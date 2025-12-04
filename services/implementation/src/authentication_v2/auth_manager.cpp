@@ -60,7 +60,8 @@ constexpr const char* NO_NEED_JOIN_LNN = "1";
 const char* DM_REJECT_KEY = "business_id_cast+_reject_event";
 const char* DM_AUTH_DIALOG_REJECT = "is_auth_dialog_reject";
 const char* DM_TIMESTAMP = "timestamp";
-
+const char* TAG_NCM_BIND_TARGET = "ncm_bind_target";
+constexpr const char* TAG_NCM_BIND_TARGET_TRUE = "1";
 int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
 {
     if (!IsNumberString(delaySecondsStr)) {
@@ -171,6 +172,11 @@ void AuthManager::RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCal
     CHECK_NULL_VOID(context_);
     context_->cleanNotifyCallback = cleanNotifyCallback;
     return;
+}
+
+void AuthManager::RegisterStopTimerAndDelDpCallback(StopTimerAndDelDpCallback stopTimerAndDelDpCallback)
+{
+    context_->stopTimerAndDelDpCallback = stopTimerAndDelDpCallback;
 }
 
 void AuthManager::SetAuthContext(std::shared_ptr<DmAuthContext> context)
@@ -476,6 +482,11 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
     }
     if (context_->authType == AUTH_TYPE_PIN_ULTRASONIC) {
         ParseUltrasonicSide(jsonObject);
+    }
+    if (context_->accesser.bundleName == BUNDLE_NAME_COLLABORATION_FWK &&
+        IsString(jsonObject, TAG_NCM_BIND_TARGET)) {
+        std::string ncmStr = jsonObject[TAG_NCM_BIND_TARGET].Get<std::string>();
+        context_->ncmBindTarget = ncmStr == TAG_NCM_BIND_TARGET_TRUE ? true : false;
     }
     ParseHmlInfoInJsonObject(jsonObject);
     ParseProxyJsonObject(jsonObject);

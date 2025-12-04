@@ -47,11 +47,17 @@ constexpr uint16_t ONBINDRESULT_MAPPING_NUM = 2;
 constexpr int32_t MS_PER_SECOND = 1000;
 constexpr int32_t US_PER_MSECOND = 1000;
 constexpr int32_t GET_SYSTEMTIME_MAX_NUM = 3;
+constexpr int32_t PIN_CODE_COUNT_MAX_NUM = 10;
 constexpr const static char* ONBINDRESULT_MAPPING_LIST[ONBINDRESULT_MAPPING_NUM] = {
     "CollaborationFwk",
     "cast_engine_service",
 };
 
+constexpr const static char* FLAG_WHITE_LIST[] = {
+    "wear_link_service",
+};
+constexpr int32_t FLAG_WHITE_LIST_NUM = std::size(FLAG_WHITE_LIST);
+const char* TAG_ONE_TIME_PIN_CODE_FLAG = "oneTimePinCodeFlag";
 const std::map<DmAuthStateType, DmAuthStatus> NEW_AND_OLD_STATE_MAPPING = {
     { DmAuthStateType::AUTH_SRC_FINISH_STATE, DmAuthStatus::STATUS_DM_AUTH_FINISH },
     { DmAuthStateType::AUTH_SINK_FINISH_STATE, DmAuthStatus::STATUS_DM_SINK_AUTH_FINISH },
@@ -126,6 +132,9 @@ DmAuthScope DmAuthState::GetAuthorizedScope(int32_t bindLevel)
 void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("SourceFinish reason:%{public}d, state:%{public}d", context->reason, context->state);
+    if (DmAuthState::IsImportAuthCodeCompatibility(context->authType)) {
+        HandlePinResultAndCallback(context, context->accesser.pkgName);
+    }
     context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
         GetOutputState(context->state), context->reason);
     context->listener->OnBindResult(context->processInfo, context->peerTargetId,
@@ -153,6 +162,22 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
 void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("SinkFinish reason:%{public}d, state:%{public}d", context->reason, context->state);
+    if (DmAuthState::IsImportAuthCodeCompatibility(context->authType)) {
+        DistributedDeviceProfile::LocalServiceInfo srvInfo;
+        JsonObject extraInfoObj;
+        bool oneTimePinCodeFlag = false;
+        if (GetServiceExtraInfo(context->accessee.pkgName, context->authType, srvInfo, extraInfoObj)) {
+            if (IsBool(extraInfoObj, TAG_ONE_TIME_PIN_CODE_FLAG)) {
+                oneTimePinCodeFlag = extraInfoObj[TAG_ONE_TIME_PIN_CODE_FLAG].Get<bool>();
+            }
+        }
+        if (oneTimePinCodeFlag) {
+            srvInfo.SetPinCode("******");
+            DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(srvInfo);
+        } else {
+            HandlePinResultAndCallback(context, context->accessee.pkgName);
+        }
+    }
     context->processInfo.pkgName = context->accessee.pkgName;
     context->listener->OnSinkBindResult(context->processInfo, context->peerTargetId,
         GetOutputReplay(context->accessee.bundleName, context->reason),
@@ -1034,6 +1059,146 @@ void DmAuthState::JoinLnn(std::shared_ptr<DmAuthContext> context)
                 context->accessee.transmitSessionKeyId, context->accessee.addr, peerUdidHash, isForceJoin);
         }
     }
+}
+
+void DmAuthState::UpdatePinErrorCount(const std::string &pkgName, int32_t pinExchangeType)
+{
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    int32_t dpRet = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        pkgName, pinExchangeType, srvInfo);
+    if (dpRet != DM_OK) {
+        LOGE("GetLocalServiceInfoByBundleNameAndPinExchangeType failed ret=%{public}d", dpRet);
+        return;
+    }
+    std::string extra = srvInfo.GetExtraInfo();
+    JsonObject extraInfoObj;
+    if (!extra.empty()) {
+        extraInfoObj.Parse(extra);
+        if (extraInfoObj.IsDiscarded()) {
+            LOGE("UpdatePinErrorCount parse extra discarded, skip update to protect original data");
+            return;
+        }
+    }
+    int32_t count = 0;
+    if (!extraInfoObj.IsDiscarded() && IsInt32(extraInfoObj, PIN_ERROR_COUNT)) {
+        count = extraInfoObj[PIN_ERROR_COUNT].Get<int32_t>();
+    }
+    extraInfoObj[PIN_ERROR_COUNT] = ++count;
+
+    srvInfo.SetExtraInfo(extraInfoObj.Dump());
+    int32_t updateRet = DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(srvInfo);
+    if (updateRet != DM_OK) {
+        LOGE("UpdatePinErrorCount UpdateLocalServiceInfo failed ret=%{public}d", updateRet);
+    }
+}
+
+void DmAuthState::HandlePinResultAndCallback(std::shared_ptr<DmAuthContext> context, const std::string &pkgName)
+{
+    int32_t count = 0;
+    uint64_t tokenId = 0;
+    DmAuthState::GetPinErrorCountAndTokenId(pkgName, context->authType, count, tokenId);
+    if (context->reason == DM_OK) {
+        if (context->stopTimerAndDelDpCallback) {
+            context->stopTimerAndDelDpCallback(pkgName, context->authType, tokenId);
+        }
+        return;
+    }
+    DmAuthState::UpdatePinErrorCount(pkgName, context->authType);
+    ++count;
+    if (count >= PIN_CODE_COUNT_MAX_NUM) {
+        if (context->stopTimerAndDelDpCallback) {
+            context->stopTimerAndDelDpCallback(pkgName, context->authType, tokenId);
+        }
+        if (context->listener != nullptr) {
+            context->listener->OnAuthCodeInvalid(pkgName);
+        }
+    }
+}
+
+void DmAuthState::GetPinErrorCountAndTokenId(const std::string &bundleName, int32_t pinExchangeType,
+    int32_t &count, uint64_t &tokenId)
+{
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    JsonObject extraInfoObj;
+    if (!GetServiceExtraInfo(bundleName, pinExchangeType, srvInfo, extraInfoObj)) {
+        LOGE("GetPinErrorCountAndTokenId: load extra info failed, use default values");
+        return;
+    }
+    if (IsInt32(extraInfoObj, PIN_ERROR_COUNT)) {
+        count = extraInfoObj[PIN_ERROR_COUNT].Get<int32_t>();
+    }
+    if (IsUint64(extraInfoObj, TAG_TOKENID)) {
+        tokenId = extraInfoObj[TAG_TOKENID].Get<uint64_t>();
+    }
+}
+
+bool DmAuthState::VerifyFlagXor(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, false);
+    if (context->ncmBindTarget && context->accesser.bundleName == BUNDLE_NAME_COLLABORATION_FWK) {
+        LOGE("ncmBindTarget not need check flag");
+        return true;
+    }
+    if (IsInFlagWhiteList(context->accesser.bundleName)) {
+        LOGE("bundleName %{public}s is in white list, not need check flag", context->accesser.bundleName.c_str());
+        return true;
+    }
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    JsonObject extraInfoObj;
+    DmAccess accessSide;
+    if (context->direction == DM_AUTH_SOURCE) {
+        accessSide = context->accesser;
+    } else {
+        accessSide = context->accessee;
+    }
+    if (!GetServiceExtraInfo(accessSide.pkgName, context->authType, srvInfo, extraInfoObj)) {
+        LOGE("VerifyFlagXor load extra failed");
+        return false;
+    }
+    bool localFlag = false;
+    bool remoteFlag = context->pinCodeFlag;
+    if (IsBool(extraInfoObj, PIN_MATCH_FLAG)) {
+        localFlag = extraInfoObj[PIN_MATCH_FLAG].Get<bool>();
+    }
+    return remoteFlag ^ localFlag;
+}
+
+bool DmAuthState::GetServiceExtraInfo(const std::string &pkgName, int32_t pinExchangeType,
+    DistributedDeviceProfile::LocalServiceInfo &srvInfo, JsonObject &extraInfoObj)
+{
+    auto dpRet = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        pkgName, pinExchangeType, srvInfo);
+    if (dpRet != DM_OK) {
+        LOGE("GetLocalServiceInfoByBundleNameAndPinExchangeType failed ret=%{public}d", dpRet);
+        return false;
+    }
+    std::string extra = srvInfo.GetExtraInfo();
+    if (extra.empty()) {
+        LOGE("extra.empty()");
+        return false;
+    }
+    extraInfoObj.Parse(extra);
+    if (extraInfoObj.IsDiscarded()) {
+        LOGE("GetServiceExtraInfo parse extra discarded");
+        return false;
+    }
+    return true;
+}
+
+bool DmAuthState::IsInFlagWhiteList(const std::string &bundleName)
+{
+    if (bundleName.empty()) {
+        LOGE("bundleName is empty");
+        return false;
+    }
+    uint16_t index = 0;
+    for (; index < FLAG_WHITE_LIST_NUM; ++index) {
+        std::string tmp = FLAG_WHITE_LIST[index];
+        if (bundleName == tmp) {
+            return true;
+        }
+    }
+    return false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

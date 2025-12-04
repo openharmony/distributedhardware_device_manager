@@ -113,7 +113,7 @@ const char* TAG_PUBLISH_STATE = "publishState";
 const char* TAG_SERVICE_TYPE = "serviceType";
 const char* TAG_SERVICE_NAME = "serviceName";
 const char* TAG_SERVICE_DISPLAY_NAME = "serviceDisplayName";
-
+const char* TAG_NCM_BIND_TARGET = "ncm_bind_target";
 constexpr const char* TAG_CUSTOM_DESCRIPTION = "CUSTOMDESC";
 
 namespace {
@@ -209,6 +209,35 @@ bool IsMessageValid(const JsonItemObject &jsonObject)
         return false;
     }
     return true;
+}
+
+bool GetPinMatchFlag(const std::string &pkgName, DmAuthType authType)
+{
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    int32_t dpRet = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        pkgName, static_cast<int32_t>(authType), srvInfo);
+    if (dpRet != DM_OK) {
+        LOGE("GetLocalServiceInfoByBundleNameAndPinExchangeType failed, pkgName=%{public}s, ret=%{public}d",
+            pkgName.c_str(), dpRet);
+        return false;
+    }
+    std::string extra = srvInfo.GetExtraInfo();
+    if (extra.empty()) {
+        LOGE("extra.empty()");
+        return false;
+    }
+    JsonObject extraObj;
+    extraObj.Parse(extra);
+    if (extraObj.IsDiscarded()) {
+        LOGE("extraObj.IsDiscarded()");
+        return false;
+    }
+    bool flag = false;
+    if (IsBool(extraObj, PIN_MATCH_FLAG)) {
+        flag = extraObj[PIN_MATCH_FLAG].Get<bool>();
+        return flag;
+    }
+    return false;
 }
 }
 
@@ -916,6 +945,7 @@ int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthCon
     if (!context->businessId.empty()) {
         jsonObject[DM_BUSINESS_ID] = context->businessId;
     }
+    jsonObject[TAG_NCM_BIND_TARGET] = context->ncmBindTarget;
     CreateProxyNegotiateMessage(context, jsonObject);
     return DM_OK;
 }
@@ -1213,6 +1243,12 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
             context->confirmOperation = static_cast<UiAction>(userConfirmOpt);
         }
     }
+    if (IsBool(jsonObject, PIN_MATCH_FLAG)) {
+        context->pinCodeFlag = jsonObject[PIN_MATCH_FLAG].Get<bool>();
+    }
+    if (IsBool(jsonObject, TAG_NCM_BIND_TARGET)) {
+        context->ncmBindTarget = jsonObject[TAG_NCM_BIND_TARGET].Get<bool>();
+    }
     ParseCert(jsonObject, context);
     ParseSyncServiceInfo(jsonObject, context);
     return DM_OK;
@@ -1463,6 +1499,9 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
     }
     if (IsString(jsonObject, DM_BUSINESS_ID)) {
         context->businessId = jsonObject[DM_BUSINESS_ID].Get<std::string>();
+    }
+    if (IsBool(jsonObject, TAG_NCM_BIND_TARGET)) {
+        context->ncmBindTarget = jsonObject[TAG_NCM_BIND_TARGET].Get<bool>();
     }
     ParseAccesserInfo(jsonObject, context);
     ParseUltrasonicSide(jsonObject, context);
@@ -2136,6 +2175,17 @@ int32_t DmAuthMessageProcessor::SetSyncMsgJson(std::shared_ptr<DmAuthContext> &c
     }
     syncMsgJson[TAG_IS_COMMON_FLAG] = context->accesser.isCommonFlag;
     syncMsgJson[TAG_DM_CERT_CHAIN] = context->accesser.cert;
+    if (DmAuthState::IsImportAuthCodeCompatibility(context->authType)) {
+        std::string queryPkgName;
+        if (context->direction == DM_AUTH_SOURCE) {
+            queryPkgName = context->accesser.pkgName;
+        } else {
+            queryPkgName = context->accessee.pkgName;
+        }
+        context->pinCodeFlag = GetPinMatchFlag(queryPkgName, context->authType);
+        syncMsgJson[PIN_MATCH_FLAG] = context->pinCodeFlag;
+        syncMsgJson[TAG_NCM_BIND_TARGET] = context->ncmBindTarget;
+    }
     if (context->isServiceBind) {
         std::string serviceInfo = GetAccesseeServiceInfo(context->accessee.serviceId);
         syncMsgJson[TAG_ACCESSEE_SERVICE_INFO] = serviceInfo;

@@ -79,7 +79,10 @@ const int32_t USLEEP_TIME_US_20000 = 20000; // 20ms
 const int32_t OPEN_AUTH_SESSION_TIMEOUT = 15000; // 15000ms
 const int32_t MAX_TRY_STOP_CNT = 5;
 const int32_t DEFAULT_SESSION_ID = -1;
-
+const int32_t METATOKEN_PINCODE_LENGTH = 14;
+const int32_t METATOKEN_LENGTH = 8;
+constexpr const char* BIND_TARGET_PIN_TIMEOUT_TASK = "devicemanagerTimer:authpininfo";
+constexpr int32_t BIND_TARGET_PIN_TIMEOUT = 600;
 const std::map<std::string, std::string> BUNDLENAME_MAPPING = {
     { "wear_link_service", "watch_system_service" }
 };
@@ -257,11 +260,16 @@ int32_t DeviceManagerServiceImpl::InitNewProtocolAuthMgr(bool isSrcSide, uint64_
         authMgr = std::make_shared<AuthSinkManager>(softbusConnector_, hiChainConnector_,
             listener_, hiChainAuthConnector_);
     }
+    StopTimerAndDelDpCallback stopTimerAndDelDpCallback = [=](const std::string &pkgName, int32_t pinExchangeType,
+        uint64_t tokenId) {
+        this->StopAuthInfoTimerAndDeleteDP(pkgName, pinExchangeType, tokenId);
+    };
     CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime) {
         this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime);
     };
     // Register resource destruction notification function
     authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
+    authMgr->RegisterStopTimerAndDelDpCallback(stopTimerAndDelDpCallback);
     CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
     hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authMgr);
     LOGI("Initialize authMgr token: %{public}" PRId64 ".", tokenId);
@@ -748,10 +756,15 @@ void DeviceManagerServiceImpl::CreateGlobalClassicalAuthMgr()
     // Create old auth_mar, only create an independent one
     authMgr_ = std::make_shared<DmAuthManager>(softbusConnector_, hiChainConnector_, listener_,
         hiChainAuthConnector_);
+    StopTimerAndDelDpCallback stopTimerAndDelDpCallback = [=](const std::string &pkgName, int32_t pinExchangeType,
+        uint64_t tokenId) {
+        this->StopAuthInfoTimerAndDeleteDP(pkgName, pinExchangeType, tokenId);
+    };
     CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime) {
         this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime);
     };
     authMgr_->RegisterCleanNotifyCallback(cleanNotifyCallback);
+    authMgr_->RegisterStopTimerAndDelDpCallback(stopTimerAndDelDpCallback);
     softbusConnector_->RegisterConnectorCallback(authMgr_);
     softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authMgr_);
     hiChainConnector_->RegisterHiChainCallback(authMgr_);
@@ -3440,6 +3453,163 @@ int32_t DeviceManagerServiceImpl::LeaveLNN(const std::string &pkgName, const std
 {
     CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
     return softbusConnector_->LeaveLNN(pkgName, networkId);
+}
+
+int32_t DeviceManagerServiceImpl::UpdateLocalServiceInfoToDp(const DmAuthInfo &dmAuthInfo,
+    const DistributedDeviceProfile::LocalServiceInfo &dpServiceInfo)
+{
+    int32_t result = DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(dpServiceInfo);
+    if (result != DM_OK) {
+        LOGE("UpdateLocalServiceInfo failed %{public}d .", result);
+        return result;
+    }
+    ImportAuthCode(dmAuthInfo.pinConsumerPkgName, dmAuthInfo.pinCode);
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
+{
+    int32_t errorCount = 0;
+    uint64_t tokenId = IPCSkeleton::GetCallingTokenID();
+    bool pinMatchFlag = GetPinMatchFlag(tokenId, dmAuthInfo);
+    DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfoOld;
+    DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfoNew;
+    InitDpServiceInfo(dmAuthInfo, dpLocalServiceInfoNew, pinMatchFlag, tokenId, errorCount);
+    int32_t ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        dmAuthInfo.pinConsumerPkgName, static_cast<int32_t>(dmAuthInfo.pinExchangeType), dpLocalServiceInfoOld);
+    if (ret != DM_OK) {
+        LOGE("GetLocalServiceInfoByBundleNameAndPinExchangeType failed");
+        int32_t result = DeviceProfileConnector::GetInstance().PutLocalServiceInfo(dpLocalServiceInfoNew);
+        if (result != DM_OK) {
+            LOGE("PutLocalServiceInfo failed %{public}d .", result);
+            return result;
+        }
+        ImportAuthCode(dmAuthInfo.pinConsumerPkgName, dmAuthInfo.pinCode);
+        return DM_OK;
+    }
+    if (dmAuthInfo.pinExchangeType != DMLocalServiceInfoPinExchangeType::FROMDP &&
+        dmAuthInfo.pinExchangeType != DMLocalServiceInfoPinExchangeType::IMPORT_AUTH_CODE) {
+        return UpdateLocalServiceInfoToDp(dmAuthInfo, dpLocalServiceInfoNew);
+    }
+    bool pinChanged = (dpLocalServiceInfoOld.GetPinCode() != std::string(dmAuthInfo.pinCode));
+    if (pinChanged) {
+        return UpdateLocalServiceInfoToDp(dmAuthInfo, dpLocalServiceInfoNew);
+    }
+    std::string oldExtra = dpLocalServiceInfoOld.GetExtraInfo();
+    if (oldExtra.empty()) {
+        return UpdateLocalServiceInfoToDp(dmAuthInfo, dpLocalServiceInfoNew);
+    }
+    JsonObject mergedExtra(oldExtra);
+    if (mergedExtra.IsDiscarded()) {
+        return UpdateLocalServiceInfoToDp(dmAuthInfo, dpLocalServiceInfoNew);
+    }
+    if (IsInt32(mergedExtra, PIN_ERROR_COUNT)) {
+        errorCount = mergedExtra[PIN_ERROR_COUNT].Get<int32_t>();
+    }
+    InitDpServiceInfo(dmAuthInfo, dpLocalServiceInfoNew, pinMatchFlag, tokenId, errorCount);
+    return UpdateLocalServiceInfoToDp(dmAuthInfo, dpLocalServiceInfoNew);
+}
+
+bool DeviceManagerServiceImpl::GetPinMatchFlag(uint64_t tokenId, const DmAuthInfo &dmAuthInfo)
+{
+    std::string key = std::to_string(tokenId) + "_" + dmAuthInfo.pinConsumerPkgName
+        + "_" + std::to_string(static_cast<int32_t>(dmAuthInfo.pinExchangeType));
+    {
+        std::lock_guard<std::mutex> lock(tokenIdPinCodeMapLock_);
+        auto it = tokenIdPinCodeMap_.find(key);
+        if (it == tokenIdPinCodeMap_.end()) {
+            return false;
+        }
+        if (!std::string(dmAuthInfo.metaToken).empty()) {
+            auto pinLen = std::string(dmAuthInfo.pinCode).length();
+            if (pinLen != METATOKEN_PINCODE_LENGTH) {
+                return false;
+            }
+            return std::string(it->second.pinCode) == std::string(dmAuthInfo.pinCode).substr(METATOKEN_LENGTH);
+        }
+        return strcmp(it->second.pinCode, dmAuthInfo.pinCode) == 0;
+    }
+}
+
+void DeviceManagerServiceImpl::InitDpServiceInfo(const DmAuthInfo &dmAuthInfo,
+    DistributedDeviceProfile::LocalServiceInfo &dpServiceInfo, bool pinMatchFlag, uint64_t tokenId, int32_t errorCount)
+{
+    dpServiceInfo.SetBundleName(dmAuthInfo.pinConsumerPkgName);
+    dpServiceInfo.SetAuthBoxType(static_cast<int32_t>(dmAuthInfo.authBoxType));
+    dpServiceInfo.SetAuthType(static_cast<int32_t>(dmAuthInfo.authType));
+    dpServiceInfo.SetPinExchangeType(static_cast<int32_t>(dmAuthInfo.pinExchangeType));
+    dpServiceInfo.SetPinCode(dmAuthInfo.pinCode);
+    dpServiceInfo.SetDescription(dmAuthInfo.description);
+    JsonObject extraInfoObj;
+    if (!dmAuthInfo.extraInfo.empty()) {
+        extraInfoObj.Parse(dmAuthInfo.extraInfo);
+        if (extraInfoObj.IsDiscarded()) {
+            LOGI("extraInfo is empty or invalid, create new extraInfo");
+            return;
+        }
+    }
+    extraInfoObj[TAG_PIN_USER_ID] = dmAuthInfo.userId;
+    extraInfoObj[PIN_CONSUMER_TOKENID] = dmAuthInfo.pinConsumerTokenId;
+    extraInfoObj[BIZ_SRC_PKGNAME] = dmAuthInfo.bizSrcPkgName;
+    extraInfoObj[BIZ_SINK_PKGNAME] = dmAuthInfo.bizSinkPkgName;
+    extraInfoObj[META_TOKEN] = dmAuthInfo.metaToken;
+    extraInfoObj[PIN_MATCH_FLAG] = pinMatchFlag;
+    extraInfoObj[PIN_ERROR_COUNT] = errorCount;
+    extraInfoObj[TAG_TOKENID] = tokenId;
+    dpServiceInfo.SetExtraInfo(extraInfoObj.Dump());
+}
+
+int32_t DeviceManagerServiceImpl::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength)
+{
+    uint64_t tokenId = IPCSkeleton::GetCallingTokenID();
+    std::string pinCode = GeneratePinCode(pinLength);
+    int32_t length = static_cast<int32_t>(pinCode.length());
+    for (int32_t i = 0; i < length; i++) {
+        if (!isdigit(pinCode[i])) {
+            LOGE("ImportAuthCode error: Invalid para, authCode format error.");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+    }
+    if (strncpy_s(dmAuthInfo.pinCode, DM_MAX_PIN_CODE_LEN, pinCode.c_str(), pinCode.length()) != 0) {
+        return ERR_DM_FAILED;
+    }
+    {
+        std::lock_guard<std::mutex> lock(tokenIdPinCodeMapLock_);
+        std::string key = std::to_string(tokenId) + "_" + dmAuthInfo.pinConsumerPkgName + "_" +
+            std::to_string(static_cast<int32_t>(dmAuthInfo.pinExchangeType));
+        tokenIdPinCodeMap_[key] = dmAuthInfo;
+    }
+    StartAuthInfoTimer(dmAuthInfo, tokenId);
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl::StartAuthInfoTimer(const DmAuthInfo &dmAuthInfo, uint64_t tokenId)
+{
+    if (timer_ == nullptr) {
+        timer_ = std::make_shared<DmTimer>();
+    }
+    std::string taskName = std::string(BIND_TARGET_PIN_TIMEOUT_TASK) + dmAuthInfo.pinConsumerPkgName +
+        std::to_string(static_cast<int32_t>(dmAuthInfo.pinExchangeType));
+    timer_->DeleteTimer(taskName);
+    timer_->StartTimer(taskName, BIND_TARGET_PIN_TIMEOUT, [this, dmAuthInfo](std::string name) {
+        DeviceManagerServiceImpl::StopAuthInfoTimerAndDeleteDP(dmAuthInfo.pinConsumerPkgName,
+            static_cast<int32_t>(dmAuthInfo.pinExchangeType), dmAuthInfo.pinConsumerTokenId);
+            listener_->OnAuthCodeInvalid(dmAuthInfo.pinConsumerPkgName);
+    });
+}
+void DeviceManagerServiceImpl::StopAuthInfoTimerAndDeleteDP(const std::string &pkgName, int32_t pinExchangeType,
+    uint64_t tokenId)
+{
+    if (timer_ != nullptr) {
+        std::string taskName = std::string(BIND_TARGET_PIN_TIMEOUT_TASK) + pkgName + std::to_string(pinExchangeType);
+        timer_->DeleteTimer(taskName);
+    }
+    DeviceProfileConnector::GetInstance().DeleteLocalServiceInfo(pkgName, pinExchangeType);
+    {
+        std::lock_guard<std::mutex> lock(tokenIdPinCodeMapLock_);
+        std::string key = std::to_string(tokenId) + "_" + pkgName + "_" + std::to_string(pinExchangeType);
+        tokenIdPinCodeMap_.erase(key);
+    }
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

@@ -42,7 +42,7 @@ class DmAuthStateMachine;
 class DmAuthMessageProcessor;
 
 using CleanNotifyCallback = std::function<void(uint64_t, int32_t)>;
-
+using StopTimerAndDelDpCallback = std::function<void(const std::string&, int32_t, uint64_t)>;
 // PIN Code Authentication Type
 enum DmAuthType : int32_t {
     AUTH_TYPE_CRE = 0,
@@ -305,10 +305,13 @@ struct DmAuthContext {
     bool needBind{true};
     bool needAgreeCredential{true};
     bool needAuth{true};
+    bool pinCodeFlag{false};
+    bool ncmBindTarget{false};
     ffrt::mutex certMtx_; // cert lock
     ffrt::mutex certCVMtx_; // cert cv lock
     ffrt::condition_variable certCV_; // cert cv
     CleanNotifyCallback cleanNotifyCallback{nullptr};
+    StopTimerAndDelDpCallback stopTimerAndDelDpCallback{nullptr};
 
     std::string GetDeviceId(DmAuthSide side);
     int32_t GetUserId(DmAuthSide side);

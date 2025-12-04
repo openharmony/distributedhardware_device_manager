@@ -1278,5 +1278,30 @@ void DeviceManagerServiceListener::SetNeedNotifyProcessInfos(const ProcessInfo &
     procInfoVec.push_back(bindProcessInfo);
     return;
 }
+
+void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName)
+{
+    LOGI("OnAuthCodeInvalid : %{public}s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("OnAuthCodeInvalid: pkgName is empty, skip IPC request");
+        return;
+    }
+    std::shared_ptr<IpcReq> pReq = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
+    ProcessInfo processInfoTemp;
+    for (const auto &item : processInfos) {
+        if (item.pkgName == pkgName) {
+            processInfoTemp = item;
+        }
+    }
+    if (processInfoTemp.pkgName.empty()) {
+        LOGI("not register listener");
+        return;
+    }
+    pReq->SetPkgName(processInfoTemp.pkgName);
+    pReq->SetProcessInfo(processInfoTemp);
+    ipcServerListener_.SendRequest(ON_AUTH_CODE_INVALID, pReq, pRsp);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

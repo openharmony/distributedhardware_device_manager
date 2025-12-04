@@ -212,6 +212,8 @@ public:
     void InitTaskOfDelTimeOutAcl(const std::string &deviceUdid, const std::string &deviceUdidHash, int32_t userId);
     void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList);
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
+    int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo);
+    int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
@@ -315,7 +317,17 @@ private:
     int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller, std::string &udid,
         int32_t &bindLevel);
     void DeleteGroupByBundleName(const std::string &localUdid, int32_t userId, const std::vector<DmAclIdParam> &acls);
+    void StartAuthInfoTimer(const DmAuthInfo &dmAuthInfo, uint64_t tokenId);
+    void StopAuthInfoTimerAndDeleteDP(const std::string &pkgName, int32_t pinExchangeType, uint64_t tokenId);
+    void InitDpServiceInfo(const DmAuthInfo &dmAuthInfo, DistributedDeviceProfile::LocalServiceInfo &dpServiceInfo,
+        bool pinMatchFlag, uint64_t tokenId, int32_t errorCount);
+    bool GetPinMatchFlag(uint64_t tokenId, const DmAuthInfo &dmAuthInfo);
+    int32_t UpdateLocalServiceInfoToDp(const DmAuthInfo &dmAuthInfo,
+        const DistributedDeviceProfile::LocalServiceInfo &dpServiceInfo);
 private:
+    std::shared_ptr<DmTimer> timer_;
+    std::map<std::string, DmAuthInfo> tokenIdPinCodeMap_;
+    std::mutex tokenIdPinCodeMapLock_;
     ffrt::mutex dmServiceImplInitMutex_;
     ffrt::mutex authMgrMtx_;
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only

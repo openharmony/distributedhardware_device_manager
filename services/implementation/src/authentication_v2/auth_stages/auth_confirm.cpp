@@ -45,6 +45,7 @@ constexpr const char* TAG_LOCAL_DEVICE_TYPE = "LOCALDEVICETYPE";
 constexpr const char* TAG_REQUESTER = "REQUESTER";
 constexpr const char* UNVALID_CREDTID = "invalidCredId";
 constexpr const char* TAG_IS_SUPPORT_ULTRASONIC = "isSupportUltrasonic";
+constexpr const char* PACKAGE_NAME_COLLABORATION_FWK = "hmos.collaborationfwk.deviceDetect";
 // authType fallback table
 using FallBackKey = std::pair<std::string, DmAuthType>; // accessee.bundleName, authType
 static std::map<FallBackKey, DmAuthType> g_pinAuthTypeFallBackMap = {
@@ -1028,6 +1029,23 @@ void AuthSinkConfirmState::MatchFallBackCandidateList(
     }
 }
 
+bool AuthSinkConfirmState::ExtractPinConsumerTokenId(const std::string &srvExtraInfo, uint64_t &tokenId)
+{
+    tokenId = 0;
+    if (srvExtraInfo.empty() ||
+        srvExtraInfo.find(PIN_CONSUMER_TOKENID) == std::string::npos) {
+        LOGE("pinConsumerTokenId field invalid");
+        return false;
+    }
+    JsonObject extraInfoObj(srvExtraInfo);
+    if (extraInfoObj.IsDiscarded() || !IsUint64(extraInfoObj, PIN_CONSUMER_TOKENID)) {
+        LOGE("pinConsumerTokenId field invalid or parse failed");
+        return false;
+    }
+    tokenId = extraInfoObj[PIN_CONSUMER_TOKENID].Get<uint64_t>();
+    return true;
+}
+
 void AuthSinkConfirmState::ReadServiceInfo(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_VOID(context);
@@ -1036,35 +1054,11 @@ void AuthSinkConfirmState::ReadServiceInfo(std::shared_ptr<DmAuthContext> contex
     auto ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
         context->accessee.pkgName, context->authType, srvInfo);
     if (ret == OHOS::DistributedDeviceProfile::DP_SUCCESS) {
-        LOGI("AuthSinkConfirmState::ReadServiceInfo found");
-        // ServiceInfo found
-        context->serviceInfoFound = true;
-        // read authBoxType
-        context->authBoxType = static_cast<DMLocalServiceInfoAuthBoxType>(srvInfo.GetAuthBoxType());
-        if (DmAuthState::IsImportAuthCodeCompatibility(context->authType)) {
-            std::string pinCode = srvInfo.GetPinCode(); // read pincode
-            if (AuthSinkStatePinAuthComm::IsPinCodeValid(pinCode)) {
-                context->pinCode = pinCode;
-            }
-            srvInfo.SetPinCode("******");
-            DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(srvInfo);
-        }
-        if (context->authBoxType == DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) { // no authorization box
-            int32_t confirmOperation = srvInfo.GetAuthType(); // read confirmOperation
-            if (confirmOperation == static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ONETIME)) {
-                context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH;
-            } else if (confirmOperation == static_cast<int32_t>(DMLocalServiceInfoAuthType::CANCEL)) {
-                context->confirmOperation = UiAction::USER_OPERATION_TYPE_CANCEL_AUTH;
-            } else if (confirmOperation == static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ALWAYS)) {
-                context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-            } else {
-                context->confirmOperation = UiAction::USER_OPERATION_TYPE_CANCEL_AUTH;
-            }
-        }
-        context->customData = srvInfo.GetDescription(); // read customData
-        context->srvExtarInfo = srvInfo.GetExtraInfo();
+        ProcessImportAuthInfo(context, srvInfo);
     } else if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) &&
-        AuthSinkStatePinAuthComm::IsAuthCodeReady(context)) {
+        AuthSinkStatePinAuthComm::IsAuthCodeReady(context) &&
+        context->importPkgName == PACKAGE_NAME_COLLABORATION_FWK &&
+        context->accesser.bundleName == BUNDLE_NAME_COLLABORATION_FWK) {
         // only special scenarios can import pincode
         context->authBoxType = DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM; // no authorization box
     } else {
@@ -1072,6 +1066,41 @@ void AuthSinkConfirmState::ReadServiceInfo(std::shared_ptr<DmAuthContext> contex
         context->confirmOperation = UiAction::USER_OPERATION_TYPE_CANCEL_AUTH;
         context->authBoxType = DMLocalServiceInfoAuthBoxType::STATE3; // default: tristate box
     }
+}
+
+void AuthSinkConfirmState::ProcessImportAuthInfo(std::shared_ptr<DmAuthContext> context,
+    const OHOS::DistributedDeviceProfile::LocalServiceInfo &srvInfo)
+{
+    CHECK_NULL_VOID(context);
+    LOGI("AuthSinkConfirmState::ReadServiceInfo found");
+    // ServiceInfo found
+    context->serviceInfoFound = true;
+    // read authBoxType
+    context->authBoxType = static_cast<DMLocalServiceInfoAuthBoxType>(srvInfo.GetAuthBoxType());
+    std::string srvExtraInfo = srvInfo.GetExtraInfo();
+    uint64_t pinConsumerTokenId = 0;
+    bool hasTokenId = ExtractPinConsumerTokenId(srvExtraInfo, pinConsumerTokenId);
+    if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) && hasTokenId &&
+            pinConsumerTokenId == static_cast<uint64_t>(context->accessee.tokenId)) {
+        std::string pinCode = srvInfo.GetPinCode(); // read pincode
+        if (AuthSinkStatePinAuthComm::IsPinCodeValid(pinCode)) {
+            context->pinCode = pinCode;
+        }
+    }
+    if (context->authBoxType == DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) { // no authorization box
+        int32_t confirmOperation = srvInfo.GetAuthType(); // read confirmOperation
+        if (confirmOperation == static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ONETIME)) {
+            context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH;
+        } else if (confirmOperation == static_cast<int32_t>(DMLocalServiceInfoAuthType::CANCEL)) {
+            context->confirmOperation = UiAction::USER_OPERATION_TYPE_CANCEL_AUTH;
+        } else if (confirmOperation == static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ALWAYS)) {
+            context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
+        } else {
+            context->confirmOperation = UiAction::USER_OPERATION_TYPE_CANCEL_AUTH;
+        }
+    }
+    context->customData = srvInfo.GetDescription(); // read customData
+    context->srvExtarInfo = srvInfo.GetExtraInfo();
 }
 
 int32_t AuthSinkConfirmState::Action(std::shared_ptr<DmAuthContext> context)

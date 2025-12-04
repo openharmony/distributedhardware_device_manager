@@ -119,6 +119,7 @@ public:
 
     // Internal API end
     void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
+    void RegisterStopTimerAndDelDpCallback(StopTimerAndDelDpCallback stopTimerAndDelDpCallback);
     void ClearSoftbusSessionCallback();
     void PrepareSoftbusSessionCallback();
     void DeleteTimer();

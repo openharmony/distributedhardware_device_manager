@@ -956,6 +956,38 @@ ON_IPC_CMD(EXPORT_AUTH_CODE, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
+ON_IPC_CMD(IMPORT_AUTH_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    DmAuthInfo authInfo;
+    if (!IpcModelCodec::DecodeDmAuthInfo(data, authInfo)) {
+        reply.WriteInt32(ERR_DM_IPC_WRITE_FAILED);
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(authInfo);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(EXPORT_AUTH_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    DmAuthInfo authInfo;
+    IpcModelCodec::DecodeDmAuthInfo(data, authInfo);
+    uint32_t pinLength = data.ReadUint32();
+    int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(authInfo, pinLength);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (result == DM_OK && !IpcModelCodec::EncodeDmAuthInfo(authInfo, reply)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(REGISTER_DISCOVERY_CALLBACK, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
@@ -2280,6 +2312,25 @@ ON_IPC_CMD(GET_AUTHTYPE_BY_UDIDHASH, MessageParcel &data, MessageParcel &reply)
     if (!reply.WriteInt32(static_cast<int32_t>(authType))) {
         return ERR_DM_IPC_WRITE_FAILED;
     }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(ON_AUTH_CODE_INVALID, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(ON_AUTH_CODE_INVALID, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 } // namespace DistributedHardware

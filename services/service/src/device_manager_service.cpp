@@ -100,6 +100,9 @@ namespace {
     const int32_t SEND_DELAY_MIN_TIME = 0;
     const int32_t DELAY_TIME_SEC_CONVERSION = 1000000;      // 1000*1000
     const int32_t RANDOM_OFF_SET = 8;
+    constexpr int32_t DM_MIN_PINCODE_SIZE = 6;
+    constexpr int32_t DM_MAX_PINCODE_SIZE = 1024;
+    constexpr int32_t DM_PARAM_STRING_LENGTH_MAX = 1024;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
     const std::string GET_LOCAL_DEVICE_NAME_API_NAME = "GetLocalDeviceName";
 #endif
@@ -1592,6 +1595,126 @@ int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
     }
     return dmServiceImpl_->ExportAuthCode(authCode);
 }
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+bool DeviceManagerService::IsExportAuthInfoValid(const DmAuthInfo &dmAuthInfo)
+{
+    std::vector<int32_t> UserIds;
+    int32_t ret = MultipleUserConnector::GetForegroundUserIds(UserIds);
+    if (ret != DM_OK) {
+        LOGE("Get foreground userids failed, ret: %{public}d", ret);
+        return false;
+    }
+    if (std::find(UserIds.begin(), UserIds.end(), dmAuthInfo.userId) == UserIds.end()) {
+        LOGE("userId %{public}d not found in foreground list", dmAuthInfo.userId);
+        return false;
+    }
+    if (dmAuthInfo.pinConsumerPkgName.empty() ||
+        dmAuthInfo.pinConsumerPkgName.length() > DM_PARAM_STRING_LENGTH_MAX) {
+        LOGE("Invalid pkgName.");
+        return false;
+    }
+    if (dmAuthInfo.bizSrcPkgName.length() > DM_PARAM_STRING_LENGTH_MAX ||
+        dmAuthInfo.bizSinkPkgName.length() > DM_PARAM_STRING_LENGTH_MAX) {
+        LOGE("bizSrcPkgName or bizSinkPkgName invalid.");
+        return false;
+    }
+    return true;
+}
+
+bool DeviceManagerService::IsImportAuthInfoValid(const DmAuthInfo &dmAuthInfo)
+{
+    if (!IsExportAuthInfoValid(dmAuthInfo)) {
+        return false;
+    }
+    if (std::string(dmAuthInfo.pinCode).length() < DM_MIN_PINCODE_SIZE ||
+        std::string(dmAuthInfo.pinCode).length() > DM_MAX_PINCODE_SIZE) {
+        LOGE("Invalid pinCode, len: %{public}zu.", std::string(dmAuthInfo.pinCode).length());
+        return false;
+    }
+    if (std::string(dmAuthInfo.metaToken).length() > DM_PARAM_STRING_LENGTH_MAX) {
+        LOGE("Invalid metaToken.");
+        return false;
+    }
+    if (dmAuthInfo.authType != DMLocalServiceInfoAuthType::TRUST_ONETIME &&
+        dmAuthInfo.authType != DMLocalServiceInfoAuthType::TRUST_ALWAYS) {
+        LOGE("Invalid authType.");
+        return false;
+    }
+    if (dmAuthInfo.authBoxType < DMLocalServiceInfoAuthBoxType::STATE3 ||
+        dmAuthInfo.authBoxType > DMLocalServiceInfoAuthBoxType::TWO_IN1) {
+        LOGE("Invalid authBoxType.");
+        return false;
+    }
+    if (dmAuthInfo.pinExchangeType < DMLocalServiceInfoPinExchangeType::PINBOX ||
+        dmAuthInfo.pinExchangeType > DMLocalServiceInfoPinExchangeType::ULTRASOUND) {
+        LOGE("Invalid pinExchangeType.");
+        return false;
+    }
+    if (dmAuthInfo.description.length() > DM_PARAM_STRING_LENGTH_MAX) {
+        LOGE("Invalid description.");
+        return false;
+    }
+    return true;
+}
+
+int32_t DeviceManagerService::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
+{
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller: %{public}s does not have permission to call ImportAuthCode.",
+            dmAuthInfo.pinConsumerPkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %{public}s.", dmAuthInfo.pinConsumerPkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsImportAuthInfoValid(dmAuthInfo)) {
+        LOGE("error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("ImportAuthCode failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->ImportAuthInfo(dmAuthInfo);
+}
+
+int32_t DeviceManagerService::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength)
+{
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission to call ExportAuthCode.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, processName: %{public}s.", processName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsExportAuthInfoValid(dmAuthInfo)) {
+        LOGE("error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (pinLength < DM_MIN_PINCODE_SIZE || pinLength > DM_MAX_PINCODE_SIZE) {
+        LOGE("pinLength error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->ExportAuthInfo(dmAuthInfo, pinLength);
+}
+#endif
 
 void DeviceManagerService::UnloadDMServiceImplSo()
 {

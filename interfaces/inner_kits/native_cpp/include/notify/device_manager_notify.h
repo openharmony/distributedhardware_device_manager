@@ -96,7 +96,8 @@ public:
     void RegisterServicePublishCallback(int64_t serviceId, std::shared_ptr<ServicePublishCallback> callback);
     void UnRegisterServicePublishCallback(int64_t serviceId);
     void RegisterLeaveLnnCallback(const std::string &networkId, std::shared_ptr<LeaveLNNCallback> callback);
-
+    void RegisterAuthCodeInvalidCallback(const std::string &pkgName, std::shared_ptr<AuthCodeInvalidCallback> cb);
+    void UnRegisterAuthCodeInvalidCallback(const std::string &pkgName);
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
     static void DeviceInfoOffline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -114,6 +115,7 @@ public:
         std::shared_ptr<DevTrustChangeCallback> tempCbk);
     static void ServiceInfoOnline(
         std::vector<std::pair<std::shared_ptr<ServiceInfoStateCallback>, int64_t>> callbackInfo);
+    static void AuthCodeInvalid(std::shared_ptr<AuthCodeInvalidCallback> tempCbk);
 public:
     void OnRemoteDied();
     void OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
@@ -155,6 +157,7 @@ public:
     void OnServiceOnline(const std::vector<int64_t> &serviceIds);
     void OnServicePublishResult(int64_t serviceId, int32_t publishResult);
     void OnLeaveLNNResult(const std::string &networkId, int32_t retCode);
+    void OnAuthCodeInvalid(const std::string &pkgName);
 
 private:
 #if !defined(__LITEOS_M__)
@@ -186,6 +189,7 @@ private:
     std::map<std::string, std::shared_ptr<ServiceInfoStateCallback>> serviceStateCallback_;
     std::map<int64_t, std::shared_ptr<ServicePublishCallback>> servicePublishCallback_;
     std::map<std::string, std::shared_ptr<LeaveLNNCallback>> leaveLnnCallback_;
+    std::map<std::string, std::shared_ptr<AuthCodeInvalidCallback>> authCodeInvalidCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

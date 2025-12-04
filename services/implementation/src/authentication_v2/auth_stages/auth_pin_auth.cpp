@@ -140,6 +140,14 @@ DmAuthStateType AuthSrcPinAuthStartState::GetStateType()
 int32_t AuthSrcPinAuthStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcPinAuthStartState::Action start");
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (DmAuthState::IsImportAuthCodeCompatibility(context->authType)) {
+        int32_t ret = ProcessImportAuthInfo(context);
+        if (ret != DM_OK) {
+            LOGE("AuthSrcPinAuthStartState::ProcessImportAuthInfo failed, ret: %{public}d", ret);
+            return ret;
+        }
+    }
     // auth pincode
     auto ret = context->hiChainAuthConnector->AuthCredentialPinCode(context->accesser.userId, context->requestId,
         context->pinCode);
@@ -159,6 +167,37 @@ int32_t AuthSrcPinAuthStartState::Action(std::shared_ptr<DmAuthContext> context)
     }
 
     return STOP_BIND;
+}
+
+int32_t AuthSrcPinAuthStartState::ProcessImportAuthInfo(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if ((context->ncmBindTarget && context->accesser.bundleName == BUNDLE_NAME_COLLABORATION_FWK) ||
+        IsInFlagWhiteList(context->accesser.bundleName)) {
+        LOGI("bundleName: %{public}s in white list, pin code from rom", context->accesser.bundleName.c_str());
+        return DM_OK;
+    }
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    int32_t dpRet = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        context->accesser.pkgName, context->authType, srvInfo);
+    if (dpRet != DM_OK) {
+        LOGE("AuthSrcPinAuthStartState DP query failed ret=%{public}d", dpRet);
+        return ERR_DM_FAILED;
+    }
+    std::string dpPin = srvInfo.GetPinCode();
+    if (dpPin.empty()) {
+        LOGE("AuthSrcPinAuthStartState dp pin is empty");
+        return ERR_DM_FAILED;
+    }
+    for (size_t i = 0; i < dpPin.length(); i++) {
+        if (!isdigit(dpPin[i])) {
+            LOGE("ImportAuthCode error: Invalid para, authCode format error.");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+    }
+    context->pinCode = dpPin;
+    LOGI("AuthSrcPinAuthStartState pincodeimport from DP");
+    return DM_OK;
 }
 
 DmAuthStateType AuthSinkPinAuthStartState::GetStateType()

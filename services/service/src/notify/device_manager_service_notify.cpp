@@ -28,14 +28,16 @@ const static std::map<DmCommonNotifyEvent, DmCommonNotifyEvent> unRegNotifyEvent
     {DmCommonNotifyEvent::UN_REG_DEVICE_STATE, DmCommonNotifyEvent::REG_DEVICE_STATE},
     {DmCommonNotifyEvent::UN_REG_DEVICE_SCREEN_STATE, DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE},
     {DmCommonNotifyEvent::UN_REG_REMOTE_DEVICE_TRUST_CHANGE, DmCommonNotifyEvent::REG_REMOTE_DEVICE_TRUST_CHANGE},
-    {DmCommonNotifyEvent::UN_REG_CREDENTIAL_AUTH_STATUS_NOTIFY, DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY}
+    {DmCommonNotifyEvent::UN_REG_CREDENTIAL_AUTH_STATUS_NOTIFY, DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY},
+    {DmCommonNotifyEvent::UN_REG_AUTH_CODE_INVALID, DmCommonNotifyEvent::REG_AUTH_CODE_INVALID}
 };
 
 const static std::set<DmCommonNotifyEvent> regNotifyEventSet_ = {
     DmCommonNotifyEvent::REG_DEVICE_STATE,
     DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE,
     DmCommonNotifyEvent::REG_REMOTE_DEVICE_TRUST_CHANGE,
-    DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY
+    DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY,
+    DmCommonNotifyEvent::REG_AUTH_CODE_INVALID,
 };
 }
 

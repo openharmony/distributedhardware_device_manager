@@ -634,5 +634,66 @@ bool IpcModelCodec::DecodePublishServiceParam(MessageParcel &parcel, PublishServ
     publishServiceParam.freq = static_cast<DmExchangeFreq>(freq);
     return true;
 }
+
+bool IpcModelCodec::EncodeDmAuthInfo(const DmAuthInfo &dmAuthInfo, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteInt32(dmAuthInfo.userId));
+    bRet = (bRet && parcel.WriteUint64(dmAuthInfo.pinConsumerTokenId));
+    bRet = (bRet && parcel.WriteString(dmAuthInfo.pinConsumerPkgName));
+    bRet = (bRet && parcel.WriteString(dmAuthInfo.bizSrcPkgName));
+    bRet = (bRet && parcel.WriteString(dmAuthInfo.bizSinkPkgName));
+    std::string pinCodeStr(dmAuthInfo.pinCode);
+    bRet = (bRet && parcel.WriteString(pinCodeStr));
+    std::string metaTokenStr(dmAuthInfo.metaToken);
+    bRet = (bRet && parcel.WriteString(metaTokenStr));
+    bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(dmAuthInfo.authType)));
+    bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(dmAuthInfo.authBoxType)));
+    bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(dmAuthInfo.pinExchangeType)));
+    bRet = (bRet && parcel.WriteString(dmAuthInfo.description));
+    bRet = (bRet && parcel.WriteString(dmAuthInfo.extraInfo));
+    return bRet;
+}
+
+bool IpcModelCodec::DecodeDmAuthInfo(MessageParcel &parcel, DmAuthInfo &dmAuthInfo)
+{
+    READ_HELPER_RET(parcel, Int32, dmAuthInfo.userId, false);
+    READ_HELPER_RET(parcel, Uint64, dmAuthInfo.pinConsumerTokenId, false);
+    READ_HELPER_RET(parcel, String, dmAuthInfo.pinConsumerPkgName, false);
+    READ_HELPER_RET(parcel, String, dmAuthInfo.bizSrcPkgName, false);
+    READ_HELPER_RET(parcel, String, dmAuthInfo.bizSinkPkgName, false);
+    std::string pinCodeStr = parcel.ReadString();
+    if (pinCodeStr.size() >= DM_MAX_PIN_CODE_LEN) {
+        LOGE("pinCode length invalid: %{public}zu >= %{public}d", pinCodeStr.size(), DM_MAX_PIN_CODE_LEN);
+        return false;
+    }
+    if (strcpy_s(dmAuthInfo.pinCode, pinCodeStr.size() + 1, pinCodeStr.c_str()) != DM_OK) {
+        LOGE("strcpy_s pinCode failed!");
+        return false;
+    }
+    std::string metaTokenStr = parcel.ReadString();
+    if (metaTokenStr.size() >= DM_MAX_META_TOKEN_LEN) {
+        LOGE("metaToken length invalid: %{public}zu >= %{public}d", metaTokenStr.size(), DM_MAX_META_TOKEN_LEN);
+        return false;
+    }
+    if (strcpy_s(dmAuthInfo.metaToken, metaTokenStr.size() + 1, metaTokenStr.c_str()) != DM_OK) {
+        LOGE("strcpy_s metaToken failed!");
+        return false;
+    }
+    int32_t authType = static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ONETIME);
+    READ_HELPER_RET(parcel, Int32, authType, false);
+    dmAuthInfo.authType = static_cast<DMLocalServiceInfoAuthType>(authType);
+
+    int32_t authBoxType = static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::STATE3);
+    READ_HELPER_RET(parcel, Int32, authBoxType, false);
+    dmAuthInfo.authBoxType = static_cast<DMLocalServiceInfoAuthBoxType>(authBoxType);
+
+    int32_t pinExchangeType = static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::QR_FROMDP);
+    READ_HELPER_RET(parcel, Int32, pinExchangeType, false);
+    dmAuthInfo.pinExchangeType = static_cast<DMLocalServiceInfoPinExchangeType>(pinExchangeType);
+    READ_HELPER_RET(parcel, String, dmAuthInfo.description, false);
+    READ_HELPER_RET(parcel, String, dmAuthInfo.extraInfo, false);
+    return true;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -194,6 +194,15 @@ DM_EXPORT extern const char* ACL_IS_LNN_ACL_VAL_TRUE;
 DM_EXPORT extern const char* ACL_IS_LNN_ACL_VAL_FALSE;
 DM_EXPORT extern const char* SERVICE_ID_KEY;
 
+DM_EXPORT extern const char* PIN_CONSUMER_TOKENID;
+DM_EXPORT extern const char* PIN_CONSUMER_PKGNAME;
+DM_EXPORT extern const char* BIZ_SRC_PKGNAME;
+DM_EXPORT extern const char* BIZ_SINK_PKGNAME;
+DM_EXPORT extern const char* META_TOKEN;
+DM_EXPORT extern const char* TAG_PIN_USER_ID;
+DM_EXPORT extern const char* PIN_ERROR_COUNT;
+DM_EXPORT extern const char* PIN_MATCH_FLAG;
+
 extern const char* DM_VERSION_5_0_1;
 extern const char* DM_VERSION_5_0_2;
 extern const char* DM_VERSION_5_0_3;
@@ -204,6 +213,7 @@ extern const char* DM_VERSION_5_1_1;
 extern const char* DM_VERSION_5_1_2;
 extern const char* DM_VERSION_5_1_3;
 extern const char* DM_VERSION_5_1_4;
+extern const char* DM_VERSION_5_1_5;
 extern const char* DM_CURRENT_VERSION;
 extern const char* DM_ACL_AGING_VERSION;
 extern const char* DM_VERSION_5_0_OLD_MAX;      // Estimated highest version number of the old version

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,9 @@ namespace {
 const int32_t DM_MIN_RANDOM = 1;
 const int32_t DM_MAX_RANDOM_UINT16 = INT16_MAX;
 const int32_t DM_INVALID_FLAG_ID = 0;
+const int32_t DM_MIN_PINCODE_SIZE = 6;
+const int32_t DM_MAX_PINCODE_SIZE = 1024;
+const int32_t DM_MAX_RANDOM = 9;
 }
 
 int32_t GenRandInt(int32_t randMin, int32_t randMax)
@@ -75,6 +78,24 @@ uint16_t GenUniqueRandUint(std::set<uint16_t> &randUint16Set)
     } while (isExist);
     randUint16Set.emplace(randUint);
     return randUint;
+}
+
+std::string GeneratePinCode(uint32_t pinLength)
+{
+    if (pinLength < DM_MIN_PINCODE_SIZE || pinLength > DM_MAX_PINCODE_SIZE) {
+        LOGE("pinLength error: Invalid para");
+        return "";
+    }
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    std::string pinCode = std::to_string(GenRandInt(DM_MIN_RANDOM, DM_MAX_RANDOM));
+    uint32_t left_digit_count = pinLength - 1;
+    while (pinCode.length() < left_digit_count) {
+        uint64_t rest_num = gen();
+        pinCode += std::to_string(rest_num);
+    }
+    pinCode = pinCode.substr(0, pinLength);
+    return pinCode;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

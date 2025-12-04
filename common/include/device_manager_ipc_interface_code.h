@@ -137,6 +137,9 @@ enum DMIpcCmdInterfaceCode {
     LEAVE_LNN,
     LEAVE_LNN_RESULT,
     GET_AUTHTYPE_BY_UDIDHASH,
+    EXPORT_AUTH_INFO,
+    IMPORT_AUTH_INFO,
+    ON_AUTH_CODE_INVALID,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

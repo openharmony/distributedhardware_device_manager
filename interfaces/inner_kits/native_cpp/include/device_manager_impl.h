@@ -459,6 +459,13 @@ public:
         std::shared_ptr<LeaveLNNCallback> callback) override;
     virtual int32_t GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
         DMLocalServiceInfoAuthType &authType) override;
+    virtual int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo) override;
+    virtual int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength) override;
+    virtual int32_t RegisterAuthCodeInvalidCallback(const std::string &pkgName,
+        std::shared_ptr<AuthCodeInvalidCallback> cb) override;
+    virtual int32_t UnRegisterAuthCodeInvalidCallback(const std::string &pkgName) override;
+    virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
+        int32_t pinExchangeType, DmAuthInfo &dmAuthInfo) override;
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;
@@ -479,7 +486,7 @@ private:
     int32_t GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid);
     bool CheckAclByIpcCode(const DmAccessCaller &caller, const DmAccessCallee &callee,
         const DMIpcCmdInterfaceCode &ipcCode);
-
+    void ConvertLocalServiceInfoToAuthInfo(const DMLocalServiceInfo &info, DmAuthInfo &dmAuthInfo);
 private:
 #if !defined(__LITEOS_M__)
     std::shared_ptr<IpcClientProxy> ipcClientProxy_ =

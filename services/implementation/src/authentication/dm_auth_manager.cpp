@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1008,6 +1008,11 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     authResponseContext_->edition = DM_VERSION_5_0_5;
     authResponseContext_->remoteDeviceName = authRequestContext_->localDeviceName;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
+    if (importAuthCode_.empty() || importPkgName_.empty()) {
+        GetLocalServiceInfoInDp();
+        importAuthCode_ = serviceInfoProfile_.GetPinCode();
+        importPkgName_ = serviceInfoProfile_.GetBundleName();
+    }
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_NEGOTIATE);
     if (!NeedInsensibleSwitching()) {
         CHECK_NULL_VOID(softbusConnector_);
@@ -1516,6 +1521,7 @@ void DmAuthManager::SinkAuthenticateFinish()
 {
     LOGI("DmAuthManager::SinkAuthenticateFinish, isFinishOfLocal: %{public}d", isFinishOfLocal_);
     processInfo_.pkgName = authResponseContext_->peerBundleName;
+    ClearLocalServiceInfo(authResponseContext_->hostPkgName, authResponseContext_->authType);
     listener_->OnSinkBindResult(processInfo_, peerTargetId_, authResponseContext_->reply,
         authResponseContext_->state, GenerateBindResultContent());
     if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH &&
@@ -1542,10 +1548,20 @@ int32_t DmAuthManager::GetOutputState(int32_t state)
     return static_cast<int32_t>(STATUS_DM_AUTH_DEFAULT);
 }
 
+void DmAuthManager::ClearLocalServiceInfo(const std::string &pkgName, int32_t authType)
+{
+    if (authType != AUTH_TYPE_NFC && authType != AUTH_TYPE_IMPORT_AUTH_CODE) {
+        LOGE("Auth type is not supported for import auth code!");
+        return;
+    }
+    DeviceProfileConnector::GetInstance().DeleteLocalServiceInfo(pkgName, authType);
+}
+
 void DmAuthManager::SrcAuthenticateFinish()
 {
     LOGI("DmAuthManager::SrcAuthenticateFinish, isFinishOfLocal: %{public}d", isFinishOfLocal_);
     CHECK_NULL_VOID(authResponseContext_);
+    ClearLocalServiceInfo(authResponseContext_->hostPkgName, authResponseContext_->authType);
     if (isFinishOfLocal_) {
         CHECK_NULL_VOID(authMessageProcessor_);
         authMessageProcessor_->SetResponseContext(authResponseContext_);

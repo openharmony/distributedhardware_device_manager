@@ -39,6 +39,7 @@ constexpr const char* DEVICE_TRUST_CHANGE = "deviceTrustChange";
 constexpr const char* SERVICE_ONLINE = "serviceOnLine";
 #endif
 const uint16_t DM_INVALID_FLAG_ID = 0;
+constexpr const char* AUTH_CODE_INVALID = "authCodeInvalid";
 void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgName,
                                                          std::shared_ptr<DmInitCallback> dmInitCallback)
 {
@@ -1705,6 +1706,69 @@ void DeviceManagerNotify::OnLeaveLNNResult(const std::string &networkId, int32_t
         return;
     }
     tempCbk->OnLeaveLNNCallback(networkId, retCode);
+}
+
+void DeviceManagerNotify::RegisterAuthCodeInvalidCallback(const std::string &pkgName,
+    std::shared_ptr<AuthCodeInvalidCallback> cb)
+{
+    if (pkgName.empty() || cb == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    CHECK_SIZE_VOID(authCodeInvalidCallback_);
+    authCodeInvalidCallback_[pkgName] = cb;
+}
+
+void DeviceManagerNotify::UnRegisterAuthCodeInvalidCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    authCodeInvalidCallback_.erase(pkgName);
+}
+
+void DeviceManagerNotify::OnAuthCodeInvalid(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    LOGI("in, pkgName:%{public}s", pkgName.c_str());
+    std::shared_ptr<AuthCodeInvalidCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (authCodeInvalidCallback_.count(pkgName) == 0) {
+            LOGE("AuthCodeInvalidCallback error, device state callback not register.");
+            return;
+        }
+        tempCbk = authCodeInvalidCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("AuthCodeInvalidCallback error, registered device state callback is nullptr.");
+        return;
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::submit([=]() { AuthCodeInvalid(tempCbk); });
+#else
+    std::thread authCodeInvalid([=]() { AuthCodeInvalid(tempCbk); });
+    int32_t ret = pthread_setname_np(authCodeInvalid.native_handle(), AUTH_CODE_INVALID);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerNotify AuthCodeInvalid setname failed, pkgName:%{public}s", pkgName.c_str());
+    }
+    authCodeInvalid.detach();
+#endif
+}
+
+void DeviceManagerNotify::AuthCodeInvalid(std::shared_ptr<AuthCodeInvalidCallback> tempCbk)
+{
+    if (tempCbk == nullptr) {
+        LOGE("AuthCodeInvalidCallback error, registered device state callback is nullptr.");
+        return;
+    }
+    tempCbk->OnAuthCodeInvalid();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

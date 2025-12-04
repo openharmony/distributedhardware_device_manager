@@ -110,7 +110,7 @@ extern const int32_t MIN_PIN_TOKEN;
 extern const int32_t MAX_PIN_TOKEN;
 
 using CleanNotifyCallback = std::function<void(uint64_t, int32_t)>;
-
+using StopTimerAndDelDpCallback = std::function<void(const std::string&, int32_t, uint64_t)>;
 enum DmRole {
     DM_ROLE_UNKNOWN = 0,
     DM_ROLE_USER = 1,
@@ -228,6 +228,7 @@ public:
     virtual void SetBindTargetParams(const PeerTargetId &targetId);
     // Register the notification function when the auth_mgr event is complete.
     virtual void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
+    virtual void RegisterStopTimerAndDelDpCallback(StopTimerAndDelDpCallback stopTimerAndDelDpCallback);
 
     /**
      * @brief Classical authMgr is global, single-frame collabration with double-frame device
@@ -263,6 +264,7 @@ protected:
     and the actual method 80 message is not sent.
     */
     bool insensibleSwitching{false};
+    StopTimerAndDelDpCallback stopTimerAndDelDpCallback_;
 };
 }  // namespace DistributedHardware
 }  // namespace OHOS

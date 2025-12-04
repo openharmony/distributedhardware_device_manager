@@ -58,7 +58,7 @@ HWTEST_F(TimeHeapTest, StartTimer_001, testing::ext::TestSize.Level0)
     int32_t ret = timer->StartTimer("", timeout, TimeOut);
     EXPECT_EQ(ERR_DM_INPUT_PARA_INVALID, ret);
 
-    ret = timer->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK), 400, TimeOut);
+    ret = timer->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK), 700, TimeOut);
     EXPECT_EQ(ERR_DM_INPUT_PARA_INVALID, ret);
 
     ret = timer->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK), -20, TimeOut);

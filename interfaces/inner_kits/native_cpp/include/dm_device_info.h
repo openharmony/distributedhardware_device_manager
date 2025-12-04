@@ -24,6 +24,8 @@
 
 #define DM_MAX_DEVICE_ID_LEN (97)
 #define DM_MAX_DEVICE_NAME_LEN (129)
+#define DM_MAX_PIN_CODE_LEN (1025)
+#define DM_MAX_META_TOKEN_LEN (9)
 
 #ifndef DM_EXPORT
 #define DM_EXPORT __attribute__ ((visibility ("default")))
@@ -370,7 +372,9 @@ typedef enum {
     UN_REG_REMOTE_DEVICE_TRUST_CHANGE = 6,
     REG_CREDENTIAL_AUTH_STATUS_NOTIFY = 7,
     UN_REG_CREDENTIAL_AUTH_STATUS_NOTIFY = 8,
-    MAX = 9,
+    REG_AUTH_CODE_INVALID = 9,
+    UN_REG_AUTH_CODE_INVALID = 10,
+    MAX = 11,
 } DmCommonNotifyEvent;
 
 DM_EXPORT extern const char* DEVICE_TYPE_UNKNOWN_STRING;
@@ -450,10 +454,11 @@ enum class DMLocalServiceInfoAuthType : int32_t {
 };
 
 enum class DMLocalServiceInfoPinExchangeType : int32_t {
-    PINBOX = 1,
-    ULTRASOUND = 2,
-    FROMDP = 3,
-    IMPORT_AUTH_CODE = 5
+    PINBOX = 1,           /** pin(from memory) */
+    QR_FROMDP = 2,        /** qr(from dp) */
+    FROMDP = 3,           /** nfc(from dp) */
+    IMPORT_AUTH_CODE = 5, /** import(from dp)  */
+    ULTRASOUND = 6,       /** ultrasound(from memory) */
 };
 
 enum class DMLocalServiceInfoAuthBoxType : int32_t {
@@ -543,6 +548,21 @@ typedef struct PublishServiceParam {
     DMSrvMediumType media;
     DmExchangeFreq freq;
 } PublishServiceParam;
+
+typedef struct DmAuthInfo {
+    int32_t userId = 0;     /** User ID of the current caller */
+    uint64_t pinConsumerTokenId = 0;    /**The tokenId corresponding to the PIN used by the current caller */
+    char pinCode[DM_MAX_PIN_CODE_LEN] = {0};
+    char metaToken[DM_MAX_META_TOKEN_LEN] = {0};    /** Meta-token for dual-device authentication */
+    std::string pinConsumerPkgName;      /** The pkgName corresponding to the PIN used by the current caller */
+    std::string bizSrcPkgName;      /** Used for dual-device collaboration (for proxy entry/exit scenarios*/
+    std::string bizSinkPkgName;     /** The target pkgName corresponding to the proxy (for dual-device collaboration) */
+    DMLocalServiceInfoAuthType authType;        /** Trustworthy period 0:Only this time; 1:cancel ; 6：Always  */
+    DMLocalServiceInfoAuthBoxType authBoxType;     /** Whether to pop up a window 1:confirmation 2:Skip confirmation  */
+    DMLocalServiceInfoPinExchangeType pinExchangeType; /**1:pin box;2:qr from dp; 3:nfc from DP; 5:import 6:ultrasonic*/
+    std::string description;        /** Description information on the three-party interface */
+    std::string extraInfo;      /** Extended configuration information */
+} DmAuthInfo;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

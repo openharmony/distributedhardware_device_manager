@@ -75,6 +75,7 @@ private:
     int32_t CleanFreezeState(int64_t reservedDataTimeStamp);
     int32_t UpdateFreezeState(int64_t nowTime);
     void CalculateNextFreezeTime(int64_t nowFreezeTime, int64_t &nextFreezeTime);
+    bool IsInWhiteList(const std::string &pkgName);
 
 private:
     bool isSynced_ = false;

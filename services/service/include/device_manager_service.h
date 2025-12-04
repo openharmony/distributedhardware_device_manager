@@ -293,6 +293,10 @@ public:
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
     int32_t GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
         DMLocalServiceInfoAuthType &authType);
+    int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo);
+    int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength);
+    int32_t RegisterAuthCodeInvalidCallback(const std::string &pkgName);
+    int32_t UnRegisterAuthCodeInvalidCallback(const std::string &pkgName);
 private:
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();
@@ -418,6 +422,8 @@ private:
     void HandleAccountLogoutEventCallback(const std::string &commonEventType, int32_t currentUserId,
         int32_t beforeUserId);
     void InitTaskOfDelTimeOutAcl();
+    bool IsExportAuthInfoValid(const DmAuthInfo &dmAuthInfo);
+    bool IsImportAuthInfoValid(const DmAuthInfo &dmAuthInfo);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();
