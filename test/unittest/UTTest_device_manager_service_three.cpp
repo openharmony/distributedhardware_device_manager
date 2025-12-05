@@ -201,9 +201,8 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportCredential_301, testing::ext::Test
     const std::string pkgName = "pkgNametest";
     const std::string credentialInfo = "credentialInfotest";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().ImportCredential(pkgName, credentialInfo);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 
     std::string reqJsonStr = "";
     std::string returnJsonStr = "";
@@ -223,9 +222,8 @@ HWTEST_F(DeviceManagerServiceThreeTest, DeleteCredential_301, testing::ext::Test
     const std::string pkgName = "pkgNametest";
     const std::string deleteInfo = "deleteInfotest";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().DeleteCredential(pkgName, deleteInfo);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**
@@ -238,9 +236,8 @@ HWTEST_F(DeviceManagerServiceThreeTest, RegisterCredentialCallback_301, testing:
 {
     const std::string pkgName = "pkgNametest";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().RegisterCredentialCallback(pkgName);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, BindDevice_301, testing::ext::TestSize.Level1)
