@@ -37,7 +37,7 @@ bool CheckJsParamStringValid(const std::string &param)
     return true;
 }
 
-void InsertMapParams(JsonObject &bindParamObj, std::map<std::string, std::string> &bindParamMap)
+void InsertMapParams(const JsonObject &bindParamObj, std::map<std::string, std::string> &bindParamMap)
 {
     if (IsInt32(bindParamObj, AUTH_TYPE)) {
         int32_t authType = bindParamObj[AUTH_TYPE].Get<int32_t>();
@@ -77,7 +77,7 @@ void InsertMapParams(JsonObject &bindParamObj, std::map<std::string, std::string
     }
 }
 
-std::string GetDeviceTypeById(DmDeviceType type)
+std::string GetDeviceTypeById(const DmDeviceType &type)
 {
     const static std::pair<DmDeviceType, std::string> mapArray[] = {
         {DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_UNKNOWN_STRING},
@@ -91,7 +91,7 @@ std::string GetDeviceTypeById(DmDeviceType type)
         {DEVICE_TYPE_SMART_DISPLAY, DEVICE_TYPE_SMART_DISPLAY_STRING},
         {DEVICE_TYPE_2IN1, DEVICE_TYPE_2IN1_STRING},
     };
-    for (const auto& item : mapArray) {
+    for (const auto &item : mapArray) {
         if (item.first == type) {
             return item.second;
         }
@@ -100,7 +100,7 @@ std::string GetDeviceTypeById(DmDeviceType type)
 }
 
 void ServiceProfileInfoToNative(const ::ohos::distributedDeviceManager::ServiceProfileInfo &taiheInfo,
-    OHOS::DistributedHardware::DmServiceProfileInfo& nativeInfo)
+    OHOS::DistributedHardware::DmServiceProfileInfo &nativeInfo)
 {
     nativeInfo.deviceId = std::string(taiheInfo.deviceId);
     nativeInfo.serviceId = std::string(taiheInfo.serviceId);
@@ -117,7 +117,7 @@ void ServiceProfileInfoToNative(const ::ohos::distributedDeviceManager::ServiceP
 
 void ServiceProfileInfoArrayToNative(
     const ::taihe::array_view<::ohos::distributedDeviceManager::ServiceProfileInfo> &taiheList,
-    std::vector<OHOS::DistributedHardware::DmServiceProfileInfo>& nativeList)
+    std::vector<OHOS::DistributedHardware::DmServiceProfileInfo> &nativeList)
 {
     for (auto it = taiheList.begin(); it != taiheList.end(); ++it) {
         auto const &value = *it;
@@ -128,7 +128,7 @@ void ServiceProfileInfoArrayToNative(
 }
 
 void DeviceProfileInfoToNative(const ::ohos::distributedDeviceManager::DeviceProfileInfo &taiheInfo,
-    OHOS::DistributedHardware::DmDeviceProfileInfo& nativeInfo)
+    OHOS::DistributedHardware::DmDeviceProfileInfo &nativeInfo)
 {
     nativeInfo.deviceId = std::string(taiheInfo.deviceId);
     nativeInfo.deviceSn = std::string(taiheInfo.deviceSn);
@@ -169,7 +169,7 @@ void DeviceProfileInfoToNative(const ::ohos::distributedDeviceManager::DevicePro
 
 void DeviceProfileInfoArrayToNative(
     const ::taihe::array_view<::ohos::distributedDeviceManager::DeviceProfileInfo> &taiheList,
-    std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo>& nativeList)
+    std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &nativeList)
 {
     for (auto it = taiheList.begin(); it != taiheList.end(); ++it) {
         auto const &value = *it;
@@ -179,7 +179,7 @@ void DeviceProfileInfoArrayToNative(
     }
 }
 
-ani_object ServiceProfileInfoToAni(ani_env* env, const OHOS::DistributedHardware::DmServiceProfileInfo &nativeObj)
+ani_object ServiceProfileInfoToAni(ani_env *env, const OHOS::DistributedHardware::DmServiceProfileInfo &nativeObj)
 {
     if (env == nullptr) {
         return {};
@@ -210,7 +210,7 @@ ani_object ServiceProfileInfoToAni(ani_env* env, const OHOS::DistributedHardware
     return ani_obj;
 }
 
-ani_object ServiceProfileInfoArrayToAni(ani_env* env,
+ani_object ServiceProfileInfoArrayToAni(ani_env *env,
     const std::vector<OHOS::DistributedHardware::DmServiceProfileInfo> &services)
 {
     if (env == nullptr) {
@@ -228,7 +228,7 @@ ani_object ServiceProfileInfoArrayToAni(ani_env* env,
     return ani_field_services;
 }
 
-ani_object DeviceProfileInfoToAni(ani_env* env, const OHOS::DistributedHardware::DmDeviceProfileInfo &nativeObj)
+ani_object DeviceProfileInfoToAni(ani_env *env, const OHOS::DistributedHardware::DmDeviceProfileInfo &nativeObj)
 {
     if (env == nullptr) {
         return {};
@@ -274,7 +274,7 @@ ani_object DeviceProfileInfoToAni(ani_env* env, const OHOS::DistributedHardware:
     return ani_obj;
 }
 
-ani_object DeviceProfileInfoArrayToAni(ani_env* env,
+ani_object DeviceProfileInfoArrayToAni(ani_env *env,
     const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &nativeList)
 {
     std::vector<ani_object> aniArray;
@@ -285,7 +285,7 @@ ani_object DeviceProfileInfoArrayToAni(ani_env* env,
     return ani_utils::AniCreateArray(env, aniArray);
 }
 
-ani_object DeviceIconInfoToAni(ani_env* env, const OHOS::DistributedHardware::DmDeviceIconInfo &nativeObj)
+ani_object DeviceIconInfoToAni(ani_env *env, const OHOS::DistributedHardware::DmDeviceIconInfo &nativeObj)
 {
     if (env == nullptr) {
         return {};
@@ -295,7 +295,7 @@ ani_object DeviceIconInfoToAni(ani_env* env, const OHOS::DistributedHardware::Dm
     ani_string ani_field_imageType = ani_utils::AniCreateString(env, nativeObj.imageType);
     ani_string ani_field_specName = ani_utils::AniCreateString(env, nativeObj.specName);
     ani_string ani_field_url = ani_utils::AniCreateString(env, nativeObj.url);
-    void* ani_field_icon_ani_data = {};
+    void *ani_field_icon_ani_data = {};
     ani_arraybuffer ani_field_icon = {};
     ani_status status = env->CreateArrayBuffer(nativeObj.icon.size(), &ani_field_icon_ani_data, &ani_field_icon);
     if (status != ANI_OK || ani_field_icon_ani_data == nullptr) {

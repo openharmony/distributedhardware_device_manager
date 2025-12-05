@@ -146,6 +146,11 @@ struct NetworkIdQueryFilter {
     onlineStatus : i32;
 }
 
+union IntAndStrUnionType {
+    numVal : i32;
+    textVal : String;
+}
+
 interface DeviceManager {
     GetInner(): i64;
 
@@ -160,10 +165,10 @@ interface DeviceManager {
     @gen_promise("getAvailableDeviceList")
     GetAvailableDeviceListSync(): Array<DeviceBasicInfo>;
  
-    BindTarget(deviceId: String, bindParam: @record Map<String, Opaque>, callback: (err: @sts_type("BusinessError<void>") Opaque, data: BindTargetResult) => void): void;
+    BindTarget(deviceId: String, bindParam: @record Map<String, IntAndStrUnionType>, callback: (err: @sts_type("BusinessError<void>") Opaque, data: BindTargetResult) => void): void;
     UnbindTarget(deviceId: String): void;
  
-    StartDiscovering(discoverParam: @record Map<String, Opaque>, filterOptions: Optional<@record Map<String, Opaque>>): void;
+    StartDiscovering(discoverParam: @record Map<String, IntAndStrUnionType>, filterOptions: Optional<@record Map<String, IntAndStrUnionType>>): void;
     StopDiscovering(): void;
     
     ReplyUiAction(action: i32, actionResult: String): void;
@@ -190,49 +195,11 @@ interface DeviceManager {
     GetDeviceNetworkIdListSync(filterOptions: NetworkIdQueryFilter): Array<String>;
 
     @!sts_inject_into_interface("""
-    on(type: string, callback: (data: object) => void): void;
     restoreLocalDeivceName(): void;
     """)
     @!sts_inject_into_class("""
-    on(type: string, callback: object): void {
-        if (type === "discoverSuccess") {
-            this.onDiscoverSuccess(callback as (data: DiscoverySuccessResult) => void);
-        } else if (type === "deviceStateChange") {
-            this.onDeviceStateChange(callback as (data: DeviceStateChangeResult) => void);
-        } else if (type === "replyResult") {
-            this.onReplyResult(callback as (data: ReplyResult) => void);
-        } else if (type === "deviceNameChange") {
-            this.onDeviceNameChange(callback as (data: DeviceNameChangeResult) => void);
-        } else if (type === "discoverFailure") {
-            this.onDiscoverFailure(callback as (data: DiscoveryFailureResult) => void);
-        } else if (type ==="serviceDie") {
-            this.onServiceDie(callback as (data: object) => void);
-        } else {
-            throw new Error(`Unknown type: ${type}`);
-        }
-    }
     restoreLocalDeivceName(): void {
         this.restoreLocalDeviceName();
-    }
-    """)
-
-    @!sts_inject_into_interface("off(type: string, callback?: (data: object) => void): void;")
-    @!sts_inject_into_class("""off(type: string, callback?: object): void {
-        if (type === "discoverSuccess") {
-            this.offDiscoverSuccess(callback as (((data: DiscoverySuccessResult) => void) | undefined));
-        } else if (type === "deviceStateChange") {
-            this.offDeviceStateChange(callback as (((data: DeviceStateChangeResult) => void) | undefined));
-        } else if (type === "replyResult") {
-            this.offReplyResult(callback as (((data: ReplyResult) => void) | undefined));
-        } else if (type === "deviceNameChange") {
-            this.offDeviceNameChange(callback as (((data: DeviceNameChangeResult) => void) | undefined));
-        } else if (type === "discoverFailure"){
-            this.offDiscoverFailure(callback as (((data: DiscoveryFailureResult) => void) | undefined));
-        } else if (type ==="serviceDie") {
-            this.offServiceDie(callback as (((data: object) => void) | undefined));
-        } else {
-            throw new Error(`Unknown type: ${type}`);
-        }
     }
     """)
 

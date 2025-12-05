@@ -49,7 +49,7 @@ bool AsyncUtilBase::AsyncExecute(const std::function<void()> func)
     return true;
 }
 
-DmAniInitCallback::DmAniInitCallback(ani_env* env, taihe::string_view bundleName)
+DmAniInitCallback::DmAniInitCallback(ani_env* env, const taihe::string_view &bundleName)
     : env_(env), bundleName_(std::string(bundleName))
 {
 }
@@ -65,12 +65,13 @@ void DmAniInitCallback::OnRemoteDied()
 
 void DmAniInitCallback::OnRemoteDiedInMainthread()
 {
-    LOGI("OnRemoteDiedInMainthread called.");
+    LOGI("In");
     std::lock_guard<std::mutex> lock(jsCallbackMutex_);
     if (serviceDieCallback_.has_value()) {
-        ani_ref *nullResult = nullptr;
-        env_->GetNull(nullResult);
-        serviceDieCallback_.value()(reinterpret_cast<uintptr_t>(nullResult));
+        ani_ref *undefinedResult = nullptr;
+        env_->GetUndefined(undefinedResult);
+        serviceDieCallback_.value()(reinterpret_cast<uintptr_t>(undefinedResult));
+        LOGI("call end");
     }
 }
 
@@ -117,7 +118,7 @@ void DmAniDeviceNameChangeCallback::OnDeviceChangedInMainThread(
     }
 }
 
-DmAniDeviceStateChangeResultCallback::DmAniDeviceStateChangeResultCallback(std::string &bundleName,
+DmAniDeviceStateChangeResultCallback::DmAniDeviceStateChangeResultCallback(const std::string &bundleName,
     taihe::callback<void(ohos::distributedDeviceManager::DeviceStateChangeResult const&)>
     deviceStateChangeDataCallback)
     : bundleName_(bundleName),
@@ -180,7 +181,7 @@ void DmAniDeviceStateChangeResultCallback::OnDeviceStateChangeInMainthread(
 
 DmAniDeviceManagerUiCallback::DmAniDeviceManagerUiCallback(
     taihe::callback<void(ohos::distributedDeviceManager::ReplyResult const&)> replyResultCallback,
-    std::string &bundleName)
+    const std::string &bundleName)
     : bundleName_(bundleName), replyResultCallback_(replyResultCallback)
 {
 }
@@ -322,7 +323,7 @@ void DmAniBindTargetCallback::OnBindResult(const OHOS::DistributedHardware::Peer
 }
 
 void DmAniBindTargetCallback::OnBindResultInMainThread(const OHOS::DistributedHardware::PeerTargetId &targetId,
-    int32_t result, int32_t status, std::string content)
+    int32_t result, int32_t status, const std::string &content)
 {
     using namespace OHOS::DistributedHardware;
     using namespace ANI::distributedDeviceManager;
@@ -330,11 +331,11 @@ void DmAniBindTargetCallback::OnBindResultInMainThread(const OHOS::DistributedHa
     LOGI("OnBindResultInMainThread");
     std::string deviceId = content;
     ani_ref err = nullptr;
-    ::ohos::distributedDeviceManager::BindTargetResult data = {};
+    ohos::distributedDeviceManager::BindTargetResult data = {};
     if (status == DM_AUTH_REQUEST_SUCCESS_STATUS && result == 0) {
         LOGI("OnBindResult success");
         env_->GetNull(&err);
-        data.deviceId = ::taihe::string(deviceId);
+        data.deviceId = taihe::string(deviceId);
     } else {
         LOGI("OnBindResult failed");
         std::string errCodeInfo = OHOS::DistributedHardware::GetErrorString((int)result);
