@@ -78,6 +78,13 @@ std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgNa
         localDeviceId, targetDeviceId);
 }
 
+int32_t DeviceProfileConnector::GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string& bundleName,
+        int32_t pinExchangeType, DistributedDeviceProfile::LocalServiceInfo &serviceInfo)
+{
+            return DmDeviceProfileConnector::dmDeviceProfileConnector->GetLocalServiceInfoByBundleNameAndPinExchangeType(
+            bundleName, pinExchangeType, serviceInfo);
+}
+
 std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
     std::string trustUdid)
 {

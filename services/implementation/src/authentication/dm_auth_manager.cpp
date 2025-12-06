@@ -1549,6 +1549,28 @@ void DmAuthManager::SinkAuthenticateFinish()
     authTimes_ = 0;
 }
 
+bool DmAuthManager::GetServiceExtraInfo(const std::string &pkgName, int32_t pinExchangeType,
+    DistributedDeviceProfile::LocalServiceInfo &srvInfo, JsonObject &extraInfoObj)
+{
+    auto dpRet = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        pkgName, pinExchangeType, srvInfo);
+    if (dpRet != DM_OK) {
+        LOGE("GetLocalServiceInfoByBundleNameAndPinExchangeType failed ret=%{public}d", dpRet);
+        return false;
+    }
+    std::string extra = srvInfo.GetExtraInfo();
+    if (extra.empty()) {
+        LOGE("extra.empty()");
+        return false;
+    }
+    extraInfoObj.Parse(extra);
+    if (extraInfoObj.IsDiscarded()) {
+        LOGE("GetServiceExtraInfo parse extra discarded");
+        return false;
+    }
+    return true;
+}
+
 int32_t DmAuthManager::GetOutputState(int32_t state)
 {
     LOGI("state %{public}d.", state);
