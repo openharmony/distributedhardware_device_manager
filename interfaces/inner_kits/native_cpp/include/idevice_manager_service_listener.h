@@ -188,6 +188,7 @@ public:
         const std::vector<DmDeviceInfo> &deviceList) = 0;
     virtual void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId,
         int32_t retCode) {}
+    virtual void OnAuthCodeInvalid(const std::string &pkgName) {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

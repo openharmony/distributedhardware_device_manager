@@ -391,6 +391,11 @@ void AuthManagerBase::RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotif
     return;
 }
 
+void AuthManagerBase::RegisterStopTimerAndDelDpCallback(StopTimerAndDelDpCallback stopTimerAndDelDpCallback)
+{
+    LOGE("RegisterStopTimerAndDelDpCallback is not implemented in the current version");
+}
+
 std::string AuthManagerBase::ConvertSrcVersion(const std::string &version, const std::string &edition)
 {
     std::string srcVersion = "";

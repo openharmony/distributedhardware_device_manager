@@ -188,6 +188,8 @@ public:
     int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
     void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList);
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
+    int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength);
+    int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 

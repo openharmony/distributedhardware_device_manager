@@ -191,7 +191,8 @@ const char* DM_VERSION_5_1_1 = "5.1.1";
 const char* DM_VERSION_5_1_2 = "5.1.2";
 const char* DM_VERSION_5_1_3 = "5.1.3";
 const char* DM_VERSION_5_1_4 = "5.1.4";
-const char* DM_CURRENT_VERSION = DM_VERSION_5_1_4;
+const char* DM_VERSION_5_1_5 = "5.1.5";
+const char* DM_CURRENT_VERSION = DM_VERSION_5_1_5;
 const char* DM_ACL_AGING_VERSION = DM_VERSION_5_1_0;
 const char* DM_VERSION_5_0_OLD_MAX = "5.0.99";       // Estimated highest version number of the old version
 const int32_t OLD_DM_HO_OSTYPE = -1;
@@ -201,5 +202,13 @@ const char* PEER_UDID = "peer_udid";
 const char* PEER_OSTYPE = "peer_ostype";
 const char* TIME_STAMP = "time_stamp";
 const char* SERVICE_ID_KEY = "serviceId";
+const char* PIN_CONSUMER_PKGNAME = "pinConsumerPkgName";
+const char* BIZ_SRC_PKGNAME = "bizSrcPkgName";
+const char* BIZ_SINK_PKGNAME = "bizSinkPkgName";
+const char* PIN_CONSUMER_TOKENID = "pinConsumerTokenId";
+const char* TAG_PIN_USER_ID = "pinUserId";
+const char* META_TOKEN = "metaToken";
+const char* PIN_ERROR_COUNT = "pinErrorCount";
+const char* PIN_MATCH_FLAG = "pinMatchFlag";
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -673,6 +673,13 @@ public:
         std::shared_ptr<LeaveLNNCallback> callback) { return 0; }
     virtual int32_t GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
         DMLocalServiceInfoAuthType &authType) { return 0; }
+    virtual int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo) { return 0; }
+    virtual int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength) { return 0; }
+    virtual int32_t RegisterAuthCodeInvalidCallback(const std::string &pkgName,
+        std::shared_ptr<AuthCodeInvalidCallback> cb) { return 0; }
+    virtual int32_t UnRegisterAuthCodeInvalidCallback(const std::string &pkgName) { return 0; }
+    virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
+        int32_t pinExchangeType, DmAuthInfo &dmAuthInfo) { return 0; }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

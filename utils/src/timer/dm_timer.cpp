@@ -21,7 +21,7 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 const int32_t MIN_TIME_OUT = 0;
-const int32_t MAX_TIME_OUT = 300;
+const int32_t MAX_TIME_OUT = 600;
 const int64_t MICROSECOND_TO_SECOND = 1000000L;
 constexpr const char* TIMER_TASK = "TimerTask";
 }

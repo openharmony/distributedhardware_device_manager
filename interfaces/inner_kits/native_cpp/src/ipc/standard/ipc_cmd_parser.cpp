@@ -81,6 +81,8 @@
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_unregister_service_info_req.h"
 #include "securec.h"
+#include "ipc_auth_info_req.h"
+#include "ipc_auth_info_rsp.h"
 namespace OHOS { class IRemoteObject; }
 
 namespace OHOS {
@@ -1015,6 +1017,61 @@ ON_IPC_READ_RESPONSE(EXPORT_AUTH_CODE, MessageParcel &reply, std::shared_ptr<Ipc
     std::string authCode = reply.ReadString();
     pRsp->SetAuthCode(authCode);
     pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(IMPORT_AUTH_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcAuthInfoReq> pReq = std::static_pointer_cast<IpcAuthInfoReq>(pBaseReq);
+    const DmAuthInfo &info = pReq->GetDmAuthInfo();
+    if (!IpcModelCodec::EncodeDmAuthInfo(info, data)) {
+        LOGE("EncodeDmAuthInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(IMPORT_AUTH_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    std::shared_ptr<IpcRsp> pRsp = std::static_pointer_cast<IpcRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(EXPORT_AUTH_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcAuthInfoReq> pReq = std::static_pointer_cast<IpcAuthInfoReq>(pBaseReq);
+    const DmAuthInfo &info = pReq->GetDmAuthInfo();
+    uint32_t pinLength = pReq->GetPinLength();
+    if (!IpcModelCodec::EncodeDmAuthInfo(info, data)) {
+        LOGE("EncodeDmAuthInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteUint32(pinLength)) {
+        LOGE("WriteUint32 length failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(EXPORT_AUTH_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    std::shared_ptr<IpcAuthInfoRsp> pRsp = std::static_pointer_cast<IpcAuthInfoRsp>(pBaseRsp);
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    if (pBaseRsp->GetErrCode() == DM_OK) {
+        DmAuthInfo info;
+        bool ret = IpcModelCodec::DecodeDmAuthInfo(reply, info);
+        if (!ret) {
+            LOGE("DecodeDmAuthInfo failed");
+            pRsp->SetErrCode(ERR_DM_IPC_READ_FAILED);
+            return ERR_DM_IPC_READ_FAILED;
+        }
+        pRsp->SetDmAuthInfo(info);
+    }
     return DM_OK;
 }
 
@@ -2542,6 +2599,14 @@ ON_IPC_READ_RESPONSE(GET_AUTHTYPE_BY_UDIDHASH, MessageParcel &reply, std::shared
         std::static_pointer_cast<IpcGetAuthTypeByUdidHashRsp>(pBaseRsp);
     pRsp->SetErrCode(reply.ReadInt32());
     pRsp->SetAuthType(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(ON_AUTH_CODE_INVALID, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(pkgName);
+    reply.WriteInt32(DM_OK);
     return DM_OK;
 }
 } // namespace DistributedHardware

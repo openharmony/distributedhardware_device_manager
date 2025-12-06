@@ -34,7 +34,7 @@ const char* const FILED_CRED_TYPE = "credType";
 const char* const FILED_AUTHORIZED_SCOPE = "authorizedScope";
 const char* const FILED_AUTHORIZED_APP_LIST = "authorizedAppList";
 const char* const FILED_SUBJECT = "subject";
-
+constexpr const static char* BUNDLE_NAME_COLLABORATION_FWK = "CollaborationFwk";
 // State Types
 enum class DmAuthStateType {
     AUTH_IDLE_STATE = 0,    // When the device is initialized
@@ -179,6 +179,13 @@ public:
     void JoinLnn(std::shared_ptr<DmAuthContext> context);
     void DeleteRedundancyAcl(std::shared_ptr<DmAuthContext> context, JsonObject &aclInfo,
         const std::set<uint32_t> bindLevelSet, bool isSrc);
+    static void UpdatePinErrorCount(const std::string &pkgName, int32_t pinExchangeType);
+    bool VerifyFlagXor(std::shared_ptr<DmAuthContext> context);
+    void GetPinErrorCountAndTokenId(const std::string &bundleName, int32_t pinExchangeType,
+        int32_t &count, uint64_t &tokenId);
+    bool GetServiceExtraInfo(const std::string &bundleName, int32_t pinExchangeType,
+        DistributedDeviceProfile::LocalServiceInfo &srvInfo, JsonObject &extraInfoObj);
+    bool IsInFlagWhiteList(const std::string &bundleName);
 protected:
     bool NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context);
     bool NeedAgreeAcl(std::shared_ptr<DmAuthContext> context);
@@ -196,6 +203,7 @@ protected:
         const DistributedDeviceProfile::AccessControlProfile &profile);
     DmAuthScope GetAuthorizedScope(int32_t bindLevel);
     void BindFail(std::shared_ptr<DmAuthContext> context);
+    void HandlePinResultAndCallback(std::shared_ptr<DmAuthContext> context, const std::string &pkgName);
     void DeleteAcl(std::shared_ptr<DmAuthContext> context, bool isDelLnnAcl,
         std::vector<std::pair<int64_t, int64_t>> &tokenIds);
     void RemoveTokenIdsFromCredential(std::shared_ptr<DmAuthContext> context, const std::string &credId,
@@ -278,6 +286,9 @@ private:
     bool IsUserAuthorize(JsonObject &paramObj, DmProxyAccess &access);
     int32_t ProcessNoBindAuthorize(std::shared_ptr<DmAuthContext> context);
     std::string GetCredIdByCredType(std::shared_ptr<DmAuthContext> context, int32_t credType);
+    bool ExtractPinConsumerTokenId(const std::string &srvExtraInfo, uint64_t &tokenId);
+    void ProcessImportAuthInfo(std::shared_ptr<DmAuthContext> context,
+        const OHOS::DistributedDeviceProfile::LocalServiceInfo &srvInfo);
 };
 
 class AuthSrcPinNegotiateStartState : public DmAuthState {
@@ -378,6 +389,7 @@ public:
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 private:
     int32_t ShowStartAuthDialog(std::shared_ptr<DmAuthContext> context); // Display PIN input box to user
+    int32_t ProcessImportAuthInfo(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSinkPinAuthStartState : public DmAuthState {

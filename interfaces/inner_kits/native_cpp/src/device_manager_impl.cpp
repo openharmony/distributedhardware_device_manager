@@ -79,6 +79,8 @@
 #include "ipc_unpublish_req.h"
 #include "ipc_unregister_service_info_req.h"
 #include "securec.h"
+#include "ipc_auth_info_req.h"
+#include "ipc_auth_info_rsp.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ipc_model_codec.h"
 #include "iservice_registry.h"
@@ -1736,6 +1738,76 @@ int32_t DeviceManagerImpl::ExportAuthCode(std::string &authCode)
     return DM_OK;
 }
 
+int32_t DeviceManagerImpl::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
+{
+    LOGI("Start");
+    std::shared_ptr<IpcAuthInfoReq> req = std::make_shared<IpcAuthInfoReq>();
+    req->SetDmAuthInfo(dmAuthInfo);
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    int32_t ret = ipcClientProxy_->SendRequest(IMPORT_AUTH_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    LOGI("Success.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength)
+{
+    LOGI("Start");
+    std::shared_ptr<IpcAuthInfoReq> req = std::make_shared<IpcAuthInfoReq>();
+    req->SetDmAuthInfo(dmAuthInfo);
+    req->SetPinLength(pinLength);
+    std::shared_ptr<IpcAuthInfoRsp> rsp = std::make_shared<IpcAuthInfoRsp>();
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    int32_t ret = ipcClientProxy_->SendRequest(EXPORT_AUTH_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    dmAuthInfo = rsp->GetDmAuthInfo();
+    LOGI("Success.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RegisterAuthCodeInvalidCallback(const std::string &pkgName,
+    std::shared_ptr<AuthCodeInvalidCallback> cb)
+{
+    if (pkgName.empty() || cb == nullptr) {
+        LOGE("DeviceManagerImpl::RegisterAuthCodeInvalidCallback failed: input callback is null or pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().RegisterAuthCodeInvalidCallback(pkgName, cb);
+    SyncCallbackToService(DmCommonNotifyEvent::REG_AUTH_CODE_INVALID, pkgName);
+    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnRegisterAuthCodeInvalidCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().UnRegisterAuthCodeInvalidCallback(pkgName);
+    SyncCallbackToService(DmCommonNotifyEvent::UN_REG_AUTH_CODE_INVALID, pkgName);
+    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    return DM_OK;
+}
+
 int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
     std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions,
     std::shared_ptr<DiscoveryCallback> callback)
@@ -3381,6 +3453,65 @@ int32_t DeviceManagerImpl::GetAuthTypeByUdidHash(const std::string &udidHash, co
     }
     authType = static_cast<DMLocalServiceInfoAuthType>(rsp->GetAuthType());
     return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
+    int32_t pinExchangeType, DmAuthInfo &dmAuthInfo)
+{
+    DMLocalServiceInfo info;
+    int32_t ret = GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName, pinExchangeType, info);
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    ConvertLocalServiceInfoToAuthInfo(info, dmAuthInfo);
+    return DM_OK;
+}
+
+void DeviceManagerImpl::ConvertLocalServiceInfoToAuthInfo(const DMLocalServiceInfo &info, DmAuthInfo &dmAuthInfo)
+{
+    dmAuthInfo.authType = static_cast<DMLocalServiceInfoAuthType>(info.authType);
+    dmAuthInfo.authBoxType = static_cast<DMLocalServiceInfoAuthBoxType>(info.authBoxType);
+    dmAuthInfo.pinExchangeType = static_cast<DMLocalServiceInfoPinExchangeType>(info.pinExchangeType);
+    dmAuthInfo.description = info.description;
+    if (info.pinCode.size() >= DM_MAX_PIN_CODE_LEN) {
+        LOGE("pinCode size invalid");
+        return;
+    }
+    if (strcpy_s(dmAuthInfo.pinCode, info.pinCode.size() + 1, info.pinCode.c_str()) != DM_OK) {
+        LOGE("strcpy_s pin code failed!");
+        return;
+    }
+    dmAuthInfo.pinConsumerPkgName = info.bundleName;
+    dmAuthInfo.extraInfo = info.extraInfo;
+    JsonObject extraJson(info.extraInfo);
+    if (extraJson.IsDiscarded()) {
+        LOGE("extra info is not json string.");
+        return;
+    }
+    if (IsInt32(extraJson, TAG_PIN_USER_ID)) {
+        dmAuthInfo.userId = extraJson[TAG_PIN_USER_ID].Get<int32_t>();
+    }
+    if (IsUint64(extraJson, PIN_CONSUMER_TOKENID)) {
+        dmAuthInfo.pinConsumerTokenId = extraJson[PIN_CONSUMER_TOKENID].Get<uint64_t>();
+    }
+    if (IsString(extraJson, BIZ_SRC_PKGNAME)) {
+        dmAuthInfo.bizSrcPkgName = extraJson[BIZ_SRC_PKGNAME].Get<std::string>();
+    }
+    if (IsString(extraJson, BIZ_SINK_PKGNAME)) {
+        dmAuthInfo.bizSinkPkgName = extraJson[BIZ_SINK_PKGNAME].Get<std::string>();
+    }
+    if (IsString(extraJson, META_TOKEN)) {
+        std::string metaTokenStr = extraJson[META_TOKEN].Get<std::string>();
+        if (metaTokenStr.size() >= DM_MAX_META_TOKEN_LEN) {
+            LOGE("metaToken size invalid");
+            return;
+        }
+        if (strcpy_s(dmAuthInfo.metaToken, metaTokenStr.size() + 1, metaTokenStr.c_str()) != DM_OK) {
+            LOGE("strcpy_s meta token failed!");
+            return;
+        }
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

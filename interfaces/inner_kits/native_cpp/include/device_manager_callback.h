@@ -213,6 +213,14 @@ public:
     }
     virtual void OnLeaveLNNCallback(const std::string &networkId, int32_t retCode) = 0;
 };
+
+class AuthCodeInvalidCallback {
+public:
+    virtual ~AuthCodeInvalidCallback()
+    {
+    }
+    virtual void OnAuthCodeInvalid() = 0;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CALLBACK_H

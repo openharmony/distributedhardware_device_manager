@@ -66,6 +66,8 @@ public:
     static bool DecodeServiceRegInfo(MessageParcel &parcel, ServiceRegInfo &serRegInfo);
     static bool EncodePublishServiceParam(const PublishServiceParam &publishServiceParam, MessageParcel &parcel);
     static bool DecodePublishServiceParam(MessageParcel &parcel, PublishServiceParam &publishServiceParam);
+    static bool EncodeDmAuthInfo(const DmAuthInfo &dmAuthInfo, MessageParcel &parcel);
+    static bool DecodeDmAuthInfo(MessageParcel &parcel, DmAuthInfo &dmAuthInfo);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

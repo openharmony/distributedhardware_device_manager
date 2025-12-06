@@ -597,6 +597,7 @@ private:
     void GetBindCallerInfo();
     void ProcessReqAuthTerminate();
     void ResetParams();
+    void ClearLocalServiceInfo(const std::string &pkgName, int32_t authType);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

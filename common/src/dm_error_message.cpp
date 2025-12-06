@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,6 +68,7 @@ ERROR_INFO g_errorMessages[] = {
     {ERR_DM_PEER_CONFIRM_TIME_OUT, "peer confirm timeout."},
     {ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY, "user canceled the pin code display."},
     {ERR_DM_SKIP_AUTHENTICATE, "skip authenticate."},
+    {ERR_DM_BIND_PIN_XOR_MISMATCH, "pin code XOR mismatch"},
 };
 
 std::string GetErrorString(int failedReason)

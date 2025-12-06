@@ -89,6 +89,15 @@ int32_t AuthSinkDataSyncState::VerifyCertificate(std::shared_ptr<DmAuthContext> 
 int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkDataSyncState::Action start");
+    CHECK_NULL_RETURN(context, ERR_DM_FAILED);
+    if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) &&
+        CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_4)) {
+        bool verifyRet = VerifyFlagXor(context);
+        if (!verifyRet) {
+            LOGE("VerifyFlagXor failed, ret: %{public}d", verifyRet);
+            return ERR_DM_BIND_PIN_XOR_MISMATCH;
+        }
+    }
     // verify device cert
     int32_t ret = VerifyCertificate(context);
     if (ret != DM_OK) {
@@ -179,6 +188,14 @@ int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_FAILED);
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_FAILED);
     if (NeedAgreeAcl(context)) {
+        if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) &&
+            CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_4)) {
+            bool verifyRet = VerifyFlagXor(context);
+            if (!verifyRet) {
+                LOGE("VerifyFlagXor failed, ret: %{public}d", verifyRet);
+                return ERR_DM_FAILED;
+            }
+        }
         // Query the ACL of the sink end. Compare the ACLs at both ends.
         context->softbusConnector->SyncLocalAclListProcess({context->accesser.deviceId, context->accesser.userId},
             {context->accessee.deviceId, context->accessee.userId}, context->accessee.aclStrList, false);
