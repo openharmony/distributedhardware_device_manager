@@ -1524,13 +1524,14 @@ void DmAuthManager::SinkAuthenticateFinish()
     bool oneTimePinCodeFlag = false;
     DistributedDeviceProfile::LocalServiceInfo srvInfo;
     JsonObject extraInfoObj;
-        if (GetServiceExtraInfo(authResponseContext_->hostPkgName, authResponseContext_->authType, srvInfo, extraInfoObj)) {
+        if (GetServiceExtraInfo(authResponseContext_->hostPkgName, authResponseContext_->authType,
+            srvInfo, extraInfoObj)) {
             if (IsBool(extraInfoObj, TAG_ONE_TIME_PIN_CODE_FLAG)) {
                 oneTimePinCodeFlag = extraInfoObj[TAG_ONE_TIME_PIN_CODE_FLAG].Get<bool>();
             }
         }
     if (!oneTimePinCodeFlag) {
-       ClearLocalServiceInfo(authResponseContext_->hostPkgName, authResponseContext_->authType);
+        ClearLocalServiceInfo(authResponseContext_->hostPkgName, authResponseContext_->authType);
     }
     listener_->OnSinkBindResult(processInfo_, peerTargetId_, authResponseContext_->reply,
         authResponseContext_->state, GenerateBindResultContent());
