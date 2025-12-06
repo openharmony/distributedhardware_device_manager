@@ -63,7 +63,6 @@ const int32_t SESSION_CLOSE_TIMEOUT = 2;
 const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
 constexpr const char* NEED_JOIN_LNN = "0";
 constexpr const char* NO_NEED_JOIN_LNN = "1";
-const char* TAG_ONE_TIME_PIN_CODE_FLAG = "oneTimePinCodeFlag";
 
 // clone task timeout map
 const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
