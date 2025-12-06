@@ -63,6 +63,7 @@ const int32_t SESSION_CLOSE_TIMEOUT = 2;
 const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
 constexpr const char* NEED_JOIN_LNN = "0";
 constexpr const char* NO_NEED_JOIN_LNN = "1";
+const char* TAG_ONE_TIME_PIN_CODE_FLAG = "oneTimePinCodeFlag";
 
 // clone task timeout map
 const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
@@ -1521,7 +1522,17 @@ void DmAuthManager::SinkAuthenticateFinish()
 {
     LOGI("DmAuthManager::SinkAuthenticateFinish, isFinishOfLocal: %{public}d", isFinishOfLocal_);
     processInfo_.pkgName = authResponseContext_->peerBundleName;
-    ClearLocalServiceInfo(authResponseContext_->hostPkgName, authResponseContext_->authType);
+    bool oneTimePinCodeFlag = false;
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    JsonObject extraInfoObj;
+        if (GetServiceExtraInfo(authResponseContext_->hostPkgName, authResponseContext_->authType, srvInfo, extraInfoObj)) {
+            if (IsBool(extraInfoObj, TAG_ONE_TIME_PIN_CODE_FLAG)) {
+                oneTimePinCodeFlag = extraInfoObj[TAG_ONE_TIME_PIN_CODE_FLAG].Get<bool>();
+            }
+        }
+    if (!oneTimePinCodeFlag) {
+       ClearLocalServiceInfo(authResponseContext_->hostPkgName, authResponseContext_->authType);
+    }
     listener_->OnSinkBindResult(processInfo_, peerTargetId_, authResponseContext_->reply,
         authResponseContext_->state, GenerateBindResultContent());
     if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH &&
