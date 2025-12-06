@@ -200,6 +200,191 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterServiceInfo_004, testing::ext::TestSiz
     ret = (ret == DM_OK) || (ret == ERR_DM_UNSUPPORTED_METHOD);
     ASSERT_EQ(ret, true);
 }
+
+HWTEST_F(DeviceManagerImplTest, ImportAuthInfo_001, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo authInfo;
+    authInfo.authType = DMLocalServiceInfoAuthType::CANCEL;
+    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
+        .WillOnce(Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+    int32_t ret = DeviceManagerImpl::GetInstance().ImportAuthInfo(authInfo);
+    ret = (ret == ERR_DM_IPC_SEND_REQUEST_FAILED);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(DeviceManagerImplTest, ImportAuthInfo_002, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo authInfo;
+    authInfo.authType = DMLocalServiceInfoAuthType::CANCEL;
+    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
+        .WillOnce(DoAll(
+            WithArg<2>([](std::shared_ptr<IpcRsp> rsp) {
+                rsp->SetErrCode(ERR_DM_FAILED);
+            }),
+            Return(DM_OK)
+        ));
+    int32_t ret = DeviceManagerImpl::GetInstance().ImportAuthInfo(authInfo);
+    ret = (ret == ERR_DM_FAILED);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(DeviceManagerImplTest, ImportAuthInfo_003, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo authInfo;
+    authInfo.authType = DMLocalServiceInfoAuthType::CANCEL;
+    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
+        .WillOnce(DoAll(
+            WithArg<2>([](std::shared_ptr<IpcRsp> rsp) {
+                rsp->SetErrCode(DM_OK);
+            }),
+            Return(DM_OK)
+        ));
+    int32_t ret = DeviceManagerImpl::GetInstance().ImportAuthInfo(authInfo);
+    ret = (ret == DM_OK);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(DeviceManagerImplTest, ExportAuthInfo_001, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo authInfo;
+    authInfo.authType = DMLocalServiceInfoAuthType::CANCEL;
+    uint32_t pinLength = 6;
+    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
+        .WillOnce(Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+    int32_t ret = DeviceManagerImpl::GetInstance().ExportAuthInfo(authInfo, pinLength);
+    ret = (ret == ERR_DM_IPC_SEND_REQUEST_FAILED);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(DeviceManagerImplTest, ExportAuthInfo_002, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo authInfo;
+    authInfo.authType = DMLocalServiceInfoAuthType::CANCEL;
+    uint32_t pinLength = 6;
+    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
+        .WillOnce(DoAll(
+            WithArg<2>([](std::shared_ptr<IpcRsp> rsp) {
+                rsp->SetErrCode(ERR_DM_FAILED);
+            }),
+            Return(DM_OK)
+        ));
+    int32_t ret = DeviceManagerImpl::GetInstance().ExportAuthInfo(authInfo, pinLength);
+    ret = (ret == ERR_DM_FAILED);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(DeviceManagerImplTest, ExportAuthInfo_003, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo authInfo;
+    authInfo.authType = DMLocalServiceInfoAuthType::CANCEL;
+    uint32_t pinLength = 6;
+    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
+        .WillOnce(DoAll(
+            WithArg<2>([](std::shared_ptr<IpcRsp> rsp) {
+                rsp->SetErrCode(DM_OK);
+            }),
+            Return(DM_OK)
+        ));
+    int32_t ret = DeviceManagerImpl::GetInstance().ExportAuthInfo(authInfo, pinLength);
+    ret = (ret == DM_OK);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(DeviceManagerImplTest, ConvertLocalServiceInfoToAuthInfo_001, testing::ext::TestSize.Level1)
+{
+    DMLocalServiceInfo localInfo;
+    DmAuthInfo authInfo;
+    localInfo.description = "test_description";
+    localInfo.pinCode = "123456";
+    localInfo.bundleName = "test_bundle";
+    localInfo.extraInfo = R"({"userId" : "123", "bizSrcPkgName" : "bizSrcPkgNameTest",
+                                "bizSinkPkgName" : "bizSinkPkgNameTest", "metaToken" : "123456"})";
+    DeviceManagerImpl::GetInstance().ConvertLocalServiceInfoToAuthInfo(localInfo, authInfo);
+    EXPECT_EQ(authInfo.description, localInfo.description);
+    EXPECT_EQ(std::string(authInfo.pinCode), localInfo.pinCode);
+    EXPECT_EQ(authInfo.pinConsumerPkgName, localInfo.bundleName);
+    EXPECT_EQ(authInfo.extraInfo, localInfo.extraInfo);
+}
+
+HWTEST_F(DeviceManagerImplTest, ConvertLocalServiceInfoToAuthInfo_002, testing::ext::TestSize.Level1)
+{
+    DMLocalServiceInfo localInfo;
+    DmAuthInfo authInfo;
+    localInfo.pinCode = std::string(DM_MAX_PIN_CODE_LEN, 'a');
+    DeviceManagerImpl::GetInstance().ConvertLocalServiceInfoToAuthInfo(localInfo, authInfo);
+    EXPECT_TRUE(std::string(authInfo.pinCode).empty());
+}
+
+HWTEST_F(DeviceManagerImplTest, ConvertLocalServiceInfoToAuthInfo_003, testing::ext::TestSize.Level1)
+{
+    DMLocalServiceInfo localInfo;
+    localInfo.pinCode = "123456";
+    localInfo.extraInfo = R"({})";
+    DmAuthInfo authInfo;
+    DeviceManagerImpl::GetInstance().ConvertLocalServiceInfoToAuthInfo(localInfo, authInfo);
+    EXPECT_EQ(std::string(authInfo.pinCode), "123456");
+}
+
+HWTEST_F(DeviceManagerImplTest, ConvertLocalServiceInfoToAuthInfo_004, testing::ext::TestSize.Level1)
+{
+    DMLocalServiceInfo localInfo;
+    localInfo.pinCode = "123456";
+    localInfo.extraInfo = R"({"pinErrorCount" : "1"})";
+    DmAuthInfo authInfo;
+    DeviceManagerImpl::GetInstance().ConvertLocalServiceInfoToAuthInfo(localInfo, authInfo);
+    EXPECT_EQ(std::string(authInfo.pinCode), "123456");
+}
+
+HWTEST_F(DeviceManagerImplTest, ConvertLocalServiceInfoToAuthInfo_005, testing::ext::TestSize.Level1)
+{
+    DMLocalServiceInfo localInfo;
+    DmAuthInfo authInfo;
+    localInfo.description = "test_description";
+    localInfo.pinCode = "123456";
+    localInfo.bundleName = "test_bundle";
+    std::string longMetaToken(2025, 'a');
+    localInfo.extraInfo = R"({"META_TOKEN": ")" + longMetaToken + R"("})";
+    DeviceManagerImpl::GetInstance().ConvertLocalServiceInfoToAuthInfo(localInfo, authInfo);
+    EXPECT_EQ(std::string(authInfo.pinCode), "123456");
+}
+
+HWTEST_F(DeviceManagerImplTest, RegisterAuthCodeInvalidCallback_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "com.ohos.test";
+    std::shared_ptr<AuthCodeInvalidCallback> cb = nullptr;
+    int32_t ret = DeviceManagerImpl::GetInstance().RegisterAuthCodeInvalidCallback(pkgName, cb);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegisterAuthCodeInvalidCallback_002, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "com.ohos.test";
+    std::shared_ptr<AuthCodeInvalidCallback> cb = std::make_shared<AuthCodeInvalidCallbackTest>();
+    int32_t ret = DeviceManagerImpl::GetInstance().RegisterAuthCodeInvalidCallback(pkgName, cb);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegisterAuthCodeInvalidCallback_003, testing::ext::TestSize.Level1)
+{
+    std::string pkgName;
+    std::shared_ptr<AuthCodeInvalidCallback> cb = nullptr;
+    int32_t ret = DeviceManagerImpl::GetInstance().RegisterAuthCodeInvalidCallback(pkgName, cb);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, UnRegisterAuthCodeInvalidCallback_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName;
+    int32_t ret = DeviceManagerImpl::GetInstance().UnRegisterAuthCodeInvalidCallback(pkgName);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, UnRegisterAuthCodeInvalidCallback_002, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t ret = DeviceManagerImpl::GetInstance().UnRegisterAuthCodeInvalidCallback(pkgName);
+    EXPECT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -20,6 +20,7 @@
 #include "device_manager_ipc_interface_code.h"
 #include "ipc_acl_profile_req.h"
 #include "ipc_bind_device_req.h"
+#include "ipc_auth_info_req.h"
 #include "ipc_client_manager.h"
 #include "ipc_cmd_register.h"
 #include "ipc_common_param_req.h"
@@ -1241,6 +1242,78 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_048, testing::ext::TestSize.Le
     ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
 }
 
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_091, testing::ext::TestSize.Level1)
+{
+    int32_t cmdCode = IMPORT_AUTH_INFO;
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), ERR_DM_IPC_READ_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_023, testing::ext::TestSize.Level1)
+{
+    auto ptr = GetIpcRequestFunc(IMPORT_AUTH_INFO);
+    ASSERT_TRUE(ptr != nullptr);
+    MessageParcel data;
+    DmAuthInfo dmAuthInfo;
+    dmAuthInfo.pinConsumerPkgName = "com.test.pkgname";
+    dmAuthInfo.bizSrcPkgName = "com.test.SrcPkgname";
+    dmAuthInfo.bizSinkPkgName = "com.test.SinkPkgname";
+    dmAuthInfo.authType = DMLocalServiceInfoAuthType::TRUST_ONETIME;
+    dmAuthInfo.authBoxType = DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM;
+    dmAuthInfo.pinExchangeType = DMLocalServiceInfoPinExchangeType::PINBOX;
+    dmAuthInfo.description = "test import auth info";
+    auto req = std::make_shared<IpcAuthInfoReq>();
+    req->SetDmAuthInfo(dmAuthInfo);
+    auto ret = ptr(req, data);
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_049, testing::ext::TestSize.Level1)
+{
+    auto ptr = GetResponseFunc(IMPORT_AUTH_INFO);
+    ASSERT_TRUE(ptr != nullptr);
+    MessageParcel data;
+    data.WriteInt32(DM_OK);
+    auto ipcRspInsance = std::make_shared<IpcRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), ERR_DM_IPC_READ_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_092, testing::ext::TestSize.Level1)
+{
+    int32_t cmdCode = EXPORT_AUTH_INFO;
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_024, testing::ext::TestSize.Level1)
+{
+    auto ptr = GetIpcRequestFunc(EXPORT_AUTH_INFO);
+    ASSERT_TRUE(ptr != nullptr);
+    MessageParcel data;
+    DmAuthInfo dmAuthInfo;
+    dmAuthInfo.pinConsumerPkgName = "com.test.pkgname";
+    dmAuthInfo.bizSrcPkgName = "com.test.SrcPkgname";
+    dmAuthInfo.bizSinkPkgName = "com.test.SinkPkgname";
+    dmAuthInfo.authType = DMLocalServiceInfoAuthType::TRUST_ONETIME;
+    dmAuthInfo.authBoxType = DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM;
+    dmAuthInfo.pinExchangeType = DMLocalServiceInfoPinExchangeType::PINBOX;
+    dmAuthInfo.description = "test import auth info";
+    uint32_t pinLength = 6;
+    auto req = std::make_shared<IpcAuthInfoReq>();
+    req->SetDmAuthInfo(dmAuthInfo);
+    req->SetPinLength(pinLength);
+    auto ret = ptr(req, data);
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_050, testing::ext::TestSize.Level1)
+{
+    auto ptr = GetResponseFunc(EXPORT_AUTH_INFO);
+    ASSERT_TRUE(ptr != nullptr);
+    MessageParcel data;
+    data.WriteInt32(DM_OK);
+    auto ipcRspInsance = std::make_shared<IpcRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
 HWTEST_F(IpcCmdParserClientTest, TEST_IPC_REQUEST_NULL_001, testing::ext::TestSize.Level2)
 {
     EXPECT_EQ(TestIpcRequestNull(REGISTER_DEVICE_MANAGER_LISTENER), ERR_DM_FAILED);
@@ -1304,6 +1377,7 @@ HWTEST_F(IpcCmdParserClientTest, TEST_IPC_REQUEST_NULL_003, testing::ext::TestSi
     EXPECT_EQ(TestIpcRequestNull(UNREG_LOCALSERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestIpcRequestNull(UPDATE_LOCALSERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestIpcRequestNull(GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(IMPORT_AUTH_INFO), ERR_DM_FAILED);
 }
 
 HWTEST_F(IpcCmdParserClientTest, TEST_READ_RESPONSE_NULL_001, testing::ext::TestSize.Level2)
@@ -1356,6 +1430,7 @@ HWTEST_F(IpcCmdParserClientTest, TEST_READ_RESPONSE_NULL_002, testing::ext::Test
     EXPECT_EQ(TestReadResponseRspNull(UNREG_LOCALSERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestReadResponseRspNull(UPDATE_LOCALSERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestReadResponseRspNull(GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(IMPORT_AUTH_INFO), ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware

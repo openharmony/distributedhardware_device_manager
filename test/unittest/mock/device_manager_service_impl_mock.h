@@ -53,6 +53,8 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller,
         std::string &udid, int32_t &bindLevel) = 0;
+    virtual int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength) = 0;
+    virtual int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerServiceImpl> dmDeviceManagerServiceImpl = nullptr;
 };
@@ -81,6 +83,8 @@ public:
         const DmAccessCallee &, const std::string &));
     MOCK_METHOD(int32_t, DeleteAclExtraDataServiceId, (int64_t, int64_t,
         std::string &, int32_t &), (override));
+    MOCK_METHOD(int32_t, ExportAuthInfo, (DmAuthInfo &, uint32_t));
+    MOCK_METHOD(int32_t, ImportAuthInfo, (const DmAuthInfo &));
 };
 }
 }

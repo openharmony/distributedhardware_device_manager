@@ -18,6 +18,7 @@
 
 
 #include <gtest/gtest.h>
+#include "distributed_device_profile_client_mock.h"
 #include "hichain_auth_connector_mock.h"
 #include "softbus_connector_mock.h"
 #include "softbus_session_mock.h"
@@ -32,6 +33,9 @@ public:
     void SetUp();
     void TearDown();
 private:
+    static inline std::shared_ptr<DistributedDeviceProfile::DistributedDeviceProfileClientMock>
+        distributedDeviceProfileClientMock_ =
+        std::make_shared<DistributedDeviceProfile::DistributedDeviceProfileClientMock>();
     static inline std::shared_ptr<SoftbusConnectorMock> dmSoftbusConnectorMock =
         std::make_shared<SoftbusConnectorMock>();
     static inline std::shared_ptr<SoftbusSessionMock> dmSoftbusSessionMock =

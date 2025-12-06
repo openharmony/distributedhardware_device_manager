@@ -35,6 +35,8 @@ public:
     virtual int32_t CheckServiceHasRegistered(const ServiceRegInfo &serviceRegInfo, int64_t tokenId,
         int32_t &regServiceId) = 0;
     virtual int32_t GenerateRegServiceId(int32_t &regServiceId) = 0;
+    virtual bool IsImportAuthInfoValid(const DmAuthInfo &dmAuthInfo) = 0;
+    virtual bool IsExportAuthInfoValid(const DmAuthInfo &dmAuthInfo) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerService> dmDeviceManagerService = nullptr;
 };
@@ -49,6 +51,8 @@ public:
     MOCK_METHOD(int32_t, GenerateServiceId, (int64_t &));
     MOCK_METHOD(int32_t, CheckServiceHasRegistered, (const ServiceRegInfo &, int64_t, int32_t &));
     MOCK_METHOD(int32_t, GenerateRegServiceId, (int32_t &));
+    MOCK_METHOD(bool, IsImportAuthInfoValid, (const DmAuthInfo &));
+    MOCK_METHOD(bool, IsExportAuthInfoValid, (const DmAuthInfo &));
 };
 }
 }
