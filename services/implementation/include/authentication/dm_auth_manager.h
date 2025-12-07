@@ -559,6 +559,8 @@ public:
     void ResponseReCheckMsg();
     void RequestReCheckMsgDone();
     void CloseAuthSession(const int32_t sessionId);
+    bool GetServiceExtraInfo(const std::string &pkgName, int32_t pinExchangeType,
+        DistributedDeviceProfile::LocalServiceInfo &srvInfo, JsonObject &extraInfoObj);
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,

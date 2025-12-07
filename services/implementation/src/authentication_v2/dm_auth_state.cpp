@@ -57,7 +57,6 @@ constexpr const static char* FLAG_WHITE_LIST[] = {
     "wear_link_service",
 };
 constexpr int32_t FLAG_WHITE_LIST_NUM = std::size(FLAG_WHITE_LIST);
-const char* TAG_ONE_TIME_PIN_CODE_FLAG = "oneTimePinCodeFlag";
 const std::map<DmAuthStateType, DmAuthStatus> NEW_AND_OLD_STATE_MAPPING = {
     { DmAuthStateType::AUTH_SRC_FINISH_STATE, DmAuthStatus::STATUS_DM_AUTH_FINISH },
     { DmAuthStateType::AUTH_SINK_FINISH_STATE, DmAuthStatus::STATUS_DM_SINK_AUTH_FINISH },
