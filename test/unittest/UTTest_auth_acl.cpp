@@ -23,12 +23,15 @@ using namespace testing;
 namespace OHOS {
 namespace DistributedHardware {
 constexpr const char *TEST_NONE_EMPTY_STRING = "test";
+std::shared_ptr<DeviceProfileConnectorMock> AuthAclTest::deviceProfileConnectorMock = nullptr;
 void AuthAclTest::SetUpTestCase()
 {
     LOGI("AuthAclTest::SetUpTestCase start.");
     DmSoftbusConnector::dmSoftbusConnector = dmSoftbusConnectorMock;
     DmSoftbusSession::dmSoftbusSession = dmSoftbusSessionMock;
     DmAuthMessageProcessorMock::dmAuthMessageProcessorMock = std::make_shared<DmAuthMessageProcessorMock>();
+    deviceProfileConnectorMock = std::make_shared<DeviceProfileConnectorMock>();
+    DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock;
 }
 
 void AuthAclTest::TearDownTestCase()
@@ -39,6 +42,8 @@ void AuthAclTest::TearDownTestCase()
     DmSoftbusSession::dmSoftbusSession = nullptr;
     dmSoftbusSessionMock = nullptr;
     DmAuthMessageProcessorMock::dmAuthMessageProcessorMock = nullptr;
+    deviceProfileConnectorMock = nullptr;
+    DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
 }
 
 void AuthAclTest::SetUp()
@@ -100,6 +105,48 @@ HWTEST_F(AuthAclTest, AuthSrcFinish_002, testing::ext::TestSize.Level1)
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcFinishState>();
 
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_FINISH_STATE);
+}
+
+HWTEST_F(AuthAclTest, VerifyFlagXor_007, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    context = authManager->GetAuthContext();
+    context->accesser.bundleName = "wear_link_service_test";
+    context->direction = DM_AUTH_SINK;
+    context->accessee.pkgName = "watch_system_service";
+    srvInfo.SetBundleName("com.huawei.hmos.wearlink");
+    context->pinCodeFlag = false;
+    srvInfo.SetExtraInfo(R"(
+{
+    "PIN_MATCH_FLAG" : false,
+    "PIN_ERROR_COUNT" : 10000
+}
+)");
+    EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        testing::StrEq("com.huawei.hmos.wearlink"), _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcDataSyncState>();
+    auto ret = authState->VerifyFlagXor(context);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(AuthAclTest, SinkFinish_001, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    context = authManager->GetAuthContext();
+    auto authState = std::make_shared<AuthSinkFinishState>();
+    context->authType = DmAuthType::AUTH_TYPE_NFC;
+    context->accessee.pkgName = "watch_system_service";
+    srvInfo.SetBundleName("com.huawei.hmos.wearlink");
+    EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        testing::StrEq("com.huawei.hmos.wearlink"), _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+    authState->SinkFinish(context);
+    EXPECT_EQ(srvInfo.GetBundleName(), "com.huawei.hmos.wearlink");
 }
 }
 }

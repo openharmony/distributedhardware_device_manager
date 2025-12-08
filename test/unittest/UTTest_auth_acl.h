@@ -19,6 +19,7 @@
 
 #include <gtest/gtest.h>
 #include "hichain_auth_connector_mock.h"
+#include "deviceprofile_connector_mock.h"
 #include "softbus_connector_mock.h"
 #include "softbus_session_mock.h"
 #include "auth_manager.h"
@@ -36,6 +37,7 @@ private:
         std::make_shared<SoftbusConnectorMock>();
     static inline std::shared_ptr<SoftbusSessionMock> dmSoftbusSessionMock =
         std::make_shared<SoftbusSessionMock>();
+    static std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock;   
     std::shared_ptr<SoftbusConnector> softbusConnector;
     std::shared_ptr<IDeviceManagerServiceListener> listener;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector;
