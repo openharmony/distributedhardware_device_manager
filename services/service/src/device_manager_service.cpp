@@ -3602,7 +3602,9 @@ int32_t DeviceManagerService::RegDevStateCallbackToService(const std::string &pk
     processInfo.pkgName = pkgName;
     processInfo.userId = userId;
     listener_->OnDevStateCallbackAdd(processInfo, deviceList);
-
+    if (PermissionManager::GetInstance().CheckOnReadyRetrospectiveNotificationBlackList()) {
+        return DM_OK;
+    }
     std::vector<DmDeviceInfo> readyDeviceList;
     CHECK_NULL_RETURN(dmServiceImpl_, ERR_DM_POINT_NULL);
     dmServiceImpl_->GetNotifyEventInfos(readyDeviceList);
