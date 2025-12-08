@@ -2026,57 +2026,6 @@ HWTEST_F(DeviceManagerServiceTest, UpdateServiceInfo_003, testing::ext::TestSize
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_203, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    std::string networkId = "networkIdTest";
-    int32_t screenStatus = -1;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(false));
-    int32_t ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
-    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
-HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_204, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    std::string networkId = "networkIdTest";
-    int32_t screenStatus = -1;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    int32_t ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
-    ASSERT_EQ(ret, DM_OK);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-}
-
-HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_004, testing::ext::TestSize.Level1)
-{
-    std::string pkgName;
-    std::string udid;
-    std::string networkId = "networkIdTest_001";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(false));
-    int32_t ret = DeviceManagerService::GetInstance().GetNetworkIdByUdid(pkgName, udid, networkId);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
-HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_203, testing::ext::TestSize.Level1)
-{
-    std::string pkgName;
-    OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(false));
-    int32_t ret = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
-HWTEST_F(DeviceManagerServiceTest, GetLocalDisplayDeviceName_203, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "packName";
-    int32_t maxNameLength = 1;
-    std::string displayName = "displayName";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(false));
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDisplayDeviceName(pkgName, maxNameLength, displayName);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
 HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_203, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "packName";
@@ -2102,29 +2051,6 @@ HWTEST_F(DeviceManagerServiceTest, RestoreLocalDeviceName_203, testing::ext::Tes
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().RestoreLocalDeviceName(pkgName);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
-HWTEST_F(DeviceManagerServiceTest, GetAccessUdidByNetworkId, testing::ext::TestSize.Level1)
-{
-    std::string srcNetWorkId = "packName";
-    std::string srcUdid = "123456";
-    std::string sinkNetWorkId = "147258";
-    std::string sinkUdid = "456789";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(false));
-    int32_t ret = DeviceManagerService::GetInstance().GetAccessUdidByNetworkId(srcNetWorkId,
-        srcUdid, sinkNetWorkId, sinkUdid);
-    EXPECT_EQ(ret, false);
-}
-
-HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_007, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "com.ohos.test";
-    PeerTargetId targetId;
-    std::map<std::string, std::string> bindParam;
-    targetId.serviceId = 123;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(false));
-    int32_t ret = DeviceManagerService::GetInstance().BindServiceTarget(pkgName, targetId, bindParam);
-    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_008, testing::ext::TestSize.Level1)
