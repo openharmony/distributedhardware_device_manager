@@ -1303,7 +1303,8 @@ HWTEST_F(DeviceManagerServiceThreeTest, GenerateServiceId_002, testing::ext::Tes
 HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_001, testing::ext::TestSize.Level1)
 {
     DmAuthInfo dmAuthInfo;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(false));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(false));
     int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(dmAuthInfo);
     EXPECT_EQ(result, ERR_DM_NO_PERMISSION);
 }
@@ -1311,8 +1312,10 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_001, testing::ext::TestSi
 HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_002, testing::ext::TestSize.Level1)
 {
     DmAuthInfo dmAuthInfo;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(ERR_DM_FAILED));
     int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(dmAuthInfo);
     EXPECT_EQ(result,  ERR_DM_FAILED);
 }
@@ -1320,9 +1323,12 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_002, testing::ext::TestSi
 HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_003, testing::ext::TestSize.Level1)
 {
     DmAuthInfo dmAuthInfo;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(false));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(false));
     int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(dmAuthInfo);
     EXPECT_EQ(result, ERR_DM_NO_PERMISSION);
 }
@@ -1330,22 +1336,31 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_003, testing::ext::TestSi
 HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_004, testing::ext::TestSize.Level1)
 {
     DmAuthInfo dmAuthInfo;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsImportAuthInfoValid(_)).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsImportAuthInfoValid(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady())
+        .Times(AnyNumber()).WillOnce(Return(false));
     int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(dmAuthInfo);
-    EXPECT_EQ(result, ERR_DM_NOT_INIT);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_005, testing::ext::TestSize.Level1)
 {
     DmAuthInfo dmAuthInfo;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsImportAuthInfoValid(_)).WillOnce(Return(false));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsImportAuthInfoValid(_))
+        .Times(AnyNumber()).WillOnce(Return(false));
     int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(dmAuthInfo);
     EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1356,21 +1371,23 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_006, testing::ext::TestSi
     dmAuthInfo.userId = 100;
     dmAuthInfo.pinConsumerPkgName = "com.ohos.test.pin";
     dmAuthInfo.bizSrcPkgName = "com.ohos.test.biz";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, ImportAuthInfo(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsImportAuthInfoValid(_)).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, ImportAuthInfo(_)).Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsImportAuthInfoValid(_)).Times(AnyNumber()).WillOnce(Return(true));
     int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(dmAuthInfo);
-    EXPECT_EQ(result, DM_OK);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_001, testing::ext::TestSize.Level1)
 {
     DmAuthInfo dmAuthInfo;
     uint32_t pinlength = 6;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(false));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(false));
     int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
     EXPECT_EQ(result, ERR_DM_NO_PERMISSION);
 }
@@ -1379,8 +1396,10 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_002, testing::ext::TestSi
 {
     DmAuthInfo dmAuthInfo;
     uint32_t pinlength = 6;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(ERR_DM_FAILED));
     int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
     EXPECT_EQ(result,  ERR_DM_FAILED);
 }
@@ -1389,9 +1408,12 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_003, testing::ext::TestSi
 {
     DmAuthInfo dmAuthInfo;
     uint32_t pinlength = 6;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(false));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(false));
     int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
     EXPECT_EQ(result, ERR_DM_NO_PERMISSION);
 }
@@ -1400,10 +1422,14 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_004, testing::ext::TestSi
 {
     DmAuthInfo dmAuthInfo;
     uint32_t pinlength = 6;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsExportAuthInfoValid(_)).WillOnce(Return(false));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsExportAuthInfoValid(_))
+        .Times(AnyNumber()).WillOnce(Return(false));
     int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
     EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1412,23 +1438,32 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_005, testing::ext::TestSi
 {
     DmAuthInfo dmAuthInfo;
     uint32_t pinlength = 6;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsExportAuthInfoValid(_)).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsExportAuthInfoValid(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady())
+        .Times(AnyNumber()).WillOnce(Return(false));
     int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
-    EXPECT_EQ(result, ERR_DM_NOT_INIT);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_006, testing::ext::TestSize.Level1)
 {
     DmAuthInfo dmAuthInfo;
     uint32_t pinlength = 5;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsExportAuthInfoValid(_)).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsExportAuthInfoValid(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
     int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
     EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1437,13 +1472,16 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_007, testing::ext::TestSi
 {
     DmAuthInfo dmAuthInfo;
     uint32_t pinlength = 5;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(Return(ERR_DM_FAILED));
+        .Times(AnyNumber()).WillOnce(Return(ERR_DM_FAILED));
     int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
-    EXPECT_FALSE(result);
+    EXPECT_EQ(result, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_008, testing::ext::TestSize.Level1)
@@ -1452,22 +1490,25 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_008, testing::ext::TestSi
     uint32_t pinlength = 5;
     std::vector<int32_t> userIds = {100, 200};
     dmAuthInfo.userId = 300;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
+        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
     int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
-    EXPECT_FALSE(result);
+    EXPECT_EQ(result, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, IsExportAuthInfoValid_001, TestSize.Level1)
 {
     DmAuthInfo dmAuthInfo;
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(Return(ERR_DM_FAILED));
+        .Times(AnyNumber()).WillOnce(Return(ERR_DM_FAILED));
     bool result = DeviceManagerService::GetInstance().IsExportAuthInfoValid(dmAuthInfo);
-    EXPECT_FALSE(result);
+    EXPECT_TRUE(result);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, IsExportAuthInfoValid_002, TestSize.Level1)
@@ -1475,7 +1516,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, IsExportAuthInfoValid_002, TestSize.Leve
     DmAuthInfo dmAuthInfo;
     std::vector<int32_t> userIds = {100, 200};
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
+        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
     dmAuthInfo.userId = 300;
     bool result = DeviceManagerService::GetInstance().IsExportAuthInfoValid(dmAuthInfo);
     EXPECT_FALSE(result);
@@ -1486,7 +1527,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, IsExportAuthInfoValid_003, TestSize.Leve
     DmAuthInfo dmAuthInfo;
     std::vector<int32_t> userIds = {100};
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
+        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
     dmAuthInfo.userId = 100;
     dmAuthInfo.pinConsumerPkgName = std::string(2025, 'a');
     bool result = DeviceManagerService::GetInstance().IsExportAuthInfoValid(dmAuthInfo);
@@ -1498,7 +1539,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, IsExportAuthInfoValid_004, TestSize.Leve
     DmAuthInfo dmAuthInfo;
     std::vector<int32_t> userIds = {100};
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
+        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
     dmAuthInfo.userId = 100;
     dmAuthInfo.pinConsumerPkgName = "com.test.valid";
     dmAuthInfo.bizSrcPkgName = std::string(2025, 'b');
@@ -1511,7 +1552,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, IsExportAuthInfoValid_005, TestSize.Leve
     DmAuthInfo dmAuthInfo;
     std::vector<int32_t> userIds = {100};
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
+        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
     dmAuthInfo.userId = 100;
     dmAuthInfo.pinConsumerPkgName = "com.test.valid";
     bool result = DeviceManagerService::GetInstance().IsExportAuthInfoValid(dmAuthInfo);

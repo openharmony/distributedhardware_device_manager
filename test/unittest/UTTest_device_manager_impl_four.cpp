@@ -208,8 +208,7 @@ HWTEST_F(DeviceManagerImplTest, ImportAuthInfo_001, testing::ext::TestSize.Level
     EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
         .WillOnce(Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
     int32_t ret = DeviceManagerImpl::GetInstance().ImportAuthInfo(authInfo);
-    ret = (ret == ERR_DM_IPC_SEND_REQUEST_FAILED);
-    EXPECT_EQ(ret, true);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 
 HWTEST_F(DeviceManagerImplTest, ImportAuthInfo_002, testing::ext::TestSize.Level1)
@@ -224,8 +223,7 @@ HWTEST_F(DeviceManagerImplTest, ImportAuthInfo_002, testing::ext::TestSize.Level
             Return(DM_OK)
         ));
     int32_t ret = DeviceManagerImpl::GetInstance().ImportAuthInfo(authInfo);
-    ret = (ret == ERR_DM_FAILED);
-    EXPECT_EQ(ret, true);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerImplTest, ImportAuthInfo_003, testing::ext::TestSize.Level1)
@@ -240,8 +238,7 @@ HWTEST_F(DeviceManagerImplTest, ImportAuthInfo_003, testing::ext::TestSize.Level
             Return(DM_OK)
         ));
     int32_t ret = DeviceManagerImpl::GetInstance().ImportAuthInfo(authInfo);
-    ret = (ret == DM_OK);
-    EXPECT_EQ(ret, true);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerImplTest, ExportAuthInfo_001, testing::ext::TestSize.Level1)
@@ -252,8 +249,7 @@ HWTEST_F(DeviceManagerImplTest, ExportAuthInfo_001, testing::ext::TestSize.Level
     EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
         .WillOnce(Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
     int32_t ret = DeviceManagerImpl::GetInstance().ExportAuthInfo(authInfo, pinLength);
-    ret = (ret == ERR_DM_IPC_SEND_REQUEST_FAILED);
-    EXPECT_EQ(ret, true);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 
 HWTEST_F(DeviceManagerImplTest, ExportAuthInfo_002, testing::ext::TestSize.Level1)
@@ -269,8 +265,7 @@ HWTEST_F(DeviceManagerImplTest, ExportAuthInfo_002, testing::ext::TestSize.Level
             Return(DM_OK)
         ));
     int32_t ret = DeviceManagerImpl::GetInstance().ExportAuthInfo(authInfo, pinLength);
-    ret = (ret == ERR_DM_FAILED);
-    EXPECT_EQ(ret, true);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerImplTest, ExportAuthInfo_003, testing::ext::TestSize.Level1)
@@ -286,8 +281,7 @@ HWTEST_F(DeviceManagerImplTest, ExportAuthInfo_003, testing::ext::TestSize.Level
             Return(DM_OK)
         ));
     int32_t ret = DeviceManagerImpl::GetInstance().ExportAuthInfo(authInfo, pinLength);
-    ret = (ret == DM_OK);
-    EXPECT_EQ(ret, true);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerImplTest, ConvertLocalServiceInfoToAuthInfo_001, testing::ext::TestSize.Level1)
