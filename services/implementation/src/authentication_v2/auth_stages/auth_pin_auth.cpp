@@ -174,7 +174,8 @@ int32_t AuthSrcPinAuthStartState::ProcessImportAuthInfo(std::shared_ptr<DmAuthCo
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     if ((context->ncmBindTarget && context->accesser.bundleName == BUNDLE_NAME_COLLABORATION_FWK) ||
         IsInFlagWhiteList(context->accesser.bundleName)) {
-        LOGI("bundleName: %{public}s in white list, pin code from rom", context->accesser.bundleName.c_str());
+        LOGI("bundleName: %{public}s in white list, pin code from rom",
+            GetAnonyString(context->accesser.bundleName).c_str());
         return DM_OK;
     }
     OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;

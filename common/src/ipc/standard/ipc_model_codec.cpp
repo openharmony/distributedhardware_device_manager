@@ -682,15 +682,25 @@ bool IpcModelCodec::DecodeDmAuthInfo(MessageParcel &parcel, DmAuthInfo &dmAuthIn
     }
     int32_t authType = static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ONETIME);
     READ_HELPER_RET(parcel, Int32, authType, false);
-    dmAuthInfo.authType = static_cast<DMLocalServiceInfoAuthType>(authType);
+    if (authType >= static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ONETIME) &&
+        authType < static_cast<int32_t>(DMLocalServiceInfoAuthType::MAX)) {
+        dmAuthInfo.authType = static_cast<DMLocalServiceInfoAuthType>(authType);
+    }
 
     int32_t authBoxType = static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::STATE3);
     READ_HELPER_RET(parcel, Int32, authBoxType, false);
-    dmAuthInfo.authBoxType = static_cast<DMLocalServiceInfoAuthBoxType>(authBoxType);
+    if (authBoxType >= static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::STATE3) &&
+        authType < static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::MAX)) {
+        dmAuthInfo.authBoxType = static_cast<DMLocalServiceInfoAuthBoxType>(authBoxType);
+    }
 
     int32_t pinExchangeType = static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::QR_FROMDP);
     READ_HELPER_RET(parcel, Int32, pinExchangeType, false);
-    dmAuthInfo.pinExchangeType = static_cast<DMLocalServiceInfoPinExchangeType>(pinExchangeType);
+    if (pinExchangeType >= static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::PINBOX) &&
+        authType < static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::MAX)) {
+        dmAuthInfo.pinExchangeType = static_cast<DMLocalServiceInfoPinExchangeType>(pinExchangeType);
+    }
+
     READ_HELPER_RET(parcel, String, dmAuthInfo.description, false);
     READ_HELPER_RET(parcel, String, dmAuthInfo.extraInfo, false);
     return true;

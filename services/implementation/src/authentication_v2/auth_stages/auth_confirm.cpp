@@ -1051,8 +1051,12 @@ void AuthSinkConfirmState::ReadServiceInfo(std::shared_ptr<DmAuthContext> contex
     CHECK_NULL_VOID(context);
     // query ServiceInfo by accessee.pkgName and authType from client
     OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    std::string pkgName = context->accessee.pkgName;
+    if (PKGNAME_MAPPING.find(pkgName) != PKGNAME_MAPPING.end()) {
+        pkgName = PKGNAME_MAPPING.at(pkgName);
+    }
     auto ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
-        context->accessee.pkgName, context->authType, srvInfo);
+        pkgName, context->authType, srvInfo);
     if (ret == OHOS::DistributedDeviceProfile::DP_SUCCESS) {
         ProcessImportAuthInfo(context, srvInfo);
     } else if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) &&

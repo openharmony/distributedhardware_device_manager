@@ -450,7 +450,8 @@ typedef struct DmNotifyKey {
 enum class DMLocalServiceInfoAuthType : int32_t {
     TRUST_ONETIME = 0,
     TRUST_ALWAYS = 6,
-    CANCEL = 1
+    CANCEL = 1,
+    MAX = 7
 };
 
 enum class DMLocalServiceInfoPinExchangeType : int32_t {
@@ -459,12 +460,14 @@ enum class DMLocalServiceInfoPinExchangeType : int32_t {
     FROMDP = 3,           /** nfc(from dp) */
     IMPORT_AUTH_CODE = 5, /** import(from dp)  */
     ULTRASOUND = 6,       /** ultrasound(from memory) */
+    MAX = 7
 };
 
 enum class DMLocalServiceInfoAuthBoxType : int32_t {
     STATE3 = 1,
     SKIP_CONFIRM = 2,
-    TWO_IN1 = 3
+    TWO_IN1 = 3,
+    MAX = 4
 };
 
 typedef struct DMLocalServiceInfo {

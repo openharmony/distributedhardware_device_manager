@@ -35,6 +35,9 @@ const char* const FILED_AUTHORIZED_SCOPE = "authorizedScope";
 const char* const FILED_AUTHORIZED_APP_LIST = "authorizedAppList";
 const char* const FILED_SUBJECT = "subject";
 constexpr const static char* BUNDLE_NAME_COLLABORATION_FWK = "CollaborationFwk";
+const std::map<std::string, std::string> PKGNAME_MAPPING = {
+    { "watch_system_service", "com.huawei.hmos.wearlink" }
+};
 // State Types
 enum class DmAuthStateType {
     AUTH_IDLE_STATE = 0,    // When the device is initialized

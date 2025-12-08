@@ -165,7 +165,11 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
         DistributedDeviceProfile::LocalServiceInfo srvInfo;
         JsonObject extraInfoObj;
         bool oneTimePinCodeFlag = false;
-        if (GetServiceExtraInfo(context->accessee.pkgName, context->authType, srvInfo, extraInfoObj)) {
+        std::string pkgName = context->accessee.pkgName;
+        if (PKGNAME_MAPPING.find(pkgName) != PKGNAME_MAPPING.end()) {
+            pkgName = PKGNAME_MAPPING.at(pkgName);
+        }
+        if (GetServiceExtraInfo(pkgName, context->authType, srvInfo, extraInfoObj)) {
             if (IsBool(extraInfoObj, TAG_ONE_TIME_PIN_CODE_FLAG)) {
                 oneTimePinCodeFlag = extraInfoObj[TAG_ONE_TIME_PIN_CODE_FLAG].Get<bool>();
             }
@@ -174,7 +178,7 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
             srvInfo.SetPinCode("******");
             DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(srvInfo);
         } else {
-            HandlePinResultAndCallback(context, context->accessee.pkgName);
+            HandlePinResultAndCallback(context, pkgName);
         }
     }
     context->processInfo.pkgName = context->accessee.pkgName;
@@ -1070,13 +1074,15 @@ void DmAuthState::UpdatePinErrorCount(const std::string &pkgName, int32_t pinExc
         return;
     }
     std::string extra = srvInfo.GetExtraInfo();
+    if (extra.empty()) {
+        LOGE("UpdatePinErrorCount extra is empty");
+        return;
+    }
     JsonObject extraInfoObj;
-    if (!extra.empty()) {
-        extraInfoObj.Parse(extra);
-        if (extraInfoObj.IsDiscarded()) {
-            LOGE("UpdatePinErrorCount parse extra discarded, skip update to protect original data");
-            return;
-        }
+    extraInfoObj.Parse(extra);
+    if (extraInfoObj.IsDiscarded()) {
+        LOGE("UpdatePinErrorCount parse extra discarded, skip update to protect original data");
+        return;
     }
     int32_t count = 0;
     if (!extraInfoObj.IsDiscarded() && IsInt32(extraInfoObj, PIN_ERROR_COUNT)) {
@@ -1093,6 +1099,7 @@ void DmAuthState::UpdatePinErrorCount(const std::string &pkgName, int32_t pinExc
 
 void DmAuthState::HandlePinResultAndCallback(std::shared_ptr<DmAuthContext> context, const std::string &pkgName)
 {
+    CHECK_NULL_VOID(context);
     int32_t count = 0;
     uint64_t tokenId = 0;
     DmAuthState::GetPinErrorCountAndTokenId(pkgName, context->authType, count, tokenId);
@@ -1109,7 +1116,7 @@ void DmAuthState::HandlePinResultAndCallback(std::shared_ptr<DmAuthContext> cont
             context->stopTimerAndDelDpCallback(pkgName, context->authType, tokenId);
         }
         if (context->listener != nullptr) {
-            context->listener->OnAuthCodeInvalid(pkgName);
+            context->listener->OnAuthCodeInvalid(context->accessee.pkgName);
         }
     }
 }
@@ -1145,12 +1152,18 @@ bool DmAuthState::VerifyFlagXor(std::shared_ptr<DmAuthContext> context)
     DistributedDeviceProfile::LocalServiceInfo srvInfo;
     JsonObject extraInfoObj;
     DmAccess accessSide;
+    std::string pkgName = "";
     if (context->direction == DM_AUTH_SOURCE) {
         accessSide = context->accesser;
+        pkgName = accessSide.pkgName;
     } else {
         accessSide = context->accessee;
+        pkgName = accessSide.pkgName;
+        if (PKGNAME_MAPPING.find(pkgName) != PKGNAME_MAPPING.end()) {
+            pkgName = PKGNAME_MAPPING.at(pkgName);
+        }
     }
-    if (!GetServiceExtraInfo(accessSide.pkgName, context->authType, srvInfo, extraInfoObj)) {
+    if (!GetServiceExtraInfo(pkgName, context->authType, srvInfo, extraInfoObj)) {
         LOGE("VerifyFlagXor load extra failed");
         return false;
     }
