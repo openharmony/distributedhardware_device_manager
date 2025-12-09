@@ -690,14 +690,14 @@ bool IpcModelCodec::DecodeDmAuthInfo(MessageParcel &parcel, DmAuthInfo &dmAuthIn
     int32_t authBoxType = static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::STATE3);
     READ_HELPER_RET(parcel, Int32, authBoxType, false);
     if (authBoxType >= static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::STATE3) &&
-        authType < static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::MAX)) {
+        authBoxType < static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::MAX)) {
         dmAuthInfo.authBoxType = static_cast<DMLocalServiceInfoAuthBoxType>(authBoxType);
     }
 
     int32_t pinExchangeType = static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::QR_FROMDP);
     READ_HELPER_RET(parcel, Int32, pinExchangeType, false);
     if (pinExchangeType >= static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::PINBOX) &&
-        authType < static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::MAX)) {
+        pinExchangeType < static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::MAX)) {
         dmAuthInfo.pinExchangeType = static_cast<DMLocalServiceInfoPinExchangeType>(pinExchangeType);
     }
 
