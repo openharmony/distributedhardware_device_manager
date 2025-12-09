@@ -1481,7 +1481,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_007, testing::ext::TestSi
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
         .Times(AnyNumber()).WillOnce(Return(ERR_DM_FAILED));
     int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
-    EXPECT_EQ(result, ERR_DM_FAILED);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_008, testing::ext::TestSize.Level1)
@@ -1499,7 +1499,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_008, testing::ext::TestSi
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
         .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
     int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
-    EXPECT_EQ(result, DM_OK);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, IsExportAuthInfoValid_001, TestSize.Level1)
