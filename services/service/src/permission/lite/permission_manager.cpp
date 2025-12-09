@@ -115,5 +115,10 @@ bool PermissionManager::CheckReadLocalDeviceName(void)
 {
     return true;
 }
+
+bool PermissionManager::CheckOnReadyRetrospectiveNotificationBlackList()
+{
+    return true;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

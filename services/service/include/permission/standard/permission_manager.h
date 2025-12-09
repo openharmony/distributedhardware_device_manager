@@ -42,6 +42,7 @@ public:
     bool CheckProcessNameValidPutDeviceProfileInfoList(const std::string &processName);
     bool CheckProcessValidOnGetTrustedDeviceList();
     bool CheckReadLocalDeviceName(void);
+    bool CheckOnReadyRetrospectiveNotificationBlackList();
 
 private:
     bool VerifyAccessTokenByPermissionName(const std::string& permissionName);
