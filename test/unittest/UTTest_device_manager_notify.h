@@ -143,6 +143,14 @@ public:
     virtual ~ServicePublishCallbackTest() = default;
     void OnServicePublishResult(int64_t serviceId, int32_t reason) override {}
 };
+
+class AuthCodeInvalidCallbackTest : public AuthCodeInvalidCallback {
+public:
+    virtual ~AuthCodeInvalidCallbackTest()
+    {
+    }
+    void OnAuthCodeInvalid() override {};
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 

@@ -2295,6 +2295,7 @@ ohos_unittest("UTTest_auth_acl") {
     "${devicemanager_path}/test/unittest/mock/hichain_auth_connector_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_connector_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_session_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/distributed_device_profile_client_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
