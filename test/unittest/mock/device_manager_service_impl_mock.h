@@ -53,6 +53,10 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller,
         std::string &udid, int32_t &bindLevel) = 0;
+    virtual int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately) = 0;
+    virtual void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
+        const std::string &localUdid, int32_t localUserId, const std::string &localAccountId) = 0;
     virtual int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength) = 0;
     virtual int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo) = 0;
 public:
@@ -83,6 +87,10 @@ public:
         const DmAccessCallee &, const std::string &));
     MOCK_METHOD(int32_t, DeleteAclExtraDataServiceId, (int64_t, int64_t,
         std::string &, int32_t &), (override));
+    MOCK_METHOD(int32_t, SyncLocalAclListProcess, (const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately));
+    MOCK_METHOD(void, HandleDeviceUnBind, (int32_t, const std::string &,
+        const std::string &, int32_t, const std::string &));
     MOCK_METHOD(int32_t, ExportAuthInfo, (DmAuthInfo &, uint32_t));
     MOCK_METHOD(int32_t, ImportAuthInfo, (const DmAuthInfo &));
 };

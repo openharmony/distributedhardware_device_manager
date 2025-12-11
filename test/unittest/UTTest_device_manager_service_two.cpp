@@ -2025,6 +2025,44 @@ HWTEST_F(DeviceManagerServiceTest, UpdateServiceInfo_003, testing::ext::TestSize
     int32_t ret = DeviceManagerService::GetInstance().UpdateServiceInfo(serviceId);
     EXPECT_EQ(ret, DM_OK);
 }
+
+HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_203, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "packName";
+    std::string deviceName = "deviceName";
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().SetLocalDeviceName(pkgName, deviceName);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, SetRemoteDeviceName_203, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "packName";
+    std::string deviceId = "123456";
+    std::string deviceName = "deviceName";
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().SetRemoteDeviceName(pkgName, deviceId, deviceName);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, RestoreLocalDeviceName_203, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "packName";
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().RestoreLocalDeviceName(pkgName);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_008, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "com.ohos.test";
+    PeerTargetId targetId;
+    std::map<std::string, std::string> bindParam;
+    targetId.serviceId = 0;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
+    int32_t ret = DeviceManagerService::GetInstance().BindServiceTarget(pkgName, targetId, bindParam);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

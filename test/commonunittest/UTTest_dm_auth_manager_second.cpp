@@ -647,7 +647,7 @@ HWTEST_F(DmAuthManagerTest, GetServiceExtraInfo_004, testing::ext::TestSize.Leve
     JsonObject extraInfoObj;
 
     EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
     bool ret = authManager_->GetServiceExtraInfo(pkgName, pinExchangeType, srvInfo, extraInfoObj);
     ASSERT_TRUE(ret);
 }
