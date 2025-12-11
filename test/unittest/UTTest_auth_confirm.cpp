@@ -423,6 +423,7 @@ HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ProcessBindAuthorize_001, testing
 
     srvInfo.SetAuthType(static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ONETIME));
     EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .Times(::testing::AtLeast(1))
         .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
 
     EXPECT_EQ(authState->ProcessBindAuthorize(context), DM_OK);
@@ -456,13 +457,59 @@ HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ReadServiceInfo_002, testing::ext
         hiChainAuthConnector);
     std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
     context = authManager->GetAuthContext();
+
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetAuthBoxType(static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM));
+    srvInfo.SetExtraInfo("invalid_extra_info");
+
+    srvInfo.SetAuthType(static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ONETIME));
+    EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+    authState->ReadServiceInfo(context);
+    auto ret = context->confirmOperation == UiAction::USER_OPERATION_TYPE_CANCEL_AUTH ? true : false;
+    EXPECT_FALSE(ret);
+
+    srvInfo.SetExtraInfo(R"({"pinConsumerTokenId":123456})");
+    EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+    authState->ReadServiceInfo(context);
+    ret = context->confirmOperation == UiAction::USER_OPERATION_TYPE_CANCEL_AUTH ? true : false;
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ExtractPinConsumerTokenId_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    uint64_t tokenId = 123;
+    std::string json = R"({"otherField":123})";
+    bool ret = authState->ExtractPinConsumerTokenId(json, tokenId);
+    EXPECT_FALSE(ret);
+    EXPECT_EQ(tokenId, 0);
+}
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ExtractPinConsumerTokenId_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    uint64_t tokenId = 0;
+    std::string json = R"({"pinConsumerTokenId":987654321})";
+    bool ret = authState->ExtractPinConsumerTokenId(json, tokenId);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(tokenId, 987654321);
+}
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ReadServiceInfo_003, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    context = authManager->GetAuthContext();
     context->authType = DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE;
     context->accessee.pkgName = "watch_system_service";
     OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
     srvInfo.SetBundleName("com.huawei.hmos.wearlink");
-    EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(
+     EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(
         testing::StrEq("com.huawei.hmos.wearlink"), _, _))
-        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
     authState->ReadServiceInfo(context);
     EXPECT_EQ(srvInfo.GetBundleName(), "com.huawei.hmos.wearlink");
 }

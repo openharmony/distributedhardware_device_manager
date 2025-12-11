@@ -19,6 +19,7 @@
 #include "dm_auth_message_processor.h"
 #include "dm_auth_context.h"
 #include "dm_auth_state_machine.h"
+#include "deviceprofile_connector.h"
 #include "UTTest_dm_auth_message_processor.h"
 
 using namespace testing;
@@ -27,10 +28,13 @@ namespace DistributedHardware {
 constexpr int32_t DP_PERMISSION_DENIED = 98566155;
 void DmAuthMessageProcessorTest::SetUpTestCase()
 {
+    DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock_;
 }
 
 void DmAuthMessageProcessorTest::TearDownTestCase()
 {
+    DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
+    deviceProfileConnectorMock_ = nullptr;
 }
 
 void DmAuthMessageProcessorTest::SetUp()
@@ -299,6 +303,134 @@ HWTEST_F(DmAuthMessageProcessorTest, SetSyncMsgJson_001, testing::ext::TestSize.
     EXPECT_EQ(syncMsgJson[TAG_DM_CERT_CHAIN].Get<std::string>(), "certData");
     EXPECT_TRUE(syncMsgJson.Contains(TAG_ACL_CHECKSUM));
     EXPECT_TRUE(syncMsgJson.Contains(TAG_USER_CONFIRM_OPT));
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, SetSyncMsgJson_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+    context->direction = DM_AUTH_SOURCE;
+    context->authType = AUTH_TYPE_NFC;
+    context->accesser.pkgName = "pkgTest";
+    DmAccess accessSide;
+    DmAccessToSync accessToSync;
+    JsonObject syncMsgJson;
+    int ret = processor->SetSyncMsgJson(context, accessSide, accessToSync, syncMsgJson);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(syncMsgJson[PIN_MATCH_FLAG].Get<bool>(), false);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, SetSyncMsgJson_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+    context->direction = DM_AUTH_SOURCE;
+    context->authType = AUTH_TYPE_NFC;
+    context->accesser.pkgName = "pkgTest";
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(Return(DM_OK));
+    DmAccess accessSide;
+    DmAccessToSync accessToSync;
+    JsonObject syncMsgJson;
+    int ret = processor->SetSyncMsgJson(context, accessSide, accessToSync, syncMsgJson);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(syncMsgJson[PIN_MATCH_FLAG].Get<bool>(), false);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, SetSyncMsgJson_004, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+    context->direction = DM_AUTH_SOURCE;
+    context->authType = AUTH_TYPE_NFC;
+    context->accesser.pkgName = "pkgTest";
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(Return(DM_OK));
+    DmAccess accessSide;
+    DmAccessToSync accessToSync;
+    DistributedDeviceProfile::LocalServiceInfo oldSrvInfo;
+    oldSrvInfo.SetExtraInfo(R"({})");
+    std::string strJson = oldSrvInfo.GetExtraInfo();
+    JsonObject syncMsgJson(strJson);
+    int ret = processor->SetSyncMsgJson(context, accessSide, accessToSync, syncMsgJson);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(syncMsgJson[PIN_MATCH_FLAG].Get<bool>(), false);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, SetSyncMsgJson_005, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+    context->direction = DM_AUTH_SOURCE;
+    context->authType = AUTH_TYPE_NFC;
+    context->accesser.pkgName = "pkgTest";
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(Return(DM_OK));
+    DmAccess accessSide;
+    DmAccessToSync accessToSync;
+    DistributedDeviceProfile::LocalServiceInfo oldSrvInfo;
+    oldSrvInfo.SetExtraInfo(R"({"pinMatchFlag": false})");
+    std::string strJson = oldSrvInfo.GetExtraInfo();
+    JsonObject syncMsgJson(strJson);
+    int ret = processor->SetSyncMsgJson(context, accessSide, accessToSync, syncMsgJson);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(syncMsgJson[PIN_MATCH_FLAG].Get<bool>(), false);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, ParseSyncMessage_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+    context->direction = DM_AUTH_SOURCE;
+    std::string accessStr = "test_access";
+    std::string aclStr = "test_acl";
+    JsonObject jsonObject;
+    jsonObject[PIN_MATCH_FLAG] = true;
+    jsonObject["ncm_bind_target"] = false;
+    DmAccess access;
+    int32_t result = processor->ParseSyncMessage(context, access, jsonObject);
+    EXPECT_EQ(result, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, ParseSyncMessage_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+    context->direction = DM_AUTH_SOURCE;
+    std::string accessStr = "test_access";
+    std::string aclStr = "test_acl";
+    JsonObject jsonObject;
+    jsonObject[PIN_MATCH_FLAG] = true;
+    DmAccess access;
+    int32_t result = processor->ParseSyncMessage(context, access, jsonObject);
+    EXPECT_EQ(result, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, ParseSyncMessage_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+    context->direction = DM_AUTH_SOURCE;
+    std::string accessStr = "test_access";
+    std::string aclStr = "test_acl";
+    JsonObject jsonObject;
+    jsonObject["ncm_bind_target"] = false;
+    DmAccess access;
+    int32_t result = processor->ParseSyncMessage(context, access, jsonObject);
+    EXPECT_EQ(result, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, ParseSyncMessage_004, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+    context->direction = DM_AUTH_SOURCE;
+    std::string accessStr = "test_access";
+    std::string aclStr = "test_acl";
+    JsonObject jsonObject;
+    DmAccess access;
+    int32_t result = processor->ParseSyncMessage(context, access, jsonObject);
+    EXPECT_EQ(result, ERR_DM_FAILED);
 }
 
 HWTEST_F(DmAuthMessageProcessorTest, GetAccesseeServiceInfo_001, testing::ext::TestSize.Level1)

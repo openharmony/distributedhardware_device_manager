@@ -190,6 +190,14 @@ public:
     }
     void OnLeaveLNNCallback(const std::string &networkId, int32_t retCode) override {}
 };
+
+class AuthCodeInvalidCallbackTest : public AuthCodeInvalidCallback {
+public:
+    virtual ~AuthCodeInvalidCallbackTest()
+    {
+    }
+    void OnAuthCodeInvalid() override {};
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 

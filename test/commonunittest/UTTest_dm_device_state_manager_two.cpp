@@ -51,6 +51,7 @@ void DmDeviceStateManagerTestTwo::TearDownTestCase()
 {
     DmSoftbusConnector::dmSoftbusConnector = nullptr;
     softbusConnectorMock_ = nullptr;
+    cryptoMock_ = nullptr;
     DmCrypto::dmCrypto = nullptr;
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
     multipleUserConnectorMock_ = nullptr;
