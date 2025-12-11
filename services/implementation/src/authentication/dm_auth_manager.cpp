@@ -1521,7 +1521,18 @@ void DmAuthManager::SinkAuthenticateFinish()
 {
     LOGI("DmAuthManager::SinkAuthenticateFinish, isFinishOfLocal: %{public}d", isFinishOfLocal_);
     processInfo_.pkgName = authResponseContext_->peerBundleName;
-    ClearLocalServiceInfo(authResponseContext_->hostPkgName, authResponseContext_->authType);
+    bool oneTimePinCodeFlag = false;
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    JsonObject extraInfoObj;
+        if (GetServiceExtraInfo(authResponseContext_->hostPkgName, authResponseContext_->authType,
+            srvInfo, extraInfoObj)) {
+            if (IsBool(extraInfoObj, TAG_ONE_TIME_PIN_CODE_FLAG)) {
+                oneTimePinCodeFlag = extraInfoObj[TAG_ONE_TIME_PIN_CODE_FLAG].Get<bool>();
+            }
+        }
+    if (!oneTimePinCodeFlag) {
+        ClearLocalServiceInfo(authResponseContext_->hostPkgName, authResponseContext_->authType);
+    }
     listener_->OnSinkBindResult(processInfo_, peerTargetId_, authResponseContext_->reply,
         authResponseContext_->state, GenerateBindResultContent());
     if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH &&
@@ -1536,6 +1547,28 @@ void DmAuthManager::SinkAuthenticateFinish()
     }
     authResponseState_ = nullptr;
     authTimes_ = 0;
+}
+
+bool DmAuthManager::GetServiceExtraInfo(const std::string &pkgName, int32_t pinExchangeType,
+    DistributedDeviceProfile::LocalServiceInfo &srvInfo, JsonObject &extraInfoObj)
+{
+    auto dpRet = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        pkgName, pinExchangeType, srvInfo);
+    if (dpRet != DM_OK) {
+        LOGE("GetLocalServiceInfoByBundleNameAndPinExchangeType failed ret=%{public}d", dpRet);
+        return false;
+    }
+    std::string extra = srvInfo.GetExtraInfo();
+    if (extra.empty()) {
+        LOGE("extra.empty()");
+        return false;
+    }
+    extraInfoObj.Parse(extra);
+    if (extraInfoObj.IsDiscarded()) {
+        LOGE("GetServiceExtraInfo parse extra discarded");
+        return false;
+    }
+    return true;
 }
 
 int32_t DmAuthManager::GetOutputState(int32_t state)

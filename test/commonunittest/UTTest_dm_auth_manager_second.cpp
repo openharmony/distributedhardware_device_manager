@@ -597,6 +597,61 @@ HWTEST_F(DmAuthManagerTest, SinkAuthenticateFinish_001, testing::ext::TestSize.L
     ASSERT_EQ(authManager_->authResponseState_, nullptr);
 }
 
+HWTEST_F(DmAuthManagerTest, GetServiceExtraInfo_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "test_pkg";
+    int32_t pinExchangeType = 1;
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    JsonObject extraInfoObj;
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(Return(ERR_DM_FAILED));
+    bool ret = authManager_->GetServiceExtraInfo(pkgName, pinExchangeType, srvInfo, extraInfoObj);
+    ASSERT_FALSE(ret);
+}
+
+HWTEST_F(DmAuthManagerTest, GetServiceExtraInfo_002, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "test_pkg";
+    int32_t pinExchangeType = 1;
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    JsonObject extraInfoObj;
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+    bool ret = authManager_->GetServiceExtraInfo(pkgName, pinExchangeType, srvInfo, extraInfoObj);
+    ASSERT_FALSE(ret);
+}
+
+HWTEST_F(DmAuthManagerTest, GetServiceExtraInfo_003, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "test_pkg";
+    int32_t pinExchangeType = 1;
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetExtraInfo("{invalid_json}");
+    JsonObject extraInfoObj;
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+    bool ret = authManager_->GetServiceExtraInfo(pkgName, pinExchangeType, srvInfo, extraInfoObj);
+    ASSERT_FALSE(ret);
+}
+
+HWTEST_F(DmAuthManagerTest, GetServiceExtraInfo_004, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "test_pkg";
+    int32_t pinExchangeType = 1;
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    std::string extraInfo = "{\"key\":\"value\"}";
+    srvInfo.SetExtraInfo(extraInfo);
+    JsonObject extraInfoObj;
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+    bool ret = authManager_->GetServiceExtraInfo(pkgName, pinExchangeType, srvInfo, extraInfoObj);
+    ASSERT_TRUE(ret);
+}
+
 HWTEST_F(DmAuthManagerTest, SrcAuthenticateFinish_001, testing::ext::TestSize.Level1)
 {
     authManager_->isFinishOfLocal_ = true;

@@ -202,6 +202,7 @@ DM_EXPORT extern const char* META_TOKEN;
 DM_EXPORT extern const char* TAG_PIN_USER_ID;
 DM_EXPORT extern const char* PIN_ERROR_COUNT;
 DM_EXPORT extern const char* PIN_MATCH_FLAG;
+DM_EXPORT extern const char* TAG_ONE_TIME_PIN_CODE_FLAG;
 
 extern const char* DM_VERSION_5_0_1;
 extern const char* DM_VERSION_5_0_2;

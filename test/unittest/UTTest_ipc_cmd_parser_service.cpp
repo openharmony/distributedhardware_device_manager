@@ -22,6 +22,8 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
+#include "ipc_auth_info_req.h"
+#include "ipc_auth_info_rsp.h"
 #include "ipc_client_manager.h"
 #include "ipc_cmd_register.h"
 #include "ipc_common_param_req.h"
@@ -1593,6 +1595,112 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_030, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY;
+    ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
+}
+
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_023, testing::ext::TestSize.Level1)
+{
+    int32_t cmdCode = IMPORT_AUTH_INFO;
+    MessageParcel data;
+    std::shared_ptr<IpcAuthInfoReq> req = nullptr;
+    int ret = ERR_DM_FAILED;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    req = std::make_shared<IpcAuthInfoReq>();
+    DmAuthInfo dmAuthInfo;
+    uint32_t pinLength = 4;
+    req->SetDmAuthInfo(dmAuthInfo);
+    req->SetPinLength(pinLength);
+
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_024, testing::ext::TestSize.Level1)
+{
+    int32_t cmdCode = EXPORT_AUTH_INFO;
+    MessageParcel data;
+    std::shared_ptr<IpcAuthInfoReq> req = nullptr;
+    int ret = ERR_DM_FAILED;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    req = std::make_shared<IpcAuthInfoReq>();
+    DmAuthInfo dmAuthInfo;
+    uint32_t pinLength = 4;
+    req->SetDmAuthInfo(dmAuthInfo);
+    req->SetPinLength(pinLength);
+
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_064, testing::ext::TestSize.Level1)
+{
+    int32_t cmdCode = EXPORT_AUTH_INFO;
+    DmAuthInfo dmAuthInfo;
+    MessageParcel data;
+    std::shared_ptr<IpcAuthInfoReq> req = std::make_shared<IpcAuthInfoReq>();
+    uint32_t pinLength = 4;
+    req->SetDmAuthInfo(dmAuthInfo);
+    req->SetPinLength(pinLength);
+
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+
+    auto cmdptr = GetIpcCmdFunc(cmdCode);
+    ASSERT_TRUE(cmdptr != nullptr);
+    MessageParcel reply;
+    EXPECT_EQ(cmdptr(data, reply), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_065, testing::ext::TestSize.Level1)
+{
+    int32_t cmdCode = IMPORT_AUTH_INFO;
+    DmAuthInfo dmAuthInfo;
+    MessageParcel data;
+    std::shared_ptr<IpcAuthInfoReq> req = std::make_shared<IpcAuthInfoReq>();
+    uint32_t pinLength = 4;
+    req->SetDmAuthInfo(dmAuthInfo);
+    req->SetPinLength(pinLength);
+
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+
+    auto cmdptr = GetIpcCmdFunc(cmdCode);
+    ASSERT_TRUE(cmdptr != nullptr);
+    MessageParcel reply;
+    EXPECT_EQ(cmdptr(data, reply), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_031, testing::ext::TestSize.Level1)
+{
+    int32_t cmdCode = EXPORT_AUTH_INFO;
+    ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
+}
+
+HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_032, testing::ext::TestSize.Level1)
+{
+    int32_t cmdCode = IMPORT_AUTH_INFO;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 } // namespace

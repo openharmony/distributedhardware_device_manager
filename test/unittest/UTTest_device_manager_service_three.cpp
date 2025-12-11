@@ -77,6 +77,7 @@ void DeviceManagerServiceThreeTest::SetUpTestCase()
     DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock_;
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient =
         distributedDeviceProfileClientMock_;
+    DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
 }
 
 void DeviceManagerServiceThreeTest::TearDownTestCase()
@@ -89,10 +90,13 @@ void DeviceManagerServiceThreeTest::TearDownTestCase()
     softbusListenerMock_ = nullptr;
     DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl = nullptr;
     deviceManagerServiceImplMock_ = nullptr;
+    DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
     deviceProfileConnectorMock_ = nullptr;
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
     distributedDeviceProfileClientMock_ = nullptr;
-    }
+    DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
+    multipleUserConnectorMock_ = nullptr;
+}
 
 namespace {
 
@@ -1062,7 +1066,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, UnbindServiceTarget_005, testing::ext::T
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(false));
 
     int32_t ret = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName, serviceId);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, UnbindServiceTarget_006, testing::ext::TestSize.Level1)
@@ -1742,6 +1746,413 @@ HWTEST_F(DeviceManagerServiceThreeTest, RegisterAuthenticationType_303, testing:
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_001, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(false));
+    int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(result, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_002, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(ERR_DM_FAILED));
+    int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(result,  ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_003, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(false));
+    int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(result, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_004, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsImportAuthInfoValid(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady())
+        .Times(AnyNumber()).WillOnce(Return(false));
+    int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_005, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsImportAuthInfoValid(_))
+        .Times(AnyNumber()).WillOnce(Return(false));
+    int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_006, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = "com.ohos.test.pin";
+    dmAuthInfo.bizSrcPkgName = "com.ohos.test.biz";
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, ImportAuthInfo(_)).Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsImportAuthInfoValid(_)).Times(AnyNumber()).WillOnce(Return(true));
+    int32_t result = DeviceManagerService::GetInstance().ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_001, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    uint32_t pinlength = 6;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(false));
+    int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
+    EXPECT_EQ(result, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_002, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    uint32_t pinlength = 6;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(ERR_DM_FAILED));
+    int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
+    EXPECT_EQ(result,  ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_003, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    uint32_t pinlength = 6;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(false));
+    int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
+    EXPECT_EQ(result, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_004, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    uint32_t pinlength = 6;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsExportAuthInfoValid(_))
+        .Times(AnyNumber()).WillOnce(Return(false));
+    int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_005, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    uint32_t pinlength = 6;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsExportAuthInfoValid(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady())
+        .Times(AnyNumber()).WillOnce(Return(false));
+    int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_006, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    uint32_t pinlength = 5;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsExportAuthInfoValid(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_007, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    uint32_t pinlength = 5;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .Times(AnyNumber()).WillOnce(Return(ERR_DM_FAILED));
+    int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthInfo_008, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    uint32_t pinlength = 5;
+    std::vector<int32_t> userIds = {100, 200};
+    dmAuthInfo.userId = 300;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission())
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .Times(AnyNumber()).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_))
+        .Times(AnyNumber()).WillOnce(Return(true));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
+    int32_t result = DeviceManagerService::GetInstance().ExportAuthInfo(dmAuthInfo, pinlength);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsExportAuthInfoValid_001, TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .Times(AnyNumber()).WillOnce(Return(ERR_DM_FAILED));
+    bool result = DeviceManagerService::GetInstance().IsExportAuthInfoValid(dmAuthInfo);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsExportAuthInfoValid_002, TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    std::vector<int32_t> userIds = {100, 200};
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
+    dmAuthInfo.userId = 300;
+    bool result = DeviceManagerService::GetInstance().IsExportAuthInfoValid(dmAuthInfo);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsExportAuthInfoValid_003, TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    std::vector<int32_t> userIds = {100};
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = std::string(2025, 'a');
+    bool result = DeviceManagerService::GetInstance().IsExportAuthInfoValid(dmAuthInfo);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsExportAuthInfoValid_004, TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    std::vector<int32_t> userIds = {100};
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = "com.test.valid";
+    dmAuthInfo.bizSrcPkgName = std::string(2025, 'b');
+    bool result = DeviceManagerService::GetInstance().IsExportAuthInfoValid(dmAuthInfo);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsExportAuthInfoValid_005, TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    std::vector<int32_t> userIds = {100};
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<0>(userIds), Return(DM_OK)));
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = "com.test.valid";
+    bool result = DeviceManagerService::GetInstance().IsExportAuthInfoValid(dmAuthInfo);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_001, TestSize.Level1)
+{
+    DmAuthInfo info;
+    info.userId = 100;
+    info.pinConsumerPkgName[0] = '\0';
+    bool result = DeviceManagerService::GetInstance().IsImportAuthInfoValid(info);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_002, TestSize.Level1)
+{
+    DmAuthInfo info;
+    info.userId = 100;
+    info.pinConsumerPkgName = "com.test.valid";
+    string pinCodeTest = "123";
+    strncpy_s(info.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    string metaTokenTest = "valid_meta";
+    strncpy_s(info.metaToken, DM_MAX_META_TOKEN_LEN, metaTokenTest.c_str(), metaTokenTest.length());
+    info.authType = DMLocalServiceInfoAuthType::TRUST_ONETIME;
+    info.authBoxType = DMLocalServiceInfoAuthBoxType::STATE3;
+    info.pinExchangeType = DMLocalServiceInfoPinExchangeType::PINBOX;
+    info.description = "valid desc";
+    bool result = DeviceManagerService::GetInstance().IsImportAuthInfoValid(info);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_003, TestSize.Level1)
+{
+    DmAuthInfo info;
+    info.userId = 100;
+    info.pinConsumerPkgName = "com.test.valid";
+    string pinCodeTest = "123456";
+    strncpy_s(info.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    string metaTokenTest = std::string(DM_MAX_PIN_CODE_LEN, 'a');
+    strncpy_s(info.metaToken, DM_MAX_META_TOKEN_LEN, metaTokenTest.c_str(), metaTokenTest.length());
+    info.authType = DMLocalServiceInfoAuthType::TRUST_ONETIME;
+    info.authBoxType = DMLocalServiceInfoAuthBoxType::STATE3;
+    info.pinExchangeType = DMLocalServiceInfoPinExchangeType::PINBOX;
+    bool result = DeviceManagerService::GetInstance().IsImportAuthInfoValid(info);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_004, TestSize.Level1)
+{
+    DmAuthInfo info;
+    info.userId = 100;
+    info.pinConsumerPkgName = "com.test.valid";
+    string pinCodeTest = "123456";
+    strncpy_s(info.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    string metaTokenTest = "valid_meta";
+    strncpy_s(info.metaToken, DM_MAX_META_TOKEN_LEN, metaTokenTest.c_str(), metaTokenTest.length());
+    info.authType = static_cast<DMLocalServiceInfoAuthType>(-1);
+    info.authBoxType = DMLocalServiceInfoAuthBoxType::STATE3;
+    info.pinExchangeType = DMLocalServiceInfoPinExchangeType::PINBOX;
+    info.description = "valid desc";
+    bool result = DeviceManagerService::GetInstance().IsImportAuthInfoValid(info);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_005, TestSize.Level1)
+{
+    DmAuthInfo info;
+    info.userId = 100;
+    info.pinConsumerPkgName = "com.test.valid";
+    string pinCodeTest = "123456";
+    strncpy_s(info.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    string metaTokenTest = "valid_meta";
+    strncpy_s(info.metaToken, DM_MAX_META_TOKEN_LEN, metaTokenTest.c_str(), metaTokenTest.length());
+    info.authType = DMLocalServiceInfoAuthType::TRUST_ONETIME;
+    info.authBoxType = static_cast<DMLocalServiceInfoAuthBoxType>(
+        static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::STATE3) - 1);
+    info.pinExchangeType = DMLocalServiceInfoPinExchangeType::PINBOX;
+    info.description = "valid desc";
+    bool result = DeviceManagerService::GetInstance().IsImportAuthInfoValid(info);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_006, TestSize.Level1)
+{
+    DmAuthInfo info;
+    info.userId = 100;
+    info.pinConsumerPkgName = "com.test.valid";
+    string pinCodeTest = "123456";
+    strncpy_s(info.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    string metaTokenTest = "valid_meta";
+    strncpy_s(info.metaToken, DM_MAX_META_TOKEN_LEN, metaTokenTest.c_str(), metaTokenTest.length());
+    info.authType = DMLocalServiceInfoAuthType::TRUST_ONETIME;
+    info.authBoxType = static_cast<DMLocalServiceInfoAuthBoxType>(
+        static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::TWO_IN1) + 1);
+    info.pinExchangeType = DMLocalServiceInfoPinExchangeType::PINBOX;
+    info.description = "valid desc";
+    bool result = DeviceManagerService::GetInstance().IsImportAuthInfoValid(info);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_007, TestSize.Level1)
+{
+    DmAuthInfo info;
+    info.userId = 100;
+    info.pinConsumerPkgName = "com.test.valid";
+    string pinCodeTest = "123456";
+    strncpy_s(info.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    string metaTokenTest = "valid_meta";
+    strncpy_s(info.metaToken, DM_MAX_META_TOKEN_LEN, metaTokenTest.c_str(), metaTokenTest.length());
+    info.authType = DMLocalServiceInfoAuthType::TRUST_ONETIME;
+    info.authBoxType = DMLocalServiceInfoAuthBoxType::STATE3;
+    info.pinExchangeType = static_cast<DMLocalServiceInfoPinExchangeType>(
+        static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::PINBOX) - 1);
+    info.description = "valid desc";
+    bool result = DeviceManagerService::GetInstance().IsImportAuthInfoValid(info);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_008, TestSize.Level1)
+{
+    DmAuthInfo info;
+    info.userId = 100;
+    info.pinConsumerPkgName = "com.test.valid";
+    string pinCodeTest = "123456";
+    strncpy_s(info.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    string metaTokenTest = "valid_meta";
+    strncpy_s(info.metaToken, DM_MAX_META_TOKEN_LEN, metaTokenTest.c_str(), metaTokenTest.length());
+    info.authType = DMLocalServiceInfoAuthType::TRUST_ONETIME;
+    info.authBoxType = DMLocalServiceInfoAuthBoxType::STATE3;
+    info.pinExchangeType = static_cast<DMLocalServiceInfoPinExchangeType>(
+        static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::ULTRASOUND) + 1);
+    info.description = "valid desc";
+    bool result = DeviceManagerService::GetInstance().IsImportAuthInfoValid(info);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_009, TestSize.Level1)
+{
+    DmAuthInfo info;
+    info.userId = 100;
+    info.pinConsumerPkgName = "com.test.valid";
+    string pinCodeTest = "123456";
+    strncpy_s(info.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    string metaTokenTest = "valid_meta";
+    strncpy_s(info.metaToken, DM_MAX_META_TOKEN_LEN, metaTokenTest.c_str(), metaTokenTest.length());
+    info.authType = DMLocalServiceInfoAuthType::TRUST_ONETIME;
+    info.authBoxType = DMLocalServiceInfoAuthBoxType::STATE3;
+    info.pinExchangeType = DMLocalServiceInfoPinExchangeType::PINBOX;
+    info.description = std::string(DM_MAX_PIN_CODE_LEN, 'd');
+    bool result = DeviceManagerService::GetInstance().IsImportAuthInfoValid(info);
+    EXPECT_FALSE(result);
 }
 } // namespace
 } // namespace DistributedHardware

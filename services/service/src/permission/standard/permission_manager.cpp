@@ -101,6 +101,13 @@ constexpr const static char* GET_TRUSTED_DEVICE_LIST_WHITE_LIST[] = {
 };
 constexpr uint32_t GET_TRUSTED_DEVICE_LIST_WHITE_LIST_NUM = std::size(GET_TRUSTED_DEVICE_LIST_WHITE_LIST);
 
+constexpr const static char* ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST[] = {
+    "distributeddata",
+};
+
+constexpr int32_t ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST_NUM =
+    std::size(ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST);
+
 constexpr const char* READ_LOCAL_DEVICE_NAME_PERMISSION = "ohos.permission.READ_LOCAL_DEVICE_NAME";
 }
 
@@ -389,6 +396,23 @@ bool PermissionManager::CheckReadLocalDeviceName(void)
         return true;
     }
     LOGE("Read local device name permission is denied, please apply for corresponding permissions.");
+    return false;
+}
+
+bool PermissionManager::CheckOnReadyRetrospectiveNotificationBlackList()
+{
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed");
+        return false;
+    }
+    uint16_t index = 0;
+    for (; index < ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST_NUM; ++index) {
+        if (processName == ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST[index]) {
+            LOGI("no need for retrospective notification %{public}s.", processName.c_str());
+            return true;
+        }
+    }
     return false;
 }
 } // namespace DistributedHardware

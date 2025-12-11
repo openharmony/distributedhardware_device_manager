@@ -21,6 +21,7 @@
 #include "hichain_auth_connector_mock.h"
 #include "auth_manager.h"
 #include "dm_negotiate_process.h"
+#include "distributed_device_profile_client_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -34,6 +35,9 @@ public:
 private:
     static inline std::shared_ptr<HiChainAuthConnectorMock> hiChainAuthConnectorMock =
         std::make_shared<HiChainAuthConnectorMock>();
+    static inline std::shared_ptr<DistributedDeviceProfile::DistributedDeviceProfileClientMock>
+        distributedDeviceProfileClientMock_ =
+        std::make_shared<DistributedDeviceProfile::DistributedDeviceProfileClientMock>();
     std::shared_ptr<SoftbusConnector> softbusConnector;
     std::shared_ptr<IDeviceManagerServiceListener> listener;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector;
