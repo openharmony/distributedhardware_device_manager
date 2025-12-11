@@ -496,5 +496,22 @@ HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ExtractPinConsumerTokenId_002, te
     EXPECT_TRUE(ret);
     EXPECT_EQ(tokenId, 987654321);
 }
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ReadServiceInfo_003, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    context = authManager->GetAuthContext();
+    context->authType = DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE;
+    context->accessee.pkgName = "watch_system_service";
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetBundleName("com.huawei.hmos.wearlink");
+    EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        testing::StrEq("com.huawei.hmos.wearlink"), _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+    authState->ReadServiceInfo(context);
+    EXPECT_EQ(srvInfo.GetBundleName(), "com.huawei.hmos.wearlink");
+}
 }  // end namespace DistributedHardware
 }  // end namespace OHOS

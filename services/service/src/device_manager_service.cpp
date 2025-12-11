@@ -1671,7 +1671,7 @@ int32_t DeviceManagerService::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
         return ERR_DM_FAILED;
     }
     if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+        LOGE("The caller: %{public}s is not in white list.", GetAnonyString(processName).c_str());
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsImportAuthInfoValid(dmAuthInfo)) {
@@ -1697,7 +1697,7 @@ int32_t DeviceManagerService::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pi
         return ERR_DM_FAILED;
     }
     if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+        LOGE("The caller: %{public}s is not in white list.", GetAnonyString(processName).c_str());
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsExportAuthInfoValid(dmAuthInfo)) {
