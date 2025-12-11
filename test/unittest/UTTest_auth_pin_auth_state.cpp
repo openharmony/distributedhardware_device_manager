@@ -27,6 +27,8 @@ void AuthPinAuthStateTest::SetUpTestCase()
     LOGI("AuthPinAuthStateTest::SetUpTestCase start.");
     DmHiChainAuthConnector::dmHiChainAuthConnector = hiChainAuthConnectorMock;
     DmAuthStateMachineMock::dmAuthStateMachineMock = std::make_shared<DmAuthStateMachineMock>();
+    DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient =
+        distributedDeviceProfileClientMock_;
 }
 
 void AuthPinAuthStateTest::TearDownTestCase()
@@ -35,6 +37,8 @@ void AuthPinAuthStateTest::TearDownTestCase()
     DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
     DmAuthStateMachineMock::dmAuthStateMachineMock = nullptr;
     hiChainAuthConnectorMock = nullptr;
+    DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
+    distributedDeviceProfileClientMock_ = nullptr;
 }
 
 void AuthPinAuthStateTest::SetUp()
@@ -114,12 +118,22 @@ HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthStartState_005, testing::ext::TestS
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinAuthStartState>();
 
     EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
+        .Times(::testing::AtLeast(1))
         .WillOnce(Return(DM_OK));
 
     EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .Times(::testing::AtLeast(1))
         .WillOnce(Return(ON_SESSION_KEY_RETURNED));
 
     EXPECT_EQ(authState->Action(context), STOP_BIND);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthStartState_006, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinAuthStartState>();
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetLocalServiceInfoByBundleAndPinType(_, _, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthPinAuthStateTest, AuthSinkPinAuthStartState_001, testing::ext::TestSize.Level1)

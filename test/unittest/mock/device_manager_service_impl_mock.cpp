@@ -123,5 +123,15 @@ int32_t DeviceManagerServiceImpl::DeleteAclExtraDataServiceId(int64_t serviceId,
     return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->DeleteAclExtraDataServiceId(serviceId, tokenIdCaller,
         udid, bindLevel);
 }
+
+int32_t DeviceManagerServiceImpl::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->ExportAuthInfo(dmAuthInfo, pinLength);
+}
+
+int32_t DeviceManagerServiceImpl::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->ImportAuthInfo(dmAuthInfo);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

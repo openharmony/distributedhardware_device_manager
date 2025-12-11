@@ -950,6 +950,225 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclExtraDataServiceId_InvalidJ
     int32_t ret = deviceManagerServiceImpl_->DeleteAclExtraDataServiceId(serviceId, tokenIdCaller, udid, bindLevel);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ImportAuthInfo_001, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = "com.ohos.test.pin";
+    dmAuthInfo.bizSrcPkgName = "com.ohos.test.biz";
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*deviceProfileConnectorMock_, PutLocalServiceInfo(_))
+        .WillOnce(Return(ERR_DM_FAILED));
+    int32_t ret = deviceManagerServiceImpl_->ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ImportAuthInfo_002, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = "com.ohos.test.pin";
+    dmAuthInfo.bizSrcPkgName = "com.ohos.test.biz";
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*deviceProfileConnectorMock_, PutLocalServiceInfo(_))
+        .WillOnce(Return(DM_OK));
+    int32_t ret = deviceManagerServiceImpl_->ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ImportAuthInfo_003, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = "com.ohos.test.pin";
+    dmAuthInfo.bizSrcPkgName = "com.ohos.test.biz";
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, UpdateLocalServiceInfo(_))
+        .WillOnce(Return(DM_OK));
+    int32_t ret = deviceManagerServiceImpl_->ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ImportAuthInfo_004, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = "com.ohos.test.pin";
+    dmAuthInfo.bizSrcPkgName = "com.ohos.test.biz";
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, UpdateLocalServiceInfo(_))
+        .WillOnce(Return(DM_OK));
+    int32_t ret = deviceManagerServiceImpl_->ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ImportAuthInfo_005, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = "com.ohos.test.pin";
+    dmAuthInfo.bizSrcPkgName = "com.ohos.test.biz";
+    DistributedDeviceProfile::LocalServiceInfo oldSrvInfo;
+    oldSrvInfo.SetPinCode("654321");
+    oldSrvInfo.SetExtraInfo(R"({"pinErrorCount":3})");
+    dmAuthInfo.pinExchangeType = DMLocalServiceInfoPinExchangeType::FROMDP;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(oldSrvInfo), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, UpdateLocalServiceInfo(_))
+        .WillOnce(Return(DM_OK));
+    int32_t ret = deviceManagerServiceImpl_->ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ImportAuthInfo_006, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = "com.ohos.test.pin";
+    dmAuthInfo.bizSrcPkgName = "com.ohos.test.biz";
+    DistributedDeviceProfile::LocalServiceInfo oldSrvInfo;
+    oldSrvInfo.SetPinCode("654321");
+    oldSrvInfo.SetExtraInfo(R"({})");
+    string pinCodeTest = "654321";
+    strncpy_s(dmAuthInfo.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    dmAuthInfo.pinExchangeType = DMLocalServiceInfoPinExchangeType::FROMDP;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(oldSrvInfo), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, UpdateLocalServiceInfo(_))
+        .WillOnce(Return(DM_OK));
+    int32_t ret = deviceManagerServiceImpl_->ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ImportAuthInfo_007, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = "com.ohos.test.pin";
+    dmAuthInfo.bizSrcPkgName = "com.ohos.test.biz";
+    DistributedDeviceProfile::LocalServiceInfo oldSrvInfo;
+    oldSrvInfo.SetPinCode("654321");
+    oldSrvInfo.SetExtraInfo(R"({"pinErrorCount":3})");
+    string pinCodeTest = "654321";
+    JsonObject object;
+    strncpy_s(dmAuthInfo.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    dmAuthInfo.pinExchangeType = DMLocalServiceInfoPinExchangeType::FROMDP;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(oldSrvInfo), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, UpdateLocalServiceInfo(_))
+        .WillOnce(Return(DM_OK));
+    int32_t ret = deviceManagerServiceImpl_->ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ImportAuthInfo_008, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = "com.ohos.test.pin";
+    dmAuthInfo.bizSrcPkgName = "com.ohos.test.biz";
+    DistributedDeviceProfile::LocalServiceInfo oldSrvInfo;
+    oldSrvInfo.SetPinCode("654321");
+    oldSrvInfo.SetExtraInfo(R"({"pinErrorCount":3})");
+    string pinCodeTest = "654321";
+    std::string strJson = oldSrvInfo.GetExtraInfo();
+    JsonObject object(strJson);
+    strncpy_s(dmAuthInfo.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    dmAuthInfo.pinExchangeType = DMLocalServiceInfoPinExchangeType::FROMDP;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(oldSrvInfo), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, UpdateLocalServiceInfo(_))
+        .WillOnce(Return(DM_OK));
+    int32_t ret = deviceManagerServiceImpl_->ImportAuthInfo(dmAuthInfo);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ExportAuthInfo_001, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    dmAuthInfo.userId = 100;
+    dmAuthInfo.pinConsumerPkgName = "com.ohos.test.pin";
+    dmAuthInfo.bizSrcPkgName = "com.ohos.test.biz";
+    uint32_t pinlength = 6;
+    int32_t ret = deviceManagerServiceImpl_->ExportAuthInfo(dmAuthInfo, pinlength);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, StopAuthInfoTimerAndDeleteDp_001, testing::ext::TestSize.Level1)
+{
+    deviceManagerServiceImpl_->timer_ = std::make_shared<DmTimer>();
+    std::string pkName = "test_pk";
+    int32_t pinExchangeType = static_cast<int>(DMLocalServiceInfoPinExchangeType::PINBOX);
+    uint64_t tokenId = 12345;
+    deviceManagerServiceImpl_->StopAuthInfoTimerAndDeleteDP(pkName, pinExchangeType, tokenId);
+    std::string key = std::to_string(tokenId) + "_" + pkName + "_" + std::to_string(pinExchangeType);
+    EXPECT_EQ(deviceManagerServiceImpl_->tokenIdPinCodeMap_.count(key), 0);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetPinMatchFlag_001, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    uint64_t tokenId = 12345;
+    std::string key = std::to_string(tokenId) + "_" + "test.pkg" + "_" + std::to_string(1);
+    deviceManagerServiceImpl_->tokenIdPinCodeMap_[key] = dmAuthInfo;
+    string metaTokenTest = "valid_meta";
+    strncpy_s(dmAuthInfo.metaToken, DM_MAX_META_TOKEN_LEN, metaTokenTest.c_str(), metaTokenTest.length());
+    auto ret = deviceManagerServiceImpl_->GetPinMatchFlag(tokenId, dmAuthInfo);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetPinMatchFlag_002, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    uint64_t tokenId = 12345;
+    string pinCodeTest = "123456";
+    strncpy_s(dmAuthInfo.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    std::string key = std::to_string(tokenId) + "_" + "test.pkg" + "_" + std::to_string(1);
+    deviceManagerServiceImpl_->tokenIdPinCodeMap_[key] = dmAuthInfo;
+    auto ret = deviceManagerServiceImpl_->GetPinMatchFlag(tokenId, dmAuthInfo);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetPinMatchFlag_003, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    uint64_t tokenId = 12345;
+    string pinCodeTest = "12345612345625";
+    strncpy_s(dmAuthInfo.pinCode, DM_MAX_PIN_CODE_LEN, pinCodeTest.c_str(), pinCodeTest.length());
+    std::string key = std::to_string(tokenId) + "_" + "test.pkg" + "_" + std::to_string(1);
+    deviceManagerServiceImpl_->tokenIdPinCodeMap_[key] = dmAuthInfo;
+    auto ret = deviceManagerServiceImpl_->GetPinMatchFlag(tokenId, dmAuthInfo);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, InitDpServiceInfo_001, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    DistributedDeviceProfile::LocalServiceInfo dpServiceInfo;
+    bool pinMatchFlag = true;
+    uint64_t tokenId  = 123;
+    int32_t errortCount = 0;
+    dmAuthInfo.extraInfo = "invalid json string";
+    deviceManagerServiceImpl_->InitDpServiceInfo(dmAuthInfo, dpServiceInfo, pinMatchFlag, tokenId, errortCount);
+    EXPECT_TRUE(dpServiceInfo.GetExtraInfo().empty());
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, InitDpServiceInfo_002, testing::ext::TestSize.Level1)
+{
+    DmAuthInfo dmAuthInfo;
+    DistributedDeviceProfile::LocalServiceInfo dpServiceInfo;
+    bool pinMatchFlag = true;
+    uint64_t tokenId  = 123;
+    int32_t errortCount = 0;
+    dmAuthInfo.extraInfo = R"({"key": "value"})";
+    deviceManagerServiceImpl_->InitDpServiceInfo(dmAuthInfo, dpServiceInfo, pinMatchFlag, tokenId, errortCount);
+    EXPECT_FALSE(dpServiceInfo.GetExtraInfo().empty());
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
