@@ -169,6 +169,7 @@ public:
     static void OnLeaveLNNResult(const char *networkId, int32_t retCode);
     void RegisterLeaveLNNCallback(std::shared_ptr<ISoftbusLeaveLNNCallback> callback);
     void UnRegisterLeaveLNNCallback();
+    void DeleteCredential(const DelInfoCache &acl);
 
 private:
     static std::shared_ptr<ConnectionAddr> SetAddrAndJson(const ConnectionAddr *addr,
@@ -185,7 +186,6 @@ private:
         std::vector<std::string> &acLStrList, bool isDelImmediately);
     int32_t GetLocalVersion(const std::string localUdid, const std::string remoteUdid,
         std::string &localVersion, DistributedDeviceProfile::AccessControlProfile &localAcl);
-    void DeleteCredential(const DelInfoCache &acl);
 #endif
 private:
     static std::string remoteUdidHash_;

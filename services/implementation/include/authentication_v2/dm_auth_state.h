@@ -188,7 +188,7 @@ public:
     bool IsInFlagWhiteList(const std::string &bundleName);
     void DeleteInvalidCredAndAcl(std::shared_ptr<DmAuthContext> context);
     void DeleteAclSKAndCredId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
-        DistributedDeviceProfile::AccessControlProfile &profile);
+        const DistributedDeviceProfile::AccessControlProfile &profile);
 protected:
     bool NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context);
     bool NeedAgreeAcl(std::shared_ptr<DmAuthContext> context);

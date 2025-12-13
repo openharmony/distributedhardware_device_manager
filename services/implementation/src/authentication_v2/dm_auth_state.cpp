@@ -1264,7 +1264,7 @@ void DmAuthState::CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> contex
     LOGI("start");
     CHECK_NULL_VOID(context);
     for (const auto &item : credInfo.Items()) {
-        if (!item.contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
+        if (!item.Contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
             continue;
         }
         std::string credId = item[FILED_CRED_ID].Get<std::string>();
@@ -1283,16 +1283,16 @@ void DmAuthState::CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> contex
         }
     }
     for (const auto &profile : targetProfiles) {
-        if (!credInfo.contains(profile.GetAccesser().GetAccesserCredentialIdStr()) &&
-            !credInfo.contains(profile.GetAccessee().GetAccesseeCredentialIdStr())) {
-            LOGI("delete profileId: %{public}d", profile.GetAccessControlId());
+        if (!credInfo.Contains(profile.GetAccesser().GetAccesserCredentialIdStr()) &&
+            !credInfo.Contains(profile.GetAccessee().GetAccesseeCredentialIdStr())) {
+            LOGI("delete profileId: %{public}" PRId64"", profile.GetAccessControlId());
             DeleteAclSKAndCredId(context, userId, profile);
         }
     }
 }
 
 void DmAuthState::DeleteAclSKAndCredId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
-    DistributedDeviceProfile::AccessControlProfile &profile)
+    const DistributedDeviceProfile::AccessControlProfile &profile)
 {
     CHECK_NULL_VOID(context);
     CHECK_NULL_VOID(context->softbusConnector);
