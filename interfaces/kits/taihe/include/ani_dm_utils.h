@@ -41,22 +41,22 @@ do {                                                                            
 
 bool CheckJsParamStringValid(const std::string &param);
 
-std::string GetDeviceTypeById(OHOS::DistributedHardware::DmDeviceType type);
-void InsertMapParams(OHOS::DistributedHardware::JsonObject &bindParamObj,
+std::string GetDeviceTypeById(const OHOS::DistributedHardware::DmDeviceType &type);
+void InsertMapParams(const OHOS::DistributedHardware::JsonObject &bindParamObj,
     std::map<std::string, std::string> &bindParamMap);
 
-ani_object ServiceProfileInfoToAni(ani_env* env, const OHOS::DistributedHardware::DmServiceProfileInfo &nativeObj);
-ani_object ServiceProfileInfoArrayToAni(ani_env* env,
+ani_object ServiceProfileInfoToAni(ani_env *env, const OHOS::DistributedHardware::DmServiceProfileInfo &nativeObj);
+ani_object ServiceProfileInfoArrayToAni(ani_env *env,
     const std::vector<OHOS::DistributedHardware::DmServiceProfileInfo> &services);
-ani_object DeviceProfileInfoToAni(ani_env* env, const OHOS::DistributedHardware::DmDeviceProfileInfo &nativeObj);
-ani_object DeviceProfileInfoArrayToAni(ani_env* env,
+ani_object DeviceProfileInfoToAni(ani_env *env, const OHOS::DistributedHardware::DmDeviceProfileInfo &nativeObj);
+ani_object DeviceProfileInfoArrayToAni(ani_env *env,
     const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &nativeList);
 
 void DeviceProfileInfoArrayToNative(
     const ::taihe::array_view<::ohos::distributedDeviceManager::DeviceProfileInfo> &taiheList,
-    std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo>& nativeList);
+    std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &nativeList);
 
-ani_object DeviceIconInfoToAni(ani_env* env, const OHOS::DistributedHardware::DmDeviceIconInfo &nativeObj);
+ani_object DeviceIconInfoToAni(ani_env *env, const OHOS::DistributedHardware::DmDeviceIconInfo &nativeObj);
 
 } //namespace ani_dmutils
 #endif

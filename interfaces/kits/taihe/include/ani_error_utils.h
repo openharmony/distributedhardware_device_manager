@@ -37,8 +37,8 @@ enum DMBusinessErrorCode {
     DM_ERR_SCAS_CHECK_FAILED = 11600108,
 };
 
-void ThrowError(const char* message);
-void ThrowError(int32_t code, const char* message);
+void ThrowError(const char *message);
+void ThrowError(int32_t code, const char *message);
 
 ani_object CreateBusinessError(int32_t errCode, bool isAsync = true);
 ani_object ToBusinessError(ani_env *env, int32_t code, const std::string &message);

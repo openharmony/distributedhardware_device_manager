@@ -42,7 +42,7 @@ int32_t AniGetProperty(const ani_env *env, ani_object ani_obj, const char *prope
         return ANI_INVALID_ARGS;
     }
     ani_boolean ani_field_value;
-    ani_status status = const_cast<ani_env*>(env)->Object_GetPropertyByName_Boolean(
+    ani_status status = const_cast<ani_env *>(env)->Object_GetPropertyByName_Boolean(
         ani_obj, property, reinterpret_cast<ani_boolean*>(&ani_field_value));
     if (status != ANI_OK) {
         if (optional) {
@@ -60,7 +60,7 @@ int32_t AniGetProperty(const ani_env *env, ani_object ani_obj, const char *prope
         return ANI_INVALID_ARGS;
     }
     ani_int ani_field_value;
-    ani_status status = const_cast<ani_env*>(env)->Object_GetPropertyByName_Int(
+    ani_status status = const_cast<ani_env *>(env)->Object_GetPropertyByName_Int(
         ani_obj, property, reinterpret_cast<ani_int*>(&ani_field_value));
     if (status != ANI_OK) {
         if (optional) {
@@ -78,7 +78,7 @@ int32_t AniGetProperty(const ani_env *env, ani_object ani_obj, const char *prope
         return ANI_INVALID_ARGS;
     }
     ani_int ani_field_value;
-    ani_status status = const_cast<ani_env*>(env)->Object_GetPropertyByName_Int(
+    ani_status status = const_cast<ani_env *>(env)->Object_GetPropertyByName_Int(
         ani_obj, property, reinterpret_cast<ani_int*>(&ani_field_value));
     if (status != ANI_OK) {
         if (optional) {
@@ -98,8 +98,8 @@ int32_t AniGetProperty(const ani_env *env, ani_object ani_obj, const char *prope
     if (env == nullptr || ani_obj == nullptr || property == nullptr) {
         return ANI_INVALID_ARGS;
     }
-    ani_status status = const_cast<ani_env*>(env)->Object_GetPropertyByName_Ref(ani_obj, property,
-        reinterpret_cast<ani_ref*>(&result));
+    ani_status status = const_cast<ani_env *>(env)->Object_GetPropertyByName_Ref(ani_obj, property,
+        reinterpret_cast<ani_ref *>(&result));
     if (status != ANI_OK) {
         if (optional) {
             status = ANI_OK;
@@ -115,7 +115,7 @@ std::string AniStringUtils::ToStd(const ani_env *env, ani_string ani_str)
         return std::string();
     }
     ani_size strSize = 0;
-    auto status = const_cast<ani_env*>(env)->String_GetUTF8Size(ani_str, &strSize);
+    auto status = const_cast<ani_env *>(env)->String_GetUTF8Size(ani_str, &strSize);
     if (ANI_OK != status) {
         LOGI("String_GetUTF8Size failed");
         return std::string();
@@ -130,7 +130,7 @@ std::string AniStringUtils::ToStd(const ani_env *env, ani_string ani_str)
     char *utf8Buffer = buffer.data();
 
     ani_size bytesWritten = 0;
-    status = const_cast<ani_env*>(env)->String_GetUTF8(ani_str, utf8Buffer, strSize + 1, &bytesWritten);
+    status = const_cast<ani_env *>(env)->String_GetUTF8(ani_str, utf8Buffer, strSize + 1, &bytesWritten);
     if (ANI_OK != status) {
         LOGI("String_GetUTF8Size failed");
         return std::string();
@@ -141,20 +141,20 @@ std::string AniStringUtils::ToStd(const ani_env *env, ani_string ani_str)
     return content;
 }
 
-ani_string AniStringUtils::ToAni(const ani_env *env, const std::string& str)
+ani_string AniStringUtils::ToAni(const ani_env *env, const std::string &str)
 {
     if (env == nullptr) {
         return nullptr;
     }
     ani_string aniStr = nullptr;
-    if (ANI_OK != const_cast<ani_env*>(env)->String_NewUTF8(str.data(), str.size(), &aniStr)) {
+    if (ANI_OK != const_cast<ani_env *>(env)->String_NewUTF8(str.data(), str.size(), &aniStr)) {
         LOGI("Unsupported ANI_VERSION_1");
         return nullptr;
     }
     return aniStr;
 }
 
-ani_status AniCreateInt(ani_env* env, int32_t value, ani_object& result)
+ani_status AniCreateInt(ani_env *env, int32_t value, ani_object &result)
 {
     ani_status state;
     ani_class intClass;
@@ -189,7 +189,7 @@ ani_string AniCreateString(ani_env *env, const std::string &para)
     return ani_string_result;
 }
 
-ani_method AniGetMethod(ani_env *env, ani_class cls, const char* methodName, const char* signature)
+ani_method AniGetMethod(ani_env *env, ani_class cls, const char *methodName, const char *signature)
 {
     if (env == nullptr) {
         return nullptr;
@@ -201,7 +201,7 @@ ani_method AniGetMethod(ani_env *env, ani_class cls, const char* methodName, con
     return retMethod;
 }
 
-ani_class AniGetClass(ani_env *env, const char* className)
+ani_class AniGetClass(ani_env *env, const char *className)
 {
     if (env == nullptr) {
         return nullptr;
@@ -213,7 +213,7 @@ ani_class AniGetClass(ani_env *env, const char* className)
     return cls;
 }
 
-ani_method AniGetClassMethod(ani_env *env, const char* className, const char* methodName, const char* signature)
+ani_method AniGetClassMethod(ani_env *env, const char *className, const char *methodName, const char *signature)
 {
     ani_class retClass = AniGetClass(env, className);
     if (retClass == nullptr) {
@@ -226,7 +226,7 @@ ani_method AniGetClassMethod(ani_env *env, const char* className, const char* me
     return retMethod;
 }
 
-ani_object AniCreatEmptyRecord(ani_env* env, ani_method& setMethod)
+ani_object AniCreatEmptyRecord(ani_env *env, ani_method &setMethod)
 {
     ani_method constructor = ani_utils::AniGetClassMethod(env, "escompat.Record", "<ctor>", ":");
     ani_method mapSetMethod = ani_utils::AniGetClassMethod(env, "escompat.Record", "$_set", nullptr);
@@ -277,7 +277,7 @@ ani_object AniCreateArray(ani_env *env, const std::vector<ani_object> &objectArr
     return array;
 }
 
-bool AniMapSet(ani_env *env, ani_object map, ani_method mapSetMethod, const char* key, ani_ref value)
+bool AniMapSet(ani_env *env, ani_object map, ani_method mapSetMethod, const char *key, ani_ref value)
 {
     if (env == nullptr || map == nullptr || mapSetMethod == nullptr
         || key == nullptr || key[0] == 0 || value == nullptr) {
@@ -295,7 +295,7 @@ bool AniMapSet(ani_env *env, ani_object map, ani_method mapSetMethod, const char
     return true;
 }
 
-bool AniMapSet(ani_env *env, ani_object map, ani_method mapSetMethod, const char* key, const std::string &valueStr)
+bool AniMapSet(ani_env *env, ani_object map, ani_method mapSetMethod, const char *key, const std::string &valueStr)
 {
     if (valueStr.empty()) {
         return false;
@@ -419,8 +419,9 @@ bool UnionAccessor::TryConvert<bool>(bool &value)
     return true;
 }
 
-bool AniGetMapItem(ani_env *env, const ::taihe::map_view<::taihe::string, uintptr_t> &taiheMap,
-    const char* key, std::string& value)
+bool AniGetMapItem(ani_env *env,
+    const taihe::map_view<::taihe::string, ::ohos::distributedDeviceManager::IntAndStrUnionType> &taiheMap,
+    const char *key, std::string &value)
 {
     if (env == nullptr) {
         return false;
@@ -431,18 +432,17 @@ bool AniGetMapItem(ani_env *env, const ::taihe::map_view<::taihe::string, uintpt
         LOGE("find_item %{public}s failed", stdKey.c_str());
         return false;
     }
-    if (iter->second == 0) {
-        LOGE("Null pointer value for key: %{public}s", stdKey.c_str());
+    if (iter->second.get_tag() != ::ohos::distributedDeviceManager::IntAndStrUnionType::tag_t::textVal) {
+        LOGE("field %{public}s type is not string", stdKey.c_str());
         return false;
     }
-    ani_object aniobj = reinterpret_cast<ani_object>(iter->second);
-    UnionAccessor access(env, aniobj);
-    bool result = access.TryConvert(value);
-    return result;
+    value = iter->second.get_textVal_ref();
+    return true;
 }
 
-bool AniGetMapItem(ani_env *env, const ::taihe::map_view<::taihe::string, uintptr_t> &taiheMap,
-    const char* key, int32_t& value)
+bool AniGetMapItem(ani_env *env,
+    const ::taihe::map_view<::taihe::string, ::ohos::distributedDeviceManager::IntAndStrUnionType> &taiheMap,
+    const char *key, int32_t &value)
 {
     if (env == nullptr) {
         return false;
@@ -453,17 +453,15 @@ bool AniGetMapItem(ani_env *env, const ::taihe::map_view<::taihe::string, uintpt
         LOGE("find_item %{public}s failed", stdKey.c_str());
         return false;
     }
-    if (iter->second == 0) {
-        LOGE("Null pointer value for key: %{public}s", stdKey.c_str());
+    if (iter->second.get_tag() != ::ohos::distributedDeviceManager::IntAndStrUnionType::tag_t::numVal) {
+        LOGE("field %{public}s type is not i32", stdKey.c_str());
         return false;
     }
-    ani_object aniobj = reinterpret_cast<ani_object>(iter->second);
-    UnionAccessor access(env, aniobj);
-    bool result = access.TryConvert(value);
-    return result;
+    value = iter->second.get_numVal_ref();
+    return true;
 }
 
-void AniExecuteFunc(ani_vm* vm, const std::function<void(ani_env*)> func)
+void AniExecuteFunc(ani_vm *vm, const std::function<void(ani_env *)> func)
 {
     LOGI("AniExecutePromise");
     if (vm == nullptr || !func) {
@@ -478,7 +476,7 @@ void AniExecuteFunc(ani_vm* vm, const std::function<void(ani_env*)> func)
         return;
     }
 
-    ani_env* newEnv = nullptr;
+    ani_env *newEnv = nullptr;
     ani_options aniArgs { 0, nullptr };
     aniResult = vm->AttachCurrentThread(&aniArgs, ANI_VERSION_1, &newEnv);
     if (ANI_OK != aniResult || newEnv == nullptr) {
