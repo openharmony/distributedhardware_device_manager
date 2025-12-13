@@ -1199,5 +1199,120 @@ bool DmAuthState::IsInFlagWhiteList(const std::string &bundleName)
     }
     return false;
 }
+
+void DmAuthState::DeleteInvalidCredAndAcl(std::shared_ptr<DmAuthContext> context)
+{
+    LOGI("start");
+    CHECK_NULL_VOID(context);
+    int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localDeviceId);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
+    std::vector<DistributedDeviceProfile::AccessControlProfile> targetProfiles = {};
+    for (const auto &item : profiles) {
+        if (item.GetAccesser().GetAccesserCredentialIdStr().empty() ||
+            item.GetAccessee().GetAccesseeCredentialIdStr().empty() || item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+            continue;
+        }
+        if ((item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserUserId() == currentUserId) ||
+            (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            item.GetAccessee().GetAccesseeUserId() == currentUserId)) {
+            targetProfiles.push_back(item);
+        }
+    }
+    JsonObject credInfo;
+    GetShareCredInfoByUserId(context, currentUserId, credInfo);
+    GetP2PCredInfoByUserId(context, currentUserId, credInfo);
+    CompatibleAclAndCredInfo(context, currentUserId, targetProfiles, credInfo);
+}
+
+void DmAuthState::GetShareCredInfoByUserId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+    JsonObject &credInfo)
+{
+    LOGI("start.");
+    CHECK_NULL_VOID(context);
+    JsonObject queryParams;
+    queryParams[FILED_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_ACROSS;
+    CHECK_NULL_VOID(context->hiChainAuthConnector);
+    int32_t ret = context->hiChainAuthConnector->QueryCredentialInfo(userId, queryParams, credInfo);
+    if (ret != DM_OK) {
+        LOGE("QueryCredentialInfo failed ret %{public}d.", ret);
+    }
+}
+
+void DmAuthState::GetP2PCredInfoByUserId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+    JsonObject &credInfo)
+{
+    LOGI("start.");
+    CHECK_NULL_VOID(context);
+    JsonObject queryParams;
+    queryParams[FILED_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_UNRELATED;
+    queryParams[FILED_CRED_OWNER] = "DM";
+    CHECK_NULL_VOID(context->hiChainAuthConnector);
+    int32_t ret = context->hiChainAuthConnector->QueryCredentialInfo(userId, queryParams, credInfo);
+    if (ret != DM_OK) {
+        LOGE("QueryCredentialInfo failed ret %{public}d.", ret);
+    }
+}
+
+void DmAuthState::CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+    const std::vector<DistributedDeviceProfile::AccessControlProfile> &targetProfiles, JsonObject &credInfo)
+{
+    LOGI("start");
+    CHECK_NULL_VOID(context);
+    for (const auto &item : credInfo.Items()) {
+        if (!item.contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
+            continue;
+        }
+        std::string credId = item[FILED_CRED_ID].Get<std::string>();
+        LOGI("credId: %{public}s", GetAnonyString(credId).c_str());
+        bool isExistAcl = false;
+        for (const auto &profile : targetProfiles) {
+            if (credId == profile.GetAccesser().GetAccesserCredentialIdStr() ||
+                credId == profile.GetAccessee().GetAccesseeCredentialIdStr()) {
+                isExistAcl = true;
+            }
+        }
+        if (!isExistAcl) {
+            LOGI("DeleteCredential credId:%{public}s", GetAnonyString(credId).c_str());
+            CHECK_NULL_VOID(context->hiChainAuthConnector);
+            context->hiChainAuthConnector->DeleteCredential(userId, credId);
+        }
+    }
+    for (const auto &profile : targetProfiles) {
+        if (!credInfo.contains(profile.GetAccesser().GetAccesserCredentialIdStr()) &&
+            !credInfo.contains(profile.GetAccessee().GetAccesseeCredentialIdStr())) {
+            LOGI("delete profileId: %{public}d", profile.GetAccessControlId());
+            DeleteAclSKAndCredId(context, userId, profile);
+        }
+    }
+}
+
+void DmAuthState::DeleteAclSKAndCredId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+    DistributedDeviceProfile::AccessControlProfile &profile)
+{
+    CHECK_NULL_VOID(context);
+    CHECK_NULL_VOID(context->softbusConnector);
+    int32_t sessionKeyId = profile.GetAccesser().GetAccesserSessionKeyId();
+    std::string credId = profile.GetAccesser().GetAccesserCredentialIdStr();
+    int32_t ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, sessionKeyId);
+    if (ret != DM_OK) {
+        LOGE("Delete acceser SessionKey failed.");
+    }
+    context->softbusConnector->DeleteCredential({ userId, sessionKeyId, profile.GetAccessControlId(), credId });
+
+    sessionKeyId = profile.GetAccessee().GetAccesseeSessionKeyId();
+    credId = profile.GetAccessee().GetAccesseeCredentialIdStr();
+    ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, sessionKeyId);
+    if (ret != DM_OK) {
+        LOGE("Delete accesee SessionKey failed.");
+    }
+    context->softbusConnector->DeleteCredential({ userId, sessionKeyId, profile.GetAccessControlId(), credId });
+
+    DeviceProfileConnector::GetInstance().DeleteAccessControlById(profile.GetAccessControlId());
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -186,6 +186,9 @@ public:
     bool GetServiceExtraInfo(const std::string &bundleName, int32_t pinExchangeType,
         DistributedDeviceProfile::LocalServiceInfo &srvInfo, JsonObject &extraInfoObj);
     bool IsInFlagWhiteList(const std::string &bundleName);
+    void DeleteInvalidCredAndAcl(std::shared_ptr<DmAuthContext> context);
+    void DeleteAclSKAndCredId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+        DistributedDeviceProfile::AccessControlProfile &profile);
 protected:
     bool NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context);
     bool NeedAgreeAcl(std::shared_ptr<DmAuthContext> context);
@@ -208,6 +211,12 @@ protected:
         std::vector<std::pair<int64_t, int64_t>> &tokenIds);
     void RemoveTokenIdsFromCredential(std::shared_ptr<DmAuthContext> context, const std::string &credId,
         std::vector<std::pair<int64_t, int64_t>> &tokenIds);
+    void GetShareCredInfoByUserId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+        JsonObject &credInfo);
+    void GetP2PCredInfoByUserId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+        JsonObject &credInfo);
+    void CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &targetProfiles, JsonObject &credInfo);
 };
 
 class AuthSrcConfirmState : public DmAuthState {

@@ -237,6 +237,7 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
         LOGE("DmAuthManager::ProcRespNegotiate5_1_0 fail to get all id.");
         return ret;
     }
+    DeleteInvalidCredAndAcl(context);
     JsonObject credInfo;
     GetSinkCredentialInfo(context, credInfo);
     JsonObject aclTypeJson;
