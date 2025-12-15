@@ -1975,7 +1975,8 @@ int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
     LOGI("start udid %{public}s.", GetAnonyString(udid).c_str());
     MultipleUserConnector::SetSwitchOldUserId(MultipleUserConnector::GetCurrentAccountUserID());
     MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
-    if (deviceStateMgr_->CheckIsOnline(udid)) {
+    CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
+    if (softbusConnector_->CheckIsOnline(udid)) {
         LOGI("DeviceManagerServiceImpl DpAclAdd identical account and online");
         ProcessInfo processInfo;
         processInfo.pkgName = std::string(DM_PKG_NAME);
