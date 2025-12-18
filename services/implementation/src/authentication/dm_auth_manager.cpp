@@ -2062,8 +2062,7 @@ int32_t DmAuthManager::AuthDevice(const std::string &pinCode)
     }
     CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_FAILED);
     CHECK_NULL_RETURN(authResponseContext_, ERR_DM_FAILED);
-    if (hiChainAuthConnector_->AuthDevice(pinCode, osAccountId, remoteDeviceId_,
-        authResponseContext_->requestId) != DM_OK) {
+    if (hiChainAuthConnector_->AuthDevice(pinCode, osAccountId, authResponseContext_->requestId) != DM_OK) {
         LOGE("DmAuthManager::AuthDevice failed.");
         isAuthDevice_ = false;
         if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {

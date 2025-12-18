@@ -138,8 +138,7 @@ std::shared_ptr<IDmDeviceAuthCallback> HiChainAuthConnector::GetDeviceAuthCallba
     return dmDeviceAuthCallback_;
 }
 
-int32_t HiChainAuthConnector::AuthDevice(const std::string &pinCode, int32_t osAccountId, std::string udid,
-    int64_t requestId)
+int32_t HiChainAuthConnector::AuthDevice(const std::string &pinCode, int32_t osAccountId, int64_t requestId)
 {
     std::string pinCodeHash = GetAnonyString(Crypto::Sha256(pinCode));
     LOGI("AuthDevice pinCodeHash: %{public}s", pinCodeHash.c_str());

@@ -27,8 +27,7 @@ public:
     virtual ~DmHiChainAuthConnector() = default;
 public:
     virtual bool QueryCredential(std::string &localUdid, int32_t osAccountId, int32_t peerOsAccountId) = 0;
-    virtual int32_t AuthDevice(const std::string &pinCode, int32_t osAccountId,
-        std::string udid, int64_t requestId) = 0;
+    virtual int32_t AuthDevice(const std::string &pinCode, int32_t osAccountId, int64_t requestId) = 0;
     virtual int32_t ImportCredential(int32_t osAccountId, int32_t peerOsAccountId, std::string deviceId,
         std::string publicKey) = 0;
 
@@ -49,7 +48,7 @@ public:
 class HiChainAuthConnectorMock : public DmHiChainAuthConnector {
 public:
     MOCK_METHOD(bool, QueryCredential, (std::string &, int32_t, int32_t));
-    MOCK_METHOD(int32_t, AuthDevice, (const std::string &, int32_t, std::string, int64_t));
+    MOCK_METHOD(int32_t, AuthDevice, (const std::string &, int32_t, int64_t));
     MOCK_METHOD(int32_t, ImportCredential, (int32_t, int32_t, std::string, std::string));
 
     MOCK_METHOD(int32_t, ProcessCredData, (int64_t, const std::string &));

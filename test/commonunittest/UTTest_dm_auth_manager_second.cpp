@@ -904,7 +904,7 @@ HWTEST_F(DmAuthManagerTest, ProcessPincode_003, testing::ext::TestSize.Level1)
     authManager_->remoteVersion_ = "4.1.5.2";
     authManager_->authResponseContext_->bindLevel = USER;
     authManager_->authResponseContext_->targetDeviceName = "ShowStartAuthDialog_004";
-    EXPECT_CALL(*hiChainAuthConnectorMock_, AuthDevice(_, _, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*hiChainAuthConnectorMock_, AuthDevice(_, _, _)).WillOnce(Return(DM_OK));
     int32_t ret = authManager_->ProcessPincode(pinCode);
     EXPECT_EQ(ret, DM_OK);
 
@@ -936,7 +936,7 @@ HWTEST_F(DmAuthManagerTest, AuthDevice_002, testing::ext::TestSize.Level1)
     std::string pinCode = "123456";
     authManager_->isAuthDevice_ = false;
     authManager_->authResponseContext_->authType = 5;
-    EXPECT_CALL(*hiChainAuthConnectorMock_, AuthDevice(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*hiChainAuthConnectorMock_, AuthDevice(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = authManager_->AuthDevice(pinCode);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
