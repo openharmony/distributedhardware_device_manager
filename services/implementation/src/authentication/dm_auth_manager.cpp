@@ -255,15 +255,17 @@ void DmAuthManager::ParseJsonObject(JsonObject &jsonObject)
         if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
             authRequestContext_->targetPkgName = jsonObject[TARGET_PKG_NAME_KEY].Get<std::string>();
         }
-        if (IsString(jsonObject, APP_OPERATION_KEY)) {
-            authRequestContext_->appOperation = jsonObject[APP_OPERATION_KEY].Get<std::string>();
-        }
-        if (IsString(jsonObject, CUSTOM_DESCRIPTION_KEY)) {
-            authRequestContext_->customDesc = DmLanguageManager::GetInstance().
-                GetTextBySystemLanguage(jsonObject[CUSTOM_DESCRIPTION_KEY].Get<std::string>());
-        }
-        if (IsString(jsonObject, TAG_APP_THUMBNAIL2)) {
-            authRequestContext_->appThumbnail = jsonObject[TAG_APP_THUMBNAIL2].Get<std::string>();
+        if (!MultipleUserConnector::CheckMDMControl()) {
+            if (IsString(jsonObject, APP_OPERATION_KEY)) {
+                authRequestContext_->appOperation = jsonObject[APP_OPERATION_KEY].Get<std::string>();
+            }
+            if (IsString(jsonObject, CUSTOM_DESCRIPTION_KEY)) {
+                authRequestContext_->customDesc = DmLanguageManager::GetInstance().
+                    GetTextBySystemLanguage(jsonObject[CUSTOM_DESCRIPTION_KEY].Get<std::string>());
+            }
+            if (IsString(jsonObject, TAG_APP_THUMBNAIL2)) {
+                authRequestContext_->appThumbnail = jsonObject[TAG_APP_THUMBNAIL2].Get<std::string>();
+            }
         }
         authRequestContext_->closeSessionDelaySeconds = 0;
         if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_SECONDS)) {
