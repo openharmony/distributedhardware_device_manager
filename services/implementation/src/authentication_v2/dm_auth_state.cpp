@@ -1226,7 +1226,7 @@ void DmAuthState::DeleteInvalidCredAndAcl(std::shared_ptr<DmAuthContext> context
     JsonObject credInfo;
     GetShareCredInfoByUserId(context, currentUserId, credInfo);
     GetP2PCredInfoByUserId(context, currentUserId, credInfo);
-    CompatibleAclAndCredInfo(context, currentUserId, targetProfiles, credInfo);
+    CompatibleAclAndCredInfo(context, currentUserId, targetProfiles, credInfo, localUdid);
 }
 
 void DmAuthState::GetShareCredInfoByUserId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
@@ -1259,7 +1259,8 @@ void DmAuthState::GetP2PCredInfoByUserId(std::shared_ptr<DmAuthContext> context,
 }
 
 void DmAuthState::CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> context, const int32_t userId,
-    const std::vector<DistributedDeviceProfile::AccessControlProfile> &targetProfiles, JsonObject &credInfo)
+    const std::vector<DistributedDeviceProfile::AccessControlProfile> &targetProfiles,
+    JsonObject &credInfo, std::string &localUdid)
 {
     LOGI("start");
     CHECK_NULL_VOID(context);
@@ -1271,8 +1272,10 @@ void DmAuthState::CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> contex
         LOGI("credId: %{public}s", GetAnonyString(credId).c_str());
         bool isExistAcl = false;
         for (const auto &profile : targetProfiles) {
-            if (credId == profile.GetAccesser().GetAccesserCredentialIdStr() ||
-                credId == profile.GetAccessee().GetAccesseeCredentialIdStr()) {
+            bool isAcer = profile.GetAccesser().GetAccesserDeviceId() == localUdid;
+            bool isAcee = profile.GetAccessee().GetAccesseeDeviceId() == localUdid;
+            if ((credId == profile.GetAccesser().GetAccesserCredentialIdStr() && isAcer) ||
+                (credId == profile.GetAccessee().GetAccesseeCredentialIdStr() && isAcee)) {
                 isExistAcl = true;
             }
         }
@@ -1283,35 +1286,39 @@ void DmAuthState::CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> contex
         }
     }
     for (const auto &profile : targetProfiles) {
-        if (!credInfo.Contains(profile.GetAccesser().GetAccesserCredentialIdStr()) &&
-            !credInfo.Contains(profile.GetAccessee().GetAccesseeCredentialIdStr())) {
+        bool isAcer = profile.GetAccesser().GetAccesserDeviceId() == localUdid;
+        bool isAcee = profile.GetAccessee().GetAccesseeDeviceId() == localUdid;
+        if ((!credInfo.Contains(profile.GetAccesser().GetAccesserCredentialIdStr()) && isAcer) &&
+            (!credInfo.Contains(profile.GetAccessee().GetAccesseeCredentialIdStr()) && isAcee)) {
             LOGI("delete profileId: %{public}" PRId64"", profile.GetAccessControlId());
-            DeleteAclSKAndCredId(context, userId, profile);
+            DeleteAclSKAndCredId(context, userId, profile, localUdid);
         }
     }
 }
 
 void DmAuthState::DeleteAclSKAndCredId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
-    const DistributedDeviceProfile::AccessControlProfile &profile)
+    const DistributedDeviceProfile::AccessControlProfile &profile, std::string &localUdid)
 {
     CHECK_NULL_VOID(context);
     CHECK_NULL_VOID(context->softbusConnector);
-    int32_t sessionKeyId = profile.GetAccesser().GetAccesserSessionKeyId();
-    std::string credId = profile.GetAccesser().GetAccesserCredentialIdStr();
-    int32_t ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, sessionKeyId);
-    if (ret != DM_OK) {
-        LOGE("Delete acceser SessionKey failed.");
+    if (profile.GetAccesser().GetAccesserDeviceId() == localUdid) {
+        int32_t sessionKeyId = profile.GetAccesser().GetAccesserSessionKeyId();
+        std::string credId = profile.GetAccesser().GetAccesserCredentialIdStr();
+        int32_t ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, sessionKeyId);
+        if (ret != DM_OK) {
+            LOGE("Delete acceser SessionKey failed.");
+        }
+        context->softbusConnector->DeleteCredential({ userId, sessionKeyId, profile.GetAccessControlId(), credId });
     }
-    context->softbusConnector->DeleteCredential({ userId, sessionKeyId, profile.GetAccessControlId(), credId });
-
-    sessionKeyId = profile.GetAccessee().GetAccesseeSessionKeyId();
-    credId = profile.GetAccessee().GetAccesseeCredentialIdStr();
-    ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, sessionKeyId);
-    if (ret != DM_OK) {
-        LOGE("Delete accesee SessionKey failed.");
+    if (profile.GetAccessee().GetAccesseeDeviceId() == localUdid) {
+        int32_t sessionKeyId = profile.GetAccessee().GetAccesseeSessionKeyId();
+        std::string credId = profile.GetAccessee().GetAccesseeCredentialIdStr();
+        int32_t ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, sessionKeyId);
+        if (ret != DM_OK) {
+            LOGE("Delete accesee SessionKey failed.");
+        }
+        context->softbusConnector->DeleteCredential({ userId, sessionKeyId, profile.GetAccessControlId(), credId });
     }
-    context->softbusConnector->DeleteCredential({ userId, sessionKeyId, profile.GetAccessControlId(), credId });
-
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(profile.GetAccessControlId());
 }
 } // namespace DistributedHardware
