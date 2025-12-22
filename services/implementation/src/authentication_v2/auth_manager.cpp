@@ -461,16 +461,14 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
     if (IsString(jsonObject, DM_BUSINESS_ID)) {
         context_->businessId = jsonObject[DM_BUSINESS_ID].Get<std::string>();
     }
-    if (!MultipleUserConnector::CheckMDMControl()) {
-        if (jsonObject[APP_OPERATION_KEY].IsString()) {
-            context_->appOperation = jsonObject[APP_OPERATION_KEY].Get<std::string>();
-        }
-        if (jsonObject[CUSTOM_DESCRIPTION_KEY].IsString()) {
-            context_->customData = jsonObject[CUSTOM_DESCRIPTION_KEY].Get<std::string>();
-        }
-        if (jsonObject[TAG_APP_THUMBNAIL2].IsString()) {
-            context_->appThumbnail = jsonObject[TAG_APP_THUMBNAIL2].Get<std::string>();
-        }
+    if (jsonObject[APP_OPERATION_KEY].IsString()) {
+        context_->appOperation = jsonObject[APP_OPERATION_KEY].Get<std::string>();
+    }
+    if (jsonObject[CUSTOM_DESCRIPTION_KEY].IsString()) {
+        context_->customData = jsonObject[CUSTOM_DESCRIPTION_KEY].Get<std::string>();
+    }
+    if (jsonObject[TAG_APP_THUMBNAIL2].IsString()) {
+        context_->appThumbnail = jsonObject[TAG_APP_THUMBNAIL2].Get<std::string>();
     }
     context_->connDelayCloseTime = 0;
     if (jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].IsString()) {

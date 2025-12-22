@@ -170,9 +170,24 @@ napi_value GenerateBusinessError(napi_env env, int32_t err, const std::string &m
     NAPI_CALL(env, napi_create_string_utf8(env, msg.c_str(), NAPI_AUTO_LENGTH, &errorMessage));
     NAPI_CALL(env, napi_set_named_property(env, businessError, "code", errorCode));
     NAPI_CALL(env, napi_set_named_property(env, businessError, "message", errorMessage));
-
     return businessError;
 }
+
+//新函数
+napi_value GenerateBusinessErrorSystem(napi_env env, int32_t err, const std::string &msg)
+{
+    // 替换成no return
+    napi_value businessError = nullptr;
+    DM_NAPI_CALL_NO_RETURN(napi_create_object(env, &businessError));
+    napi_value errorCode = nullptr;
+    DM_NAPI_CALL_NO_RETURN(napi_create_int32(env, err, &errorCode));
+    napi_value errorMessage = nullptr;
+    DM_NAPI_CALL_NO_RETURN(napi_create_string_utf8(env, msg.c_str(), NAPI_AUTO_LENGTH, &errorMessage));
+    DM_NAPI_CALL_NO_RETURN(napi_set_named_property(env, businessError, "code", errorCode));
+    DM_NAPI_CALL_NO_RETURN(napi_set_named_property(env, businessError, "message", errorMessage));
+    return businessError;
+}
+
 
 bool CheckArgsCount(napi_env env, bool assertion, const std::string &message)
 {
@@ -203,6 +218,18 @@ napi_value CreateErrorForCall(napi_env env, int32_t code, const std::string &err
         napi_throw_error(env, std::to_string(code).c_str(), errMsg.c_str());
     } else {
         error = GenerateBusinessError(env, code, errMsg);
+    }
+    return error;
+}
+
+napi_value CreateErrorForCallSystem(napi_env env, int32_t code, const std::string &errMsg, bool isAsync)
+{
+    LOGI("CreateErrorForCall code:%{public}d, message:%{public}s", code, errMsg.c_str());
+    napi_value error = nullptr;
+    if (isAsync) {
+        napi_throw_error(env, std::to_string(code).c_str(), errMsg.c_str());
+    } else {
+        error = GenerateBusinessErrorSystem(env, code, errMsg);
     }
     return error;
 }
@@ -253,6 +280,57 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
     }
     return error;
 }
+
+
+
+napi_value CreateBusinessErrorSystem(napi_env env, int32_t errCode, bool isAsync)
+{
+    napi_value error = nullptr;
+    switch (errCode) {
+        case ERR_DM_NO_PERMISSION:
+            error = CreateErrorForCallSystem(env, ERR_NO_PERMISSION, ERR_MESSAGE_NO_PERMISSION, isAsync);
+            break;
+        case ERR_DM_DISCOVERY_REPEATED:
+            error = CreateErrorForCallSystem(env, DM_ERR_DISCOVERY_INVALID, ERR_MESSAGE_DISCOVERY_INVALID, isAsync);
+            break;
+        case ERR_DM_PUBLISH_REPEATED:
+            error = CreateErrorForCallSystem(env, DM_ERR_PUBLISH_INVALID, ERR_MESSAGE_PUBLISH_INVALID, isAsync);
+            break;
+        case ERR_DM_AUTH_BUSINESS_BUSY:
+            error = CreateErrorForCallSystem(env, DM_ERR_AUTHENTICALTION_INVALID,
+                ERR_MESSAGE_AUTHENTICALTION_INVALID, isAsync);
+            break;
+        case ERR_DM_INPUT_PARA_INVALID:
+        case ERR_DM_UNSUPPORTED_AUTH_TYPE:
+        case ERR_DM_CALLBACK_REGISTER_FAILED:
+            error = CreateErrorForCallSystem(env, ERR_INVALID_PARAMS, ERR_MESSAGE_INVALID_PARAMS, isAsync);
+            break;
+        case ERR_DM_INIT_FAILED:
+            error = CreateErrorForCallSystem(env, DM_ERR_OBTAIN_SERVICE, ERR_MESSAGE_OBTAIN_SERVICE, isAsync);
+            break;
+        case ERR_NOT_SYSTEM_APP:
+            error = CreateErrorForCallSystem(env, ERR_NOT_SYSTEM_APP, ERR_MESSAGE_NOT_SYSTEM_APP, isAsync);
+            break;
+        case ERR_DM_HILINKSVC_RSP_PARSE_FAILD:
+        case ERR_DM_HILINKSVC_REPLY_FAILED:
+        case ERR_DM_HILINKSVC_ICON_URL_EMPTY:
+        case ERR_DM_HILINKSVC_DISCONNECT:
+            error = CreateErrorForCallSystem(env, DM_ERR_FROM_CLOUD_FAILED, ERR_MESSAGE_FROM_CLOUD_FAILED, isAsync);
+            break;
+        case ERR_DM_WISE_NEED_LOGIN:
+            error = CreateErrorForCallSystem(env, DM_ERR_NEED_LOGIN, ERR_MESSAGE_NEED_LOGIN, isAsync);
+            break;
+        case ERR_DM_HILINKSVC_SCAS_CHECK_FAILED:
+            error = CreateErrorForCallSystem(env, DM_ERR_SCAS_CHECK_FAILED, ERR_MESSAGE_SCAS_CHECK_FAILED, isAsync);
+            break;
+        default:
+            error = CreateErrorForCallSystem(env, DM_ERR_FAILED, ERR_MESSAGE_FAILED, isAsync);
+            break;
+    }
+    return error;
+}
+
+
 
 bool IsFunctionType(napi_env env, napi_value value)
 {

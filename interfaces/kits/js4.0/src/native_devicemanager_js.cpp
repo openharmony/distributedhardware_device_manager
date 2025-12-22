@@ -34,11 +34,34 @@
 using namespace OHOS::DistributedHardware;
 
 namespace {
+// TODO更改CALL
+#define DM_NAPI_RETVAL_NOTHING
+#define DM_NAPI_CALL_BASE(theCall,result)       \
+    do{                                         \
+        if((theCall) != napi_ok)                \
+        {                                       \
+            LOGE("napi call failed, error %{public}s", #theCall); \
+            return result;                      \
+        }                                       \
+    }while (0)
+#define DM_NAPI_CALL(theCall,result)  DM_NAPI_CALL_BASE(theCall,result)
+#define DM_NAPI_CALL_RETURN_VOID(theCall) DM_NAPI_CALL_BASE(theCall,DM_NAPI_RETVAL_NOTHING)
+#define DM_NAPI_CALL_NORETURN_BASE(theCall)       \
+    do{                                         \
+        if((theCall) != napi_ok)                \
+        {                                       \
+            LOGE("napi call failed, error %{public}s", #theCall); \
+        }                                       \
+    }while (0)
+#define DM_NAPI_CALL_NO_RETURN(theCall)  DM_NAPI_CALL_NORETURN_BASE(theCall)
+
+
+//不能修改但可以添加一个新版本的宏
 #define GET_PARAMS(env, info, num)    \
     size_t argc = num;                \
     napi_value argv[num] = {nullptr}; \
     napi_value thisVar = nullptr;     \
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr))
+    NAPI_CALL(env,napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr))
 
 #define CHECK_NULL_VOID_RET_LOG(ptr, fmt, ...)      \
     do {                                            \
@@ -47,6 +70,14 @@ namespace {
             return;                                 \
         }                                           \
     } while (0)
+//新版本的宏
+#define GET_PARAMS_SYSTEM(env, info, num)    \
+    size_t argc = num;                \
+    napi_value argv[num] = {nullptr}; \
+    napi_value thisVar = nullptr;     \
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr),nullptr)
+
+
 
 const std::string DM_NAPI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
@@ -1049,10 +1080,10 @@ napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_i
     LOGI("SetUserOperationSync in");
     if (!IsSystemApp()) {
         LOGI("SetUserOperationSync not SystemApp");
-        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        CreateBusinessErrorSystem(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_TWO);
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     if (!CheckArgsType(env, valueType == napi_number, "action", "number")) {
@@ -1075,7 +1106,7 @@ napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_i
     if (ret != 0) {
         LOGE("SetUserOperation for bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
     }
     napi_get_undefined(env, &result);
     return result;
@@ -1294,7 +1325,7 @@ napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info in
     napi_value result = nullptr;
     std::string extra = "";
     deviceBasicInfoListAsyncCallbackInfo->extra = extra;
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
     napi_valuetype eventHandleType = napi_undefined;
     napi_typeof(env, argv[0], &eventHandleType);
     if (eventHandleType == napi_function) {
@@ -1326,7 +1357,7 @@ napi_value DeviceManagerNapi::GetAvailableDeviceListSync(napi_env env, napi_call
     if (!isArray) {
         LOGE("napi_create_array fail");
     }
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
@@ -1373,7 +1404,7 @@ napi_value DeviceManagerNapi::GetAvailableDeviceList(napi_env env, napi_callback
     napi_value thisVar = nullptr;
     size_t argc = 0;
     std::vector<DmDeviceBasicInfo> devList;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
 
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
@@ -1391,7 +1422,7 @@ napi_value DeviceManagerNapi::GetAvailableDeviceList(napi_env env, napi_callback
     if (argc == DM_NAPI_ARGS_ZERO) {
         return GetAvailableDeviceListPromise(env, deviceBasicInfoListAsyncCallbackInfo);
     } else if (argc == DM_NAPI_ARGS_ONE) {
-        GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+        GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
         if (!IsFunctionType(env, argv[0])) {
             DeleteAsyncCallbackInfo(deviceBasicInfoListAsyncCallbackInfo);
             return nullptr;
@@ -1416,7 +1447,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceNetworkId(napi_env env, napi_callbac
     std::string networkId;
     size_t argc = 0;
 
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_int32(env, ERR_DM_POINT_NULL, &result);
@@ -1446,7 +1477,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceId(napi_env env, napi_callback_info 
     std::string deviceId;
     size_t argc = 0;
 
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_int32(env, ERR_DM_POINT_NULL, &result);
@@ -1472,7 +1503,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceName(napi_env env, napi_callback_inf
     std::string deviceName;
     size_t argc = 0;
 
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
@@ -1502,7 +1533,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceType(napi_env env, napi_callback_inf
     int32_t deviceType = 0;
     size_t argc = 0;
 
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
@@ -1525,7 +1556,7 @@ napi_value DeviceManagerNapi::GetDeviceName(napi_env env, napi_callback_info inf
     LOGI("GetDeviceName in");
     napi_value result = nullptr;
     std::string deviceName;
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -1555,7 +1586,7 @@ napi_value DeviceManagerNapi::GetDeviceType(napi_env env, napi_callback_info inf
     LOGI("GetDeviceType in");
     napi_value result = nullptr;
     int32_t deviceType;
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -1618,20 +1649,20 @@ napi_value DeviceManagerNapi::StartDeviceDiscover(napi_env env, napi_callback_in
     size_t argcNum = 0;
     int32_t discoverTargetType = -1;
     uint32_t subscribeId = 0;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argcNum, nullptr, &thisVar, nullptr));
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argcNum, nullptr, &thisVar, nullptr));//不能修改
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
         return result;
     }
     if (argcNum == DM_NAPI_ARGS_ONE) {
-        GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+        GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
         if (!JsToDiscoverTargetType(env, argv[DM_NAPI_ARGS_ZERO], discoverTargetType) || discoverTargetType != 1) {
             return nullptr;
         }
         JsToDiscoveryParam(env, argv[DM_NAPI_ARGS_ZERO], discParam);
     } else if (argcNum == DM_NAPI_ARGS_TWO) {
-        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);//不能修改
         if (!JsToDiscoverTargetType(env, argv[DM_NAPI_ARGS_ZERO], discoverTargetType) || discoverTargetType != 1) {
             return nullptr;
         }
@@ -1654,7 +1685,7 @@ napi_value DeviceManagerNapi::StopDeviceDiscover(napi_env env, napi_callback_inf
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     size_t argc = 0;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
     if (argc != 0) {
         return nullptr;
     }
@@ -1674,98 +1705,7 @@ napi_value DeviceManagerNapi::StopDeviceDiscover(napi_env env, napi_callback_inf
     napi_get_undefined(env, &result);
     return result;
 }
-
-napi_value DeviceManagerNapi::PublishDeviceDiscoverySync(napi_env env, napi_callback_info info)
-{
-    LOGI("PublishDeviceDiscoverySync in");
-    if (!IsSystemApp()) {
-        LOGI("PublishDeviceDiscoverySync not SystemApp");
-        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
-        return nullptr;
-    }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-    if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
-        return nullptr;
-    }
-
-    napi_value result = nullptr;
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
-    if (!CheckArgsType(env, valueType == napi_object, "publishInfo", "object")) {
-        return nullptr;
-    }
-    DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
-        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
-        return result;
-    }
-
-    std::shared_ptr<DmNapiPublishCallback> publishCallback = nullptr;
-    {
-        std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
-        auto iter = g_publishCallbackMap.find(deviceManagerWrapper->bundleName_);
-        if (iter == g_publishCallbackMap.end()) {
-            CHECK_SIZE_RETURN(g_publishCallbackMap, nullptr);
-            publishCallback = std::make_shared<DmNapiPublishCallback>(env, deviceManagerWrapper->bundleName_);
-            g_publishCallbackMap[deviceManagerWrapper->bundleName_] = publishCallback;
-        } else {
-            publishCallback = iter->second;
-        }
-    }
-    DmPublishInfo publishInfo;
-    JsToDmPublishInfo(env, argv[0], publishInfo);
-    int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(deviceManagerWrapper->bundleName_, publishInfo,
-        publishCallback);
-    if (ret != 0) {
-        LOGE("PublishDeviceDiscovery for bundleName %{public}s failed, ret %{public}d",
-            deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
-        publishCallback->OnPublishResult(publishInfo.publishId, ret);
-        return result;
-    }
-
-    napi_get_undefined(env, &result);
-    return result;
-}
-
-napi_value DeviceManagerNapi::UnPublishDeviceDiscoverySync(napi_env env, napi_callback_info info)
-{
-    LOGI("UnPublishDeviceDiscoverySync in");
-    if (!IsSystemApp()) {
-        LOGI("UnPublishDeviceDiscoverySync not SystemApp");
-        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
-        return nullptr;
-    }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-    if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
-        return nullptr;
-    }
-    napi_value result = nullptr;
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
-    if (!CheckArgsType(env, valueType == napi_number, "publishId", "number")) {
-        return nullptr;
-    }
-    int32_t publishId = 0;
-    napi_get_value_int32(env, argv[0], &publishId);
-
-    DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
-        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
-        return result;
-    }
-
-    int32_t ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(deviceManagerWrapper->bundleName_, publishId);
-    if (ret != 0) {
-        LOGE("UnPublishDeviceDiscovery bundleName %{public}s failed, ret %{public}d",
-            deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
-        return result;
-    }
-
-    napi_get_undefined(env, &result);
-    return result;
-}
+//删除了函数PublishDeviceDiscoverySync和UnPublishDeviceDiscoverySync
 
 void DeviceManagerNapi::BindDevOrTarget(DeviceManagerNapi *deviceManagerWrapper, const std::string &deviceId,
     napi_env env, napi_value &object)
@@ -1819,7 +1759,7 @@ void DeviceManagerNapi::BindDevOrTarget(DeviceManagerNapi *deviceManagerWrapper,
 
 napi_value DeviceManagerNapi::BindTarget(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
+    GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);//不能修改
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_THREE,  "Wrong number of arguments, required 3")) {
         return nullptr;
     }
@@ -1854,7 +1794,7 @@ napi_value DeviceManagerNapi::UnBindTarget(napi_env env, napi_callback_info info
 {
     LOGI("UnBindDevice");
     napi_value result = nullptr;
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -1926,10 +1866,10 @@ napi_value DeviceManagerNapi::JsOn(napi_env env, napi_callback_info info)
     }
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
     if (argc == DM_NAPI_ARGS_THREE) {
         LOGI("JsOn in argc == 3");
-        GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
+        GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);//不能修改
         if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_THREE, "Wrong number of arguments, required 3")) {
             return nullptr;
         }
@@ -1949,7 +1889,7 @@ napi_value DeviceManagerNapi::JsOn(napi_env env, napi_callback_info info)
         }
         return JsOnFrench(env, 1, thisVar, argv);
     } else {
-        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);//不能修改
         if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
             return nullptr;
         }
@@ -1996,10 +1936,10 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
 {
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
     if (argc == DM_NAPI_ARGS_THREE) {
         LOGI("JsOff in argc == 3");
-        GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
+        GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);//不能修改
         if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
             return nullptr;
         }
@@ -2020,7 +1960,7 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
         }
         return JsOffFrench(env, 1, thisVar, argv);
     } else {
-        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);//不能修改
         if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
             return nullptr;
         }
@@ -2131,28 +2071,28 @@ napi_value DeviceManagerNapi::JsGetDeviceNetworkIdList(napi_env env, napi_callba
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != DM_OK) {
         LOGE("Do not have correct access");
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
         return nullptr;
     }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
 
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         LOGE("deviceManagerWrapper is NULL");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     auto *jsCallback = new GetDeviceNetworkIdListAsyncCallbackInfo();
     if (jsCallback == nullptr) {
         LOGE("jsCallback is nullptr");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     NetworkIdQueryFilter filterOptions;
@@ -2168,35 +2108,35 @@ napi_value DeviceManagerNapi::JsGetDeviceProfileInfoList(napi_env env, napi_call
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != DM_OK) {
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
         return nullptr;
     }
 
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),thisVar);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         LOGE("deviceManagerWrapper is NULL");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     napi_value argv[DM_NAPI_ARGS_ONE] = {nullptr};
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr),thisVar);
     DmDeviceProfileInfoFilterOptions filterOptions;
     JsToDmDeviceProfileInfoFilterOptions(env, argv[0], filterOptions);
     auto *jsCallback = new DeviceProfileInfosAsyncCallbackInfo();
     if (jsCallback == nullptr) {
         LOGE("jsCallback is nullptr");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
 
@@ -2256,35 +2196,35 @@ napi_value DeviceManagerNapi::JsGetDeviceIconInfo(napi_env env, napi_callback_in
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != DM_OK) {
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
         return nullptr;
     }
 
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),thisVar);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         LOGE("deviceManagerWrapper is NULL");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     napi_value argv[DM_NAPI_ARGS_ONE] = {nullptr};
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr),thisVar);
     DmDeviceIconInfoFilterOptions filterOptions;
     JsToDmDeviceIconInfoFilterOptions(env, argv[0], filterOptions);
     auto *jsCallback = new DeviceIconInfoAsyncCallbackInfo();
     if (jsCallback == nullptr) {
         LOGE("jsCallback is nullptr");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
 
@@ -2299,16 +2239,16 @@ napi_value DeviceManagerNapi::SetHeartbeatPolicy(napi_env env, napi_callback_inf
     LOGI("in");
     size_t argsCount = 0;
     napi_value thisArg = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argsCount, nullptr, &thisArg, nullptr));
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argsCount, nullptr, &thisArg, nullptr),thisArg);
     if (!CheckArgsCount(env, argsCount >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
         return nullptr;
     }
     if (!IsSystemApp()) {
         LOGI("The caller is not SystemApp");
-        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        CreateBusinessErrorSystem(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_TWO);
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     if (!CheckArgsType(env, valueType == napi_number, "policy", "number")) {
@@ -2337,7 +2277,7 @@ napi_value DeviceManagerNapi::SetHeartbeatPolicy(napi_env env, napi_callback_inf
     if (ret != 0) {
         LOGE("bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
     }
     napi_get_undefined(env, &result);
     return result;
@@ -2386,36 +2326,36 @@ napi_value DeviceManagerNapi::JsPutDeviceProfileInfoList(napi_env env, napi_call
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != DM_OK) {
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
         return nullptr;
     }
 
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         LOGE("deviceManagerWrapper is NULL");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     std::vector<DmDeviceProfileInfo> deviceProfileInfos;
     if (!JsToDmDeviceProfileInfos(env, argv[0], deviceProfileInfos)) {
         LOGE("JsToDmDeviceProfileInfos fail");
-        CreateBusinessError(env, ERR_INVALID_PARAMS);
+        CreateBusinessErrorSystem(env, ERR_INVALID_PARAMS);
         return nullptr;
     }
     auto *jsCallback = new PutDeviceProfileInfoListAsyncCallbackInfo();
     if (jsCallback == nullptr) {
         LOGE("jsCallback is nullptr");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     jsCallback->env = env;
@@ -2467,16 +2407,16 @@ napi_value DeviceManagerNapi::JsGetLocalDisplayDeviceName(napi_env env, napi_cal
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != DM_OK) {
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
         return nullptr;
     }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
     int32_t maxNameLength = 0;
     if (argc >= DM_NAPI_ARGS_ONE) {
         napi_valuetype maxNameLengthType = napi_undefined;
@@ -2490,13 +2430,13 @@ napi_value DeviceManagerNapi::JsGetLocalDisplayDeviceName(napi_env env, napi_cal
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         LOGE("deviceManagerWrapper is NULL");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     auto *jsCallback = new GetLocalDisplayDeviceNameAsyncCallbackInfo();
     if (jsCallback == nullptr) {
         LOGE("jsCallback is nullptr");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
 
@@ -2606,7 +2546,7 @@ napi_value DeviceManagerNapi::JsSetLocalDeviceName(napi_env env, napi_callback_i
         CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -2642,17 +2582,17 @@ napi_value DeviceManagerNapi::JsSetRemoteDeviceName(napi_env env, napi_callback_
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_TWO);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
         return nullptr;
     }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         LOGE("deviceManagerWrapper is NULL");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     std::string deviceName = "";
@@ -2661,7 +2601,7 @@ napi_value DeviceManagerNapi::JsSetRemoteDeviceName(napi_env env, napi_callback_
     }
     if (deviceName.size() > DEVICE_NAME_MAX_BYTES) {
         LOGE("deviceName is too long");
-        CreateBusinessError(env, ERR_DM_INPUT_PARA_INVALID);
+        CreateBusinessErrorSystem(env, ERR_DM_INPUT_PARA_INVALID);
         return nullptr;
     }
     std::string deviceId = "";
@@ -2671,7 +2611,7 @@ napi_value DeviceManagerNapi::JsSetRemoteDeviceName(napi_env env, napi_callback_
     auto *jsCallback = new SetRemoteDeviceNameAsyncCallbackInfo();
     if (jsCallback == nullptr) {
         LOGE("jsCallback is nullptr");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
 
@@ -2687,12 +2627,12 @@ napi_value DeviceManagerNapi::JsRestoreLocalDeviceName(napi_env env, napi_callba
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),thisVar);
     napi_value result = nullptr;
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
@@ -2703,7 +2643,7 @@ napi_value DeviceManagerNapi::JsRestoreLocalDeviceName(napi_env env, napi_callba
     if (ret != 0) {
         LOGE("bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
     }
     napi_get_undefined(env, &result);
     return result;
@@ -2746,7 +2686,7 @@ void DeviceManagerNapi::ClearBundleCallbacks(std::string &bundleName)
 napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_info info)
 {
     LOGI("ReleaseDeviceManager in");
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
     if (!CheckArgsCount(env, argc == DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -2772,14 +2712,14 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     }
     ClearBundleCallbacks(deviceManagerWrapper->bundleName_);
     napi_get_undefined(env, &result);
-    NAPI_CALL(env, napi_remove_wrap(env, argv[0], (void**)&deviceManagerWrapper));
+    NAPI_CALL(env, napi_remove_wrap(env, argv[0], (void**)&deviceManagerWrapper));//不能修改
     return result;
 }
 
 napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_info info)
 {
     LOGI("In");
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc == DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -2814,7 +2754,7 @@ napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_in
 napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
 {
     LOGI("In");
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//待确定,确定后为不能修改
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -2895,10 +2835,10 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
 
     LOGI("DeviceManagerNapi::Init() is called!");
     NAPI_CALL(env, napi_define_class(env, DEVICE_MANAGER_NAPI_CLASS_NAME.c_str(), NAPI_AUTO_LENGTH, Constructor,
-                                     nullptr, sizeof(dmProperties) / sizeof(dmProperties[0]), dmProperties, &dmClass));
-    NAPI_CALL(env, napi_create_reference(env, dmClass, 1, &sConstructor_));
-    NAPI_CALL(env, napi_set_named_property(env, exports, DEVICE_MANAGER_NAPI_CLASS_NAME.c_str(), dmClass));
-    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(static_prop) / sizeof(static_prop[0]), static_prop));
+                                     nullptr, sizeof(dmProperties) / sizeof(dmProperties[0]), dmProperties, &dmClass));//不能修改
+    NAPI_CALL(env, napi_create_reference(env, dmClass, 1, &sConstructor_));//不能修改
+    NAPI_CALL(env, napi_set_named_property(env, exports, DEVICE_MANAGER_NAPI_CLASS_NAME.c_str(), dmClass));//不能修改
+    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(static_prop) / sizeof(static_prop[0]), static_prop));//不能修改
     LOGI("All props and functions are configured..");
     return exports;
 }
@@ -2907,7 +2847,7 @@ napi_value DeviceManagerNapi::EnumTypeConstructor(napi_env env, napi_callback_in
 {
     size_t argc = 0;
     napi_value res = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &res, nullptr));
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &res, nullptr));//不能修改
     return res;
 }
 

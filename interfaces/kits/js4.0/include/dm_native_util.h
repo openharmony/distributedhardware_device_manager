@@ -69,6 +69,7 @@ bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &dis
 bool IsSystemApp();
 void InsertMapParames(JsonObject &bindParamObj, std::map<std::string, std::string> &bindParamMap);
 napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = true);
+napi_value CreateBusinessErrorSystem(napi_env env, int32_t errCode, bool isAsync = true);
 bool CheckArgsCount(napi_env env, bool assertion, const std::string &message);
 bool CheckArgsType(napi_env env, bool assertion, const std::string &paramName, const std::string &type);
 bool IsFunctionType(napi_env env, napi_value value);
