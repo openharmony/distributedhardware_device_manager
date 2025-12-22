@@ -257,14 +257,7 @@ void AuthSrcConfirmState::GetSrcCredTypeForP2P(std::shared_ptr<DmAuthContext> co
         LOGE("credObj is invalid or err json string.");
         return;
     }
-    if (!aclInfo.Contains("pointTopointAcl") ||
-        (context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserCredentialIdStr() !=
-        credObj[FILED_CRED_ID].Get<std::string>() &&
-        context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeCredentialIdStr() !=
-        credObj[FILED_CRED_ID].Get<std::string>())) {
-        deleteCredInfo.push_back(credObj[FILED_CRED_ID].Get<std::string>());
-        DeleteCredential(context, context->accesser.userId, credObj, context->accesser.aclProfiles[DM_POINT_TO_POINT]);
-    } else {
+    if (aclInfo.Contains("pointTopointAcl")) {
         credTypeJson["pointTopointCredType"] = credType;
         context->accesser.credentialInfos[credType] = credObj.Dump();
     }
@@ -435,14 +428,6 @@ bool AuthSrcConfirmState::CheckCredIdInAcl(std::shared_ptr<DmAuthContext> contex
 {
     LOGI("start.");
     std::string credId = profile.GetAccesser().GetAccesserCredentialIdStr();
-    if (!credInfo.Contains(credId)) {
-        credId = profile.GetAccessee().GetAccesseeCredentialIdStr();
-        if (!credInfo.Contains(credId)) {
-            LOGE("credInfoJson not contain credId %{public}s.", GetAnonyString(credId).c_str());
-            DeleteAclAndSk(context, profile);
-            return false;
-        }
-    }
     if (credInfo.Contains(credId) && (!credInfo[credId].IsObject() || !credInfo[credId].Contains(FILED_CRED_TYPE) ||
         !credInfo[credId][FILED_CRED_TYPE].IsNumberInteger())) {
         LOGE("credId %{public}s contain credInfoJson invalid.", credId.c_str());
@@ -682,6 +667,7 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
     ResetBindLevel(context);
     GetCustomDescBySinkLanguage(context);
     context->accessee.isOnline = SoftbusCache::GetInstance().CheckIsOnline(context->accessee.deviceIdHash);
+    DeleteInvalidCredAndAcl(context);
     JsonObject credInfo;
     GetSrcCredentialInfo(context, credInfo);
     JsonObject aclInfo;
@@ -722,8 +708,7 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
     context->listener->OnBindResult(context->processInfo, context->peerTargetId,
         DM_OK, static_cast<int32_t>(STATUS_DM_SHOW_AUTHORIZE_UI), "");
     context->timer->StartTimer(std::string(CONFIRM_TIMEOUT_TASK),
-        DmAuthState::GetTaskTimeout(context, CONFIRM_TIMEOUT_TASK, CONFIRM_TIMEOUT),
-        [context] (std::string name) {
+        DmAuthState::GetTaskTimeout(context, CONFIRM_TIMEOUT_TASK, CONFIRM_TIMEOUT), [context] (std::string name) {
             HandleAuthenticateTimeout(context, name);
         });
     return DM_OK;
