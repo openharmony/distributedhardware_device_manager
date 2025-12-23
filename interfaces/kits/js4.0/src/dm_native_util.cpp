@@ -173,10 +173,8 @@ napi_value GenerateBusinessError(napi_env env, int32_t err, const std::string &m
     return businessError;
 }
 
-//新函数
 napi_value GenerateBusinessErrorSystem(napi_env env, int32_t err, const std::string &msg)
 {
-    // 替换成no return
     napi_value businessError = nullptr;
     DM_NAPI_CALL_NO_RETURN(napi_create_object(env, &businessError));
     napi_value errorCode = nullptr;
@@ -187,7 +185,6 @@ napi_value GenerateBusinessErrorSystem(napi_env env, int32_t err, const std::str
     DM_NAPI_CALL_NO_RETURN(napi_set_named_property(env, businessError, "message", errorMessage));
     return businessError;
 }
-
 
 bool CheckArgsCount(napi_env env, bool assertion, const std::string &message)
 {
@@ -281,8 +278,6 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
     return error;
 }
 
-
-
 napi_value CreateBusinessErrorSystem(napi_env env, int32_t errCode, bool isAsync)
 {
     napi_value error = nullptr;
@@ -329,8 +324,6 @@ napi_value CreateBusinessErrorSystem(napi_env env, int32_t errCode, bool isAsync
     }
     return error;
 }
-
-
 
 bool IsFunctionType(napi_env env, napi_value value)
 {

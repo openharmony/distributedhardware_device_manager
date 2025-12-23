@@ -34,13 +34,11 @@
 using namespace OHOS::DistributedHardware;
 
 namespace {
-
-//不能修改但可以添加一个新版本的宏
 #define GET_PARAMS(env, info, num)    \
     size_t argc = num;                \
     napi_value argv[num] = {nullptr}; \
     napi_value thisVar = nullptr;     \
-    NAPI_CALL(env,napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr))
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr))
 
 #define CHECK_NULL_VOID_RET_LOG(ptr, fmt, ...)      \
     do {                                            \
@@ -49,14 +47,12 @@ namespace {
             return;                                 \
         }                                           \
     } while (0)
-//新版本的宏
+
 #define GET_PARAMS_SYSTEM(env, info, num)    \
     size_t argc = num;                \
     napi_value argv[num] = {nullptr}; \
     napi_value thisVar = nullptr;     \
     DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr),nullptr)
-
-
 
 const std::string DM_NAPI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
@@ -1304,7 +1300,7 @@ napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info in
     napi_value result = nullptr;
     std::string extra = "";
     deviceBasicInfoListAsyncCallbackInfo->extra = extra;
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     napi_valuetype eventHandleType = napi_undefined;
     napi_typeof(env, argv[0], &eventHandleType);
     if (eventHandleType == napi_function) {
@@ -1336,7 +1332,7 @@ napi_value DeviceManagerNapi::GetAvailableDeviceListSync(napi_env env, napi_call
     if (!isArray) {
         LOGE("napi_create_array fail");
     }
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
@@ -1383,7 +1379,7 @@ napi_value DeviceManagerNapi::GetAvailableDeviceList(napi_env env, napi_callback
     napi_value thisVar = nullptr;
     size_t argc = 0;
     std::vector<DmDeviceBasicInfo> devList;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
 
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
@@ -1401,7 +1397,7 @@ napi_value DeviceManagerNapi::GetAvailableDeviceList(napi_env env, napi_callback
     if (argc == DM_NAPI_ARGS_ZERO) {
         return GetAvailableDeviceListPromise(env, deviceBasicInfoListAsyncCallbackInfo);
     } else if (argc == DM_NAPI_ARGS_ONE) {
-        GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
+        GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
         if (!IsFunctionType(env, argv[0])) {
             DeleteAsyncCallbackInfo(deviceBasicInfoListAsyncCallbackInfo);
             return nullptr;
@@ -1426,7 +1422,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceNetworkId(napi_env env, napi_callbac
     std::string networkId;
     size_t argc = 0;
 
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_int32(env, ERR_DM_POINT_NULL, &result);
@@ -1456,7 +1452,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceId(napi_env env, napi_callback_info 
     std::string deviceId;
     size_t argc = 0;
 
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_int32(env, ERR_DM_POINT_NULL, &result);
@@ -1482,7 +1478,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceName(napi_env env, napi_callback_inf
     std::string deviceName;
     size_t argc = 0;
 
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
@@ -1512,7 +1508,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceType(napi_env env, napi_callback_inf
     int32_t deviceType = 0;
     size_t argc = 0;
 
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
@@ -1535,7 +1531,7 @@ napi_value DeviceManagerNapi::GetDeviceName(napi_env env, napi_callback_info inf
     LOGI("GetDeviceName in");
     napi_value result = nullptr;
     std::string deviceName;
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -1565,7 +1561,7 @@ napi_value DeviceManagerNapi::GetDeviceType(napi_env env, napi_callback_info inf
     LOGI("GetDeviceType in");
     napi_value result = nullptr;
     int32_t deviceType;
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -1628,20 +1624,20 @@ napi_value DeviceManagerNapi::StartDeviceDiscover(napi_env env, napi_callback_in
     size_t argcNum = 0;
     int32_t discoverTargetType = -1;
     uint32_t subscribeId = 0;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argcNum, nullptr, &thisVar, nullptr));//不能修改
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argcNum, nullptr, &thisVar, nullptr));
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
         return result;
     }
     if (argcNum == DM_NAPI_ARGS_ONE) {
-        GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
+        GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
         if (!JsToDiscoverTargetType(env, argv[DM_NAPI_ARGS_ZERO], discoverTargetType) || discoverTargetType != 1) {
             return nullptr;
         }
         JsToDiscoveryParam(env, argv[DM_NAPI_ARGS_ZERO], discParam);
     } else if (argcNum == DM_NAPI_ARGS_TWO) {
-        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);//不能修改
+        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
         if (!JsToDiscoverTargetType(env, argv[DM_NAPI_ARGS_ZERO], discoverTargetType) || discoverTargetType != 1) {
             return nullptr;
         }
@@ -1664,7 +1660,7 @@ napi_value DeviceManagerNapi::StopDeviceDiscover(napi_env env, napi_callback_inf
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     size_t argc = 0;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     if (argc != 0) {
         return nullptr;
     }
@@ -1684,7 +1680,6 @@ napi_value DeviceManagerNapi::StopDeviceDiscover(napi_env env, napi_callback_inf
     napi_get_undefined(env, &result);
     return result;
 }
-//删除了函数PublishDeviceDiscoverySync和UnPublishDeviceDiscoverySync
 
 void DeviceManagerNapi::BindDevOrTarget(DeviceManagerNapi *deviceManagerWrapper, const std::string &deviceId,
     napi_env env, napi_value &object)
@@ -1738,7 +1733,7 @@ void DeviceManagerNapi::BindDevOrTarget(DeviceManagerNapi *deviceManagerWrapper,
 
 napi_value DeviceManagerNapi::BindTarget(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);//不能修改
+    GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_THREE,  "Wrong number of arguments, required 3")) {
         return nullptr;
     }
@@ -1773,7 +1768,7 @@ napi_value DeviceManagerNapi::UnBindTarget(napi_env env, napi_callback_info info
 {
     LOGI("UnBindDevice");
     napi_value result = nullptr;
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -1845,10 +1840,10 @@ napi_value DeviceManagerNapi::JsOn(napi_env env, napi_callback_info info)
     }
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     if (argc == DM_NAPI_ARGS_THREE) {
         LOGI("JsOn in argc == 3");
-        GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);//不能修改
+        GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
         if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_THREE, "Wrong number of arguments, required 3")) {
             return nullptr;
         }
@@ -1868,7 +1863,7 @@ napi_value DeviceManagerNapi::JsOn(napi_env env, napi_callback_info info)
         }
         return JsOnFrench(env, 1, thisVar, argv);
     } else {
-        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);//不能修改
+        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
         if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
             return nullptr;
         }
@@ -1915,10 +1910,10 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
 {
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));//不能修改
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     if (argc == DM_NAPI_ARGS_THREE) {
         LOGI("JsOff in argc == 3");
-        GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);//不能修改
+        GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
         if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
             return nullptr;
         }
@@ -1939,7 +1934,7 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
         }
         return JsOffFrench(env, 1, thisVar, argv);
     } else {
-        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);//不能修改
+        GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
         if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
             return nullptr;
         }
@@ -2665,7 +2660,7 @@ void DeviceManagerNapi::ClearBundleCallbacks(std::string &bundleName)
 napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_info info)
 {
     LOGI("ReleaseDeviceManager in");
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//不能修改
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc == DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -2691,7 +2686,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     }
     ClearBundleCallbacks(deviceManagerWrapper->bundleName_);
     napi_get_undefined(env, &result);
-    NAPI_CALL(env, napi_remove_wrap(env, argv[0], (void**)&deviceManagerWrapper));//不能修改
+    NAPI_CALL(env, napi_remove_wrap(env, argv[0], (void**)&deviceManagerWrapper));
     return result;
 }
 
@@ -2733,7 +2728,7 @@ napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_in
 napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
 {
     LOGI("In");
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);//待确定,确定后为不能修改
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -2814,10 +2809,10 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
 
     LOGI("DeviceManagerNapi::Init() is called!");
     NAPI_CALL(env, napi_define_class(env, DEVICE_MANAGER_NAPI_CLASS_NAME.c_str(), NAPI_AUTO_LENGTH, Constructor,
-                                     nullptr, sizeof(dmProperties) / sizeof(dmProperties[0]), dmProperties, &dmClass));//不能修改
-    NAPI_CALL(env, napi_create_reference(env, dmClass, 1, &sConstructor_));//不能修改
-    NAPI_CALL(env, napi_set_named_property(env, exports, DEVICE_MANAGER_NAPI_CLASS_NAME.c_str(), dmClass));//不能修改
-    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(static_prop) / sizeof(static_prop[0]), static_prop));//不能修改
+                                     nullptr, sizeof(dmProperties) / sizeof(dmProperties[0]), dmProperties, &dmClass));
+    NAPI_CALL(env, napi_create_reference(env, dmClass, 1, &sConstructor_));
+    NAPI_CALL(env, napi_set_named_property(env, exports, DEVICE_MANAGER_NAPI_CLASS_NAME.c_str(), dmClass));
+    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(static_prop) / sizeof(static_prop[0]), static_prop));
     LOGI("All props and functions are configured..");
     return exports;
 }
@@ -2826,7 +2821,7 @@ napi_value DeviceManagerNapi::EnumTypeConstructor(napi_env env, napi_callback_in
 {
     size_t argc = 0;
     napi_value res = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &res, nullptr));//不能修改
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &res, nullptr));
     return res;
 }
 

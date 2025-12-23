@@ -55,25 +55,23 @@ enum DMBussinessErrorCode {
     DM_ERR_SCAS_CHECK_FAILED = 11600108,
 };
 
-// TODO更改CALL
 #define DM_NAPI_RETVAL_NOTHING
 #define DM_NAPI_CALL_BASE(theCall,result)       \
-    do{                                         \
-        if((theCall) != napi_ok)                \
-        {                                       \
+    do {                                         \
+        if ((theCall) != napi_ok){               \
             LOGE("napi call failed, error %{public}s", #theCall); \
             return result;                      \
         }                                       \
-    }while (0)
+    } while (0)
 #define DM_NAPI_CALL(theCall,result)  DM_NAPI_CALL_BASE(theCall,result)
 #define DM_NAPI_CALL_RETURN_VOID(theCall) DM_NAPI_CALL_BASE(theCall,DM_NAPI_RETVAL_NOTHING)
 #define DM_NAPI_CALL_NORETURN_BASE(theCall)       \
-    do{                                         \
+    do {                                         \
         if((theCall) != napi_ok)                \
         {                                       \
             LOGE("napi call failed, error %{public}s", #theCall); \
         }                                       \
-    }while (0)
+    } while (0)
 #define DM_NAPI_CALL_NO_RETURN(theCall)  DM_NAPI_CALL_NORETURN_BASE(theCall)
 
 

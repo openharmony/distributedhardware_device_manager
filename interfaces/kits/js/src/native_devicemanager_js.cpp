@@ -27,37 +27,28 @@
 using namespace OHOS::DistributedHardware;
 
 namespace {
-
 #define DM_NAPI_RETVAL_NOTHING
 #define DM_NAPI_CALL_BASE(theCall, result)       \
-    do{                                         \
-        if((theCall) != napi_ok)                \
-        {                                       \
+    do {                                         \
+        if((theCall) != napi_ok){              \
             LOGE("napi call failed, error %{public}s", #theCall); \
             return result;                      \
         }                                       \
-    }while (0)
+    } while (0)
 #define DM_NAPI_CALL(theCall, result)  DM_NAPI_CALL_BASE(theCall, result)
 #define DM_NAPI_CALL_RETURN_VOID(theCall) DM_NAPI_CALL_BASE(theCall,DM_NAPI_RETVAL_NOTHING)
 #define DM_NAPI_CALL_NORETURN_BASE(theCall)       \
-    do{                                         \
-        if((theCall) != napi_ok)                \
-        {                                       \
+    do {                                         \
+        if((theCall) != napi_ok){                \
             LOGE("napi call failed, error %{public}s", #theCall); \
         }                                       \
-    }while (0)
+    } while (0)
 #define DM_NAPI_CALL_NO_RETURN(theCall) DM_NAPI_CALL_NORETURN_BASE(theCall)
-
-
-
 #define GET_PARAMS(env, info, num)    \
     size_t argc = num;                \
     napi_value argv[num] = {nullptr}; \
     napi_value thisVar = nullptr;     \
     DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), nullptr)
-
-
-
 #define DM_NAPI_ASSERT_BASE(condition, msg, retVal) \
     do {                                         \
         if (!(condition)) {                       \
@@ -65,7 +56,6 @@ namespace {
             return retVal;                      \
         }                                       \
     } while (0)
-
 #define DM_NAPI_ASSERT(condition, msg) DM_NAPI_ASSERT_BASE(condition, msg, nullptr)
 
 const std::string DM_NAPI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
