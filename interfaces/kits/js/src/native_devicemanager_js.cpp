@@ -27,9 +27,9 @@
 using namespace OHOS::DistributedHardware;
 
 namespace {
-// TODO更改CALL
+
 #define DM_NAPI_RETVAL_NOTHING
-#define DM_NAPI_CALL_BASE(theCall,result)       \
+#define DM_NAPI_CALL_BASE(theCall, result)       \
     do{                                         \
         if((theCall) != napi_ok)                \
         {                                       \
@@ -37,7 +37,7 @@ namespace {
             return result;                      \
         }                                       \
     }while (0)
-#define DM_NAPI_CALL(theCall,result)  DM_NAPI_CALL_BASE(theCall,result)
+#define DM_NAPI_CALL(theCall, result)  DM_NAPI_CALL_BASE(theCall, result)
 #define DM_NAPI_CALL_RETURN_VOID(theCall) DM_NAPI_CALL_BASE(theCall,DM_NAPI_RETVAL_NOTHING)
 #define DM_NAPI_CALL_NORETURN_BASE(theCall)       \
     do{                                         \
@@ -46,7 +46,7 @@ namespace {
             LOGE("napi call failed, error %{public}s", #theCall); \
         }                                       \
     }while (0)
-#define DM_NAPI_CALL_NO_RETURN(theCall)  DM_NAPI_CALL_NORETURN_BASE(theCall)
+#define DM_NAPI_CALL_NO_RETURN(theCall) DM_NAPI_CALL_NORETURN_BASE(theCall)
 
 
 
@@ -54,20 +54,19 @@ namespace {
     size_t argc = num;                \
     napi_value argv[num] = {nullptr}; \
     napi_value thisVar = nullptr;     \
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr),nullptr) // TODO 参数,已经修改
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), nullptr)
 
 
-//napi_为0
-#define DM_NAPI_ASSERT_BASE(condition,msg,retVal) \
-    do{                                         \
-        if(!(condition))                \
-        {                                       \
-            LOGE("napi call failed, theCall %{public}s error, msg %{public}s", #condition, (msg).c_str()); \
+
+#define DM_NAPI_ASSERT_BASE(condition, msg, retVal) \
+    do {                                         \
+        if (!(condition)) {                       \
+            LOGE("napi call failed, error, msg %{public}s", msg); \
             return retVal;                      \
         }                                       \
-    }while (0)
+    } while (0)
 
-#define DM_NAPI_ASSERT(condition,msg) DM_NAPI_ASSERT_BASE(condition,msg,nullptr)
+#define DM_NAPI_ASSERT(condition, msg) DM_NAPI_ASSERT_BASE(condition, msg, nullptr)
 
 const std::string DM_NAPI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
 const std::string DM_NAPI_EVENT_DEVICE_FOUND = "deviceFound";
