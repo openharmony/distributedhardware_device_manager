@@ -292,7 +292,7 @@ bool IsDeviceManagerNapiNull(napi_env env, napi_value thisVar, DeviceManagerNapi
     if (pDeviceManagerWrapper != nullptr && *pDeviceManagerWrapper != nullptr) {
         return false;
     }
-    CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
+    CreateBusinessError(env, ERR_DM_POINT_NULL);
     LOGE(" DeviceManagerNapi object is nullptr!");
     return true;
 }
@@ -1552,7 +1552,7 @@ napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_i
 {
     LOGI("SetUserOperationSync in");
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
@@ -1587,7 +1587,7 @@ napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_i
     if (ret != 0) {
         LOGE("SetUserOperation for bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
     }
     napi_get_undefined(env, &result);
     return result;
@@ -1626,7 +1626,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatusSync(napi_env env, napi_st
         }
         napi_resolve_deferred(env, deviceInfoListAsyncCallbackInfo->deferred, array[1]);
     } else {
-        array[0] = CreateBusinessErrorSystem(env, deviceInfoListAsyncCallbackInfo->ret, false);
+        array[0] = CreateBusinessError(env, deviceInfoListAsyncCallbackInfo->ret, false);
         napi_reject_deferred(env, deviceInfoListAsyncCallbackInfo->deferred, array[0]);
     }
 }
@@ -1723,7 +1723,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status
             LOGE("devList is null");
         }
     } else {
-        array[0] = CreateBusinessErrorSystem(env, deviceInfoListAsyncCallbackInfo->ret, false);
+        array[0] = CreateBusinessError(env, deviceInfoListAsyncCallbackInfo->ret, false);
     }
 
     NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, deviceInfoListAsyncCallbackInfo->callback, &handler));
@@ -1751,7 +1751,7 @@ void DeviceManagerNapi::CallRequestCreInfoStatus(napi_env env, napi_status &stat
         }
         SetValueUtf8String(env, "registerInfo", creAsyncCallbackInfo->returnJsonStr, result);
     } else {
-        result = CreateBusinessErrorSystem(env, creAsyncCallbackInfo->ret, false);
+        result = CreateBusinessError(env, creAsyncCallbackInfo->ret, false);
     }
 
     napi_get_reference_value(env, creAsyncCallbackInfo->callback, &handler);
@@ -1778,7 +1778,7 @@ void DeviceManagerNapi::CallGetLocalDeviceInfoSync(napi_env env, napi_status &st
         DmDeviceInfotoJsDeviceInfo(env, deviceInfoAsyncCallbackInfo->deviceInfo, result[1]);
         napi_resolve_deferred(env, deviceInfoAsyncCallbackInfo->deferred, result[1]);
     } else {
-        result[0] = CreateBusinessErrorSystem(env, deviceInfoAsyncCallbackInfo->ret, false);
+        result[0] = CreateBusinessError(env, deviceInfoAsyncCallbackInfo->ret, false);
         napi_reject_deferred(env, deviceInfoAsyncCallbackInfo->deferred, result[0]);
     }
 }
@@ -1798,7 +1798,7 @@ void DeviceManagerNapi::CallGetLocalDeviceInfo(napi_env env, napi_status &status
     if (deviceInfoAsyncCallbackInfo->status == 0) {
         DmDeviceInfotoJsDeviceInfo(env, deviceInfoAsyncCallbackInfo->deviceInfo, result[1]);
     } else {
-        result[0] = CreateBusinessErrorSystem(env, deviceInfoAsyncCallbackInfo->ret, false);
+        result[0] = CreateBusinessError(env, deviceInfoAsyncCallbackInfo->ret, false);
     }
 
     NAPI_CALL_RETURN_VOID(env, napi_get_reference_value(env, deviceInfoAsyncCallbackInfo->callback, &handler));
@@ -2070,7 +2070,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
     if (ret != 0) {
         LOGE("GetTrustedDeviceList for bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         return result;
     }
     if (devList.size() > 0) {
@@ -2122,12 +2122,12 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListByFilter(napi_env env, napi_ca
 napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_info info)
 {
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != 0) {
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         return nullptr;
     }
     napi_value result = nullptr;
@@ -2171,12 +2171,12 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfoSync(napi_env env, napi_callback
 {
     LOGI("GetLocalDeviceInfoSync in");
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != 0) {
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         return nullptr;
     }
     napi_value result = nullptr;
@@ -2194,7 +2194,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfoSync(napi_env env, napi_callback
     ret = DeviceManager::GetInstance().GetLocalDeviceInfo(deviceManagerWrapper->bundleName_, deviceInfo);
     if (ret != 0) {
         LOGE("GetLocalDeviceInfoSync for failed, ret %{public}d", ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         return result;
     }
     LOGI("DeviceManager::GetLocalDeviceInfoSync deviceId:%{public}s deviceName:%{public}s deviceTypeId:%{public}d ",
@@ -2209,11 +2209,11 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfo(napi_env env, napi_callback_inf
 {
     LOGI("GetLocalDeviceInfo in");
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     if (DeviceManager::GetInstance().CheckAPIAccessPermission() != 0) {
-        CreateBusinessErrorSystem(env, ERR_DM_NO_PERMISSION);
+        CreateBusinessError(env, ERR_DM_NO_PERMISSION);
         return nullptr;
     }
     napi_value result = nullptr;
@@ -2261,7 +2261,7 @@ napi_value DeviceManagerNapi::UnAuthenticateDevice(napi_env env, napi_callback_i
 {
     LOGI("UnAuthenticateDevice");
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     napi_value result = nullptr;
@@ -2288,7 +2288,7 @@ napi_value DeviceManagerNapi::UnAuthenticateDevice(napi_env env, napi_callback_i
     if (ret != 0) {
         LOGE("UnAuthenticateDevice for bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
     }
 
     napi_create_int32(env, ret, &result);
@@ -2314,12 +2314,12 @@ bool DeviceManagerNapi::CheckPermissions(napi_env env)
 {
     LOGI("CheckPermissions in");
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return false;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != 0) {
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         return false;
     }
     return true;
@@ -2343,7 +2343,7 @@ void DeviceManagerNapi::LockDiscoveryCallbackMutex(napi_env env, DmSubscribeInfo
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(bundleName, subInfo, extra, discoveryCallback);
     if (ret != 0) {
         LOGE("Discovery failed, bundleName %{public}s, ret %{public}d", bundleName.c_str(), ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         discoveryCallback->OnDiscoveryFailed(subInfo.subscribeId, ret);
     }
     return;
@@ -2353,7 +2353,7 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
 {
     LOGI("StartDeviceDiscoverSync in");
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     std::string extra = "";
@@ -2391,7 +2391,7 @@ napi_value DeviceManagerNapi::StopDeviceDiscoverSync(napi_env env, napi_callback
 {
     LOGI("StopDeviceDiscoverSync in");
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
@@ -2421,7 +2421,7 @@ napi_value DeviceManagerNapi::StopDeviceDiscoverSync(napi_env env, napi_callback
     if (ret != 0) {
         LOGE("StopDeviceDiscovery for bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         return result;
     }
 
@@ -2433,7 +2433,7 @@ napi_value DeviceManagerNapi::PublishDeviceDiscoverySync(napi_env env, napi_call
 {
     LOGI("PublishDeviceDiscoverySync in");
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
@@ -2472,7 +2472,7 @@ napi_value DeviceManagerNapi::PublishDeviceDiscoverySync(napi_env env, napi_call
     if (ret != 0) {
         LOGE("PublishDeviceDiscovery for bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         publishCallback->OnPublishResult(publishInfo.publishId, ret);
         return result;
     }
@@ -2485,7 +2485,7 @@ napi_value DeviceManagerNapi::UnPublishDeviceDiscoverySync(napi_env env, napi_ca
 {
     LOGI("UnPublishDeviceDiscoverySync in");
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
@@ -2512,7 +2512,7 @@ napi_value DeviceManagerNapi::UnPublishDeviceDiscoverySync(napi_env env, napi_ca
     if (ret != 0) {
         LOGE("UnPublishDeviceDiscovery bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         return result;
     }
 
@@ -2523,7 +2523,7 @@ napi_value DeviceManagerNapi::UnPublishDeviceDiscoverySync(napi_env env, napi_ca
 napi_value DeviceManagerNapi::AuthenticateDevice(napi_env env, napi_callback_info info)
 {
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
@@ -2565,7 +2565,7 @@ napi_value DeviceManagerNapi::AuthenticateDevice(napi_env env, napi_callback_inf
         authAsyncCallbackInfo_.authType, deviceInfo, extraString, authCallback);
     if (ret != 0) {
         LOGE("AuthDevice failed bundleName %{public}s, ret %{public}d", deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
     }
     napi_get_undefined(env, &result);
     return result;
@@ -2576,7 +2576,7 @@ napi_value DeviceManagerNapi::RequestCredential(napi_env env, napi_callback_info
     LOGI("RequestCredential function has been discarded");
     return nullptr;
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
@@ -2640,7 +2640,7 @@ int32_t DeviceManagerNapi::RegisterCredentialCallback(napi_env env, const std::s
         creCallback);
     if (ret != 0) {
         LOGE("RegisterCredentialCallback for bundleName %{public}s failed, ret %{public}d", pkgName.c_str(), ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
     }
     return ret;
 }
@@ -2649,7 +2649,7 @@ napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info 
 {
     LOGI("ImportCredential start.");
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
@@ -2691,7 +2691,7 @@ napi_value DeviceManagerNapi::ImportCredential(napi_env env, napi_callback_info 
     if (ret != 0) {
         LOGE("ImportCredential for bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
     }
     napi_get_undefined(env, &result);
     return result;
@@ -2702,7 +2702,7 @@ napi_value DeviceManagerNapi::DeleteCredential(napi_env env, napi_callback_info 
     LOGE("DeleteCredential function has been discarded");
     return nullptr;
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
@@ -2744,7 +2744,7 @@ napi_value DeviceManagerNapi::DeleteCredential(napi_env env, napi_callback_info 
     if (ret != 0) {
         LOGE("DeleteCredential for bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
     }
     napi_get_undefined(env, &result);
     return result;
@@ -2801,12 +2801,12 @@ napi_value DeviceManagerNapi::JsOnFrench(napi_env env, int32_t num, napi_value t
 napi_value DeviceManagerNapi::JsOn(napi_env env, napi_callback_info info)
 {
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != 0) {
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         return nullptr;
     }
     size_t argc = 0;
@@ -2853,7 +2853,7 @@ napi_value DeviceManagerNapi::JsOffFrench(napi_env env, int32_t num, napi_value 
 {
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != 0) {
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         return nullptr;
     }
     size_t typeLen = 0;
@@ -2887,7 +2887,7 @@ napi_value DeviceManagerNapi::JsOffFrench(napi_env env, int32_t num, napi_value 
 napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
 {
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     size_t argc = 0;
@@ -2969,12 +2969,12 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
 {
     LOGI("ReleaseDeviceManager in");
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != 0) {
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         return nullptr;
     }
     size_t argc = 0;
@@ -2991,7 +2991,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     if (ret != 0) {
         LOGE("ReleaseDeviceManager for bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessErrorSystem(env, ret);
+        CreateBusinessError(env, ret);
         napi_create_uint32(env, static_cast<uint32_t>(ret), &result);
         return result;
     }
@@ -3020,7 +3020,7 @@ void DeviceManagerNapi::HandleCreateDmCallBackCompletedCB(napi_env env, napi_sta
         }
     } else {
         LOGI("InitDeviceManager for bundleName %{public}s failed", asyncCallbackInfo->bundleName);
-        result[0] = CreateBusinessErrorSystem(env, asyncCallbackInfo->ret, false);
+        result[0] = CreateBusinessError(env, asyncCallbackInfo->ret, false);
     }
     napi_value callback = nullptr;
     napi_value callResult = nullptr;
@@ -3131,7 +3131,7 @@ void DeviceManagerNapi::CallGetDeviceInfoPromise(napi_env env, napi_status &stat
         DeviceInfotoJsByNetworkId(env, networkIdAsyncCallbackInfo->deviceInfo, result[1]);
         napi_resolve_deferred(env, networkIdAsyncCallbackInfo->deferred, result[1]);
     } else {
-        result[0] = CreateBusinessErrorSystem(env, networkIdAsyncCallbackInfo->ret, false);
+        result[0] = CreateBusinessError(env, networkIdAsyncCallbackInfo->ret, false);
         napi_reject_deferred(env, networkIdAsyncCallbackInfo->deferred, result[0]);
     }
 }
@@ -3150,7 +3150,7 @@ void DeviceManagerNapi::CallGetDeviceInfoCB(napi_env env, napi_status &status,
     if (networkIdAsyncCallbackInfo->status == 0) {
         DeviceInfotoJsByNetworkId(env, networkIdAsyncCallbackInfo->deviceInfo, result[1]);
     } else {
-        result[0] = CreateBusinessErrorSystem(env, networkIdAsyncCallbackInfo->ret, false);
+        result[0] = CreateBusinessError(env, networkIdAsyncCallbackInfo->ret, false);
     }
 
     napi_get_reference_value(env, networkIdAsyncCallbackInfo->callback, &handler);
@@ -3197,7 +3197,7 @@ bool DeviceManagerNapi::JsToStringAndCheck(napi_env env, napi_value value, const
 napi_value DeviceManagerNapi::GetDeviceInfo(napi_env env, napi_callback_info info)
 {
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     napi_value result = nullptr;
@@ -3246,7 +3246,7 @@ napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_in
 {
     LOGI("CreateDeviceManager in");
     if (!IsSystemApp()) {
-        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
