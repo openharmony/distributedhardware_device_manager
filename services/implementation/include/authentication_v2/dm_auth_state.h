@@ -191,7 +191,7 @@ public:
     bool IsInFlagWhiteList(const std::string &bundleName);
     void DeleteInvalidCredAndAcl(std::shared_ptr<DmAuthContext> context);
     void DeleteAclSKAndCredId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
-        const DistributedDeviceProfile::AccessControlProfile &profile, std::string &localUdid);
+        const DistributedDeviceProfile::AccessControlProfile &profile, const std::string &localUdid);
 protected:
     bool NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context);
     bool NeedAgreeAcl(std::shared_ptr<DmAuthContext> context);
@@ -220,7 +220,7 @@ protected:
         JsonObject &credInfo);
     void CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> context, const int32_t userId,
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &targetProfiles,
-        JsonObject &credInfo, std::string &localUdid);
+        JsonObject &credInfo, const std::string &localUdid);
 };
 
 class AuthSrcConfirmState : public DmAuthState {

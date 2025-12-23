@@ -420,12 +420,7 @@ void AuthManager::ParseHmlInfoInJsonObject(const JsonObject &jsonObject)
         context_->connSessionType = jsonObject[PARAM_KEY_CONN_SESSIONTYPE].Get<std::string>();
         LOGI("connSessionType %{public}s", context_->connSessionType.c_str());
     }
-    if (context_->connSessionType != CONN_SESSION_TYPE_HML) {
-        return;
-    }
-    if (context_->connDelayCloseTime == 0) {
-        context_->connDelayCloseTime = HML_SESSION_TIMEOUT;
-    }
+    GetDelayCloseConnTime(jsonObject);
     if (jsonObject[PARAM_KEY_HML_ENABLE_160M].IsBoolean()) {
         context_->hmlEnable160M = jsonObject[PARAM_KEY_HML_ENABLE_160M].Get<bool>();
         LOGI("hmlEnable160M %{public}d", context_->hmlEnable160M);
@@ -471,11 +466,6 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
         if (jsonObject[TAG_APP_THUMBNAIL2].IsString()) {
             context_->appThumbnail = jsonObject[TAG_APP_THUMBNAIL2].Get<std::string>();
         }
-    }
-    context_->connDelayCloseTime = 0;
-    if (jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].IsString()) {
-        std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
-        context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
     }
     ParseAccessJsonObject(jsonObject);
     if (jsonObject[TAG_IS_NEED_AUTHENTICATE].IsString()) {
@@ -774,11 +764,7 @@ void AuthManager::GetConnDelayCloseTime(const std::string &extra)
         return;
     }
     CHECK_NULL_VOID(context_);
-    context_->connDelayCloseTime = 0;
-    if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_SECONDS)) {
-        std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
-        context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
-    }
+    GetDelayCloseConnTime(jsonObject);
 }
 
 int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
@@ -1415,6 +1401,22 @@ void AuthManager::GetBindLevelByBundleName(std::string &bundleName, int32_t user
         bindLevel = DmRole::DM_ROLE_SA;
     } else {
         LOGE("src not contain the bundlename %{public}s.", bundleName.c_str());
+    }
+}
+
+void AuthManager::GetDelayCloseConnTime(const JsonObject &jsonObject)
+{
+    CHECK_NULL_VOID(context_);
+    context_->connDelayCloseTime = 0;
+    if (context_->connSessionType != CONN_SESSION_TYPE_HML) {
+        context_->connDelayCloseTime = DEFAULT_DELAY_CLOSE_TIME_US;
+    }
+    if (jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].IsString()) {
+        std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
+        context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
+    }
+    if (context_->connDelayCloseTime == 0) {
+        context_->connDelayCloseTime = HML_SESSION_TIMEOUT;
     }
 }
 //LCOV_EXCL_STOP

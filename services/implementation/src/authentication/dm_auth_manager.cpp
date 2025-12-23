@@ -54,7 +54,6 @@ const int32_t MAX_PIN_CODE = 999999;
 const int32_t DM_AUTH_TYPE_MAX = 6;
 const int32_t DM_AUTH_TYPE_MIN = 0;
 const int32_t AUTH_SESSION_SIDE_SERVER = 0;
-const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
 const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
