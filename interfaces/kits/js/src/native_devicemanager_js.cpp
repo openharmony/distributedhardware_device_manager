@@ -30,16 +30,16 @@ namespace {
 #define DM_NAPI_RETVAL_NOTHING
 #define DM_NAPI_CALL_BASE(theCall, result)       \
     do {                                         \
-        if((theCall) != napi_ok){              \
+        if ((theCall) != napi_ok) {              \
             LOGE("napi call failed, error %{public}s", #theCall); \
             return result;                      \
         }                                       \
     } while (0)
-#define DM_NAPI_CALL(theCall, result)  DM_NAPI_CALL_BASE(theCall, result)
+#define DM_NAPI_CALL(theCall, result) DM_NAPI_CALL_BASE(theCall, result)
 #define DM_NAPI_CALL_RETURN_VOID(theCall) DM_NAPI_CALL_BASE(theCall,DM_NAPI_RETVAL_NOTHING)
 #define DM_NAPI_CALL_NORETURN_BASE(theCall)       \
     do {                                         \
-        if((theCall) != napi_ok){                \
+        if ((theCall) != napi_ok) {                \
             LOGE("napi call failed, error %{public}s", #theCall); \
         }                                       \
     } while (0)
@@ -2032,7 +2032,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceListSync(napi_env env, napi_callba
     if (!isArray) {
         LOGE("napi_create_array fail");
     }
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
@@ -2123,7 +2123,7 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
     napi_value thisVar = nullptr;
     size_t argc = 0;
     std::vector<DmDeviceInfo> devList;
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
 
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
@@ -2173,7 +2173,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfoSync(napi_env env, napi_callback
     DmDeviceInfo deviceInfo;
     size_t argc = 0;
 
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
@@ -2209,7 +2209,7 @@ napi_value DeviceManagerNapi::GetLocalDeviceInfo(napi_env env, napi_callback_inf
     napi_value thisVar = nullptr;
     size_t argc = 0;
     DmDeviceInfo deviceInfo;
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
@@ -2350,7 +2350,7 @@ napi_value DeviceManagerNapi::StartDeviceDiscoverSync(napi_env env, napi_callbac
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     size_t argcNum = 0;
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argcNum, nullptr, &thisVar, nullptr),nullptr);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argcNum, nullptr, &thisVar, nullptr), nullptr);
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
@@ -2800,7 +2800,7 @@ napi_value DeviceManagerNapi::JsOn(napi_env env, napi_callback_info info)
     }
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     if (argc == DM_NAPI_ARGS_THREE) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
         if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_THREE, "Wrong number of arguments, required 3")) {
@@ -2881,7 +2881,7 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
     }
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     if (argc == DM_NAPI_ARGS_THREE) {
         LOGI("JsOff in argc == 3");
         GET_PARAMS(env, info, DM_NAPI_ARGS_THREE);
@@ -2969,7 +2969,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     size_t argc = 0;
     napi_value thisVar = nullptr;
     napi_value result = nullptr;
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
@@ -2986,7 +2986,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
     }
     ClearBundleCallbacks(deviceManagerWrapper->bundleName_);
     napi_get_undefined(env, &result);
-    DM_NAPI_CALL(napi_remove_wrap(env, thisVar, (void**)&deviceManagerWrapper),nullptr);
+    DM_NAPI_CALL(napi_remove_wrap(env, thisVar, (void**)&deviceManagerWrapper), nullptr);
     return result;
 }
 
@@ -3194,7 +3194,7 @@ napi_value DeviceManagerNapi::GetDeviceInfo(napi_env env, napi_callback_info inf
     napi_value argv[2] = {nullptr};
     napi_value thisVar = nullptr;
     DmDeviceInfo deviceInfo;
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr),nullptr);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), nullptr);
     DM_NAPI_ASSERT(((argc >= DM_NAPI_ARGS_ONE) && (argc <= DM_NAPI_ARGS_TWO)), "requires 1 or 2 parameter");
 
     std::string networkId;

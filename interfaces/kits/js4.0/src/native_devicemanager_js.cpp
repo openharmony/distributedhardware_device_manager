@@ -52,7 +52,7 @@ namespace {
     size_t argc = num;                \
     napi_value argv[num] = {nullptr}; \
     napi_value thisVar = nullptr;     \
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr),nullptr)
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), nullptr)
 
 const std::string DM_NAPI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
@@ -2055,7 +2055,7 @@ napi_value DeviceManagerNapi::JsGetDeviceNetworkIdList(napi_env env, napi_callba
         return nullptr;
     }
     GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
 
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
@@ -2093,7 +2093,7 @@ napi_value DeviceManagerNapi::JsGetDeviceProfileInfoList(napi_env env, napi_call
 
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),thisVar);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -2104,7 +2104,7 @@ napi_value DeviceManagerNapi::JsGetDeviceProfileInfoList(napi_env env, napi_call
         return nullptr;
     }
     napi_value argv[DM_NAPI_ARGS_ONE] = {nullptr};
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr),thisVar);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), nullptr);
     DmDeviceProfileInfoFilterOptions filterOptions;
     JsToDmDeviceProfileInfoFilterOptions(env, argv[0], filterOptions);
     auto *jsCallback = new DeviceProfileInfosAsyncCallbackInfo();
@@ -2181,7 +2181,7 @@ napi_value DeviceManagerNapi::JsGetDeviceIconInfo(napi_env env, napi_callback_in
 
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),thisVar);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -2192,7 +2192,7 @@ napi_value DeviceManagerNapi::JsGetDeviceIconInfo(napi_env env, napi_callback_in
         return nullptr;
     }
     napi_value argv[DM_NAPI_ARGS_ONE] = {nullptr};
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr),thisVar);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), nullptr);
     DmDeviceIconInfoFilterOptions filterOptions;
     JsToDmDeviceIconInfoFilterOptions(env, argv[0], filterOptions);
     auto *jsCallback = new DeviceIconInfoAsyncCallbackInfo();
@@ -2213,7 +2213,7 @@ napi_value DeviceManagerNapi::SetHeartbeatPolicy(napi_env env, napi_callback_inf
     LOGI("in");
     size_t argsCount = 0;
     napi_value thisArg = nullptr;
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argsCount, nullptr, &thisArg, nullptr),thisArg);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argsCount, nullptr, &thisArg, nullptr), nullptr);
     if (!CheckArgsCount(env, argsCount >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
         return nullptr;
     }
@@ -2310,7 +2310,7 @@ napi_value DeviceManagerNapi::JsPutDeviceProfileInfoList(napi_env env, napi_call
     }
 
     GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -2390,7 +2390,7 @@ napi_value DeviceManagerNapi::JsGetLocalDisplayDeviceName(napi_env env, napi_cal
         return nullptr;
     }
     GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),nullptr);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     int32_t maxNameLength = 0;
     if (argc >= DM_NAPI_ARGS_ONE) {
         napi_valuetype maxNameLengthType = napi_undefined;
@@ -2606,7 +2606,7 @@ napi_value DeviceManagerNapi::JsRestoreLocalDeviceName(napi_env env, napi_callba
     }
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr),thisVar);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     napi_value result = nullptr;
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
