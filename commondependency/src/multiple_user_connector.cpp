@@ -38,7 +38,8 @@ std::map<int32_t, DMAccountInfo> MultipleUserConnector::dmAccountInfoMap_ = {};
 std::mutex MultipleUserConnector::dmAccountInfoMaplock_;
 #ifndef OS_ACCOUNT_PART_EXISTS
 const int32_t DEFAULT_OS_ACCOUNT_ID = 0; // 0 is the default id when there is no os_account part
-#endif // OS_ACCOUNT_PART_EXISTS
+#endif                                           // OS_ACCOUNT_PART_EXISTS
+const char *DM_MDM_CONSTRAINT = "constraint.distributed.transmission.outgoing";
 
 int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 {
@@ -55,6 +56,20 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 #else // OS_ACCOUNT_PART_EXISTS
     return DEFAULT_OS_ACCOUNT_ID;
 #endif
+}
+DM_EXPORT bool MultipleUserConnector::CheckMDMControl() {
+    bool isMDMControl = false;
+#ifdef OS_ACCOUNT_PART_EXISTS
+    int32_t activeAccountId = GetCurrentAccountUserID();
+    int32_t ret =
+        AccountSA::OsAccountManager::CheckOsAccountConstraintEnabled(activeAccountId, DM_MDM_CONSTRAINT, isMDMControl);
+    if (ret != ERR_OK) {
+        LOGE("CheckOsAccountConstraintEnabled failed, ret %{public}d.", ret);
+        return false;
+    }
+    LOGI("CheckOsAccountConstraintEnabled success, isMDMControl %{public}d.", isMDMControl);
+#endif
+    return isMDMControl;
 }
 
 DM_EXPORT std::string MultipleUserConnector::GetOhosAccountId(void)
@@ -206,7 +221,7 @@ std::string MultipleUserConnector::GetSwitchOldAccountName(void)
 }
 
 DM_EXPORT void MultipleUserConnector::SetAccountInfo(int32_t userId,
-    DMAccountInfo dmAccountInfo)
+                                                        DMAccountInfo dmAccountInfo)
 {
     std::lock_guard<std::mutex> lock(dmAccountInfoMaplock_);
     CHECK_SIZE_VOID(dmAccountInfoMap_);
