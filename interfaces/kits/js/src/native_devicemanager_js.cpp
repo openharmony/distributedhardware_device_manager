@@ -36,7 +36,7 @@ namespace {
         }                                       \
     } while (0)
 #define DM_NAPI_CALL(theCall, result) DM_NAPI_CALL_BASE(theCall, result)
-#define DM_NAPI_CALL_RETURN_VOID(theCall) DM_NAPI_CALL_BASE(theCall,DM_NAPI_RETVAL_NOTHING)
+#define DM_NAPI_CALL_RETURN_VOID(theCall) DM_NAPI_CALL_BASE(theCall, DM_NAPI_RETVAL_NOTHING)
 #define DM_NAPI_CALL_NORETURN_BASE(theCall)       \
     do {                                         \
         if ((theCall) != napi_ok) {                \
@@ -3358,7 +3358,8 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
                                      nullptr, sizeof(dmProperties) / sizeof(dmProperties[0]), dmProperties, &dmClass));
     DM_NAPI_CALL_NO_RETURN(napi_create_reference(env, dmClass, 1, &sConstructor_));
     DM_NAPI_CALL_NO_RETURN(napi_set_named_property(env, exports, DEVICE_MANAGER_NAPI_CLASS_NAME.c_str(), dmClass));
-    DM_NAPI_CALL_NO_RETURN(napi_define_properties(env, exports, sizeof(static_prop) / sizeof(static_prop[0]), static_prop));
+    DM_NAPI_CALL_NO_RETURN(napi_define_properties(env, exports,
+         sizeof(static_prop) / sizeof(static_prop[0]), static_prop));
     LOGI("All props and functions are configured..");
     return exports;
 }

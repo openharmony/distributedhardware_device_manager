@@ -56,15 +56,15 @@ enum DMBussinessErrorCode {
 };
 
 #define DM_NAPI_RETVAL_NOTHING
-#define DM_NAPI_CALL_BASE(theCall,result)       \
+#define DM_NAPI_CALL_BASE(theCall, result)       \
     do {                                         \
         if ((theCall) != napi_ok) {               \
             LOGE("napi call failed, error %{public}s", #theCall); \
             return result;                      \
         }                                       \
     } while (0)
-#define DM_NAPI_CALL(theCall,result) DM_NAPI_CALL_BASE(theCall,result)
-#define DM_NAPI_CALL_RETURN_VOID(theCall) DM_NAPI_CALL_BASE(theCall,DM_NAPI_RETVAL_NOTHING)
+#define DM_NAPI_CALL(theCall,result) DM_NAPI_CALL_BASE(theCall, result)
+#define DM_NAPI_CALL_RETURN_VOID(theCall) DM_NAPI_CALL_BASE(theCall, DM_NAPI_RETVAL_NOTHING)
 #define DM_NAPI_CALL_NORETURN_BASE(theCall)       \
     do {                                         \
         if ((theCall) != napi_ok) {              \
