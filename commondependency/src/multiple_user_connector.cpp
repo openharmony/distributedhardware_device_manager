@@ -38,8 +38,8 @@ std::map<int32_t, DMAccountInfo> MultipleUserConnector::dmAccountInfoMap_ = {};
 std::mutex MultipleUserConnector::dmAccountInfoMaplock_;
 #ifndef OS_ACCOUNT_PART_EXISTS
 const int32_t DEFAULT_OS_ACCOUNT_ID = 0; // 0 is the default id when there is no os_account part
-#endif                                           // OS_ACCOUNT_PART_EXISTS
-const char *DM_MDM_CONSTRAINT = "constraint.distributed.transmission.outgoing";
+#endif // OS_ACCOUNT_PART_EXISTS
+const char* DM_MDM_CONSTRAINT = "constraint.distributed.transmission.outgoing";
 
 int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 {
@@ -57,7 +57,8 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
     return DEFAULT_OS_ACCOUNT_ID;
 #endif
 }
-DM_EXPORT bool MultipleUserConnector::CheckMDMControl() {
+DM_EXPORT bool MultipleUserConnector::CheckMDMControl()
+{
     bool isMDMControl = false;
 #ifdef OS_ACCOUNT_PART_EXISTS
     int32_t activeAccountId = GetCurrentAccountUserID();

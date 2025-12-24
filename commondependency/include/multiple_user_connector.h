@@ -117,7 +117,7 @@ public:
     DM_EXPORT static void DeleteAccountInfoByUserId(int32_t userId);
     DM_EXPORT static void GetTokenId(uint32_t &tokenId);
     DM_EXPORT static void GetTokenIdAndForegroundUserId(uint32_t &tokenId,
-                                                        int32_t &userId);
+        int32_t &userId);
     DM_EXPORT static void GetCallerUserId(int32_t &userId);
     DM_EXPORT static int32_t GetForegroundUserIds(std::vector<int32_t> &userVec);
     DM_EXPORT static int32_t GetFirstForegroundUserId(void);
@@ -127,7 +127,7 @@ public:
     DM_EXPORT static bool IsUserUnlocked(int32_t userId);
     DM_EXPORT static void ClearLockedUser(std::vector<int32_t> &foregroundUserVec);
     DM_EXPORT static void ClearLockedUser(std::vector<int32_t> &foregroundUserVec,
-                                            std::vector<int32_t> &backgroundUserVec);
+        std::vector<int32_t> &backgroundUserVec);
     DM_EXPORT static DMAccountInfo GetCurrentDMAccountInfo();
     DM_EXPORT static void GetCallingTokenId(uint32_t &tokenId);
     DM_EXPORT static int32_t GetUserIdByDisplayId(int32_t displayId);
