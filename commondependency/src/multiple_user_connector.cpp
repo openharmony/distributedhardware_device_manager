@@ -57,6 +57,7 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
     return DEFAULT_OS_ACCOUNT_ID;
 #endif
 }
+
 DM_EXPORT bool MultipleUserConnector::CheckMDMControl()
 {
     bool isMDMControl = false;
@@ -222,7 +223,7 @@ std::string MultipleUserConnector::GetSwitchOldAccountName(void)
 }
 
 DM_EXPORT void MultipleUserConnector::SetAccountInfo(int32_t userId,
-                                                        DMAccountInfo dmAccountInfo)
+    DMAccountInfo dmAccountInfo)
 {
     std::lock_guard<std::mutex> lock(dmAccountInfoMaplock_);
     CHECK_SIZE_VOID(dmAccountInfoMap_);
