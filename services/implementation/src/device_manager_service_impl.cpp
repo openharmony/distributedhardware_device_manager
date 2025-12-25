@@ -349,18 +349,13 @@ void DeviceManagerServiceImpl::CleanSessionMap(int sessionId, int32_t connDelayC
         CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
     };
-    const int64_t MICROSECOND_PER_SECOND = 1000000L;
-    int64_t delayTime = connDelayCloseTime * MICROSECOND_PER_SECOND;
-    if (connDelayCloseTime == DEFAULT_DELAY_CLOSE_TIME_US) {
-        delayTime = DEFAULT_DELAY_CLOSE_TIME_US;
-    }
     {
         std::lock_guard<ffrt::mutex> lock(isNeedJoinLnnMtx_);
         if (!isNeedJoinLnn_) {
-            delayTime = 0;
+            connDelayCloseTime = 0; // no need joinlnn specified by business, close directly
         }
     }
-    ffrt::submit(taskFunc, ffrt::task_attr().delay(delayTime));
+    ffrt::submit(taskFunc, ffrt::task_attr().delay(connDelayCloseTime));
     {
         std::lock_guard<ffrt::mutex> lock(mapMutex_);
         std::shared_ptr<Session> session = nullptr;

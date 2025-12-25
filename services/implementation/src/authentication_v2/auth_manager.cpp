@@ -421,6 +421,9 @@ void AuthManager::ParseHmlInfoInJsonObject(const JsonObject &jsonObject)
         LOGI("connSessionType %{public}s", context_->connSessionType.c_str());
     }
     GetDelayCloseConnTime(jsonObject);
+    if (context_->connSessionType != CONN_SESSION_TYPE_HML) {
+        return;
+    }
     if (jsonObject[PARAM_KEY_HML_ENABLE_160M].IsBoolean()) {
         context_->hmlEnable160M = jsonObject[PARAM_KEY_HML_ENABLE_160M].Get<bool>();
         LOGI("hmlEnable160M %{public}d", context_->hmlEnable160M);
@@ -1408,15 +1411,16 @@ void AuthManager::GetDelayCloseConnTime(const JsonObject &jsonObject)
 {
     CHECK_NULL_VOID(context_);
     context_->connDelayCloseTime = 0;
+    const int32_t MICROSECOND_PER_SECOND = 1000000L;
     if (context_->connSessionType != CONN_SESSION_TYPE_HML) {
         context_->connDelayCloseTime = DEFAULT_DELAY_CLOSE_TIME_US;
     }
+    if (context_->connDelayCloseTime == 0) {
+        context_->connDelayCloseTime = HML_SESSION_TIMEOUT * MICROSECOND_PER_SECOND;
+    }
     if (jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].IsString()) {
         std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
-        context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
-    }
-    if (context_->connDelayCloseTime == 0) {
-        context_->connDelayCloseTime = HML_SESSION_TIMEOUT;
+        context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr) * MICROSECOND_PER_SECOND;
     }
 }
 //LCOV_EXCL_STOP

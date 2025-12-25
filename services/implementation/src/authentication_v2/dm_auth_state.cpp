@@ -1301,7 +1301,7 @@ void DmAuthState::CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> contex
     for (const auto &profile : targetProfiles) {
         bool isAcer = profile.GetAccesser().GetAccesserDeviceId() == localUdid;
         bool isAcee = profile.GetAccessee().GetAccesseeDeviceId() == localUdid;
-        if ((!credInfo.Contains(profile.GetAccesser().GetAccesserCredentialIdStr()) && isAcer) &&
+        if ((!credInfo.Contains(profile.GetAccesser().GetAccesserCredentialIdStr()) && isAcer) ||
             (!credInfo.Contains(profile.GetAccessee().GetAccesseeCredentialIdStr()) && isAcee)) {
             LOGI("delete profileId: %{public}" PRId64"", profile.GetAccessControlId());
             DeleteAclSKAndCredId(context, userId, profile, localUdid);
