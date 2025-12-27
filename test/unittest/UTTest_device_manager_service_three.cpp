@@ -401,7 +401,6 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_301, testing::ext::TestSi
     EXPECT_CALL(*deviceManagerServiceMock_, GetTrustedDeviceList(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(deviceList), Return(DM_OK)));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
-    DeviceManagerService::GetInstance().LoadHardwareFwkService();
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthCode_301, testing::ext::TestSize.Level1)

@@ -156,8 +156,6 @@ public:
 
     int32_t CheckApiPermission(int32_t permissionLevel);
 
-    void LoadHardwareFwkService();
-
     int32_t GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId, std::string &uuid);
 
     int32_t GenerateEncryptedUuid(const std::string &pkgName, const std::string &uuid, const std::string &appId,

@@ -60,7 +60,6 @@ group("unittest") {
     ":UTTest_dm_deviceprofile_connector",
     ":UTTest_dm_deviceprofile_connector_second",
     ":UTTest_dm_dfx",
-    ":UTTest_dm_distributed_hardware_load",
     ":UTTest_dm_import_auth_code",
     ":UTTest_dm_pin_holder",
     ":UTTest_dm_publish_common_event",
@@ -1806,31 +1805,6 @@ ohos_unittest("UTTest_dm_deviceprofile_connector_second") {
 
 ## UTTest_dm_deviceprofile_connector_second }}}
 
-#############################
-
-## UnitTest UTTest_dm_distributed_hardware_load {{{
-ohos_unittest("UTTest_dm_distributed_hardware_load") {
-  module_out_path = module_out_path
-
-  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
-
-  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_distributed_hardware_load.cpp" ]
-
-  deps = [ ":device_manager_test_common" ]
-
-  external_deps = [
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "hilog:libhilog",
-    "hitrace:hitrace_meter",
-  ]
-}
-
-## UnitTest UTTest_dm_distributed_hardware_load }}}
-
 ## UnitTest UTTest_dm_comm_tool {{{
 ohos_unittest("UTTest_dm_comm_tool") {
   module_out_path = module_out_path
@@ -2427,7 +2401,6 @@ config("device_manager_test_common_public_config") {
     "${utils_path}/include",
     "${utils_path}/include/ipc/standard",
     "${utils_path}/include/crypto",
-    "${utils_path}/include/fwkload/standard",
     "${utils_path}/include/timer",
     "${json_path}/include",
     "${servicesimpl_path}/include",

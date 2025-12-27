@@ -28,7 +28,6 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
-#include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
 #include "dm_radar_helper.h"
 #include "dm_softbus_cache.h"
@@ -2019,11 +2018,6 @@ std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrus
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string deviceId = reinterpret_cast<char *>(localDeviceId);
     return DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgname, deviceId);
-}
-
-void DeviceManagerServiceImpl::LoadHardwareFwkService()
-{
-    DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
 }
 
 void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId)

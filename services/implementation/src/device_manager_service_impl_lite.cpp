@@ -396,11 +396,6 @@ std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrus
     return tmp;
 }
 
-void DeviceManagerServiceImpl::LoadHardwareFwkService()
-{
-    return;
-}
-
 int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
 {
     (void)udid;

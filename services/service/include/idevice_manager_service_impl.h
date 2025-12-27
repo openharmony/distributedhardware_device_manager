@@ -198,13 +198,6 @@ public:
         const std::map<std::string, std::string> &bindParam) = 0;
 
     /**
-     * @tc.name: IDeviceManagerServiceImpl::LoadHardwareFwkService
-     * @tc.desc: LoadHardwareFwkService
-     * @tc.type: FUNC
-     */
-    virtual void LoadHardwareFwkService() = 0;
-
-    /**
      * @tc.name: IDeviceManagerServiceImpl::RegisterUiStateCallback
      * @tc.desc: RegisterUiStateCallback
      * @tc.type: FUNC
