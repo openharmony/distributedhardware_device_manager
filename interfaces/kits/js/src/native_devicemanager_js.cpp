@@ -136,9 +136,9 @@ napi_value GenerateBusinessError(napi_env env, int32_t err, const std::string &m
     napi_value businessError = nullptr;
     DM_NAPI_CALL(napi_create_object(env, &businessError), nullptr);
     napi_value errorCode = nullptr;
-    DM_NAPI_CALL_NO_RETURN(napi_create_int32(env, err, &errorCode));
+    DM_NAPI_CALL(napi_create_int32(env, err, &errorCode), nullptr);
     napi_value errorMessage = nullptr;
-    DM_NAPI_CALL_NO_RETURN(napi_create_string_utf8(env, msg.c_str(), NAPI_AUTO_LENGTH, &errorMessage));
+    DM_NAPI_CALL(napi_create_string_utf8(env, msg.c_str(), NAPI_AUTO_LENGTH, &errorMessage), nullptr);
     DM_NAPI_CALL_NO_RETURN(napi_set_named_property(env, businessError, "code", errorCode));
     DM_NAPI_CALL_NO_RETURN(napi_set_named_property(env, businessError, "message", errorMessage));
 
