@@ -115,7 +115,7 @@ enum class DMBussinessErrorCode : int32_t {
     // Failed to obtain the service.
     DM_ERR_OBTAIN_SERVICE = 11600102,
     // Authentication invalid.
-    DM_ERR_AUTHENTICALTION_INVALID = 11600103,
+    DM_ERR_AUTHENTICATION_INVALID = 11600103,
     // Discovery invalid.
     DM_ERR_DISCOVERY_INVALID = 11600104,
     // Publish invalid.
@@ -127,14 +127,14 @@ const std::string ERR_MESSAGE_NOT_SYSTEM_APP = "The caller is not a system appli
 const std::string ERR_MESSAGE_INVALID_PARAMS = "Input parameter error.";
 const std::string ERR_MESSAGE_FAILED = "Failed to execute the function.";
 const std::string ERR_MESSAGE_OBTAIN_SERVICE = "Failed to obtain the service.";
-const std::string ERR_MESSAGE_AUTHENTICALTION_INVALID = "Authentication invalid.";
+const std::string ERR_MESSAGE_AUTHENTICATION_INVALID = "Authentication invalid.";
 const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery invalid.";
 const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
 
 napi_value GenerateBusinessError(napi_env env, int32_t err, const std::string &msg)
 {
     napi_value businessError = nullptr;
-    DM_NAPI_CALL_NO_RETURN(napi_create_object(env, &businessError));
+    DM_NAPI_CALL(napi_create_object(env, &businessError), nullptr);
     napi_value errorCode = nullptr;
     DM_NAPI_CALL_NO_RETURN(napi_create_int32(env, err, &errorCode));
     napi_value errorMessage = nullptr;
@@ -208,8 +208,8 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = tru
                 ERR_MESSAGE_PUBLISH_INVALID, isAsync);
             break;
         case ERR_DM_AUTH_BUSINESS_BUSY:
-            error = CreateErrorForCall(env, static_cast<int32_t>(DMBussinessErrorCode::DM_ERR_AUTHENTICALTION_INVALID),
-                ERR_MESSAGE_AUTHENTICALTION_INVALID, isAsync);
+            error = CreateErrorForCall(env, static_cast<int32_t>(DMBussinessErrorCode::DM_ERR_AUTHENTICATION_INVALID),
+                ERR_MESSAGE_AUTHENTICATION_INVALID, isAsync);
             break;
         case ERR_DM_INPUT_PARA_INVALID:
         case ERR_DM_UNSUPPORTED_AUTH_TYPE:

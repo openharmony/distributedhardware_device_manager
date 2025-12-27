@@ -32,7 +32,7 @@ const std::string ERR_MESSAGE_NOT_SYSTEM_APP = "The caller is not a system appli
 const std::string ERR_MESSAGE_INVALID_PARAMS = "Input parameter error.";
 const std::string ERR_MESSAGE_FAILED = "Failed to execute the function.";
 const std::string ERR_MESSAGE_OBTAIN_SERVICE = "Failed to obtain the service.";
-const std::string ERR_MESSAGE_AUTHENTICALTION_INVALID = "Authentication invalid.";
+const std::string ERR_MESSAGE_AUTHENTICATION_INVALID = "Authentication invalid.";
 const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery invalid.";
 const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
 const std::string ERR_MESSAGE_FROM_CLOUD_FAILED = "Get data from cloud failed.";
@@ -245,8 +245,8 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
             error = CreateErrorForCall(env, DM_ERR_PUBLISH_INVALID, ERR_MESSAGE_PUBLISH_INVALID, isAsync);
             break;
         case ERR_DM_AUTH_BUSINESS_BUSY:
-            error = CreateErrorForCall(env, DM_ERR_AUTHENTICALTION_INVALID,
-                ERR_MESSAGE_AUTHENTICALTION_INVALID, isAsync);
+            error = CreateErrorForCall(env, DM_ERR_AUTHENTICATION_INVALID,
+                ERR_MESSAGE_AUTHENTICATION_INVALID, isAsync);
             break;
         case ERR_DM_INPUT_PARA_INVALID:
         case ERR_DM_UNSUPPORTED_AUTH_TYPE:
@@ -292,8 +292,8 @@ napi_value CreateBusinessErrorSystem(napi_env env, int32_t errCode, bool isAsync
             error = CreateErrorForCallSystem(env, DM_ERR_PUBLISH_INVALID, ERR_MESSAGE_PUBLISH_INVALID, isAsync);
             break;
         case ERR_DM_AUTH_BUSINESS_BUSY:
-            error = CreateErrorForCallSystem(env, DM_ERR_AUTHENTICALTION_INVALID,
-                ERR_MESSAGE_AUTHENTICALTION_INVALID, isAsync);
+            error = CreateErrorForCallSystem(env, DM_ERR_AUTHENTICATION_INVALID,
+                ERR_MESSAGE_AUTHENTICATION_INVALID, isAsync);
             break;
         case ERR_DM_INPUT_PARA_INVALID:
         case ERR_DM_UNSUPPORTED_AUTH_TYPE:
