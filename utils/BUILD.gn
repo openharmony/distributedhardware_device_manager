@@ -82,6 +82,7 @@ if (defined(ohos_lite)) {
       "include/fwkload/standard",
       "include/jsonstr_handle",
       "include/kvadapter",
+      "include/librarymanager",
       "include/timer",
       "${innerkits_path}/native_cpp/include",
       "${common_path}/include",
@@ -135,6 +136,7 @@ if (defined(ohos_lite)) {
       "src/kvadapter/dm_kv_info.cpp",
       "src/kvadapter/kv_adapter.cpp",
       "src/kvadapter/kv_adapter_manager.cpp",
+      "src/librarymanager/dm_library_manager.cpp",
       "src/timer/dm_timer.cpp",
     ]
 

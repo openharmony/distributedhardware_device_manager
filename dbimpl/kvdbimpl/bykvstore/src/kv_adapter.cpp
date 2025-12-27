@@ -300,5 +300,17 @@ int32_t KVAdapter::GetOstypeCountByPrefix(const std::string &prefix, int32_t &co
     }
     return DM_OK;
 }
+
+extern "C" IKVAdapter* CreateKVAdapter()
+{
+    return new (std::nothrow) KVAdapter();
+}
+
+extern "C" void DestroyKVAdapter(IKVAdapter* adapter)
+{
+    if (adapter != nullptr) {
+        delete adapter;
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -21,9 +21,11 @@
 #include <memory>
 #include <string>
 
-#include "dm_single_instance.h"
 #include "ffrt.h"
-#include "kv_adapter.h"
+
+#include "dm_kv_info.h"
+#include "dm_single_instance.h"
+#include "dm_timer.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -51,14 +53,35 @@ public:
 private:
     KVAdapterManager() = default;
     ~KVAdapterManager() = default;
+
+    struct KVAdapterDeleter {
+        explicit KVAdapterDeleter(KVAdapterManager& manager) : manager(manager) {}
+        void operator()(IKVAdapter* adapter) const {
+            if (adapter != nullptr) {
+                manager.AfterUseKvAdapter();
+            }
+        }
+        KVAdapterManager& manager;
+    };
+    using KVAdapterPtr = std::unique_ptr<IKVAdapter, KVAdapterDeleter>;
+
+    KVAdapterPtr GetKvAdapter();
+    void AfterUseKvAdapter();
+    std::unique_ptr<DmTimer> libTimer_;
     inline bool IsTimeOut(int64_t sourceTime, int64_t targetTime, int64_t timeOut);
 
 private:
-    std::shared_ptr<DistributedKv::KvStoreDeathRecipient> deathRecipient_ = nullptr;
     ffrt::mutex kvAdapterMtx_;
-    std::shared_ptr<KVAdapter> kvAdapter_ = nullptr;
+    IKVAdapter *kvAdapter_ = nullptr;
     ffrt::mutex idCacheMapMtx_;
     std::map<std::string, DmKVValue> idCacheMap_;
+
+    std::atomic<int32_t> refCount_{0};
+
+    void* kvAdapterLibHandle_ = nullptr;
+    CreateKVAdapterFunc createFunc_ = nullptr;
+    DestroyKVAdapterFunc destroyFunc_ = nullptr;
+    bool isLibraryLoaded_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
