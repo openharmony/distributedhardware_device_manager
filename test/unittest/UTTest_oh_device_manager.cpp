@@ -43,6 +43,25 @@ HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_001, testing::
         delete[] localDeviceName;
     }
 }
+
+HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_002, testing::ext::TestSize.Level0)
+{
+    char **localDeviceName = nullptr;
+    unsigned int len = 0;
+    int32_t result = OH_DeviceManager_GetLocalDeviceName(nullptr, len);
+
+    EXPECT_EQ(result, ERR_INVALID_PARAMETER);
+}
+
+HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_003, testing::ext::TestSize.Level0)
+{
+    char tmp[] = "nullptr";
+    char *localDeviceName = tmp;
+    unsigned int len = 0;
+    int32_t result = OH_DeviceManager_GetLocalDeviceName(&localDeviceName, len);
+
+    EXPECT_EQ(result, ERR_INVALID_PARAMETER);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

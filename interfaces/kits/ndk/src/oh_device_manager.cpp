@@ -24,6 +24,10 @@
 
 int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int &len)
 {
+    if (localDeviceName == nullptr || *localDeviceName != nullptr) {
+        LOGE("localDeviceName is nullptr or *localDeviceName is not nullptr");
+        return ERR_INVALID_PARAMETER;
+    }
     std::string deviceName = "";
     int32_t ret = OHOS::DistributedHardware::DmClient::GetInstance().GetLocalDeviceName(deviceName);
     if (ret != ERR_OK) {
@@ -39,6 +43,7 @@ int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int
     if (strcpy_s(*localDeviceName, len + 1, deviceName.c_str()) != EOK) {
         LOGE("copy string fail");
         delete [] *localDeviceName;
+        *localDeviceName = nullptr;
         return DM_ERR_FAILED;
     }
     return ERR_OK;
