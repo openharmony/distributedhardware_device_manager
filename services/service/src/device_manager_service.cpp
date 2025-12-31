@@ -2569,7 +2569,7 @@ void DeviceManagerService::NotifyRemoteAccountCommonEvent(const std::string comm
         }
     }
     if (!bleUdids.empty()) {
-        UpdateAcl(localUdid, peerUdids, foregroundUserIds, backgroundUserIds);
+        UpdateAcl(localUdid, bleUdids, foregroundUserIds, backgroundUserIds);
         if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_UNLOCKED ||
             commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
             SendCommonEventBroadCast(bleUdids, foregroundUserIds, backgroundUserIds, true);
