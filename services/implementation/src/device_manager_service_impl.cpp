@@ -73,7 +73,6 @@ constexpr const char* NO_NEED_JOIN_LNN = "1";
 constexpr const char* TAG_SERVICE_ID = "serviceId";
 // currently, we just support one bind session in one device at same time
 constexpr size_t MAX_NEW_PROC_SESSION_COUNT_TEMP = 1;
-const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
 const int32_t USLEEP_TIME_US_550000 = 550000; // 550ms
 const int32_t USLEEP_TIME_US_20000 = 20000; // 20ms
 const int32_t OPEN_AUTH_SESSION_TIMEOUT = 15000; // 15000ms
@@ -334,13 +333,6 @@ void DeviceManagerServiceImpl::CleanSessionMap(std::shared_ptr<Session> session,
     }
     session->logicalSessionCnt_.fetch_sub(1);
     if (session->logicalSessionCnt_.load(std::memory_order_relaxed) <= 0) {
-        {
-            std::lock_guard<ffrt::mutex> lock(isNeedJoinLnnMtx_);
-            if (isNeedJoinLnn_) {
-                ffrt_usleep(USLEEP_TIME_US_500000);
-            }
-            isNeedJoinLnn_ = true;
-        }
         CleanSessionMap(session->sessionId_, connDelayCloseTime);
     }
 }
@@ -357,8 +349,13 @@ void DeviceManagerServiceImpl::CleanSessionMap(int sessionId, int32_t connDelayC
         CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
     };
-    const int64_t MICROSECOND_PER_SECOND = 1000000L;
-    ffrt::submit(taskFunc, ffrt::task_attr().delay(connDelayCloseTime * MICROSECOND_PER_SECOND));
+    {
+        std::lock_guard<ffrt::mutex> lock(isNeedJoinLnnMtx_);
+        if (!isNeedJoinLnn_) {
+            connDelayCloseTime = 0; // no need joinlnn specified by business, close directly
+        }
+    }
+    ffrt::submit(taskFunc, ffrt::task_attr().delay(connDelayCloseTime));
     {
         std::lock_guard<ffrt::mutex> lock(mapMutex_);
         std::shared_ptr<Session> session = nullptr;

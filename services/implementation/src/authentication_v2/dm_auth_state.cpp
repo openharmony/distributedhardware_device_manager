@@ -1273,7 +1273,7 @@ void DmAuthState::GetP2PCredInfoByUserId(std::shared_ptr<DmAuthContext> context,
 
 void DmAuthState::CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> context, const int32_t userId,
     const std::vector<DistributedDeviceProfile::AccessControlProfile> &targetProfiles,
-    JsonObject &credInfo, std::string &localUdid)
+    JsonObject &credInfo, const std::string &localUdid)
 {
     LOGI("start");
     CHECK_NULL_VOID(context);
@@ -1301,7 +1301,7 @@ void DmAuthState::CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> contex
     for (const auto &profile : targetProfiles) {
         bool isAcer = profile.GetAccesser().GetAccesserDeviceId() == localUdid;
         bool isAcee = profile.GetAccessee().GetAccesseeDeviceId() == localUdid;
-        if ((!credInfo.Contains(profile.GetAccesser().GetAccesserCredentialIdStr()) && isAcer) &&
+        if ((!credInfo.Contains(profile.GetAccesser().GetAccesserCredentialIdStr()) && isAcer) ||
             (!credInfo.Contains(profile.GetAccessee().GetAccesseeCredentialIdStr()) && isAcee)) {
             LOGI("delete profileId: %{public}" PRId64"", profile.GetAccessControlId());
             DeleteAclSKAndCredId(context, userId, profile, localUdid);
@@ -1310,7 +1310,7 @@ void DmAuthState::CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> contex
 }
 
 void DmAuthState::DeleteAclSKAndCredId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
-    const DistributedDeviceProfile::AccessControlProfile &profile, std::string &localUdid)
+    const DistributedDeviceProfile::AccessControlProfile &profile, const std::string &localUdid)
 {
     CHECK_NULL_VOID(context);
     CHECK_NULL_VOID(context->softbusConnector);
