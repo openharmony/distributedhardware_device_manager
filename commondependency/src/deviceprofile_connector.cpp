@@ -3316,19 +3316,15 @@ bool DeviceProfileConnector::CheckSrcAcuntAccessControl(const DistributedDeviceP
 {
     std::string acerDeviceId = profile.GetAccesser().GetAccesserDeviceId();
     int32_t acerUserId = profile.GetAccesser().GetAccesserUserId();
-    std::string acerAccountId = profile.GetAccesser().GetAccesserAccountId();
 
     std::string aceeDeviceId = profile.GetAccessee().GetAccesseeDeviceId();
     int32_t aceeUserId = profile.GetAccessee().GetAccesseeUserId();
-    std::string aceeAccountId = profile.GetAccessee().GetAccesseeAccountId();
     //bind type is identical account, accesser is caller, accessee is callee
-    if (srcUdid == acerDeviceId && caller.userId == acerUserId && caller.accountId == acerAccountId &&
-        sinkUdid == aceeDeviceId && acerAccountId == aceeAccountId) {
+    if (srcUdid == acerDeviceId && caller.userId == acerUserId && sinkUdid == aceeDeviceId) {
         return true;
     }
     //bind type is identical account, accessee is caller, accesser is callee
-    if (srcUdid == aceeDeviceId && caller.userId == aceeUserId && caller.accountId == aceeAccountId &&
-        sinkUdid == acerDeviceId && acerAccountId == aceeAccountId) {
+    if (srcUdid == aceeDeviceId && caller.userId == aceeUserId && sinkUdid == acerDeviceId) {
         return true;
     }
     return false;
@@ -3445,23 +3441,19 @@ bool DeviceProfileConnector::CheckSinkAcuntAccessControl(const DistributedDevice
 {
     std::string acerDeviceId = profile.GetAccesser().GetAccesserDeviceId();
     int32_t acerUserId = profile.GetAccesser().GetAccesserUserId();
-    std::string acerAccountId = profile.GetAccesser().GetAccesserAccountId();
 
     std::string aceeDeviceId = profile.GetAccessee().GetAccesseeDeviceId();
     int32_t aceeUserId = profile.GetAccessee().GetAccesseeUserId();
-    std::string aceeAccountId = profile.GetAccessee().GetAccesseeAccountId();
 
     //bind type is identical account, accesser is caller, accessee is callee
-    if (srcUdid == acerDeviceId && caller.userId == acerUserId && caller.accountId == acerAccountId &&
-        sinkUdid == aceeDeviceId && callee.userId == aceeUserId && callee.accountId == aceeAccountId &&
-        caller.accountId == callee.accountId) {
+    if (srcUdid == acerDeviceId && caller.userId == acerUserId &&
+        sinkUdid == aceeDeviceId && callee.userId == aceeUserId && caller.accountId == callee.accountId) {
         return true;
     }
 
     //bind type is identical account, accessee is caller, accesser is callee
-    if (srcUdid == aceeDeviceId && caller.userId == aceeUserId && caller.accountId == aceeAccountId &&
-        sinkUdid == acerDeviceId && callee.userId == acerUserId && callee.accountId == acerAccountId &&
-        caller.accountId == callee.accountId) {
+    if (srcUdid == aceeDeviceId && caller.userId == aceeUserId &&
+        sinkUdid == acerDeviceId && callee.userId == acerUserId && caller.accountId == callee.accountId) {
         return true;
     }
     return false;
