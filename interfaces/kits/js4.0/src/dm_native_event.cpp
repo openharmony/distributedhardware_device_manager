@@ -105,7 +105,11 @@ void DmNativeEvent::OnEvent(const std::string &eventType, size_t argc, const nap
     }
 
     napi_value handler = nullptr;
-    CHECK_NULL_VOID(listener);
+    if (listener == nullptr) {
+        LOGE("listener is null for %{public}s", eventType.c_str());
+        napi_close_handle_scope(env_, scope);
+        return;
+    }
     status = napi_get_reference_value(env_, listener->handlerRef, &handler);
     if (status != napi_ok) {
         LOGE("napi_get_reference_value handler for %{public}s failed, status = %{public}d", eventType.c_str(), status);
