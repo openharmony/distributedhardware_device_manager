@@ -52,7 +52,7 @@ std::string ComposeOsTypePrefix()
     return dmKey;
 }
 
-KVAdapterPtr KVAdapterManager::GetKvAdapter()
+KVAdapterManager::KVAdapterPtr KVAdapterManager::GetKvAdapter()
 {
     std::lock_guard<ffrt::mutex> lock(kvAdapterMtx_);
     if (kvAdapter_ != nullptr) {

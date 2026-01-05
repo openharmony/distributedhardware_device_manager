@@ -24,7 +24,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "ffrt"
+#include "ffrt.h"
 
 #include "ikv_adapter.h"
 #include "distributed_kv_data_manager.h"
