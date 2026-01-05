@@ -57,7 +57,8 @@ private:
 
     struct KVAdapterDeleter {
         explicit KVAdapterDeleter(KVAdapterManager& manager) : manager(manager) {}
-        void operator()(IKVAdapter* adapter) const {
+        void operator()(IKVAdapter* adapter) const
+        {
             if (adapter != nullptr) {
                 manager.AfterUseKvAdapter();
             }
