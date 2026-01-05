@@ -90,10 +90,10 @@ KVAdapterPtr KVAdapterManager::GetKvAdapter()
 
 void KVAdapterManager::AfterUseKvAdapter()
 {
-    refCount_--;
-    if (refCount == 0) {
+    if (refCount_.fetch_sub(1, std::memory_order_acq_rel) == 1) {
         libTimer_->DeleteTimer(KV_ADAPTER_TIMER);
-        libTimer_->StartTimer(KV_ADAPTER_TIMER, RELEASE_KV_ADAPTER_TIMESPAN, [this] (std::string timerName) {
+        libTimer_->StartTimer(KV_ADAPTER_TIMER, RELEASE_KV_ADAPTER_TIMESPAN,
+            [this, libName = std::string(KV_ADAPTER_LIB_NAME)] (std::string timerName) {
             (void)timerName;
             LOGI("Uninit and Release kv adapter");
             std::lock_guard<ffrt::mutex> lock(kvAdapterMtx_);
@@ -101,7 +101,8 @@ void KVAdapterManager::AfterUseKvAdapter()
                 kvAdapter_->UnInit();
                 kvAdapter_ = nullptr;
             }
-            GetLibraryManager().Release(KV_ADAPTER_LIB_NAME));
+            GetLibraryManager().Release(libName);
+        });
     }
 }
 
