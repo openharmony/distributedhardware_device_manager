@@ -35,12 +35,9 @@ constexpr int32_t LIB_UNLOAD_TRIGGER_FREE_TIMESPAN = 60;
 class DMLibraryManager {
 public:
     DMLibraryManager();
-
     static DMLibraryManager& GetInstance();
-
     template<typename FuncType>
     FuncType GetFunction(const std::string& libraryPath, const std::string& functionName);
-
     void Release(const std::string& libraryPath);
 
 private:
@@ -91,7 +88,8 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
                 libInfo->handle = dlopen(libraryPath.c_str(), RTLD_LAZY);
                 if (libInfo->handle == nullptr) {
                     libInfo->refCount--;
-                    LOGE("dlopen failed for %{public}s: %{public}s", libraryPath.c_str(), dlerror());
+                    LOGE("dlopen failed for %{public}s: %{public}s, refCount: %{public}d",
+                        libraryPath.c_str(), dlerror(), libInfo->refCount.load());
                     return nullptr;
                 }
             }
@@ -101,7 +99,8 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
     void* sym = dlsym(libInfo->handle, functionName.c_str());
     if (sym == nullptr) {
         libInfo->refCount--;
-        LOGE("dlsym failed for %{public}s: %{public}s", libraryPath.c_str(), dlerror());
+        LOGE("dlsym failed for %{public}s: %{public}s, refCount: %{public}d",
+            libraryPath.c_str(), dlerror(), libInfo->refCount.load());
         return nullptr;
     }
     auto now = std::chrono::steady_clock::now();
@@ -114,7 +113,7 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
             DMLibraryManager::DoUnloadLib(libPath);
         });
     }
-    LOGI("Do load lib: %{public}s", libraryPath.c_str());
+    LOGI("Do load lib: %{public}s, refCount: %{public}d", libraryPath.c_str(), libInfo->refCount.load());
     return reinterpret_cast<FuncType>(sym);
 }
 

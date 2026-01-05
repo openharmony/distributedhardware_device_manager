@@ -24,6 +24,7 @@
 #include "ffrt.h"
 
 #include "dm_kv_info.h"
+#include "ikv_adapter.h"
 #include "dm_single_instance.h"
 #include "dm_timer.h"
 
@@ -39,7 +40,7 @@ public:
     int32_t PutByAnoyDeviceId(const std::string &key, const DmKVValue &value);
     DM_EXPORT int32_t Get(const std::string &key, DmKVValue &value);
     DM_EXPORT int32_t DeleteAgedEntry();
-    DM_EXPORT int32_t AppUnintall(const std::string &appId);
+    DM_EXPORT int32_t AppUninstall(const std::string &appId);
     DM_EXPORT int32_t GetFreezeData(const std::string &key, std::string &value);
     DM_EXPORT int32_t PutFreezeData(const std::string &key, std::string &value);
     DM_EXPORT int32_t DeleteFreezeData(const std::string &key);
@@ -77,11 +78,6 @@ private:
     std::map<std::string, DmKVValue> idCacheMap_;
 
     std::atomic<int32_t> refCount_{0};
-
-    void* kvAdapterLibHandle_ = nullptr;
-    CreateKVAdapterFunc createFunc_ = nullptr;
-    DestroyKVAdapterFunc destroyFunc_ = nullptr;
-    bool isLibraryLoaded_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

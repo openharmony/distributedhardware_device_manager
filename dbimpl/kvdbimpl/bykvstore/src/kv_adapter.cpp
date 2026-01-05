@@ -18,7 +18,6 @@
 #include <mutex>
 #include <unistd.h>
 
-#include "cJSON.h"
 #include "datetime_ex.h"
 #include "string_ex.h"
 
@@ -26,7 +25,6 @@
 #include "dm_anonymous.h"
 #include "dm_error_type.h"
 #include "dm_log.h"
-#include "ffrt.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -263,8 +261,8 @@ int32_t KVAdapter::GetAllOstypeData(const std::string &key, std::vector<std::str
     }
     values.clear();
     for (const auto &entry : localEntries) {
-        JsonObject osTyoeJson(entry.value.ToString());
-        if (osTyoeJson.IsDiscarded() || !IsInt32(osTyoeJson, PEER_OSTYPE) || !IsInt64(osTyoeJson, TIME_STAMP)) {
+        JsonObject osTypeJson(entry.value.ToString());
+        if (osTypeJson.IsDiscarded() || !IsInt32(osTypeJson, PEER_OSTYPE) || !IsInt64(osTypeJson, TIME_STAMP)) {
             LOGE("entry parse error.");
             continue;
         }
@@ -274,8 +272,8 @@ int32_t KVAdapter::GetAllOstypeData(const std::string &key, std::vector<std::str
         }
         JsonObject jsonObj;
         jsonObj[PEER_UDID] = entry.key.ToString().substr(DM_OSTYPE_PREFIX_LEN);
-        jsonObj[PEER_OSTYPE] = osTyoeJson[PEER_OSTYPE].Get<int32_t>();
-        jsonObj[TIME_STAMP] = osTyoeJson[TIME_STAMP].Get<int64_t>();
+        jsonObj[PEER_OSTYPE] = osTypeJson[PEER_OSTYPE].Get<int32_t>();
+        jsonObj[TIME_STAMP] = osTypeJson[TIME_STAMP].Get<int64_t>();
         values.push_back(jsonObj.Dump());
     }
     return DM_OK;
@@ -303,14 +301,7 @@ int32_t KVAdapter::GetOstypeCountByPrefix(const std::string &prefix, int32_t &co
 
 extern "C" IKVAdapter* CreateKVAdapter()
 {
-    return new (std::nothrow) KVAdapter();
-}
-
-extern "C" void DestroyKVAdapter(IKVAdapter* adapter)
-{
-    if (adapter != nullptr) {
-        delete adapter;
-    }
+    return static_cast<IKVAdapter*>(new KVAdapter());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

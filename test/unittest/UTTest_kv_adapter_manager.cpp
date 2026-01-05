@@ -14,19 +14,21 @@
  */
 
 #include "UTTest_kv_adapter_manager.h"
+
+#include <algorithm>
+#include <thread>
+
+#include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
+
 #include "datetime_ex.h"
+
+#include "dm_crypto.h"
 #include "dm_constants.h"
 #include "dm_anonymous.h"
+#include "dm_library_manager.h"
 
-using ::testing::_;
-using ::testing::An;
-using ::testing::Return;
-using ::testing::DoAll;
-using ::testing::AtLeast;
-using ::testing::InSequence;
-using ::testing::SetArgReferee;
-
-using namespace OHOS::DistributedKv;
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
@@ -42,240 +44,235 @@ constexpr const char* APP_ID_KEY = "appID";
 constexpr const char* ANOY_DEVICE_ID_KEY = "anoyDeviceId";
 constexpr const char* SALT_KEY = "salt";
 constexpr const char* LAST_MODIFY_TIME_KEY = "lastModifyTime";
+constexpr const char* KV_ADAPTER_LIB_NAME = "libdmdb_kvstore.z.so";
+constexpr int64_t KV_TIME_OFFSET_SECONDS = 4 * 24 * 60 * 60; // 4days
+constexpr int32_t WAITFOR_RESOURCE_RELEASE_SECONDS = 130;
 } // namespace
+
 void KVAdapterManagerTest::SetUp()
 {
-    InitKvStoreEnv();
+    const int32_t permsNum = 3;
+    const int32_t indexZero = 0;
+    const int32_t indexOne = 1;
+    const int32_t indexTwo = 2;
+    uint64_t tokenId;
+    const char *perms[permsNum];
+    perms[indexZero] = "ohos.permission.ACCESS_SERVICE_DM";
+    perms[indexOne] = "ohos.permission.DISTRIBUTED_DATASYNC";
+    perms[indexTwo] = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permsNum,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "device_manager",
+        .aplStr = "system_core",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
 void KVAdapterManagerTest::TearDown()
 {
-    UnInitKvStoreEnv();
 }
 
 void KVAdapterManagerTest::SetUpTestCase()
 {}
 
 void KVAdapterManagerTest::TearDownTestCase()
-{}
-
-bool KVAdapterManagerTest::InitKvStoreEnv()
 {
-    auto kvDataMgr = IDistributedKvDataManager::GetOrCreateDistributedKvDataManager();
-    kvDataMgr_ = std::static_pointer_cast<DistributedKvDataManagerMock>(kvDataMgr);
-    mockSingleKvStore_ = std::make_shared<MockSingleKvStore>();
-    if (!kvDataMgr_ || !mockSingleKvStore_) {
-        return false;
-    }
-    EXPECT_CALL(*kvDataMgr_, GetSingleKvStore(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<ARG_FOURTH>(mockSingleKvStore_), Return(Status::SUCCESS)));
-    return KVAdapterManager::GetInstance().Init() == DM_OK;
-}
-
-bool KVAdapterManagerTest::UnInitKvStoreEnv()
-{
-    if (!kvDataMgr_ || !mockSingleKvStore_) {
-        return false;
-    }
-    KVAdapterManager::GetInstance().UnInit();
-    IDistributedKvDataManager::ReleaseDistributedKvDataManager();
-    mockSingleKvStore_.reset();
-    mockSingleKvStore_ = nullptr;
-    return true;
+    std::this_thread::sleep_for(std::chrono::seconds(WAITFOR_RESOURCE_RELEASE_SECONDS));
 }
 
 std::string KVAdapterManagerTest::CreateDmKVValueStr(const std::string &appId, int64_t lastModifyTime) const
 {
     JsonObject jsonObject;
-    jsonObject[UDID_HASH_KEY] = "udid";
+    jsonObject[UDID_HASH_KEY] = Crypto::GetSecSalt();
     jsonObject[APP_ID_KEY] = appId;
-    jsonObject[ANOY_DEVICE_ID_KEY] = "anoy_device";
-    jsonObject[SALT_KEY] = "salt";
+    jsonObject[ANOY_DEVICE_ID_KEY] = Crypto::GetSecSalt();
+    jsonObject[SALT_KEY] = Crypto::GetSecSalt();
     jsonObject[LAST_MODIFY_TIME_KEY] = lastModifyTime;
     return jsonObject.Dump();
 }
 
+void KVAdapterManagerTest::ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr)
+{
+    int64_t nowTime = GetSecondsSince1970ToNow();
+    JsonObject jsonObj;
+    jsonObj[PEER_OSTYPE] = osType;
+    jsonObj[TIME_STAMP] = nowTime;
+    osTypeStr = jsonObj.Dump();
+}
+
+void KVAdapterManagerTest::RemoveDuplicates(const std::vector<std::string> &source, std::vector<std::string> &target)
+{
+    target.erase(
+        std::remove_if(target.begin(), target.end(),
+            [&source](std::string value) {
+                return std::find(source.begin(), source.end(), value) != source.end();
+            }),
+        target.end()
+    );
+}
+
 HWTEST_F(KVAdapterManagerTest, Init_001, testing::ext::TestSize.Level1)
 {
-    ASSERT_TRUE(kvDataMgr_ != nullptr);
-    EXPECT_CALL(*kvDataMgr_, GetSingleKvStore(_, _, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<ARG_FOURTH>(mockSingleKvStore_), Return(Status::DATA_CORRUPTED)));
-    EXPECT_CALL(*kvDataMgr_, CloseKvStore(_, An<const StoreId &>())).WillRepeatedly(Return(Status::SUCCESS));
-    EXPECT_CALL(*kvDataMgr_, DeleteKvStore(_, _, _)).WillRepeatedly(Return(Status::SUCCESS));
     auto ret = KVAdapterManager::GetInstance().Init();
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(KVAdapterManagerTest, ReInit_001, testing::ext::TestSize.Level1)
+HWTEST_F(KVAdapterManagerTest, TestDMKVRW_001, testing::ext::TestSize.Level1)
 {
-    ASSERT_TRUE(kvDataMgr_ != nullptr);
-    EXPECT_CALL(*kvDataMgr_, GetSingleKvStore(_, _, _, _))
-        .WillOnce(DoAll(SetArgReferee<ARG_FOURTH>(mockSingleKvStore_), Return(Status::SUCCESS)));
-    KVAdapterManager::GetInstance().ReInit();
-}
-
-HWTEST_F(KVAdapterManagerTest, PutByAnoyDeviceId_001, testing::ext::TestSize.Level1)
-{
-    ASSERT_TRUE(mockSingleKvStore_ != nullptr);
-
-    std::string key = "key_1";
-    std::string appId = "appId_1";
+    std::string appId = "com.ohos.appID_1";
     int64_t nowTime = GetSecondsSince1970ToNow();
-    auto kVValueStr = CreateDmKVValueStr(appId, nowTime);
-    DmKVValue kVValue;
-    ConvertJsonToDmKVValue(kVValueStr, kVValue);
-    {
-        InSequence s;
-        EXPECT_CALL(*mockSingleKvStore_, Put(_, _)).WillOnce(Return(Status::SUCCESS));
-        EXPECT_CALL(*mockSingleKvStore_, Put(_, _)).WillOnce(Return(Status::SUCCESS));
-    }
-    auto ret = KVAdapterManager::GetInstance().PutByAnoyDeviceId(key, kVValue);
+    auto kvValueStr = CreateDmKVValueStr(appId, nowTime);
+    DmKVValue kvValue;
+    ConvertJsonToDmKVValue(kvValueStr, kvValue);
+    auto ret = KVAdapterManager::GetInstance().PutByAnoyDeviceId(kvValue.anoyDeviceId, kvValue);
+    EXPECT_EQ(ret, DM_OK);
+    ret = KVAdapterManager::GetInstance().PutByAnoyDeviceId(kvValue.anoyDeviceId, kvValue);
     EXPECT_EQ(ret, DM_OK);
 
-    // @tc.expect: Kv value is existed.
-    ret = KVAdapterManager::GetInstance().PutByAnoyDeviceId(key, kVValue);
+    DmKVValue kvValueOut1;
+    ret = KVAdapterManager::GetInstance().Get(kvValue.anoyDeviceId, kvValueOut1);
     EXPECT_EQ(ret, DM_OK);
-}
+    std::string kvValueOutStr1;
+    ConvertDmKVValueToJson(kvValueOut1, kvValueOutStr1);
+    EXPECT_EQ(kvValueOutStr1, kvValueStr);
 
-HWTEST_F(KVAdapterManagerTest, PutByAnoyDeviceId_002, testing::ext::TestSize.Level2)
-{
-    ASSERT_TRUE(mockSingleKvStore_ != nullptr);
+    ret = KVAdapterManager::GetInstance().DeleteAgedEntry();
+    EXPECT_EQ(ret, DM_OK);
 
-    std::string key = "key_1";
-    std::string appId = "appId_1";
-    int64_t nowTime = GetSecondsSince1970ToNow();
-    auto kVValueStr = CreateDmKVValueStr(appId, nowTime);
-    DmKVValue kVValue;
-    ConvertJsonToDmKVValue(kVValueStr, kVValue);
-    EXPECT_CALL(*mockSingleKvStore_, Put(_, _)).WillRepeatedly(Return(Status::ERROR));
-    auto ret = KVAdapterManager::GetInstance().PutByAnoyDeviceId(key, kVValue);
+    DmKVValue kvValueOut2;
+    ret = KVAdapterManager::GetInstance().Get(kvValue.anoyDeviceId, kvValueOut2);
+    EXPECT_EQ(ret, DM_OK);
+    std::string kvValueOutStr2;
+    ConvertDmKVValueToJson(kvValueOut2, kvValueOutStr2);
+    EXPECT_EQ(kvValueOutStr2, kvValueStr);
+
+    ret = KVAdapterManager::GetInstance().AppUninstall(appId);
+    EXPECT_EQ(ret, DM_OK);
+
+    DmKVValue kvValueOut3;
+    ret = KVAdapterManager::GetInstance().Get(kvValue.anoyDeviceId, kvValueOut3);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(KVAdapterManagerTest, PutByAnoyDeviceId_003, testing::ext::TestSize.Level2)
+HWTEST_F(KVAdapterManagerTest, TestDMKVRW_002, testing::ext::TestSize.Level1)
 {
-    ASSERT_TRUE(mockSingleKvStore_ != nullptr);
+    std::string appId = "com.ohos.appID_2";
+    int64_t lastModifyTime = GetSecondsSince1970ToNow() - KV_TIME_OFFSET_SECONDS;
+    auto kvValueStr = CreateDmKVValueStr(appId, lastModifyTime);
+    DmKVValue kvValue;
+    ConvertJsonToDmKVValue(kvValueStr, kvValue);
+    auto ret = KVAdapterManager::GetInstance().PutByAnoyDeviceId(kvValue.anoyDeviceId, kvValue);
+    EXPECT_EQ(ret, DM_OK);
+    ret = KVAdapterManager::GetInstance().PutByAnoyDeviceId(kvValue.anoyDeviceId, kvValue);
+    EXPECT_EQ(ret, DM_OK);
 
-    std::string key = "key_1";
-    std::string appId = "appId_1";
-    int64_t nowTime = GetSecondsSince1970ToNow();
-    auto kVValueStr = CreateDmKVValueStr(appId, nowTime);
-    DmKVValue kVValue;
-    ConvertJsonToDmKVValue(kVValueStr, kVValue);
-    {
-        InSequence s;
-        EXPECT_CALL(*mockSingleKvStore_, Put(_, _)).WillOnce(Return(Status::SUCCESS));
-        EXPECT_CALL(*mockSingleKvStore_, Put(_, _)).WillOnce(Return(Status::ERROR));
-    }
-    auto ret = KVAdapterManager::GetInstance().PutByAnoyDeviceId(key, kVValue);
+    ret = KVAdapterManager::GetInstance().DeleteAgedEntry();
+    EXPECT_EQ(ret, DM_OK);
+
+    DmKVValue kvValueOut;
+    ret = KVAdapterManager::GetInstance().Get(kvValue.anoyDeviceId, kvValueOut);
+    EXPECT_EQ(ret, DM_OK);
+    std::string kvValueOutStr;
+    ConvertDmKVValueToJson(kvValueOut, kvValueOutStr);
+    EXPECT_EQ(kvValueOutStr, kvValueStr);
+
+    ret = KVAdapterManager::GetInstance().AppUninstall(appId);
+    EXPECT_EQ(ret, DM_OK);
+
+    DmKVValue kvValueOut2;
+    ret = KVAdapterManager::GetInstance().Get(kvValue.anoyDeviceId, kvValueOut2);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(KVAdapterManagerTest, Get_001, testing::ext::TestSize.Level1)
+HWTEST_F(KVAdapterManagerTest, TestFreezeData_001, testing::ext::TestSize.Level1)
 {
-    ASSERT_TRUE(mockSingleKvStore_ != nullptr);
-
-    std::string key = "key_1";
-    std::string appId = "appId_1";
-    int64_t nowTime = GetSecondsSince1970ToNow();
-    auto kVValueStr = CreateDmKVValueStr(appId, nowTime);
-    DmKVValue kVValue;
-    ConvertJsonToDmKVValue(kVValueStr, kVValue);
-    EXPECT_CALL(*mockSingleKvStore_, Get(_, _))
-        .WillOnce(DoAll(SetArgReferee<ARG_SECOND>(kVValueStr), Return(Status::SUCCESS)));
-    auto ret = KVAdapterManager::GetInstance().Get(key, kVValue);
+    std::string freezeKey = "freezeKey1";
+    std::string freezeValue = "freezeValue1";
+    auto ret = KVAdapterManager::GetInstance().PutFreezeData(freezeKey, freezeValue);
     EXPECT_EQ(ret, DM_OK);
 
-    ret = KVAdapterManager::GetInstance().Get(key, kVValue);
+    std::string freezeValueOut;
+    ret = KVAdapterManager::GetInstance().GetFreezeData(freezeKey, freezeValueOut);
     EXPECT_EQ(ret, DM_OK);
-}
+    EXPECT_EQ(freezeValueOut, freezeValue);
 
-HWTEST_F(KVAdapterManagerTest, Get_002, testing::ext::TestSize.Level2)
-{
-    ASSERT_TRUE(mockSingleKvStore_ != nullptr);
+    ret = KVAdapterManager::GetInstance().DeleteFreezeData(freezeKey);
+    EXPECT_EQ(ret, DM_OK);
 
-    std::string key = "key_1";
-    std::string appId = "appId_1";
-    int64_t nowTime = GetSecondsSince1970ToNow();
-    auto kVValueStr = CreateDmKVValueStr(appId, nowTime);
-    DmKVValue kVValue;
-    ConvertJsonToDmKVValue(kVValueStr, kVValue);
-    EXPECT_CALL(*mockSingleKvStore_, Get(_, _))
-        .WillOnce(Return(Status::ERROR));
-    auto ret = KVAdapterManager::GetInstance().Get(key, kVValue);
+    ret = KVAdapterManager::GetInstance().GetFreezeData(freezeKey, freezeValueOut);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(KVAdapterManagerTest, DeleteAgedEntry_001, testing::ext::TestSize.Level1)
+HWTEST_F(KVAdapterManagerTest, TestOSType_001, testing::ext::TestSize.Level1)
 {
-    ASSERT_TRUE(mockSingleKvStore_ != nullptr);
-    for (int64_t i = 0; i < 2; ++i) {
-        std::string key = KEY + std::to_string(i);
-        std::string appId = APPID + std::to_string(i);
-        bool isTimeOutFlag = true;
-        if (i % 2) {
-            isTimeOutFlag = true;
-        } else {
-            isTimeOutFlag = false;
-        }
-        int64_t nowTime = !isTimeOutFlag ? GetSecondsSince1970ToNow() : ANCHOR_TIME + i;
-        auto kVValueStr = CreateDmKVValueStr(appId, nowTime);
-        DmKVValue kVValue;
-        ConvertJsonToDmKVValue(kVValueStr, kVValue);
-        {
-            InSequence s;
-            EXPECT_CALL(*mockSingleKvStore_, Put(_, _)).WillOnce(Return(Status::SUCCESS));
-            EXPECT_CALL(*mockSingleKvStore_, Put(_, _)).WillOnce(Return(Status::SUCCESS));
-        }
-        KVAdapterManager::GetInstance().PutByAnoyDeviceId(key, kVValue);
+    std::vector<std::string> osTypeValsExist;
+    KVAdapterManager::GetInstance().GetAllOstypeData(osTypeValsExist);
+    int32_t osTypeExistCnt = osTypeValsExist.size();
+
+    std::vector<std::pair<std::string, std::string>> osTypes;
+    const int32_t osTypeCnt = 10;
+    for (int32_t i = 0; i < osTypeCnt; i++) {
+        std::string udid = Crypto::GetSecSalt();
+        int32_t osType = (i % 2 == 0 ? 10 : 11);
+        std::string osTypeVal;
+        ConvertOsTypeToJson(osType, osTypeVal);
+        osTypes.push_back({udid, osTypeVal});
     }
 
-    auto ret = KVAdapterManager::GetInstance().DeleteAgedEntry();
-    EXPECT_EQ(ret, DM_OK);
+    for (const auto &osType : osTypes) {
+        auto ret = KVAdapterManager::GetInstance().PutOstypeData(osType.first, osType.second);
+        EXPECT_EQ(ret, DM_OK);
+    }
+
+    std::vector<std::string> osTypeVals;
+    int32_t count = 0;
+    for (int32_t j = 0; j < osTypeCnt; j++) {
+        osTypeVals.clear();
+        auto ret = KVAdapterManager::GetInstance().GetAllOstypeData(osTypeVals);
+        EXPECT_EQ(ret, DM_OK);
+        RemoveDuplicates(osTypeValsExist, osTypeVals);
+        EXPECT_EQ(osTypeVals.size(), osTypeCnt - j);
+        ret = KVAdapterManager::GetInstance().GetOsTypeCount(count);
+        EXPECT_EQ(ret, DM_OK);
+        EXPECT_EQ(count, osTypeCnt - j + osTypeExistCnt);
+        ret = KVAdapterManager::GetInstance().DeleteOstypeData(osTypes[j].first);
+        EXPECT_EQ(ret, DM_OK);
+    }
+
+    osTypeVals.clear();
+    auto ret = KVAdapterManager::GetInstance().GetAllOstypeData(osTypeVals);
+    EXPECT_EQ(osTypeVals.size(), osTypeExistCnt);
+    RemoveDuplicates(osTypeValsExist, osTypeVals);
+    EXPECT_EQ(osTypeVals.size(), 0);
 }
 
-HWTEST_F(KVAdapterManagerTest, AppUnintall_001, testing::ext::TestSize.Level1)
+HWTEST_F(KVAdapterManagerTest, TestLocalUserIdData_001, testing::ext::TestSize.Level1)
 {
-    ASSERT_TRUE(mockSingleKvStore_ != nullptr);
-    std::map<std::string, std::string> registerMap;
-    for (int64_t i = 0; i < 2; ++i) {
-        std::string key = KEY + std::to_string(i);
-        std::string appId = APPID + std::to_string(i);
-        bool isTimeOutFlag = true;
-        if (i % 2) {
-            isTimeOutFlag = true;
-        } else {
-            isTimeOutFlag = false;
-        }
-        int64_t nowTime = !isTimeOutFlag ? GetSecondsSince1970ToNow() : ANCHOR_TIME + i;
-        auto kVValueStr = CreateDmKVValueStr(appId, nowTime);
-        DmKVValue kVValue;
-        ConvertJsonToDmKVValue(kVValueStr, kVValue);
-        {
-            InSequence s;
-            EXPECT_CALL(*mockSingleKvStore_, Put(_, _)).WillOnce(Return(Status::SUCCESS));
-            EXPECT_CALL(*mockSingleKvStore_, Put(_, _)).WillOnce(Return(Status::SUCCESS));
-        }
-        KVAdapterManager::GetInstance().PutByAnoyDeviceId(key, kVValue);
-        registerMap.emplace(key, appId);
-    }
-    ASSERT_FALSE(registerMap.empty());
-    std::vector<DistributedKv::Entry> entrys;
-    for (const auto& item : registerMap) {
-        if (item.first.empty()) {
-            continue;
-        }
-        DistributedKv::Entry entry;
-        entry.key = item.first;
-        entry.value = item.second;
-        entrys.emplace_back(entry);
-    }
-    EXPECT_CALL(*mockSingleKvStore_, GetEntries(An<const Key &>(), _))
-        .WillOnce(DoAll(SetArgReferee<ARG_SECOND>(entrys), Return(Status::SUCCESS)));
-    EXPECT_CALL(*mockSingleKvStore_, DeleteBatch(_))
-        .WillRepeatedly(Return(Status::SUCCESS));
-    auto ret = KVAdapterManager::GetInstance().AppUnintall(registerMap.rbegin()->second);
+    std::string key = "UTTEST_LOCAL_USER_ID_KEY";
+    std::string value = "UTTEST_LOCAL_USER_ID_VALUE";
+
+    auto ret = KVAdapterManager::GetInstance().PutLocalUserIdData(key, value);
     EXPECT_EQ(ret, DM_OK);
+
+    std::string valueOut;
+    ret = KVAdapterManager::GetInstance().GetLocalUserIdData(key, valueOut);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(valueOut, value);
+
+    std::string valueUpdate = "UTTEST_LOCAL_USER_ID_VALUE_UPDATE";
+    ret = KVAdapterManager::GetInstance().PutLocalUserIdData(key, valueUpdate);
+    EXPECT_EQ(ret, DM_OK);
+
+    ret = KVAdapterManager::GetInstance().GetLocalUserIdData(key, valueOut);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(valueOut, valueUpdate);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

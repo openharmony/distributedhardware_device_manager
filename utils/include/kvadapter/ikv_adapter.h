@@ -26,7 +26,7 @@ namespace DistributedHardware {
 class IKVAdapter {
 public:
     virtual ~IKVAdapter() = default;
-    
+
     virtual int32_t Init() = 0;
     virtual void UnInit() = 0;
     virtual int32_t ReInit() = 0;
@@ -40,10 +40,7 @@ public:
     virtual int32_t GetOstypeCountByPrefix(const std::string &prefix, int32_t &count) = 0;
 };
 
-// 工厂函数声明
 using CreateKVAdapterFunc = IKVAdapter* (*)();
-using DestroyKVAdapterFunc = void (*)(IKVAdapter*);
-
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_IKV_ADAPTER_H

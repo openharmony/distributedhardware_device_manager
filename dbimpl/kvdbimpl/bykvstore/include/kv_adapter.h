@@ -24,9 +24,10 @@
 #include <unordered_set>
 #include <vector>
 
+#include "ffrt"
+
 #include "ikv_adapter.h"
 #include "distributed_kv_data_manager.h"
-#include "ffrt.h"
 #include "kvstore_death_recipient.h"
 #include "kvstore_observer.h"
 
@@ -64,7 +65,6 @@ private:
 };
 
 extern "C" IKVAdapter* CreateKVAdapter();
-extern "C" void DestroyKVAdapter(IKVAdapter* adapter);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_KV_ADAPTER_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,10 +36,8 @@ constexpr int64_t MAX_SUPPORTED_EXIST_TIME = 3 * 24 * 60 * 60; // 3days
 constexpr const char* DM_OSTYPE_PREFIX = "ostype";
 constexpr const char* DM_UDID_PREFIX = "udid";
 
-constexpr const char* KV_ADAPTER_LIB_NAME = "libkvadapter.so";
+constexpr const char* KV_ADAPTER_LIB_NAME = "libdmdb_kvstore.z.so";
 constexpr const char* CREATE_KV_ADAPTER_FUNC = "CreateKVAdapter";
-constexpr const char* DESTROY_KV_ADAPTER_FUNC = "DestroyKVAdapter";
-
 constexpr const char* KV_ADAPTER_TIMER = "DMKVAdapterTimer";
 // if no use kvAdapter function more than 60 sec, release kvAdapter so
 constexpr int32_t RELEASE_KV_ADAPTER_TIMESPAN = 60;
@@ -67,20 +65,23 @@ KVAdapterPtr KVAdapterManager::GetKvAdapter()
         CREATE_KV_ADAPTER_FUNC);
     if (createKVAdapterObj == nullptr) {
         LOGE("load kv adapter so failed");
-        return nullptr;
+        libManager.Release(KV_ADAPTER_LIB_NAME);
+        return KVAdapterPtr(nullptr, KVAdapterDeleter(*this));
     }
 
     kvAdapter_ = createKVAdapterObj();
     if (kvAdapter_ == nullptr) {
         LOGE("get kv adapter ptr failed");
         libManager.Release(KV_ADAPTER_LIB_NAME);
-        return nullptr;
+        return KVAdapterPtr(nullptr, KVAdapterDeleter(*this));
     }
 
     if (kvAdapter_->Init() != DM_OK) {
         LOGE("get kv adapter init failed");
+        kvAdapter_->UnInit();
+        kvAdapter_ = nullptr;
         libManager.Release(KV_ADAPTER_LIB_NAME);
-        return nullptr;
+        return KVAdapterPtr(nullptr, KVAdapterDeleter(*this));
     }
     
     refCount_++;
@@ -92,7 +93,8 @@ void KVAdapterManager::AfterUseKvAdapter()
     refCount_--;
     if (refCount == 0) {
         libTimer_->DeleteTimer(KV_ADAPTER_TIMER);
-        libTimer_->StartTimer(KV_ADAPTER_TIMER, RELEASE_KV_ADAPTER_TIMESPAN, [] () {
+        libTimer_->StartTimer(KV_ADAPTER_TIMER, RELEASE_KV_ADAPTER_TIMESPAN, [this] (std::string timerName) {
+            (void)timerName;
             LOGI("Uninit and Release kv adapter");
             std::lock_guard<ffrt::mutex> lock(kvAdapterMtx_);
             if (kvAdapter_ != nullptr) {
@@ -211,7 +213,7 @@ inline bool KVAdapterManager::IsTimeOut(int64_t sourceTime, int64_t targetTime, 
     return targetTime - sourceTime >= timeOut ? true : false;
 }
 
-DM_EXPORT int32_t KVAdapterManager::AppUnintall(const std::string &appId)
+DM_EXPORT int32_t KVAdapterManager::AppUninstall(const std::string &appId)
 {
     LOGI("appId %{public}s.", GetAnonyString(appId).c_str());
     {
@@ -334,8 +336,8 @@ DM_EXPORT int32_t KVAdapterManager::PutLocalUserIdData(const std::string &key, c
 
 DM_EXPORT int32_t KVAdapterManager::GetOsTypeCount(int32_t &count)
 {
-    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     auto kvAdapterPtr = GetKvAdapter();
+    CHECK_NULL_RETURN(kvAdapterPtr, ERR_DM_POINT_NULL);
     std::string osTypePrefix = ComposeOsTypePrefix();
     if (kvAdapterPtr->GetOstypeCountByPrefix(osTypePrefix, count) != DM_OK) {
         LOGE("GetOstypeCountByPrefix failed, osTypePrefix:%{public}s.", osTypePrefix.c_str());
