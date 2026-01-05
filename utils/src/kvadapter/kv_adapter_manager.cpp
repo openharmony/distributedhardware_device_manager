@@ -79,6 +79,7 @@ KVAdapterPtr KVAdapterManager::GetKvAdapter()
     if (kvAdapter_->Init() != DM_OK) {
         LOGE("get kv adapter init failed");
         kvAdapter_->UnInit();
+        delete kvAdapter_;
         kvAdapter_ = nullptr;
         libManager.Release(KV_ADAPTER_LIB_NAME);
         return KVAdapterPtr(nullptr, KVAdapterDeleter(*this));
@@ -99,6 +100,7 @@ void KVAdapterManager::AfterUseKvAdapter()
             std::lock_guard<ffrt::mutex> lock(kvAdapterMtx_);
             if (kvAdapter_ != nullptr) {
                 kvAdapter_->UnInit();
+                delete kvAdapter_;
                 kvAdapter_ = nullptr;
             }
             GetLibraryManager().Release(libName);
