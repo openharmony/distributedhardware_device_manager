@@ -24,9 +24,9 @@
 
 #include "datetime_ex.h"
 
-#include "dm_crypto.h"
-#include "dm_constants.h"
 #include "dm_anonymous.h"
+#include "dm_constants.h"
+#include "dm_crypto.h"
 #include "dm_library_manager.h"
 
 namespace OHOS {

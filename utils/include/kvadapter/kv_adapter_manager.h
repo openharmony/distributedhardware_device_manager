@@ -24,9 +24,9 @@
 #include "ffrt.h"
 
 #include "dm_kv_info.h"
-#include "ikv_adapter.h"
 #include "dm_single_instance.h"
 #include "dm_timer.h"
+#include "ikv_adapter.h"
 
 #ifndef DM_EXPORT
 #define DM_EXPORT __attribute__ ((visibility ("default")))

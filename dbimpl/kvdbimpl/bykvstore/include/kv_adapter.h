@@ -24,12 +24,12 @@
 #include <unordered_set>
 #include <vector>
 
-#include "ffrt.h"
-
-#include "ikv_adapter.h"
 #include "distributed_kv_data_manager.h"
+#include "ffrt.h"
 #include "kvstore_death_recipient.h"
 #include "kvstore_observer.h"
+
+#include "ikv_adapter.h"
 
 namespace OHOS {
 namespace DistributedHardware {
