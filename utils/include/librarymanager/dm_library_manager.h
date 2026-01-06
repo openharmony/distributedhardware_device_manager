@@ -72,9 +72,9 @@ private:
     static std::once_flag initFlag_;
 
 private:
-    std::shared_ptr<LibraryInfo> GetOrCreateLibrary(const std::string& libraryPath);
-    std::shared_ptr<LibraryInfo> GetLibraryInfo(const std::string& libraryPath);
-    void DoUnloadLib(const std::string& libraryPath);
+    DM_EXPORT std::shared_ptr<LibraryInfo> GetOrCreateLibrary(const std::string& libraryPath);
+    DM_EXPORT std::shared_ptr<LibraryInfo> GetLibraryInfo(const std::string& libraryPath);
+    DM_EXPORT void DoUnloadLib(const std::string& libraryPath);
 };
 
 template<typename FuncType>
