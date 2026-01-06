@@ -57,6 +57,7 @@ KVAdapterManager::KVAdapterPtr KVAdapterManager::GetKvAdapter()
     std::lock_guard<ffrt::mutex> lock(kvAdapterMtx_);
     if (kvAdapter_ != nullptr) {
         refCount_++;
+        libTimer_->DeleteTimer(KV_ADAPTER_TIMER);
         return KVAdapterPtr(kvAdapter_, KVAdapterDeleter(*this));
     }
 
@@ -86,6 +87,7 @@ KVAdapterManager::KVAdapterPtr KVAdapterManager::GetKvAdapter()
     }
     
     refCount_++;
+    libTimer_->DeleteTimer(KV_ADAPTER_TIMER);
     return KVAdapterPtr(kvAdapter_, KVAdapterDeleter(*this));
 }
 
