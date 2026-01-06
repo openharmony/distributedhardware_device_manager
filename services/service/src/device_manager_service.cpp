@@ -3542,7 +3542,7 @@ void DeviceManagerService::SubscribePackageCommonEvent()
         if (IsDMServiceImplReady()) {
             dmServiceImpl_->ProcessAppUnintall(arg1, arg3);
         }
-        KVAdapterManager::GetInstance().AppUnintall(arg1);
+        KVAdapterManager::GetInstance().AppUninstall(arg1);
     };
     std::vector<std::string> commonEventVec;
     commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
