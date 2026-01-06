@@ -28,17 +28,21 @@
 #include "dm_log.h"
 #include "dm_timer.h"
 
+#ifndef DM_EXPORT
+#define DM_EXPORT __attribute__ ((visibility ("default")))
+#endif // DM_EXPORT
+
 namespace OHOS {
 namespace DistributedHardware {
 // if a lib not used more than 60 seconds, trigger unload it.
 constexpr int32_t LIB_UNLOAD_TRIGGER_FREE_TIMESPAN = 60;
 class DMLibraryManager {
 public:
-    DMLibraryManager();
-    static DMLibraryManager& GetInstance();
+    DM_EXPORT DMLibraryManager();
+    DM_EXPORT static DMLibraryManager& GetInstance();
     template<typename FuncType>
-    FuncType GetFunction(const std::string& libraryPath, const std::string& functionName);
-    void Release(const std::string& libraryPath);
+    DM_EXPORT FuncType GetFunction(const std::string& libraryPath, const std::string& functionName);
+    DM_EXPORT void Release(const std::string& libraryPath);
 
 private:
     struct LibraryInfo {

@@ -28,6 +28,10 @@
 #include "dm_single_instance.h"
 #include "dm_timer.h"
 
+#ifndef DM_EXPORT
+#define DM_EXPORT __attribute__ ((visibility ("default")))
+#endif // DM_EXPORT
+
 namespace OHOS {
 namespace DistributedHardware {
 
@@ -37,7 +41,7 @@ public:
     DM_EXPORT int32_t Init();
     DM_EXPORT void UnInit();
     DM_EXPORT void ReInit();
-    int32_t PutByAnoyDeviceId(const std::string &key, const DmKVValue &value);
+    DM_EXPORT int32_t PutByAnoyDeviceId(const std::string &key, const DmKVValue &value);
     DM_EXPORT int32_t Get(const std::string &key, DmKVValue &value);
     DM_EXPORT int32_t DeleteAgedEntry();
     DM_EXPORT int32_t AppUninstall(const std::string &appId);

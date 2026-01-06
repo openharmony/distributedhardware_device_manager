@@ -155,6 +155,7 @@ if (defined(ohos_lite)) {
       "${utils_path}/include/appInfo/standard",
       "${utils_path}/include/crypto",
       "${utils_path}/include/kvadapter",
+      "${utils_path}/include/librarymanager",
       "${utils_path}/include/timer",
       "${json_path}/include",
     ]
