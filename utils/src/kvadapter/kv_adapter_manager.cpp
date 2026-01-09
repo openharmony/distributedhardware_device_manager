@@ -117,9 +117,6 @@ DM_EXPORT int32_t KVAdapterManager::Init()
         std::lock_guard<ffrt::mutex> lock(idCacheMapMtx_);
         idCacheMap_.clear();
     }
-
-    libTimer_ = std::make_unique<DmTimer>();
-
     return DM_OK;
 }
 
