@@ -73,7 +73,7 @@ private:
 
     KVAdapterPtr GetKvAdapter();
     void AfterUseKvAdapter();
-    std::unique_ptr<DmTimer> libTimer_;
+    std::unique_ptr<DmTimer> libTimer_ = std::make_unique<DmTimer>();
     inline bool IsTimeOut(int64_t sourceTime, int64_t targetTime, int64_t timeOut);
 
 private:
