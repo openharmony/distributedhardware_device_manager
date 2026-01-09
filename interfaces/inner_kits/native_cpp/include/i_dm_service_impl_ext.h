@@ -113,6 +113,8 @@ public:
     virtual int32_t StartPublishService(const ProcessInfo &processInfo,
         const PublishServiceParam &publishServiceParam) = 0;
     virtual int32_t StopPublishService(int64_t serviceId) = 0;
+    virtual void OnDynamicSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result) = 0;
+    virtual void OnDynamicSessionClosed(const int32_t sessionId) = 0;
 };
 
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);
