@@ -40,6 +40,7 @@ public:
     void SaveDeviceSecurityLevel(const char *networkId);
     void DeleteDeviceSecurityLevel(const char *networkId);
     int32_t GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList);
+    bool GetDeviceInfoByDeviceId(const std::string &deviceId, std::string &uuid, DmDeviceInfo &devInfo);
     int32_t GetUdidFromCache(const char *networkId, std::string &udid);
     int32_t GetUuidFromCache(const char *networkId, std::string &uuid);
     int32_t GetSecurityDeviceLevel(const char *networkId, int32_t &securityLevel);

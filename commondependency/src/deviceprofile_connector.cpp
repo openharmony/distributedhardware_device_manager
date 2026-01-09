@@ -895,8 +895,7 @@ DM_EXPORT uint32_t DeviceProfileConnector::CheckBindType(std::string peerUdid,
 int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles,
     const std::string &trustDev, const std::string &reqDev)
 {
-    LOGI("BindType %{public}d, bindLevel %{public}d",
-        profiles.GetBindType(), profiles.GetBindLevel());
+    LOGI("BindType %{public}d, bindLevel %{public}d", profiles.GetBindType(), profiles.GetBindLevel());
     uint32_t priority = INVALIED_TYPE;
     uint32_t bindType = profiles.GetBindType();
 

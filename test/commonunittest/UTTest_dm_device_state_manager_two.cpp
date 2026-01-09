@@ -159,10 +159,10 @@ HWTEST_F(DmDeviceStateManagerTestTwo, OnDeviceOnline_001, testing::ext::TestSize
         .deviceTypeId = 1,
     };
     std::vector<ProcessInfo> processInfoVec;
-    EXPECT_CALL(*softbusConnectorMock_, GetDeviceInfoByDeviceId("123")).WillOnce(Return(info));
+    EXPECT_CALL(*softbusConnectorMock_, GetDeviceInfoByDeviceId("123", _)).WillOnce(Return(info));
     EXPECT_CALL(*softbusConnectorMock_, GetProcessInfo()).WillOnce(Return(processInfoVec));
     dmDeviceStateManager->OnDeviceOnline("123", 0);
-    EXPECT_CALL(*softbusConnectorMock_, GetDeviceInfoByDeviceId("123")).WillOnce(Return(info));
+    EXPECT_CALL(*softbusConnectorMock_, GetDeviceInfoByDeviceId("123", _)).WillOnce(Return(info));
     EXPECT_CALL(*softbusConnectorMock_, GetProcessInfo()).WillOnce(Return(processInfoVec));
     dmDeviceStateManager->stateDeviceInfos_["123"] = info;
     dmDeviceStateManager->OnDeviceOnline("123", 0);

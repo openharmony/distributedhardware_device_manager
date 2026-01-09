@@ -29,7 +29,7 @@ public:
     virtual int32_t GetUdidByNetworkId(const char *networkId, std::string &udid) = 0;
     virtual bool CheckIsOnline(const std::string &targetDeviceId) = 0;
     virtual std::vector<ProcessInfo> GetProcessInfo() = 0;
-    virtual DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId) = 0;
+    virtual DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId, std::string &uuid) = 0;
     virtual std::shared_ptr<SoftbusSession> GetSoftbusSession();
     virtual void SetProcessInfo(ProcessInfo processInfo) = 0;
     virtual void SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec) = 0;
@@ -45,7 +45,7 @@ public:
     MOCK_METHOD(int32_t, GetUdidByNetworkId, (const char *, std::string &));
     MOCK_METHOD(bool, CheckIsOnline, (const std::string &));
     MOCK_METHOD(std::vector<ProcessInfo>, GetProcessInfo, ());
-    MOCK_METHOD(DmDeviceInfo, GetDeviceInfoByDeviceId, (const std::string &deviceId));
+    MOCK_METHOD(DmDeviceInfo, GetDeviceInfoByDeviceId, (const std::string &deviceId, std::string &));
     MOCK_METHOD(std::shared_ptr<SoftbusSession>, GetSoftbusSession, ());
     MOCK_METHOD(void, SetProcessInfo, (ProcessInfo processInfo));
     MOCK_METHOD(void, SetProcessInfoVec, (std::vector<ProcessInfo> processInfoVec));

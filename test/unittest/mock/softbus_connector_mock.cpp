@@ -35,9 +35,9 @@ std::vector<ProcessInfo> SoftbusConnector::GetProcessInfo()
     return DmSoftbusConnector::dmSoftbusConnector->GetProcessInfo();
 }
 
-DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &deviceId)
+DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &deviceId, std::string &uuid)
 {
-    return DmSoftbusConnector::dmSoftbusConnector->GetDeviceInfoByDeviceId(deviceId);
+    return DmSoftbusConnector::dmSoftbusConnector->GetDeviceInfoByDeviceId(deviceId, uuid);
 }
 void SoftbusConnector::SetProcessInfo(ProcessInfo processInfo)
 {

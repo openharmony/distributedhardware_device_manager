@@ -250,6 +250,25 @@ int32_t SoftbusCache::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceIn
     return DM_OK;
 }
 
+bool SoftbusCache::GetDeviceInfoByDeviceId(const std::string &deviceId, std::string &uuid, DmDeviceInfo &devInfo)
+{
+    LOGI("deviceId: %{public}s", GetAnonyString(deviceId).c_str());
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
+#else
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+#endif
+    for (const auto &item : deviceInfo_) {
+        if (item.first == deviceId) {
+            uuid = item.second.first;
+            devInfo = item.second.second;
+            LOGI("uuid %{public}s, udid %{public}s", GetAnonyString(uuid).c_str(), GetAnonyString(item.first).c_str());
+            return true;
+        }
+    }
+    return false;
+}
+
 void SoftbusCache::UpdateDeviceInfoCache()
 {
     LOGI("start");
