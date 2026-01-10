@@ -66,6 +66,7 @@ group("unittest") {
     ":UTTest_dm_publish_common_event",
     ":UTTest_dm_radar_helper_test",
     ":UTTest_dm_screen_common_event",
+    ":UTTest_dm_service_hichain_connector",
     ":UTTest_dm_service_load",
     ":UTTest_dm_softbus_cache",
     ":UTTest_dm_timer",
@@ -2578,3 +2579,29 @@ ohos_unittest("UTTest_dm_library_manager_test") {
 }
 
 ## UnitTest UTTest_dm_library_manager_test }}}
+
+## UnitTest UTTest_dm_service_hichain_connector {{{
+ohos_unittest("UTTest_dm_service_hichain_connector") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources = [ "${devicemanager_path}/test/unittest/UTTest_dm_service_hichain_connector.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson_static",
+    "device_auth:deviceauth_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hilog:libhilog",
+    "selinux_adapter:librestorecon",
+  ]
+}
+
+## UnitTest UTTest_dm_service_hichain_connector}}}
