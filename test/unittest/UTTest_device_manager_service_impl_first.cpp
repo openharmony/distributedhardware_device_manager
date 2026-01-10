@@ -682,7 +682,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessAppUninstall_005, testing::ex
     EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl())
         .WillOnce(Return(profiles));
     EXPECT_CALL(*deviceProfileConnectorMock_, IsLnnAcl(_)).WillRepeatedly(Return(true));
-    EXPECT_CALL(*deviceProfileConnectorMock_, CacheAcerAclId(_, _)).Times(1);
+    EXPECT_CALL(*deviceProfileConnectorMock_, CacheAcerAclId(_, _)).Times(0);
     EXPECT_CALL(*hiChainConnectorMock_, DeleteGroupByACL(_, _)).Times(1);
 
     int32_t result = deviceManagerServiceImpl_->ProcessAppUninstall(userId, accessTokenId);

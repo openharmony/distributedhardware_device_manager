@@ -565,6 +565,7 @@ ohos_unittest("UTTest_device_manager_service_three") {
     "mock/deviceprofile_connector_mock.cpp",
     "mock/permission_manager_mock.cpp",
     "mock/softbus_listener_mock.cpp",
+    "mock/multiple_user_connector_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -2206,6 +2207,7 @@ ohos_unittest("UTTest_auth_pin_auth_state") {
     "${devicemanager_path}/test/unittest/UTTest_auth_pin_auth_state.cpp",
     "${devicemanager_path}/test/unittest/mock/dm_auth_state_machine_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/hichain_auth_connector_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/distributed_device_profile_client_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]

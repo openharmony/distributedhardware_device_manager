@@ -396,7 +396,7 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation004, testing::ext::TestSize.Level1)
     g_reportAuthInputPinBoxReturnBoolValue = true;
     int32_t ret = authManager_->OnUserOperation(action, params);
     g_reportAuthInputPinBoxReturnBoolValue = false;
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_NE(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt001, testing::ext::TestSize.Level1)

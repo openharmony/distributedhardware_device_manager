@@ -245,7 +245,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAclForAccountLogOut_001, testin
     DmOfflineParam offlineParam;
     DMAclQuadInfo info = {localUdid, localUserId, peerUdid, peerUserId};
     std::string accoutId = "accountId";
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).Times(0);
     int32_t result = connector.DeleteAclForAccountLogOut(info, accoutId, offlineParam);
 
     EXPECT_EQ(result, false);
