@@ -719,11 +719,12 @@ HWTEST_F(SoftbusConnectorTest, CheckIsOnline_001, testing::ext::TestSize.Level1)
 HWTEST_F(SoftbusConnectorTest, GetDeviceInfoByDeviceId_001, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "deviceId";
+    std::string uuid = "";
     int32_t deviceCount = 1;
     std::string strNetworkId = "networkId**1";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
-    auto ret = softbusConnector->GetDeviceInfoByDeviceId(deviceId);
+    auto ret = softbusConnector->GetDeviceInfoByDeviceId(deviceId, uuid);
     EXPECT_EQ(ret.deviceId == deviceId, false);
 
     EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _))

@@ -157,7 +157,7 @@ public:
     void SetChangeProcessInfo(ProcessInfo processInfo);
     std::vector<ProcessInfo> GetChangeProcessInfo();
     void ClearChangeProcessInfo();
-    DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId);
+    DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId, std::string &uuid);
     void DeleteOffLineTimer(std::string &udidHash);
     void SyncAclList();
     void SyncAclList(int32_t userId, std::string credId, int32_t sessionKeyId, int32_t aclId);

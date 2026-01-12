@@ -122,6 +122,8 @@ public:
     virtual int32_t StopPublishService(int64_t serviceId) = 0;
     virtual bool CheckBuildLink(const DmSaCaller &caller, const DmSaCallee &callee,
         bool isRpc, bool isSrc) = 0;
+    virtual int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo) = 0;
+    virtual int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo) = 0;
     virtual int32_t InitSoftbusServer() = 0;
 };
 

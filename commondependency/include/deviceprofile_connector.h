@@ -348,6 +348,7 @@ public:
     DM_EXPORT bool CheckUserIdIsForegroundUserId(const int32_t userId);
     DM_EXPORT void GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
         DMLocalServiceInfoAuthType &authType);
+    DM_EXPORT bool CheckAccessControlProfileByTokenId(int32_t tokenId);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,

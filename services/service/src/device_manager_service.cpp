@@ -1685,7 +1685,16 @@ int32_t DeviceManagerService::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
         LOGE("ImportAuthCode failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    return dmServiceImpl_->ImportAuthInfo(dmAuthInfo);
+    int32_t ret = dmServiceImpl_->ImportAuthInfo(dmAuthInfo);
+    if (ret != DM_OK) {
+        LOGE("ImportAuthInfo failed: %{public}d.", ret);
+        return ret;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->ImportAuthInfo(dmAuthInfo);
 }
 
 int32_t DeviceManagerService::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength)
@@ -1715,7 +1724,16 @@ int32_t DeviceManagerService::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pi
         LOGE("failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    return dmServiceImpl_->ExportAuthInfo(dmAuthInfo, pinLength);
+    int32_t ret = dmServiceImpl_->ExportAuthInfo(dmAuthInfo, pinLength);
+    if (ret != DM_OK) {
+        LOGE("ExportAuthInfo failed: %{public}d.", ret);
+        return ret;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->ExportAuthInfo(dmAuthInfo);
 }
 #endif
 
@@ -3540,6 +3558,9 @@ void DeviceManagerService::SubscribePackageCommonEvent()
         packageCommonEventManager_ = std::make_shared<DmPackageCommonEventManager>();
     }
     PackageEventCallback callback = [=](const auto &arg1, const auto &arg2, const auto &arg3) {
+        if (!DeviceProfileConnector::GetInstance().CheckAccessControlProfileByTokenId(arg3)) {
+            return;
+        }
         int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
         NotifyRemoteUninstallApp(userId, arg3);
         if (IsDMServiceImplReady()) {

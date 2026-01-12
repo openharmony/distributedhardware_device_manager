@@ -912,13 +912,18 @@ bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceIdHash, bool
 
 bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
 {
+    LOGI("targetDeviceId: %{public}s", GetAnonyString(targetDeviceId).c_str());
     return CheckIsOnline(targetDeviceId, false);
 }
 
-DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &deviceId)
+DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &deviceId, std::string &uuid)
 {
-    LOGI("start");
+    LOGI("in, deviceId: %{public}s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo info;
+    if (SoftbusCache::GetInstance().GetDeviceInfoByDeviceId(deviceId, uuid, info)) {
+        LOGI("SoftbusCache contains deviceinfo");
+        return info;
+    }
     int32_t deviceCount = 0;
     NodeBasicInfo *nodeInfo = nullptr;
     if (GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount) != DM_OK) {

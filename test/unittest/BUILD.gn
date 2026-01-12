@@ -1790,6 +1790,7 @@ ohos_unittest("UTTest_dm_deviceprofile_connector_second") {
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_deviceprofile_connector_second.cpp",
     "${devicemanager_path}/test/unittest/mock/distributed_device_profile_client_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/multiple_user_connector_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -2031,6 +2032,7 @@ ohos_unittest("UTTest_kv_adapter_manager") {
     "access_token:libtoken_setproc",
     "ffrt:libffrt",
     "hilog:libhilog",
+    "selinux_adapter:librestorecon",
   ]
 }
 
