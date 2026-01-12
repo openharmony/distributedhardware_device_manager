@@ -2581,6 +2581,7 @@ ohos_unittest("UTTest_dm_library_manager_test") {
 ## UnitTest UTTest_dm_library_manager_test }}}
 
 ## UnitTest UTTest_dm_service_hichain_connector {{{
+  
 ohos_unittest("UTTest_dm_service_hichain_connector") {
   module_out_path = module_out_path
 
