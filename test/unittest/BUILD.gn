@@ -2031,6 +2031,7 @@ ohos_unittest("UTTest_kv_adapter_manager") {
     "access_token:libtoken_setproc",
     "ffrt:libffrt",
     "hilog:libhilog",
+    "selinux_adapter:librestorecon",
   ]
 }
 
