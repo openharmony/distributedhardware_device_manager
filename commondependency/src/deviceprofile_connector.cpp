@@ -2000,6 +2000,33 @@ std::map<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndBindLevel(s
     return deviceIdMap;
 }
 
+bool DeviceProfileConnector::CheckAccessControlProfileByTokenId(int32_t tokenId)
+{
+    if (tokenId < 0) {
+        LOGE("tokenId error.");
+        return false;
+    }
+    std::string localUdid = GetLocalDeviceId();
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    for (const auto &item : profiles) {
+        if (IsLnnAcl(item)) {
+            continue;
+        }
+        if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserUserId() == userId &&
+            static_cast<int32_t>(item.GetAccesser().GetAccesserTokenId()) == tokenId) {
+            return true;
+        }
+        if (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            item.GetAccessee().GetAccesseeUserId() == userId &&
+            static_cast<int32_t>(item.GetAccessee().GetAccesseeTokenId()) == tokenId) {
+            return true;
+        }
+    }
+    return false;
+}
+
 std::vector<std::string> DeviceProfileConnector::GetDeviceIdAndUdidListByTokenId(const std::vector<int32_t> &userIds,
     const std::string &localUdid, int32_t tokenId)
 {

@@ -227,5 +227,10 @@ int32_t DeviceProfileConnector::GetServiceInfoProfileByRegServiceId(int32_t regS
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfoProfileByRegServiceId(regSerId, serInfo);
 }
+
+bool DeviceProfileConnector::CheckAccessControlProfileByTokenId(int32_t tokenId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->CheckAccessControlProfileByTokenId(tokenId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

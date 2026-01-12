@@ -3555,6 +3555,9 @@ void DeviceManagerService::SubscribePackageCommonEvent()
         packageCommonEventManager_ = std::make_shared<DmPackageCommonEventManager>();
     }
     PackageEventCallback callback = [=](const auto &arg1, const auto &arg2, const auto &arg3) {
+        if (!DeviceProfileConnector::GetInstance().CheckAccessControlProfileByTokenId(arg3)) {
+            return;
+        }
         int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
         NotifyRemoteUninstallApp(userId, arg3);
         if (IsDMServiceImplReady()) {

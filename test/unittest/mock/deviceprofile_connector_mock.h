@@ -80,6 +80,7 @@ public:
     virtual int32_t PutServiceInfoProfile(const ServiceInfoProfile &profile) = 0;
     virtual int32_t GetServiceInfoProfileByTokenId(int64_t tokenId, std::vector<ServiceInfoProfile> &serviceInfos) = 0;
     virtual int32_t GetServiceInfoProfileByRegServiceId(int32_t regServiceId, ServiceInfoProfile &profile) = 0;
+    virtual bool CheckAccessControlProfileByTokenId(int32_t tokenId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -135,6 +136,7 @@ public:
     MOCK_METHOD(int32_t, DeleteServiceInfoProfile, (int32_t, int32_t));
     MOCK_METHOD(int32_t, GetServiceInfoProfileByTokenId, (int64_t, std::vector<ServiceInfoProfile> &));
     MOCK_METHOD(int32_t, GetServiceInfoProfileByRegServiceId, (int32_t, ServiceInfoProfile &));
+    MOCK_METHOD(bool, CheckAccessControlProfileByTokenId, (int32_t));
 };
 }
 }
