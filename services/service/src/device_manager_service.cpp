@@ -151,8 +151,11 @@ int32_t DeviceManagerService::InitSoftbusListener()
     SubscribeDataShareCommonEvent();
 #endif
     LOGI("SoftbusListener init success.");
-    if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("load dm service resident failed.");
+    if (IsDMServiceAdapterResidentLoad()) {
+        int32_t ret = dmServiceImplExtResident_->InitSoftbusServer();
+        if (ret != DM_OK) {
+            LOGE("resident InitSoftbusServer failed.");
+        }
     }
     return DM_OK;
 }

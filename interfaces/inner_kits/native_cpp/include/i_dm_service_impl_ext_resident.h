@@ -124,6 +124,7 @@ public:
         bool isRpc, bool isSrc) = 0;
     virtual int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo) = 0;
     virtual int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo) = 0;
+    virtual int32_t InitSoftbusServer() = 0;
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);
