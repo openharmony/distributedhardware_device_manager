@@ -82,6 +82,7 @@ if (device_manager_enable_ets_frontend) {
     external_deps = [
       "access_token:libtokenid_sdk",
       "bundle_framework:appexecfwk_base",
+      "bundle_framework:appexecfwk_core",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
       "ipc:ipc_core",
