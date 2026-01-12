@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,7 @@ void DmServiceHiChainConnectorTest::TearDownTestCase()
 
 /**
  * @tc.name: DmServiceHiChainConnector_Constructor_001
- * @tc.desc: 构造 + 析构（栈对象）
+ * @tc.desc: Constructor + Destructor (stack object)
  * @tc.type: FUNC
  */
 HWTEST_F(DmServiceHiChainConnectorTest, DmServiceHiChainConnector_Constructor_001, testing::ext::TestSize.Level1)
@@ -52,7 +52,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, DmServiceHiChainConnector_Constructor_00
 
 /**
  * @tc.name: DmServiceHiChainConnector_Constructor_002
- * @tc.desc: 构造 + 析构（堆对象 new/delete）
+ * @tc.desc: Constructor + Destructor (heap object new/delete)
  * @tc.type: FUNC
  */
 HWTEST_F(DmServiceHiChainConnectorTest, DmServiceHiChainConnector_Constructor_002, testing::ext::TestSize.Level1)
@@ -67,7 +67,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, DmServiceHiChainConnector_Constructor_00
 
 /**
  * @tc.name: DmServiceHiChainConnector_Constructor_003
- * @tc.desc: 连续多次构造/析构不崩溃（覆盖 DestroyDeviceAuthService 多次调用场景）
+ * @tc.desc: Constructor + Destructor (multiple times)
  * @tc.type: FUNC
  */
 HWTEST_F(DmServiceHiChainConnectorTest, DmServiceHiChainConnector_Constructor_003, testing::ext::TestSize.Level1)
@@ -208,7 +208,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, OnFinish_003, testing::ext::TestSize.Lev
 
 /**
  * @tc.name: OnFinish_004
- * @tc.desc: 覆盖 operationCode 非 create/disband 的默认路径
+ * @tc.desc: Cover the default path for operationCode not being create/disband
  * @tc.type: FUNC
  */
 HWTEST_F(DmServiceHiChainConnectorTest, OnFinish_004, testing::ext::TestSize.Level1)
