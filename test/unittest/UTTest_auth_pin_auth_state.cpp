@@ -132,7 +132,7 @@ HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthStartState_006, testing::ext::TestS
 {
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinAuthStartState>();
     context->authType = DmAuthType::AUTH_TYPE_NFC;
- 	context->accesser.bundleName = "wear_link_service_test";
+    context->accesser.bundleName = "wear_link_service_test";
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetLocalServiceInfoByBundleAndPinType(_, _, _))
         .WillOnce(Return(ERR_DM_FAILED));
     EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
