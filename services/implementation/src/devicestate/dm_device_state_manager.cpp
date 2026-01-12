@@ -112,17 +112,21 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const DmDeviceInfo &info)
 
 void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm)
 {
-    LOGI("OnDeviceOnline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
-    DmDeviceInfo devInfo = softbusConnector_->GetDeviceInfoByDeviceId(deviceId);
+    std::string uuid = "";
+    DmDeviceInfo devInfo = softbusConnector_->GetDeviceInfoByDeviceId(deviceId, uuid);
     if (devInfo.deviceId[0] == '\0') {
         LOGE("deviceId is empty.");
         return;
     }
+    LOGI("deviceId: %{public}s,  uuid: %{public}s", GetAnonyString(deviceId).c_str(), GetAnonyString(uuid).c_str());
     devInfo.authForm = static_cast<DmAuthForm>(authForm);
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
         if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
             stateDeviceInfos_[deviceId] = devInfo;
+        }
+        if (remoteDeviceInfos_.find(uuid) == remoteDeviceInfos_.end()) {
+            remoteDeviceInfos_[uuid] = devInfo;
         }
     }
     std::vector<ProcessInfo> processInfoVec = softbusConnector_->GetProcessInfo();
@@ -137,7 +141,7 @@ void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
         if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
-            LOGE("DmDeviceStateManager::OnDeviceOnline not find deviceId");
+            LOGE("DmDeviceStateManager::OnDeviceOffline not find deviceId");
             return;
         }
         devInfo = stateDeviceInfos_[deviceId];
@@ -183,8 +187,7 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
 void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
     std::vector<ProcessInfo> &processInfoVec)
 {
-    LOGI("begin, devState = %{public}d networkId: %{public}s.", devState,
-        GetAnonyString(devInfo.networkId).c_str());
+    LOGI("begin, devState = %{public}d networkId: %{public}s.", devState, GetAnonyString(devInfo.networkId).c_str());
     std::unordered_set<int64_t> remoteTokenIds;
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -634,7 +637,7 @@ int32_t DmDeviceStateManager::DeleteGroupByDP(const std::string &deviceId)
 
 bool DmDeviceStateManager::CheckIsOnline(const std::string &udid)
 {
-    LOGI("DmDeviceStateManager::CheckIsOnline start.");
+    LOGI("start, udid: %{public}s", GetAnonyString(std::string(udid)).c_str());
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
         if (stateDeviceInfos_.find(udid) != stateDeviceInfos_.end()) {
