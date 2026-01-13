@@ -173,12 +173,7 @@ if (defined(ohos_lite)) {
 
     public_external_deps = [
       "bundle_framework:appexecfwk_core",
-      "kv_store:distributeddata_inner",
     ]
-
-    if (support_jsapi) {
-      external_deps += [ "bundle_framework:appexecfwk_core" ]
-    }
 
     subsystem_name = "distributedhardware"
 
@@ -253,12 +248,7 @@ if (defined(ohos_lite)) {
 
     public_external_deps = [
       "bundle_framework:appexecfwk_core",
-      "kv_store:distributeddata_inner",
     ]
-
-    if (support_jsapi) {
-      external_deps += [ "bundle_framework:appexecfwk_core" ]
-    }
 
     subsystem_name = "distributedhardware"
 

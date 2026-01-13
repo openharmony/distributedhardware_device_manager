@@ -77,42 +77,6 @@ int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
     return delaySeconds;
 }
 
-std::string GetBundleLabel(const std::string &bundleName)
-{
-    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        LOGE("Get ability manager failed");
-        return bundleName;
-    }
-
-    sptr<IRemoteObject> object = samgr->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (object == nullptr) {
-        LOGE("object is NULL.");
-        return bundleName;
-    }
-
-    sptr<OHOS::AppExecFwk::IBundleMgr> bms = iface_cast<OHOS::AppExecFwk::IBundleMgr>(object);
-    if (bms == nullptr) {
-        LOGE("bundle manager service is NULL.");
-        return bundleName;
-    }
-
-    auto bundleResourceProxy = bms->GetBundleResourceProxy();
-    if (bundleResourceProxy == nullptr) {
-        LOGE("GetBundleResourceProxy fail");
-        return bundleName;
-    }
-    AppExecFwk::BundleResourceInfo resourceInfo;
-    auto result = bundleResourceProxy->GetBundleResourceInfo(bundleName,
-        static_cast<uint32_t>(OHOS::AppExecFwk::ResourceFlag::GET_RESOURCE_INFO_ALL), resourceInfo);
-    if (result != ERR_OK) {
-        LOGE("GetBundleResourceInfo failed");
-        return bundleName;
-    }
-    LOGI("bundle resource label is %{public}s ", (resourceInfo.label).c_str());
-    return resourceInfo.label;
-}
-
 std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindParam)
 {
     auto iter = bindParam.find(PARAM_KEY_BIND_EXTRA_DATA);
