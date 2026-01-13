@@ -113,8 +113,8 @@ typedef struct DmAuthRequestContext {
     std::string cryptoVer;
     std::string hostPkgName;
     std::string targetPkgName;
-    std::string bundleName;
     std::string peerBundleName;
+    std::string bundleName;
     std::string appOperation;
     std::string appDesc;
     std::string appName;
@@ -497,6 +497,10 @@ public:
 
 private:
     bool IsHmlSessionType();
+    void JoinLnn(const std::string &deviceId, bool isForceJoin = false);
+    int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
+        const std::string &extra);
+    int32_t CheckAuthParamVaildExtra(const std::string &extra, const std::string &deviceId);
     bool CanUsePincodeFromDp();
     bool IsServiceInfoAuthTypeValid(int32_t authType);
     bool IsServiceInfoAuthBoxTypeValid(int32_t authBoxType);
@@ -505,10 +509,6 @@ private:
     void GetLocalServiceInfoInDp();
     bool CheckNeedShowAuthInfoDialog(int32_t errorCode);
     void UpdateInputPincodeDialog(int32_t errorCode);
-    void JoinLnn(const std::string &deviceId, bool isForceJoin = false);
-    int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
-        const std::string &extra);
-    int32_t CheckAuthParamVaildExtra(const std::string &extra, const std::string &deviceId);
     bool CheckHmlParamValid(JsonObject &jsonObject);
     void ProcessSourceMsg();
     void ProcessSinkMsg();
@@ -586,12 +586,11 @@ private:
     void NegotiateRespMsg(const std::string &version);
     void SetAuthType(int32_t authType);
     int32_t GetTaskTimeout(const char* taskName, int32_t taskTimeOut);
-    void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
-    void DeleteOffLineTimer(int32_t sessionId);
-    int32_t GetBinderInfo();
-    void SetProcessInfo();
+    void ProcessSessionOpen(int32_t sessionId, int32_t result);
     int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr);
     void ConverToFinish();
+    int32_t GetBinderInfo();
+    void SetProcessInfo();
     bool IsSinkMsgValid();
     bool IsSourceMsgValid();
     void ProcessReqPublicKey();
@@ -633,19 +632,18 @@ private:
     int32_t authForm_ = DmAuthForm::ACROSS_ACCOUNT;
     std::string remoteVersion_ = "";
     std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
-    std::string remoteUdidHash_ = "";
     ProcessInfo processInfo_;
     ffrt::mutex srcReqMsgLock_;
     bool isNeedProcCachedSrcReqMsg_ = false;
     std::string srcReqMsg_ = "";
+    std::string bundleName_ = "";
     int32_t authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
+    bool isWaitingJoinLnnCallback_ = false;
     DistributedDeviceProfile::LocalServiceInfo serviceInfoProfile_;
     bool pincodeDialogEverShown_ = false;
-    std::string bundleName_ = "";
     ffrt::mutex sessionKeyIdMutex_;
     ffrt::condition_variable sessionKeyIdCondition_;
     std::map<int64_t, std::optional<int32_t>> sessionKeyIdAsyncResult_;
-    bool isWaitingJoinLnnCallback_ = false;
     CleanNotifyCallback cleanNotifyCallback_{nullptr};
     ffrt::mutex bindParamMutex_;
     std::map<std::string, std::string> bindParam_;

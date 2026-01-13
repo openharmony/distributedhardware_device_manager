@@ -32,11 +32,12 @@ public:
     virtual int32_t GetBackgroundUserIds(std::vector<int32_t> &userIdVec) = 0;
     virtual int32_t GetForegroundUserIds(std::vector<int32_t> &userVec) = 0;
     virtual std::string GetOhosAccountId(void) = 0;
+    virtual int32_t GetUserIdByDisplayId(int32_t displayId) = 0;
     virtual void GetTokenIdAndForegroundUserId(uint32_t &tokenId, int32_t &userId) = 0;
     virtual std::string GetOhosAccountIdByUserId(int32_t userId) = 0;
-    virtual std::string GetAccountNickName(int32_t) = 0;
-    virtual void GetCallerUserId(int32_t &) = 0;
-    virtual int32_t GetUserIdByDisplayId(int32_t displayId) = 0;
+    virtual std::string GetAccountNickName(int32_t userId) = 0;
+    virtual void GetCallerUserId(int32_t &userId) = 0;
+    virtual void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo);
 public:
     static inline std::shared_ptr<DmMultipleUserConnector> dmMultipleUserConnector = nullptr;
 };
@@ -49,11 +50,12 @@ public:
     MOCK_METHOD(int32_t, GetBackgroundUserIds, (std::vector<int32_t> &));
     MOCK_METHOD(int32_t, GetForegroundUserIds, (std::vector<int32_t> &));
     MOCK_METHOD(std::string, GetOhosAccountId, ());
+    MOCK_METHOD(int32_t, GetUserIdByDisplayId, (int32_t));
     MOCK_METHOD(void, GetTokenIdAndForegroundUserId, (uint32_t &, int32_t &));
     MOCK_METHOD(std::string, GetOhosAccountIdByUserId, (int32_t));
     MOCK_METHOD(std::string, GetAccountNickName, (int32_t));
     MOCK_METHOD(void, GetCallerUserId, (int32_t &));
-    MOCK_METHOD(int32_t, GetUserIdByDisplayId, (int32_t));
+    MOCK_METHOD(void, SetAccountInfo, (int32_t, DMAccountInfo));
 };
 }
 }

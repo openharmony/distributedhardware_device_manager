@@ -78,5 +78,21 @@ int32_t HiChainAuthConnector::QueryCredentialInfo(int32_t userId, const JsonObje
 {
     return DmHiChainAuthConnector::dmHiChainAuthConnector->QueryCredentialInfo(userId, queryParams, resultJson);
 }
+
+int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int32_t userId, int32_t peerUserId)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->DeleteCredential(deviceId, userId, peerUserId);
+}
+
+int32_t HiChainAuthConnector::QueryCredInfoByCredId(int32_t userId, const std::string &credId, JsonObject &resultJson)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->QueryCredInfoByCredId(userId, credId, resultJson);
+}
+
+int32_t HiChainAuthConnector::UpdateCredential(const std::string &credId, int32_t userId,
+    std::vector<std::string> &tokenIds)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->UpdateCredential(credId, userId, tokenIds);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

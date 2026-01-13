@@ -42,6 +42,9 @@ public:
         const std::string &pinCode) = 0;
     virtual int32_t AuthCredentialPinCode(int32_t osAccountId, int64_t authReqId, const std::string &pinCode) = 0;
     virtual int32_t QueryCredentialInfo(int32_t userId, const JsonObject &queryParams, JsonObject &resultJson) = 0;
+    virtual int32_t DeleteCredential(const std::string &deviceId, int32_t userId, int32_t peerUserId) = 0;
+    virtual int32_t QueryCredInfoByCredId(int32_t userId, const std::string &credId, JsonObject &resultJson) = 0;
+    virtual int32_t UpdateCredential(const std::string &credId, int32_t userId, std::vector<std::string> &tokenIds) = 0;
 public:
     static inline std::shared_ptr<DmHiChainAuthConnector> dmHiChainAuthConnector = nullptr;
 };
@@ -60,6 +63,9 @@ public:
     MOCK_METHOD(int32_t, AuthCredential, (int32_t, int64_t, const std::string &, const std::string &));
     MOCK_METHOD(int32_t, AuthCredentialPinCode, (int32_t, int64_t, const std::string &));
     MOCK_METHOD(int32_t, QueryCredentialInfo, (int32_t, const JsonObject &, JsonObject &));
+    MOCK_METHOD(int32_t, DeleteCredential, (const std::string &, int32_t, int32_t));
+    MOCK_METHOD(int32_t, QueryCredInfoByCredId, (int32_t, const std::string &, JsonObject &));
+    MOCK_METHOD(int32_t, UpdateCredential, (const std::string &, int32_t, std::vector<std::string> &));
 };
 }
 }

@@ -59,7 +59,7 @@ public:
     int32_t GenerateCredential(std::string &localUdid, int32_t osAccountId, std::string &publicKey);
     bool QueryCredential(std::string &localUdid, int32_t osAccountId, int32_t peerOsAccountId);
     int32_t QueryCredentialInfo(int32_t userId, const JsonObject &queryParams, JsonObject &resultJson);
-    int32_t QueryCredInfoByCredId(int32_t userId, std::string credId, JsonObject &resultJson);
+    int32_t QueryCredInfoByCredId(int32_t userId, const std::string &credId, JsonObject &resultJson);
     int32_t ImportCredential(int32_t osAccountId, int32_t peerOsAccountId, std::string deviceId, std::string publicKey);
     int32_t DeleteCredential(const std::string &deviceId, int32_t userId, int32_t peerUserId);
     int32_t RegisterHiChainAuthCallback(std::shared_ptr<IDmDeviceAuthCallback> callback);

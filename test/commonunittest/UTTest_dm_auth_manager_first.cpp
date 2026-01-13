@@ -63,7 +63,7 @@ public:
     virtual ~SoftbusStateCallbackTest() {}
     void OnDeviceOnline(std::string deviceId, int32_t authForm) {}
     void OnDeviceOffline(std::string deviceId) {}
-    void DeleteOffLineTimer(std::string udidHash) {}
+    void DeleteOffLineTimer(const std::string &peerUdid) {}
 };
 
 void DmAuthManagerTest::SetUp()
@@ -85,6 +85,11 @@ void DmAuthManagerTest::SetUp()
 void DmAuthManagerTest::TearDown()
 {
     Mock::VerifyAndClearExpectations(softbusSessionMock_.get());
+    Mock::VerifyAndClearExpectations(appManagerMock_.get());
+    Mock::VerifyAndClearExpectations(cryptoMock_.get());
+    Mock::VerifyAndClearExpectations(deviceProfileConnectorMock_.get());
+    Mock::VerifyAndClearExpectations(hiChainAuthConnectorMock_.get());
+    Mock::VerifyAndClearExpectations(multipleUserConnectorMock_.get());
 }
 
 void DmAuthManagerTest::SetUpTestCase()
@@ -1455,7 +1460,6 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.L
     int64_t requestId = 12;
     int32_t status = 0;
     int32_t sessionId = 1;
-    std::string peerUdidHash;
     if (authManager_->timer_ == nullptr) {
         authManager_->timer_ = std::make_shared<DmTimer>();
     }
@@ -1481,13 +1485,14 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.L
     authManager_->NegotiateRespMsg(DM_VERSION_5_0_1);
     authManager_->NegotiateRespMsg(DM_VERSION_4_1_5_1);
     authManager_->NegotiateRespMsg(DM_VERSION_5_0_2);
-    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
+    std::string peerUdid = "peerUdid";
+    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(DoAll(SetArgReferee<1>(peerUdid), Return(DM_OK)));
     EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
-    authManager_->GetPeerUdidHash(sessionId, peerUdidHash);
-
-    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
+    authManager_->ProcessSessionOpen(sessionId, 0);
+    peerUdid = "peerUdid1";
+    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(DoAll(SetArgReferee<1>(peerUdid), Return(DM_OK)));
     EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(ERR_DM_FAILED));
-    authManager_->GetPeerUdidHash(sessionId, peerUdidHash);
+    authManager_->ProcessSessionOpen(sessionId, 0);
     ret = authManager_->StopAuthenticateDevice(pkgName);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -1890,20 +1895,9 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_002, testing::ext::TestSize.L
     authManager_->authRequestContext_->hostPkgName = "hostPkgName";
     authManager_->ParseJsonObject(jsonObject);
 
-    int32_t sessionId = 1;
-    authManager_->remoteUdidHash_ = "remoteUdidhash";
-    std::string udidHashTemp = "remoteUdidhash";
-    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1))
-    .WillOnce(WithArgs<1>(Invoke([udidHashTemp](unsigned char *udidHash) {
-        memcpy_s(udidHash, (udidHashTemp.length() + 1), udidHashTemp.c_str(), (udidHashTemp.length()));
-        return DM_OK;
-    })));
-    authManager_->DeleteOffLineTimer(sessionId);
-
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     authManager_->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    sessionId = 1;
+    int32_t sessionId = 1;
     std::string message;
     authManager_->authResponseContext_->sessionId = sessionId;
     JsonObject jsonObject1;

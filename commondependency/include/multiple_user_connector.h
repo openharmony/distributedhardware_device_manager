@@ -112,6 +112,7 @@ public:
      * @tc.type: FUNC
      */
     static std::string GetSwitchOldAccountName(void);
+
     DM_EXPORT static void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo);
     DM_EXPORT static DMAccountInfo GetAccountInfoByUserId(int32_t userId);
     DM_EXPORT static void DeleteAccountInfoByUserId(int32_t userId);

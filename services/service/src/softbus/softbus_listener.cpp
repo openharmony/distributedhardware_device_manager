@@ -564,7 +564,7 @@ void SoftbusListener::OnLocalDevInfoChange()
         LOGE("GetUdidByNetworkId failed, not update deviceName ret: %{public}d.", ret);
         return;
     }
-    DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, nodeBasicInfo.deviceName);
+    DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, nodeBasicInfo.deviceName, true);
 #endif
 }
 

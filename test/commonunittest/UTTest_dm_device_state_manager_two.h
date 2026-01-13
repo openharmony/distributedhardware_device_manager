@@ -18,11 +18,14 @@
 #include <gtest/gtest.h>
 #include <refbase.h>
 
-#include "softbus_connector_mock.h"
 #include "device_manager_service_listener.h"
-#include "softbus_session_callback.h"
+#include "deviceprofile_connector_mock.h"
 #include "dm_crypto_mock.h"
+#include "hichain_auth_connector_mock.h"
+#include "hichain_connector_mock.h"
 #include "multiple_user_connector_mock.h"
+#include "softbus_connector_mock.h"
+#include "softbus_session_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -36,7 +39,14 @@ public:
         std::make_shared<SoftbusConnectorMock>();
     static inline std::shared_ptr<CryptoMock> cryptoMock_ =
         std::make_shared<CryptoMock>();
-    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ = nullptr;
+    static inline std::shared_ptr<HiChainConnectorMock> hiChainConnectorMock_ =
+        std::make_shared<HiChainConnectorMock>();
+    static inline std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock_ =
+        std::make_shared<DeviceProfileConnectorMock>();
+    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
+        std::make_shared<MultipleUserConnectorMock>();
+    static inline std::shared_ptr<HiChainAuthConnectorMock> hiChainAuthConnectorMock_ =
+        std::make_shared<HiChainAuthConnectorMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

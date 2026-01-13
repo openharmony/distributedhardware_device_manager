@@ -121,6 +121,8 @@ public:
     std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname);
 
     int32_t DpAclAdd(const std::string &udid);
+    void DeleteAlwaysAllowTimeOut();
+    void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     int32_t IsSameAccount(const std::string &udid);
     uint64_t GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId);
     void ScreenCommonEventCallback(std::string commonEventType);
@@ -161,8 +163,6 @@ public:
     void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid, const std::string &localUdid,
         int32_t localUserId, const std::string &localAccountId);
     int32_t RegisterAuthenticationType(int32_t authenticationType);
-    void DeleteAlwaysAllowTimeOut();
-    void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
         std::string &remoteUdid, bool &isSendBroadCast);
     void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId, const std::string &localUdid);
@@ -182,16 +182,16 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid);
     void DeleteHoDevice(const std::string &peerUdid, const std::vector<int32_t> &foreGroundUserIds,
         const std::vector<int32_t> &backGroundUserIds);
-    void InitTaskOfDelTimeOutAcl(const std::string &deviceUdid, const std::string &deviceUdidHash, int32_t userId);
+    void InitTaskOfDelTimeOutAcl(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId);
+    int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
+    void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList);
     int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam);
     int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
-    void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList);
-    int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
     int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength);
     int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo);
 private:
-    std::string GetUdidHashByNetworkId(const std::string &networkId);
+    std::string GetUdidHashByNetworkId(const std::string &networkId, std::string &peerUdid);
 
 private:
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;

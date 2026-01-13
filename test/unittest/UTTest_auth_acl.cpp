@@ -34,6 +34,7 @@ void AuthAclTest::SetUpTestCase()
     DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock;
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient =
         distributedDeviceProfileClientMock_;
+    DmHiChainAuthConnector::dmHiChainAuthConnector = hiChainAuthConnectorMock_;
 }
 
 void AuthAclTest::TearDownTestCase()
@@ -48,6 +49,7 @@ void AuthAclTest::TearDownTestCase()
     DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
     distributedDeviceProfileClientMock_ = nullptr;
+    DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
 }
 
 void AuthAclTest::SetUp()
@@ -68,6 +70,7 @@ void AuthAclTest::TearDown()
     Mock::VerifyAndClearExpectations(&*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock);
     Mock::VerifyAndClearExpectations(&*DmSoftbusConnector::dmSoftbusConnector);
     Mock::VerifyAndClearExpectations(&*DmSoftbusSession::dmSoftbusSession);
+    Mock::VerifyAndClearExpectations(hiChainAuthConnectorMock_.get());
 }
 
 HWTEST_F(AuthAclTest, AuthSinkAcl_002, testing::ext::TestSize.Level1)
