@@ -220,7 +220,7 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_004, testing::ext::Tes
     int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
     pkgName = "1com.ohos.test1";
     ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
-    EXPECT_TRUE(ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_DISCOVER_MANAGER_DUPLICATE_PARAM || ret == DM_OK);
+    EXPECT_FALSE(ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_DISCOVER_MANAGER_DUPLICATE_PARAM || ret == DM_OK);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 

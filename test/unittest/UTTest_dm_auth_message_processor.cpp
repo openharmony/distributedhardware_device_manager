@@ -328,7 +328,7 @@ HWTEST_F(DmAuthMessageProcessorTest, SetSyncMsgJson_003, testing::ext::TestSize.
     context->authType = AUTH_TYPE_NFC;
     context->accesser.pkgName = "pkgTest";
     EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
-        .WillOnce(Return(DM_OK));
+        .Times(0);
     DmAccess accessSide;
     DmAccessToSync accessToSync;
     JsonObject syncMsgJson;

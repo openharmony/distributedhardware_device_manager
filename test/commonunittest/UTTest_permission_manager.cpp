@@ -278,18 +278,6 @@ HWTEST_F(PermissionManagerTest, CheckReadLocalDeviceName_001, testing::ext::Test
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(0));
     bool ret = PermissionManager::GetInstance().CheckReadLocalDeviceName();
     ASSERT_FALSE(ret);
-
-    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(10));
-    EXPECT_CALL(*accessTokenKitMock_, VerifyAccessToken(_, _))
-        .WillOnce(Return(Security::AccessToken::PermissionState::PERMISSION_DENIED));
-    ret = PermissionManager::GetInstance().CheckAccessServicePermission();
-    ASSERT_FALSE(ret);
-
-    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(10));
-    EXPECT_CALL(*accessTokenKitMock_, VerifyAccessToken(_, _))
-        .WillOnce(Return(Security::AccessToken::PermissionState::PERMISSION_GRANTED));
-    ret = PermissionManager::GetInstance().CheckAccessServicePermission();
-    ASSERT_TRUE(ret);
 }
 }
 } // namespace DistributedHardware

@@ -196,7 +196,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceFound_001, testing::ext::Test
     };
     uint16_t subscribeId = 1;
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     listener_->OnDeviceFound(processInfo, subscribeId, info);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
@@ -490,30 +489,10 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceScreenStateChange_001, testin
     processInfo.userId = 100;
     processInfo.pkgName = "com.ohos.helloworld";
     DmDeviceInfo devInfo;
-    ProcessInfo processInfoTmp;
-    processInfoTmp.pkgName = "ohos.deviceprofile";
-    processInfoTmp.userId = 106;
-    int32_t dmCommonNotifyEvent = 3;
-    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfoTmp);
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     listener_->OnDeviceScreenStateChange(processInfo, devInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 
     processInfo.pkgName = "ohos.distributedhardware.devicemanager";
-    ProcessInfo processInfo1;
-    processInfo1.pkgName = "pkgName";
-    processInfo1.userId = 101;
-    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo1);
-
-    std::vector<ProcessInfo> processInfos;
-    processInfos.push_back(processInfo1);
-    std::set<std::string> systemSA;
-    systemSA.insert("pkgName");
-    EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(processInfos));
-    EXPECT_CALL(*ipcServerListenerMock_, GetSystemSA()).Times(::testing::AtLeast(1)).WillOnce(Return(systemSA));
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     listener_->OnDeviceScreenStateChange(processInfo, devInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }

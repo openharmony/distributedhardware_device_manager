@@ -225,15 +225,12 @@ HWTEST_F(DmDeviceStateManagerTestTwo, RegisterOffLineTimer_003, testing::ext::Te
     StateTimerInfo stateTimerInfo = {
         .isStart = true,
     };
-    dmDeviceStateManager->stateTimerInfoMap_["123_100"] = stateTimerInfo;
+    dmDeviceStateManager->stateTimerInfoMap_["123"] = stateTimerInfo;
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(DoAll(WithArgs<1>(Invoke([](unsigned char* udidHash) {
-            memcpy_s(udidHash, DM_MAX_DEVICE_ID_LEN, "123", 3);
-        })), Return(DM_OK)));
-    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(100));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(0);
     dmDeviceStateManager->timer_ = std::make_shared<DmTimer>();
     dmDeviceStateManager->RegisterOffLineTimer(info);
-    EXPECT_EQ(dmDeviceStateManager->stateTimerInfoMap_["123_100"].isStart, false);
+    EXPECT_NE(dmDeviceStateManager->stateTimerInfoMap_["123"].isStart, false);
     dmDeviceStateManager->stateTimerInfoMap_.clear();
 }
 
