@@ -44,7 +44,7 @@ public:
     virtual ~SoftbusStateCallbackTest() {}
     void OnDeviceOnline(std::string deviceId, int32_t authForm) {}
     void OnDeviceOffline(std::string deviceId) {}
-    void DeleteOffLineTimer(std::string udidHash) override {}
+    void DeleteOffLineTimer(const std::string &peerUdid) override {}
 };
 
 class ISoftbusLeaveLNNCallbackTest : public ISoftbusLeaveLNNCallback {

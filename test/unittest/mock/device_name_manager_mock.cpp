@@ -29,5 +29,10 @@ int32_t DeviceNameManager::GetLocalDisplayDeviceName(int32_t maxNamelength, std:
 {
     return DmDeviceNameManager::dmDeviceNameManager_->GetLocalDisplayDeviceName(maxNamelength, displayName);
 }
+
+int32_t DeviceNameManager::InitDeviceNameWhenUserSwitch(int32_t curUserId, int32_t preUserId)
+{
+    return DmDeviceNameManager::dmDeviceNameManager_->InitDeviceNameWhenUserSwitch(curUserId, preUserId);
+}
 } // namespace DistributedHardware
-} // namespace OHOS
+} // namespace OHOS

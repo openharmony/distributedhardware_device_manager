@@ -22,7 +22,7 @@ class ISoftbusStateCallback {
 public:
     virtual void OnDeviceOnline(std::string deviceId, int32_t authForm) = 0;
     virtual void OnDeviceOffline(std::string deviceId) = 0;
-    virtual void DeleteOffLineTimer(std::string udidHash) = 0;
+    virtual void DeleteOffLineTimer(const std::string &peerUdid) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -40,7 +40,6 @@ static int32_t g_leftAclNumber = 0;
 static int32_t g_trustNumber = 0;
 static std::string g_accountId = "";
 static std::string g_createSimpleMessageReturnDataStr = "{}";
-static std::string g_peerUdidHash = "";
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -52,11 +51,6 @@ std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
 bool DmAuthManager::IsIdenticalAccount()
 {
     return g_isIdenticalAccountReturnBoolValue;
-}
-
-void DmAuthManager::GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash)
-{
-    peerUdidHash = g_peerUdidHash;
 }
 
 bool DmAuthManager::IsScreenLocked()
@@ -125,7 +119,6 @@ void DmAuthManagerTest::TearDown()
     g_createSimpleMessageReturnDataStr = "{}";
     g_isIdenticalAccountReturnBoolValue = false;
     g_leftAclNumber = 0;
-    g_peerUdidHash = "";
 }
 void DmAuthManagerTest::SetUpTestCase() {}
 void DmAuthManagerTest::TearDownTestCase() {}

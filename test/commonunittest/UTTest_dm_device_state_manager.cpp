@@ -178,17 +178,37 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceOffline_001, testing::ext::TestSize.L
 
 HWTEST_F(DmDeviceStateManagerTest, StartOffLineTimer_001, testing::ext::TestSize.Level0)
 {
-    DmDeviceInfo deviceInfo;
+    std::string peerUdid = "";
     dmDeviceStateManager->timer_ = nullptr;
-    dmDeviceStateManager->StartOffLineTimer(deviceInfo);
+    dmDeviceStateManager->StartOffLineTimer(peerUdid);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
 }
 
 HWTEST_F(DmDeviceStateManagerTest, DeleteTimeOutGroup_001, testing::ext::TestSize.Level0)
 {
-    std::string name = "name";
-    dmDeviceStateManager->DeleteTimeOutGroup(name);
+    auto hiChainConnectorTemp = dmDeviceStateManager->hiChainConnector_;
+    dmDeviceStateManager->hiChainConnector_ = nullptr;
+    std::string timerName = "timerName";
+    dmDeviceStateManager->DeleteTimeOutGroup(timerName);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+    dmDeviceStateManager->hiChainConnector_ = hiChainConnectorTemp;
+}
+
+HWTEST_F(DmDeviceStateManagerTest, DeleteTimeOutGroup_002, testing::ext::TestSize.Level0)
+{
+    auto softbusConnectorTemp = dmDeviceStateManager->softbusConnector_;
+    dmDeviceStateManager->softbusConnector_ = nullptr;
+    std::string timerName = "timerName";
+    dmDeviceStateManager->DeleteTimeOutGroup(timerName);
+    EXPECT_NE(dmDeviceStateManager->hiChainConnector_, nullptr);
+    dmDeviceStateManager->softbusConnector_ = softbusConnectorTemp;
+}
+
+HWTEST_F(DmDeviceStateManagerTest, DeleteTimeOutGroup_003, testing::ext::TestSize.Level0)
+{
+    std::string timerName = "timerName";
+    dmDeviceStateManager->DeleteTimeOutGroup(timerName);
+    EXPECT_NE(dmDeviceStateManager->hiChainConnector_, nullptr);
 }
 
 HWTEST_F(DmDeviceStateManagerTest, AddTask_001, testing::ext::TestSize.Level0)

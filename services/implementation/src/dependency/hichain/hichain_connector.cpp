@@ -665,7 +665,7 @@ int32_t HiChainConnector::DeleteGroup(std::string &groupId)
     return DM_OK;
 }
 
-int32_t HiChainConnector::DeleteGroupExt(std::string &groupId)
+int32_t HiChainConnector::DeleteGroupExt(const std::string &groupId)
 {
     int64_t requestId = GenRequestId();
     JsonObject jsonObj;
@@ -685,7 +685,7 @@ int32_t HiChainConnector::DeleteGroupExt(std::string &groupId)
     return DM_OK;
 }
 
-int32_t HiChainConnector::DeleteGroupExt(int32_t userId, std::string &groupId)
+int32_t HiChainConnector::DeleteGroupExt(int32_t userId, const std::string &groupId)
 {
     LOGI("userId: %{public}d, groupId: %{public}s", userId, GetAnonyString(groupId).c_str());
     int64_t requestId = GenRequestId();
@@ -750,20 +750,15 @@ int32_t HiChainConnector::DeleteGroup(int64_t requestId_, const std::string &use
     return DM_OK;
 }
 
-int32_t HiChainConnector::DeleteTimeOutGroup(const char* deviceId)
+int32_t HiChainConnector::DeleteTimeOutGroup(const std::string &peerUdid, int32_t localUserId)
 {
     LOGI("HiChainConnector::DeleteTimeOutGroup start");
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-    if (userId < 0) {
-        LOGE("get current process account user id failed");
-        return ERR_DM_FAILED;
-    }
     std::vector<GroupInfo> peerGroupInfoList;
-    GetRelatedGroups(deviceId, peerGroupInfoList);
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    GetRelatedGroups(peerUdid, peerGroupInfoList);
+    char localUdid[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
     for (auto &group : peerGroupInfoList) {
-        if (!(deviceGroupManager_->isDeviceInGroup(userId, DM_PKG_NAME, group.groupId.c_str(), localDeviceId))) {
+        if (!deviceGroupManager_->isDeviceInGroup(localUserId, DM_PKG_NAME, group.groupId.c_str(), localUdid)) {
             continue;
         }
         if ((!group.groupName.empty()) && (group.groupName[CHECK_AUTH_ALWAYS_POS] == AUTH_ALWAYS)) {

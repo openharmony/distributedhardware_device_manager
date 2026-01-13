@@ -172,13 +172,13 @@ public:
     static uint64_t GetSysTimeMs();
     static void DeleteAcl(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile);
+    void GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId);
     static void DeleteCredential(std::shared_ptr<DmAuthContext> context, int32_t userId,
         const JsonItemObject &credInfo, const DistributedDeviceProfile::AccessControlProfile &profile);
     static void DirectlyDeleteCredential(std::shared_ptr<DmAuthContext> context, int32_t userId,
         const JsonItemObject &credInfo);
     static void DeleteAclAndSk(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile);
-    void GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId);
     void JoinLnn(std::shared_ptr<DmAuthContext> context);
     void DeleteRedundancyAcl(std::shared_ptr<DmAuthContext> context, JsonObject &aclInfo,
         const std::set<uint32_t> bindLevelSet, bool isSrc);

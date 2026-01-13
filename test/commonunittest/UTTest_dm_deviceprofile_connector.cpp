@@ -1079,9 +1079,12 @@ HWTEST_F(DeviceProfileConnectorTest, CheckDevIdInAclForDevBind_001, testing::ext
 
 HWTEST_F(DeviceProfileConnectorTest, DeleteTimeOutAcl_001, testing::ext::TestSize.Level1)
 {
-    std::string deviceId;
+    std::string peerUdid;
+    int32_t peerUserId = 0;
+    int32_t localUserId = 0;
     DmOfflineParam offlineParam;
-    uint32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(deviceId, offlineParam);
+    uint32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(peerUdid, peerUserId,
+        localUserId, offlineParam);
     EXPECT_EQ(ret, 0);
 }
 
@@ -1340,9 +1343,12 @@ HWTEST_F(DeviceProfileConnectorTest, CheckSrcDevIdInAclForDevBind_004, testing::
 
 HWTEST_F(DeviceProfileConnectorTest, DeleteTimeOutAcl_002, testing::ext::TestSize.Level1)
 {
-    std::string deviceId = "remoteDeviceId";
+    std::string peerUdid = "remoteDeviceId";
+    int32_t peerUserId = 0;
+    int32_t localUserId = 0;
     DmOfflineParam offlineParam;
-    uint32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(deviceId, offlineParam);
+    uint32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(peerUdid, peerUserId,
+        localUserId, offlineParam);
     EXPECT_EQ(ret, 0);
 }
 

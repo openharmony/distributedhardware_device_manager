@@ -50,10 +50,10 @@ std::string ConvertMapToJsonString(const std::map<std::string, std::string> &par
 void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, std::string> &paramMap);
 bool IsInvalidPeerTargetId(const PeerTargetId &targetId);
 std::string ConvertCharArray2String(const char *srcData, uint32_t srcLen);
-int32_t StringToInt(const std::string &str, int32_t base);
-int64_t StringToInt64(const std::string &str, int32_t base);
 void VersionSplitToInt(const std::string &str, const char split, std::vector<int32_t> &numVec);
 bool CompareVecNum(const std::vector<int32_t> &srcVecNum, const std::vector<int32_t> &sinkVecNum);
+int32_t StringToInt(const std::string &str, int32_t base);
+int64_t StringToInt64(const std::string &str, int32_t base);
 bool CompareVersion(const std::string &remoteVersion, const std::string &oldVersion);
 bool GetVersionNumber(const std::string dmVersion, int32_t &versionNum);
 std::string ComposeStr(const std::string &pkgName, uint16_t subscribeId);

@@ -4257,6 +4257,28 @@ void DeviceManagerService::HandleNetworkConnected(int32_t networkStatus)
     dmServiceImplExtResident_->HandleNetworkConnected(networkStatus);
 }
 
+void DeviceManagerService::AddHmlInfoToBindParam(int32_t actionId, std::string &bindParam)
+{
+    cJSON *bindParamObj = cJSON_Parse(bindParam.c_str());
+    if (bindParamObj == NULL) {
+        bindParamObj = cJSON_CreateObject();
+        if (bindParamObj == NULL) {
+            LOGE("Create bindParamObj object failed.");
+            return;
+        }
+    }
+    cJSON_AddStringToObject(bindParamObj, PARAM_KEY_CONN_SESSIONTYPE, CONN_SESSION_TYPE_HML);
+    cJSON_AddStringToObject(bindParamObj, PARAM_KEY_HML_ACTIONID, std::to_string(actionId).c_str());
+    char *str = cJSON_PrintUnformatted(bindParamObj);
+    if (str == nullptr) {
+        cJSON_Delete(bindParamObj);
+        return;
+    }
+    bindParam = std::string(str);
+    cJSON_free(str);
+    cJSON_Delete(bindParamObj);
+}
+
 int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
 {
     LOGI("In");
@@ -4282,28 +4304,6 @@ int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
     return DeviceNameManager::GetInstance().RestoreLocalDeviceName();
 #endif
     return DM_OK;
-}
-
-void DeviceManagerService::AddHmlInfoToBindParam(int32_t actionId, std::string &bindParam)
-{
-    cJSON *bindParamObj = cJSON_Parse(bindParam.c_str());
-    if (bindParamObj == NULL) {
-        bindParamObj = cJSON_CreateObject();
-        if (bindParamObj == NULL) {
-            LOGE("Create bindParamObj object failed.");
-            return;
-        }
-    }
-    cJSON_AddStringToObject(bindParamObj, PARAM_KEY_CONN_SESSIONTYPE, CONN_SESSION_TYPE_HML);
-    cJSON_AddStringToObject(bindParamObj, PARAM_KEY_HML_ACTIONID, std::to_string(actionId).c_str());
-    char *str = cJSON_PrintUnformatted(bindParamObj);
-    if (str == nullptr) {
-        cJSON_Delete(bindParamObj);
-        return;
-    }
-    bindParam = std::string(str);
-    cJSON_free(str);
-    cJSON_Delete(bindParamObj);
 }
 
 void DeviceManagerService::ClearPublishIdCache(const std::string &pkgName)
@@ -4664,9 +4664,9 @@ void DeviceManagerService::InitTaskOfDelTimeOutAcl()
         LOGE("IsCommonDependencyReady failed or GetCommonDependencyObj() is nullptr.");
         return;
     }
-    std::map<std::string, std::unordered_set<int32_t>> udid2UserIdsMap;
-    discoveryMgr_->GetCommonDependencyObj()->GetAuthOnceUdids(udid2UserIdsMap);
-    if (udid2UserIdsMap.empty()) {
+    std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> aclInfos;
+    discoveryMgr_->GetCommonDependencyObj()->GetAllAuthOnceAclInfos(aclInfos);
+    if (aclInfos.empty()) {
         LOGI("no auth once data.");
         return;
     }
@@ -4674,20 +4674,8 @@ void DeviceManagerService::InitTaskOfDelTimeOutAcl()
         LOGE("instance not init or init failed.");
         return;
     }
-
-    for (const auto &[udid, userIds] : udid2UserIdsMap) {
-        char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
-        if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
-            LOGE("get udidhash failed.");
-            return;
-        }
-        if (SoftbusCache::GetInstance().CheckIsOnline(udidHash)) {
-            LOGE("device is online udidhash %{public}s.", GetAnonyString(udidHash).c_str());
-            continue;
-        }
-        for (auto userId : userIds) {
-            dmServiceImpl_->InitTaskOfDelTimeOutAcl(udid, udidHash, userId);
-        }
+    for (const auto &acl : aclInfos) {
+        dmServiceImpl_->InitTaskOfDelTimeOutAcl(acl.peerUdid, acl.peerUserId, acl.localUserId);
     }
 }
 
@@ -5069,16 +5057,6 @@ int32_t DeviceManagerService::GenerateRegServiceId(int32_t &regServiceId)
     return ERR_DM_SERVICE_GEN_REGISTER_ID_FAILED;
 }
 
-int32_t DeviceManagerService::OpenAuthSessionWithPara(int64_t serviceId)
-{
-    if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
-        return ERR_DM_UNSUPPORTED_METHOD;
-    }
-    return dmServiceImplExtResident_->OpenAuthSessionWithPara(serviceId);
-}
-#endif
-
 int32_t DeviceManagerService::LeaveLNN(const std::string &pkgName, const std::string &networkId)
 {
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
@@ -5095,6 +5073,16 @@ int32_t DeviceManagerService::LeaveLNN(const std::string &pkgName, const std::st
     }
     return dmServiceImpl_->LeaveLNN(pkgName, networkId);
 }
+
+int32_t DeviceManagerService::OpenAuthSessionWithPara(int64_t serviceId)
+{
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->OpenAuthSessionWithPara(serviceId);
+}
+#endif
 
 int32_t DeviceManagerService::GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
     DMLocalServiceInfoAuthType &authType)

@@ -67,6 +67,7 @@ void DeviceManagerServiceThreeTest::TearDown()
     Mock::VerifyAndClearExpectations(softbusListenerMock_.get());
     Mock::VerifyAndClearExpectations(deviceManagerServiceImplMock_.get());
     Mock::VerifyAndClearExpectations(deviceProfileConnectorMock_.get());
+    Mock::VerifyAndClearExpectations(deviceNameManagerMock_.get());
 }
 
 void DeviceManagerServiceThreeTest::SetUpTestCase()
@@ -79,6 +80,7 @@ void DeviceManagerServiceThreeTest::SetUpTestCase()
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient =
         distributedDeviceProfileClientMock_;
     DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
+    DmDeviceNameManager::dmDeviceNameManager_ = deviceNameManagerMock_;
 }
 
 void DeviceManagerServiceThreeTest::TearDownTestCase()
@@ -1748,6 +1750,30 @@ HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_009, TestSize.Leve
     info.description = std::string(DM_MAX_PIN_CODE_LEN, 'd');
     bool result = DeviceManagerService::GetInstance().IsImportAuthInfoValid(info);
     EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, InitTaskOfDelTimeOutAcl_002, TestSize.Level0)
+{
+    if (DeviceManagerService::GetInstance().discoveryMgr_ == nullptr) {
+        DeviceManagerService::GetInstance().InitDMServiceListener();
+    }
+    std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> aclInfos;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAuthOnceAclInfos(_))
+        .WillOnce(DoAll(SetArgReferee<0>(aclInfos), Return(0)));
+    DeviceManagerService::GetInstance().InitTaskOfDelTimeOutAcl();
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, InitTaskOfDelTimeOutAcl_003, TestSize.Level0)
+{
+    if (DeviceManagerService::GetInstance().discoveryMgr_ == nullptr) {
+        DeviceManagerService::GetInstance().InitDMServiceListener();
+    }
+    AuthOnceAclInfo aclInfo;
+    std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> aclInfos {aclInfo};
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAuthOnceAclInfos(_))
+        .WillOnce(DoAll(SetArgReferee<0>(aclInfos), Return(0)));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    DeviceManagerService::GetInstance().InitTaskOfDelTimeOutAcl();
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, StopDiscovering_001, testing::ext::TestSize.Level1)

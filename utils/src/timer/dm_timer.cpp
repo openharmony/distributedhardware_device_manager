@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,7 +49,7 @@ int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback cal
         return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(queue_, ERR_DM_POINT_NULL);
-    LOGI("start name: %{public}s", name.c_str());
+    LOGI("DmTimer StartTimer start name: %{public}s", name.c_str());
     std::lock_guard<ffrt::mutex> locker(timerMutex_);
 
     auto taskFunc = [callback, name] () { callback(name); };
@@ -68,7 +68,7 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
         LOGE("DmTimer DeleteTimer timer is null");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("start name: %{public}s", timerName.c_str());
+    LOGI("DmTimer DeleteTimer start name: %{public}s", timerName.c_str());
     std::lock_guard<ffrt::mutex> locker(timerMutex_);
     auto item = timerVec_.find(timerName);
     if (item == timerVec_.end()) {
@@ -87,7 +87,7 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
 
 DM_EXPORT int32_t DmTimer::DeleteAll()
 {
-    LOGI("start");
+    LOGI("DmTimer DeleteAll start");
     std::lock_guard<ffrt::mutex> locker(timerMutex_);
     for (const auto &name : timerVec_) {
         if (name.second != nullptr && queue_ != nullptr) {
