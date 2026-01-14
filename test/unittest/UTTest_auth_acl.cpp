@@ -34,6 +34,7 @@ void AuthAclTest::SetUpTestCase()
     DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock;
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient =
         distributedDeviceProfileClientMock_;
+    DmHiChainAuthConnector::dmHiChainAuthConnector = hiChainAuthConnectorMock_;
 }
 
 void AuthAclTest::TearDownTestCase()
@@ -48,6 +49,7 @@ void AuthAclTest::TearDownTestCase()
     DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
     distributedDeviceProfileClientMock_ = nullptr;
+    DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
 }
 
 void AuthAclTest::SetUp()
@@ -68,6 +70,7 @@ void AuthAclTest::TearDown()
     Mock::VerifyAndClearExpectations(&*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock);
     Mock::VerifyAndClearExpectations(&*DmSoftbusConnector::dmSoftbusConnector);
     Mock::VerifyAndClearExpectations(&*DmSoftbusSession::dmSoftbusSession);
+    Mock::VerifyAndClearExpectations(hiChainAuthConnectorMock_.get());
 }
 
 HWTEST_F(AuthAclTest, AuthSinkAcl_002, testing::ext::TestSize.Level1)
@@ -534,7 +537,7 @@ HWTEST_F(AuthAclTest, AuthSinkFinishState_UpdatePinErrorCount_005, testing::ext:
 }
 )");
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetLocalServiceInfoByBundleAndPinType(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+        .Times(::testing::AtLeast(1)).WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
     EXPECT_CALL(*distributedDeviceProfileClientMock_, UpdateLocalServiceInfo(_)).WillOnce(Return(DM_OK));
     authState->UpdatePinErrorCount(pkgName, pinExchangeType);
     JsonObject InfoObj;
@@ -561,8 +564,7 @@ HWTEST_F(AuthAclTest, VerifyFlagXor_007, testing::ext::TestSize.Level1)
 }
 )");
     EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(
-        testing::StrEq("com.huawei.hmos.wearlink"), _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+        _, _, _)).Times(0);
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcDataSyncState>();
     auto ret = authState->VerifyFlagXor(context);
     EXPECT_FALSE(ret);

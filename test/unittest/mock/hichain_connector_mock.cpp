@@ -46,5 +46,20 @@ int32_t HiChainConnector::DeleteGroupByACL(std::vector<std::pair<int32_t, std::s
 {
     return DmHiChainConnector::dmHiChainConnector->DeleteGroupByACL(delACLInfoVec, userIdVec);
 }
+
+int32_t HiChainConnector::DeleteTimeOutGroup(const std::string &peerUdid, int32_t userId)
+{
+    return DmHiChainConnector::dmHiChainConnector->DeleteTimeOutGroup(peerUdid, userId);
+}
+
+int32_t HiChainConnector::GetRelatedGroupsExt(const std::string &deviceId, std::vector<GroupInfo> &groupList)
+{
+    return DmHiChainConnector::dmHiChainConnector->GetRelatedGroupsExt(deviceId, groupList);
+}
+
+int32_t HiChainConnector::DeleteGroupExt(int32_t userId, const std::string &groupId)
+{
+    return DmHiChainConnector::dmHiChainConnector->DeleteGroupExt(userId, groupId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -456,7 +456,7 @@ int32_t HiChainAuthConnector::QueryCredentialInfo(int32_t userId, const JsonObje
     return DM_OK;
 }
 
-int32_t HiChainAuthConnector::QueryCredInfoByCredId(int32_t userId, std::string credId, JsonObject &resultJson)
+int32_t HiChainAuthConnector::QueryCredInfoByCredId(int32_t userId, const std::string &credId, JsonObject &resultJson)
 {
     const CredManager *cm = GetCredMgrInstance();
     char *returnCredInfo = nullptr;

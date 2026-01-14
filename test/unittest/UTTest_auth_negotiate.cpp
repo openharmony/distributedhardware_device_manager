@@ -146,8 +146,8 @@ HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_002, testing::ext::Tes
     context->accesser.dmVersion = DM_VERSION_5_1_0;
     context->accessee.displayId = -1;
     EXPECT_CALL(*softbusConnectorMock, GetSoftbusSession).WillOnce(Return(softbusSession));
-    EXPECT_CALL(*tokenMock, GetNativeTokenId(_)).WillOnce(Return(1));
-    EXPECT_EQ(authState->Action(context), ERR_DM_GET_TOKENID_FAILED);
+    EXPECT_CALL(*tokenMock, GetNativeTokenId(_)).Times(0);
+    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_003, testing::ext::TestSize.Level1)

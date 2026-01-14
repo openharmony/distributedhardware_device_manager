@@ -80,6 +80,20 @@ public:
     virtual int32_t PutServiceInfoProfile(const ServiceInfoProfile &profile) = 0;
     virtual int32_t GetServiceInfoProfileByTokenId(int64_t tokenId, std::vector<ServiceInfoProfile> &serviceInfos) = 0;
     virtual int32_t GetServiceInfoProfileByRegServiceId(int32_t regServiceId, ServiceInfoProfile &profile) = 0;
+    virtual int32_t GetAclListHashStr(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string &aclListHash, std::string dmVersion) = 0;
+    virtual void DeleteDpInvalidAcl() = 0;
+    virtual bool AuthOnceAclIsActive(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId) = 0;
+    virtual uint32_t DeleteTimeOutAcl(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId,
+        DmOfflineParam &offlineParam) = 0;
+    virtual int32_t GetAllAuthOnceAclInfos(std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> &aclInfos) = 0;
+    virtual std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> GetAuthOnceAclInfos(
+        const std::string &peerUdid) = 0;
+    virtual std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfileByUserId(
+        int32_t userId) = 0;
+    virtual std::unordered_set<int32_t> GetActiveAuthOncePeerUserId(const std::string &peerUdid,
+        int32_t localUserId) = 0;
+    virtual bool CheckAccessControlProfileByTokenId(int32_t tokenId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -135,6 +149,17 @@ public:
     MOCK_METHOD(int32_t, DeleteServiceInfoProfile, (int32_t, int32_t));
     MOCK_METHOD(int32_t, GetServiceInfoProfileByTokenId, (int64_t, std::vector<ServiceInfoProfile> &));
     MOCK_METHOD(int32_t, GetServiceInfoProfileByRegServiceId, (int32_t, ServiceInfoProfile &));
+    MOCK_METHOD(int32_t, GetAclListHashStr, (const DevUserInfo &, const DevUserInfo &, std::string &,
+        std::string));
+    MOCK_METHOD(void, DeleteDpInvalidAcl, ());
+    MOCK_METHOD(bool, AuthOnceAclIsActive, (const std::string &, int32_t, int32_t));
+    MOCK_METHOD(uint32_t, DeleteTimeOutAcl, (const std::string &, int32_t, int32_t, DmOfflineParam &));
+    MOCK_METHOD(int32_t, GetAllAuthOnceAclInfos, ((std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> &)));
+    MOCK_METHOD((std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash>), GetAuthOnceAclInfos, (const std::string &));
+    MOCK_METHOD((std::vector<DistributedDeviceProfile::AccessControlProfile>),
+        GetAccessControlProfileByUserId, (int32_t));
+    MOCK_METHOD((std::unordered_set<int32_t>), GetActiveAuthOncePeerUserId, (const std::string &, int32_t));
+    MOCK_METHOD(bool, CheckAccessControlProfileByTokenId, (int32_t));
 };
 }
 }

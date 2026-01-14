@@ -49,6 +49,11 @@ std::string MultipleUserConnector::GetOhosAccountId(void)
     return DmMultipleUserConnector::dmMultipleUserConnector->GetOhosAccountId();
 }
 
+int32_t MultipleUserConnector::GetUserIdByDisplayId(int32_t displayId)
+{
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetUserIdByDisplayId(displayId);
+}
+
 void MultipleUserConnector::GetTokenIdAndForegroundUserId(uint32_t &tokenId, int32_t &userId)
 {
     return DmMultipleUserConnector::dmMultipleUserConnector->GetTokenIdAndForegroundUserId(tokenId, userId);
@@ -69,9 +74,9 @@ void MultipleUserConnector::GetCallerUserId(int32_t &userId)
     return DmMultipleUserConnector::dmMultipleUserConnector->GetCallerUserId(userId);
 }
 
-int32_t MultipleUserConnector::GetUserIdByDisplayId(int32_t displayId)
+void MultipleUserConnector::SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo)
 {
-    return DmMultipleUserConnector::dmMultipleUserConnector->GetUserIdByDisplayId(displayId);
+    return DmMultipleUserConnector::dmMultipleUserConnector->SetAccountInfo(userId, dmAccountInfo);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

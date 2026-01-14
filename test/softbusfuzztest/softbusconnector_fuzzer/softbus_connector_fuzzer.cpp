@@ -111,7 +111,7 @@ void SoftBusConnectorSecondFuzzTest(FuzzedDataProvider &fdp)
     processInfoVec.emplace_back(processInfo);
     softbusConnector->SetProcessInfoVec(processInfoVec);
     softbusConnector->SetChangeProcessInfo(processInfo);
-    softbusConnector->DeleteOffLineTimer(udidHash);
+    softbusConnector->OnSessionOpened(sessionId, fdp.ConsumeIntegral<int32_t>());
     softbusConnector->CheckIsNeedJoinLnn(udid, deviceId);
     softbusConnector->CheckIsNeedJoinLnn(udid, deviceId);
     NodeBasicInfo nodeBasicInfo;

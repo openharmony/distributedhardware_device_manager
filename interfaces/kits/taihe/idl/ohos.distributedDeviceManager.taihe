@@ -31,6 +31,8 @@ struct DeviceBasicInfo {
     networkId: Optional<String>;
 }
 
+interface ServiceDieData {}
+
 function MakeDeviceBasicInfo(deviceId:String, deviceName:String, deviceType:String,
                              networkId:Optional<String>): DeviceBasicInfo;
 

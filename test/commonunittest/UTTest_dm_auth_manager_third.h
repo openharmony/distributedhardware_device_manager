@@ -50,7 +50,7 @@ public:
     virtual ~SoftbusStateCallbackMock() {}
     void OnDeviceOnline(std::string deviceId, int32_t authForm) {}
     void OnDeviceOffline(std::string deviceId) {}
-    void DeleteOffLineTimer(std::string udidHash) {}
+    void DeleteOffLineTimer(const std::string &peerUdid) {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

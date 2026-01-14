@@ -152,7 +152,6 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_Action_002, testing::ext::TestSize
     allProfiles.push_back(profile);
     profile.SetBindType(DM_POINT_TO_POINT);
     allProfiles.push_back(profile);
-    EXPECT_CALL(*deviceProfileConnectorMock, GetAllAclIncludeLnnAcl()).WillOnce(Return(allProfiles));
     EXPECT_EQ(authState->Action(context), DM_OK);
 }
 

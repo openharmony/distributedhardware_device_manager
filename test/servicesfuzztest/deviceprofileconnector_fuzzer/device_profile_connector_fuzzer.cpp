@@ -50,13 +50,17 @@ void DeviceProfileConnectorFuzzTest(FuzzedDataProvider &fdp)
     dmAccessee.trustUserId = fdp.ConsumeIntegral<int32_t>();
     dmAccessee.trustBundleName = trustBundleName;
     int32_t userId = fdp.ConsumeIntegral<int32_t>();
+    int32_t peerUserId = fdp.ConsumeIntegral<int32_t>();
     std::string accountId = fdp.ConsumeRandomLengthString();
+    DmOfflineParam offlineParam;
+    offlineParam.bindType = fdp.ConsumeIntegral<uint32_t>();
     DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
     DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(pkgName, requestDeviceId, trustUdid);
     DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId, targetDeviceId, userId);
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, dmAccesser, dmAccessee);
     DeviceProfileConnector::GetInstance().UpdateAccessControlList(userId, accountId, accountId);
     DeviceProfileConnector::GetInstance().CheckDevIdInAclForDevBind(pkgName, localDeviceId);
+    DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(trustUdid, peerUserId, userId, offlineParam);
     DeviceProfileConnector::GetInstance().GetTrustNumber(localDeviceId);
 }
 

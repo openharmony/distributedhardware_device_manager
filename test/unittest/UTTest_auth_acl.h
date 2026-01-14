@@ -41,6 +41,8 @@ private:
         std::make_shared<SoftbusConnectorMock>();
     static inline std::shared_ptr<SoftbusSessionMock> dmSoftbusSessionMock =
         std::make_shared<SoftbusSessionMock>();
+    static inline std::shared_ptr<HiChainAuthConnectorMock> hiChainAuthConnectorMock_ =
+        std::make_shared<HiChainAuthConnectorMock>();
     static std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock;
     std::shared_ptr<SoftbusConnector> softbusConnector;
     std::shared_ptr<IDeviceManagerServiceListener> listener;

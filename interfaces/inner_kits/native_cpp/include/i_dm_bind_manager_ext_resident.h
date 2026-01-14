@@ -25,6 +25,8 @@ class IDMBindManagerExtResident {
 public:
     virtual ~IDMBindManagerExtResident() = default;
     virtual int32_t SendResidentData(int32_t sessionId, std::string &message) = 0;
+    virtual int32_t GetAuthInfoByMetaToken(const std::string &metaToken, DmAuthInfo &dmAuthInfo) = 0;
+    virtual void ClearAuthInfoByMetaToken(const std::string &metaToken) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

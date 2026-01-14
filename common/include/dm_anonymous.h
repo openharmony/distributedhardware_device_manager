@@ -22,6 +22,10 @@
 #include "dm_device_info.h"
 #include "json_object.h"
 
+#ifndef DM_EXPORT
+#define DM_EXPORT __attribute__ ((visibility ("default")))
+#endif // DM_EXPORT
+
 namespace OHOS {
 namespace DistributedHardware {
 extern const char* PRINT_LIST_SPLIT;
@@ -38,7 +42,7 @@ bool IsString(const JsonItemObject &jsonObj, const std::string &key);
 DM_EXPORT bool IsUint16(const JsonItemObject &jsonObj, const std::string &key);
 DM_EXPORT bool IsInt32(const JsonItemObject &jsonObj, const std::string &key);
 bool IsUint32(const JsonItemObject &jsonObj, const std::string &key);
-bool IsInt64(const JsonItemObject &jsonObj, const std::string &key);
+DM_EXPORT bool IsInt64(const JsonItemObject &jsonObj, const std::string &key);
 bool IsUint64(const JsonItemObject &jsonObj, const std::string &key);
 bool IsArray(const JsonItemObject &jsonObj, const std::string &key);
 bool IsBool(const JsonItemObject &jsonObj, const std::string &key);
@@ -46,10 +50,10 @@ std::string ConvertMapToJsonString(const std::map<std::string, std::string> &par
 void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, std::string> &paramMap);
 bool IsInvalidPeerTargetId(const PeerTargetId &targetId);
 std::string ConvertCharArray2String(const char *srcData, uint32_t srcLen);
-int32_t StringToInt(const std::string &str, int32_t base);
-int64_t StringToInt64(const std::string &str, int32_t base);
 void VersionSplitToInt(const std::string &str, const char split, std::vector<int32_t> &numVec);
 bool CompareVecNum(const std::vector<int32_t> &srcVecNum, const std::vector<int32_t> &sinkVecNum);
+int32_t StringToInt(const std::string &str, int32_t base);
+int64_t StringToInt64(const std::string &str, int32_t base);
 bool CompareVersion(const std::string &remoteVersion, const std::string &oldVersion);
 bool GetVersionNumber(const std::string dmVersion, int32_t &versionNum);
 std::string ComposeStr(const std::string &pkgName, uint16_t subscribeId);

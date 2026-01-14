@@ -77,42 +77,6 @@ int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
     return delaySeconds;
 }
 
-std::string GetBundleLabel(const std::string &bundleName)
-{
-    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        LOGE("Get ability manager failed");
-        return bundleName;
-    }
-
-    sptr<IRemoteObject> object = samgr->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (object == nullptr) {
-        LOGE("object is NULL.");
-        return bundleName;
-    }
-
-    sptr<OHOS::AppExecFwk::IBundleMgr> bms = iface_cast<OHOS::AppExecFwk::IBundleMgr>(object);
-    if (bms == nullptr) {
-        LOGE("bundle manager service is NULL.");
-        return bundleName;
-    }
-
-    auto bundleResourceProxy = bms->GetBundleResourceProxy();
-    if (bundleResourceProxy == nullptr) {
-        LOGE("GetBundleResourceProxy fail");
-        return bundleName;
-    }
-    AppExecFwk::BundleResourceInfo resourceInfo;
-    auto result = bundleResourceProxy->GetBundleResourceInfo(bundleName,
-        static_cast<uint32_t>(OHOS::AppExecFwk::ResourceFlag::GET_RESOURCE_INFO_ALL), resourceInfo);
-    if (result != ERR_OK) {
-        LOGE("GetBundleResourceInfo failed");
-        return bundleName;
-    }
-    LOGI("bundle resource label is %{public}s ", (resourceInfo.label).c_str());
-    return resourceInfo.label;
-}
-
 std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindParam)
 {
     auto iter = bindParam.find(PARAM_KEY_BIND_EXTRA_DATA);
@@ -420,11 +384,9 @@ void AuthManager::ParseHmlInfoInJsonObject(const JsonObject &jsonObject)
         context_->connSessionType = jsonObject[PARAM_KEY_CONN_SESSIONTYPE].Get<std::string>();
         LOGI("connSessionType %{public}s", context_->connSessionType.c_str());
     }
+    GetDelayCloseConnTime(jsonObject);
     if (context_->connSessionType != CONN_SESSION_TYPE_HML) {
         return;
-    }
-    if (context_->connDelayCloseTime == 0) {
-        context_->connDelayCloseTime = HML_SESSION_TIMEOUT;
     }
     if (jsonObject[PARAM_KEY_HML_ENABLE_160M].IsBoolean()) {
         context_->hmlEnable160M = jsonObject[PARAM_KEY_HML_ENABLE_160M].Get<bool>();
@@ -471,11 +433,6 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
         if (jsonObject[TAG_APP_THUMBNAIL2].IsString()) {
             context_->appThumbnail = jsonObject[TAG_APP_THUMBNAIL2].Get<std::string>();
         }
-    }
-    context_->connDelayCloseTime = 0;
-    if (jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].IsString()) {
-        std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
-        context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
     }
     ParseAccessJsonObject(jsonObject);
     if (jsonObject[TAG_IS_NEED_AUTHENTICATE].IsString()) {
@@ -774,11 +731,7 @@ void AuthManager::GetConnDelayCloseTime(const std::string &extra)
         return;
     }
     CHECK_NULL_VOID(context_);
-    context_->connDelayCloseTime = 0;
-    if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_SECONDS)) {
-        std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
-        context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
-    }
+    GetDelayCloseConnTime(jsonObject);
 }
 
 int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
@@ -1415,6 +1368,23 @@ void AuthManager::GetBindLevelByBundleName(std::string &bundleName, int32_t user
         bindLevel = DmRole::DM_ROLE_SA;
     } else {
         LOGE("src not contain the bundlename %{public}s.", bundleName.c_str());
+    }
+}
+
+void AuthManager::GetDelayCloseConnTime(const JsonObject &jsonObject)
+{
+    CHECK_NULL_VOID(context_);
+    context_->connDelayCloseTime = 0;
+    const int32_t MICROSECOND_PER_SECOND = 1000000L;
+    if (context_->connSessionType != CONN_SESSION_TYPE_HML) {
+        context_->connDelayCloseTime = DEFAULT_DELAY_CLOSE_TIME_US;
+    }
+    if (context_->connDelayCloseTime == 0) {
+        context_->connDelayCloseTime = HML_SESSION_TIMEOUT * MICROSECOND_PER_SECOND;
+    }
+    if (jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].IsString()) {
+        std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
+        context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr) * MICROSECOND_PER_SECOND;
     }
 }
 //LCOV_EXCL_STOP

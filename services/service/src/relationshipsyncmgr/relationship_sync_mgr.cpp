@@ -67,11 +67,11 @@ namespace {
     const int32_t USERID_BYTES = 2;
     const int32_t BITS_PER_BYTE = 8;
     const int32_t INVALIED_PAYLOAD_SIZE = 12;
-    const int32_t CREDID_PAYLOAD_LEN = 8;
     const int32_t ACCOUNT_LOGOUT_BROADCAST_LEN = 8;
     const int32_t BROADCAST_PAYLOAD_LEN = 10;
     const int32_t BROADCAST_TIMEOUT_S = 5;
     const int32_t CURRENT_TIME_SEC_FLAG = 10;
+    const int32_t CREDID_PAYLOAD_LEN = 8;
     const int32_t GET_CURRENT_TIME_MAX_NUM = 3;
 
     const char * const MSG_TYPE = "TYPE";

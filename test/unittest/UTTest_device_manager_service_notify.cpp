@@ -37,27 +37,27 @@ HWTEST_F(DeviceManagerServiceNotifyTest, RegisterCallBack_001, testing::ext::Tes
     int32_t dmCommonNotifyEvent = 1;
     ProcessInfo processInfo;
     int32_t ret = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 
     processInfo.pkgName = "pkgName";
     processInfo.userId = 2;
     ret = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 
     dmCommonNotifyEvent = 10;
     ret = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 
     dmCommonNotifyEvent = 2;
     ret = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 
     std::set<ProcessInfo> processInfoSet;
     processInfoSet.insert(processInfo);
     DeviceManagerServiceNotify::GetInstance().callbackMap_
         .insert(std::make_pair(static_cast<DmCommonNotifyEvent>(dmCommonNotifyEvent), processInfoSet));
     ret = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 
     dmCommonNotifyEvent = 3;
     DmCommonNotifyEvent notifyEvent = static_cast<DmCommonNotifyEvent>(dmCommonNotifyEvent);
@@ -66,7 +66,7 @@ HWTEST_F(DeviceManagerServiceNotifyTest, RegisterCallBack_001, testing::ext::Tes
     processInfo.pkgName = "proName";
     processInfo.userId = 10;
     ret = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 
     dmCommonNotifyEvent = 4;
     std::set<ProcessInfo> processInfos;

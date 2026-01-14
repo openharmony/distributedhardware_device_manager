@@ -34,6 +34,9 @@ public:
         std::vector<GroupInfo> &groupList) = 0;
     virtual int32_t DeleteGroupByACL(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec,
         std::vector<int32_t> &userIdVec) = 0;
+    virtual int32_t DeleteTimeOutGroup(const std::string &peerUdid, int32_t userId) = 0;
+    virtual int32_t GetRelatedGroupsExt(const std::string &deviceId, std::vector<GroupInfo> &groupList) = 0;
+    virtual int32_t DeleteGroupExt(int32_t userId, const std::string &groupId) = 0;
 public:
     static inline std::shared_ptr<DmHiChainConnector> dmHiChainConnector = nullptr;
 };
@@ -46,6 +49,9 @@ public:
     MOCK_METHOD(int32_t, GetRelatedGroups, (int32_t, const std::string &, std::vector<GroupInfo> &));
     MOCK_METHOD(int32_t, DeleteGroupByACL, ((std::vector<std::pair<int32_t, std::string>> &),
         (std::vector<int32_t> &)));
+    MOCK_METHOD(int32_t, DeleteTimeOutGroup, (const std::string &, int32_t));
+    MOCK_METHOD(int32_t, GetRelatedGroupsExt, (const std::string &, std::vector<GroupInfo> &));
+    MOCK_METHOD(int32_t, DeleteGroupExt, (int32_t, const std::string &));
 };
 }
 }

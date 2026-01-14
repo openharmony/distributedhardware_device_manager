@@ -27,6 +27,7 @@ public:
     virtual ~DmDeviceNameManager() = default;
     virtual std::string GetLocalMarketName() = 0;
     virtual int32_t GetLocalDisplayDeviceName(int32_t maxNamelength, std::string &displayName) = 0;
+    virtual int32_t InitDeviceNameWhenUserSwitch(int32_t curUserId, int32_t preUserId) = 0;
     static inline std::shared_ptr<DmDeviceNameManager> dmDeviceNameManager_ = nullptr;
 };
 
@@ -34,6 +35,7 @@ class DeviceNameManagerMock : public DmDeviceNameManager {
 public:
     MOCK_METHOD(std::string, GetLocalMarketName, ());
     MOCK_METHOD(int32_t, GetLocalDisplayDeviceName, (int32_t, std::string &));
+    MOCK_METHOD(int32_t, InitDeviceNameWhenUserSwitch, (int32_t, int32_t));
 };
 } // namespace DistributedHardware
 } // namespace OHOS

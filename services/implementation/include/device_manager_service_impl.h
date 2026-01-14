@@ -144,6 +144,8 @@ public:
     std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname);
 
     int32_t DpAclAdd(const std::string &udid);
+    void DeleteAlwaysAllowTimeOut();
+    void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     int32_t IsSameAccount(const std::string &udid);
     uint64_t GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId);
     void ScreenCommonEventCallback(std::string commonEventType);
@@ -174,8 +176,6 @@ public:
     void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
         const std::string &localUdid, int32_t localUserId, const std::string &localAccountId);
     int32_t RegisterAuthenticationType(int32_t authenticationType);
-    void DeleteAlwaysAllowTimeOut();
-    void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
         std::string &remoteUdid, bool &isSendBroadCast);
     void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId, const std::string &localUdid);
@@ -207,14 +207,14 @@ public:
     int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam);
     int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
-    void InitTaskOfDelTimeOutAcl(const std::string &deviceUdid, const std::string &deviceUdidHash, int32_t userId);
+    void InitTaskOfDelTimeOutAcl(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId);
     void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList);
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
     int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo);
     int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
-    std::string GetUdidHashByNetworkId(const std::string &networkId);
+    std::string GetUdidHashByNetworkId(const std::string &networkId, std::string &peerUdid);
     void SetOnlineProcessInfo(const uint32_t &bindType, ProcessInfo &processInfo, DmDeviceInfo &devInfo,
         const std::string &requestDeviceId, const std::string &trustDeviceId, DmDeviceState devState);
     void HandleDeletedAclOffline(const std::string &trustDeviceId,
@@ -312,9 +312,9 @@ private:
     void NotifyDeviceOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid);
     void NotifyDeviceOrAppOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid);
     void DeleteSessionKey(int32_t userId, const DistributedDeviceProfile::AccessControlProfile &profile);
+    void DeleteGroupByBundleName(const std::string &localUdid, int32_t userId, const std::vector<DmAclIdParam> &acls);
     int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller, std::string &udid,
         int32_t &bindLevel);
-    void DeleteGroupByBundleName(const std::string &localUdid, int32_t userId, const std::vector<DmAclIdParam> &acls);
     void StartAuthInfoTimer(const DmAuthInfo &dmAuthInfo, uint64_t tokenId);
     void StopAuthInfoTimerAndDeleteDP(const std::string &pkgName, int32_t pinExchangeType, uint64_t tokenId);
     void InitDpServiceInfo(const DmAuthInfo &dmAuthInfo, DistributedDeviceProfile::LocalServiceInfo &dpServiceInfo,

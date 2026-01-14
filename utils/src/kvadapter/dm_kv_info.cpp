@@ -14,7 +14,7 @@
  */
 #include "dm_kv_info.h"
 
-#include "cJSON.h"
+#include "json_object.h"
 #include "dm_anonymous.h"
 
 namespace OHOS {

@@ -33,18 +33,21 @@ void DeviceProfileConnectorSecondTest::SetUp()
 
 void DeviceProfileConnectorSecondTest::TearDown()
 {
+    Mock::VerifyAndClearExpectations(distributedDeviceProfileClientMock_.get());
+    Mock::VerifyAndClearExpectations(multipleUserConnectorMock_.get());
 }
 
 void DeviceProfileConnectorSecondTest::SetUpTestCase()
 {
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient =
         distributedDeviceProfileClientMock_;
+    DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
 }
 
 void DeviceProfileConnectorSecondTest::TearDownTestCase()
 {
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
-    distributedDeviceProfileClientMock_ = nullptr;
+    DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
 }
 
 class DpInitedCallback : public DistributedDeviceProfile::DpInitedCallbackStub {
@@ -61,56 +64,69 @@ public:
     }
 };
 
-void AddAccessControlProfile(std::vector<DistributedDeviceProfile::AccessControlProfile>& accessControlProfiles)
+DistributedDeviceProfile::AccessControlProfile GenerateAccessControlProfile(int64_t accessControlId,
+    uint32_t deviceIdType, const std::string &peerUdid, int32_t authType, int32_t bindType, uint32_t status,
+    uint32_t accesserId, const std::string &accesserUdId, int32_t accesserUserId, const std::string &accesserAccountId,
+    uint32_t accesseeId, const std::string &accesseeUdId, int32_t accesseeUserId, const std::string &accesseeAccountId,
+    uint32_t tokenId, const std::string &bundleName, uint32_t bindLevel, const std::string &extraData)
 {
-    int32_t userId = 123456;
-    int32_t bindType = 256;
-    int32_t deviceIdType = 1;
-    uint32_t bindLevel = 1;
-    uint32_t status = 1;
-    uint32_t authenticationType = 2;
-    uint32_t accesserId = 1;
-    uint32_t tokenId = 1001;
-
-    std::string oldAccountId = "oldAccountId";
-    std::string newAccountId = "newAccountId";
-    std::string deviceIdEr = "remoteDeviceId";
-    std::string deviceIdEe = "localDeviceId";
-    std::string trustDeviceId = "123456";
-
     DistributedDeviceProfile::Accesser accesser;
     accesser.SetAccesserId(accesserId);
-    accesser.SetAccesserDeviceId(deviceIdEr);
-    accesser.SetAccesserUserId(userId);
-    accesser.SetAccesserAccountId(oldAccountId);
+    accesser.SetAccesserDeviceId(accesserUdId);
+    accesser.SetAccesserUserId(accesserUserId);
+    accesser.SetAccesserAccountId(accesserAccountId);
     accesser.SetAccesserTokenId(tokenId);
-    accesser.SetAccesserBundleName("bundleName");
+    accesser.SetAccesserBundleName(bundleName);
     accesser.SetAccesserHapSignature("uph1");
     accesser.SetAccesserBindLevel(bindLevel);
 
     DistributedDeviceProfile::Accessee accessee;
-    accessee.SetAccesseeId(accesserId);
-    accessee.SetAccesseeDeviceId(deviceIdEe);
-    accessee.SetAccesseeUserId(userId);
-    accessee.SetAccesseeAccountId(newAccountId);
+    accessee.SetAccesseeId(accesseeId);
+    accessee.SetAccesseeDeviceId(accesseeUdId);
+    accessee.SetAccesseeUserId(accesseeUserId);
+    accessee.SetAccesseeAccountId(accesseeAccountId);
     accessee.SetAccesseeTokenId(tokenId);
-    accessee.SetAccesseeBundleName("bundleName");
+    accessee.SetAccesseeBundleName(bundleName);
     accessee.SetAccesseeHapSignature("uph1");
     accessee.SetAccesseeBindLevel(bindLevel);
 
-    DistributedDeviceProfile::AccessControlProfile profileFifth;
-    profileFifth.SetAccessControlId(accesserId);
-    profileFifth.SetAccesserId(accesserId);
-    profileFifth.SetAccesseeId(accesserId);
-    profileFifth.SetTrustDeviceId(trustDeviceId);
-    profileFifth.SetBindType(bindType);
-    profileFifth.SetAuthenticationType(authenticationType);
-    profileFifth.SetDeviceIdType(deviceIdType);
-    profileFifth.SetStatus(status);
-    profileFifth.SetBindLevel(bindLevel);
-    profileFifth.SetAccesser(accesser);
-    profileFifth.SetAccessee(accessee);
-    accessControlProfiles.push_back(profileFifth);
+    DistributedDeviceProfile::AccessControlProfile accessControlProfile;
+    accessControlProfile.SetAccessControlId(accessControlId);
+    accessControlProfile.SetDeviceIdType(deviceIdType);
+    accessControlProfile.SetTrustDeviceId(peerUdid);
+    accessControlProfile.SetAuthenticationType(authType);
+    accessControlProfile.SetBindType(bindType);
+    accessControlProfile.SetStatus(status);
+    accessControlProfile.SetAccesserId(accesserId);
+    accessControlProfile.SetAccesseeId(accesseeId);
+    accessControlProfile.SetBindLevel(bindLevel);
+    accessControlProfile.SetAccesser(accesser);
+    accessControlProfile.SetAccessee(accessee);
+    accessControlProfile.SetExtraData(extraData);
+    return accessControlProfile;
+}
+
+void AddAccessControlProfile(std::vector<DistributedDeviceProfile::AccessControlProfile>& accessControlProfiles)
+{
+    uint32_t accessControlId = 1;
+    int32_t userId = 123456;
+    int32_t bindType = 256;
+    int32_t deviceIdType = 1;
+    uint32_t bindLevel = 1;
+    uint32_t status = ACTIVE;
+    uint32_t authType = 2;
+    uint32_t accesserId = 1;
+    uint32_t accesseeId = 1;
+    uint32_t tokenId = 1001;
+
+    std::string accesserAccountId = "oldAccountId";
+    std::string accesseeAccountId = "newAccountId";
+    std::string accesserUdId = "remoteDeviceId";
+    std::string accesseeUdId = "localDeviceId";
+
+    accessControlProfiles.emplace_back(GenerateAccessControlProfile(accessControlId, deviceIdType, accesserUdId,
+        authType, bindType, status, accesserId, accesserUdId, userId, accesserAccountId, accesseeId, accesseeUdId,
+        userId, accesseeAccountId, tokenId, "bundleName", bindLevel, ""));
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, GetAccessControlProfile_201, testing::ext::TestSize.Level1)
@@ -171,7 +187,6 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteSigTrustACL_201, testing::ext::
 {
     int32_t userId = 0;
     std::string accountId;
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
 
     userId = 1;
     int32_t bindType = 1;
@@ -215,6 +230,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteSigTrustACL_201, testing::ext::
     std::vector<int32_t> localUserIds;
     int32_t localUserId = 1;
     localUserIds.push_back(localUserId);
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, UpdateAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
     DeviceProfileConnector::GetInstance().UpdatePeerUserId(profilesecond, localUdid, localUserIds,
         remoteUdid, remoteFrontUserIds);
 }
@@ -244,10 +260,9 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAclForAccountLogOut_001, testin
     int32_t peerUserId = 2;
     DmOfflineParam offlineParam;
     DMAclQuadInfo info = {localUdid, localUserId, peerUdid, peerUserId};
-    std::string accoutId = "accountId";
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
-    int32_t result = connector.DeleteAclForAccountLogOut(info, accoutId, offlineParam);
-
+    std::string accountId = "accountId";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl(_)).WillOnce(Return(DM_OK));
+    int32_t result = connector.DeleteAclForAccountLogOut(info, accountId, offlineParam);
     EXPECT_EQ(result, false);
 }
 
@@ -1777,6 +1792,492 @@ HWTEST_F(DeviceProfileConnectorSecondTest, IsAllowAuthAlways_003, testing::ext::
         .WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
     bool result = DeviceProfileConnector::GetInstance().IsAllowAuthAlways(localUdid, userId, peerUdid,
         pkgName, tokenId);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, DeleteTimeOutAcl_001, testing::ext::TestSize.Level1)
+{
+    int32_t deviceIdType = 1;
+    std::string peerUdid = "remoteDeviceId1";
+    int32_t peerUserId = 123456;
+    int32_t localUserId = 123456;
+    int32_t authType = ALLOW_AUTH_ONCE;
+    int32_t bindType = DM_POINT_TO_POINT;
+    uint32_t status = ACTIVE;
+    uint32_t bindLevel = 1;
+    uint32_t tokenId = 1;
+    DmOfflineParam offlineParam;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    acls.emplace_back(GenerateAccessControlProfile(1, deviceIdType, peerUdid, authType, bindType, status,
+        1, peerUdid, peerUserId, "accesserAccountId", 1, "localUdid", localUserId, "accesseeAccountId",
+        tokenId, "bundleName1", bindLevel, ""));
+    acls.emplace_back(GenerateAccessControlProfile(2, deviceIdType, peerUdid, authType, bindType, status,
+        2, "localUdid", localUserId, "accesserAccountId", 2, peerUdid, peerUserId, "accesseeAccountId",
+        tokenId, "bundleName1", bindLevel, ""));
+    acls.emplace_back(GenerateAccessControlProfile(3, deviceIdType, "remoteDeviceId2", authType, bindType, status,
+        3, "localUdid", localUserId, "accesserAccountId", 3, "remoteDeviceId2", peerUserId, "accesseeAccountId",
+        tokenId, "bundleName2", bindLevel, ""));
+    acls.emplace_back(GenerateAccessControlProfile(4, deviceIdType, peerUdid, authType, bindType, status,
+        4, peerUdid, peerUserId, "accesserAccountId", 4, "localUdid", localUserId, "accesseeAccountId",
+        tokenId, "bundleName1", bindLevel, R"({"IsLnnAcl":"true"})"));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl(_))
+        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    uint32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(peerUdid, peerUserId,
+        localUserId, offlineParam);
+    EXPECT_EQ(ret, 3);
+    EXPECT_EQ(offlineParam.needDelAclInfos.size(), 3);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, DeleteTimeOutAcl_002, testing::ext::TestSize.Level1)
+{
+    int32_t deviceIdType = 1;
+    std::string peerUdid = "remoteDeviceId1";
+    int32_t peerUserId = 123456;
+    int32_t localUserId = 123456;
+    int32_t authType = ALLOW_AUTH_ONCE;
+    int32_t bindType = DM_ACROSS_ACCOUNT;
+    uint32_t status = ACTIVE;
+    uint32_t bindLevel = 1;
+    uint32_t tokenId = 1;
+    DmOfflineParam offlineParam;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    acls.emplace_back(GenerateAccessControlProfile(1, deviceIdType, peerUdid, authType, bindType, status,
+        1, peerUdid, peerUserId, "accesserAccountId", 1, "localUdid", localUserId, "accesseeAccountId",
+        tokenId, "bundleName1", bindLevel, ""));
+    acls.emplace_back(GenerateAccessControlProfile(2, deviceIdType, peerUdid, authType, bindType, status,
+        2, "localUdid", localUserId, "accesserAccountId", 2, peerUdid, peerUserId, "accesseeAccountId",
+        tokenId, "bundleName1", bindLevel, ""));
+    acls.emplace_back(GenerateAccessControlProfile(3, deviceIdType, "remoteDeviceId2", authType, bindType, status,
+        3, "localUdid", localUserId, "accesserAccountId", 3, "remoteDeviceId2", peerUserId, "accesseeAccountId",
+        tokenId, "bundleName2", bindLevel, ""));
+    acls.emplace_back(GenerateAccessControlProfile(4, deviceIdType, peerUdid, authType, bindType, status,
+        4, peerUdid, peerUserId, "accesserAccountId", 4, "localUdid", localUserId, "accesseeAccountId",
+        tokenId, "bundleName1", bindLevel, R"({"IsLnnAcl":"true"})"));
+    acls.emplace_back(GenerateAccessControlProfile(5, deviceIdType, peerUdid, ALLOW_AUTH_ALWAYS, bindType, status,
+        5, "localUdid", localUserId, "accesserAccountId", 5, peerUdid, peerUserId, "accesseeAccountId",
+        tokenId, "bundleName1", bindLevel, ""));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl(_))
+        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    uint32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(peerUdid, peerUserId,
+        localUserId, offlineParam);
+    EXPECT_EQ(ret, 4);
+    EXPECT_EQ(offlineParam.needDelAclInfos.size(), 2);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, AuthOnceAclIsActive_001, testing::ext::TestSize.Level1)
+{
+    int32_t deviceIdType = 1;
+    std::string peerUdid = "remoteDeviceId1";
+    int32_t peerUserId = 123456;
+    int32_t localUserId = 123456;
+    int32_t authType = ALLOW_AUTH_ONCE;
+    int32_t bindType = 1;
+    uint32_t status = ACTIVE;
+    uint32_t bindLevel = 1;
+    uint32_t tokenId = 1;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    acls.emplace_back(GenerateAccessControlProfile(1, deviceIdType, peerUdid, authType, bindType, status,
+        1, peerUdid, peerUserId, "accesserAccountId", 1, "localUdid", localUserId, "accesseeAccountId",
+        tokenId, "bundleName1", bindLevel, ""));
+    acls.emplace_back(GenerateAccessControlProfile(3, deviceIdType, "remoteDeviceId2", authType, bindType, status,
+        3, "localUdid", localUserId, "accesserAccountId", 3, "remoteDeviceId2", peerUserId, "accesseeAccountId",
+        tokenId, "bundleName2", bindLevel, ""));
+    acls.emplace_back(GenerateAccessControlProfile(5, deviceIdType, peerUdid, ALLOW_AUTH_ALWAYS, bindType, status,
+        5, "localUdid", localUserId, "accesserAccountId", 5, peerUdid, peerUserId, "accesseeAccountId",
+        tokenId, "bundleName1", bindLevel, ""));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(acls), Return(0)));
+    bool ret = DeviceProfileConnector::GetInstance().AuthOnceAclIsActive(peerUdid, peerUserId,
+        localUserId);
+    EXPECT_TRUE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, AuthOnceAclIsActive_002, testing::ext::TestSize.Level1)
+{
+    int32_t deviceIdType = 1;
+    std::string peerUdid = "remoteDeviceId1";
+    int32_t peerUserId = 123456;
+    int32_t localUserId = 123456;
+    int32_t authType = ALLOW_AUTH_ONCE;
+    int32_t bindType = 1;
+    uint32_t status = ACTIVE;
+    uint32_t bindLevel = 1;
+    uint32_t tokenId = 1;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    acls.emplace_back(GenerateAccessControlProfile(2, deviceIdType, peerUdid, authType, bindType, status,
+        2, "localUdid", localUserId, "accesserAccountId", 2, peerUdid, peerUserId, "accesseeAccountId",
+        tokenId, "bundleName1", bindLevel, ""));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(acls), Return(0)));
+    bool ret = DeviceProfileConnector::GetInstance().AuthOnceAclIsActive(peerUdid, peerUserId,
+        localUserId);
+    EXPECT_TRUE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, AuthOnceAclIsActive_003, testing::ext::TestSize.Level1)
+{
+    std::string peerUdid = "remoteDeviceId1";
+    int32_t peerUserId = 123456;
+    int32_t localUserId = 123456;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(acls), Return(0)));
+    bool ret = DeviceProfileConnector::GetInstance().AuthOnceAclIsActive(peerUdid, peerUserId,
+        localUserId);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CacheLnnAcl_001, testing::ext::TestSize.Level1)
+{
+    int32_t deviceIdType = 1;
+    std::string peerUdid = "remoteDeviceId1";
+    int32_t peerUserId = 123456;
+    int32_t localUserId = 123456;
+    int32_t authType = ALLOW_AUTH_ONCE;
+    int32_t bindType = 1;
+    uint32_t status = ACTIVE;
+    uint32_t bindLevel = 1;
+    uint32_t tokenId = 1;
+    DistributedDeviceProfile::AccessControlProfile profile =
+        GenerateAccessControlProfile(4, deviceIdType, peerUdid, authType, bindType, status,
+        4, peerUdid, peerUserId, "accesserAccountId", 4, "localUdid", localUserId, "accesseeAccountId",
+        tokenId, "bundleName1", bindLevel, R"({"IsLnnAcl":"true"})");
+    DmAclIdParam dmAclIdParam;
+    bool ret = DeviceProfileConnector::GetInstance().CacheLnnAcl(profile,
+        peerUdid, peerUserId, localUserId, dmAclIdParam);
+    EXPECT_TRUE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CacheLnnAcl_002, testing::ext::TestSize.Level1)
+{
+    int32_t deviceIdType = 1;
+    std::string peerUdid = "remoteDeviceId1";
+    int32_t peerUserId = 123456;
+    int32_t localUserId = 123456;
+    int32_t authType = ALLOW_AUTH_ONCE;
+    int32_t bindType = 1;
+    uint32_t status = ACTIVE;
+    uint32_t bindLevel = 1;
+    uint32_t tokenId = 1;
+    DistributedDeviceProfile::AccessControlProfile profile =
+        GenerateAccessControlProfile(4, deviceIdType, peerUdid, authType, bindType, status,
+        4, "localUdid", localUserId, "accesseeAccountId", 4, peerUdid, peerUserId, "accesserAccountId",
+        tokenId, "bundleName1", bindLevel, R"({"IsLnnAcl":"true"})");
+    DmAclIdParam dmAclIdParam;
+    bool ret = DeviceProfileConnector::GetInstance().CacheLnnAcl(profile,
+        peerUdid, peerUserId, localUserId, dmAclIdParam);
+    EXPECT_TRUE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CacheLnnAcl_003, testing::ext::TestSize.Level1)
+{
+    std::string peerUdid = "remoteDeviceId1";
+    int32_t peerUserId = 123456;
+    int32_t localUserId = 123456;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DmAclIdParam dmAclIdParam;
+    bool ret = DeviceProfileConnector::GetInstance().CacheLnnAcl(profile,
+        peerUdid, peerUserId, localUserId, dmAclIdParam);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, UpdateAclDeviceName_001, testing::ext::TestSize.Level1)
+{
+    std::string udid;
+    std::string newDeviceName;
+    bool isLocal = false;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(DM_OK)));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(100));
+    int32_t ret = DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, newDeviceName, isLocal);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, UpdateAclDeviceName_002, testing::ext::TestSize.Level1)
+{
+    std::string udid = "peerUdid";
+    std::string newDeviceName = "newDeviceName";
+    bool isLocal = false;
+    int32_t peerUserId = 1;
+    int32_t localUserId = 1;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    acls.emplace_back(GenerateAccessControlProfile(1, 1, "peerUdid1", 0, 1, ACTIVE,
+        1, "peerUdid1", peerUserId, "accesserAccountId", 1, "localUdid", localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(2, 1, udid, 0, 1, INACTIVE,
+        2, udid, peerUserId, "accesserAccountId", 2, "localUdid", localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(3, 1, udid, 0, 1, ACTIVE,
+        3, udid, peerUserId, "accesserAccountId", 3, "localUdid", localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(4, 1, udid, 0, 1, ACTIVE,
+        4, "localUdid", localUserId, "accesseeAccountId", 4, udid, peerUserId, "accesserAccountId",
+        1, "bundleName1", 1, ""));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(DM_OK)));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(localUserId));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, UpdateAccessControlProfile(_))
+        .Times(2).WillRepeatedly(Return(0));
+    int32_t ret = DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, newDeviceName, isLocal);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, UpdateAclDeviceName_003, testing::ext::TestSize.Level1)
+{
+    std::string udid = "localUdid";
+    std::string newDeviceName = "newDeviceName";
+    bool isLocal = true;
+    int32_t peerUserId = 1;
+    int32_t localUserId = 1;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    acls.emplace_back(GenerateAccessControlProfile(3, 1, "peerUdid", 0, 1, ACTIVE,
+        3, "peerUdid", peerUserId, "accesserAccountId", 3, udid, localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(4, 1, "peerUdid", 0, 1, ACTIVE,
+        4, udid, localUserId, "accesseeAccountId", 4, "peerUdid", peerUserId, "accesserAccountId",
+        1, "bundleName1", 1, ""));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(DM_OK)));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(localUserId));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, UpdateAccessControlProfile(_))
+        .Times(2).WillRepeatedly(Return(0));
+    int32_t ret = DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, newDeviceName, isLocal);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetActiveAuthOncePeerUserId_001, testing::ext::TestSize.Level1)
+{
+    std::string peerUdid = "peerUdid";
+    int32_t peerUserId = 1;
+    int32_t localUserId = 1;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    acls.emplace_back(GenerateAccessControlProfile(1, 1, "peerUdid1", ALLOW_AUTH_ONCE, 1, ACTIVE,
+        1, peerUdid, peerUserId, "accesserAccountId", 1, "localUdid", localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(2, 1, peerUdid, ALLOW_AUTH_ONCE, 1, INACTIVE,
+        2, peerUdid, peerUserId, "accesserAccountId", 2, "localUdid", localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(5, 1, peerUdid, ALLOW_AUTH_ALWAYS, 1, ACTIVE,
+        5, peerUdid, peerUserId, "accesserAccountId", 5, "localUdid", localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(3, 1, peerUdid, ALLOW_AUTH_ONCE, 1, ACTIVE,
+        3, peerUdid, peerUserId, "accesserAccountId", 3, "localUdid", localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(4, 1, peerUdid, ALLOW_AUTH_ONCE, 1, ACTIVE,
+        4, "localUdid", localUserId, "accesseeAccountId", 4, peerUdid, peerUserId, "accesserAccountId",
+        1, "bundleName1", 1, ""));
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(acls), Return(0)));
+
+    std::unordered_set<int32_t> peerUserIds = DeviceProfileConnector::GetInstance()
+        .GetActiveAuthOncePeerUserId(peerUdid, localUserId);
+    EXPECT_EQ(peerUserIds.size(), 1);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAllAuthOnceAclInfos_001, testing::ext::TestSize.Level1)
+{
+    std::string peerUdid = "peerUdid";
+    int32_t peerUserId = 1;
+    int32_t localUserId = 1;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    acls.emplace_back(GenerateAccessControlProfile(1, 1, peerUdid, ALLOW_AUTH_ALWAYS, 1, ACTIVE,
+        1, peerUdid, peerUserId, "accesserAccountId", 1, "localUdid", localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(3, 1, peerUdid, ALLOW_AUTH_ONCE, 1, ACTIVE,
+        3, peerUdid, peerUserId, "accesserAccountId", 3, "localUdid", localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(4, 1, peerUdid, ALLOW_AUTH_ONCE, 1, ACTIVE,
+        4, "localUdid", localUserId, "accesseeAccountId", 4, peerUdid, peerUserId, "accesserAccountId",
+        1, "bundleName1", 1, ""));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl(_))
+        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> aclInfos;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetAllAuthOnceAclInfos(aclInfos);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(aclInfos.size(), 1);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAuthOnceAclInfos_001, testing::ext::TestSize.Level1)
+{
+    std::string peerUdid = "peerUdid";
+    int32_t peerUserId = 1;
+    int32_t localUserId = 1;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    acls.emplace_back(GenerateAccessControlProfile(1, 1, peerUdid, ALLOW_AUTH_ALWAYS, 1, ACTIVE,
+        1, peerUdid, peerUserId, "accesserAccountId", 1, "localUdid", localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(1, 1, "peerUdid1", ALLOW_AUTH_ONCE, 1, ACTIVE,
+        1, peerUdid, peerUserId, "accesserAccountId", 1, "localUdid", localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(3, 1, peerUdid, ALLOW_AUTH_ONCE, 1, ACTIVE,
+        3, peerUdid, peerUserId, "accesserAccountId", 3, "localUdid", localUserId, "accesseeAccountId",
+        1, "bundleName1", 1, ""));
+    acls.emplace_back(GenerateAccessControlProfile(4, 1, peerUdid, ALLOW_AUTH_ONCE, 1, ACTIVE,
+        4, "localUdid", localUserId, "accesseeAccountId", 4, peerUdid, peerUserId, "accesserAccountId",
+        1, "bundleName1", 1, ""));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> aclInfos =
+        DeviceProfileConnector::GetInstance().GetAuthOnceAclInfos(peerUdid);
+    EXPECT_EQ(aclInfos.size(), 1);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckAccessControlProfileByTokenId_001, testing::ext::TestSize.Level1)
+{
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localDeviceId);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    AddAccessControlProfile(acls);
+    auto &item = acls[0];
+    item.accesser_.SetAccesserDeviceId(localUdid);
+    int32_t userId = item.GetAccesser().GetAccesserUserId();
+    int32_t tokenId = static_cast<int32_t>(item.GetAccesser().GetAccesserTokenId());
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID())
+        .Times(::testing::AtLeast(1)).WillOnce(Return(userId));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .Times(::testing::AtLeast(1)).WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    bool result = DeviceProfileConnector::GetInstance().CheckAccessControlProfileByTokenId(tokenId);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckAccessControlProfileByTokenId_002, testing::ext::TestSize.Level1)
+{
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localDeviceId);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    AddAccessControlProfile(acls);
+    auto &item = acls[0];
+    item.accessee_.SetAccesseeDeviceId(localUdid);
+    int32_t userId = item.GetAccessee().GetAccesseeUserId();
+    int32_t tokenId = static_cast<int32_t>(item.GetAccessee().GetAccesseeTokenId());
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID())
+        .Times(::testing::AtLeast(1)).WillOnce(Return(userId));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .Times(::testing::AtLeast(1)).WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    bool result = DeviceProfileConnector::GetInstance().CheckAccessControlProfileByTokenId(tokenId);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckAccessControlProfileByTokenId_003, testing::ext::TestSize.Level1)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    int32_t tokenId = 123456;
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .Times(::testing::AtLeast(1)).WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    bool result = DeviceProfileConnector::GetInstance().CheckAccessControlProfileByTokenId(tokenId);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckAccessControlProfileByTokenId_004, testing::ext::TestSize.Level1)
+{
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localDeviceId);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    AddAccessControlProfile(acls);
+    auto &item = acls[0];
+    item.accesser_.SetAccesserDeviceId(localUdid);
+    int32_t userId = item.GetAccesser().GetAccesserUserId();
+    int32_t tokenId = 123456;
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID())
+        .Times(::testing::AtLeast(1)).WillOnce(Return(userId));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .Times(::testing::AtLeast(1)).WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    bool result = DeviceProfileConnector::GetInstance().CheckAccessControlProfileByTokenId(tokenId);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckAccessControlProfileByTokenId_005, testing::ext::TestSize.Level1)
+{
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localDeviceId);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    AddAccessControlProfile(acls);
+    auto &item = acls[0];
+    item.accesser_.SetAccesserDeviceId(localUdid);
+    int32_t tokenId = static_cast<int32_t>(item.GetAccesser().GetAccesserTokenId());
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .Times(::testing::AtLeast(1)).WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    bool result = DeviceProfileConnector::GetInstance().CheckAccessControlProfileByTokenId(tokenId);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckAccessControlProfileByTokenId_006, testing::ext::TestSize.Level1)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    AddAccessControlProfile(acls);
+    auto &item = acls[0];
+    int32_t userId = item.GetAccesser().GetAccesserUserId();
+    int32_t tokenId = static_cast<int32_t>(item.GetAccesser().GetAccesserTokenId());
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID())
+        .Times(::testing::AtLeast(1)).WillOnce(Return(userId));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .Times(::testing::AtLeast(1)).WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    bool result = DeviceProfileConnector::GetInstance().CheckAccessControlProfileByTokenId(tokenId);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckAccessControlProfileByTokenId_007, testing::ext::TestSize.Level1)
+{
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localDeviceId);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    AddAccessControlProfile(acls);
+    auto &item = acls[0];
+    item.accessee_.SetAccesseeDeviceId(localUdid);
+    int32_t userId = item.GetAccessee().GetAccesseeUserId();
+    int32_t tokenId = 123456;
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID())
+        .Times(::testing::AtLeast(1)).WillOnce(Return(userId));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .Times(::testing::AtLeast(1)).WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    bool result = DeviceProfileConnector::GetInstance().CheckAccessControlProfileByTokenId(tokenId);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckAccessControlProfileByTokenId_008, testing::ext::TestSize.Level1)
+{
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localDeviceId);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    AddAccessControlProfile(acls);
+    auto &item = acls[0];
+    item.accessee_.SetAccesseeDeviceId(localUdid);
+    int32_t tokenId = static_cast<int32_t>(item.GetAccessee().GetAccesseeTokenId());
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .Times(::testing::AtLeast(1)).WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    bool result = DeviceProfileConnector::GetInstance().CheckAccessControlProfileByTokenId(tokenId);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckAccessControlProfileByTokenId_009, testing::ext::TestSize.Level1)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    AddAccessControlProfile(acls);
+    auto &item = acls[0];
+    int32_t userId = item.GetAccessee().GetAccesseeUserId();
+    int32_t tokenId = static_cast<int32_t>(item.GetAccessee().GetAccesseeTokenId());
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID())
+        .Times(::testing::AtLeast(1)).WillOnce(Return(userId));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .Times(::testing::AtLeast(1)).WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    bool result = DeviceProfileConnector::GetInstance().CheckAccessControlProfileByTokenId(tokenId);
     EXPECT_FALSE(result);
 }
 } // namespace DistributedHardware
