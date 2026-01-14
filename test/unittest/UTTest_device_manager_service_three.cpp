@@ -371,15 +371,6 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_301, testing::ext::TestSi
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().ImportAuthCode(pkgName, authCode);
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
-
-    std::vector<DmDeviceInfo> deviceList;
-    DmDeviceInfo dmDeviceInfo;
-    dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
-    deviceList.push_back(dmDeviceInfo);
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*deviceManagerServiceMock_, GetTrustedDeviceList(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(deviceList), Return(DM_OK)));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthCode_301, testing::ext::TestSize.Level1)
