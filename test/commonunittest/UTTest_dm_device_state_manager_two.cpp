@@ -144,10 +144,12 @@ HWTEST_F(DmDeviceStateManagerTestTwo, HandleDeviceStatusChange_001, testing::ext
     std::vector<ProcessInfo> processInfoVec;
     auto softbusConnector = dmDeviceStateManager->softbusConnector_;
     dmDeviceStateManager->softbusConnector_ = nullptr;
-    dmDeviceStateManager->HandleDeviceStatusChange(DmDeviceState::DEVICE_STATE_OFFLINE, info, processInfoVec, "123");
+    dmDeviceStateManager->HandleDeviceStatusChange(DmDeviceState::DEVICE_STATE_OFFLINE, info, processInfoVec,
+        "123", true);
     dmDeviceStateManager->softbusConnector_ = softbusConnector;
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    dmDeviceStateManager->HandleDeviceStatusChange(DmDeviceState::DEVICE_STATE_OFFLINE, info, processInfoVec, "123");
+    dmDeviceStateManager->HandleDeviceStatusChange(DmDeviceState::DEVICE_STATE_OFFLINE, info, processInfoVec,
+        "123", true);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
 }
 
@@ -157,7 +159,7 @@ HWTEST_F(DmDeviceStateManagerTestTwo, ProcessDeviceStateChange_001, testing::ext
     DmDeviceInfo devInfo;
     std::vector<ProcessInfo> processInfoVec;
     processInfoVec.push_back(info);
-    dmDeviceStateManager->ProcessDeviceStateChange(DmDeviceState::DEVICE_STATE_OFFLINE, devInfo, processInfoVec);
+    dmDeviceStateManager->ProcessDeviceStateChange(DmDeviceState::DEVICE_STATE_OFFLINE, devInfo, processInfoVec, true);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
 }
 

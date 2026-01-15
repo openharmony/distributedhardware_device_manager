@@ -109,7 +109,8 @@ int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t
     return DM_OK;
 }
 
-void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
+void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
+    const bool isOnline)
 {
     if (deviceStateMgr_ == nullptr || softbusConnector_ == nullptr) {
         LOGE("deviceStateMgr_ or softbusConnector_ is nullpter!");
@@ -127,7 +128,7 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
     } else {
         processInfoVec = softbusConnector_->GetProcessInfo();
     }
-    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, peerUdid);
+    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, peerUdid, isOnline);
     return;
 }
 

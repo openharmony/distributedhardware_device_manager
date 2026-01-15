@@ -59,7 +59,7 @@ public:
 
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 
-    void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
+    void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline);
 
     int OnSessionOpened(int sessionId, int result);
 

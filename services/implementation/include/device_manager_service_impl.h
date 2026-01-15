@@ -89,7 +89,7 @@ public:
 
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 
-    void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
+    void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline);
 
     int OnSessionOpened(int sessionId, int result);
 
@@ -218,11 +218,12 @@ private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId, std::string &peerUdid);
     void SetOnlineProcessInfo(const uint32_t &bindType, ProcessInfo &processInfo, DmDeviceInfo &devInfo,
-        const std::string &requestDeviceId, const std::string &trustDeviceId, DmDeviceState devState);
+        const std::string &requestDeviceId, const std::string &trustDeviceId,
+        DmDeviceState devState, const bool isOnline);
     void HandleDeletedAclOffline(const std::string &trustDeviceId,
         const std::string &requestDeviceId, DmDeviceInfo &devInfo, ProcessInfo &processInfo, DmDeviceState &devState);
-    void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo);
-    void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
+    void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline);
+    void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline);
     bool CheckSharePeerSrc(const std::string &peerUdid, const std::string &localUdid);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId, const std::string &accountId);

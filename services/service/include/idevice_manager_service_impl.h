@@ -74,7 +74,7 @@ public:
      * @tc.desc: Handle Device Status Event to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo) = 0;
+    virtual void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline) = 0;
     /**
      * @tc.name: IDeviceManagerServiceImpl::OnSessionOpened
      * @tc.desc: Send Session Opened event to the device manager service impl

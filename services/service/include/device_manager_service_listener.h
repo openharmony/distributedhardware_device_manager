@@ -42,7 +42,7 @@ public:
     virtual ~DeviceManagerServiceListener() {};
 
     void OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
-        const DmDeviceInfo &info) override;
+        const DmDeviceInfo &info, const bool isOnline) override;
 
     void OnDeviceFound(const ProcessInfo &processInfo, uint16_t subscribeId, const DmDeviceInfo &info) override;
 
@@ -110,9 +110,9 @@ private:
         const DmDeviceState &state, const DmDeviceInfo &deviceInfo, const DmDeviceBasicInfo &deviceBasicInfo);
     int32_t FillUdidAndUuidToDeviceInfo(const std::string &pkgName, DmDeviceInfo &dmDeviceInfo);
     void ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
-        const DmDeviceBasicInfo &deviceBasicInfo);
+        const DmDeviceBasicInfo &deviceBasicInfo, const bool isOnline);
     void ProcessAppStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
-        const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
+        const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo, const bool isOnline);
     void SetDeviceScreenInfo(std::shared_ptr<IpcNotifyDeviceStateReq> pReq, const ProcessInfo &processInfo,
         const DmDeviceInfo &deviceInfo);
     void RemoveOnlinePkgName(const DmDeviceInfo &info);
@@ -128,13 +128,15 @@ private:
     void ProcessDeviceOnline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
     void ProcessDeviceOffline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
-        const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
+        const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo,
+        const bool isOnline);
     void ProcessDeviceInfoChange(std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
     void ProcessAppOnline(std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
     void ProcessAppOffline(std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
-        const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
+        const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo,
+        const bool isOnline);
     void RemoveNotExistProcess();
     void ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
         const DmDeviceBasicInfo &deviceBasicInfo, const std::vector<int64_t> &serviceIds);

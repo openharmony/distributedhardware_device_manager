@@ -1182,11 +1182,11 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
     return ret;
 }
 
-void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
+void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline)
 {
     LOGD("start, devState = %{public}d", devState);
     if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
+        dmServiceImpl_->HandleDeviceStatusChange(devState, devInfo, isOnline);
     }
 }
 

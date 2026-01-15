@@ -540,7 +540,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, HandleDeviceStatusChange_001, testing::e
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
-    DeviceManagerService::GetInstance().HandleDeviceStatusChange(devState, devInfo);
+    DeviceManagerService::GetInstance().HandleDeviceStatusChange(devState, devInfo, true);
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
