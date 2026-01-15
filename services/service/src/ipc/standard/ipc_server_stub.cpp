@@ -83,7 +83,6 @@ void IpcServerStub::OnStart()
     IPCSkeleton::SetMaxWorkThreadNum(DM_IPC_THREAD_NUM);
 
     LOGI("called:AddAbilityListener begin!");
-    AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
 #ifdef SUPPORT_MEMMGR
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
 #endif // SUPPORT_MEMMGR
@@ -220,8 +219,6 @@ void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::st
     LOGI("OnRemoveSystemAbility systemAbilityId:%{public}d removed!", systemAbilityId);
     if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
         DeviceManagerService::GetInstance().UninitSoftbusListener();
-    } else if (systemAbilityId == DISTRIBUTED_HARDWARE_SA_ID) {
-        DeviceManagerService::GetInstance().LoadHardwareFwkService();
     }
 }
 

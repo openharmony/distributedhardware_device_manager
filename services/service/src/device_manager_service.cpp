@@ -1452,26 +1452,6 @@ int32_t DeviceManagerService::NotifyEvent(const std::string &pkgName, const int3
     return dmServiceImpl_->NotifyEvent(pkgName, eventId, event);
 }
 
-void DeviceManagerService::LoadHardwareFwkService()
-{
-    std::vector<DmDeviceInfo> deviceList;
-    CHECK_NULL_VOID(softbusListener_);
-    int32_t ret = GetTrustedDeviceList(DHARD_WARE_PKG_NAME, deviceList);
-    if (ret != DM_OK) {
-        LOGE("LoadHardwareFwkService failed, get trusted devicelist failed.");
-        return;
-    }
-    if (deviceList.empty()) {
-        LOGI("no trusted device.");
-        return;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("LoadHardwareFwkService failed, instance not init or init failed.");
-        return;
-    }
-    dmServiceImpl_->LoadHardwareFwkService();
-}
-
 int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
     std::string &uuid)
 {

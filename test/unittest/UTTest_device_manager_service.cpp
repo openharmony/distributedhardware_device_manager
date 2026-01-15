@@ -1562,12 +1562,6 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_003, testing::ext::TestSize.Level
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
-HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_001, testing::ext::TestSize.Level1)
-{
-    DeviceManagerService::GetInstance().LoadHardwareFwkService();
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-}
-
 HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;

@@ -21,7 +21,6 @@
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_device_info.h"
-#include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "deviceprofile_connector.h"
@@ -180,7 +179,6 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
             RegisterOffLineTimer(devInfo);
 #endif
             SaveOnlineDeviceInfo(devInfo);
-            DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
             ProcessDeviceStateChange(devState, devInfo, processInfoVec);
             break;
         case DEVICE_STATE_OFFLINE:

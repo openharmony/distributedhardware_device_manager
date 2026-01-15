@@ -26,7 +26,6 @@ if (defined(ohos_lite)) {
         "include",
         "include/appInfo/lite",
         "include/crypto",
-        "include/fwkload/lite",
         "include/jsonstr_handle",
         "include/timer/lite",
         "${common_path}/include",
@@ -51,7 +50,6 @@ if (defined(ohos_lite)) {
         "src/appInfo/lite/app_manager.cpp",
         "src/crypto/dm_crypto.cpp",
         "src/dm_random.cpp",
-        "src/fwkload/lite/dm_distributed_hardware_load.cpp",
         "src/jsonstr_handle/dm_jsonstr_handle.cpp",
         "src/timer/lite/dm_timer.cpp",
       ]
@@ -79,7 +77,6 @@ if (defined(ohos_lite)) {
       "include",
       "include/appInfo/standard",
       "include/crypto",
-      "include/fwkload/standard",
       "include/jsonstr_handle",
       "include/kvadapter",
       "include/librarymanager",
@@ -138,10 +135,6 @@ if (defined(ohos_lite)) {
       "src/librarymanager/dm_library_manager.cpp",
       "src/timer/dm_timer.cpp",
     ]
-
-    if (support_jsapi) {
-      sources += [ "src/fwkload/standard/dm_distributed_hardware_load.cpp" ]
-    }
 
     public_configs = [ ":devicemanagerutils_config" ]
 
@@ -213,10 +206,6 @@ if (defined(ohos_lite)) {
       "src/librarymanager/dm_library_manager.cpp",
       "src/timer/dm_timer.cpp",
     ]
-
-    if (support_jsapi) {
-      sources += [ "src/fwkload/standard/dm_distributed_hardware_load.cpp" ]
-    }
 
     public_configs = [ ":devicemanagerutils_config" ]
 
