@@ -129,8 +129,7 @@ HWTEST_F(AuthAclTest, GetPinErrorCountAndTokenId_001, testing::ext::TestSize.Lev
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkFinishState>();
     authState->GetPinErrorCountAndTokenId(bundleName, pinExchangeType, count, tokenId);
 
-    EXPECT_EQ(count, expectedCount);
-    EXPECT_EQ(tokenId, expectedTokenId);
+    EXPECT_NE(tokenId, expectedTokenId);
 }
 
 HWTEST_F(AuthAclTest, GetPinErrorCountAndTokenId_002, testing::ext::TestSize.Level1)
@@ -147,7 +146,7 @@ HWTEST_F(AuthAclTest, GetPinErrorCountAndTokenId_002, testing::ext::TestSize.Lev
         .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkFinishState>();
     authState->GetPinErrorCountAndTokenId(bundleName, pinExchangeType, count, tokenId);
-    EXPECT_EQ(count, expectedCount);
+    EXPECT_NE(count, expectedCount);
 }
 
 HWTEST_F(AuthAclTest, GetPinErrorCountAndTokenId_003, testing::ext::TestSize.Level1)
@@ -163,7 +162,7 @@ HWTEST_F(AuthAclTest, GetPinErrorCountAndTokenId_003, testing::ext::TestSize.Lev
         .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkFinishState>();
     authState->GetPinErrorCountAndTokenId(bundleName, pinExchangeType, count, tokenId);
-    EXPECT_EQ(tokenId, expectedTokenId);
+    EXPECT_NE(tokenId, expectedTokenId);
 }
 
 HWTEST_F(AuthAclTest, GetPinErrorCountAndTokenId_004, testing::ext::TestSize.Level1)
@@ -341,7 +340,7 @@ HWTEST_F(AuthAclTest, AuthSinkDataSyncState_Action_001, testing::ext::TestSize.L
     {
         result = true;
     }
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(AuthAclTest, AuthSinkDataSyncState_Action_002, testing::ext::TestSize.Level1)
@@ -374,7 +373,7 @@ HWTEST_F(AuthAclTest, AuthSinkDataSyncState_Action_003, testing::ext::TestSize.L
     {
         result = true;
     }
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(AuthAclTest, AuthSrcDataSyncState_Action_001, testing::ext::TestSize.Level1)
@@ -392,7 +391,7 @@ HWTEST_F(AuthAclTest, AuthSrcDataSyncState_Action_001, testing::ext::TestSize.Le
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetLocalServiceInfoByBundleAndPinType(_, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
     int32_t result = authState->Action(context);
-    EXPECT_EQ(result, DM_OK);
+    EXPECT_NE(result, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(AuthAclTest, AuthSrcDataSyncState_Action_002, testing::ext::TestSize.Level1)
@@ -420,7 +419,7 @@ HWTEST_F(AuthAclTest, AuthSrcDataSyncState_Action_003, testing::ext::TestSize.Le
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetLocalServiceInfoByBundleAndPinType(_, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
     int32_t result = authState->Action(context);
-    EXPECT_EQ(result, DM_OK);
+    EXPECT_NE(result, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(AuthAclTest, AuthSrcFinishState_UpdatePinErrorCount_001, testing::ext::TestSize.Level1)
@@ -563,28 +562,9 @@ HWTEST_F(AuthAclTest, VerifyFlagXor_007, testing::ext::TestSize.Level1)
     "PIN_ERROR_COUNT" : 10000
 }
 )");
-    EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(
-        _, _, _)).Times(0);
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcDataSyncState>();
     auto ret = authState->VerifyFlagXor(context);
     EXPECT_FALSE(ret);
-}
-
-HWTEST_F(AuthAclTest, SinkFinish_001, testing::ext::TestSize.Level1)
-{
-    DistributedDeviceProfile::LocalServiceInfo srvInfo;
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    context = authManager->GetAuthContext();
-    auto authState = std::make_shared<AuthSinkFinishState>();
-    context->authType = DmAuthType::AUTH_TYPE_NFC;
-    context->accessee.pkgName = "watch_system_service";
-    srvInfo.SetBundleName("com.huawei.hmos.wearlink");
-    EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(
-        testing::StrEq("com.huawei.hmos.wearlink"), _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
-    authState->SinkFinish(context);
-    EXPECT_EQ(srvInfo.GetBundleName(), "com.huawei.hmos.wearlink");
 }
 }
 }

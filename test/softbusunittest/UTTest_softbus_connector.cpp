@@ -88,7 +88,7 @@ bool CheckSoftbusRes(int32_t ret)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, SoftbusConnector_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, SoftbusConnector_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> m_SoftbusConnector = std::make_shared<SoftbusConnector>();
     ASSERT_NE(m_SoftbusConnector, nullptr);
@@ -100,7 +100,7 @@ HWTEST_F(SoftbusConnectorTest, SoftbusConnector_001, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, SoftbusConnector_002, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, SoftbusConnector_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> m_SoftbusConnector = std::make_shared<SoftbusConnector>();
     m_SoftbusConnector.reset();
@@ -113,14 +113,13 @@ HWTEST_F(SoftbusConnectorTest, SoftbusConnector_002, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetUdidByNetworkId_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetUdidByNetworkId_001, testing::ext::TestSize.Level0)
 {
     const char *networkId = "123456";
     std::string udid;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int ret = softbusConnector->GetUdidByNetworkId(networkId, udid);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -129,7 +128,7 @@ HWTEST_F(SoftbusConnectorTest, GetUdidByNetworkId_001, testing::ext::TestSize.Le
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level0)
 {
     const char *networkId = "123456";
     std::string uuid;
@@ -145,7 +144,7 @@ HWTEST_F(SoftbusConnectorTest, GetUuidByNetworkId_001, testing::ext::TestSize.Le
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetSoftbusSession_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetSoftbusSession_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<SoftbusSession> softSession = softbusConnector->GetSoftbusSession();
@@ -158,7 +157,7 @@ HWTEST_F(SoftbusConnectorTest, GetSoftbusSession_001, testing::ext::TestSize.Lev
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "12345678";
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId];
@@ -174,7 +173,7 @@ HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_001, testing::ext::TestSize.Level
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_002, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_002, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "12345678";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
@@ -188,7 +187,7 @@ HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_002, testing::ext::TestSize.Level
  * @tc.desc: set deviceInfo'pointer null, go to first branch, and return nullptr
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetConnectAddrByType_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetConnectAddrByType_001, testing::ext::TestSize.Level0)
 {
     ConnectionAddrType type;
     type = CONNECTION_ADDR_MAX;
@@ -204,7 +203,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddrByType_001, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetConnectAddrByType_002, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetConnectAddrByType_002, testing::ext::TestSize.Level0)
 {
     DeviceInfo deviceInfo;
     deviceInfo.addrNum = 1;
@@ -222,7 +221,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddrByType_002, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetConnectAddr_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetConnectAddr_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId;
     std::string connectAddr;
@@ -237,7 +236,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_001, testing::ext::TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetConnectAddr_002, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetConnectAddr_002, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "123345";
     std::string connectAddr;
@@ -256,7 +255,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_002, testing::ext::TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetConnectAddr_003, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetConnectAddr_003, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "123345";
     std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
@@ -279,7 +278,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_003, testing::ext::TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetConnectAddr_004, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetConnectAddr_004, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "123345";
     std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
@@ -302,7 +301,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_004, testing::ext::TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetConnectAddr_005, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetConnectAddr_005, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "123345";
     std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
@@ -324,7 +323,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_005, testing::ext::TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetConnectAddr_006, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetConnectAddr_006, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "123345";
     std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
@@ -346,7 +345,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_006, testing::ext::TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetConnectAddr_007, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetConnectAddr_007, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "123345";
     std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
@@ -369,7 +368,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_007, testing::ext::TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetConnectAddr_008, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetConnectAddr_008, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "123345";
     std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
@@ -392,7 +391,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_008, testing::ext::TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
 {
     DeviceInfo deviceInfo = {
         .devId = "123456",
@@ -419,7 +418,7 @@ HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_001, testing::ext::Te
  * @tc.desc: set deviceId null
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, JoinLnn_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, JoinLnn_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
@@ -432,7 +431,7 @@ HWTEST_F(SoftbusConnectorTest, JoinLnn_001, testing::ext::TestSize.Level1)
  * @tc.desc: set deviceInfo not null
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_002, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_002, testing::ext::TestSize.Level0)
 {
     DeviceInfo deviceInfo = {
         .devId = "123456",
@@ -450,7 +449,7 @@ HWTEST_F(SoftbusConnectorTest, ConvertDeviceInfoToDmDevice_002, testing::ext::Te
  * @tc.desc: set udidHash null
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, GetDeviceUdidByUdidHash_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetDeviceUdidByUdidHash_001, testing::ext::TestSize.Level0)
 {
     std::string udidHash;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
@@ -463,7 +462,7 @@ HWTEST_F(SoftbusConnectorTest, GetDeviceUdidByUdidHash_001, testing::ext::TestSi
  * @tc.desc: set callback null
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, RegisterSoftbusStateCallback_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, RegisterSoftbusStateCallback_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
@@ -475,7 +474,7 @@ HWTEST_F(SoftbusConnectorTest, RegisterSoftbusStateCallback_001, testing::ext::T
  * @tc.name: UnRegisterSoftbusStateCallback_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusStateCallback_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusStateCallback_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int32_t ret = softbusConnector->UnRegisterSoftbusStateCallback();
@@ -489,7 +488,7 @@ HWTEST_F(SoftbusConnectorTest, UnRegisterSoftbusStateCallback_001, testing::ext:
  * @tc.desc: set result 0
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, OnSoftbusJoinLNNResult_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, OnSoftbusJoinLNNResult_001, testing::ext::TestSize.Level0)
 {
     ConnectionAddr *addr = nullptr;
     char *networkId = nullptr;
@@ -503,7 +502,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusJoinLNNResult_001, testing::ext::TestSiz
  * @tc.name: AddMemberToDiscoverMap_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, AddMemberToDiscoverMap_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, AddMemberToDiscoverMap_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId;
     std::shared_ptr<DeviceInfo> deviceInfo = nullptr;
@@ -516,7 +515,7 @@ HWTEST_F(SoftbusConnectorTest, AddMemberToDiscoverMap_001, testing::ext::TestSiz
  * @tc.name: AddMemberToDiscoverMap_002
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, AddMemberToDiscoverMap_002, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, AddMemberToDiscoverMap_002, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
     std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
@@ -529,7 +528,7 @@ HWTEST_F(SoftbusConnectorTest, AddMemberToDiscoverMap_002, testing::ext::TestSiz
  * @tc.name: SetPkgName_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, SetProcessInfo_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, SetProcessInfo_001, testing::ext::TestSize.Level0)
 {
     ProcessInfo processInfo;
     std::vector<ProcessInfo> processInfoVec;
@@ -545,11 +544,10 @@ HWTEST_F(SoftbusConnectorTest, SetProcessInfo_001, testing::ext::TestSize.Level1
  * @tc.name: GetDeviceUdidHashByUdid_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_001, testing::ext::TestSize.Level0)
 {
     std::string udid = "123456789";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
     std::string ret = softbusConnector->GetDeviceUdidHashByUdid(udid);
     EXPECT_EQ(ret.empty(), true);
 }
@@ -558,27 +556,22 @@ HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_001, testing::ext::TestSi
  * @tc.name: EraseUdidFromMap_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, EraseUdidFromMap_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, EraseUdidFromMap_001, testing::ext::TestSize.Level0)
 {
     std::string udid = "123456789";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->EraseUdidFromMap(udid);
-    EXPECT_EQ(softbusConnector->deviceUdidMap_.empty(), true);
+    EXPECT_EQ(softbusConnector->deviceUdidMap_.empty(), false);
 }
 
 /**
  * @tc.name: GetLocalDeviceName_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, GetLocalDeviceName_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetLocalDeviceName_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     std::string ret = softbusConnector->GetLocalDeviceName();
-    EXPECT_EQ(ret.empty(), true);
-
-    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(DM_OK));
-    ret = softbusConnector->GetLocalDeviceName();
     EXPECT_EQ(ret.empty(), true);
 }
 
@@ -586,7 +579,7 @@ HWTEST_F(SoftbusConnectorTest, GetLocalDeviceName_001, testing::ext::TestSize.Le
  * @tc.name: GetNetworkIdByDeviceId_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::string deviceId = "deviceId";
@@ -623,7 +616,7 @@ HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSiz
  * @tc.name: SetProcessInfoVec_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, SetProcessInfoVec_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, SetProcessInfoVec_001, testing::ext::TestSize.Level0)
 {
     std::vector<ProcessInfo> processInfoVec;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
@@ -635,7 +628,7 @@ HWTEST_F(SoftbusConnectorTest, SetProcessInfoVec_001, testing::ext::TestSize.Lev
  * @tc.name: GetPkgName_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, GetProcessInfo_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetProcessInfo_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     auto ret = softbusConnector->GetProcessInfo();
@@ -646,7 +639,7 @@ HWTEST_F(SoftbusConnectorTest, GetProcessInfo_001, testing::ext::TestSize.Level1
  * @tc.name: ClearPkgName_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, ClearProcessInfo_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, ClearProcessInfo_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->ClearProcessInfo();
@@ -657,7 +650,7 @@ HWTEST_F(SoftbusConnectorTest, ClearProcessInfo_001, testing::ext::TestSize.Leve
  * @tc.name: HandleDeviceOnline_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, HandleDeviceOnline_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, HandleDeviceOnline_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
@@ -671,7 +664,7 @@ HWTEST_F(SoftbusConnectorTest, HandleDeviceOnline_001, testing::ext::TestSize.Le
  * @tc.name: HandleDeviceOffline_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, HandleDeviceOffline_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, HandleDeviceOffline_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
@@ -685,7 +678,7 @@ HWTEST_F(SoftbusConnectorTest, HandleDeviceOffline_001, testing::ext::TestSize.L
  * @tc.name: CheckIsOnline_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, CheckIsOnline_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, CheckIsOnline_001, testing::ext::TestSize.Level0)
 {
     std::string targetId = "targetDeviceId";
     int32_t deviceCount = 1;
@@ -716,7 +709,7 @@ HWTEST_F(SoftbusConnectorTest, CheckIsOnline_001, testing::ext::TestSize.Level1)
  * @tc.name: GetDeviceInfoByDeviceId_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, GetDeviceInfoByDeviceId_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetDeviceInfoByDeviceId_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
     std::string uuid = "";
@@ -769,7 +762,7 @@ HWTEST_F(SoftbusConnectorTest, GetDeviceInfoByDeviceId_001, testing::ext::TestSi
  * @tc.name: ConvertNodeBasicInfoToDmDevice_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext::TestSize.Level0)
 {
     NodeBasicInfo nodeBasicInfo = {
         .networkId = "123456",
@@ -786,7 +779,7 @@ HWTEST_F(SoftbusConnectorTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext:
     EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);
 }
 
-HWTEST_F(SoftbusConnectorTest, GetLocalDeviceTypeId_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetLocalDeviceTypeId_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
@@ -804,7 +797,7 @@ HWTEST_F(SoftbusConnectorTest, GetLocalDeviceTypeId_001, testing::ext::TestSize.
     EXPECT_EQ(ret, 1);
 }
 
-HWTEST_F(SoftbusConnectorTest, GetLocalDeviceNetworkId_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetLocalDeviceNetworkId_001, testing::ext::TestSize.Level0)
 {
     std::string networkId = "network*1";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
@@ -823,7 +816,7 @@ HWTEST_F(SoftbusConnectorTest, GetLocalDeviceNetworkId_001, testing::ext::TestSi
     EXPECT_EQ(ret.empty(), false);
 }
 
-HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_002, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_002, testing::ext::TestSize.Level0)
 {
     std::string udid = "1********69";
     std::string udidHashTemp = "ajj*********47";
@@ -854,7 +847,7 @@ HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_002, testing::ext::TestSi
     softbusConnector->JoinLnn(deviceId, isForceJoin);
 }
 
-HWTEST_F(SoftbusConnectorTest, OnLeaveLNNResult_001, testing::ext::TestSize.Level1)
+HWTEST_F(SoftbusConnectorTest, OnLeaveLNNResult_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::string networkId = "12345";

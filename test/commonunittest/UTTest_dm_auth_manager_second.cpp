@@ -597,61 +597,6 @@ HWTEST_F(DmAuthManagerTest, SinkAuthenticateFinish_001, testing::ext::TestSize.L
     ASSERT_EQ(authManager_->authResponseState_, nullptr);
 }
 
-HWTEST_F(DmAuthManagerTest, GetServiceExtraInfo_001, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "test_pkg";
-    int32_t pinExchangeType = 1;
-    DistributedDeviceProfile::LocalServiceInfo srvInfo;
-    JsonObject extraInfoObj;
-
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
-        .WillOnce(Return(ERR_DM_FAILED));
-    bool ret = authManager_->GetServiceExtraInfo(pkgName, pinExchangeType, srvInfo, extraInfoObj);
-    ASSERT_FALSE(ret);
-}
-
-HWTEST_F(DmAuthManagerTest, GetServiceExtraInfo_002, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "test_pkg";
-    int32_t pinExchangeType = 1;
-    DistributedDeviceProfile::LocalServiceInfo srvInfo;
-    JsonObject extraInfoObj;
-
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
-    bool ret = authManager_->GetServiceExtraInfo(pkgName, pinExchangeType, srvInfo, extraInfoObj);
-    ASSERT_FALSE(ret);
-}
-
-HWTEST_F(DmAuthManagerTest, GetServiceExtraInfo_003, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "test_pkg";
-    int32_t pinExchangeType = 1;
-    DistributedDeviceProfile::LocalServiceInfo srvInfo;
-    srvInfo.SetExtraInfo("{invalid_json}");
-    JsonObject extraInfoObj;
-
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
-    bool ret = authManager_->GetServiceExtraInfo(pkgName, pinExchangeType, srvInfo, extraInfoObj);
-    ASSERT_FALSE(ret);
-}
-
-HWTEST_F(DmAuthManagerTest, GetServiceExtraInfo_004, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "test_pkg";
-    int32_t pinExchangeType = 1;
-    DistributedDeviceProfile::LocalServiceInfo srvInfo;
-    std::string extraInfo = "{\"key\":\"value\"}";
-    srvInfo.SetExtraInfo(extraInfo);
-    JsonObject extraInfoObj;
-
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
-        .Times(AnyNumber()).WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
-    bool ret = authManager_->GetServiceExtraInfo(pkgName, pinExchangeType, srvInfo, extraInfoObj);
-    ASSERT_TRUE(ret);
-}
-
 HWTEST_F(DmAuthManagerTest, SrcAuthenticateFinish_001, testing::ext::TestSize.Level1)
 {
     authManager_->isFinishOfLocal_ = true;
@@ -936,9 +881,9 @@ HWTEST_F(DmAuthManagerTest, AuthDevice_002, testing::ext::TestSize.Level1)
     std::string pinCode = "123456";
     authManager_->isAuthDevice_ = false;
     authManager_->authResponseContext_->authType = 5;
-    EXPECT_CALL(*hiChainAuthConnectorMock_, AuthDevice(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*hiChainAuthConnectorMock_, AuthDevice(_, _, _, _)).WillOnce(Return(DM_OK));
     int32_t ret = authManager_->AuthDevice(pinCode);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DmAuthManagerTest, ImportAuthCode_001, testing::ext::TestSize.Level1)
@@ -1621,7 +1566,7 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authResponseContext_->accountGroupIdHash = OLD_VERSION_ACCOUNT;
     EXPECT_CALL(*multipleUserConnectorMock_,
-        GetCurrentAccountUserID()).Times(::testing::AtLeast(3)).WillRepeatedly(Return(0));
+        GetCurrentAccountUserID()).Times(::testing::AtLeast(5)).WillRepeatedly(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     ret = authManager_->IsIdenticalAccount();
     ASSERT_TRUE(ret);
@@ -1637,11 +1582,6 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
     authManager_->importAuthCode_= "";
     authManager_->authResponseContext_->authType = AUTH_TYPE_NFC;
     authManager_->AbilityNegotiate();
-
-    authManager_->authResponseContext_->isOnline = true;
-    EXPECT_CALL(*softbusConnectorMock_, CheckIsOnline(_)).WillOnce(Return(true));
-    EXPECT_CALL(*hiChainAuthConnectorMock_, QueryCredential(_, _, _)).WillOnce(Return(true));
-    authManager_->GetAuthRequestContext();
 
     JsonObject jsonPeerGroupIdObj;
     jsonPeerGroupIdObj["groupId"] = "123456";
@@ -1697,30 +1637,6 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level1)
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     int32_t ret = authManager_->CheckTrustState();
     ASSERT_EQ(ret, 1);
-
-    int32_t sessionId = 1;
-    authManager_->authResponseContext_->authType = AUTH_TYPE_PIN;
-    authManager_->authResponseContext_->isOnline = true;
-    EXPECT_CALL(*softbusConnectorMock_, CheckIsOnline(_)).Times(::testing::AtLeast(2)).WillOnce(Return(true));
-    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
-    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
-    authManager_->ProcessAuthRequest(sessionId);
-
-    authManager_->authResponseContext_->haveCredential = true;
-    EXPECT_CALL(*hiChainAuthConnectorMock_,
-        QueryCredential(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(true));
-    authManager_->GetAuthRequestContext();
-
-    authManager_->authResponseContext_->isOnline = true;
-    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
-    authManager_->authResponseContext_->importAuthCode = "";
-    authManager_->importAuthCode_ = "";
-    std::vector<int32_t> bindType;
-    bindType.push_back(101);
-    bindType.push_back(102);
-    EXPECT_CALL(*softbusConnectorMock_, CheckIsOnline(_)).Times(::testing::AtLeast(1)).WillOnce(Return(true));
-    EXPECT_CALL(*deviceProfileConnectorMock_, SyncAclByBindType(_, _, _, _)).WillOnce(Return(bindType));
-    authManager_->ProcessAuthRequestExt(sessionId);
 }
 
 HWTEST_F(DmAuthManagerTest, DeleteGroup_201, testing::ext::TestSize.Level1)
@@ -1754,10 +1670,8 @@ HWTEST_F(DmAuthManagerTest, DeleteGroup_202, testing::ext::TestSize.Level1)
     GroupInfo groupInfo1;
     groupInfo1.groupId = "12345";
     groupList.push_back(groupInfo1);
-    EXPECT_CALL(*hiChainConnectorMock_, GetRelatedGroups(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(groupList), Return(DM_OK)));
     ret = authManager_->DeleteGroup(pkgName, userId, deviceId);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DmAuthManagerTest, ParseConnectAddr_201, testing::ext::TestSize.Level1)

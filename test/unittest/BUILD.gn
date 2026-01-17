@@ -567,7 +567,7 @@ ohos_unittest("UTTest_device_manager_service_three") {
     "mock/distributed_device_profile_client_mock.cpp",
     "mock/multiple_user_connector_mock.cpp",
     "mock/permission_manager_mock.cpp",
-    "mock/softbus_listener_mock.cpp"
+    "mock/softbus_listener_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -731,7 +731,7 @@ ohos_unittest("UTTest_softbus_connector") {
   sources = [
     "${devicemanager_path}/test/softbusunittest/UTTest_softbus_connector.cpp",
     "mock/dm_crypto_mock.cpp",
-    "mock/softbus_center_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/softbus_center_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -766,8 +766,8 @@ ohos_unittest("UTTest_softbus_listener") {
   sources = [
     "${devicemanager_path}/test/softbusunittest/UTTest_softbus_listener.cpp",
     "${devicemanager_path}/test/unittest/mock/parameter.cpp",
+    "${devicemanager_path}/test/unittest/mock/dm_crypto_mock.cpp",
     "mock/deviceprofile_connector_mock.cpp",
-    "mock/dm_crypto_mock.cpp",
     "mock/dm_ipc_skeleton_mock.cpp",
     "mock/dm_softbus_cache_mock.cpp",
     "mock/softbus_center_mock.cpp",
@@ -1427,6 +1427,7 @@ ohos_unittest("UTTest_device_manager_service_impl_first") {
     "UTTest_device_manager_service_impl_first.cpp",
     "mock/deviceprofile_connector_mock.cpp",
     "mock/multiple_user_connector_mock.cpp",
+    "mock/ipc_server_listener_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -1620,7 +1621,7 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
     "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_second.cpp",
     "mock/deviceprofile_connector_mock.cpp",
     "mock/hichain_auth_connector_mock.cpp",
-    "mock/hichain_connector_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/hichain_connector_mock.cpp",
     "mock/multiple_user_connector_mock.cpp",
     "mock/softbus_connector_mock.cpp",
   ]
@@ -2219,6 +2220,7 @@ ohos_unittest("UTTest_dm_auth_message_processor") {
 
   sources = [
     "${devicemanager_path}/test/unittest/UTTest_dm_auth_message_processor.cpp",
+    "${devicemanager_path}/test/unittest/mock/deviceprofile_connector_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -2282,6 +2284,7 @@ ohos_unittest("UTTest_auth_acl") {
     "${devicemanager_path}/test/unittest/mock/softbus_connector_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_session_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/distributed_device_profile_client_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/deviceprofile_connector_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]

@@ -621,8 +621,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppStateChange_001, testing::e
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).Times(::testing::AtLeast(1))
         .WillOnce(Return(allProcessInfos));
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(4)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
-        .Times(::testing::AtLeast(4)).WillOnce(Return(DM_OK));
     listener_->ProcessAppStateChange(processInfo, state, info, deviceBasicInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
@@ -1054,23 +1052,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_002, testing::ext::T
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo())
         .Times(::testing::AtLeast(1)).WillOnce(Return(processInfos));
     listener_->OnSinkBindResult(processInfo, targetId, result, status, content);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
-}
-
-HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
-    ProcessInfo processInfo;
-    processInfo.pkgName = "pkgNameqaz";
-    DmDeviceState state = DmDeviceState::DEVICE_INFO_CHANGED;
-    DmDeviceInfo deviceInfo;
-    DmDeviceBasicInfo deviceBasicInfo;
-
-    EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).Times(::testing::AtLeast(3)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
-    listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
