@@ -4,21 +4,21 @@
             "name":"dm_connect_code",
             "value":"Bağlantı kodu",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_hap",
             "value":"%2$s üzerindeki %1$s bu cihaza erişmek istiyor. Bu uygulamaya güvenilsin mi?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_cancel",
             "value":"İptal",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {

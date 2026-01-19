@@ -7,14 +7,14 @@
                     "quantity":"one",
                     "value":"Yanlış. %d deneme kaldı.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
                     "quantity":"other",
                     "value":"Yanlış. %d deneme kaldı.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
@@ -26,14 +26,14 @@
                     "quantity":"other",
                     "value":"Güvenme (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
                     "quantity":"one",
                     "value":"Güvenme (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

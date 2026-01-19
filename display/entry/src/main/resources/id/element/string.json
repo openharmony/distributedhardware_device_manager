@@ -4,21 +4,21 @@
             "name":"dm_connect_code",
             "value":"Kode koneksi",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_hap",
             "value":"%1$s yang ada di %2$s ingin mengakses perangkat ini. Percayai aplikasi ini?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_cancel",
             "value":"Batal",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -93,7 +93,7 @@
         },
         {
             "name":"dm_authenticating",
-            "value":"Mengautentikasi¡­",
+            "value":"Mengautentikasi…",
             "attr":{
                 "priority":"translate"
             }

@@ -4,21 +4,21 @@
             "name":"dm_connect_code",
             "value":"รหัสการเชื่อมต่อ",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_hap",
             "value":"%1$s บน %2$s ต้องการเข้าถึงอุปกรณ์นี้ เชื่อถือแอปนี้หรือไม่",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_cancel",
             "value":"ยกเลิก",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -114,9 +114,9 @@
         },
         {
             "name":"dm_connect",
-            "value":"เชื่อมต่อกับ %s แล้ว",
+            "value":"เชื่อมต่อกับ %s",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {

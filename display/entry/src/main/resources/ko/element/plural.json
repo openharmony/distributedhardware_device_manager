@@ -7,7 +7,7 @@
                     "quantity":"other",
                     "value":"틀렸습니다. %d회의 시도가 남았습니다.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
@@ -19,7 +19,7 @@
                     "quantity":"other",
                     "value":"신뢰 안 함(%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

@@ -42,7 +42,7 @@
                     "quantity":"two",
                     "value":"رقم خاطئ. لا تزال لديك محاولتين متبقيتين.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
