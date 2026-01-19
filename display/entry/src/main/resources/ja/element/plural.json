@@ -7,7 +7,7 @@
                     "quantity":"other",
                     "value":"正しくありません。残り試行回数は%d回です。",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
@@ -19,7 +19,7 @@
                     "quantity":"other",
                     "value":"信頼しない（%d）",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

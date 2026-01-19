@@ -11,14 +11,14 @@
             "name":"dm_confirm_title_hap",
             "value":"%2$s ရှိ %1$s သည် ဤစက်ကို ဝင်ရောက်သုံးစွဲလိုပါသည်။ ဤအက်ပ်ကို ယုံကြည်ပါသလား။",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_cancel",
-            "value":"ပယ်ဖျက်မည်",
+            "value":"မလုပ်ပါ",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -32,7 +32,7 @@
             "name":"dm_confirm_intention",
             "value":"စက်များအကြား ‌ဒေတာချိန်ကိုက်မှုနှင့် ပူးတွဲလုပ်ဆောင်မှုအတွက် ဤသည်ကို လိုအပ်ပါသည်။",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {

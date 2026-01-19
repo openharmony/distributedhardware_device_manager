@@ -7,7 +7,7 @@
                     "quantity":"other",
                     "value":"မမှန်ကန်ပါ။ ကြိုးပမ်းမှု %d ကြိမ် ကျန်ပါသည်။",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
@@ -19,7 +19,7 @@
                     "quantity":"other",
                     "value":"မယုံကြည်ပါ (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

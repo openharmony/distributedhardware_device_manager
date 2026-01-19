@@ -7,7 +7,7 @@
                     "quantity":"other",
                     "value":"སྦྲེལ་མཐུད་ཨང་རྟགས་ནོར་འདུག ཁྱེད་ཀྱིས་ད་དུང་ཚོད་ལྟ་ཐེངས་ %d བྱ་ཆོག",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
@@ -19,7 +19,7 @@
                     "quantity":"other",
                     "value":"ཡིད་ཆེས་མེད། (སྐར་ཆ་ %d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

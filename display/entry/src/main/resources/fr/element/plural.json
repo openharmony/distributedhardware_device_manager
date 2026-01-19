@@ -7,14 +7,14 @@
                     "quantity":"one",
                     "value":"Le code est incorrect. Il reste %d essai.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
                     "quantity":"other",
                     "value":"Le code est incorrect. Il reste %d essais.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
@@ -26,7 +26,7 @@
                     "quantity":"other",
                     "value":"Ne pas faire confiance (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {

@@ -7,7 +7,7 @@
                     "quantity":"other",
                     "value":"連接碼錯誤，還可以嘗試 %d 次",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
@@ -19,7 +19,7 @@
                     "quantity":"other",
                     "value":"不信任（%d 秒）",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

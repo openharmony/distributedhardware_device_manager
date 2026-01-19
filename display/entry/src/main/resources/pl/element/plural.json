@@ -7,14 +7,14 @@
                     "quantity":"one",
                     "value":"Nie zgadza się. Liczba pozostałych prób: %d.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
                     "quantity":"other",
                     "value":"Nie zgadza się. Liczba pozostałych prób: %d.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
@@ -40,21 +40,21 @@
                     "quantity":"other",
                     "value":"Nie ufaj (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
                     "quantity":"one",
                     "value":"Nie ufaj (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
                     "quantity":"few",
                     "value":"Nie ufaj (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {

@@ -4,21 +4,21 @@
             "name":"dm_connect_code",
             "value":"Verbindungscode",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_hap",
             "value":"%1$s auf %2$s möchte auf dieses Gerät zugreifen. Dieser App vertrauen?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_cancel",
             "value":"Abbrechen",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {

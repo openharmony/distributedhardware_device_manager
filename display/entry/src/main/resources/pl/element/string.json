@@ -4,21 +4,21 @@
             "name":"dm_connect_code",
             "value":"Kod połączenia",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_hap",
             "value":"%1$s na %2$s chce uzyskać dostęp do tego urządzenia. Zaufać tej aplikacji?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_cancel",
             "value":"Anuluj",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -114,9 +114,9 @@
         },
         {
             "name":"dm_connect",
-            "value":"Połącz z urządzeniem %s",
+            "value":"Połącz z %s",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
