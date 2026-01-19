@@ -33,7 +33,7 @@ public:
      * @tc.type: FUNC
      */
     virtual void OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
-        const DmDeviceInfo &info) = 0;
+        const DmDeviceInfo &info, const bool isOnline) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnDeviceFound

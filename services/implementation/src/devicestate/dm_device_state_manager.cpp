@@ -143,7 +143,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
         }
     }
     std::vector<ProcessInfo> processInfoVec = softbusConnector_->GetProcessInfo();
-    ProcessDeviceStateChange(DEVICE_STATE_ONLINE, devInfo, processInfoVec);
+    ProcessDeviceStateChange(DEVICE_STATE_ONLINE, devInfo, processInfoVec, true);
     softbusConnector_->ClearProcessInfo();
 }
 
@@ -164,12 +164,12 @@ void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
         devInfo = stateDeviceInfos_[deviceId];
     }
     std::vector<ProcessInfo> processInfoVec = softbusConnector_->GetProcessInfo();
-    ProcessDeviceStateChange(DEVICE_STATE_OFFLINE, devInfo, processInfoVec);
+    ProcessDeviceStateChange(DEVICE_STATE_OFFLINE, devInfo, processInfoVec, true);
     softbusConnector_->ClearProcessInfo();
 }
 
 void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
-    std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid)
+    std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid, const bool isOnline)
 {
     LOGI("Handle device status change: devState=%{public}d, deviceId=%{public}s.", devState,
         GetAnonyString(devInfo.deviceId).c_str());
@@ -179,7 +179,7 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
             RegisterOffLineTimer(devInfo);
 #endif
             SaveOnlineDeviceInfo(devInfo);
-            ProcessDeviceStateChange(devState, devInfo, processInfoVec);
+            ProcessDeviceStateChange(devState, devInfo, processInfoVec, isOnline);
             break;
         case DEVICE_STATE_OFFLINE:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -191,11 +191,11 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
                 softbusConnector_->GetUdidByNetworkId(devInfo.networkId, udid);
                 softbusConnector_->EraseUdidFromMap(udid);
             }
-            ProcessDeviceStateChange(devState, devInfo, processInfoVec);
+            ProcessDeviceStateChange(devState, devInfo, processInfoVec, isOnline);
             break;
         case DEVICE_INFO_CHANGED:
             ChangeDeviceInfo(devInfo);
-            ProcessDeviceStateChange(devState, devInfo, processInfoVec);
+            ProcessDeviceStateChange(devState, devInfo, processInfoVec, isOnline);
             break;
         default:
             LOGE("HandleDeviceStatusChange error, unknown device state = %{public}d", devState);
@@ -205,7 +205,7 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
-    std::vector<ProcessInfo> &processInfoVec)
+    std::vector<ProcessInfo> &processInfoVec, const bool isOnline)
 {
     LOGI("begin, devState = %{public}d networkId: %{public}s.", devState, GetAnonyString(devInfo.networkId).c_str());
     std::unordered_set<int64_t> remoteTokenIds;
@@ -236,21 +236,21 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
                 std::vector<int64_t> remoteServiceIdVec(remoteServiceIds.begin(), remoteServiceIds.end());
                 listener_->OnDeviceStateChange(item, devState, devInfo, remoteServiceIdVec);
             } else {
-                listener_->OnDeviceStateChange(item, devState, devInfo);
+                listener_->OnDeviceStateChange(item, devState, devInfo, isOnline);
             }
         }
     }
 }
 #else
 void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
-    std::vector<ProcessInfo> &processInfoVec)
+    std::vector<ProcessInfo> &processInfoVec, const bool isOnline)
 {
     LOGI("begin, devState = %{public}d networkId: %{public}s.", devState,
         GetAnonyString(devInfo.networkId).c_str());
     CHECK_NULL_VOID(listener_);
     for (const auto &item : processInfoVec) {
         if (!item.pkgName.empty()) {
-            listener_->OnDeviceStateChange(item, devState, devInfo);
+            listener_->OnDeviceStateChange(item, devState, devInfo, isOnline);
         }
     }
 }
@@ -285,7 +285,7 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
         ProcessInfo processInfo;
         processInfo.pkgName = pkgName;
         processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
-        listener_->OnDeviceStateChange(processInfo, state, saveInfo);
+        listener_->OnDeviceStateChange(processInfo, state, saveInfo, true);
     }
 }
 

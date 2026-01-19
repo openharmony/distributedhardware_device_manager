@@ -62,11 +62,12 @@ public:
     }
 
     void OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
-        const DmDeviceInfo &info) override
+        const DmDeviceInfo &info, const bool isOnline) override
     {
         (void)processInfo;
         (void)state;
         (void)info;
+        (void)isOnline;
     }
 
     void OnDeviceFound(const ProcessInfo &processInfo, uint16_t subscribeId, const DmDeviceInfo &info) override

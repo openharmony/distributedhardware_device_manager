@@ -768,7 +768,7 @@ void DeviceManagerServiceImpl::CreateGlobalClassicalAuthMgr()
     softbusConnector_->RegisterLeaveLNNCallback(authMgr_);
 }
 
-void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo)
+void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline)
 {
     std::string trustDeviceId = deviceStateMgr_->GetUdidByNetWorkId(std::string(devInfo.networkId));
     LOGI("deviceStateMgr Udid: %{public}s", GetAnonyString(trustDeviceId).c_str());
@@ -816,11 +816,11 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
             std::set<ProcessInfo> processInfoSet(processInfoVec.begin(), processInfoVec.end());
             processInfoVec.assign(processInfoSet.begin(), processInfoSet.end());
         }
-        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, trustDeviceId);
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, trustDeviceId, isOnline);
     }
 }
 
-void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo)
+void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline)
 {
     LOGI("networkId: %{public}s.", GetAnonyString(devInfo.networkId).c_str());
     std::string trustDeviceId = "";
@@ -841,11 +841,12 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     ProcessInfo processInfo;
     processInfo.pkgName = std::string(DM_PKG_NAME);
     processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
-    SetOnlineProcessInfo(bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+    SetOnlineProcessInfo(bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState, isOnline);
 }
 
 void DeviceManagerServiceImpl::SetOnlineProcessInfo(const uint32_t &bindType, ProcessInfo &processInfo,
-    DmDeviceInfo &devInfo, const std::string &requestDeviceId, const std::string &trustDeviceId, DmDeviceState devState)
+    DmDeviceInfo &devInfo, const std::string &requestDeviceId, const std::string &trustDeviceId,
+    DmDeviceState devState, const bool isOnline)
 {
     std::vector<ProcessInfo> processInfoVec;
     if (bindType == IDENTICAL_ACCOUNT_TYPE) {
@@ -878,7 +879,7 @@ void DeviceManagerServiceImpl::SetOnlineProcessInfo(const uint32_t &bindType, Pr
         processInfoVec.push_back(processInfo);
     }
     LOGI("HandleOnline success devInfo authForm is %{public}d.", devInfo.authForm);
-    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, trustDeviceId);
+    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, trustDeviceId, isOnline);
     return;
 }
 
@@ -901,7 +902,8 @@ bool DeviceManagerServiceImpl::CheckSharePeerSrc(const std::string &peerUdid, co
     return false;
 }
 
-void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
+void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
+    const bool isOnline)
 {
     LOGI("start, devState = %{public}d, networkId: %{public}s.",
         devState, GetAnonyString(devInfo.networkId).c_str());
@@ -910,9 +912,9 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
         return;
     }
     if (devState == DEVICE_STATE_ONLINE) {
-        HandleOnline(devState, devInfo);
+        HandleOnline(devState, devInfo, isOnline);
     } else if (devState == DEVICE_STATE_OFFLINE) {
-        HandleOffline(devState, devInfo);
+        HandleOffline(devState, devInfo, isOnline);
     } else {
         std::string peerUdid = "";
         std::string udidHash = GetUdidHashByNetworkId(devInfo.networkId, peerUdid);
@@ -925,7 +927,7 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
         processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
         std::vector<ProcessInfo> processInfoVec;
         processInfoVec.push_back(processInfo);
-        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, peerUdid);
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, peerUdid, isOnline);
     }
 }
 

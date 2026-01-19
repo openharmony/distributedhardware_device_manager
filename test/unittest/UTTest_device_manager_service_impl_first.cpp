@@ -462,10 +462,10 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_001, testing::e
     DmDeviceState devState = DEVICE_STATE_ONLINE;
 
     EXPECT_CALL(*softbusConnectorMock_, SetProcessInfo(_)).Times(1);
-    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _)).Times(1);
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _, _)).Times(1);
 
     deviceManagerServiceImpl_->SetOnlineProcessInfo(
-        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState, true);
 
     EXPECT_EQ(devInfo.authForm, DmAuthForm::IDENTICAL_ACCOUNT);
 }
@@ -480,10 +480,10 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_002, testing::e
     DmDeviceState devState = DEVICE_STATE_ONLINE;
 
     EXPECT_CALL(*softbusConnectorMock_, SetProcessInfo(_)).Times(1);
-    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _)).Times(1);
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _, _)).Times(1);
 
     deviceManagerServiceImpl_->SetOnlineProcessInfo(
-        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState, true);
 
     EXPECT_EQ(devInfo.authForm, DmAuthForm::PEER_TO_PEER);
 }
@@ -498,11 +498,10 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_003, testing::e
     DmDeviceState devState = DEVICE_STATE_ONLINE;
 
     EXPECT_CALL(*softbusConnectorMock_, SetProcessInfo(_)).Times(1);
-    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _)).Times(1);
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _, _)).Times(1);
 
     deviceManagerServiceImpl_->SetOnlineProcessInfo(
-        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
-
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState, true);
     EXPECT_EQ(devInfo.authForm, DmAuthForm::ACROSS_ACCOUNT);
 }
 
@@ -519,10 +518,10 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_004, testing::e
     EXPECT_CALL(*deviceProfileConnectorMock_, GetProcessInfoFromAclByUserId(_, _, _))
         .WillOnce(Return(processInfoVec));
     EXPECT_CALL(*softbusConnectorMock_, SetProcessInfoVec(_)).Times(1);
-    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _)).Times(1);
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _, _)).Times(1);
 
     deviceManagerServiceImpl_->SetOnlineProcessInfo(
-        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState, true);
 
     EXPECT_EQ(devInfo.authForm, DmAuthForm::PEER_TO_PEER);
 }
@@ -540,10 +539,10 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_005, testing::e
     EXPECT_CALL(*deviceProfileConnectorMock_, GetProcessInfoFromAclByUserId(_, _, _))
         .WillOnce(Return(processInfoVec));
     EXPECT_CALL(*softbusConnectorMock_, SetProcessInfoVec(_)).Times(1);
-    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _)).Times(1);
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _, _)).Times(1);
 
     deviceManagerServiceImpl_->SetOnlineProcessInfo(
-        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState, true);
 
     EXPECT_EQ(devInfo.authForm, DmAuthForm::ACROSS_ACCOUNT);
 }
@@ -562,10 +561,10 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_006, testing::e
 
     EXPECT_CALL(*deviceManagerServiceImplMock_, CheckSharePeerSrc(_, _)).WillOnce(Return(false));
     EXPECT_CALL(*softbusConnectorMock_, SetProcessInfo(_)).Times(1);
-    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _)).Times(1);
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _, _)).Times(1);
 
     deviceManagerServiceImpl_->SetOnlineProcessInfo(
-        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState, true);
 
     EXPECT_EQ(devInfo.authForm, DmAuthForm::SHARE);
 }

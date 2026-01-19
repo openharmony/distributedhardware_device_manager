@@ -89,7 +89,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_001, testing::ext
         .deviceName = "asda",
         .deviceTypeId = 1,
     };
-    listener_->OnDeviceStateChange(processInfo, state, info);
+    listener_->OnDeviceStateChange(processInfo, state, info, true);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -112,7 +112,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_002, testing::ext
         .deviceName = "asda",
         .deviceTypeId = 1,
     };
-    listener_->OnDeviceStateChange(processInfo, state, info);
+    listener_->OnDeviceStateChange(processInfo, state, info, true);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -595,11 +595,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_001, testing
     DmDeviceState state = DmDeviceState::DEVICE_STATE_ONLINE;
     DmDeviceInfo info;
     DmDeviceBasicInfo deviceBasicInfo;
-    listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo);
+    listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, true);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 
     state = DmDeviceState::DEVICE_INFO_CHANGED;
-    listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo);
+    listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, true);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
@@ -621,7 +621,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppStateChange_001, testing::e
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).Times(::testing::AtLeast(1))
         .WillOnce(Return(allProcessInfos));
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(4)).WillOnce(Return(DM_OK));
-    listener_->ProcessAppStateChange(processInfo, state, info, deviceBasicInfo);
+    listener_->ProcessAppStateChange(processInfo, state, info, deviceBasicInfo, true);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
@@ -862,7 +862,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceOffline_001, testing::ex
     DmDeviceBasicInfo deviceBasicInfo;
     std::string notifyPkgName = pro.pkgName + "#" + std::to_string(pro.userId) + "#" + std::string(info.deviceId);
     listener_->alreadyOnlinePkgName_[notifyPkgName] = info;
-    listener_->ProcessDeviceOffline(procInfoVec, processInfo, state, info, deviceBasicInfo);
+    listener_->ProcessDeviceOffline(procInfoVec, processInfo, state, info, deviceBasicInfo, true);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -900,7 +900,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppOffline_001, testing::ext::
     std::string notifyPkgName = pro.pkgName + "#" + std::to_string(pro.userId) + "#" + std::string(info.deviceId);
     listener_->alreadyOnlinePkgName_[notifyPkgName] = info;
     EXPECT_CALL(*softbusCacheMock_, CheckIsOnline(_)).WillOnce(Return(false));
-    listener_->ProcessAppOffline(procInfoVec, processInfo, state, info, deviceBasicInfo);
+    listener_->ProcessAppOffline(procInfoVec, processInfo, state, info, deviceBasicInfo, true);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 
     processInfo.pkgName = "pkgNamesa";
@@ -908,11 +908,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppOffline_001, testing::ext::
     notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId) + "#" + std::string(info.deviceId);
     listener_->alreadyOnlinePkgName_[notifyPkgName] = info;
     EXPECT_CALL(*softbusCacheMock_, CheckIsOnline(_)).WillOnce(Return(true));
-    listener_->ProcessAppOffline(procInfoVec, processInfo, state, info, deviceBasicInfo);
+    listener_->ProcessAppOffline(procInfoVec, processInfo, state, info, deviceBasicInfo, true);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 
     EXPECT_CALL(*softbusCacheMock_, CheckIsOnline(_)).WillOnce(Return(true));
-    listener_->ProcessAppOffline(procInfoVec, processInfo, state, info, deviceBasicInfo);
+    listener_->ProcessAppOffline(procInfoVec, processInfo, state, info, deviceBasicInfo, true);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 

@@ -87,7 +87,7 @@ public:
     void SaveOnlineDeviceInfo(const DmDeviceInfo &info);
     void DeleteOfflineDeviceInfo(const DmDeviceInfo &info);
     void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
-        std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid);
+        std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid, const bool isOnline);
     void OnDbReady(const std::string &pkgName, const std::string &uuid);
     void ChangeDeviceInfo(const DmDeviceInfo &info);
     int32_t RegisterSoftbusStateCallback();
@@ -117,7 +117,7 @@ private:
     void DeleteCredential(const DmAclIdParam &acl);
 #endif
     void ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
-        std::vector<ProcessInfo> &processInfoVec);
+        std::vector<ProcessInfo> &processInfoVec, const bool isOnline);
 private:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::mutex timerMapMutex_;
