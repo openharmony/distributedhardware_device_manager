@@ -1349,19 +1349,6 @@ HWTEST_F(DeviceManagerServiceImplTest, GetAppTrustDeviceIdList_003, testing::ext
 }
 
 /**
- * @tc.name: LoadHardwareFwkService_001
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, LoadHardwareFwkService_001, testing::ext::TestSize.Level1)
-{
-    if (deviceManagerServiceImpl_ == nullptr) {
-        deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
-    }
-    deviceManagerServiceImpl_->LoadHardwareFwkService();
-    EXPECT_NE(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
-}
-
-/**
  * tc.name: ScreenCommonEventCallback_001
  * tc.type: FUNC
 */

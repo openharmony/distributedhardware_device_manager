@@ -590,29 +590,6 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_202, testing::ext::TestSize.Leve
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_201, testing::ext::TestSize.Level1)
-{
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    std::vector<DmDeviceInfo> deviceList;
-    DmDeviceInfo dmDeviceInfo;
-    dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
-    dmDeviceInfo.extraData = "extraInfo";
-    deviceList.push_back(dmDeviceInfo);
-    std::unordered_map<std::string, DmAuthForm> udidMap;
-    udidMap.insert(std::make_pair("udid01", DmAuthForm::IDENTICAL_ACCOUNT));
-    udidMap.insert(std::make_pair("udid02", DmAuthForm::ACROSS_ACCOUNT));
-    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
-        .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(DM_OK)));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetAppTrustDeviceIdList(_)).WillOnce(Return(udidMap));
-    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
-    DeviceManagerService::GetInstance().LoadHardwareFwkService();
-    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_)).WillOnce(Return(ERR_DM_FAILED));
-    DeviceManagerService::GetInstance().LoadHardwareFwkService();
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-}
-
 /**
  * @tc.name: UnAuthenticateDevice_201
  * @tc.desc: Set intFlag for UnAuthenticateDevice to true and pkgName to com.ohos.test; set deviceId null ，The return
@@ -1118,17 +1095,6 @@ HWTEST_F(DeviceManagerServiceTest, IsDMServiceAdapterSoLoaded_201, testing::ext:
     EXPECT_FALSE(ret);
 
     DeviceManagerService::GetInstance().UnloadDMServiceAdapterResident();
-}
-
-HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_202, testing::ext::TestSize.Level1)
-{
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    std::vector<DmDeviceInfo> deviceList;
-    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
-        .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(DM_OK)));
-    DeviceManagerService::GetInstance().LoadHardwareFwkService();
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
 HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_201, testing::ext::TestSize.Level1)

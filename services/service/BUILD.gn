@@ -41,7 +41,6 @@ if (defined(ohos_lite)) {
         "${utils_path}/include",
         "${utils_path}/include/appInfo/lite",
         "${utils_path}/include/crypto",
-        "${utils_path}/include/fwkload/lite",
         "${utils_path}/include/kvadapter",
         "${utils_path}/include/timer/lite",
         "${json_path}/include",

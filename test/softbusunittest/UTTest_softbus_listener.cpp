@@ -85,7 +85,7 @@ HWTEST_F(SoftbusListenerTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext::
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
-    EXPECT_NE(ret, SOFTBUS_NETWORK_NOT_INIT);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**

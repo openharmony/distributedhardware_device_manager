@@ -130,8 +130,6 @@ public:
 
     int32_t GetUdidHashByNetWorkId(const char *networkId, std::string &deviceId);
 
-    void LoadHardwareFwkService();
-
     int32_t RegisterUiStateCallback(const std::string &pkgName);
 
     int32_t UnRegisterUiStateCallback(const std::string &pkgName);
