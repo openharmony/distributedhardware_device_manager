@@ -621,8 +621,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppStateChange_001, testing::e
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).Times(::testing::AtLeast(1))
         .WillOnce(Return(allProcessInfos));
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(4)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
-        .Times(::testing::AtLeast(4)).WillOnce(Return(DM_OK));
     listener_->ProcessAppStateChange(processInfo, state, info, deviceBasicInfo, true);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
