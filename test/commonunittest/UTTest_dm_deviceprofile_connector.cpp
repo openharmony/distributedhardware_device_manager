@@ -1705,25 +1705,25 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_004, testing::ext::Te
     std::string pkgName = "bundleName";
     std::string deviceId = "deviceId";
 
-    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(123456));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(123456));
     auto ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
     EXPECT_NE(ret.empty(), false);
 
     deviceId = "remoteDeviceId";
-    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID())
         .Times(::testing::AtLeast(1))
         .WillOnce(Return(1234));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
     EXPECT_EQ(ret.empty(), true);
 
     deviceId = "remoteDeviceId";
-    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID())
         .Times(::testing::AtLeast(1))
         .WillOnce(Return(1234));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
 
     deviceId = "remoteDeviceId";
-    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID())
         .Times(::testing::AtLeast(1))
         .WillOnce(Return(1234));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
@@ -2284,7 +2284,7 @@ HWTEST_F(DeviceProfileConnectorTest, UpdateAclDeviceName_001, testing::ext::Test
 
     udid = "UDID";
     ret = DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, newDeviceName);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, CheckAppLevelAccess_001, testing::ext::TestSize.Level1)

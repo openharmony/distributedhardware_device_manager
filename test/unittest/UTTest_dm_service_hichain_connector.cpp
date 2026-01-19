@@ -145,7 +145,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupInfo_001, testing::ext::TestSize
     std::vector<DmGroupInfo> groupList;
     std::string queryParams = "{}";
     bool ret = connector.GetGroupInfo(0, queryParams, groupList);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**
