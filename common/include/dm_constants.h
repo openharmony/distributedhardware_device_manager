@@ -189,6 +189,8 @@ DM_EXPORT extern const uint32_t MAX_CONTAINER_SIZE;
 DM_EXPORT extern const int32_t MAX_DEVICE_PROFILE_SIZE;
 const int32_t DEVICE_NAME_MAX_BYTES = 100;
 
+DM_EXPORT extern const int32_t DEFAULT_DELAY_CLOSE_TIME_US;
+
 DM_EXPORT extern const char* ACL_IS_LNN_ACL_KEY;
 DM_EXPORT extern const char* ACL_IS_LNN_ACL_VAL_TRUE;
 DM_EXPORT extern const char* ACL_IS_LNN_ACL_VAL_FALSE;

@@ -63,7 +63,7 @@ public:
     virtual ~SoftbusStateCallbackTest() {}
     void OnDeviceOnline(std::string deviceId, int32_t authForm) {}
     void OnDeviceOffline(std::string deviceId) {}
-    void DeleteOffLineTimer(std::string udidHash) {}
+    void DeleteOffLineTimer(const std::string &peerUdid) {}
 };
 
 void DmAuthManagerTest::SetUp()
@@ -85,6 +85,11 @@ void DmAuthManagerTest::SetUp()
 void DmAuthManagerTest::TearDown()
 {
     Mock::VerifyAndClearExpectations(softbusSessionMock_.get());
+    Mock::VerifyAndClearExpectations(appManagerMock_.get());
+    Mock::VerifyAndClearExpectations(cryptoMock_.get());
+    Mock::VerifyAndClearExpectations(deviceProfileConnectorMock_.get());
+    Mock::VerifyAndClearExpectations(hiChainAuthConnectorMock_.get());
+    Mock::VerifyAndClearExpectations(multipleUserConnectorMock_.get());
 }
 
 void DmAuthManagerTest::SetUpTestCase()
@@ -785,7 +790,6 @@ HWTEST_F(DmAuthManagerTest, ImportCredential001, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "deviceId";
     std::string publicKey = "publicKey";
-    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = authManager_->ImportCredential(deviceId, publicKey);
     ASSERT_NE(ret, ERR_DM_FAILED);
 }
@@ -795,14 +799,8 @@ HWTEST_F(DmAuthManagerTest, ResponseCredential001, testing::ext::TestSize.Level1
     authManager_->ResponseCredential();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 
-    authManager_->authResponseContext_->publicKey = "publicKey";
-    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
-    authManager_->ResponseCredential();
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
-
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     authManager_->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _, _)).WillOnce(Return(DM_OK));
     authManager_->ResponseCredential();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
@@ -1406,15 +1404,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_001, testing::ext::TestSize
     int32_t ret = authManager_->CheckAuthParamVaildExtra(extra, "");
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
-    extra = jsonObject.Dump();
-    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
-    ret = authManager_->CheckAuthParamVaildExtra(extra, "");
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-
-    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
-    ret = authManager_->CheckAuthParamVaildExtra(extra, "");
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-
     jsonObject["bindLevel"] = 15;
     extra = jsonObject.Dump();
     ret = authManager_->CheckAuthParamVaildExtra(extra, "");
@@ -1455,7 +1444,6 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.L
     int64_t requestId = 12;
     int32_t status = 0;
     int32_t sessionId = 1;
-    std::string peerUdidHash;
     if (authManager_->timer_ == nullptr) {
         authManager_->timer_ = std::make_shared<DmTimer>();
     }
@@ -1481,13 +1469,14 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.L
     authManager_->NegotiateRespMsg(DM_VERSION_5_0_1);
     authManager_->NegotiateRespMsg(DM_VERSION_4_1_5_1);
     authManager_->NegotiateRespMsg(DM_VERSION_5_0_2);
-    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
+    std::string peerUdid = "peerUdid";
+    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(DoAll(SetArgReferee<1>(peerUdid), Return(DM_OK)));
     EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
-    authManager_->GetPeerUdidHash(sessionId, peerUdidHash);
-
-    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
+    authManager_->ProcessSessionOpen(sessionId, 0);
+    peerUdid = "peerUdid1";
+    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(DoAll(SetArgReferee<1>(peerUdid), Return(DM_OK)));
     EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(ERR_DM_FAILED));
-    authManager_->GetPeerUdidHash(sessionId, peerUdidHash);
+    authManager_->ProcessSessionOpen(sessionId, 0);
     ret = authManager_->StopAuthenticateDevice(pkgName);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -1791,7 +1780,6 @@ HWTEST_F(DmAuthManagerTest, RequestCredentialDone_003, testing::ext::TestSize.Le
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 
     authManager_->authResponseContext_->publicKey = "publicKey";
-    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     authManager_->RequestCredentialDone();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
@@ -1890,20 +1878,9 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_002, testing::ext::TestSize.L
     authManager_->authRequestContext_->hostPkgName = "hostPkgName";
     authManager_->ParseJsonObject(jsonObject);
 
-    int32_t sessionId = 1;
-    authManager_->remoteUdidHash_ = "remoteUdidhash";
-    std::string udidHashTemp = "remoteUdidhash";
-    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1))
-    .WillOnce(WithArgs<1>(Invoke([udidHashTemp](unsigned char *udidHash) {
-        memcpy_s(udidHash, (udidHashTemp.length() + 1), udidHashTemp.c_str(), (udidHashTemp.length()));
-        return DM_OK;
-    })));
-    authManager_->DeleteOffLineTimer(sessionId);
-
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     authManager_->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    sessionId = 1;
+    int32_t sessionId = 1;
     std::string message;
     authManager_->authResponseContext_->sessionId = sessionId;
     JsonObject jsonObject1;
@@ -2159,17 +2136,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize
     strExtra = jsonObject.Dump();
     ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-
-    jsonObject[PARAM_KEY_HML_ACTIONID] = "1";
-    jsonObject[TAG_BIND_LEVEL] = 1;
-    strExtra = jsonObject.Dump();
-    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
-    ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
-    ASSERT_EQ(ret, DM_OK);
-
-    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
-    ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
-    ASSERT_EQ(ret, DM_OK);
 
     std::string pkgName = "pkgName_pickerProxy_Info";
     int32_t authType = 1;

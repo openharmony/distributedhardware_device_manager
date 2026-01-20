@@ -919,7 +919,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_001, testing::ext::TestSize
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
-    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOffline(devState, devInfo, true);
     EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
 }
 
@@ -936,7 +936,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_002, testing::ext::TestSize
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
-    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOffline(devState, devInfo, true);
     EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
 }
 
@@ -951,7 +951,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_001, testing::ext::TestSize.
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
-    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOffline(devState, devInfo, true);
     EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
 }
 
@@ -968,7 +968,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_002, testing::ext::TestSize.
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
-    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOffline(devState, devInfo, true);
     EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
 }
 
@@ -984,7 +984,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceStatusChange_001, testing::ex
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     deviceManagerServiceImpl_->deviceStateMgr_ = nullptr;
-    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
+    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo, true);
     EXPECT_EQ(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }
 
@@ -999,7 +999,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceStatusChange_002, testing::ex
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
-    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
+    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo, true);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }
 
@@ -1014,7 +1014,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceStatusChange_003, testing::ex
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
-    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
+    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo, true);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }
 
@@ -1030,10 +1030,10 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceStatusChange_004, testing::ex
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
+    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo, true);
 
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
-    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
+    deviceManagerServiceImpl_->HandleDeviceStatusChange(devState, devInfo, true);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }
 
@@ -1346,19 +1346,6 @@ HWTEST_F(DeviceManagerServiceImplTest, GetAppTrustDeviceIdList_003, testing::ext
     }
     auto ret = deviceManagerServiceImpl_->GetAppTrustDeviceIdList(pkgname);
     EXPECT_EQ(ret.empty(), true);
-}
-
-/**
- * @tc.name: LoadHardwareFwkService_001
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, LoadHardwareFwkService_001, testing::ext::TestSize.Level1)
-{
-    if (deviceManagerServiceImpl_ == nullptr) {
-        deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
-    }
-    deviceManagerServiceImpl_->LoadHardwareFwkService();
-    EXPECT_NE(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
 }
 
 /**
@@ -1719,38 +1706,38 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_003, testing::ext::TestSize.
     strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, testID.c_str());
     devInfo.networkId[sizeof(devInfo.networkId) - 1] = '\0';
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOnline(devState, devInfo, true);
 
     deviceManagerServiceImpl_->isCredentialType_.store(true);
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(INVALIED_TYPE));
-    deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOnline(devState, devInfo, true);
 
     deviceManagerServiceImpl_->isCredentialType_.store(false);
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(IDENTICAL_ACCOUNT_TYPE));
-    deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOnline(devState, devInfo, true);
 
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(DEVICE_PEER_TO_PEER_TYPE));
-    deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOnline(devState, devInfo, true);
 
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(DEVICE_ACROSS_ACCOUNT_TYPE));
-    deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOnline(devState, devInfo, true);
 
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(SHARE_TYPE));
-    deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOnline(devState, devInfo, true);
 
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(APP_PEER_TO_PEER_TYPE));
-    deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOnline(devState, devInfo, true);
 
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(APP_ACROSS_ACCOUNT_TYPE));
-    deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOnline(devState, devInfo, true);
     EXPECT_NE(deviceManagerServiceImpl_->softbusConnector_, nullptr);
 }
 
@@ -1764,7 +1751,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_003, testing::ext::TestSize
         deviceManagerServiceImpl_->Initialize(listener_);
     }
     EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return(""));
-    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOffline(devState, devInfo, true);
 
     std::map<int32_t, int32_t> userIdAndBindLevel;
     userIdAndBindLevel[1] = INVALIED_TYPE;
@@ -1775,7 +1762,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_003, testing::ext::TestSize
     EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return("123456"));
     EXPECT_CALL(*deviceProfileConnectorMock_, GetUserIdAndBindLevel(_, _)).WillOnce(Return(userIdAndBindLevel));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(SHARE_TYPE));
-    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
+    deviceManagerServiceImpl_->HandleOffline(devState, devInfo, true);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }
 

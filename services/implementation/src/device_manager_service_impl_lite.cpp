@@ -109,13 +109,15 @@ int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t
     return DM_OK;
 }
 
-void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
+void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
+    const bool isOnline)
 {
     if (deviceStateMgr_ == nullptr || softbusConnector_ == nullptr) {
         LOGE("deviceStateMgr_ or softbusConnector_ is nullpter!");
         return;
     }
-    std::string deviceId = GetUdidHashByNetworkId(devInfo.networkId);
+    std::string peerUdid = "";
+    std::string deviceId = GetUdidHashByNetworkId(devInfo.networkId, peerUdid);
     if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
         LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceId).c_str());
         return;
@@ -126,23 +128,22 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
     } else {
         processInfoVec = softbusConnector_->GetProcessInfo();
     }
-    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec);
+    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, peerUdid, isOnline);
     return;
 }
 
-std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &networkId)
+std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &networkId, std::string &peerUdid)
 {
     if (softbusConnector_ == nullptr) {
         LOGE("softbusConnector_ is nullpter!");
         return "";
     }
-    std::string udid = "";
-    int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId.c_str(), udid);
+    int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId.c_str(), peerUdid);
     if (ret != DM_OK) {
         LOGE("GetUdidByNetworkId failed ret: %{public}d", ret);
         return "";
     }
-    return softbusConnector_->GetDeviceUdidHashByUdid(udid);
+    return softbusConnector_->GetDeviceUdidHashByUdid(peerUdid);
 }
 
 int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)
@@ -396,11 +397,6 @@ std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrus
     return tmp;
 }
 
-void DeviceManagerServiceImpl::LoadHardwareFwkService()
-{
-    return;
-}
-
 int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
 {
     (void)udid;
@@ -612,6 +608,18 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
     return;
 }
 
+void DeviceManagerServiceImpl::DeleteAlwaysAllowTimeOut()
+{
+    return;
+}
+
+void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId)
+{
+    (void)remoteUdid;
+    (void)remoteUserId;
+    return;
+}
+
 void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId,
     const std::string &localUdid)
 {
@@ -663,24 +671,17 @@ int32_t DeviceManagerServiceImpl::RegisterAuthenticationType(int32_t authenticat
     return DM_OK;
 }
 
-void DeviceManagerServiceImpl::DeleteAlwaysAllowTimeOut()
-{
-    return;
-}
-
-void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId)
-{
-    (void)remoteUdid;
-    (void)remoteUserId;
-    return;
-}
-
 int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &localUdid,
     const std::string &peerDeviceId)
 {
     (void)localUdid;
     (void)peerDeviceId;
     return DM_OK;
+}
+
+void DeviceManagerServiceImpl::GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList)
+{
+    (void)deviceList;
 }
 
 int32_t DeviceManagerServiceImpl::BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
@@ -697,11 +698,6 @@ int32_t DeviceManagerServiceImpl::UnbindServiceTarget(const std::string &pkgName
     (void)pkgName;
     (void)serviceId;
     return DM_OK;
-}
-
-void DeviceManagerServiceImpl::GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList)
-{
-    (void)deviceList;
 }
 
 void DeviceManagerServiceImpl::HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
@@ -771,12 +767,12 @@ void DeviceManagerServiceImpl::DeleteHoDevice(const std::string &peerUdid,
     return;
 }
 
-void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &deviceUdid,
-    const std::string &deviceUdidHash, int32_t userId)
+void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &peerUdid, int32_t peerUserId,
+    int32_t localUserId)
 {
-    (void)deviceUdid;
-    (void)deviceUdidHash;
-    (void)userId;
+    (void)peerUdid;
+    (void)peerUserId;
+    (void)localUserId;
 }
 
 int32_t DeviceManagerServiceImpl::LeaveLNN(const std::string &pkgName, const std::string &networkId)

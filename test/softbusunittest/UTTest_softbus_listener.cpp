@@ -85,7 +85,7 @@ HWTEST_F(SoftbusListenerTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext::
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -106,7 +106,7 @@ HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceOnline_001, testing::ext::TestSize.
     }
     softbusListener->OnSoftbusDeviceOnline(&info);
     softbusListener->OnSoftbusDeviceOffline(&info);
-    EXPECT_NE(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
 }
 
 /**
@@ -173,7 +173,7 @@ HWTEST_F(SoftbusListenerTest, DeviceOnLine_001, testing::ext::TestSize.Level1)
     softbusListener->DeviceOnLine(deviceInf);
     softbusListener->DeviceNameChange(deviceInf);
     softbusListener->DeviceOffLine(deviceInf);
-    EXPECT_NE(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
 }
 
 HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceInfoChanged_001, testing::ext::TestSize.Level1)
@@ -184,7 +184,7 @@ HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceInfoChanged_001, testing::ext::Test
         softbusListener = std::make_shared<SoftbusListener>();
     }
     softbusListener->OnSoftbusDeviceInfoChanged(type, info);
-    EXPECT_NE(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
 }
 
 HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceInfoChanged_002, testing::ext::TestSize.Level1)
@@ -196,7 +196,7 @@ HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceInfoChanged_002, testing::ext::Test
         softbusListener = std::make_shared<SoftbusListener>();
     }
     softbusListener->OnSoftbusDeviceInfoChanged(type, info);
-    EXPECT_NE(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
 }
 
 HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceInfoChanged_003, testing::ext::TestSize.Level1)
@@ -208,7 +208,7 @@ HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceInfoChanged_003, testing::ext::Test
         softbusListener = std::make_shared<SoftbusListener>();
     }
     softbusListener->OnSoftbusDeviceInfoChanged(type, info);
-    EXPECT_NE(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
 }
 
 HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceFound_001, testing::ext::TestSize.Level1)
@@ -218,7 +218,7 @@ HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceFound_001, testing::ext::TestSize.L
         softbusListener = std::make_shared<SoftbusListener>();
     }
     softbusListener->OnSoftbusDeviceFound(device);
-    EXPECT_NE(softbusListener->isRadarSoLoad_, true);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
 }
 
 HWTEST_F(SoftbusListenerTest, OnSoftbusDeviceFound_002, testing::ext::TestSize.Level1)

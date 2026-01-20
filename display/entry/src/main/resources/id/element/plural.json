@@ -7,7 +7,7 @@
                     "quantity":"other",
                     "value":"Salah. Tersisa %d kesempatan.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
@@ -19,7 +19,7 @@
                     "quantity":"other",
                     "value":"Jangan percayai (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

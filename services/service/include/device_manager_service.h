@@ -115,7 +115,7 @@ public:
 
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 
-    void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
+    void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline);
 
     int OnSessionOpened(int sessionId, int result);
 
@@ -155,8 +155,6 @@ public:
     int32_t NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event);
 
     int32_t CheckApiPermission(int32_t permissionLevel);
-
-    void LoadHardwareFwkService();
 
     int32_t GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId, std::string &uuid);
 

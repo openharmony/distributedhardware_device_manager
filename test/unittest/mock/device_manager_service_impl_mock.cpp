@@ -67,6 +67,7 @@ int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const
 {
     return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->UnBindDevice(pkgName, udid, bindLevel, extra);
 }
+
 bool DeviceManagerServiceImpl::CheckSharePeerSrc(const std::string &peerUdid, const std::string &localUdid)
 {
     return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->CheckSharePeerSrc(peerUdid, localUdid);
@@ -132,6 +133,13 @@ int32_t DeviceManagerServiceImpl::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_
 int32_t DeviceManagerServiceImpl::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
 {
     return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->ImportAuthInfo(dmAuthInfo);
+}
+
+void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &peerUdid, int32_t peerUserId,
+    int32_t localUserId)
+{
+    DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->InitTaskOfDelTimeOutAcl(peerUdid,
+        peerUserId, localUserId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -129,7 +129,7 @@ void HiChainConnectorFuzzTest(FuzzedDataProvider &fdp)
     hichainConnector->GetConnectPara(deviceId, reqDeviceId);
     hichainConnector->IsDevicesInP2PGroup(hostDevice, reqDeviceId);
     hichainConnector->SyncGroups(deviceId, remoteGroupIdList);
-    hichainConnector->DeleteTimeOutGroup(deviceId.data());
+    hichainConnector->DeleteTimeOutGroup(deviceId.data(), delUserid);
     hichainConnector->getRegisterInfo(queryParams, jsonStr);
     hichainConnector->GetGroupId(userId, groupType, queryParams);
     hichainConnector->addMultiMembers(groupType, userId, jsonDeviceList);

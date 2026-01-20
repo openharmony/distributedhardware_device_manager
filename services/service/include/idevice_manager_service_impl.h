@@ -74,7 +74,7 @@ public:
      * @tc.desc: Handle Device Status Event to the device manager service impl
      * @tc.type: FUNC
      */
-    virtual void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo) = 0;
+    virtual void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline) = 0;
     /**
      * @tc.name: IDeviceManagerServiceImpl::OnSessionOpened
      * @tc.desc: Send Session Opened event to the device manager service impl
@@ -198,13 +198,6 @@ public:
         const std::map<std::string, std::string> &bindParam) = 0;
 
     /**
-     * @tc.name: IDeviceManagerServiceImpl::LoadHardwareFwkService
-     * @tc.desc: LoadHardwareFwkService
-     * @tc.type: FUNC
-     */
-    virtual void LoadHardwareFwkService() = 0;
-
-    /**
      * @tc.name: IDeviceManagerServiceImpl::RegisterUiStateCallback
      * @tc.desc: RegisterUiStateCallback
      * @tc.type: FUNC
@@ -220,6 +213,8 @@ public:
 
     virtual std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname) = 0;
     virtual int32_t DpAclAdd(const std::string &udid) = 0;
+    virtual void DeleteAlwaysAllowTimeOut() = 0;
+    virtual void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId) = 0;
     virtual int32_t IsSameAccount(const std::string &udid) = 0;
     virtual uint64_t GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId) = 0;
     virtual void ScreenCommonEventCallback(std::string commonEventType) = 0;
@@ -265,8 +260,6 @@ public:
     virtual void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
         const std::string &localUdid, int32_t localUserId, const std::string &localAccountId) = 0;
     virtual int32_t RegisterAuthenticationType(int32_t authenticationType) = 0;
-    virtual void DeleteAlwaysAllowTimeOut() = 0;
-    virtual void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId) = 0;
     virtual void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
         std::string &remoteUdid, bool &isSendBroadCast) = 0;
     virtual void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId,
@@ -289,8 +282,7 @@ public:
     virtual int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam) = 0;
     virtual int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId) = 0;
-    virtual void InitTaskOfDelTimeOutAcl(const std::string &deviceUdid,
-        const std::string &deviceUdidHash, int32_t userId) = 0;
+    virtual void InitTaskOfDelTimeOutAcl(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId) = 0;
     virtual void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList) = 0;
     virtual int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId) = 0;
     virtual int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength) = 0;

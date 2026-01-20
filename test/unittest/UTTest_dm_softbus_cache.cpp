@@ -271,6 +271,29 @@ HWTEST_F(DMSoftbusCacheTest, GetUdidFromCache_001, testing::ext::TestSize.Level1
     EXPECT_NE(SoftbusCache::GetInstance().GetUdidFromCache("test", udid), DM_OK);
     SoftbusCache::GetInstance().DeleteDeviceInfo();
 }
+
+HWTEST_F(DMSoftbusCacheTest, GetDeviceInfoByDeviceId_001, testing::ext::TestSize.Level1)
+{
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+    DmDeviceInfo deviceInfo = {
+        .deviceId = "deviceIdTest",
+        .deviceName = "deviceNameTest",
+        .deviceTypeId = 1,
+        .networkId = "networkidTest"
+    };
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceInfosMutex_);
+        SoftbusCache::GetInstance().deviceInfo_["udidTest"] =
+            std::pair<std::string, DmDeviceInfo>("uuidTest", deviceInfo);
+    }
+    std::string deviceId = "udidTest";
+    std::string uuid = "";
+    DmDeviceInfo devInfo;
+    EXPECT_EQ(SoftbusCache::GetInstance().GetDeviceInfoByDeviceId(deviceId, uuid, devInfo), true);
+    EXPECT_EQ(uuid, "uuidTest");
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

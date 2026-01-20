@@ -14,7 +14,7 @@
                     "quantity":"other",
                     "value":"Incorrect. %d attempts remaining.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
@@ -26,14 +26,14 @@
                     "quantity":"other",
                     "value":"Don't trust (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
                     "quantity":"one",
                     "value":"Don't trust (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

@@ -485,10 +485,12 @@ bool IsJsonValIntegerString(const JsonItemObject &jsonObj, const std::string &ke
 std::string GetAnonyJsonString(const std::string &value)
 {
     if (value.empty()) {
+        LOGE("Str is empty.");
         return "";
     }
     JsonObject paramJson(value);
     if (paramJson.IsDiscarded()) {
+        LOGE("Str is not json string.");
         return "";
     }
     const std::set<std::string> sensitiveKey = { "LOCALDEVICEID", "localAccountId", "networkId", "lnnPublicKey",

@@ -23,6 +23,7 @@
 #include "deviceprofile_connector.h"
 #include "distributed_device_profile_client_mock.h"
 #include "deviceprofile_connector_mock.h"
+#include "multiple_user_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -37,6 +38,8 @@ public:
     static inline std::shared_ptr<DistributedDeviceProfile::DistributedDeviceProfileClientMock>
         distributedDeviceProfileClientMock_ =
         std::make_shared<DistributedDeviceProfile::DistributedDeviceProfileClientMock>();
+    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
+        std::make_shared<MultipleUserConnectorMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -196,7 +196,7 @@ int32_t DeviceManagerServiceListener::FillUdidAndUuidToDeviceInfo(const std::str
 }
 
 void DeviceManagerServiceListener::ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
-    const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo)
+    const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo, const bool isOnline)
 {
     std::vector<ProcessInfo> processInfoVec = GetNotifyProcessInfoByUserId(processInfo.userId,
         DmCommonNotifyEvent::REG_DEVICE_STATE);
@@ -216,8 +216,8 @@ void DeviceManagerServiceListener::ProcessDeviceStateChange(const ProcessInfo &p
             ProcessDeviceOnline(lpProcessInfoVec, processInfo, state, info, deviceBasicInfo);
             break;
         case static_cast<int32_t>(DmDeviceState::DEVICE_STATE_OFFLINE):
-            ProcessDeviceOffline(lpProcessInfoVec, processInfo, state, info, deviceBasicInfo);
-            ProcessDeviceOffline(hpProcessInfoVec, processInfo, state, info, deviceBasicInfo);
+            ProcessDeviceOffline(lpProcessInfoVec, processInfo, state, info, deviceBasicInfo, isOnline);
+            ProcessDeviceOffline(hpProcessInfoVec, processInfo, state, info, deviceBasicInfo, isOnline);
             break;
         case static_cast<int32_t>(DmDeviceState::DEVICE_INFO_READY):
         case static_cast<int32_t>(DmDeviceState::DEVICE_INFO_CHANGED):
@@ -230,7 +230,7 @@ void DeviceManagerServiceListener::ProcessDeviceStateChange(const ProcessInfo &p
 }
 
 void DeviceManagerServiceListener::ProcessAppStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
-    const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo)
+    const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo, const bool isOnline)
 {
     LOGI("In");
     std::vector<ProcessInfo> processInfoVec = GetWhiteListSAProcessInfo(DmCommonNotifyEvent::REG_DEVICE_STATE);
@@ -241,7 +241,7 @@ void DeviceManagerServiceListener::ProcessAppStateChange(const ProcessInfo &proc
             ProcessAppOnline(processInfoVec, processInfo, state, info, deviceBasicInfo);
             break;
         case static_cast<int32_t>(DmDeviceState::DEVICE_STATE_OFFLINE):
-            ProcessAppOffline(processInfoVec, processInfo, state, info, deviceBasicInfo);
+            ProcessAppOffline(processInfoVec, processInfo, state, info, deviceBasicInfo, isOnline);
             break;
         case static_cast<int32_t>(DmDeviceState::DEVICE_INFO_READY):
         case static_cast<int32_t>(DmDeviceState::DEVICE_INFO_CHANGED):
@@ -253,14 +253,14 @@ void DeviceManagerServiceListener::ProcessAppStateChange(const ProcessInfo &proc
 }
 
 void DeviceManagerServiceListener::OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
-                                                       const DmDeviceInfo &info)
+                                                       const DmDeviceInfo &info, const bool isOnline)
 {
     DmDeviceBasicInfo deviceBasicInfo;
     ConvertDeviceInfoToDeviceBasicInfo(processInfo.pkgName, info, deviceBasicInfo);
     if (processInfo.pkgName == std::string(DM_PKG_NAME)) {
-        ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo);
+        ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
     } else {
-        ProcessAppStateChange(processInfo, state, info, deviceBasicInfo);
+        ProcessAppStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     KVAdapterManager::GetInstance().DeleteAgedEntry();
@@ -789,7 +789,7 @@ void DeviceManagerServiceListener::ProcessDeviceOnline(const std::vector<Process
 
 void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<ProcessInfo> &procInfoVec,
     const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
-    const DmDeviceBasicInfo &deviceBasicInfo)
+    const DmDeviceBasicInfo &deviceBasicInfo, const bool isOnline)
 {
     LOGI("userId %{public}d, state %{public}d, udidhash %{public}s.", processInfo.userId, static_cast<int32_t>(state),
         GetAnonyString(info.deviceId).c_str());
@@ -797,7 +797,6 @@ void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<Proces
     std::vector<ProcessInfo> whiteListVec = GetWhiteListSAProcessInfo(DmCommonNotifyEvent::REG_DEVICE_STATE);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-    bool isOnline = SoftbusCache::GetInstance().CheckIsOnline(std::string(info.deviceId));
     for (const auto &it : procInfoVec) {
         if (isOnline && find(whiteListVec.begin(), whiteListVec.end(), it) != whiteListVec.end()) {
             continue;
@@ -880,14 +879,14 @@ void DeviceManagerServiceListener::ProcessAppOnline(std::vector<ProcessInfo> &pr
 
 void DeviceManagerServiceListener::ProcessAppOffline(std::vector<ProcessInfo> &procInfoVec,
     const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
-    const DmDeviceBasicInfo &deviceBasicInfo)
+    const DmDeviceBasicInfo &deviceBasicInfo, const bool isOnline)
 {
     LOGI("userId %{public}d, state %{public}d, udidhash %{public}s.", processInfo.userId, static_cast<int32_t>(state),
         GetAnonyString(info.deviceId).c_str());
     RemoveNotExistProcess();
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-    if (SoftbusCache::GetInstance().CheckIsOnline(std::string(info.deviceId))) {
+    if (isOnline) {
         procInfoVec.clear();
     }
     SetNeedNotifyProcessInfos(processInfo, procInfoVec);

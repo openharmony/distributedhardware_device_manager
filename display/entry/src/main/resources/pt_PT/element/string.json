@@ -4,21 +4,21 @@
             "name":"dm_connect_code",
             "value":"Código de ligação",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_hap",
             "value":"A aplicação %1$s no %2$s pretende aceder a este dispositivo. Confiar nesta aplicação?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_cancel",
             "value":"Cancelar",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -32,7 +32,7 @@
             "name":"dm_confirm_intention",
             "value":"Para a sincronização e colaboração de dados entre dispositivos.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {

@@ -162,7 +162,7 @@ void SoftbusListener::DeviceOnLine(DmDeviceInfo deviceInfo)
 #endif
     LOGI("received device online deviceId: %{public}s, networkId: %{public}s.",
         GetAnonyString(deviceInfo.deviceId).c_str(), GetAnonyString(deviceInfo.networkId).c_str());
-    DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_ONLINE, deviceInfo);
+    DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_ONLINE, deviceInfo, true);
 }
 
 void SoftbusListener::DeviceOffLine(DmDeviceInfo deviceInfo)
@@ -172,7 +172,7 @@ void SoftbusListener::DeviceOffLine(DmDeviceInfo deviceInfo)
 #else
     std::lock_guard<std::mutex> lock(g_lockDeviceOffLine);
 #endif
-    DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_OFFLINE, deviceInfo);
+    DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_OFFLINE, deviceInfo, false);
 }
 
 void SoftbusListener::DeviceNameChange(DmDeviceInfo deviceInfo)
@@ -182,7 +182,7 @@ void SoftbusListener::DeviceNameChange(DmDeviceInfo deviceInfo)
 #else
     std::lock_guard<std::mutex> lock(g_lockDevInfoChange);
 #endif
-    DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_INFO_CHANGED, deviceInfo);
+    DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_INFO_CHANGED, deviceInfo, true);
 }
 
 void SoftbusListener::DeviceNotTrust(const std::string &msg)
@@ -564,7 +564,7 @@ void SoftbusListener::OnLocalDevInfoChange()
         LOGE("GetUdidByNetworkId failed, not update deviceName ret: %{public}d.", ret);
         return;
     }
-    DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, nodeBasicInfo.deviceName);
+    DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, nodeBasicInfo.deviceName, true);
 #endif
 }
 

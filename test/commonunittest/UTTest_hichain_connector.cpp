@@ -1064,8 +1064,9 @@ HWTEST_F(HichainConnectorTest, DeleteGroupExt_001, testing::ext::TestSize.Level1
 HWTEST_F(HichainConnectorTest, DeleteTimeOutGroup_001, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "13245631";
+    int32_t localUserId = 0;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    int ret = hiChainConnector->DeleteTimeOutGroup(deviceId.c_str());
+    int ret = hiChainConnector->DeleteTimeOutGroup(deviceId, localUserId);
     EXPECT_EQ(ret, DM_OK);
 }
 

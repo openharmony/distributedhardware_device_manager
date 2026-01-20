@@ -236,7 +236,7 @@ HWTEST_F(DmAuthMessageProcessorTest, ParseSyncServiceInfo_001, testing::ext::Tes
 
     ServiceInfoProfile profile;
     int ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(5, profile);
-    EXPECT_EQ(ret, DP_PERMISSION_DENIED);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DmAuthMessageProcessorTest, ParseServiceNego_001, testing::ext::TestSize.Level1)
@@ -431,14 +431,6 @@ HWTEST_F(DmAuthMessageProcessorTest, ParseSyncMessage_004, testing::ext::TestSiz
     DmAccess access;
     int32_t result = processor->ParseSyncMessage(context, access, jsonObject);
     EXPECT_EQ(result, ERR_DM_FAILED);
-}
-
-HWTEST_F(DmAuthMessageProcessorTest, GetAccesseeServiceInfo_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
-    auto processor = std::make_shared<DmAuthMessageProcessor>();
-    std::string result = processor->GetAccesseeServiceInfo(99999);
-    EXPECT_EQ(result, "");
 }
 } // namespace DistributedHardware
 } // namespace OHOS

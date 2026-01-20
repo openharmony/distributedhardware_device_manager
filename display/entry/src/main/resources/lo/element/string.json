@@ -39,21 +39,21 @@
             "name":"dm_connect_code",
             "value":"ລະ​ຫັດ​ການ​ເຊື່ອມ​ຕໍ່",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_hap",
             "value":"%1$s ໃນ %2$s ຕ້ອງ​ການ​ເຂົ້າ​ເຖິງ​ອຸ​ປະ​ກອນ​ນີ້. ເຊື່ອໝັ້ນແອັບນີ້ບໍ?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_cancel",
             "value":"ຍົກເລີກ",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -102,7 +102,7 @@
             "name":"dm_confirm_intention",
             "value":"ສິ່ງ​ນີ້​ຈຳ​ເປັນ​ສຳ​ລັບ​ການ​ຊິງ​ຄ໌​ຂໍ້​ມູນ ແລະ ການ​ໃຊ້​ຮ່ວມ​ກັນ​ຂ້າມ​ອຸ​ປະ​ກອນ.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {

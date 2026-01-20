@@ -23,14 +23,15 @@
 #include <string>
 #include <thread>
 
-#include "idevice_manager_service_listener.h"
-#include "softbus_connector.h"
 #include "dm_timer.h"
-#include "hichain_connector.h"
 #include "hichain_auth_connector.h"
+#include "hichain_connector.h"
+#include "idevice_manager_service_listener.h"
 #include "multiple_user_connector.h"
+#include "softbus_connector.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "deviceprofile_connector.h"
+#include "ffrt.h"
 #endif
 
 namespace OHOS {
@@ -38,7 +39,9 @@ namespace DistributedHardware {
 #define OFFLINE_TIMEOUT 300
 struct StateTimerInfo {
     std::string timerName;
-    std::string networkId;
+    std::string peerUdid;
+    int32_t peerUserId;
+    int32_t localUserId;
     bool isStart;
 };
 
@@ -84,23 +87,19 @@ public:
     void SaveOnlineDeviceInfo(const DmDeviceInfo &info);
     void DeleteOfflineDeviceInfo(const DmDeviceInfo &info);
     void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
-        std::vector<ProcessInfo> &processInfoVec);
+        std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid, const bool isOnline);
     void OnDbReady(const std::string &pkgName, const std::string &uuid);
-    void RegisterOffLineTimer(const DmDeviceInfo &deviceInfo);
-    void StartOffLineTimer(const DmDeviceInfo &deviceInfo);
-    void DeleteTimeOutGroup(const std::string &name);
     void ChangeDeviceInfo(const DmDeviceInfo &info);
     int32_t RegisterSoftbusStateCallback();
     void OnDeviceOnline(std::string deviceId, int32_t authForm);
     void OnDeviceOffline(std::string deviceId);
     std::string GetUdidByNetWorkId(std::string networkId);
     bool CheckIsOnline(const std::string &udid);
-    void DeleteOffLineTimer(std::string udidHash);
+    void DeleteOffLineTimer(const std::string &peerUdid);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo, std::vector<ProcessInfo> &processInfos);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
+    void StartDelTimerByDP(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId);
 #endif
-    void StartDelTimerByDP(const std::string &deviceUdid, const std::string &deviceUdidHash, int32_t userId);
 private:
     void StartEventThread();
     void StopEventThread();
@@ -109,22 +108,28 @@ private:
     void RunTask(const std::shared_ptr<NotifyEvent> &task);
     DmAuthForm GetAuthForm(const std::string &networkId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    int32_t DeleteGroupByDP(const std::string &deviceId);
-    void DeleteCredential(DmOfflineParam offlineParam, const std::string &deviceId);
+    void RegisterOffLineTimer(const DmDeviceInfo &deviceInfo);
+    void StartOffLineTimer(const std::string &peerUdid);
+    void DeleteTimeOutGroup(const std::string &timerName);
+    int32_t DeleteGroupByDP(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId);
+    void DeleteCredential(const DmOfflineParam &offlineParam, const std::string &peerUdid, int32_t localUserId);
+    int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
+    void DeleteCredential(const DmAclIdParam &acl);
 #endif
     void ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
-        std::vector<ProcessInfo> &processInfoVec);
+        std::vector<ProcessInfo> &processInfoVec, const bool isOnline);
 private:
-    std::mutex timerMapMutex_;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::mutex timerMapMutex_;
+    ffrt::mutex remoteDeviceInfosMutex_;
+#else
     std::mutex remoteDeviceInfosMutex_;
+#endif
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::map<std::string, DmDeviceInfo> remoteDeviceInfos_;
     std::map<std::string, DmDeviceInfo> stateDeviceInfos_;
-    // key is udidhash + "_" + userId
     std::map<std::string, StateTimerInfo> stateTimerInfoMap_;
-    // key is udidhash + "_" + userId
-    std::map<std::string, std::string> udidhashAndUserId2udidMap_;
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;

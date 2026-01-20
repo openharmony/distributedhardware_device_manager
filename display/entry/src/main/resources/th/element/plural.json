@@ -7,7 +7,7 @@
                     "quantity":"other",
                     "value":"ไม่ถูกต้อง ลองได้อีก %d ครั้ง",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
@@ -19,7 +19,7 @@
                     "quantity":"other",
                     "value":"ไม่เชื่อถือ (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

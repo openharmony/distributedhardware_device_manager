@@ -93,7 +93,7 @@ DM_EXPORT void AppManager::RegisterCallerAppId(const std::string &pkgName, const
     }
     std::string appId = GetAppId();
     if (appId.empty()) {
-        LOGD("PkgName %{public}s get appid failed.", pkgName.c_str());
+        LOGE("PkgName %{public}s get appid failed.", pkgName.c_str());
         return;
     }
     LOGI("PkgName %{public}s, userId %{public}d, appId %{public}s.",

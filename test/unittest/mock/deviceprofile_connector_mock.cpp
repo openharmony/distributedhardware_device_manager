@@ -227,5 +227,57 @@ int32_t DeviceProfileConnector::GetServiceInfoProfileByRegServiceId(int32_t regS
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfoProfileByRegServiceId(regSerId, serInfo);
 }
+
+int32_t DeviceProfileConnector::GetAclListHashStr(const DevUserInfo &localDevUserInfo,
+    const DevUserInfo &remoteDevUserInfo, std::string &aclListHash, std::string dmVersion)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetAclListHashStr(localDevUserInfo,
+        remoteDevUserInfo, aclListHash, dmVersion);
+}
+
+void DeviceProfileConnector::DeleteDpInvalidAcl()
+{
+    DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteDpInvalidAcl();
+}
+
+bool DeviceProfileConnector::AuthOnceAclIsActive(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->AuthOnceAclIsActive(peerUdid, peerUserId, localUserId);
+}
+
+uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId,
+    DmOfflineParam &offlineParam)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteTimeOutAcl(peerUdid, peerUserId, localUserId,
+        offlineParam);
+}
+
+int32_t DeviceProfileConnector::GetAllAuthOnceAclInfos(std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> &acls)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetAllAuthOnceAclInfos(acls);
+}
+
+std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> DeviceProfileConnector::GetAuthOnceAclInfos(
+    const std::string &peerUdid)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetAuthOnceAclInfos(peerUdid);
+}
+
+std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfileConnector::GetAccessControlProfileByUserId(
+    int32_t userId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetAccessControlProfileByUserId(userId);
+}
+
+std::unordered_set<int32_t> DeviceProfileConnector::GetActiveAuthOncePeerUserId(const std::string &peerUdid,
+    int32_t localUserId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetActiveAuthOncePeerUserId(peerUdid, localUserId);
+}
+
+bool DeviceProfileConnector::CheckAccessControlProfileByTokenId(int32_t tokenId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->CheckAccessControlProfileByTokenId(tokenId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -237,6 +237,7 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
         LOGE("DmAuthManager::ProcRespNegotiate5_1_0 fail to get all id.");
         return ret;
     }
+    DeleteInvalidCredAndAcl(context);
     JsonObject credInfo;
     GetSinkCredentialInfo(context, credInfo);
     JsonObject aclTypeJson;
@@ -416,14 +417,7 @@ void AuthSinkNegotiateStateMachine::GetSinkCredTypeForP2P(std::shared_ptr<DmAuth
     int32_t credType, std::vector<std::string> &deleteCredInfo)
 {
     CHECK_NULL_VOID(context);
-    if (!aclInfo.Contains("pointTopointAcl") ||
-        (context->accessee.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeCredentialIdStr() !=
-        credObj[FILED_CRED_ID].Get<std::string>() &&
-        context->accessee.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserCredentialIdStr() !=
-        credObj[FILED_CRED_ID].Get<std::string>())) {
-        deleteCredInfo.push_back(credObj[FILED_CRED_ID].Get<std::string>());
-        DeleteCredential(context, context->accessee.userId, credObj, context->accessee.aclProfiles[DM_POINT_TO_POINT]);
-    } else {
+    if (aclInfo.Contains("pointTopointAcl")) {
         credTypeJson["pointTopointCredType"] = credType;
         context->accessee.credentialInfos[credType] = credObj.Dump();
     }
@@ -595,14 +589,6 @@ bool AuthSinkNegotiateStateMachine::CheckCredIdInAcl(std::shared_ptr<DmAuthConte
     const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo, uint32_t bindType)
 {
     std::string credId = profile.GetAccessee().GetAccesseeCredentialIdStr();
-    if (!credInfo.Contains(credId)) {
-        credId = profile.GetAccesser().GetAccesserCredentialIdStr();
-        if (!credInfo.Contains(credId)) {
-            LOGE("credInfoJson not contain credId %{public}s.", credId.c_str());
-            DeleteAclAndSk(context, profile);
-            return false;
-        }
-    }
     if (credInfo.Contains(credId) && (!credInfo[credId].IsObject() || !credInfo[credId].Contains(FILED_CRED_TYPE) ||
         !credInfo[credId][FILED_CRED_TYPE].IsNumberInteger())) {
         LOGE("credId %{public}s contain credInfoJson invalid.", credId.c_str());

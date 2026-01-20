@@ -4,7 +4,7 @@
             "name":"dm_connect_code",
             "value":"Codice di connessione",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -18,7 +18,7 @@
             "name":"dm_cancel",
             "value":"Annulla",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {

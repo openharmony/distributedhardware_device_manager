@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,22 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef OHOS_DM_SERVICE_HICHAIN_CONNECTORSERVICE_HICHAIN_CONNECTOR_H
+#define OHOS_DM_SERVICE_HICHAIN_CONNECTORSERVICE_HICHAIN_CONNECTOR_H
 
-#ifndef OHOS_DM_DISTRIBUTEED_HARDWARE_LOAD_H
-#define OHOS_DM_DISTRIBUTEED_HARDWARE_LOAD_H
-#include <cstdint>
-#include "dm_single_instance.h"
+#include <gtest/gtest.h>
+#include <refbase.h>
+#include "device_auth.h"
+#include "dm_service_hichain_connector.h"
+
 namespace OHOS {
 namespace DistributedHardware {
-class DmDistributedHardwareLoad {
-    DM_DECLARE_SINGLE_INSTANCE(DmDistributedHardwareLoad);
+class DmServiceHiChainConnectorTest : public testing::Test {
 public:
-    void LoadDistributedHardwareFwk(void);
-    void InitDistributedHardwareLoadCount(void);
-    uint32_t GetDistributedHardwareLoadCount(void);
-private:
-    uint32_t distributedHardwareLoadCount_;
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    void SetUp();
+    void TearDown();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_PERMISSION_MANAGER_H
+#endif // OHOS_DM_SCREEN_COMMON_EVENT_TEST_H

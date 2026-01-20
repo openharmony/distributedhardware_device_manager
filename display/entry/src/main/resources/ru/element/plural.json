@@ -14,7 +14,7 @@
                     "quantity":"other",
                     "value":"Неверный код. Еще %d попытки.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
@@ -40,7 +40,7 @@
                     "quantity":"other",
                     "value":"Не доверять (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {

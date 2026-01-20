@@ -22,18 +22,19 @@
 #include <string>
 #include <vector>
 
+#include "common_event_support.h"
 #include "device_manager_service.h"
 #include "device_manager_service_listener.h"
 #include "device_manager_service_impl.h"
 #include "dm_single_instance.h"
-#include "common_event_support.h"
-#include "permission_manager_mock.h"
-#include "softbus_listener_mock.h"
 #include "device_manager_service_mock.h"
 #include "device_manager_service_impl_mock.h"
+#include "device_name_manager_mock.h"
 #include "deviceprofile_connector_mock.h"
 #include "distributed_device_profile_client_mock.h"
 #include "multiple_user_connector_mock.h"
+#include "permission_manager_mock.h"
+#include "softbus_listener_mock.h"
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerServiceThreeTest : public testing::Test {
@@ -58,6 +59,8 @@ public:
         std::make_shared<DistributedDeviceProfile::DistributedDeviceProfileClientMock>();
     static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
         std::make_shared<MultipleUserConnectorMock>();
+    static inline std::shared_ptr<DeviceNameManagerMock> deviceNameManagerMock_ =
+        std::make_shared<DeviceNameManagerMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

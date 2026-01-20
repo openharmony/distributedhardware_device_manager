@@ -822,13 +822,24 @@ void SoftbusConnector::HandleDeviceOffline(std::string deviceId)
     return;
 }
 
-void SoftbusConnector::DeleteOffLineTimer(std::string &udidHash)
+void SoftbusConnector::OnSessionOpened(int32_t sessionId, int32_t result)
 {
-    LOGI("start");
-    remoteUdidHash_ = udidHash;
-    if (deviceStateManagerCallback_ != nullptr) {
-        deviceStateManagerCallback_->DeleteOffLineTimer(udidHash);
+    LOGI("SoftbusConnector::OnSessionOpened");
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string peerUdid = "";
+    int32_t ret = softbusSession_->GetPeerDeviceId(sessionId, peerUdid);
+    if (ret != DM_OK) {
+        LOGE("SoftbusConnector::GetPeerUdidHash failed.");
+        return;
     }
+    remoteUdidHash_ = GetDeviceUdidHashByUdid(peerUdid);
+    if (result == 0 && !peerUdid.empty() && deviceStateManagerCallback_ != nullptr) {
+        deviceStateManagerCallback_->DeleteOffLineTimer(peerUdid);
+    }
+#else
+    (void) sessionId;
+    (void) result;
+#endif
 }
 
 bool SoftbusConnector::CheckIsNeedJoinLnn(const std::string &udid, const std::string &deviceId)
@@ -912,13 +923,18 @@ bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceIdHash, bool
 
 bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
 {
+    LOGI("targetDeviceId: %{public}s", GetAnonyString(targetDeviceId).c_str());
     return CheckIsOnline(targetDeviceId, false);
 }
 
-DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &deviceId)
+DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &deviceId, std::string &uuid)
 {
-    LOGI("start");
+    LOGI("in, deviceId: %{public}s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo info;
+    if (SoftbusCache::GetInstance().GetDeviceInfoByDeviceId(deviceId, uuid, info)) {
+        LOGI("SoftbusCache contains deviceinfo");
+        return info;
+    }
     int32_t deviceCount = 0;
     NodeBasicInfo *nodeInfo = nullptr;
     if (GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount) != DM_OK) {

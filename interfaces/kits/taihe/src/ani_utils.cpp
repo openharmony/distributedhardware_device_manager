@@ -228,15 +228,15 @@ ani_method AniGetClassMethod(ani_env *env, const char *className, const char *me
 
 ani_object AniCreatEmptyRecord(ani_env *env, ani_method &setMethod)
 {
-    ani_method constructor = ani_utils::AniGetClassMethod(env, "escompat.Record", "<ctor>", ":");
-    ani_method mapSetMethod = ani_utils::AniGetClassMethod(env, "escompat.Record", "$_set", nullptr);
+    ani_method constructor = ani_utils::AniGetClassMethod(env, "std.core.Record", "<ctor>", ":");
+    ani_method mapSetMethod = ani_utils::AniGetClassMethod(env, "std.core.Record", "$_set", nullptr);
     if (constructor == nullptr || mapSetMethod == nullptr) {
-        LOGE("AniGetClassMethod escompat.Record find method failed");
+        LOGE("AniGetClassMethod std.core.Record find method failed");
         return nullptr;
     }
     ani_object ani_record_result = nullptr;
-    if (ANI_OK != env->Object_New(ani_utils::AniGetClass(env, "escompat.Record"), constructor, &ani_record_result)) {
-        LOGE("escompat.Record Object_New failed");
+    if (ANI_OK != env->Object_New(ani_utils::AniGetClass(env, "std.core.Record"), constructor, &ani_record_result)) {
+        LOGE("std.core.Record Object_New failed");
         return nullptr;
     }
     setMethod = mapSetMethod;

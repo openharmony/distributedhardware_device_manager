@@ -896,7 +896,7 @@ int32_t DMCommTool::StartCommonEvent(std::string commonEventType, EventCallback 
         return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(eventQueue_, ERR_DM_POINT_NULL);
-    LOGI("StartCommonEvent start eventType: %{public}s", commonEventType.c_str());
+    LOGI("DMCommTool::StartCommonEvent start eventType: %{public}s", commonEventType.c_str());
     std::lock_guard<ffrt::mutex> locker(eventMutex_);
     auto taskFunc = [eventCallback] () { eventCallback(); };
     eventQueue_->submit(taskFunc);

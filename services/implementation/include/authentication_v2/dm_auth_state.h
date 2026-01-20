@@ -172,13 +172,13 @@ public:
     static uint64_t GetSysTimeMs();
     static void DeleteAcl(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile);
+    void GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId);
     static void DeleteCredential(std::shared_ptr<DmAuthContext> context, int32_t userId,
         const JsonItemObject &credInfo, const DistributedDeviceProfile::AccessControlProfile &profile);
     static void DirectlyDeleteCredential(std::shared_ptr<DmAuthContext> context, int32_t userId,
         const JsonItemObject &credInfo);
     static void DeleteAclAndSk(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile);
-    void GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId);
     void JoinLnn(std::shared_ptr<DmAuthContext> context);
     void DeleteRedundancyAcl(std::shared_ptr<DmAuthContext> context, JsonObject &aclInfo,
         const std::set<uint32_t> bindLevelSet, bool isSrc);
@@ -189,6 +189,9 @@ public:
     bool GetServiceExtraInfo(const std::string &bundleName, int32_t pinExchangeType,
         DistributedDeviceProfile::LocalServiceInfo &srvInfo, JsonObject &extraInfoObj);
     bool IsInFlagWhiteList(const std::string &bundleName);
+    void DeleteInvalidCredAndAcl(std::shared_ptr<DmAuthContext> context);
+    void DeleteAclSKAndCredId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+        const DistributedDeviceProfile::AccessControlProfile &profile, const std::string &localUdid);
 protected:
     bool NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context);
     bool NeedAgreeAcl(std::shared_ptr<DmAuthContext> context);
@@ -211,6 +214,13 @@ protected:
         std::vector<std::pair<int64_t, int64_t>> &tokenIds);
     void RemoveTokenIdsFromCredential(std::shared_ptr<DmAuthContext> context, const std::string &credId,
         std::vector<std::pair<int64_t, int64_t>> &tokenIds);
+    void GetShareCredInfoByUserId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+        JsonObject &credInfo);
+    void GetP2PCredInfoByUserId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+        JsonObject &credInfo);
+    void CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &targetProfiles,
+        JsonObject &credInfo, const std::string &localUdid);
 };
 
 class AuthSrcConfirmState : public DmAuthState {

@@ -125,7 +125,6 @@ public:
      * @tc.type: FUNC
      */
     int32_t UnRegisterConnectorCallback();
-
 public:
     SoftbusConnector();
     ~SoftbusConnector();
@@ -157,8 +156,8 @@ public:
     void SetChangeProcessInfo(ProcessInfo processInfo);
     std::vector<ProcessInfo> GetChangeProcessInfo();
     void ClearChangeProcessInfo();
-    DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId);
-    void DeleteOffLineTimer(std::string &udidHash);
+    DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId, std::string &uuid);
+    void OnSessionOpened(int32_t sessionId, int32_t result);
     void SyncAclList();
     void SyncAclList(int32_t userId, std::string credId, int32_t sessionKeyId, int32_t aclId);
     int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
@@ -169,6 +168,7 @@ public:
     static void OnLeaveLNNResult(const char *networkId, int32_t retCode);
     void RegisterLeaveLNNCallback(std::shared_ptr<ISoftbusLeaveLNNCallback> callback);
     void UnRegisterLeaveLNNCallback();
+    void DeleteCredential(const DelInfoCache &acl);
 
 private:
     static std::shared_ptr<ConnectionAddr> SetAddrAndJson(const ConnectionAddr *addr,
@@ -185,8 +185,8 @@ private:
         std::vector<std::string> &acLStrList, bool isDelImmediately);
     int32_t GetLocalVersion(const std::string localUdid, const std::string remoteUdid,
         std::string &localVersion, DistributedDeviceProfile::AccessControlProfile &localAcl);
-    void DeleteCredential(const DelInfoCache &acl);
 #endif
+
 private:
     static std::string remoteUdidHash_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

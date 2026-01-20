@@ -31,9 +31,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
-const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
-
 int32_t AuthSinkDataSyncState::VerifyCertificate(std::shared_ptr<DmAuthContext> context)
 {
 #ifdef DEVICE_MANAGER_COMMON_FLAG

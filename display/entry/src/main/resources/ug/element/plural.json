@@ -7,14 +7,14 @@
                     "quantity":"one",
                     "value":"ئۇلاش كودى خاتا. يەنە %d پۇرسەت قالدى.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
                     "quantity":"other",
                     "value":"ئۇلاش كودى خاتا. يەنە %d پۇرسەت قالدى.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
@@ -33,7 +33,7 @@
                     "quantity":"one",
                     "value":"ئىشەنمەيمەن (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

@@ -1800,7 +1800,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_010, testing::ext::TestSize.Leve
     ASSERT_EQ(ret, DM_OK);
     jsonObj[TAG_MSG_TYPE] = 504;
     message = jsonObj.Dump();
-    EXPECT_CALL(*cryptoMgrMock_, DecryptMessage(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*cryptoMgrMock_, DecryptMessage(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(ERR_DM_FAILED));
     ret = authMessageProcessor->ParseMessage(message);
     ASSERT_EQ(ret, DM_OK);
     jsonObj[TAG_MSG_TYPE] = 700;

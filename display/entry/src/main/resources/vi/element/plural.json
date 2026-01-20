@@ -19,7 +19,7 @@
                     "quantity":"other",
                     "value":"Không tin tưởng (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

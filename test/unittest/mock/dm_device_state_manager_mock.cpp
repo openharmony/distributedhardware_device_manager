@@ -30,9 +30,10 @@ int32_t DmDeviceStateManager::ProcNotifyEvent(const int32_t eventId, const std::
     return DmDmDeviceStateManager::dmDeviceStateManager->ProcNotifyEvent(eventId, deviceId);
 }
 void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
-    std::vector<ProcessInfo> &processInfoVec)
+    std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid, const bool isOnline)
 {
-    DmDmDeviceStateManager::dmDeviceStateManager->HandleDeviceStatusChange(devState, devInfo, processInfoVec);
+    DmDmDeviceStateManager::dmDeviceStateManager->HandleDeviceStatusChange(
+        devState, devInfo, processInfoVec, peerUdid, isOnline);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

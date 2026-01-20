@@ -48,6 +48,12 @@ namespace {
         }                                           \
     } while (0)
 
+#define GET_PARAMS_SYSTEM(env, info, num)    \
+    size_t argc = num;                \
+    napi_value argv[num] = {nullptr}; \
+    napi_value thisVar = nullptr;     \
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), nullptr)
+
 const std::string DM_NAPI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFailure";
@@ -152,8 +158,8 @@ void DmNapiInitCallback::OnRemoteDied()
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-        LOGD("OnRemoteDied uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+        LOGD("OnRemoteDied uv_queue_work_with_qos_internal");
     }, [] (uv_work_t *work, int status) {
         std::lock_guard<std::mutex> autoLock(g_onRemoteDiedHandleMutex);
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
@@ -166,7 +172,7 @@ void DmNapiInitCallback::OnRemoteDied()
         LOGI("OnRemoteDied, deviceManagerNapi bundleName %{public}s", callback->bundleName_.c_str());
         DeleteDmNapiStatusJsCallbackPtr(callback);
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_OnRemoteDied");
     if (ret != 0) {
         LOGE("Failed to execute OnRemoteDied work queue");
         DeleteDmNapiStatusJsCallbackPtr(jsCallback);
@@ -194,8 +200,8 @@ void DmNapiDeviceStatusCallback::OnDeviceOnline(const DmDeviceBasicInfo &deviceB
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-        LOGD("OnDeviceOnline uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+        LOGD("OnDeviceOnline uv_queue_work_with_qos_internal");
     }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
@@ -206,7 +212,7 @@ void DmNapiDeviceStatusCallback::OnDeviceOnline(const DmDeviceBasicInfo &deviceB
         }
         DeleteDmNapiStatusJsCallbackPtr(callback);
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_OnDeviceOnline");
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceOnline work queue");
         DeleteDmNapiStatusJsCallbackPtr(jsCallback);
@@ -234,8 +240,8 @@ void DmNapiDeviceStatusCallback::OnDeviceReady(const DmDeviceBasicInfo &deviceBa
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-        LOGD("OnDeviceReady uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+        LOGD("OnDeviceReady uv_queue_work_with_qos_internal");
     }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
@@ -246,7 +252,7 @@ void DmNapiDeviceStatusCallback::OnDeviceReady(const DmDeviceBasicInfo &deviceBa
         }
         DeleteDmNapiStatusJsCallbackPtr(callback);
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_OnDeviceReady");
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceReady work queue");
         DeleteDmNapiStatusJsCallbackPtr(jsCallback);
@@ -274,8 +280,8 @@ void DmNapiDeviceStatusCallback::OnDeviceOffline(const DmDeviceBasicInfo &device
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-        LOGD("OnDeviceOffline uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+        LOGD("OnDeviceOffline uv_queue_work_with_qos_internal");
     }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
@@ -287,7 +293,7 @@ void DmNapiDeviceStatusCallback::OnDeviceOffline(const DmDeviceBasicInfo &device
         }
         DeleteDmNapiStatusJsCallbackPtr(callback);
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_OnDeviceOffline");
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceOffline work queue");
         DeleteDmNapiStatusJsCallbackPtr(jsCallback);
@@ -315,8 +321,8 @@ void DmNapiDeviceStatusCallback::OnDeviceChanged(const DmDeviceBasicInfo &device
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-        LOGD("OnDeviceChanged uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+        LOGD("OnDeviceChanged uv_queue_work_with_qos_internal");
     }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
@@ -329,7 +335,7 @@ void DmNapiDeviceStatusCallback::OnDeviceChanged(const DmDeviceBasicInfo &device
         }
         DeleteDmNapiStatusJsCallbackPtr(callback);
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_OnDeviceChanged");
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceChanged work queue");
         DeleteDmNapiStatusJsCallbackPtr(jsCallback);
@@ -359,8 +365,8 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId,
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-        LOGD("OnDeviceFound uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+        LOGD("OnDeviceFound uv_queue_work_with_qos_internal");
     }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
@@ -371,7 +377,7 @@ void DmNapiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId,
         }
         DeleteDmNapiStatusJsCallbackPtr(callback);
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_OnDeviceFound");
     if (ret != 0) {
         LOGE("Failed to execute OnDeviceFound work queue");
         DeleteDmNapiStatusJsCallbackPtr(jsCallback);
@@ -403,8 +409,8 @@ void DmNapiDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t fa
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-        LOGD("OnDiscoveryFailed uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+        LOGD("OnDiscoveryFailed uv_queue_work_with_qos_internal");
     }, [] (uv_work_t *work, int status) {
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
@@ -416,7 +422,7 @@ void DmNapiDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t fa
         }
         DeleteDmNapiStatusJsCallbackPtr(callback);
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_OnDiscoveryFailed");
     if (ret != 0) {
         LOGE("Failed to execute OnDiscoveryFailed work queue");
         DeleteDmNapiStatusJsCallbackPtr(jsCallback);
@@ -471,8 +477,8 @@ void DmNapiPublishCallback::OnPublishResult(int32_t publishId, int32_t publishRe
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-        LOGD("OnPublishResult uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+        LOGD("OnPublishResult uv_queue_work_with_qos_internal");
     }, [] (uv_work_t *work, int status) {
         DmNapiPublishJsCallback *callback = reinterpret_cast<DmNapiPublishJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
@@ -484,7 +490,7 @@ void DmNapiPublishCallback::OnPublishResult(int32_t publishId, int32_t publishRe
         delete callback;
         callback = nullptr;
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_OnPublishResult");
     if (ret != 0) {
         LOGE("Failed to execute OnPublishResult work queue");
         delete jsCallback;
@@ -529,8 +535,8 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-        LOGD("OnAuthResult uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+        LOGD("OnAuthResult uv_queue_work_with_qos_internal");
     }, [] (uv_work_t *work, int status) {
         DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
@@ -543,7 +549,7 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
         delete callback;
         callback = nullptr;
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_OnAuthResult");
     if (ret != 0) {
         LOGE("Failed to execute OnAuthResult work queue");
         delete jsCallback;
@@ -580,8 +586,8 @@ void DmNapiGetDeviceProfileInfoListCallback::OnResult(const std::vector<DmDevice
     jsCallback->deviceProfileInfos = deviceProfileInfos;
     jsCallback->code = code;
     work->data = reinterpret_cast<void *>(jsCallback);
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-            LOGD("OnResult uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+            LOGD("OnResult uv_queue_work_with_qos_internal");
     },  [] (uv_work_t *work, int status) {
         DeviceProfileInfosAsyncCallbackInfo *callback =
             reinterpret_cast<DeviceProfileInfosAsyncCallbackInfo *>(work->data);
@@ -594,7 +600,7 @@ void DmNapiGetDeviceProfileInfoListCallback::OnResult(const std::vector<DmDevice
         delete callback;
         callback = nullptr;
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_ProfileInfoList_OnResult");
     if (ret != 0) {
         LOGE("Failed to execute OnBindResult work queue");
         delete jsCallback;
@@ -1049,10 +1055,10 @@ napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_i
     LOGI("SetUserOperationSync in");
     if (!IsSystemApp()) {
         LOGI("SetUserOperationSync not SystemApp");
-        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        CreateBusinessErrorSystem(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_TWO);
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     if (!CheckArgsType(env, valueType == napi_number, "action", "number")) {
@@ -1075,7 +1081,7 @@ napi_value DeviceManagerNapi::SetUserOperationSync(napi_env env, napi_callback_i
     if (ret != 0) {
         LOGE("SetUserOperation for bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
     }
     napi_get_undefined(env, &result);
     return result;
@@ -1101,8 +1107,8 @@ void DmNapiDeviceManagerUiCallback::OnCall(const std::string &paramJson)
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-        LOGD("OnCall uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+        LOGD("OnCall uv_queue_work_with_qos_internal");
     }, [] (uv_work_t *work, int status) {
         DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
@@ -1114,7 +1120,7 @@ void DmNapiDeviceManagerUiCallback::OnCall(const std::string &paramJson)
         delete callback;
         callback = nullptr;
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_OnCall");
     if (ret != 0) {
         LOGE("Failed to execute OnCall work queue");
         delete jsCallback;
@@ -1161,8 +1167,8 @@ void DmNapiBindTargetCallback::OnBindResult(const PeerTargetId &targetId, int32_
     }
     work->data = reinterpret_cast<void *>(jsCallback);
 
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-        LOGD("OnBindResult uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+        LOGD("OnBindResult uv_queue_work_with_qos_internal");
     }, [] (uv_work_t *work, int status) {
         DmNapiAuthJsCallback *callback = reinterpret_cast<DmNapiAuthJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
@@ -1175,7 +1181,7 @@ void DmNapiBindTargetCallback::OnBindResult(const PeerTargetId &targetId, int32_
         delete callback;
         callback = nullptr;
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_OnBindResult");
     if (ret != 0) {
         LOGE("Failed to execute OnBindResult work queue");
         delete jsCallback;
@@ -1675,98 +1681,6 @@ napi_value DeviceManagerNapi::StopDeviceDiscover(napi_env env, napi_callback_inf
     return result;
 }
 
-napi_value DeviceManagerNapi::PublishDeviceDiscoverySync(napi_env env, napi_callback_info info)
-{
-    LOGI("PublishDeviceDiscoverySync in");
-    if (!IsSystemApp()) {
-        LOGI("PublishDeviceDiscoverySync not SystemApp");
-        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
-        return nullptr;
-    }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-    if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
-        return nullptr;
-    }
-
-    napi_value result = nullptr;
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
-    if (!CheckArgsType(env, valueType == napi_object, "publishInfo", "object")) {
-        return nullptr;
-    }
-    DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
-        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
-        return result;
-    }
-
-    std::shared_ptr<DmNapiPublishCallback> publishCallback = nullptr;
-    {
-        std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
-        auto iter = g_publishCallbackMap.find(deviceManagerWrapper->bundleName_);
-        if (iter == g_publishCallbackMap.end()) {
-            CHECK_SIZE_RETURN(g_publishCallbackMap, nullptr);
-            publishCallback = std::make_shared<DmNapiPublishCallback>(env, deviceManagerWrapper->bundleName_);
-            g_publishCallbackMap[deviceManagerWrapper->bundleName_] = publishCallback;
-        } else {
-            publishCallback = iter->second;
-        }
-    }
-    DmPublishInfo publishInfo;
-    JsToDmPublishInfo(env, argv[0], publishInfo);
-    int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(deviceManagerWrapper->bundleName_, publishInfo,
-        publishCallback);
-    if (ret != 0) {
-        LOGE("PublishDeviceDiscovery for bundleName %{public}s failed, ret %{public}d",
-            deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
-        publishCallback->OnPublishResult(publishInfo.publishId, ret);
-        return result;
-    }
-
-    napi_get_undefined(env, &result);
-    return result;
-}
-
-napi_value DeviceManagerNapi::UnPublishDeviceDiscoverySync(napi_env env, napi_callback_info info)
-{
-    LOGI("UnPublishDeviceDiscoverySync in");
-    if (!IsSystemApp()) {
-        LOGI("UnPublishDeviceDiscoverySync not SystemApp");
-        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
-        return nullptr;
-    }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-    if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE,  "Wrong number of arguments, required 1")) {
-        return nullptr;
-    }
-    napi_value result = nullptr;
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
-    if (!CheckArgsType(env, valueType == napi_number, "publishId", "number")) {
-        return nullptr;
-    }
-    int32_t publishId = 0;
-    napi_get_value_int32(env, argv[0], &publishId);
-
-    DeviceManagerNapi *deviceManagerWrapper = nullptr;
-    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
-        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
-        return result;
-    }
-
-    int32_t ret = DeviceManager::GetInstance().UnPublishDeviceDiscovery(deviceManagerWrapper->bundleName_, publishId);
-    if (ret != 0) {
-        LOGE("UnPublishDeviceDiscovery bundleName %{public}s failed, ret %{public}d",
-            deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
-        return result;
-    }
-
-    napi_get_undefined(env, &result);
-    return result;
-}
-
 void DeviceManagerNapi::BindDevOrTarget(DeviceManagerNapi *deviceManagerWrapper, const std::string &deviceId,
     napi_env env, napi_value &object)
 {
@@ -2131,28 +2045,28 @@ napi_value DeviceManagerNapi::JsGetDeviceNetworkIdList(napi_env env, napi_callba
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != DM_OK) {
         LOGE("Do not have correct access");
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
         return nullptr;
     }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
 
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         LOGE("deviceManagerWrapper is NULL");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     auto *jsCallback = new GetDeviceNetworkIdListAsyncCallbackInfo();
     if (jsCallback == nullptr) {
         LOGE("jsCallback is nullptr");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     NetworkIdQueryFilter filterOptions;
@@ -2168,35 +2082,35 @@ napi_value DeviceManagerNapi::JsGetDeviceProfileInfoList(napi_env env, napi_call
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != DM_OK) {
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
         return nullptr;
     }
 
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         LOGE("deviceManagerWrapper is NULL");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     napi_value argv[DM_NAPI_ARGS_ONE] = {nullptr};
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), nullptr);
     DmDeviceProfileInfoFilterOptions filterOptions;
     JsToDmDeviceProfileInfoFilterOptions(env, argv[0], filterOptions);
     auto *jsCallback = new DeviceProfileInfosAsyncCallbackInfo();
     if (jsCallback == nullptr) {
         LOGE("jsCallback is nullptr");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
 
@@ -2256,35 +2170,35 @@ napi_value DeviceManagerNapi::JsGetDeviceIconInfo(napi_env env, napi_callback_in
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != DM_OK) {
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
         return nullptr;
     }
 
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         LOGE("deviceManagerWrapper is NULL");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     napi_value argv[DM_NAPI_ARGS_ONE] = {nullptr};
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr), nullptr);
     DmDeviceIconInfoFilterOptions filterOptions;
     JsToDmDeviceIconInfoFilterOptions(env, argv[0], filterOptions);
     auto *jsCallback = new DeviceIconInfoAsyncCallbackInfo();
     if (jsCallback == nullptr) {
         LOGE("jsCallback is nullptr");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
 
@@ -2299,16 +2213,16 @@ napi_value DeviceManagerNapi::SetHeartbeatPolicy(napi_env env, napi_callback_inf
     LOGI("in");
     size_t argsCount = 0;
     napi_value thisArg = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argsCount, nullptr, &thisArg, nullptr));
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argsCount, nullptr, &thisArg, nullptr), nullptr);
     if (!CheckArgsCount(env, argsCount >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
         return nullptr;
     }
     if (!IsSystemApp()) {
         LOGI("The caller is not SystemApp");
-        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        CreateBusinessErrorSystem(env, ERR_NOT_SYSTEM_APP);
         return nullptr;
     }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_TWO);
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
     if (!CheckArgsType(env, valueType == napi_number, "policy", "number")) {
@@ -2337,7 +2251,7 @@ napi_value DeviceManagerNapi::SetHeartbeatPolicy(napi_env env, napi_callback_inf
     if (ret != 0) {
         LOGE("bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
     }
     napi_get_undefined(env, &result);
     return result;
@@ -2386,36 +2300,36 @@ napi_value DeviceManagerNapi::JsPutDeviceProfileInfoList(napi_env env, napi_call
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != DM_OK) {
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
         return nullptr;
     }
 
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         LOGE("deviceManagerWrapper is NULL");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     std::vector<DmDeviceProfileInfo> deviceProfileInfos;
     if (!JsToDmDeviceProfileInfos(env, argv[0], deviceProfileInfos)) {
         LOGE("JsToDmDeviceProfileInfos fail");
-        CreateBusinessError(env, ERR_INVALID_PARAMS);
+        CreateBusinessErrorSystem(env, ERR_INVALID_PARAMS);
         return nullptr;
     }
     auto *jsCallback = new PutDeviceProfileInfoListAsyncCallbackInfo();
     if (jsCallback == nullptr) {
         LOGE("jsCallback is nullptr");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     jsCallback->env = env;
@@ -2467,16 +2381,16 @@ napi_value DeviceManagerNapi::JsGetLocalDisplayDeviceName(napi_env env, napi_cal
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
     if (ret != DM_OK) {
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
         return nullptr;
     }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     int32_t maxNameLength = 0;
     if (argc >= DM_NAPI_ARGS_ONE) {
         napi_valuetype maxNameLengthType = napi_undefined;
@@ -2490,13 +2404,13 @@ napi_value DeviceManagerNapi::JsGetLocalDisplayDeviceName(napi_env env, napi_cal
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         LOGE("deviceManagerWrapper is NULL");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     auto *jsCallback = new GetLocalDisplayDeviceNameAsyncCallbackInfo();
     if (jsCallback == nullptr) {
         LOGE("jsCallback is nullptr");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
 
@@ -2606,7 +2520,7 @@ napi_value DeviceManagerNapi::JsSetLocalDeviceName(napi_env env, napi_callback_i
         CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -2642,17 +2556,17 @@ napi_value DeviceManagerNapi::JsSetRemoteDeviceName(napi_env env, napi_callback_
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
-    GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_TWO);
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
         return nullptr;
     }
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
         LOGE("deviceManagerWrapper is NULL");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
     std::string deviceName = "";
@@ -2661,7 +2575,7 @@ napi_value DeviceManagerNapi::JsSetRemoteDeviceName(napi_env env, napi_callback_
     }
     if (deviceName.size() > DEVICE_NAME_MAX_BYTES) {
         LOGE("deviceName is too long");
-        CreateBusinessError(env, ERR_DM_INPUT_PARA_INVALID);
+        CreateBusinessErrorSystem(env, ERR_DM_INPUT_PARA_INVALID);
         return nullptr;
     }
     std::string deviceId = "";
@@ -2671,7 +2585,7 @@ napi_value DeviceManagerNapi::JsSetRemoteDeviceName(napi_env env, napi_callback_
     auto *jsCallback = new SetRemoteDeviceNameAsyncCallbackInfo();
     if (jsCallback == nullptr) {
         LOGE("jsCallback is nullptr");
-        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        CreateBusinessErrorSystem(env, ERR_DM_POINT_NULL);
         return nullptr;
     }
 
@@ -2687,12 +2601,12 @@ napi_value DeviceManagerNapi::JsRestoreLocalDeviceName(napi_env env, napi_callba
     LOGI("In");
     if (!IsSystemApp()) {
         LOGE("Caller is not systemApp");
-        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        CreateBusinessErrorSystem(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
         return nullptr;
     }
     size_t argc = 0;
     napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    DM_NAPI_CALL(napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr), nullptr);
     napi_value result = nullptr;
     DeviceManagerNapi *deviceManagerWrapper = nullptr;
     if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
@@ -2703,7 +2617,7 @@ napi_value DeviceManagerNapi::JsRestoreLocalDeviceName(napi_env env, napi_callba
     if (ret != 0) {
         LOGE("bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
-        CreateBusinessError(env, ret);
+        CreateBusinessErrorSystem(env, ret);
     }
     napi_get_undefined(env, &result);
     return result;
@@ -2779,7 +2693,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
 napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_info info)
 {
     LOGI("In");
-    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    GET_PARAMS_SYSTEM(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc == DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -3054,8 +2968,8 @@ void DmNapiGetDeviceIconInfoCallback::OnResult(const OHOS::DistributedHardware::
     jsCallback->deviceIconInfo = deviceIconInfo;
     jsCallback->code = code;
     work->data = reinterpret_cast<void *>(jsCallback);
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-            LOGD("OnResult uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+            LOGD("OnResult uv_queue_work_with_qos_internal");
     },  [] (uv_work_t *work, int status) {
         DeviceIconInfoAsyncCallbackInfo *callback =
             reinterpret_cast<DeviceIconInfoAsyncCallbackInfo *>(work->data);
@@ -3068,7 +2982,7 @@ void DmNapiGetDeviceIconInfoCallback::OnResult(const OHOS::DistributedHardware::
         delete callback;
         callback = nullptr;
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_DeviceIconInfo_OnResult");
     if (ret != 0) {
         LOGE("Failed to execute OnBindResult work queue");
         delete jsCallback;
@@ -3103,8 +3017,8 @@ void DmNapiSetLocalDeviceNameCallback::OnResult(int32_t code)
     jsCallback->deferred = deferred_;
     jsCallback->code = code;
     work->data = reinterpret_cast<void *>(jsCallback);
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-            LOGD("OnResult uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+            LOGD("OnResult uv_queue_work_with_qos_internal");
     },  [] (uv_work_t *work, int status) {
         SetLocalDeviceNameAsyncCallbackInfo *callback =
             reinterpret_cast<SetLocalDeviceNameAsyncCallbackInfo *>(work->data);
@@ -3117,7 +3031,7 @@ void DmNapiSetLocalDeviceNameCallback::OnResult(int32_t code)
         delete callback;
         callback = nullptr;
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_LocalDeviceName_OnResult");
     if (ret != 0) {
         LOGE("Failed to execute OnBindResult work queue");
         delete jsCallback;
@@ -3152,8 +3066,8 @@ void DmNapiSetRemoteDeviceNameCallback::OnResult(int32_t code)
     jsCallback->deferred = deferred_;
     jsCallback->code = code;
     work->data = reinterpret_cast<void *>(jsCallback);
-    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
-            LOGD("OnResult uv_queue_work_with_qos");
+    int ret = uv_queue_work_with_qos_internal(loop, work, [] (uv_work_t *work) {
+            LOGD("OnResult uv_queue_work_with_qos_internal");
     },  [] (uv_work_t *work, int status) {
         SetRemoteDeviceNameAsyncCallbackInfo *callback =
             reinterpret_cast<SetRemoteDeviceNameAsyncCallbackInfo *>(work->data);
@@ -3166,7 +3080,7 @@ void DmNapiSetRemoteDeviceNameCallback::OnResult(int32_t code)
         delete callback;
         callback = nullptr;
         DeleteUvWork(work);
-    }, uv_qos_user_initiated);
+    }, uv_qos_user_initiated, "Dm_RemoteDeviceName_OnResult");
     if (ret != 0) {
         LOGE("Failed to execute OnBindResult work queue");
         delete jsCallback;

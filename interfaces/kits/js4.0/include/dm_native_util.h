@@ -42,7 +42,7 @@ enum DMBussinessErrorCode {
     // Failed to obtain the service.
     DM_ERR_OBTAIN_SERVICE = 11600102,
     // Authentication invalid.
-    DM_ERR_AUTHENTICALTION_INVALID = 11600103,
+    DM_ERR_AUTHENTICATION_INVALID = 11600103,
     // Discovery invalid.
     DM_ERR_DISCOVERY_INVALID = 11600104,
     // Publish invalid.
@@ -54,6 +54,25 @@ enum DMBussinessErrorCode {
     // The device name contains non-compliant content.
     DM_ERR_SCAS_CHECK_FAILED = 11600108,
 };
+
+#define DM_NAPI_RETVAL_NOTHING
+#define DM_NAPI_CALL_BASE(theCall, result)       \
+    do {                                         \
+        if ((theCall) != napi_ok) {               \
+            LOGE("napi call failed, error %{public}s", #theCall); \
+            return result;                      \
+        }                                       \
+    } while (0)
+#define DM_NAPI_CALL(theCall, result) DM_NAPI_CALL_BASE(theCall, result)
+#define DM_NAPI_CALL_RETURN_VOID(theCall) DM_NAPI_CALL_BASE(theCall, DM_NAPI_RETVAL_NOTHING)
+#define DM_NAPI_CALL_NORETURN_BASE(theCall)       \
+    do {                                         \
+        if ((theCall) != napi_ok) {              \
+            LOGE("napi call failed, error %{public}s", #theCall); \
+        }                                       \
+    } while (0)
+#define DM_NAPI_CALL_NO_RETURN(theCall) DM_NAPI_CALL_NORETURN_BASE(theCall)
+
 void DeviceBasicInfoToJsArray(const napi_env &env,
                               const std::vector<DmDeviceBasicInfo> &vecDevInfo,
                               const int32_t idx, napi_value &arrayResult);
@@ -69,6 +88,7 @@ bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &dis
 bool IsSystemApp();
 void InsertMapParames(JsonObject &bindParamObj, std::map<std::string, std::string> &bindParamMap);
 napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = true);
+napi_value CreateBusinessErrorSystem(napi_env env, int32_t errCode, bool isAsync = true);
 bool CheckArgsCount(napi_env env, bool assertion, const std::string &message);
 bool CheckArgsType(napi_env env, bool assertion, const std::string &paramName, const std::string &type);
 bool IsFunctionType(napi_env env, napi_value value);

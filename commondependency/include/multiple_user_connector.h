@@ -112,6 +112,7 @@ public:
      * @tc.type: FUNC
      */
     static std::string GetSwitchOldAccountName(void);
+
     DM_EXPORT static void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo);
     DM_EXPORT static DMAccountInfo GetAccountInfoByUserId(int32_t userId);
     DM_EXPORT static void DeleteAccountInfoByUserId(int32_t userId);
@@ -131,6 +132,7 @@ public:
     DM_EXPORT static DMAccountInfo GetCurrentDMAccountInfo();
     DM_EXPORT static void GetCallingTokenId(uint32_t &tokenId);
     DM_EXPORT static int32_t GetUserIdByDisplayId(int32_t displayId);
+    DM_EXPORT static bool CheckMDMControl();
 private:
     static int32_t oldUserId_;
     static std::string accountId_;

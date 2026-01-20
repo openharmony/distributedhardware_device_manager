@@ -7,14 +7,14 @@
                     "quantity":"one",
                     "value":"Falscher Code, noch %d Versuch übrig.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
                     "quantity":"other",
                     "value":"Falscher Code, noch %d Versuche übrig.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
@@ -26,14 +26,14 @@
                     "quantity":"other",
                     "value":"Nicht vertrauen (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
                     "quantity":"one",
                     "value":"Nicht vertrauen (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

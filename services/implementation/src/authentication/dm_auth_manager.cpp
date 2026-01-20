@@ -37,8 +37,8 @@
 #include "dm_radar_helper.h"
 #include "dm_random.h"
 #include "ffrt.h"
-#include "multiple_user_connector.h"
 #include "json_object.h"
+#include "multiple_user_connector.h"
 #include "openssl/sha.h"
 #include "parameter.h"
 
@@ -54,7 +54,6 @@ const int32_t MAX_PIN_CODE = 999999;
 const int32_t DM_AUTH_TYPE_MAX = 6;
 const int32_t DM_AUTH_TYPE_MIN = 0;
 const int32_t AUTH_SESSION_SIDE_SERVER = 0;
-const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
 const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
@@ -255,15 +254,17 @@ void DmAuthManager::ParseJsonObject(JsonObject &jsonObject)
         if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
             authRequestContext_->targetPkgName = jsonObject[TARGET_PKG_NAME_KEY].Get<std::string>();
         }
-        if (IsString(jsonObject, APP_OPERATION_KEY)) {
-            authRequestContext_->appOperation = jsonObject[APP_OPERATION_KEY].Get<std::string>();
-        }
-        if (IsString(jsonObject, CUSTOM_DESCRIPTION_KEY)) {
-            authRequestContext_->customDesc = DmLanguageManager::GetInstance().
-                GetTextBySystemLanguage(jsonObject[CUSTOM_DESCRIPTION_KEY].Get<std::string>());
-        }
-        if (IsString(jsonObject, TAG_APP_THUMBNAIL2)) {
-            authRequestContext_->appThumbnail = jsonObject[TAG_APP_THUMBNAIL2].Get<std::string>();
+        if (!MultipleUserConnector::CheckMDMControl()) {
+            if (IsString(jsonObject, APP_OPERATION_KEY)) {
+                authRequestContext_->appOperation = jsonObject[APP_OPERATION_KEY].Get<std::string>();
+            }
+            if (IsString(jsonObject, CUSTOM_DESCRIPTION_KEY)) {
+                authRequestContext_->customDesc = DmLanguageManager::GetInstance().
+                    GetTextBySystemLanguage(jsonObject[CUSTOM_DESCRIPTION_KEY].Get<std::string>());
+            }
+            if (IsString(jsonObject, TAG_APP_THUMBNAIL2)) {
+                authRequestContext_->appThumbnail = jsonObject[TAG_APP_THUMBNAIL2].Get<std::string>();
+            }
         }
         authRequestContext_->closeSessionDelaySeconds = 0;
         if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_SECONDS)) {
@@ -499,42 +500,16 @@ int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::strin
     return DeleteAcl(pkgName, std::string(localDeviceId), udid, bindLevel, extra);
 }
 
-void DmAuthManager::GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash)
+void DmAuthManager::ProcessSessionOpen(int32_t sessionId, int32_t result)
 {
     CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
-    std::string peerUdid = "";
-    int32_t ret = softbusConnector_->GetSoftbusSession()->GetPeerDeviceId(sessionId, peerUdid);
-    if (ret != DM_OK) {
-        LOGE("DmAuthManager::GetPeerUdidHash failed.");
-        peerUdidHash = "";
-        return;
-    }
-    char udidHashTmp[DM_MAX_DEVICE_ID_LEN] = {0};
-    if (Crypto::GetUdidHash(peerUdid, reinterpret_cast<uint8_t *>(udidHashTmp)) != DM_OK) {
-        LOGE("get udidhash by udid: %{public}s failed.", GetAnonyString(peerUdid).c_str());
-        peerUdidHash = "";
-        return;
-    }
-    peerUdidHash = std::string(udidHashTmp);
-}
-
-void DmAuthManager::DeleteOffLineTimer(int32_t sessionId)
-{
-    GetPeerUdidHash(sessionId, remoteUdidHash_);
-    if (remoteUdidHash_.empty()) {
-        LOGE("DeleteOffLineTimer remoteUdidHash is empty.");
-        return;
-    }
-    if (softbusConnector_ != nullptr) {
-        softbusConnector_->DeleteOffLineTimer(remoteUdidHash_);
-    }
+    softbusConnector_->OnSessionOpened(sessionId, result);
 }
 
 void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
     LOGI("sessionId = %{public}d and sessionSide = %{public}d result = %{public}d", sessionId, sessionSide, result);
-    DeleteOffLineTimer(sessionId);
+    ProcessSessionOpen(sessionId, result);
     if (sessionSide == AUTH_SESSION_SIDE_SERVER) {
         if (authResponseState_ == nullptr && authRequestState_ == nullptr) {
             authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
@@ -1237,7 +1212,6 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
     if (IsAuthFinish()) {
         return;
     }
-
     std::vector<std::string> messageList = authMessageProcessor_->CreateAuthRequestMessage();
     for (auto msg : messageList) {
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, msg);
@@ -1405,7 +1379,6 @@ void DmAuthManager::StartRespAuthProcess()
                     DmAuthManager::HandleSessionHeartbeat(name);
                 });
         }
-
         CHECK_NULL_VOID(listener_);
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId,
             authRequestContext_->token, STATUS_DM_SHOW_PIN_INPUT_UI, DM_OK);
@@ -1524,12 +1497,12 @@ void DmAuthManager::SinkAuthenticateFinish()
     bool oneTimePinCodeFlag = false;
     DistributedDeviceProfile::LocalServiceInfo srvInfo;
     JsonObject extraInfoObj;
-        if (GetServiceExtraInfo(authResponseContext_->hostPkgName, authResponseContext_->authType,
-            srvInfo, extraInfoObj)) {
-            if (IsBool(extraInfoObj, TAG_ONE_TIME_PIN_CODE_FLAG)) {
-                oneTimePinCodeFlag = extraInfoObj[TAG_ONE_TIME_PIN_CODE_FLAG].Get<bool>();
-            }
+    if (GetServiceExtraInfo(authResponseContext_->hostPkgName, authResponseContext_->authType,
+        srvInfo, extraInfoObj)) {
+        if (IsBool(extraInfoObj, TAG_ONE_TIME_PIN_CODE_FLAG)) {
+            oneTimePinCodeFlag = extraInfoObj[TAG_ONE_TIME_PIN_CODE_FLAG].Get<bool>();
         }
+    }
     if (!oneTimePinCodeFlag) {
         ClearLocalServiceInfo(authResponseContext_->hostPkgName, authResponseContext_->authType);
     }
@@ -3466,6 +3439,43 @@ void DmAuthManager::ProcessReqPublicKey()
     }
 }
 
+void DmAuthManager::JoinLnn(const std::string &deviceId, bool isForceJoin)
+{
+    CHECK_NULL_VOID(authRequestContext_);
+    CHECK_NULL_VOID(authResponseContext_);
+    CHECK_NULL_VOID(softbusConnector_);
+    if (IsHmlSessionType()) {
+        if (authRequestContext_->closeSessionDelaySeconds == 0) {
+            isWaitingJoinLnnCallback_ = true;
+        }
+        authResponseContext_->localSessionKeyId = GetSessionKeyIdSync(authResponseContext_->requestId);
+        softbusConnector_->JoinLnnByHml(authRequestContext_->sessionId, authResponseContext_->localSessionKeyId,
+            authResponseContext_->remoteSessionKeyId);
+        return;
+    }
+    if (isNeedJoinLnn_) {
+        LOGI("isNeedJoinLnn %{public}d", isNeedJoinLnn_);
+        softbusConnector_->JoinLnn(deviceId, isForceJoin);
+    }
+}
+
+void DmAuthManager::OnSoftbusJoinLNNResult(const int32_t sessionId, const char *networkId, int32_t result)
+{
+    (void)sessionId;
+    (void)networkId;
+    (void)result;
+}
+
+void DmAuthManager::CloseAuthSession(const int32_t sessionId)
+{
+    if (timer_ != nullptr) {
+        timer_->DeleteTimer(std::string(WAIT_SESSION_CLOSE_TIMEOUT_TASK) + std::string(CLOSE_SESSION_TASK_SEPARATOR) +
+            std::to_string(sessionId));
+    }
+    CHECK_NULL_VOID(softbusConnector_);
+    softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
+}
+
 void DmAuthManager::GetLocalServiceInfoInDp()
 {
     CHECK_NULL_VOID(authResponseContext_);
@@ -3518,43 +3528,6 @@ void DmAuthManager::UpdateInputPincodeDialog(int32_t errorCode)
     } else {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
     }
-}
-
-void DmAuthManager::JoinLnn(const std::string &deviceId, bool isForceJoin)
-{
-    CHECK_NULL_VOID(authRequestContext_);
-    CHECK_NULL_VOID(authResponseContext_);
-    CHECK_NULL_VOID(softbusConnector_);
-    if (IsHmlSessionType()) {
-        if (authRequestContext_->closeSessionDelaySeconds == 0) {
-            isWaitingJoinLnnCallback_ = true;
-        }
-        authResponseContext_->localSessionKeyId = GetSessionKeyIdSync(authResponseContext_->requestId);
-        softbusConnector_->JoinLnnByHml(authRequestContext_->sessionId, authResponseContext_->localSessionKeyId,
-            authResponseContext_->remoteSessionKeyId);
-        return;
-    }
-    if (isNeedJoinLnn_) {
-        LOGI("isNeedJoinLnn %{public}d", isNeedJoinLnn_);
-        softbusConnector_->JoinLnn(deviceId, isForceJoin);
-    }
-}
-
-void DmAuthManager::OnSoftbusJoinLNNResult(const int32_t sessionId, const char *networkId, int32_t result)
-{
-    (void)sessionId;
-    (void)networkId;
-    (void)result;
-}
-
-void DmAuthManager::CloseAuthSession(const int32_t sessionId)
-{
-    if (timer_ != nullptr) {
-        timer_->DeleteTimer(std::string(WAIT_SESSION_CLOSE_TIMEOUT_TASK) + std::string(CLOSE_SESSION_TASK_SEPARATOR) +
-            std::to_string(sessionId));
-    }
-    CHECK_NULL_VOID(softbusConnector_);
-    softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
 }
 
 void DmAuthManager::RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback)
