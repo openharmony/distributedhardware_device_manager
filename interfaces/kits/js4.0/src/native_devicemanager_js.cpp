@@ -70,6 +70,7 @@ const int32_t DM_NAPI_ARGS_TWO = 2;
 const int32_t DM_NAPI_ARGS_THREE = 3;
 const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 const int32_t DM_MAX_DEVICE_SIZE = 100;
+const uint32_t DM_MAX_DEVICESLIST_SIZE = 50;
 
 napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
 napi_ref g_strategyForHeartbeatEnumConstructor = nullptr;
