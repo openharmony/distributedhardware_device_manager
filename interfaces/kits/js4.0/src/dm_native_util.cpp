@@ -621,6 +621,30 @@ void JsObjectToStrVector(const napi_env &env, const napi_value &object, const st
     }
 }
 
+void JsObjectToStrVector(const napi_env &env, const napi_value &object, std::vector<std::string> &fieldRef)
+{
+    bool isArr = false;
+    napi_is_array(env, object, &isArr);
+    if (!isArr) {
+        LOGE("object is not array");
+        return;
+    }
+    uint32_t length = 0;
+    napi_get_array_length(env, object, &length);
+    for (size_t i = 0; i < length; i++) {
+        napi_value element;
+        napi_get_element(env, object, i, &element);
+        size_t strLen = 0;
+        napi_get_value_string_utf8(env, element, nullptr, 0, &strLen);
+        if (strLen == 0 || strLen >= DM_MAX_DEVICE_ID_LEN) {
+            continue;
+        }
+        char buf[DM_MAX_DEVICE_ID_LEN] = {0};
+        napi_get_value_string_utf8(env, element, buf, strLen + 1, &strLen);
+        fieldRef.emplace_back(buf);
+    }
+}
+
 void JsToDmDeviceProfileInfoFilterOptions(const napi_env &env, const napi_value &object,
     DmDeviceProfileInfoFilterOptions &info)
 {

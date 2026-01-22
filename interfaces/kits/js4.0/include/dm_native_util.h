@@ -97,6 +97,7 @@ bool JsToStringAndCheck(napi_env env, napi_value value, const std::string &value
 
 void JsObjectToStrVector(const napi_env &env, const napi_value &object, const std::string &fieldStr,
     std::vector<std::string> &fieldRef);
+void JsObjectToStrVector(const napi_env &env, const napi_value &object, std::vector<std::string> &fieldRef);
 void JsToDmDeviceProfileInfoFilterOptions(const napi_env &env, const napi_value &object,
     DmDeviceProfileInfoFilterOptions &info);
 void JsToDmDeviceIconInfoFilterOptions(const napi_env &env, const napi_value &object,
