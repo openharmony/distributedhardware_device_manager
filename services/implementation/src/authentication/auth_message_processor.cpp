@@ -543,7 +543,7 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(JsonObject &json)
 
 void AuthMessageProcessor::ParseAuthResponseMessage(JsonObject &json)
 {
-    LOGI("start ParseAuthResponseMessage")
+    LOGI("start ParseAuthResponseMessage");
     if (!IsInt32(json, TAG_REPLY)) {
         LOGE("AuthMessageProcessor::ParseAuthResponseMessage err json string, first time.");
         return;
