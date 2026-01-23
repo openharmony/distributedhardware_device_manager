@@ -256,7 +256,7 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
         case ERR_DM_INIT_FAILED:
             error = CreateErrorForCall(env, DM_ERR_OBTAIN_SERVICE, ERR_MESSAGE_OBTAIN_SERVICE, isAsync);
             break;
-        case ERR_NOT_SYSTEM_APP:
+        case ERR_DM_NOT_SYSTEM_APP:
             error = CreateErrorForCall(env, ERR_NOT_SYSTEM_APP, ERR_MESSAGE_NOT_SYSTEM_APP, isAsync);
             break;
         case ERR_DM_HILINKSVC_RSP_PARSE_FAILD:

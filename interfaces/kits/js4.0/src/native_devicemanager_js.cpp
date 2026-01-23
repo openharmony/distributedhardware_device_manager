@@ -2657,7 +2657,7 @@ napi_value DeviceManagerNapi::GetUdidsByDeviceIds(napi_env env, napi_callback_in
     std::map<std::string, std::string> deviceIdToUdidMap;
     int32_t ret = DeviceManager::GetInstance().GetUdidsByDeviceIds(deviceManagerWrapper->bundleName_,
         deviceIdList, deviceIdToUdidMap);
-    if (ret != 0) {
+    if (ret != DM_OK) {
         LOGE("GetUdidsByDeviceIds failed, ret %{public}d", ret);
         CreateBusinessError(env, ret);
         return result;

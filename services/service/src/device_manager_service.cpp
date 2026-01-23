@@ -4524,7 +4524,7 @@ int32_t DeviceManagerService::GetUdidsByDeviceIds(const std::string &pkgName,
     LOGI("GetUdidsByDeviceIds pkgName = %{public}s.", pkgName.c_str());
     if (!AppManager::GetInstance().IsSystemApp()) {
         LOGE("The caller does not have permission to call");
-        return ERR_DM_NO_PERMISSION;
+        return ERR_DM_NOT_SYSTEM_APP;
     }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission() ||
         !PermissionManager::GetInstance().CheckDataSyncPermission()) {
