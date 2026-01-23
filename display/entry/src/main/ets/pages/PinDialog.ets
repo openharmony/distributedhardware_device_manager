@@ -56,7 +56,12 @@ struct PinCustomDialog {
     this.isPC = Constant.isPC();
     // 获取pinCode
     this.pinCode = AppStorage.get('pinCode') as string;
-    this.pinCodeArr = this.pinCode.split('');
+    if (this.pinCode) {
+        this.pinCodeArr = this.pinCode.split('');
+    } else {
+        console.error(TAG + 'pinCode is undefined or null');
+        this.pinCodeArr = [];
+    }
   }
 
   setUserOperation(operation: number, param: string) {

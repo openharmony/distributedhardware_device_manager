@@ -54,7 +54,7 @@ public:
 public:
     HiChainAuthConnector();
     ~HiChainAuthConnector();
-    int32_t AuthDevice(const std::string &pinCode, int32_t osAccountId, std::string udid, int64_t requestId);
+    int32_t AuthDevice(const std::string &pinCode, int32_t osAccountId, int64_t requestId);
     int32_t ProcessAuthData(int64_t requestId, std::string authData, int32_t osAccountId);
     int32_t GenerateCredential(std::string &localUdid, int32_t osAccountId, std::string &publicKey);
     bool QueryCredential(std::string &localUdid, int32_t osAccountId, int32_t peerOsAccountId);
