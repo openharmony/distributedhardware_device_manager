@@ -157,7 +157,7 @@ typedef enum DmAuthForm {
      */
     ACROSS_ACCOUNT = 2,
     /**
-     * Share
+     * Share.
      */
     SHARE = 3,
 } DmAuthForm;

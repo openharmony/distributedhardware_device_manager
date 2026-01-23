@@ -99,8 +99,8 @@ int32_t DeviceManagerImplMini::GetLocalDisplayDeviceName(const std::string &pkgN
     req->SetMaxNameLength(maxNameLength);
     int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DISPLAY_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
         LOGE("error: Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
