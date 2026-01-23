@@ -256,7 +256,7 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
         case ERR_DM_INIT_FAILED:
             error = CreateErrorForCall(env, DM_ERR_OBTAIN_SERVICE, ERR_MESSAGE_OBTAIN_SERVICE, isAsync);
             break;
-        case ERR_NOT_SYSTEM_APP:
+        case ERR_DM_NOT_SYSTEM_APP:
             error = CreateErrorForCall(env, ERR_NOT_SYSTEM_APP, ERR_MESSAGE_NOT_SYSTEM_APP, isAsync);
             break;
         case ERR_DM_HILINKSVC_RSP_PARSE_FAILD:
@@ -616,6 +616,30 @@ void JsObjectToStrVector(const napi_env &env, const napi_value &object, const st
             continue;
         }
         char buf[DEVICE_UUID_LENGTH] = {0};
+        napi_get_value_string_utf8(env, element, buf, strLen + 1, &strLen);
+        fieldRef.emplace_back(buf);
+    }
+}
+
+void JsObjectToStrVector(const napi_env &env, const napi_value &object, std::vector<std::string> &fieldRef)
+{
+    bool isArr = false;
+    napi_is_array(env, object, &isArr);
+    if (!isArr) {
+        LOGE("object is not array");
+        return;
+    }
+    uint32_t length = 0;
+    napi_get_array_length(env, object, &length);
+    for (size_t i = 0; i < length; i++) {
+        napi_value element;
+        napi_get_element(env, object, i, &element);
+        size_t strLen = 0;
+        napi_get_value_string_utf8(env, element, nullptr, 0, &strLen);
+        if (strLen == 0 || strLen >= DM_MAX_DEVICE_ID_LEN) {
+            continue;
+        }
+        char buf[DM_MAX_DEVICE_ID_LEN] = {0};
         napi_get_value_string_utf8(env, element, buf, strLen + 1, &strLen);
         fieldRef.emplace_back(buf);
     }

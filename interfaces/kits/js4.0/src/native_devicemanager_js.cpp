@@ -70,6 +70,7 @@ const int32_t DM_NAPI_ARGS_TWO = 2;
 const int32_t DM_NAPI_ARGS_THREE = 3;
 const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 const int32_t DM_MAX_DEVICE_SIZE = 100;
+const uint32_t DM_MAX_DEVICESLIST_SIZE = 50;
 
 napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
 napi_ref g_strategyForHeartbeatEnumConstructor = nullptr;
@@ -2623,6 +2624,78 @@ napi_value DeviceManagerNapi::JsRestoreLocalDeviceName(napi_env env, napi_callba
     return result;
 }
 
+napi_value DeviceManagerNapi::GetUdidsByDeviceIds(napi_env env, napi_callback_info info)
+{
+    LOGI("In");
+    napi_value result = nullptr;
+    napi_value thisVar = nullptr;
+    size_t argc = DM_NAPI_ARGS_ONE;
+    napi_value argv[DM_NAPI_ARGS_ONE] = {nullptr};
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
+        return nullptr;
+    }
+    DeviceManagerNapi *deviceManagerWrapper = nullptr;
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        return result;
+    }
+    bool isArray = false;
+    napi_is_array(env, argv[0], &isArray);
+    if (!isArray) {
+        LOGE("argv[0] is not Array");
+        CreateBusinessError(env, ERR_DM_INPUT_PARA_INVALID);
+        return result;
+    }
+    std::vector<std::string> deviceIdList;
+    JsObjectToStrVector(env, argv[0], deviceIdList);
+    if (deviceIdList.size() == 0 || deviceIdList.size() > DM_MAX_DEVICESLIST_SIZE) {
+        LOGE("Invalid param, the size of deviceIdList is %{public}zu", deviceIdList.size());
+        CreateBusinessError(env, ERR_DM_INPUT_PARA_INVALID);
+        return result;
+    }
+    std::map<std::string, std::string> deviceIdToUdidMap;
+    int32_t ret = DeviceManager::GetInstance().GetUdidsByDeviceIds(deviceManagerWrapper->bundleName_,
+        deviceIdList, deviceIdToUdidMap);
+    if (ret != DM_OK) {
+        LOGE("GetUdidsByDeviceIds failed, ret %{public}d", ret);
+        CreateBusinessError(env, ret);
+        return result;
+    }
+    ConstructOutput(env, result, deviceIdList, deviceIdToUdidMap);
+    return result;
+}
+
+void DeviceManagerNapi::ConstructOutput(napi_env env, napi_value &result,
+    const std::vector<std::string> &deviceIdList, std::map<std::string, std::string> &deviceIdToUdidMap)
+{
+    bool isArray = false;
+    napi_status status = napi_ok;
+    napi_create_array(env, &result);
+    napi_is_array(env, result, &isArray);
+    if (!isArray) {
+        LOGE("napi_create_array fail");
+        CreateBusinessError(env, ERR_DM_INPUT_PARA_INVALID);
+        return ;
+    }
+    int32_t index = 0;
+    for (const auto& deviceId : deviceIdList) {
+        std::string udid = deviceIdToUdidMap[deviceId];
+        napi_value obj;
+        status = napi_create_object(env, &obj);
+        if (status != napi_ok) {
+            return;
+        }
+        SetValueUtf8String(env, "deviceId", deviceId, obj);
+        SetValueUtf8String(env, "udid", udid, obj);
+        status = napi_set_element(env, result, index, obj);
+        if (status != napi_ok) {
+            return;
+        }
+        index++;
+    }
+}
+
 void DeviceManagerNapi::ClearBundleCallbacks(std::string &bundleName)
 {
     LOGI("ClearBundleCallbacks start for bundleName %{public}s", bundleName.c_str());
@@ -2800,6 +2873,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("restoreLocalDeviceName", JsRestoreLocalDeviceName),
         DECLARE_NAPI_FUNCTION("restoreLocalDeivceName", JsRestoreLocalDeviceName),
         DECLARE_NAPI_FUNCTION("getDeviceNetworkIdList", JsGetDeviceNetworkIdList),
+        DECLARE_NAPI_FUNCTION("getUdidsByDeviceIds", GetUdidsByDeviceIds),
         DECLARE_NAPI_FUNCTION("setHeartbeatPolicy", SetHeartbeatPolicy)};
 
     napi_property_descriptor static_prop[] = {
