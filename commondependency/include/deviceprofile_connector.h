@@ -119,6 +119,7 @@ typedef struct DmOfflineParam {
     int32_t peerUserId;
     bool hasLnnAcl = false;
     bool hasUserAcl = false;
+    bool isNewVersion = true;
     int64_t accessControlId;
     // save the need unbind acl info
     std::vector<DmAclIdParam> needDelAclInfos;
@@ -181,6 +182,7 @@ class DeviceProfileConnector : public IDeviceProfileConnector {
 public:
     DM_EXPORT DmOfflineParam FilterNeedDeleteACL(const std::string &localDeviceId, uint32_t localTokenId,
         const std::string &remoteDeviceId, const std::string &extra);
+    DM_EXPORT DmOfflineParam FilterNeedDeleteACL(const std::string &peerUdid);
     DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile>
         GetAccessControlProfile();
     DM_EXPORT DmOfflineParam HandleServiceUnBindEvent(int32_t remoteUserId,
@@ -239,7 +241,6 @@ public:
         const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid);
     DM_EXPORT bool CheckIsSameAccount(const DmAccessCaller &caller,
         const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid);
-    DM_EXPORT void DeleteAccessControlList(const std::string &udid);
     DM_EXPORT int32_t GetBindLevel(const std::string &pkgName,
         const std::string &localUdid, const std::string &udid, uint64_t &tokenId);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds, const std::string &localUdid);
@@ -420,6 +421,8 @@ private:
         const std::vector<int32_t> &backgroundUserIds);
 
     void FilterNeedDeleteACLInfos(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
+        const std::string &localUdid, const std::string &peerUdid, DmOfflineParam &offlineParam);
+    void FilterNeedDeleteACLInfos(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
         const std::string &localUdid, const uint32_t localTokenId,
         const std::string &remoteUdid, const std::string &extra, DmOfflineParam &offlineParam);
     bool FindLeftAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
@@ -427,6 +430,11 @@ private:
     bool FindUserAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
         const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam);
     bool FindLnnAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+        const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam);
+
+    bool FindTargetAclIncludeLnn(const DistributedDeviceProfile::AccessControlProfile &acl,
+        const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam);
+    bool FindTargetAclIncludeLnnOld(const DistributedDeviceProfile::AccessControlProfile &acl,
         const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam);
     bool FindTargetAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
         const std::string &localUdid, const uint32_t localTokenId,
@@ -438,7 +446,10 @@ private:
     bool FindTargetAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
         const std::string &localUdid, const int32_t remoteUserId, const std::string &remoteUdid,
         const int32_t remoteTokenId, DmOfflineParam &offlineParam);
-
+    bool IsAuthNewVersion(const DistributedDeviceProfile::AccessControlProfile &acl,
+        const std::string localUdid, const std::string remoteUdid);
+    std::string GetAclVersionInfo(const std::string localUdid, const std::string remoteUdid,
+        const DistributedDeviceProfile::AccessControlProfile &acl);
     std::string GetAppServiceAuthVersionInfo(std::string localUdid, std::string remoteUdid, int32_t tokenId,
         int32_t userId, std::vector<DistributedDeviceProfile::AccessControlProfile> profiles);
     std::string GetDeviceAuthVersionInfo(std::string localUdid, std::string remoteUdid,

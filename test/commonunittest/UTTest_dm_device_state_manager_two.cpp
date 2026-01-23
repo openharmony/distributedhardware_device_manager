@@ -129,7 +129,7 @@ HWTEST_F(DmDeviceStateManagerTestTwo, OnDeviceOffline_002, testing::ext::TestSiz
         .deviceTypeId = 1,
     };
     dmDeviceStateManager->stateDeviceInfos_["123"] = info;
-    dmDeviceStateManager->OnDeviceOffline(deviceId);
+    dmDeviceStateManager->OnDeviceOffline(deviceId, false);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
     dmDeviceStateManager->stateDeviceInfos_.clear();
 }

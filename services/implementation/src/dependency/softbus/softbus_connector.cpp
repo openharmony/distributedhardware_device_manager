@@ -815,10 +815,10 @@ void SoftbusConnector::HandleDeviceOnline(std::string deviceId, int32_t authForm
     return;
 }
 
-void SoftbusConnector::HandleDeviceOffline(std::string deviceId)
+void SoftbusConnector::HandleDeviceOffline(std::string deviceId, const bool isOnline)
 {
     LOGI("start");
-    deviceStateManagerCallback_->OnDeviceOffline(deviceId);
+    deviceStateManagerCallback_->OnDeviceOffline(deviceId, isOnline);
     return;
 }
 

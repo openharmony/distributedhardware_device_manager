@@ -147,7 +147,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
     softbusConnector_->ClearProcessInfo();
 }
 
-void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
+void DmDeviceStateManager::OnDeviceOffline(std::string deviceId, const bool isOnline)
 {
     LOGI("OnDeviceOffline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo devInfo;
@@ -164,7 +164,7 @@ void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
         devInfo = stateDeviceInfos_[deviceId];
     }
     std::vector<ProcessInfo> processInfoVec = softbusConnector_->GetProcessInfo();
-    ProcessDeviceStateChange(DEVICE_STATE_OFFLINE, devInfo, processInfoVec, true);
+    ProcessDeviceStateChange(DEVICE_STATE_OFFLINE, devInfo, processInfoVec, isOnline);
     softbusConnector_->ClearProcessInfo();
 }
 
