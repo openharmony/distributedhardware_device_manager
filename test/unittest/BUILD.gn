@@ -1251,7 +1251,7 @@ ohos_unittest("UTTest_oh_device_manager") {
 
   deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${utils_path}:devicemanagerutils",
+    "${utils_path}:devicemanagerutilstest",
   ]
 
   external_deps = [
