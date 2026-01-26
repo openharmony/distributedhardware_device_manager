@@ -126,7 +126,7 @@ bool AuthMessageProcessor::IsPincodeImported()
 
 std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
 {
-    LOGI("start.");
+    LOGI("AuthMessageProcessor::CreateAuthRequestMessage start.");
     std::vector<std::string> jsonStrVec;
     if (authRequestContext_ == nullptr) {
         LOGE("AuthMessageProcessor::CreateAuthRequestMessage authRequestContext_ is nullptr.");
@@ -158,7 +158,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
 
 std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
 {
-    LOGI("start. msgType is %{public}d", msgType);
+    LOGI("AuthMessageProcessor::CreateSimpleMessage start. msgType is %{public}d", msgType);
     JsonObject jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
     jsonObj[TAG_MSG_TYPE] = msgType;
@@ -319,7 +319,7 @@ void AuthMessageProcessor::CreateResponseAuthMessage(JsonObject &json)
     json[TAG_TOKEN] = authResponseContext_->token;
     if (authResponseContext_->reply == 0) {
         std::string groupId = authResponseContext_->groupId;
-        LOGI("groupId %{public}s", GetAnonyString(groupId).c_str());
+        LOGI("AuthMessageProcessor::CreateResponseAuthMessage groupId %{public}s", GetAnonyString(groupId).c_str());
         JsonObject jsonObject(groupId);
         if (jsonObject.IsDiscarded()) {
             LOGE("DecodeRequestAuth jsonStr error");
@@ -361,7 +361,7 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
     int32_t msgType = jsonObject[TAG_MSG_TYPE].Get<int32_t>();
     CHECK_NULL_RETURN(authResponseContext_, ERR_DM_FAILED);
     authResponseContext_->msgType = msgType;
-    LOGI("message type %{public}d", authResponseContext_->msgType);
+    LOGI("AuthMessageProcessor::ParseMessage message type %{public}d", authResponseContext_->msgType);
     switch (msgType) {
         case MSG_TYPE_NEGOTIATE:
             ParseNegotiateMessage(jsonObject);
@@ -427,6 +427,7 @@ void AuthMessageProcessor::ParsePublicKeyMessageExt(JsonObject &json)
         }
         if (IsInt32(jsonObject, TAG_SESSIONKEY_ID)) {
             authResponseContext_->remoteSessionKeyId = jsonObject[TAG_SESSIONKEY_ID].Get<int32_t>();
+            LOGI("get remoteSessionKeyId");
         }
         return;
     }
@@ -434,7 +435,7 @@ void AuthMessageProcessor::ParsePublicKeyMessageExt(JsonObject &json)
 
 void AuthMessageProcessor::ParseAuthResponseMessageExt(JsonObject &json)
 {
-    LOGI("start");
+    LOGI("start ParseAuthResponseMessageExt");
     CHECK_NULL_VOID(authResponseContext_);
     if (IsInt32(json, TAG_REPLY)) {
         authResponseContext_->reply = json[TAG_REPLY].Get<int32_t>();
@@ -499,7 +500,7 @@ void AuthMessageProcessor::GetAuthReqMessage(JsonObject &json)
 
 int32_t AuthMessageProcessor::ParseAuthRequestMessage(JsonObject &json)
 {
-    LOGI("start");
+    LOGI("start ParseAuthRequestMessage");
     int32_t sliceNum = 0;
     int32_t idx = 0;
     if (!IsInt32(json, TAG_INDEX) || !IsInt32(json, TAG_SLICE_NUM)) {
@@ -542,7 +543,7 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(JsonObject &json)
 
 void AuthMessageProcessor::ParseAuthResponseMessage(JsonObject &json)
 {
-    LOGI("start");
+    LOGI("start ParseAuthResponseMessage");
     if (!IsInt32(json, TAG_REPLY)) {
         LOGE("AuthMessageProcessor::ParseAuthResponseMessage err json string, first time.");
         return;
@@ -729,7 +730,7 @@ std::shared_ptr<DmAuthRequestContext> AuthMessageProcessor::GetRequestContext()
 
 std::string AuthMessageProcessor::CreateDeviceAuthMessage(int32_t msgType, const uint8_t *data, uint32_t dataLen)
 {
-    LOGI("start, msgType %{public}d.", msgType);
+    LOGI("CreateDeviceAuthMessage start, msgType %{public}d.", msgType);
     JsonObject jsonObj;
     jsonObj[TAG_MSG_TYPE] = msgType;
     std::string authDataStr = std::string(reinterpret_cast<const char *>(data), dataLen);

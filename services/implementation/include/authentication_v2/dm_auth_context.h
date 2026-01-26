@@ -201,7 +201,7 @@ struct DmAccess {
     int64_t transmitSkTimeStamp; // Used for aging, time is 2 days, application-level credential timestamp
     int64_t lnnSkTimeStamp{0};     // Used for aging, time is 2 days, user-level credential timestamp
     int64_t skTimeStamp;        // Used for aging, time is 2 days
-    uint64_t certRandom{0}; // Used for cert generate
+    uint64_t certRandom{0};
     bool isAuthed;
     bool isUserLevelAuthed;
     bool isOnline;

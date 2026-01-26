@@ -128,10 +128,10 @@ int32_t HiChainAuthConnector::UnRegisterHiChainAuthCallbackById(int64_t id)
 std::shared_ptr<IDmDeviceAuthCallback> HiChainAuthConnector::GetDeviceAuthCallback(int64_t id)
 {
     if (dmDeviceAuthCallbackMap_.find(id) != dmDeviceAuthCallbackMap_.end()) {
-        LOGD("dmDeviceAuthCallbackMap_ id: %{public}" PRId64 ".", id);
+        LOGD("HiChainAuthConnector::GetDeviceAuthCallback dmDeviceAuthCallbackMap_ id: %{public}" PRId64 ".", id);
         return dmDeviceAuthCallbackMap_[id];
     }
-    LOGD("dmDeviceAuthCallbackMap_ not found, id: %{public}"
+    LOGD("HiChainAuthConnector::GetDeviceAuthCallback dmDeviceAuthCallbackMap_ not found, id: %{public}"
         PRId64 ".", id);
     // If the callback registered by the new protocol ID cannot be found, the callback registered
     // by the old protocol is used. However, the old protocol callback may be empty.
@@ -159,7 +159,7 @@ int32_t HiChainAuthConnector::AuthDevice(const std::string &pinCode, int32_t osA
 
 int32_t HiChainAuthConnector::ProcessAuthData(int64_t requestId, std::string authData, int32_t osAccountId)
 {
-    LOGI("start.");
+    LOGI("HiChainAuthConnector::ProcessAuthData start.");
     JsonObject jsonAuthParam;
     jsonAuthParam["osAccountId"] = osAccountId;
     jsonAuthParam["data"] = authData;
@@ -173,7 +173,7 @@ int32_t HiChainAuthConnector::ProcessAuthData(int64_t requestId, std::string aut
 
 int32_t HiChainAuthConnector::ProcessCredData(int64_t authReqId, const std::string &data)
 {
-    LOGI("start.");
+    LOGI("HiChainAuthConnector::ProcessAuthData start.");
     const CredAuthManager *credAuthManager = GetCredAuthInstance();
     int32_t ret = credAuthManager->processCredData(authReqId, reinterpret_cast<const uint8_t *>(data.c_str()),
         data.length(), &deviceAuthCallback_);
