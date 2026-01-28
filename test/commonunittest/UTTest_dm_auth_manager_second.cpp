@@ -883,7 +883,7 @@ HWTEST_F(DmAuthManagerTest, AuthDevice_002, testing::ext::TestSize.Level1)
     authManager_->authResponseContext_->authType = 5;
     EXPECT_CALL(*hiChainAuthConnectorMock_, AuthDevice(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = authManager_->AuthDevice(pinCode);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DmAuthManagerTest, ImportAuthCode_001, testing::ext::TestSize.Level1)
@@ -1586,20 +1586,19 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
     JsonObject jsonPeerGroupIdObj;
     jsonPeerGroupIdObj["groupId"] = "123456";
     authManager_->authResponseContext_->accountGroupIdHash = jsonPeerGroupIdObj.Dump();
-    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
-    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
-    EXPECT_CALL(*cryptoMock_, GetGroupIdHash(_)).WillOnce(Return("123"));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).Times(::testing::AtLeast(1))
+        .WillOnce(Return(0));
+    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).Times(::testing::AtLeast(1))
+        .WillOnce(Return(true));
     ret = authManager_->IsIdenticalAccount();
     ASSERT_FALSE(ret);
 }
 
 HWTEST_F(DmAuthManagerTest, GetAccountGroupIdHash_201, testing::ext::TestSize.Level1)
 {
-    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(-1));
     auto ret = authManager_->GetAccountGroupIdHash();
     ASSERT_TRUE(ret.empty());
 
-    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     ret = authManager_->GetAccountGroupIdHash();
     ASSERT_FALSE(ret.empty());
@@ -1617,7 +1616,6 @@ HWTEST_F(DmAuthManagerTest, GetAccountGroupIdHash_201, testing::ext::TestSize.Le
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(groupList), Return(true)));
-    EXPECT_CALL(*cryptoMock_, GetGroupIdHash(_)).WillOnce(Return("123456"));
     bool rets = authManager_->IsIdenticalAccount();
     ASSERT_FALSE(rets);
 

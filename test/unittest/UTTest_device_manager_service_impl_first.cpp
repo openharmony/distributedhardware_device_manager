@@ -49,17 +49,11 @@ void DeviceManagerServiceImplFirstTest::SetUpTestCase()
 void DeviceManagerServiceImplFirstTest::TearDownTestCase()
 {
     DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
-    deviceProfileConnectorMock_ = nullptr;
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
-    multipleUserConnectorMock_ = nullptr;
     DmSoftbusConnector::dmSoftbusConnector = nullptr;
-    softbusConnectorMock_ = nullptr;
     DmDmDeviceStateManager::dmDeviceStateManager = nullptr;
-    dmDeviceStateManagerMock_ = nullptr;
     DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl = nullptr;
-    deviceManagerServiceImplMock_ = nullptr;
     DmHiChainConnector::dmHiChainConnector = nullptr;
-    hiChainConnectorMock_ = nullptr;
 }
 
 namespace {

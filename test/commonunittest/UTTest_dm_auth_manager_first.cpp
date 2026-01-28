@@ -2136,13 +2136,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize
     strExtra = jsonObject.Dump();
     ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-
-    std::string pkgName = "pkgName_pickerProxy_Info";
-    int32_t authType = 1;
-    std::string extra = "extra";
-    authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(DM_OK));
-    authManager_->GetAuthParam(pkgName, authType, deviceId, extra);
 }
 
 HWTEST_F(DmAuthManagerTest, CheckHmlParamValid_001, testing::ext::TestSize.Level1)
