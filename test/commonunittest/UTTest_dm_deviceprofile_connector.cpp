@@ -1733,12 +1733,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_004, testing::ext::Te
 
     deviceId = "remoteDeviceId";
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-
-    std::string udid;
-    DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
-
-    udid = "deviceId";
-    DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetDevIdAndUserIdByActHash_001, testing::ext::TestSize.Level1)

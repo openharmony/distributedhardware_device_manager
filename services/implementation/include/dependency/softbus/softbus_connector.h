@@ -145,7 +145,7 @@ public:
     int32_t AddMemberToDiscoverMap(const std::string &deviceId, std::shared_ptr<DeviceInfo> deviceInfo);
     std::string GetNetworkIdByDeviceId(const std::string &deviceId);
     void HandleDeviceOnline(std::string deviceId, int32_t authForm);
-    void HandleDeviceOffline(std::string deviceId);
+    void HandleDeviceOffline(std::string deviceId, const bool isOnline);
     void SetProcessInfo(ProcessInfo processInfo);
     bool CheckIsNeedJoinLnn(const std::string &udid, const std::string &deviceId);
     bool CheckIsOnline(const std::string &targetDeviceId);

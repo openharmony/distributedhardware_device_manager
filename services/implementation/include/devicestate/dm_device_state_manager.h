@@ -92,7 +92,7 @@ public:
     void ChangeDeviceInfo(const DmDeviceInfo &info);
     int32_t RegisterSoftbusStateCallback();
     void OnDeviceOnline(std::string deviceId, int32_t authForm);
-    void OnDeviceOffline(std::string deviceId);
+    void OnDeviceOffline(std::string deviceId, const bool isOnline);
     std::string GetUdidByNetWorkId(std::string networkId);
     bool CheckIsOnline(const std::string &udid);
     void DeleteOffLineTimer(const std::string &peerUdid);

@@ -323,6 +323,10 @@ public:
         (void)networkId;
         (void)retCode;
     }
+    virtual std::set<ProcessInfo> GetAlreadyOnlineProcess() override
+    {
+        return std::set<ProcessInfo> {};
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

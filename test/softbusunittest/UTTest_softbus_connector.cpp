@@ -43,7 +43,7 @@ public:
     SoftbusStateCallbackTest() {}
     virtual ~SoftbusStateCallbackTest() {}
     void OnDeviceOnline(std::string deviceId, int32_t authForm) {}
-    void OnDeviceOffline(std::string deviceId) {}
+    void OnDeviceOffline(std::string deviceId, const bool isOnline) {}
     void DeleteOffLineTimer(const std::string &peerUdid) override {}
 };
 
@@ -665,7 +665,7 @@ HWTEST_F(SoftbusConnectorTest, HandleDeviceOffline_001, testing::ext::TestSize.L
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
     softbusConnector->RegisterSoftbusStateCallback(callback);
-    softbusConnector->HandleDeviceOffline(deviceId);
+    softbusConnector->HandleDeviceOffline(deviceId, false);
     EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);
 }
 
