@@ -17,8 +17,10 @@
 
 #include <gtest/gtest.h>
 #include <refbase.h>
+#include <gmock/gmock.h>
 #include "device_auth.h"
 #include "dm_service_hichain_connector.h"
+#include "multiple_user_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
