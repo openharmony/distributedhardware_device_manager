@@ -1386,6 +1386,49 @@ void DeviceManagerImpl::ClearBundleCallbacks(const std::string &bundleName)
     ClearDiscoverCallbacks(bundleName);
 }
 
+::taihe::array<::ohos::distributedDeviceManager::DeviceIdToUdid> DeviceManagerImpl::GetUdidsByDeviceIds(
+    ::taihe::array_view<::taihe::string> deviceIdList)
+{
+    if (!IsInit()) {
+        ani_errorutils::CreateBusinessError(DM_ERR_FAILED);
+        return {};
+    }
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        CreateBusinessError(static_cast<int32_t>(DMBusinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return {};
+    }
+    if (deviceIdList.size() == 0 || deviceIdList.size() > DM_MAX_DEVICESLIST_SIZE) {
+        LOGE("Invalid param, the size of deviceIdList is %{public}zu", deviceIdList.size());
+        CreateBusinessError(ERR_DM_INPUT_PARA_INVALID);
+        return {};
+    }
+
+    std::vector<std::string> deviceIdListVec;
+    for (const auto& deviceId : deviceIdList) {
+        deviceIdListVec.push_back(std::string(deviceId));
+    }
+
+    std::map<std::string, std::string> deviceIdToUdidMap;
+    int32_t ret = DeviceManager::GetInstance().GetUdidsByDeviceIds(bundleName_,
+        deviceIdListVec, deviceIdToUdidMap);
+    if (ret != DM_OK) {
+        LOGE("GetUdidsByDeviceIds failed, ret %{public}d", ret);
+        CreateBusinessError(ret);
+        return {};
+    }
+
+    std::vector<::ohos::distributedDeviceManager::DeviceIdToUdid> result;
+    for (const auto& pair : deviceIdToUdidMap) {
+        ::ohos::distributedDeviceManager::DeviceIdToUdid item;
+        item.deviceId = ::taihe::string(pair.first);
+        item.udid = ::taihe::string(pair.second);
+        result.emplace_back(item);
+    }
+    return ::taihe::array<::ohos::distributedDeviceManager::DeviceIdToUdid>(::taihe::copy_data_t{},
+        result.data(), result.size());
+}
+
 } // namespace ANI::distributedDeviceManager
 
 TH_EXPORT_CPP_API_CreateDeviceManager(ANI::distributedDeviceManager::CreateDeviceManager);

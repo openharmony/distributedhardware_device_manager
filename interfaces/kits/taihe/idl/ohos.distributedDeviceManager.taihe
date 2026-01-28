@@ -83,6 +83,11 @@ struct BindTargetResult {
     deviceId: String;
 }
 
+struct DeviceIdToUdid {
+    deviceId: String;
+    udid: String;
+}
+
 struct DeviceIconInfo {
     productId: String;
     subProductId: Optional<String>;
@@ -195,6 +200,8 @@ interface DeviceManager {
 
     @gen_promise("getDeviceNetworkIdList")
     GetDeviceNetworkIdListSync(filterOptions: NetworkIdQueryFilter): Array<String>;
+
+    GetUdidsByDeviceIds(deviceIdList: Array<String>): Array<DeviceIdToUdid>;
 
     @!sts_inject_into_interface("""
     restoreLocalDeivceName(): void;
