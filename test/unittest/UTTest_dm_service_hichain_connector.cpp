@@ -24,7 +24,6 @@ using namespace testing;
 namespace OHOS {
 namespace DistributedHardware {
 
-// Test callback class for IDmServiceGroupResCallback
 class TestDmServiceGroupResCallback : public IDmServiceGroupResCallback {
 public:
     virtual ~TestDmServiceGroupResCallback() = default;
@@ -175,9 +174,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupInfo_001, testing::ext::TestSize
     DmServiceHiChainConnector connector;
     std::vector<DmGroupInfo> groupList;
     std::string queryParams = "{}";
-
     bool ret = connector.GetGroupInfo(0, queryParams, groupList);
-
     (void)ret;
 }
 
@@ -191,9 +188,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupInfo_002, testing::ext::TestSize
     DmServiceHiChainConnector connector;
     std::vector<DmGroupInfo> groupList;
     std::string queryParams = "{}";
-
     bool ret = connector.GetGroupInfo(queryParams, groupList);
-
     (void)ret;
 }
 
@@ -209,9 +204,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupInfo_003, testing::ext::TestSize
     JsonObject queryParams;
     queryParams["groupType"] = 1;
     std::string queryStr = queryParams.Dump();
-
     bool ret = connector.GetGroupInfo(0, queryStr, groupList);
-
     (void)ret;
 }
 
@@ -225,9 +218,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupInfoCommon_001, testing::ext::Te
     DmServiceHiChainConnector connector;
     std::vector<DmGroupInfo> groupList;
     std::string queryParams = "{}";
-
     bool ret = connector.GetGroupInfoCommon(0, queryParams, "ohos.distributedhardware.devicemanagerservice", groupList);
-
     (void)ret;
 }
 
@@ -241,9 +232,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupInfoCommon_002, testing::ext::Te
     DmServiceHiChainConnector connector;
     std::vector<DmGroupInfo> groupList;
     std::string queryParams = "";
-
     bool ret = connector.GetGroupInfoCommon(0, queryParams, "ohos.distributedhardware.devicemanagerservice", groupList);
-
     (void)ret;
 }
 
@@ -257,9 +246,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupInfoCommon_003, testing::ext::Te
     DmServiceHiChainConnector connector;
     std::vector<DmGroupInfo> groupList;
     std::string queryParams = "{}";
-
     bool ret = connector.GetGroupInfoCommon(0, queryParams, "ohos.distributedhardware.devicemanagerservice", groupList);
-
     (void)ret;
 }
 
@@ -323,7 +310,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, UnRegisterHiChainGroupCallback_002, test
 HWTEST_F(DmServiceHiChainConnectorTest, OnFinish_001, testing::ext::TestSize.Level1)
 {
     DmServiceHiChainConnector connector;
-
     connector.onFinish(1, static_cast<int>(GroupOperationCode::GROUP_CREATE), nullptr);
 }
 
@@ -336,7 +322,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, OnFinish_002, testing::ext::TestSize.Lev
 {
     DmServiceHiChainConnector connector;
     const char *data = "create_ok";
-
     connector.onFinish(2, static_cast<int>(GroupOperationCode::GROUP_CREATE), data);
 }
 
@@ -348,7 +333,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, OnFinish_002, testing::ext::TestSize.Lev
 HWTEST_F(DmServiceHiChainConnectorTest, OnFinish_003, testing::ext::TestSize.Level1)
 {
     DmServiceHiChainConnector connector;
-
     connector.onFinish(3, static_cast<int>(GroupOperationCode::GROUP_DISBAND), nullptr);
 }
 
@@ -360,7 +344,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, OnFinish_003, testing::ext::TestSize.Lev
 HWTEST_F(DmServiceHiChainConnectorTest, OnFinish_004, testing::ext::TestSize.Level1)
 {
     DmServiceHiChainConnector connector;
-
     connector.onFinish(4, 999, nullptr);
     connector.onFinish(5, -1, "any");
 }
@@ -373,7 +356,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, OnFinish_004, testing::ext::TestSize.Lev
 HWTEST_F(DmServiceHiChainConnectorTest, OnError_001, testing::ext::TestSize.Level1)
 {
     DmServiceHiChainConnector connector;
-
     connector.onError(100, static_cast<int>(GroupOperationCode::GROUP_CREATE), -1, nullptr);
 }
 
@@ -386,7 +368,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, OnError_002, testing::ext::TestSize.Leve
 {
     DmServiceHiChainConnector connector;
     const char *err = "create_failed";
-
     connector.onError(101, static_cast<int>(GroupOperationCode::GROUP_CREATE), 123, err);
 }
 
@@ -398,7 +379,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, OnError_002, testing::ext::TestSize.Leve
 HWTEST_F(DmServiceHiChainConnectorTest, OnError_003, testing::ext::TestSize.Level1)
 {
     DmServiceHiChainConnector connector;
-
     connector.onError(200, static_cast<int>(GroupOperationCode::GROUP_DISBAND), -2, nullptr);
 }
 
@@ -411,7 +391,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, OnError_004, testing::ext::TestSize.Leve
 {
     DmServiceHiChainConnector connector;
     const char *err = "disband_failed";
-
     connector.onError(201, static_cast<int>(GroupOperationCode::GROUP_DISBAND), 456, err);
 }
 
@@ -423,7 +402,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, OnError_004, testing::ext::TestSize.Leve
 HWTEST_F(DmServiceHiChainConnectorTest, OnError_005, testing::ext::TestSize.Level1)
 {
     DmServiceHiChainConnector connector;
-
     connector.onError(300, 999, -999, nullptr);
     connector.onError(301, -1, 0, "any");
 }
@@ -439,9 +417,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupId_001, testing::ext::TestSize.L
     std::string groupId = "";
     std::string userId = "test_user_123";
     int32_t groupType = 1;
-
     int32_t ret = connector.GetGroupId(userId, groupType, groupId);
-
     (void)ret;
 }
 
@@ -961,9 +937,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, IsRedundanceGroup_003, testing::ext::Tes
     std::string userId = "test_user_redundance_002";
     int32_t authType = 1;
     std::vector<DmGroupInfo> groupList;
-
     bool ret = connector.IsRedundanceGroup(userId, authType, groupList);
-
     (void)ret;
 }
 
@@ -976,7 +950,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, DeleteRedundanceGroup_001, testing::ext:
 {
     DmServiceHiChainConnector connector;
     std::string userId = "";
-
     connector.DeleteRedundanceGroup(userId);
 }
 
@@ -989,7 +962,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, DeleteRedundanceGroup_002, testing::ext:
 {
     DmServiceHiChainConnector connector;
     std::string userId = "test_group_to_delete";
-
     connector.DeleteRedundanceGroup(userId);
 }
 
@@ -1003,7 +975,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, DealRedundanceGroup_001, testing::ext::T
     DmServiceHiChainConnector connector;
     std::string userId = "";
     int32_t authType = 1;
-
     connector.DealRedundanceGroup(userId, authType);
 }
 
@@ -1017,7 +988,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, DealRedundanceGroup_002, testing::ext::T
     DmServiceHiChainConnector connector;
     std::string userId = "test_user_deal_redundance_001";
     int32_t authType = 1;
-
     connector.DealRedundanceGroup(userId, authType);
 }
 
@@ -1030,17 +1000,11 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupInfo_With_Mock_001, testing::ext
 {
     auto mockUserConnector = std::make_shared<MultipleUserConnectorMock>();
     DmMultipleUserConnector::dmMultipleUserConnector = mockUserConnector;
-
-//     EXPECT_CALL(*mockUserConnector, GetCurrentAccountUserID())
-//         .WillOnce(Return(-1));
-
     DmServiceHiChainConnector connector;
     std::vector<DmGroupInfo> groupList;
     std::string queryParams = "{}";
     bool ret = connector.GetGroupInfo(queryParams, groupList);
-
     (void)ret;
-
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
 }
 
@@ -1053,17 +1017,11 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupInfo_With_Mock_002, testing::ext
 {
     auto mockUserConnector = std::make_shared<MultipleUserConnectorMock>();
     DmMultipleUserConnector::dmMultipleUserConnector = mockUserConnector;
-
-//     EXPECT_CALL(*mockUserConnector, GetCurrentAccountUserID())
-//         .WillOnce(Return(100));
-
     DmServiceHiChainConnector connector;
     std::vector<DmGroupInfo> groupList;
     std::string queryParams = "{}";
     bool ret = connector.GetGroupInfo(queryParams, groupList);
-
     (void)ret;
-
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
 }
 
@@ -1093,15 +1051,10 @@ HWTEST_F(DmServiceHiChainConnectorTest, DeleteGroup_With_Mock_001, testing::ext:
 {
     auto mockUserConnector = std::make_shared<MultipleUserConnectorMock>();
     DmMultipleUserConnector::dmMultipleUserConnector = mockUserConnector;
-
-//     EXPECT_CALL(*mockUserConnector, GetCurrentAccountUserID())
-//         .WillOnce(Return(-1));
-
     DmServiceHiChainConnector connector;
     std::string groupId = "test_group_id";
     int32_t ret = connector.DeleteGroup(groupId);
     (void)ret;
-
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
 }
 
@@ -1114,19 +1067,12 @@ HWTEST_F(DmServiceHiChainConnectorTest, DeleteGroup_With_Mock_002, testing::ext:
 {
     auto mockUserConnector = std::make_shared<MultipleUserConnectorMock>();
     DmMultipleUserConnector::dmMultipleUserConnector = mockUserConnector;
-
-//     EXPECT_CALL(*mockUserConnector, GetCurrentAccountUserID())
-//         .Times(2)
-//         .WillRepeatedly(Return(-1));
-
     DmServiceHiChainConnector connector;
     int64_t requestId = 1001;
     std::string userId = "test_user";
     int32_t authType = 1;
     int32_t ret = connector.DeleteGroup(requestId, userId, authType);
-
     (void)ret;
-
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
 }
 
@@ -1139,10 +1085,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, CreateGroup_With_Mock_001, testing::ext:
 {
     auto mockUserConnector = std::make_shared<MultipleUserConnectorMock>();
     DmMultipleUserConnector::dmMultipleUserConnector = mockUserConnector;
-
-//     EXPECT_CALL(*mockUserConnector, GetCurrentAccountUserID())
-//         .WillOnce(Return(-1));
-
     DmServiceHiChainConnector connector;
     int64_t requestId = 2001;
     int32_t authType = 1;
@@ -1150,7 +1092,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, CreateGroup_With_Mock_001, testing::ext:
     JsonObject jsonOutObj;
     int32_t ret = connector.CreateGroup(requestId, authType, userId, jsonOutObj);
     (void)ret;
-
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
 }
 
@@ -1163,10 +1104,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, CreateGroup_With_Mock_002, testing::ext:
 {
     auto mockUserConnector = std::make_shared<MultipleUserConnectorMock>();
     DmMultipleUserConnector::dmMultipleUserConnector = mockUserConnector;
-
-//     EXPECT_CALL(*mockUserConnector, GetCurrentAccountUserID())
-//         .WillOnce(Return(100));
-
     DmServiceHiChainConnector connector;
     int64_t requestId = 2002;
     int32_t authType = 1;
@@ -1174,7 +1111,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, CreateGroup_With_Mock_002, testing::ext:
     JsonObject jsonOutObj;
     int32_t ret = connector.CreateGroup(requestId, authType, userId, jsonOutObj);
     (void)ret;
-
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
 }
 
@@ -1187,10 +1123,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, addMultiMembers_With_Mock_001, testing::
 {
     auto mockUserConnector = std::make_shared<MultipleUserConnectorMock>();
     DmMultipleUserConnector::dmMultipleUserConnector = mockUserConnector;
-
-//     EXPECT_CALL(*mockUserConnector, GetCurrentAccountUserID())
-//         .WillOnce(Return(-1));
-
     DmServiceHiChainConnector connector;
     std::string userId = "test_user";
     int32_t groupType = 1;
@@ -1200,7 +1132,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, addMultiMembers_With_Mock_001, testing::
     jsonDeviceList["deviceList"] = deviceList;
     int32_t ret = connector.addMultiMembers(groupType, userId, jsonDeviceList);
     (void)ret;
-
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
 }
 
@@ -1213,10 +1144,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, deleteMultiMembers_With_Mock_001, testin
 {
     auto mockUserConnector = std::make_shared<MultipleUserConnectorMock>();
     DmMultipleUserConnector::dmMultipleUserConnector = mockUserConnector;
-
-//     EXPECT_CALL(*mockUserConnector, GetCurrentAccountUserID())
-//         .WillOnce(Return(-1));
-
     DmServiceHiChainConnector connector;
     std::string userId = "test_user";
     int32_t groupType = 1;
@@ -1226,7 +1153,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, deleteMultiMembers_With_Mock_001, testin
     jsonDeviceList["deviceList"] = deviceList;
     int32_t ret = connector.deleteMultiMembers(groupType, userId, jsonDeviceList);
     (void)ret;
-
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
 }
 
@@ -1239,15 +1165,10 @@ HWTEST_F(DmServiceHiChainConnectorTest, addMultiMembersExt_With_Mock_001, testin
 {
     auto mockUserConnector = std::make_shared<MultipleUserConnectorMock>();
     DmMultipleUserConnector::dmMultipleUserConnector = mockUserConnector;
-
-//     EXPECT_CALL(*mockUserConnector, GetCurrentAccountUserID())
-//         .WillOnce(Return(-1));
-
     DmServiceHiChainConnector connector;
     std::string credentialInfo = "test_credential";
     int32_t ret = connector.addMultiMembersExt(credentialInfo);
     (void)ret;
-
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
 }
 
@@ -1268,6 +1189,5 @@ HWTEST_F(DmServiceHiChainConnectorTest, IsRedundanceGroup_With_Mock_001, testing
     EXPECT_FALSE(ret);
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS
