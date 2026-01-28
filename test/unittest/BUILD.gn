@@ -1428,6 +1428,8 @@ ohos_unittest("UTTest_device_manager_service_impl_first") {
     "mock/deviceprofile_connector_mock.cpp",
     "mock/multiple_user_connector_mock.cpp",
     "mock/ipc_server_listener_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/dm_device_state_manager_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/hichain_connector_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -1456,10 +1458,10 @@ ohos_unittest("UTTest_device_manager_service_listener") {
 
   sources = [
     "UTTest_device_manager_service_listener.cpp",
-    "mock/app_manager_mock.cpp",
-    "mock/dm_crypto_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/app_manager_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/dm_crypto_mock.cpp",
     "mock/dm_softbus_cache_mock.cpp",
-    "mock/ipc_server_listener_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/ipc_server_listener_mock.cpp",
     "mock/kv_adapter_manager_mock.cpp",
   ]
 
@@ -1621,8 +1623,9 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
     "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_second.cpp",
     "mock/deviceprofile_connector_mock.cpp",
     "mock/hichain_auth_connector_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/dm_crypto_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/hichain_connector_mock.cpp",
-    "mock/multiple_user_connector_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/multiple_user_connector_mock.cpp",
     "mock/softbus_connector_mock.cpp",
   ]
 

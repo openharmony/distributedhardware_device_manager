@@ -41,14 +41,10 @@ void AuthAclTest::TearDownTestCase()
 {
     LOGI("AuthAclTest::TearDownTestCase start.");
     DmSoftbusConnector::dmSoftbusConnector = nullptr;
-    dmSoftbusConnectorMock = nullptr;
     DmSoftbusSession::dmSoftbusSession = nullptr;
-    dmSoftbusSessionMock = nullptr;
     DmAuthMessageProcessorMock::dmAuthMessageProcessorMock = nullptr;
-    deviceProfileConnectorMock = nullptr;
     DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
-    distributedDeviceProfileClientMock_ = nullptr;
     DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
 }
 
@@ -124,8 +120,6 @@ HWTEST_F(AuthAclTest, GetPinErrorCountAndTokenId_001, testing::ext::TestSize.Lev
     uint64_t expectedTokenId = 12345;
     DistributedDeviceProfile::LocalServiceInfo srvInfo;
     srvInfo.SetExtraInfo(R"({"pinErrorCount":5, "tokenId":12345})");
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetLocalServiceInfoByBundleAndPinType(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkFinishState>();
     authState->GetPinErrorCountAndTokenId(bundleName, pinExchangeType, count, tokenId);
 
