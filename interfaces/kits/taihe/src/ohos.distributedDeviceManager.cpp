@@ -28,6 +28,7 @@
 
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
+const uint32_t DM_MAX_DEVICESLIST_SIZE = 50;
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFail";
 
@@ -1420,13 +1421,11 @@ void DeviceManagerImpl::ClearBundleCallbacks(const std::string &bundleName)
 
     std::vector<::ohos::distributedDeviceManager::DeviceIdToUdid> result;
     for (const auto& pair : deviceIdToUdidMap) {
-        ::ohos::distributedDeviceManager::DeviceIdToUdid item;
-        item.deviceId = ::taihe::string(pair.first);
-        item.udid = ::taihe::string(pair.second);
-        result.emplace_back(item);
+        result.emplace_back(::ohos::distributedDeviceManager::DeviceIdToUdid{
+            ::taihe::string(pair.first), ::taihe::string(pair.second)});
     }
-    return ::taihe::array<::ohos::distributedDeviceManager::DeviceIdToUdid>(::taihe::copy_data_t{},
-        result.data(), result.size());
+    return ::taihe::array<::ohos::distributedDeviceManager::DeviceIdToUdid>(
+        ::taihe::copy_data_t{}, result.data(), result.size());
 }
 
 } // namespace ANI::distributedDeviceManager
