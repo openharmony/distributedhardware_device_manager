@@ -4514,32 +4514,33 @@ bool DeviceManagerService::CheckSinkIsSameAccount(const DmAccessCaller &caller, 
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-int32_t DeviceManagerService::GetUdidsByDeviceIds(const std::string &pkgName,
-    const std::vector<std::string> deviceIdList, std::map<std::string, std::string> &deviceIdToUdidMap)
+int32_t DeviceManagerService::GetIdentificationByDeviceIds(const std::string &pkgName,
+    const std::vector<std::string> deviceIdList,
+    std::map<std::string, std::string> &deviceIdentificationMap)
 {
     if (pkgName.empty() || deviceIdList.empty()) {
         LOGE("Invalid parameter, pkgName is empty or deviceIdList is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("GetUdidsByDeviceIds pkgName = %{public}s.", pkgName.c_str());
+    LOGI("GetIdentificationByDeviceIds pkgName = %{public}s.", pkgName.c_str());
     if (!AppManager::GetInstance().IsSystemApp()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NOT_SYSTEM_APP;
     }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission() ||
         !PermissionManager::GetInstance().CheckDataSyncPermission()) {
-        LOGE("The caller does not have permission to call GetUdidsByDeviceIds.");
+        LOGE("The caller does not have permission to call GetIdentificationByDeviceIds.");
         return ERR_DM_NO_PERMISSION;
     }
     for (auto deviceId : deviceIdList) {
-        LOGI("GetUdidsByDeviceIds deviceId = %{public}s.", GetAnonyString(deviceId).c_str());
-        if (deviceIdToUdidMap.find(deviceId) == deviceIdToUdidMap.end()) {
+        LOGI("GetIdentificationByDeviceIds deviceId = %{public}s.", GetAnonyString(deviceId).c_str());
+        if (deviceIdentificationMap.find(deviceId) == deviceIdentificationMap.end()) {
             std::string udidHash = "";
             std::string udid = "";
             GetUdidHashByAnoyDeviceId(deviceId, udidHash);
             SoftbusCache::GetInstance().GetUdidByUdidHash(udidHash, udid);
             if (!deviceId.empty() && !udidHash.empty() && !udid.empty()) {
-                deviceIdToUdidMap[deviceId] = udid;
+                deviceIdentificationMap[deviceId] = udid;
             }
         }
     }
