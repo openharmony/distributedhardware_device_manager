@@ -1387,8 +1387,8 @@ void DeviceManagerImpl::ClearBundleCallbacks(const std::string &bundleName)
     ClearDiscoverCallbacks(bundleName);
 }
 
-::taihe::array<::ohos::distributedDeviceManager::DeviceIdentification>
-DeviceManagerImpl::GetIdentificationByDeviceIds(::taihe::array_view<::taihe::string> deviceIdList)
+::taihe::array<::ohos::distributedDeviceManager::DeviceIdentification> DeviceManagerImpl::GetIdentificationByDeviceIds(
+    ::taihe::array_view<::taihe::string> deviceIdList)
 {
     if (!IsInit()) {
         ani_errorutils::CreateBusinessError(DM_ERR_FAILED);
