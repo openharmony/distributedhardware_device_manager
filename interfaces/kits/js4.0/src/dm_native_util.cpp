@@ -633,7 +633,7 @@ void JsObjectToStrVector(const napi_env &env, const napi_value &object, std::vec
     napi_get_array_length(env, object, &length);
     for (size_t i = 0; i < length; i++) {
         napi_value element;
-        napi_get_element(env, object, i, &element);
+        NAPI_CALL_RETURE_VOID(env, napi_get_element(env, object, i, &element));
         size_t strLen = 0;
         napi_get_value_string_utf8(env, element, nullptr, 0, &strLen);
         if (strLen == 0 || strLen >= DM_MAX_DEVICE_ID_LEN) {
