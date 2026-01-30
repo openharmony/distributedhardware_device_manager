@@ -29,7 +29,7 @@ public:
     virtual ~SoftbusStateCallbackFuzzTest() {}
 
     void OnDeviceOnline(std::string deviceId, int32_t authForm) override {}
-    void OnDeviceOffline(std::string deviceId) override {}
+    void OnDeviceOffline(std::string deviceId, const bool isOnline) override {}
     void DeleteOffLineTimer(const std::string &peerUdid) override {}
 };
 
@@ -42,12 +42,13 @@ void SoftBusConnectorStateFuzzTest(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     std::string str = fdp.ConsumeRandomLengthString();
     int32_t authForm = fdp.ConsumeIntegral<int32_t>();
+    bool isOnline = fdp.ConsumeBool();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackFuzzTest>();
 
     softbusConnector->RegisterSoftbusStateCallback(callback);
     softbusConnector->HandleDeviceOnline(str, authForm);
-    softbusConnector->HandleDeviceOffline(str);
+    softbusConnector->HandleDeviceOffline(str, isOnline);
 }
 }
 }

@@ -36,6 +36,7 @@
 #include "dm_log.h"
 #include "dm_radar_helper.h"
 #include "dm_random.h"
+#include "dm_softbus_cache.h"
 #include "ffrt.h"
 #include "json_object.h"
 #include "multiple_user_connector.h"
@@ -459,7 +460,8 @@ int32_t DmAuthManager::DeleteAcl(const std::string &pkgName, const std::string &
         if (offlineParam.leftAclNumber != 0) {
             LOGI("The pkgName unbind app-level type leftAclNumber not zero.");
             softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
-            softbusConnector_->HandleDeviceOffline(remoteUdid);
+            bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(remoteUdid);
+            softbusConnector_->HandleDeviceOffline(remoteUdid, isOnline);
             return DM_OK;
         }
         if (offlineParam.leftAclNumber == 0) {
@@ -2035,8 +2037,7 @@ int32_t DmAuthManager::AuthDevice(const std::string &pinCode)
     }
     CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_FAILED);
     CHECK_NULL_RETURN(authResponseContext_, ERR_DM_FAILED);
-    if (hiChainAuthConnector_->AuthDevice(pinCode, osAccountId, remoteDeviceId_,
-        authResponseContext_->requestId) != DM_OK) {
+    if (hiChainAuthConnector_->AuthDevice(pinCode, osAccountId, authResponseContext_->requestId) != DM_OK) {
         LOGE("DmAuthManager::AuthDevice failed.");
         isAuthDevice_ = false;
         if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
@@ -3192,13 +3193,6 @@ void DmAuthManager::OnScreenLocked()
 void DmAuthManager::HandleDeviceNotTrust(const std::string &udid)
 {
     LOGI("DmAuthManager::HandleDeviceNotTrust udid: %{public}s.", GetAnonyString(udid).c_str());
-    if (udid.empty()) {
-        LOGE("DmAuthManager::HandleDeviceNotTrust udid is empty.");
-        return;
-    }
-    DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
-    CHECK_NULL_VOID(hiChainConnector_);
-    hiChainConnector_->DeleteAllGroupByUdid(udid);
 }
 
 std::string DmAuthManager::ConvertSinkVersion(const std::string &version)

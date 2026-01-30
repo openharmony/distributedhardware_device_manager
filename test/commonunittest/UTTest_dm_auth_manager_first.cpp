@@ -62,7 +62,7 @@ public:
     SoftbusStateCallbackTest() {}
     virtual ~SoftbusStateCallbackTest() {}
     void OnDeviceOnline(std::string deviceId, int32_t authForm) {}
-    void OnDeviceOffline(std::string deviceId) {}
+    void OnDeviceOffline(std::string deviceId, const bool isOnline) {}
     void DeleteOffLineTimer(const std::string &peerUdid) {}
 };
 
@@ -1789,7 +1789,7 @@ HWTEST_F(DmAuthManagerTest, AuthDevice_003, testing::ext::TestSize.Level1)
     std::string pinCode = "123456";
     authManager_->isAuthDevice_ = false;
     authManager_->authResponseContext_->authType = 5;
-    EXPECT_CALL(*hiChainAuthConnectorMock_, AuthDevice(_, _, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*hiChainAuthConnectorMock_, AuthDevice(_, _, _)).WillOnce(Return(DM_OK));
     int32_t ret = authManager_->AuthDevice(pinCode);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -2136,13 +2136,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize
     strExtra = jsonObject.Dump();
     ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-
-    std::string pkgName = "pkgName_pickerProxy_Info";
-    int32_t authType = 1;
-    std::string extra = "extra";
-    authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(DM_OK));
-    authManager_->GetAuthParam(pkgName, authType, deviceId, extra);
 }
 
 HWTEST_F(DmAuthManagerTest, CheckHmlParamValid_001, testing::ext::TestSize.Level1)

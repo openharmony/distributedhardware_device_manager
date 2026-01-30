@@ -189,6 +189,7 @@ public:
     virtual void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId,
         int32_t retCode) {}
     virtual void OnAuthCodeInvalid(const std::string &pkgName) {}
+    virtual std::set<ProcessInfo> GetAlreadyOnlineProcess() = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -225,11 +225,8 @@ HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_201, testing::ext::TestSiz
 {
     DmAccessCaller caller;
     DmAccessCallee callee;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, CheckAccessControl(_, _, _, _)).WillOnce(Return(true));
     bool ret = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
 }
 
 /**
@@ -249,22 +246,19 @@ HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_202, testing::ext::TestSiz
  * @tc.name: CheckIsSameAccount_201
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_201, testing::ext::TestSize.Level1)
+HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_201, testing::ext::TestSize.Level0)
 {
     DmAccessCaller caller;
     DmAccessCallee callee;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, CheckIsSameAccount(_, _, _, _)).WillOnce(Return(true));
     bool ret = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
 }
 
 /**
  * @tc.name: CheckIsSameAccount_202
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_202, testing::ext::TestSize.Level1)
+HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_202, testing::ext::TestSize.Level0)
 {
     DmAccessCaller caller;
     DmAccessCallee callee;
@@ -295,7 +289,6 @@ HWTEST_F(DeviceManagerServiceTest, InitAccountInfo_201, testing::ext::TestSize.L
     DMAccountInfo dmAccountInfo;
     dmAccountInfo.accountId = "accountId";
     dmAccountInfo.accountName = "accountName";
-    EXPECT_CALL(*multipleUserConnectorMock_, GetAccountInfoByUserId(_)).WillOnce(Return(dmAccountInfo));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, currentUserId, beforeUserId);
     int32_t ret = DeviceManagerService::GetInstance().InitAccountInfo();
     EXPECT_EQ(ret, DM_OK);

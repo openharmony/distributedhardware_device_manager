@@ -24,10 +24,9 @@ bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAcc
     return DmHiChainAuthConnector::dmHiChainAuthConnector->QueryCredential(localUdid, osAccountId, peerOsAccountId);
 }
 
-int32_t HiChainAuthConnector::AuthDevice(const std::string &pinCode, int32_t osAccountId, std::string udid,
-    int64_t requestId)
+int32_t HiChainAuthConnector::AuthDevice(const std::string &pinCode, int32_t osAccountId, int64_t requestId)
 {
-    return DmHiChainAuthConnector::dmHiChainAuthConnector->AuthDevice(pinCode, osAccountId, udid, requestId);
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->AuthDevice(pinCode, osAccountId, requestId);
 }
 
 int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, int32_t peerOsAccountId, std::string deviceId,
