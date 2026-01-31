@@ -16,7 +16,7 @@
 #ifndef OHOS_DM_IPC_GET_IDENTIFICATION_BY_DEVICEIDS_RSP_H
 #define OHOS_DM_IPC_GET_IDENTIFICATION_BY_DEVICEIDS_RSP_H
 
-#include "ipc_req.h"
+#include "ipc_rsp.h"
 
 namespace OHOS {
 namespace DistributedHardware {
