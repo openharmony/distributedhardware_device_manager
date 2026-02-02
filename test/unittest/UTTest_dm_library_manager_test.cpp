@@ -25,9 +25,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace {
-constexpr int32_t WAITFOR_RESOURCE_RELEASE_SECONDS = 65;
-}
 void DMLibraryManagerTest::SetUp()
 {
 }
@@ -42,7 +39,6 @@ void DMLibraryManagerTest::SetUpTestCase()
 
 void DMLibraryManagerTest::TearDownTestCase()
 {
-    std::this_thread::sleep_for(std::chrono::seconds(WAITFOR_RESOURCE_RELEASE_SECONDS));
 }
 
 namespace {

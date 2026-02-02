@@ -18,7 +18,11 @@
 
 #include <gtest/gtest.h>
 #include "kv_adapter_manager.h"
+#include "mock_distributed_kv_data_manager.h"
+#include "mock_single_kv_store.h"
 
+using OHOS::DistributedKv::DistributedKvDataManagerMock;
+using OHOS::DistributedKv::MockSingleKvStore;
 namespace OHOS {
 namespace DistributedHardware {
 class KVAdapterManagerTest : public testing::Test {
@@ -27,10 +31,12 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-private:
+    bool InitKvStoreEnv();
+    bool UnInitKvStoreEnv();
     std::string CreateDmKVValueStr(const std::string &appId, int64_t lastModifyTime) const;
-    void ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr);
-    void RemoveDuplicates(const std::vector<std::string> &source, std::vector<std::string> &target);
+private:
+    std::shared_ptr<DistributedKvDataManagerMock> kvDataMgr_;
+    std::shared_ptr<MockSingleKvStore> mockSingleKvStore_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
