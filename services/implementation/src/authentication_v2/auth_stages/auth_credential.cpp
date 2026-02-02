@@ -39,7 +39,7 @@ namespace {
 constexpr const char* TAG_LOWER_DEVICE_ID = "deviceId";
 constexpr const char* TAG_LOWER_USER_ID = "userId";
 constexpr const char* DM_AUTH_CREDENTIAL_OWNER = "DM";
-const int32_t GENERATE_CERT_TIMEOUT = 100; // 100ms
+const int32_t GENERATE_CERT_TIMEOUT = 300; // 300ms
 
 // decrypt process
 int32_t g_authCredentialTransmitDecryptProcess(std::shared_ptr<DmAuthContext> context, DmEventType event)
