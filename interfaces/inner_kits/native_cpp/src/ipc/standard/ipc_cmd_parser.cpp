@@ -52,8 +52,8 @@
 #include "ipc_get_localserviceinfo_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
-#include "ipc_get_udids_by_deviceIds_req.h"
-#include "ipc_get_udids_by_deviceIds_rsp.h"
+#include "ipc_get_identification_by_deviceIds_req.h"
+#include "ipc_get_identification_by_deviceIds_rsp.h"
 #include "ipc_import_auth_code_req.h"
 #include "ipc_model_codec.h"
 #include "ipc_notify_event_req.h"
@@ -2289,11 +2289,11 @@ ON_IPC_READ_RESPONSE(CHECK_SINK_SAME_ACCOUNT, MessageParcel &reply, std::shared_
     return ReadResponse(CHECK_SINK_SAME_ACCOUNT, reply, pBaseRsp);
 }
 
-ON_IPC_SET_REQUEST(GET_UDIDS_BY_DEVICEIDS, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+ON_IPC_SET_REQUEST(GET_IDENTIFICATION_BY_DEVICEIDS, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
-    std::shared_ptr<IpcGetUdidsByDeviceIdsReq> pReq =
-        std::static_pointer_cast<IpcGetUdidsByDeviceIdsReq>(pBaseReq);
+    std::shared_ptr<IpcGetIdentificationByDeviceIdsReq> pReq =
+        std::static_pointer_cast<IpcGetIdentificationByDeviceIdsReq>(pBaseReq);
     if (!data.WriteString(pReq->GetPkgName())) {
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -2306,15 +2306,17 @@ ON_IPC_SET_REQUEST(GET_UDIDS_BY_DEVICEIDS, std::shared_ptr<IpcReq> pBaseReq, Mes
     return DM_OK;
 }
 
-ON_IPC_READ_RESPONSE(GET_UDIDS_BY_DEVICEIDS, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+ON_IPC_READ_RESPONSE(GET_IDENTIFICATION_BY_DEVICEIDS, MessageParcel &reply,
+    std::shared_ptr<IpcRsp> pBaseRsp)
 {
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
-    std::shared_ptr<IpcGetUdidsByDeviceIdsRsp> pRsp = std::static_pointer_cast<IpcGetUdidsByDeviceIdsRsp>(pBaseRsp);
+    std::shared_ptr<IpcGetIdentificationByDeviceIdsRsp> pRsp =
+        std::static_pointer_cast<IpcGetIdentificationByDeviceIdsRsp>(pBaseRsp);
     pRsp->SetErrCode(reply.ReadInt32());
     std::string outParaStr = reply.ReadString();
     std::map<std::string, std::string> outputResult;
     ParseMapFromJsonString(outParaStr, outputResult);
-    pRsp->SetDeviceIdToUdidMap(outputResult);
+    pRsp->SetDeviceIdentificationMap(outputResult);
     return DM_OK;
 }
 

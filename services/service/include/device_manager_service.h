@@ -285,8 +285,9 @@ public:
     bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    int32_t GetUdidsByDeviceIds(const std::string &pkgName, const std::vector<std::string> deviceIdList,
-        std::map<std::string, std::string> &deviceIdToUdidMap);
+    int32_t GetIdentificationByDeviceIds(const std::string &pkgName,
+        const std::vector<std::string> deviceIdList,
+        std::map<std::string, std::string> &deviceIdentificationMap);
 #endif
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
     int32_t GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,

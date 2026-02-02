@@ -2050,19 +2050,20 @@ ON_IPC_CMD(CHECK_SINK_SAME_ACCOUNT, MessageParcel &data, MessageParcel &reply)
     return OnIpcCmd(CHECK_SINK_SAME_ACCOUNT, data, reply);
 }
 
-ON_IPC_CMD(GET_UDIDS_BY_DEVICEIDS, MessageParcel &data, MessageParcel &reply)
+ON_IPC_CMD(GET_IDENTIFICATION_BY_DEVICEIDS, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     std::vector<std::string> deviceIdList;
     IpcModelCodec::DecodeStringVector(data, deviceIdList);
-    std::map<std::string, std::string> deviceIdToUdidMap;
-    int32_t result = DeviceManagerService::GetInstance().GetUdidsByDeviceIds(pkgName, deviceIdList, deviceIdToUdidMap);
+    std::map<std::string, std::string> deviceIdentificationMap;
+    int32_t result = DeviceManagerService::GetInstance().GetIdentificationByDeviceIds(
+        pkgName, deviceIdList, deviceIdentificationMap);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (result == DM_OK && !deviceIdToUdidMap.empty()) {
-        std::string outParaStr = ConvertMapToJsonString(deviceIdToUdidMap);
+    if (result == DM_OK && !deviceIdentificationMap.empty()) {
+        std::string outParaStr = ConvertMapToJsonString(deviceIdentificationMap);
         if (!reply.WriteString(outParaStr)) {
             LOGE("write returnJsonStr failed");
             return ERR_DM_IPC_WRITE_FAILED;
