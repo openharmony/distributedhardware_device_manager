@@ -594,7 +594,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupInfoCommon_009, testing::ext::Te
     DmServiceHiChainConnector connector;
     std::vector<DmGroupInfo> groupList;
     std::string queryParams = "{\"invalid_group\":999999}";
-    bool ret = connector.GetGroupInfoCommon(0, queryParams, "ohos.distributedhardware.devicemanagerservice", 
+    bool ret = connector.GetGroupInfoCommon(0, queryParams, "ohos.distributedhardware.devicemanagerservice",
                                             groupList);
     EXPECT_TRUE(ret == true || ret == false);
 }
@@ -624,7 +624,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupInfoCommon_011, testing::ext::Te
     DmServiceHiChainConnector connector;
     std::vector<DmGroupInfo> groupList;
     std::string queryParams = "{\"not_an_array\":true}";
-    bool ret = connector.GetGroupInfoCommon(0, queryParams, "ohos.distributedhardware.devicemanagerservice", 
+    bool ret = connector.GetGroupInfoCommon(0, queryParams, "ohos.distributedhardware.devicemanagerservice",
                                             groupList);
     EXPECT_TRUE(ret == true || ret == false);
 }
@@ -639,7 +639,7 @@ HWTEST_F(DmServiceHiChainConnectorTest, GetGroupInfoCommon_012, testing::ext::Te
     DmServiceHiChainConnector connector;
     std::vector<DmGroupInfo> groupList;
     std::string queryParams = "{malformed_json_content";
-    bool ret = connector.GetGroupInfoCommon(0, queryParams, "ohos.distributedhardware.devicemanagerservice", 
+    bool ret = connector.GetGroupInfoCommon(0, queryParams, "ohos.distributedhardware.devicemanagerservice",
                                             groupList);
     EXPECT_TRUE(ret == true || ret == false);
 }
