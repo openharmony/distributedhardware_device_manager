@@ -410,13 +410,13 @@ void DMCommTool::DMCommToolEventHandler::HandleEvent(const std::shared_ptr<DMCom
             break;
         }
         case DM_COMM_SEND_SERVICE_UNBIND_PROXY: {
- 	        dmCommToolPtr->ProcessReceiveServiceUnbindProxyEvent(commMsg);
- 	        break;
- 	    }
- 	    case DM_COMM_RSP_SERVICE_UNBIND_PROXY: {
- 	        dmCommToolPtr->ProcessReceiveRspServiceUnbindProxyEvent(commMsg);
- 	        break;
- 	    }
+            dmCommToolPtr->ProcessReceiveServiceUnbindProxyEvent(commMsg);
+            break;
+        }
+        case DM_COMM_RSP_SERVICE_UNBIND_PROXY: {
+            dmCommToolPtr->ProcessReceiveRspServiceUnbindProxyEvent(commMsg);
+            break;
+        }
         default:
             LOGE("event is undefined, id is %{public}d", eventId);
             break;

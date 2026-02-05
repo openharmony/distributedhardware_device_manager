@@ -170,8 +170,8 @@ if (defined(ohos_lite)) {
     ]
     
     if (support_jsapi) {
- 	    external_deps += [ "bundle_framework:appexecfwk_core" ]
- 	  }
+        external_deps += [ "bundle_framework:appexecfwk_core" ]
+      }
       
     subsystem_name = "distributedhardware"
 
@@ -213,8 +213,8 @@ if (defined(ohos_lite)) {
     ]
 
     if (support_jsapi) {
- 	    sources += [ "src/fwkload/standard/dm_distributed_hardware_load.cpp" ]
- 	  }
+        sources += [ "src/fwkload/standard/dm_distributed_hardware_load.cpp" ]
+      }
 
     public_configs = [ ":devicemanagerutils_config" ]
 
@@ -247,12 +247,12 @@ if (defined(ohos_lite)) {
     public_external_deps = [
       "bundle_framework:appexecfwk_core",
       "cJSON:cjson",
- 	    "kv_store:distributeddata_inner",
+        "kv_store:distributeddata_inner",
     ]
 
     if (support_jsapi) {
- 	    external_deps += [ "bundle_framework:appexecfwk_core" ]
- 	  }
+        external_deps += [ "bundle_framework:appexecfwk_core" ]
+      }
 
     subsystem_name = "distributedhardware"
 

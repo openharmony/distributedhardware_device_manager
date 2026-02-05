@@ -64,7 +64,7 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t GetAvailableDeviceList(const std::string &pkgName,
-    	std::vector<DmDeviceBasicInfo> &deviceList) override;
+       std::vector<DmDeviceBasicInfo> &deviceList) override;
     /**
      * @tc.name: DeviceManagerImpl::GetLocalDeviceInfo
      * @tc.desc: Get local device information

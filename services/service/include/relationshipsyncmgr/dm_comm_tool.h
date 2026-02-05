@@ -84,9 +84,9 @@ public:
     void ProcessReceiveUninstAppEvent(const std::shared_ptr<InnerCommMsg> &commMsg);
     void ProcessReceiveUnBindAppEvent(const std::shared_ptr<InnerCommMsg> &commMsg);
     int32_t SendUnBindServiceProxyObj(const UnbindServiceProxyParam &param);
- 	void ProcessReceiveServiceUnbindProxyEvent(const std::shared_ptr<InnerCommMsg> &commMsg);
- 	int32_t RspServiceUnbindProxy(const std::string &rmtNetworkId, int32_t socketId);
- 	void ProcessReceiveRspServiceUnbindProxyEvent(const std::shared_ptr<InnerCommMsg> commMsg);
+    void ProcessReceiveServiceUnbindProxyEvent(const std::shared_ptr<InnerCommMsg> &commMsg);
+    int32_t RspServiceUnbindProxy(const std::string &rmtNetworkId, int32_t socketId);
+    void ProcessReceiveRspServiceUnbindProxyEvent(const std::shared_ptr<InnerCommMsg> commMsg);
 private:
     std::shared_ptr<DMTransport> dmTransportPtr_;
     std::shared_ptr<DMCommTool::DMCommToolEventHandler> eventHandler_;

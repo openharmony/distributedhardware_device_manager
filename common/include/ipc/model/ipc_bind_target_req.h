@@ -66,29 +66,29 @@ public:
     }
 
     void SetNetWorkId(const std::string &netWorkId)
- 	{
- 	    netWorkId_ = netWorkId;
- 	}
+    {
+        netWorkId_ = netWorkId;
+    }
 
- 	const std::string &GetNetWorkId() const
- 	{
- 	    return netWorkId_;
- 	}
+    const std::string &GetNetWorkId() const
+    {
+        return netWorkId_;
+    }
 
- 	void SetServiceId(int64_t serviceId)
- 	{
- 	    serviceId_ = serviceId;
- 	}
+    void SetServiceId(int64_t serviceId)
+    {
+        serviceId_ = serviceId;
+    }
 
- 	const int64_t &GetServiceId() const
- 	{
- 	    return serviceId_;
- 	}
+    const int64_t &GetServiceId() const
+    {
+        return serviceId_;
+    }
 private:
     PeerTargetId targetId_;
     std::string bindParam_;
     std::string netWorkId_;
- 	int64_t serviceId_;
+    int64_t serviceId_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

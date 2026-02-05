@@ -301,7 +301,7 @@ private:
     bool ProcessServerAuthorize(std::shared_ptr<DmAuthContext> context);
     bool IsUserAuthorize(JsonObject &paramObj, DmProxyAccess &access);
     bool IsUserAuthorizeProxy(JsonObject &paramObj, std::shared_ptr<DmAuthContext> context);
- 	bool IsUserAuthorizeService(JsonObject &paramObj, DmProxyAccess &accesser, DmProxyAccess &accessee);
+    bool IsUserAuthorizeService(JsonObject &paramObj, DmProxyAccess &accesser, DmProxyAccess &accessee);
     int32_t ProcessNoBindAuthorize(std::shared_ptr<DmAuthContext> context);
     std::string GetCredIdByCredType(std::shared_ptr<DmAuthContext> context, int32_t credType);
     bool ExtractPinConsumerTokenId(const std::string &srvExtraInfo, uint64_t &tokenId);

@@ -122,8 +122,8 @@ typedef struct DmProxyAccess {
     std::string credInfoJson;
     std::string aclTypeJson;
     int64_t serviceId;
- 	std::string serviceInfo;
- 	std::string extraInfo;
+    std::string serviceInfo;
+    std::string extraInfo;
 } DmProxyAccess;
 
 struct DmProxyAuthContext {
@@ -318,7 +318,7 @@ struct DmAuthContext {
     CleanNotifyCallback cleanNotifyCallback{nullptr};
     StopTimerAndDelDpCallback stopTimerAndDelDpCallback{nullptr};
     std::vector<int64_t> serviceId; // sync service id
- 	std::vector<DistributedDeviceProfile::ServiceInfo> serviceInfos; // sync service infos and send service info to source
+    std::vector<DistributedDeviceProfile::ServiceInfo> serviceInfos; // sync service infos and send service info to source
 
     std::string GetDeviceId(DmAuthSide side);
     int32_t GetUserId(DmAuthSide side);
