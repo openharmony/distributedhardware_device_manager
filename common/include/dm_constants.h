@@ -174,6 +174,7 @@ DM_EXPORT extern const char* TITLE;
 DM_EXPORT extern const char* DM_BUSINESS_ID;
 DM_EXPORT extern const char* PARAM_KEY_IS_SERVICE_BIND;
 DM_EXPORT extern const char* BIND_CALLER_IS_SYSTEM_SA;
+DM_EXPORT extern const char* SERVICE_USER_DATA;
 
 // screen state
 enum ScreenState {

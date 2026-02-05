@@ -95,6 +95,7 @@ namespace {
     constexpr const char* APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:appUninstallByWifi";
     constexpr const char* APP_UNBIND_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:appUnbindByWifi";
     constexpr const char* ACCOUNT_COMMON_EVENT_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:accountCommonEventByWifi";
+    constexpr const char* SERVICE_UNBIND_PROXY_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:serviceUnbindProxyByWifi";
     const int32_t USER_SWITCH_BY_WIFI_TIMEOUT_S = 2;
     const int32_t SEND_DELAY_MAX_TIME = 5;
     const int32_t SEND_DELAY_MIN_TIME = 0;
@@ -5084,6 +5085,30 @@ int32_t DeviceManagerService::GetAuthTypeByUdidHash(const std::string &udidHash,
     DeviceProfileConnector::GetInstance().GetAuthTypeByUdidHash(udidHash, pkgName, authType);
 #endif
     return DM_OK;
+}
+
+void DeviceManagerService::ProcessReceiveRspSvcUnbindProxy(const std::string &remoteUdid)
+{
+    LOGI("ProcessReceiveRspSvcUnbindProxy remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
+    std::lock_guard<std::mutex> autoLock(timerLocks_);
+    if (timer_ != nullptr && remoteUdid != "") {
+        timer_->DeleteTimer(std::string(SERVICE_UNBIND_PROXY_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
+    }
+}
+
+void DeviceManagerService::ProcessUnBindServiceProxy(const UnbindServiceProxyParam &param)
+{
+    LOGI("ProcessUnBindServiceProxy, userId: %{public}d, serviceId: %{public}s, peerTokenId %{public}zu",
+        param.userId, std::to_string(param.serviceId).c_str(), param.peerTokenId.size());
+    int32_t peerUserId = param.userId;
+    uint64_t peerTokenId = param.localTokenId;
+    std::vector<uint64_t> localTokenId = param.peerTokenId;
+    std::string peerUdid = param.localUdid;
+    //the code will be using in next pr
+    // if (IsDMServiceAdapterResidentLoad()) {
+    //     dmServiceImplExtResident_->HandleProcessUnBindServiceProxy(peerUserId, peerTokenId, localTokenId,
+    //         param.serviceId, peerUdid);
+    // }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

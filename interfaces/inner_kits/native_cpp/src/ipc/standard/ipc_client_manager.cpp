@@ -242,13 +242,14 @@ void IpcClientManager::SystemAbilityListener::OnAddSystemAbility(int32_t systemA
             return;
         }
         DeviceManagerImpl::GetInstance().SyncCallbacksToService(callbackMap);
-        std::map<DmCommonNotifyEvent, std::set<std::pair<std::string, int64_t>>> serviceCallbackMap;
-        DeviceManagerNotify::GetInstance().GetServiceCallBack(serviceCallbackMap);
-        if (serviceCallbackMap.size() == 0) {
-            LOGE("serviceCallbackMap is empty when ReInit");
-            return;
-        }
-        DeviceManagerImpl::GetInstance().SyncServiceCallbacksToService(serviceCallbackMap);
+        //the code will be using in next pr
+        // std::map<DmCommonNotifyEvent, std::set<std::pair<std::string, int64_t>>> serviceCallbackMap;
+        // DeviceManagerNotify::GetInstance().GetServiceCallBack(serviceCallbackMap);
+        // if (serviceCallbackMap.size() == 0) {
+        //     LOGE("serviceCallbackMap is empty when ReInit");
+        //     return;
+        // }
+        // DeviceManagerImpl::GetInstance().SyncServiceCallbacksToService(serviceCallbackMap);
     }
 }
 } // namespace DistributedHardware

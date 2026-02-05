@@ -164,6 +164,7 @@ const char* TITLE = "title";
 const char* DM_BUSINESS_ID = "business_id";
 const char* PARAM_KEY_IS_SERVICE_BIND = "isServiceBind";
 const char* BIND_CALLER_IS_SYSTEM_SA = "bindCallerIsSystemSA";
+const char* SERVICE_USER_DATA = "serviceUserData";
 
 // errCode map
 const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
