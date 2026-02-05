@@ -5104,11 +5104,6 @@ void DeviceManagerService::ProcessUnBindServiceProxy(const UnbindServiceProxyPar
     uint64_t peerTokenId = param.localTokenId;
     std::vector<uint64_t> localTokenId = param.peerTokenId;
     std::string peerUdid = param.localUdid;
-    //the code will be using in next pr
-    // if (IsDMServiceAdapterResidentLoad()) {
-    //     dmServiceImplExtResident_->HandleProcessUnBindServiceProxy(peerUserId, peerTokenId, localTokenId,
-    //         param.serviceId, peerUdid);
-    // }
 }
 } // namespace DistributedHardware
 } // namespace OHOS
