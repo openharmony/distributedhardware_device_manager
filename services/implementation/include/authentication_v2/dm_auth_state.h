@@ -34,6 +34,7 @@ const char* const FILED_CRED_TYPE = "credType";
 const char* const FILED_AUTHORIZED_SCOPE = "authorizedScope";
 const char* const FILED_AUTHORIZED_APP_LIST = "authorizedAppList";
 const char* const FILED_SUBJECT = "subject";
+const char* const TAG_SERVICE_ID = "serviceId";
 constexpr const static char* BUNDLE_NAME_COLLABORATION_FWK = "CollaborationFwk";
 const std::map<std::string, std::string> PKGNAME_MAPPING = {
     { "watch_system_service", "com.huawei.hmos.wearlink" }
@@ -288,7 +289,9 @@ private:
     void NegotiateAcl(std::shared_ptr<DmAuthContext> context, JsonObject &aclNegoRsult);
     void NegotiateProxyAcl(std::shared_ptr<DmAuthContext> context);
     int32_t ShowConfigDialog(std::shared_ptr<DmAuthContext> context);
+    int32_t ShowServiceBindConfigDialog(std::shared_ptr<DmAuthContext> context);
     int32_t CreateProxyData(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObj);
+    int32_t CreateServiceBindProxyData(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObj);
     void GetBundleLabel(std::shared_ptr<DmAuthContext> context);
     void ReadServiceInfo(std::shared_ptr<DmAuthContext> context);
     void MatchFallBackCandidateList(std::shared_ptr<DmAuthContext> context, DmAuthType authType);
@@ -297,6 +300,8 @@ private:
     bool ProcessUserOption(std::shared_ptr<DmAuthContext> context, const std::string &authorizeInfo);
     bool ProcessServerAuthorize(std::shared_ptr<DmAuthContext> context);
     bool IsUserAuthorize(JsonObject &paramObj, DmProxyAccess &access);
+    bool IsUserAuthorizeProxy(JsonObject &paramObj, std::shared_ptr<DmAuthContext> context);
+ 	bool IsUserAuthorizeService(JsonObject &paramObj, DmProxyAccess &accesser, DmProxyAccess &accessee);
     int32_t ProcessNoBindAuthorize(std::shared_ptr<DmAuthContext> context);
     std::string GetCredIdByCredType(std::shared_ptr<DmAuthContext> context, int32_t credType);
     bool ExtractPinConsumerTokenId(const std::string &srvExtraInfo, uint64_t &tokenId);
@@ -550,6 +555,7 @@ public:
 private:
     int32_t RespQueryAcceseeIds(std::shared_ptr<DmAuthContext> context);
     int32_t RespQueryProxyAcceseeIds(std::shared_ptr<DmAuthContext> context);
+    int32_t RespQueryServiceAcceseeIds(std::shared_ptr<DmAuthContext> context);
     int32_t ProcRespNegotiate5_1_0(std::shared_ptr<DmAuthContext> context);
     void GetSinkCredentialInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);
     void GetIdenticalCredentialInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);

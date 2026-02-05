@@ -28,6 +28,7 @@ namespace OHOS {
 namespace DistributedHardware {
 DM_EXPORT int32_t GenRandInt(int32_t randMin, int32_t randMax);
 DM_EXPORT int64_t GenRandLongLong(int64_t randMin, int64_t randMax);
+DM_EXPORT uint64_t GenRandUnLongLong(uint64_t randMin, uint64_t randMax);
 DM_EXPORT uint16_t GenRandUint(uint16_t randMin, uint16_t randMax);
 DM_EXPORT uint16_t GenUniqueRandUint(std::set<uint16_t> &randUint16Set);
 DM_EXPORT std::string GeneratePinCode(uint32_t pinLength);

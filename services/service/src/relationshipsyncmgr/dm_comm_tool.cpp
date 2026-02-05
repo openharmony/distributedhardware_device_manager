@@ -39,6 +39,8 @@ constexpr int32_t DM_COMM_SEND_LOCAL_APP_UNINSTALL = 6;
 constexpr int32_t DM_COMM_SEND_LOCAL_APP_UNBIND = 7;
 constexpr int32_t DM_COMM_RSP_APP_UNINSTALL = 8;
 constexpr int32_t DM_COMM_RSP_APP_UNBIND = 9;
+constexpr int32_t DM_COMM_SEND_SERVICE_UNBIND_PROXY = 10;
+constexpr int32_t DM_COMM_RSP_SERVICE_UNBIND_PROXY = 11;
 constexpr const char* EVENT_TASK = "EventTask";
 const char* const USER_STOP_MSG_KEY = "stopUserId";
 
@@ -260,6 +262,52 @@ int32_t DMCommTool::SendUnBindAppObj(int32_t userId, int32_t tokenId, const std:
     return DM_OK;
 }
 
+int32_t DMCommTool::SendUnBindServiceProxyObj(const UnbindServiceProxyParam &param)
+{
+    LOGI("DMCommTool::SendUnBindAppObj, userId: %{public}d, peerTokenId: %{public}zu, serviceId: %{public}s",
+        param.userId, param.peerTokenId.size(), std::to_string(param.serviceId).c_str());
+    if (!IsIdLengthValid(param.peerNetworkId)) {
+        LOGE("param invalid, networkId: %{public}s", GetAnonyString(param.peerNetworkId).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null");
+        return ERR_DM_FAILED;
+    }
+    int32_t socketId;
+    if (dmTransportPtr_->StartSocket(param.peerNetworkId, socketId) != DM_OK || socketId <= 0) {
+        LOGE("Start socket error");
+        return ERR_DM_FAILED;
+    }
+
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        LOGE("Create cJSON object failed.");
+        return ERR_DM_FAILED;
+    }
+    ToJson(root, param);
+    char *msg = cJSON_PrintUnformatted(root);
+    if (msg == nullptr) {
+        cJSON_Delete(root);
+        return ERR_DM_FAILED;
+    }
+    std::string msgStr(msg);
+    cJSON_Delete(root);
+    cJSON_free(msg);
+    CommMsg commMsg(DM_COMM_SEND_SERVICE_UNBIND_PROXY, msgStr);
+    std::string payload = GetCommMsgString(commMsg);
+
+    int32_t ret = dmTransportPtr_->Send(param.peerNetworkId, payload, socketId);
+    if (ret != DM_OK) {
+        LOGE("Send local foreground userids failed, ret: %{public}d", ret);
+        return ERR_DM_FAILED;
+    }
+    
+    LOGI("Send local foreground userids success");
+    return DM_OK;
+}
+
 void DMCommTool::RspLocalFrontOrBackUserIds(const std::string &rmtNetworkId,
     const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds, int32_t socketId)
 {
@@ -361,6 +409,14 @@ void DMCommTool::DMCommToolEventHandler::HandleEvent(const std::shared_ptr<DMCom
             dmCommToolPtr->ProcessReceiveRspAppUnbindEvent(commMsg);
             break;
         }
+        case DM_COMM_SEND_SERVICE_UNBIND_PROXY: {
+ 	        dmCommToolPtr->ProcessReceiveServiceUnbindProxyEvent(commMsg);
+ 	        break;
+ 	    }
+ 	    case DM_COMM_RSP_SERVICE_UNBIND_PROXY: {
+ 	        dmCommToolPtr->ProcessReceiveRspServiceUnbindProxyEvent(commMsg);
+ 	        break;
+ 	    }
         default:
             LOGE("event is undefined, id is %{public}d", eventId);
             break;
@@ -567,6 +623,72 @@ void DMCommTool::ProcessReceiveUnBindAppEvent(const std::shared_ptr<InnerCommMsg
         DeviceManagerService::GetInstance().ProcessUnBindApp(unBindAppMsg.userId_,
             unBindAppMsg.tokenId_, unBindAppMsg.extra_, unBindAppMsg.udid_);
     }
+}
+
+void DMCommTool::ProcessReceiveServiceUnbindProxyEvent(const std::shared_ptr<InnerCommMsg> &commMsg)
+{
+    if (commMsg == nullptr || commMsg->commMsg == nullptr) {
+        LOGE("commMsg or commMsg->commMsg is null");
+        return;
+    }
+    LOGI("DMCommTool::ProcessReceiveServiceUnbindProxyEvent Receive remote unbind service proxy.");
+    std::string payload = commMsg->commMsg->msg;
+    cJSON *root = cJSON_Parse(payload.c_str());
+    if (root == NULL) {
+        LOGE("the msg is not json format");
+        return;
+    }
+    UnbindServiceProxyParam unBindMsg;
+    FromJson(root, unBindMsg);
+    cJSON_Delete(root);
+    RspServiceUnbindProxy(commMsg->remoteNetworkId, commMsg->socketId);
+    DeviceManagerService::GetInstance().ProcessUnBindServiceProxy(unBindMsg);
+}
+
+int32_t DMCommTool::RspServiceUnbindProxy(const std::string &rmtNetworkId, int32_t socketId)
+{
+    LOGI("RspServiceUnbindProxy Start.");
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null");
+        return ERR_DM_FAILED;
+    }
+    std::string msgStr("");
+    CommMsg commMsg(DM_COMM_RSP_SERVICE_UNBIND_PROXY, msgStr);
+    std::string payload = GetCommMsgString(commMsg);
+
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null");
+        return ERR_DM_FAILED;
+    }
+    int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload, socketId);
+    if (ret != DM_OK) {
+        LOGE("RspServiceUnbindProxy failed, ret: %{public}d", ret);
+        return ERR_DM_FAILED;
+    }
+    
+    LOGI("RspServiceUnbindProxy success");
+    return DM_OK;
+}
+
+void DMCommTool::ProcessReceiveRspServiceUnbindProxyEvent(const std::shared_ptr<InnerCommMsg> commMsg)
+{
+    if (commMsg == nullptr || commMsg->remoteNetworkId == "") {
+        LOGE("commMsg or commMsg->remoteNetworkId is null");
+        return;
+    }
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null");
+        return;
+    }
+    LOGI("DMCommTool::ProcessReceiveRspServiceUnbindProxyEvent Start.");
+    this->dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
+    std::string rmtUdid = "";
+    SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
+    if (rmtUdid.empty()) {
+        LOGE("Can not find remote udid by networkid.");
+        return;
+    }
+    DeviceManagerService::GetInstance().ProcessReceiveRspSvcUnbindProxy(rmtUdid);
 }
 
 void DMCommTool::StopSocket(const std::string &networkId)

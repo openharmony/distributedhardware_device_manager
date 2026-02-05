@@ -42,6 +42,7 @@ constexpr const char* PIN_ABILITY_NAME = "com.ohos.devicemanagerui.PincodeUIExtA
 constexpr const char* INPUT_ABILITY_NAME = "com.ohos.devicemanagerui.InputUIExtAbility";
 constexpr uint32_t CLOSE_DIALOG_CMD_CODE = 3;
 constexpr uint32_t SHOW_DIALOG_CMD_CODE = 1;
+constexpr const char* TAG_SERVICE_TYPE = "serviceType";
 }
 DM_IMPLEMENT_SINGLE_INSTANCE(DmDialogManager);
 
@@ -53,6 +54,50 @@ DmDialogManager::DmDialogManager()
 DmDialogManager::~DmDialogManager()
 {
     LOGI("DmDialogManager destructor");
+}
+
+void DmDialogManager::ShowServiceBindConfirmDialog(const std::string param)
+{
+    {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+#else
+        std::lock_guard<std::mutex> lock(mutex_);
+#endif
+        JsonObject jsonObject(param);
+        if (!jsonObject.IsDiscarded()) {
+            if (IsString(jsonObject, TAG_REQUESTER)) {
+                deviceName_ = jsonObject[TAG_REQUESTER].Get<std::string>();
+            }
+            if (IsString(jsonObject, TAG_APP_OPERATION)) {
+                appOperationStr_ = jsonObject[TAG_APP_OPERATION].Get<std::string>();
+            }
+            if (IsString(jsonObject, TAG_CUSTOM_DESCRIPTION)) {
+                customDescriptionStr_ = jsonObject[TAG_CUSTOM_DESCRIPTION].Get<std::string>();
+            }
+            if (IsInt32(jsonObject, TAG_LOCAL_DEVICE_TYPE)) {
+                deviceType_ = jsonObject[TAG_LOCAL_DEVICE_TYPE].Get<std::int32_t>();
+            }
+            if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
+                hostPkgLabel_ = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
+            }
+            if (IsBool(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
+                isProxyBind_ = jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<bool>();
+            }
+            if (IsBool(jsonObject, PARAM_KEY_IS_SERVICE_BIND)) {
+                isServiceBind_ = jsonObject[PARAM_KEY_IS_SERVICE_BIND].Get<bool>();
+            }
+            if (IsString(jsonObject, SERVICE_USER_DATA)) {
+                serviceUserData_ = jsonObject[SERVICE_USER_DATA].Get<std::string>();
+            }
+            if (IsString(jsonObject, TITLE)) {
+                title_ = jsonObject[TITLE].Get<std::string>();
+            }
+        }
+        bundleName_ = DM_UI_BUNDLE_NAME;
+        abilityName_ = CONFIRM_ABILITY_NAME;
+    }
+    ConnectExtension();
 }
 
 void DmDialogManager::ShowConfirmDialog(const std::string param)
@@ -260,7 +305,9 @@ void DmDialogManager::SendMsgRequest(const sptr<IRemoteObject>& remoteObject)
         param["sysDialogZOrder"] = WINDOW_LEVEL_UPPER;
     }
     param["isProxyBind"] = isProxyBind_;
+    param["isServiceBind"] = isServiceBind_;
     param["appUserData"] = appUserData_;
+    param["serviceUserData"] = serviceUserData_;
     param["title"] = title_;
     std::string pinCodeHash = GetAnonyString(Crypto::Sha256(pinCode_));
     LOGI("OnAbilityConnectDone pinCodeHash: %{public}s", pinCodeHash.c_str());
@@ -269,6 +316,7 @@ void DmDialogManager::SendMsgRequest(const sptr<IRemoteObject>& remoteObject)
     param["appOperationStr"] = appOperationStr_;
     param["customDescriptionStr"] = customDescriptionStr_;
     param["deviceType"] = deviceType_;
+    param["serviceType"] = serviceType_;
     param[TAG_TARGET_DEVICE_NAME] = targetDeviceName_;
     param[TAG_HOST_PKGLABEL] = hostPkgLabel_;
     param["disableUpGesture"] = 1;

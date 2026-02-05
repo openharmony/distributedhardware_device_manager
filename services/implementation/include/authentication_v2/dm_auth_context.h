@@ -121,6 +121,9 @@ typedef struct DmProxyAccess {
     std::map<int32_t, DistributedDeviceProfile::AccessControlProfile> aclProfiles;
     std::string credInfoJson;
     std::string aclTypeJson;
+    int64_t serviceId;
+ 	std::string serviceInfo;
+ 	std::string extraInfo;
 } DmProxyAccess;
 
 struct DmProxyAuthContext {
@@ -226,6 +229,7 @@ struct DmAccess {
     bool isCommonFlag{false};
     bool isGeneratedLnnCredThisBind{false};
     bool isGeneratedTransmitThisBind{false};
+    std::string serviceInfo;
 };
 
 struct DmAuthContext {
@@ -282,6 +286,7 @@ struct DmAuthContext {
     bool IsNeedSetProxy{false};
     bool isNeedAuthenticate{true}; // apply for skip authenticate
     std::vector<DmProxyAuthContext> subjectProxyOnes;
+    std::vector<DmProxyAuthContext> subjectServiceOnes;
     std::string reUseCreId;
     std::string title;
     std::string srvExtarInfo;
@@ -312,6 +317,8 @@ struct DmAuthContext {
     ffrt::condition_variable certCV_; // cert cv
     CleanNotifyCallback cleanNotifyCallback{nullptr};
     StopTimerAndDelDpCallback stopTimerAndDelDpCallback{nullptr};
+    std::vector<int64_t> serviceId; // sync service id
+ 	std::vector<DistributedDeviceProfile::ServiceInfo> serviceInfos; // sync service infos and send service info to source
 
     std::string GetDeviceId(DmAuthSide side);
     int32_t GetUserId(DmAuthSide side);

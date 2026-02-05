@@ -55,6 +55,14 @@ DM_EXPORT int64_t GenRandLongLong(int64_t randMin, int64_t randMax)
     return disRand(genRand);
 }
 
+DM_EXPORT uint64_t GenRandUnLongLong(uint64_t randMin, uint64_t randMax)
+{
+    std::random_device randDevice;
+    std::mt19937 genRand(randDevice());
+    std::uniform_int_distribution<unsigned long long> disRand(randMin, randMax);
+    return disRand(genRand);
+}
+
 uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
 {
     std::random_device randDevice;
