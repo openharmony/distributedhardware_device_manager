@@ -410,11 +410,15 @@ void FromJson(const cJSON *jsonObject, UnbindServiceProxyParam &unBindServiceMsg
         unBindServiceMsg.localUdid = udidObj->valuestring;
     }
     cJSON *tokenIdsArr = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_PEER_TOKENID_KEY);
+    if (tokenIdsArr == nullptr) {
+        LOGE("tokenIdsArr is nullptr.");
+        return;
+    }
     if (cJSON_IsArray(tokenIdsArr)) {
         int32_t arrSize = cJSON_GetArraySize(tokenIdsArr);
         for (int32_t i = 0; i < arrSize; i++) {
             cJSON *tokenIdItem = cJSON_GetArrayItem(tokenIdsArr, i);
-            if (cJSON_IsNumber(tokenIdItem)) {
+            if (tokenIdItem != nullptr && cJSON_IsNumber(tokenIdItem)) {
                 uint32_t tokenId = static_cast<uint32_t>(tokenIdItem->valueint);
                 unBindServiceMsg.peerTokenId.push_back(tokenId);
             }
