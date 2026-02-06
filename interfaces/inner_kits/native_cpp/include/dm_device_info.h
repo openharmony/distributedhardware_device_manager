@@ -374,7 +374,9 @@ typedef enum {
     UN_REG_CREDENTIAL_AUTH_STATUS_NOTIFY = 8,
     REG_AUTH_CODE_INVALID = 9,
     UN_REG_AUTH_CODE_INVALID = 10,
-    MAX = 11,
+    REG_SERVICE_STATE = 11,
+    UN_REG_SERVICE_STATE = 12,
+    MAX = 13,
 } DmCommonNotifyEvent;
 
 DM_EXPORT extern const char* DEVICE_TYPE_UNKNOWN_STRING;
@@ -566,6 +568,15 @@ typedef struct DmAuthInfo {
     std::string description;        /** Description information on the three-party interface */
     std::string extraInfo;      /** Extended configuration information */
 } DmAuthInfo;
+
+typedef struct UnbindServiceProxyParam {
+    int32_t userId = -1;
+    uint64_t localTokenId = 0;
+    std::vector<uint64_t> peerTokenId = {};
+    std::string localUdid = "";
+    std::string peerNetworkId = "";
+    int64_t serviceId = -1;
+} UnbindServiceProxyParam;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

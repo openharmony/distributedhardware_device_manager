@@ -34,6 +34,7 @@ class DmDialogManager {
 public:
     void ConnectExtension();
     void ShowConfirmDialog(const std::string param);
+    void ShowServiceBindConfirmDialog(const std::string param);
     void ShowPinDialog(const std::string param);
     void ShowInputDialog(const std::string param);
     void CloseDialog();
@@ -59,9 +60,12 @@ private:
     std::string customDescriptionStr_;
     std::string pinCode_;
     std::string hostPkgLabel_;
+    std::string serviceType_;
     int32_t deviceType_ = -1;
     bool isProxyBind_ = false;
+    bool isServiceBind_ = false;
     std::string appUserData_;
+    std::string serviceUserData_;
     std::string title_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::mutex mutex_;

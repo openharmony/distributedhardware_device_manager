@@ -106,7 +106,6 @@ const char* TAG_LANGUAGE = "language";
 const char* TAG_ULTRASONIC_SIDE = "ultrasonicSide";
 const char* TAG_REMAINING_FROZEN_TIME = "remainingFrozenTime";
 const char* TAG_IS_SUPPORT_ULTRASONIC = "isSupportUltrasonic";
-const char* TAG_SERVICE_ID = "serviceId";
 const char* TAG_ACCESSEE_SERVICE_INFO = "accesseeServiceInfo";
 const char* TAG_REG_SERVICE_ID = "regServiceId";
 const char* TAG_PUBLISH_STATE = "publishState";

@@ -18,6 +18,7 @@
 
 #include <string>
 #include <cJSON.h>
+#include "dm_device_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -100,6 +101,8 @@ struct UnBindAppMsg {
 
 void ToJson(cJSON *jsonObject, const UnBindAppMsg &unBindAppMsg);
 void FromJson(const cJSON *jsonObject, UnBindAppMsg &unBindAppMsg);
+void ToJson(cJSON *jsonObject, const UnbindServiceProxyParam &unBindServiceMsg);
+void FromJson(const cJSON *jsonObject, UnbindServiceProxyParam &unBindServiceMsg);
 } // DistributedHardware
 } // OHOS
 #endif

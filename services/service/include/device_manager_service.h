@@ -296,6 +296,8 @@ public:
     int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength);
     int32_t RegisterAuthCodeInvalidCallback(const std::string &pkgName);
     int32_t UnRegisterAuthCodeInvalidCallback(const std::string &pkgName);
+    void ProcessReceiveRspSvcUnbindProxy(const std::string &remoteUdid);
+    void ProcessUnBindServiceProxy(const UnbindServiceProxyParam &param);
 private:
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();
