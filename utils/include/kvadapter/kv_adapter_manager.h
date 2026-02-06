@@ -21,16 +21,9 @@
 #include <memory>
 #include <string>
 
-#include "ffrt.h"
-
-#include "dm_kv_info.h"
 #include "dm_single_instance.h"
-#include "dm_timer.h"
-#include "ikv_adapter.h"
-
-#ifndef DM_EXPORT
-#define DM_EXPORT __attribute__ ((visibility ("default")))
-#endif // DM_EXPORT
+#include "ffrt.h"
+#include "kv_adapter.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -41,7 +34,7 @@ public:
     DM_EXPORT int32_t Init();
     DM_EXPORT void UnInit();
     DM_EXPORT void ReInit();
-    DM_EXPORT int32_t PutByAnoyDeviceId(const std::string &key, const DmKVValue &value);
+    int32_t PutByAnoyDeviceId(const std::string &key, const DmKVValue &value);
     DM_EXPORT int32_t Get(const std::string &key, DmKVValue &value);
     DM_EXPORT int32_t DeleteAgedEntry();
     DM_EXPORT int32_t AppUninstall(const std::string &appId);
@@ -58,31 +51,14 @@ public:
 private:
     KVAdapterManager() = default;
     ~KVAdapterManager() = default;
-
-    struct KVAdapterDeleter {
-        explicit KVAdapterDeleter(KVAdapterManager& manager) : manager(manager) {}
-        void operator()(IKVAdapter* adapter) const
-        {
-            if (adapter != nullptr) {
-                manager.AfterUseKvAdapter();
-            }
-        }
-        KVAdapterManager& manager;
-    };
-    using KVAdapterPtr = std::unique_ptr<IKVAdapter, KVAdapterDeleter>;
-
-    KVAdapterPtr GetKvAdapter();
-    void AfterUseKvAdapter();
-    std::unique_ptr<DmTimer> libTimer_ = std::make_unique<DmTimer>();
     inline bool IsTimeOut(int64_t sourceTime, int64_t targetTime, int64_t timeOut);
 
 private:
+    std::shared_ptr<DistributedKv::KvStoreDeathRecipient> deathRecipient_ = nullptr;
     ffrt::mutex kvAdapterMtx_;
-    IKVAdapter *kvAdapter_ = nullptr;
+    std::shared_ptr<KVAdapter> kvAdapter_ = nullptr;
     ffrt::mutex idCacheMapMtx_;
     std::map<std::string, DmKVValue> idCacheMap_;
-
-    std::atomic<int32_t> refCount_{0};
 };
 } // namespace DistributedHardware
 } // namespace OHOS

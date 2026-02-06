@@ -79,7 +79,6 @@ if (defined(ohos_lite)) {
       "include/crypto",
       "include/jsonstr_handle",
       "include/kvadapter",
-      "include/librarymanager",
       "include/timer",
       "${innerkits_path}/native_cpp/include",
       "${common_path}/include",
@@ -131,8 +130,8 @@ if (defined(ohos_lite)) {
       "src/dm_random.cpp",
       "src/jsonstr_handle/dm_jsonstr_handle.cpp",
       "src/kvadapter/dm_kv_info.cpp",
+      "src/kvadapter/kv_adapter.cpp",
       "src/kvadapter/kv_adapter_manager.cpp",
-      "src/librarymanager/dm_library_manager.cpp",
       "src/timer/dm_timer.cpp",
     ]
 
@@ -202,8 +201,8 @@ if (defined(ohos_lite)) {
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
       "src/kvadapter/dm_kv_info.cpp",
+      "src/kvadapter/kv_adapter.cpp",
       "src/kvadapter/kv_adapter_manager.cpp",
-      "src/librarymanager/dm_library_manager.cpp",
       "src/timer/dm_timer.cpp",
     ]
 
@@ -236,6 +235,7 @@ if (defined(ohos_lite)) {
 
     public_external_deps = [
       "bundle_framework:appexecfwk_core",
+      "kv_store:distributeddata_inner",
     ]
 
     subsystem_name = "distributedhardware"
