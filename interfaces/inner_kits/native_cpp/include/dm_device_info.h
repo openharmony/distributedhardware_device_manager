@@ -569,6 +569,27 @@ typedef struct DmAuthInfo {
     std::string extraInfo;      /** Extended configuration information */
 } DmAuthInfo;
 
+// this code line need delete:compile dependence start
+typedef struct DmUserRemovedServiceInfo {
+    int64_t localTokenId = 0;
+    std::string localPkgName = "";
+    int32_t bindType = 0;
+    std::string peerUdid = "";
+    std::vector<int64_t> serviceIds = {};
+    bool isActive = false;
+    int32_t peerUserId = 0;
+    std::map<int32_t, std::vector<int64_t>> bindTypeToServiceIdMap;
+} DmUserRemovedServiceInfo;
+
+typedef struct ServiceStateBindParameter {
+    uint64_t tokenId = 0;
+    std::string pkgName = "";
+    int32_t bindType = 0;
+    std::string peerUdid = "";
+    int32_t peerUserId = 0;
+    int64_t serviceId = -1;
+} ServiceStateBindParameter;
+// this code line need delete:compile dependence end
 typedef struct UnbindServiceProxyParam {
     int32_t userId = -1;
     uint64_t localTokenId = 0;

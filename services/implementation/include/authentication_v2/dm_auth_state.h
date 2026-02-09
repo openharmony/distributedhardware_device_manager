@@ -550,21 +550,33 @@ class AuthSinkNegotiateStateMachine : public DmAuthState {
 public:
     virtual ~AuthSinkNegotiateStateMachine() {};
     DmAuthStateType GetStateType() override;
+    // this code line need delete: 635
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+    // need add override when delete SrvBind
+    int32_t ActionSrvBind(std::shared_ptr<DmAuthContext> context);
 
 private:
+    // this code line need delete: 641
     int32_t RespQueryAcceseeIds(std::shared_ptr<DmAuthContext> context);
+    int32_t RespQueryAcceseeIdsSrvBind(std::shared_ptr<DmAuthContext> context);
     int32_t RespQueryProxyAcceseeIds(std::shared_ptr<DmAuthContext> context);
     int32_t RespQueryServiceAcceseeIds(std::shared_ptr<DmAuthContext> context);
+    // this code line need delete: 646
     int32_t ProcRespNegotiate5_1_0(std::shared_ptr<DmAuthContext> context);
+    int32_t ProcRespNegotiate5_1_0SrvBind(std::shared_ptr<DmAuthContext> context);
+    // this code line need delete: 649
     void GetSinkCredentialInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);
+    void GetSinkCredentialInfoSrvBind(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);
     void GetIdenticalCredentialInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);
     void GetShareCredentialInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);
     void GetP2PCredentialInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);
     void GetSinkAclInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo, JsonObject &aclInfo);
     void GetSinkAclInfoForP2P(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo, JsonObject &aclInfo);
+    // this code line need delete: 658-659
     void GetSinkProxyAclInfoForP2P(std::shared_ptr<DmAuthContext> context,
+        const DistributedDeviceProfile::AccessControlProfile &profile);
+    void GetSinkProxyAclInfoForP2PSrvBind(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile);
     bool IdenticalAccountAclCompare(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee);
@@ -574,7 +586,10 @@ private:
         const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee);
     bool LnnAclCompare(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee);
+    // this code line need delete:671-672
     bool CheckCredIdInAcl(std::shared_ptr<DmAuthContext> context,
+        const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo, uint32_t bindType);
+    bool CheckCredIdInAclSrvBind(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo, uint32_t bindType);
     void CheckCredIdInAclForP2P(std::shared_ptr<DmAuthContext> context, std::string &credId,
         const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo, uint32_t bindType,
@@ -583,11 +598,18 @@ private:
         JsonObject &credTypeJson);
     void GetSinkCredTypeForP2P(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credObj,
         JsonObject &aclInfo, JsonObject &credTypeJson, int32_t credType, std::vector<std::string> &deleteCredInfo);
+    // this code line need delete: 683
     void GetSinkProxyCredTypeForP2P(std::shared_ptr<DmAuthContext> context, std::vector<std::string> &deleteCredInfo);
+    void GetSinkProxyCredTypeForP2PSrvBind(std::shared_ptr<DmAuthContext> context,
+        std::vector<std::string> &deleteCredInfo);
     bool IsAntiDisturbanceMode(const std::string &businessId);
     bool ParseAndCheckAntiDisturbanceMode(const std::string &businessId, const std::string &businessValue);
+    // this code line need delete: 689
     void SetIsProxyBind(std::shared_ptr<DmAuthContext> context);
+    void SetIsProxyBindSrvBind(std::shared_ptr<DmAuthContext> context);
+    // this code line need delete: 692
     int32_t SinkNegotiateService(std::shared_ptr<DmAuthContext> context);
+    int32_t SinkNegotiateServiceSrvBind(std::shared_ptr<DmAuthContext> context);
     int32_t GetSinkUserIdByDeviceType(std::shared_ptr<DmAuthContext> context, DmDeviceType deviceType);
     int32_t GetSinkCarUserId(std::shared_ptr<DmAuthContext> context);
 };
