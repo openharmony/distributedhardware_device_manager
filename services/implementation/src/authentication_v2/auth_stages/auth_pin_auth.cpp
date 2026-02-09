@@ -28,7 +28,6 @@
 #include "dm_random.h"
 #include "hichain_auth_connector.h"
 #include "multiple_user_connector.h"
-#include "service_info_profile.h"
 
 #ifdef SUPPORT_MSDP
 #include "spatial_location_callback_impl.h"
