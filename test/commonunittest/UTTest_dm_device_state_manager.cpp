@@ -172,7 +172,7 @@ HWTEST_F(DmDeviceStateManagerTest, OnDeviceOnline_001, testing::ext::TestSize.Le
 HWTEST_F(DmDeviceStateManagerTest, OnDeviceOffline_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
-    dmDeviceStateManager->OnDeviceOffline(deviceId);
+    dmDeviceStateManager->OnDeviceOffline(deviceId, false);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
 }
 

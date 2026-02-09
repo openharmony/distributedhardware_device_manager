@@ -49,7 +49,7 @@ public:
     SoftbusStateCallbackMock() {}
     virtual ~SoftbusStateCallbackMock() {}
     void OnDeviceOnline(std::string deviceId, int32_t authForm) {}
-    void OnDeviceOffline(std::string deviceId) {}
+    void OnDeviceOffline(std::string deviceId, const bool isOnline) {}
     void DeleteOffLineTimer(const std::string &peerUdid) {}
 };
 } // namespace DistributedHardware

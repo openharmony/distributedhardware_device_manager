@@ -285,8 +285,9 @@ public:
     bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    int32_t GetUdidsByDeviceIds(const std::string &pkgName, const std::vector<std::string> deviceIdList,
-        std::map<std::string, std::string> &deviceIdToUdidMap);
+    int32_t GetIdentificationByDeviceIds(const std::string &pkgName,
+        const std::vector<std::string> deviceIdList,
+        std::map<std::string, std::string> &deviceIdentificationMap);
 #endif
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
     int32_t GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
@@ -295,6 +296,8 @@ public:
     int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength);
     int32_t RegisterAuthCodeInvalidCallback(const std::string &pkgName);
     int32_t UnRegisterAuthCodeInvalidCallback(const std::string &pkgName);
+    void ProcessReceiveRspSvcUnbindProxy(const std::string &remoteUdid);
+    void ProcessUnBindServiceProxy(const UnbindServiceProxyParam &param);
 private:
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();

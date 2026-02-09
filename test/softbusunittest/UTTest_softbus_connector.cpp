@@ -43,7 +43,7 @@ public:
     SoftbusStateCallbackTest() {}
     virtual ~SoftbusStateCallbackTest() {}
     void OnDeviceOnline(std::string deviceId, int32_t authForm) {}
-    void OnDeviceOffline(std::string deviceId) {}
+    void OnDeviceOffline(std::string deviceId, const bool isOnline) {}
     void DeleteOffLineTimer(const std::string &peerUdid) override {}
 };
 
@@ -599,11 +599,6 @@ HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSiz
             infoNum = &deviceCount;
             return DM_OK;
         })));
-    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _))
-        .WillOnce(WithArgs<3>(Invoke([deviceId](uint8_t *info) {
-            memcpy_s(info, (deviceId.length() + 1), deviceId.c_str(), deviceId.length());
-            return DM_OK;
-        })));
     ret = softbusConnector->GetNetworkIdByDeviceId(deviceId);
     EXPECT_EQ(ret.empty(), true);
 
@@ -670,7 +665,7 @@ HWTEST_F(SoftbusConnectorTest, HandleDeviceOffline_001, testing::ext::TestSize.L
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
     softbusConnector->RegisterSoftbusStateCallback(callback);
-    softbusConnector->HandleDeviceOffline(deviceId);
+    softbusConnector->HandleDeviceOffline(deviceId, false);
     EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);
 }
 
@@ -692,11 +687,6 @@ HWTEST_F(SoftbusConnectorTest, CheckIsOnline_001, testing::ext::TestSize.Level0)
             infoNum = &deviceCount;
             return DM_OK;
         })));
-    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _))
-        .WillOnce(WithArgs<3>(Invoke([targetId](uint8_t *info) {
-            memcpy_s(info, (targetId.length() + 1), targetId.c_str(), targetId.length());
-            return DM_OK;
-        })));
     ret = softbusConnector->CheckIsOnline(targetId);
     EXPECT_FALSE(ret);
 
@@ -713,48 +703,9 @@ HWTEST_F(SoftbusConnectorTest, GetDeviceInfoByDeviceId_001, testing::ext::TestSi
 {
     std::string deviceId = "deviceId";
     std::string uuid = "";
-    int32_t deviceCount = 1;
-    std::string strNetworkId = "networkId**1";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     auto ret = softbusConnector->GetDeviceInfoByDeviceId(deviceId, uuid);
-    EXPECT_EQ(ret.deviceId == deviceId, false);
-
-    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _))
-        .WillOnce(WithArgs<2>(Invoke([&deviceCount](int32_t *infoNum) {
-            infoNum = &deviceCount;
-            return DM_OK;
-        })));
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    EXPECT_EQ(ret.deviceId == deviceId, false);
-
-    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _))
-        .WillOnce(WithArgs<2>(Invoke([&deviceCount](int32_t *infoNum) {
-            infoNum = &deviceCount;
-            return DM_OK;
-        })));
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _))
-    .WillOnce(WithArgs<3>(Invoke([](uint8_t *info) {
-        info[0] = 'd';
-        info[1] = 'e';
-        info[2] = 'v';
-        info[3] = 'i';
-        return DM_OK;
-    })));
-    EXPECT_EQ(ret.deviceId == deviceId, false);
-
-    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _))
-        .WillOnce(WithArgs<2>(Invoke([&deviceCount](int32_t *infoNum) {
-            infoNum = &deviceCount;
-            return DM_OK;
-        })));
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _))
-        .WillOnce(WithArgs<3>(Invoke([deviceId, strNetworkId](uint8_t *info) {
-            memcpy_s(info, (strNetworkId.length() + 1), strNetworkId.c_str(), (strNetworkId.length()));
-            return DM_OK;
-        })));
     EXPECT_EQ(ret.deviceId == deviceId, false);
 }
 

@@ -95,6 +95,7 @@ namespace {
     constexpr const char* APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:appUninstallByWifi";
     constexpr const char* APP_UNBIND_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:appUnbindByWifi";
     constexpr const char* ACCOUNT_COMMON_EVENT_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:accountCommonEventByWifi";
+    constexpr const char* SERVICE_UNBIND_PROXY_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:serviceUnbindProxyByWifi";
     const int32_t USER_SWITCH_BY_WIFI_TIMEOUT_S = 2;
     const int32_t SEND_DELAY_MAX_TIME = 5;
     const int32_t SEND_DELAY_MIN_TIME = 0;
@@ -2692,13 +2693,15 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
         if (find(peerHOUdids.begin(), peerHOUdids.end(), item.first) != peerHOUdids.end()) {
             LOGI("dualUdid: %{public}s", GetAnonyString(item.first).c_str());
             dualPeerUdids.emplace_back(item.first);
+            continue;
         }
         peerUdids.emplace_back(item.first);
     }
     if (!dualPeerUdids.empty()) {
         //logout notify cast+
         if (IsDMServiceAdapterResidentLoad()) {
-            dmServiceImplExtResident_->AccountIdLogout(userId, accountId, peerUdids);
+            LOGI("logout notify userId: %{public}d, accountId: %{public}s", userId, GetAnonyString(accountId).c_str());
+            dmServiceImplExtResident_->AccountIdLogout(userId, accountId, dualPeerUdids);
         }
     }
     if (!peerUdids.empty()) {
@@ -2707,6 +2710,8 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
             LOGE("GetAccountHash failed.");
             return;
         }
+        LOGI("NotifyRemoteLogout, userId: %{public}d, accountId: %{public}s, accountName: %{public}s",
+            userId, GetAnonyString(accountId).c_str(), GetAnonyString(accountName).c_str());
         NotifyRemoteLocalLogout(peerUdids, std::string(accountIdHash), accountName, userId);
     }
     for (const auto &item : deviceMap) {
@@ -4514,32 +4519,33 @@ bool DeviceManagerService::CheckSinkIsSameAccount(const DmAccessCaller &caller, 
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-int32_t DeviceManagerService::GetUdidsByDeviceIds(const std::string &pkgName,
-    const std::vector<std::string> deviceIdList, std::map<std::string, std::string> &deviceIdToUdidMap)
+int32_t DeviceManagerService::GetIdentificationByDeviceIds(const std::string &pkgName,
+    const std::vector<std::string> deviceIdList,
+    std::map<std::string, std::string> &deviceIdentificationMap)
 {
     if (pkgName.empty() || deviceIdList.empty()) {
         LOGE("Invalid parameter, pkgName is empty or deviceIdList is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("GetUdidsByDeviceIds pkgName = %{public}s.", pkgName.c_str());
+    LOGI("GetIdentificationByDeviceIds pkgName = %{public}s.", pkgName.c_str());
     if (!AppManager::GetInstance().IsSystemApp()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NOT_SYSTEM_APP;
     }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission() ||
         !PermissionManager::GetInstance().CheckDataSyncPermission()) {
-        LOGE("The caller does not have permission to call GetUdidsByDeviceIds.");
+        LOGE("The caller does not have permission to call GetIdentificationByDeviceIds.");
         return ERR_DM_NO_PERMISSION;
     }
     for (auto deviceId : deviceIdList) {
-        LOGI("GetUdidsByDeviceIds deviceId = %{public}s.", GetAnonyString(deviceId).c_str());
-        if (deviceIdToUdidMap.find(deviceId) == deviceIdToUdidMap.end()) {
+        LOGI("GetIdentificationByDeviceIds deviceId = %{public}s.", GetAnonyString(deviceId).c_str());
+        if (deviceIdentificationMap.find(deviceId) == deviceIdentificationMap.end()) {
             std::string udidHash = "";
             std::string udid = "";
             GetUdidHashByAnoyDeviceId(deviceId, udidHash);
             SoftbusCache::GetInstance().GetUdidByUdidHash(udidHash, udid);
             if (!deviceId.empty() && !udidHash.empty() && !udid.empty()) {
-                deviceIdToUdidMap[deviceId] = udid;
+                deviceIdentificationMap[deviceId] = udid;
             }
         }
     }
@@ -5083,6 +5089,25 @@ int32_t DeviceManagerService::GetAuthTypeByUdidHash(const std::string &udidHash,
     DeviceProfileConnector::GetInstance().GetAuthTypeByUdidHash(udidHash, pkgName, authType);
 #endif
     return DM_OK;
+}
+
+void DeviceManagerService::ProcessReceiveRspSvcUnbindProxy(const std::string &remoteUdid)
+{
+    LOGI("ProcessReceiveRspSvcUnbindProxy remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
+    std::lock_guard<std::mutex> autoLock(timerLocks_);
+    if (timer_ != nullptr && remoteUdid != "") {
+        timer_->DeleteTimer(std::string(SERVICE_UNBIND_PROXY_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
+    }
+}
+
+void DeviceManagerService::ProcessUnBindServiceProxy(const UnbindServiceProxyParam &param)
+{
+    LOGI("ProcessUnBindServiceProxy, userId: %{public}d, serviceId: %{public}s, peerTokenId %{public}zu",
+        param.userId, std::to_string(param.serviceId).c_str(), param.peerTokenId.size());
+    int32_t peerUserId = param.userId;
+    uint64_t peerTokenId = param.localTokenId;
+    std::vector<uint64_t> localTokenId = param.peerTokenId;
+    std::string peerUdid = param.localUdid;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

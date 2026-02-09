@@ -55,7 +55,6 @@ if (defined(ohos_lite)) {
       "services/implementation:devicemanagerserviceimpl",
       "services/service:devicemanagerservice",
       "services/softbuscache:dmdevicecache",
-      "dbimpl/kvdbimpl/bykvstore:dmdb_kvstore",
     ]
     if (!is_lite_system && product_name != "qemu-arm-linux-min") {
       deps += [

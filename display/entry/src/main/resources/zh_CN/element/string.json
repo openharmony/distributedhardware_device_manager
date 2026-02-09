@@ -146,26 +146,26 @@
                 "priority":"translate"
             }
         },
- 	    {
- 	        "name":"serve_confirm_trust",
- 	        "value":"%1$s的%2$s请求访问本机%3$s服务，是否信任此应用？",
- 	        "attr":{
- 	            "priority":"translate"
- 	        }
- 	    },
- 	    {
- 	        "name":"serve_confirm_trust_nohost",
- 	        "value":"%1$s请求访问本机%2$s服务，是否信任此应用？",
- 	        "attr":{
- 	            "priority":"translate"
- 	        }
- 	    },
- 	    {
- 	        "name":"serve_agency_confirm_proxy",
- 	        "value":"%s请求连接本机服务，请选择授权的服务：",
- 	        "attr":{
- 	            "priority":"translate"
- 	        }
+        {
+            "name":"serve_confirm_trust",
+            "value":"%1$s的%2$s请求访问本机%3$s服务，是否信任此应用？",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s请求访问本机%2$s服务，是否信任此应用？",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s请求连接本机服务，请选择授权的服务：",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

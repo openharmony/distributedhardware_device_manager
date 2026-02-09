@@ -374,10 +374,8 @@ typedef enum {
     UN_REG_CREDENTIAL_AUTH_STATUS_NOTIFY = 8,
     REG_AUTH_CODE_INVALID = 9,
     UN_REG_AUTH_CODE_INVALID = 10,
-    // zl online&offline
     REG_SERVICE_STATE = 11,
     UN_REG_SERVICE_STATE = 12,
-
     MAX = 13,
 } DmCommonNotifyEvent;
 

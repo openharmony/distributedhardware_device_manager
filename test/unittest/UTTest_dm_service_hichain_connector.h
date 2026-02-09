@@ -17,8 +17,10 @@
 
 #include <gtest/gtest.h>
 #include <refbase.h>
+#include <gmock/gmock.h>
 #include "device_auth.h"
 #include "dm_service_hichain_connector.h"
+#include "multiple_user_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -28,7 +30,10 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+private:
+    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
+        std::make_shared<MultipleUserConnectorMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_SCREEN_COMMON_EVENT_TEST_H
+#endif // OHOS_DM_SERVICE_HICHAIN_CONNECTORSERVICE_HICHAIN_CONNECTOR_H

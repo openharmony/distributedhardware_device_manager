@@ -43,7 +43,6 @@ namespace {
     std::shared_ptr<DmAuthContext> context_ = authManager->GetAuthContext();
     std::shared_ptr<AuthManager> authSinkManager = std::make_shared<AuthSinkManager>(softbusConnector, hiChainConnector,
         listener, hiChainAuthConnector);
-    const char* TAG_SERVICE_ID = "serviceId";
     const char* TAG_ACCESSEE_SERVICE_INFO = "accesseeServiceInfo";
     const char* TAG_REG_SERVICE_ID = "regServiceId";
     const char* TAG_PUBLISH_STATE = "publishState";

@@ -64,7 +64,7 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t GetAvailableDeviceList(const std::string &pkgName,
-    	std::vector<DmDeviceBasicInfo> &deviceList) override;
+       std::vector<DmDeviceBasicInfo> &deviceList) override;
     /**
      * @tc.name: DeviceManagerImpl::GetLocalDeviceInfo
      * @tc.desc: Get local device information
@@ -439,8 +439,9 @@ public:
     virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
-    virtual int32_t GetUdidsByDeviceIds(const std::string &pkgName, const std::vector<std::string> deviceIdList,
-        std::map<std::string, std::string> &deviceIdToUdidMap) override;
+    virtual int32_t GetIdentificationByDeviceIds(const std::string &pkgName,
+        const std::vector<std::string> deviceIdList,
+        std::map<std::string, std::string> &deviceIdentificationMap) override;
     virtual int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback) override;
     virtual int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId) override;

@@ -28,6 +28,7 @@
 
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
+const uint32_t DM_MAX_DEVICESLIST_SIZE = 50;
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFail";
 
@@ -1384,6 +1385,47 @@ void DeviceManagerImpl::ClearBundleCallbacks(const std::string &bundleName)
     ClearBindCallbacks(bundleName);
     ClearAuthCallbacks(bundleName);
     ClearDiscoverCallbacks(bundleName);
+}
+
+::taihe::array<::ohos::distributedDeviceManager::DeviceIdentification> DeviceManagerImpl::GetIdentificationByDeviceIds(
+    ::taihe::array_view<::taihe::string> deviceIdList)
+{
+    if (!IsInit()) {
+        ani_errorutils::CreateBusinessError(DM_ERR_FAILED);
+        return {};
+    }
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        CreateBusinessError(static_cast<int32_t>(DMBusinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return {};
+    }
+    if (deviceIdList.size() == 0 || deviceIdList.size() > DM_MAX_DEVICESLIST_SIZE) {
+        LOGE("Invalid param, the size of deviceIdList is %{public}zu", deviceIdList.size());
+        CreateBusinessError(ERR_DM_INPUT_PARA_INVALID);
+        return {};
+    }
+
+    std::vector<std::string> deviceIdListVec;
+    for (const auto& deviceId : deviceIdList) {
+        deviceIdListVec.push_back(std::string(deviceId));
+    }
+
+    std::map<std::string, std::string> deviceIdentificationMap;
+    int32_t ret = DeviceManager::GetInstance().GetIdentificationByDeviceIds(
+        bundleName_, deviceIdListVec, deviceIdentificationMap);
+    if (ret != DM_OK) {
+        LOGE("GetIdentificationByDeviceIds failed, ret %{public}d", ret);
+        CreateBusinessError(ret);
+        return {};
+    }
+
+    std::vector<::ohos::distributedDeviceManager::DeviceIdentification> result;
+    for (const auto& pair : deviceIdentificationMap) {
+        result.emplace_back(::ohos::distributedDeviceManager::DeviceIdentification{
+            ::taihe::string(pair.first), ::taihe::string(pair.second)});
+    }
+    return ::taihe::array<::ohos::distributedDeviceManager::DeviceIdentification>(
+        ::taihe::copy_data_t{}, result.data(), result.size());
 }
 
 } // namespace ANI::distributedDeviceManager

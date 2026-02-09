@@ -1733,12 +1733,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_004, testing::ext::Te
 
     deviceId = "remoteDeviceId";
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-
-    std::string udid;
-    DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
-
-    udid = "deviceId";
-    DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetDevIdAndUserIdByActHash_001, testing::ext::TestSize.Level1)
@@ -2314,6 +2308,169 @@ HWTEST_F(DeviceProfileConnectorTest, CheckAppLevelAccess_001, testing::ext::Test
     callee.tokenId = 1;
     ret = DeviceProfileConnector::GetInstance().CheckAppLevelAccess(profile, caller, callee);
     EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, GetAclVersionInfo_001, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    std::string localUdid = "localUdid";
+    std::string remoteUdid = "remoteUdid";
+    std::string extraStr = "extraStr";
+    accesser.SetAccesserDeviceId(localUdid);
+    accessee.SetAccesseeDeviceId(remoteUdid);
+    accesser.SetAccesserExtraData(extraStr);
+    accessee.SetAccesseeExtraData(extraStr);
+    profile.SetAccesser(accesser);
+    profile.SetAccessee(accessee);
+    std::string ret = DeviceProfileConnector::GetInstance().GetAclVersionInfo(localUdid, remoteUdid, profile);
+    EXPECT_EQ(ret, extraStr);
+
+    localUdid = "remoteUdid";
+    remoteUdid = "localUdid";
+    ret = DeviceProfileConnector::GetInstance().GetAclVersionInfo(localUdid, remoteUdid, profile);
+    EXPECT_EQ(ret, extraStr);
+
+    localUdid = "";
+    remoteUdid = "";
+    ret = DeviceProfileConnector::GetInstance().GetAclVersionInfo(localUdid, remoteUdid, profile);
+    EXPECT_EQ(ret, localUdid);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, FilterNeedDeleteACL_001, testing::ext::TestSize.Level1)
+{
+    std::string peerUdid = "peerUdid";
+    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().FilterNeedDeleteACL(peerUdid);
+    EXPECT_EQ(false, offlineParam.hasLnnAcl);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, IsAuthNewVersion_001, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile acl1;
+    std::string localUdid = "localUdidprofile";
+    std::string remoteUdid = "remoteUdidprofile";
+    DmOfflineParam offlineParam;
+    acl1.SetTrustDeviceId(localUdid);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    profiles.push_back(acl1);
+    DeviceProfileConnector::GetInstance().FilterNeedDeleteACLInfos(profiles, localUdid, remoteUdid, offlineParam);
+
+    DistributedDeviceProfile::AccessControlProfile acl2;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    localUdid = "localUdid";
+    remoteUdid = "remoteUdid";
+    std::string extraStr = "extraStr";
+    accesser.SetAccesserDeviceId(localUdid);
+    accessee.SetAccesseeDeviceId(remoteUdid);
+    accesser.SetAccesserExtraData(extraStr);
+    accessee.SetAccesseeExtraData(extraStr);
+    acl2.SetAccesser(accesser);
+    acl2.SetAccessee(accessee);
+    bool ret = DeviceProfileConnector::GetInstance().IsAuthNewVersion(acl2, localUdid, remoteUdid);
+    EXPECT_EQ(false, ret);
+    profiles.push_back(acl2);
+    DeviceProfileConnector::GetInstance().FilterNeedDeleteACLInfos(profiles, localUdid, remoteUdid, offlineParam);
+
+    DistributedDeviceProfile::AccessControlProfile acl3;
+    extraStr = "{\"key\":\"value\"}";
+    accesser.SetAccesserExtraData(extraStr);
+    accessee.SetAccesseeExtraData(extraStr);
+    acl3.SetAccesser(accesser);
+    acl3.SetAccessee(accessee);
+    ret = DeviceProfileConnector::GetInstance().IsAuthNewVersion(acl3, localUdid, remoteUdid);
+    EXPECT_EQ(false, ret);
+
+    DistributedDeviceProfile::AccessControlProfile acl4;
+    extraStr = "{\"dmVersion\":\"5.1.0\"}";
+    accesser.SetAccesserExtraData(extraStr);
+    accessee.SetAccesseeExtraData(extraStr);
+    acl4.SetAccesser(accesser);
+    acl4.SetAccessee(accessee);
+    ret = DeviceProfileConnector::GetInstance().IsAuthNewVersion(acl4, localUdid, remoteUdid);
+    EXPECT_EQ(true, ret);
+
+    DistributedDeviceProfile::AccessControlProfile acl5;
+    extraStr = "{\"dmVersion\":\"4.1.0\"}";
+    accesser.SetAccesserExtraData(extraStr);
+    accessee.SetAccesseeExtraData(extraStr);
+    acl5.SetAccesser(accesser);
+    acl5.SetAccessee(accessee);
+    ret = DeviceProfileConnector::GetInstance().IsAuthNewVersion(acl5, localUdid, remoteUdid);
+    EXPECT_EQ(false, ret);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, FindTargetAclIncludeLnn_001, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile acl1;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    DmOfflineParam offlineParam;
+    std::string localUdid = "localUdid";
+    std::string remoteUdid = "remoteUdid";
+    accesser.SetAccesserDeviceId(remoteUdid);
+    accessee.SetAccesseeDeviceId(localUdid);
+    acl1.SetAccesser(accesser);
+    acl1.SetAccessee(accessee);
+    bool ret = DeviceProfileConnector::GetInstance().FindTargetAclIncludeLnn(
+        acl1, localUdid, remoteUdid, offlineParam);
+    EXPECT_EQ(true, ret);
+
+    DistributedDeviceProfile::AccessControlProfile acl2;
+    accesser.SetAccesserDeviceId(localUdid);
+    accessee.SetAccesseeDeviceId(remoteUdid);
+    acl2.SetAccesser(accesser);
+    acl2.SetAccessee(accessee);
+    ret = DeviceProfileConnector::GetInstance().FindTargetAclIncludeLnn(
+        acl2, localUdid, remoteUdid, offlineParam);
+    EXPECT_EQ(true, ret);
+
+    std::string extra = "extra";
+    DistributedDeviceProfile::AccessControlProfile acl3;
+    accesser.SetAccesserDeviceId(localUdid);
+    accessee.SetAccesseeDeviceId(remoteUdid);
+    acl3.SetAccesser(accesser);
+    acl3.SetAccessee(accessee);
+    ret = DeviceProfileConnector::GetInstance().FindTargetAclIncludeLnn(
+        acl3, extra, remoteUdid, offlineParam);
+    EXPECT_EQ(false, ret);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, FindTargetAclIncludeLnnOld_001, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile acl1;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    DmOfflineParam offlineParam;
+    std::string localUdid = "localUdid";
+    std::string remoteUdid = "remoteUdid";
+    accesser.SetAccesserDeviceId(remoteUdid);
+    accessee.SetAccesseeDeviceId(localUdid);
+    acl1.SetAccesser(accesser);
+    acl1.SetAccessee(accessee);
+    bool ret = DeviceProfileConnector::GetInstance().FindTargetAclIncludeLnnOld(
+        acl1, localUdid, remoteUdid, offlineParam);
+    EXPECT_EQ(true, ret);
+
+    DistributedDeviceProfile::AccessControlProfile acl2;
+    accesser.SetAccesserDeviceId(localUdid);
+    accessee.SetAccesseeDeviceId(remoteUdid);
+    acl2.SetAccesser(accesser);
+    acl2.SetAccessee(accessee);
+    ret = DeviceProfileConnector::GetInstance().FindTargetAclIncludeLnnOld(
+        acl2, localUdid, remoteUdid, offlineParam);
+    EXPECT_EQ(true, ret);
+
+    std::string extra = "extra";
+    DistributedDeviceProfile::AccessControlProfile acl3;
+    accesser.SetAccesserDeviceId(localUdid);
+    accessee.SetAccesseeDeviceId(remoteUdid);
+    acl3.SetAccesser(accesser);
+    acl3.SetAccessee(accessee);
+    ret = DeviceProfileConnector::GetInstance().FindTargetAclIncludeLnnOld(
+        acl3, extra, remoteUdid, offlineParam);
+    EXPECT_EQ(false, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -14,6 +14,7 @@
  */
 
 #include <set>
+#include <sstream>
 #include "cJSON.h"
 
 #include "device_manager_service_listener.h"
@@ -1302,6 +1303,23 @@ void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName)
     pReq->SetPkgName(processInfoTemp.pkgName);
     pReq->SetProcessInfo(processInfoTemp);
     ipcServerListener_.SendRequest(ON_AUTH_CODE_INVALID, pReq, pRsp);
+}
+
+std::set<ProcessInfo> DeviceManagerServiceListener::GetAlreadyOnlineProcess()
+{
+    std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
+    std::set<ProcessInfo> processInfoSet;
+    for (const auto &item : alreadyOnlinePkgName_) {
+        std::string notifyPkgName = item.first;
+        std::istringstream stream(notifyPkgName);
+        ProcessInfo processInfo;
+        std::string userId;
+        std::getline(stream, processInfo.pkgName, '#');
+        std::getline(stream, userId, '#');
+        processInfo.userId = atoi(userId.c_str());
+        processInfoSet.insert(processInfo);
+    }
+    return processInfoSet;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

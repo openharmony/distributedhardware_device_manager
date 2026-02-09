@@ -28,21 +28,17 @@
 #include "dm_log.h"
 #include "dm_timer.h"
 
-#ifndef DM_EXPORT
-#define DM_EXPORT __attribute__ ((visibility ("default")))
-#endif // DM_EXPORT
-
 namespace OHOS {
 namespace DistributedHardware {
 // if a lib not used more than 60 seconds, trigger unload it.
 constexpr int32_t LIB_UNLOAD_TRIGGER_FREE_TIMESPAN = 60;
 class DMLibraryManager {
 public:
-    DM_EXPORT DMLibraryManager();
-    DM_EXPORT static DMLibraryManager& GetInstance();
+    DMLibraryManager();
+    static DMLibraryManager& GetInstance();
     template<typename FuncType>
-    DM_EXPORT FuncType GetFunction(const std::string& libraryPath, const std::string& functionName);
-    DM_EXPORT void Release(const std::string& libraryPath);
+    FuncType GetFunction(const std::string& libraryPath, const std::string& functionName);
+    void Release(const std::string& libraryPath);
 
 private:
     struct LibraryInfo {
@@ -72,9 +68,9 @@ private:
     static std::once_flag initFlag_;
 
 private:
-    DM_EXPORT std::shared_ptr<LibraryInfo> GetOrCreateLibrary(const std::string& libraryPath);
-    DM_EXPORT std::shared_ptr<LibraryInfo> GetLibraryInfo(const std::string& libraryPath);
-    DM_EXPORT void DoUnloadLib(const std::string& libraryPath);
+    std::shared_ptr<LibraryInfo> GetOrCreateLibrary(const std::string& libraryPath);
+    std::shared_ptr<LibraryInfo> GetLibraryInfo(const std::string& libraryPath);
+    void DoUnloadLib(const std::string& libraryPath);
 };
 
 template<typename FuncType>
@@ -92,8 +88,7 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
                 libInfo->handle = dlopen(libraryPath.c_str(), RTLD_LAZY);
                 if (libInfo->handle == nullptr) {
                     libInfo->refCount--;
-                    LOGE("dlopen failed for %{public}s: %{public}s, refCount: %{public}d",
-                        libraryPath.c_str(), dlerror(), libInfo->refCount.load());
+                    LOGE("dlopen failed for %{public}s: %{public}s", libraryPath.c_str(), dlerror());
                     return nullptr;
                 }
             }
@@ -117,11 +112,11 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
             DMLibraryManager::DoUnloadLib(libPath);
         });
     }
-    LOGI("Do load lib: %{public}s, refCount: %{public}d", libraryPath.c_str(), libInfo->refCount.load());
+    LOGI("Do load lib: %{public}s", libraryPath.c_str());
     return reinterpret_cast<FuncType>(sym);
 }
 
-DM_EXPORT inline DMLibraryManager& GetLibraryManager()
+inline DMLibraryManager& GetLibraryManager()
 {
     return DMLibraryManager::GetInstance();
 }

@@ -57,7 +57,9 @@ public:
     void RestoreLocalDeviceName();
     ::taihe::array<::taihe::string> GetDeviceNetworkIdListSync(
         const ::ohos::distributedDeviceManager::NetworkIdQueryFilter &filterOptions);
-    
+    ::taihe::array<::ohos::distributedDeviceManager::DeviceIdentification> GetIdentificationByDeviceIds(
+        ::taihe::array_view<::taihe::string> deviceIdList);
+
     static std::shared_ptr<DmAniBindTargetCallback> GetBindTargetCallback(const std::string &bundleName);
     static std::shared_ptr<DmAniAuthenticateCallback> GetAuthenticateTargetCallback(const std::string &bundleName);
     void OnDiscoverFailure(::taihe::callback_view<void(

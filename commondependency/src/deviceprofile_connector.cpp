@@ -403,12 +403,26 @@ std::string DeviceProfileConnector::GetDeviceAuthVersionInfo(std::string localUd
     return "";
 }
 
+std::string DeviceProfileConnector::GetAclVersionInfo(const std::string localUdid, const std::string remoteUdid,
+    const DistributedDeviceProfile::AccessControlProfile &acl)
+{
+    std::string acerDeviceId = acl.GetAccesser().GetAccesserDeviceId();
+    std::string aceeDeviceId = acl.GetAccessee().GetAccesseeDeviceId();
+    if (acerDeviceId == localUdid && aceeDeviceId == remoteUdid) {
+        return acl.GetAccesser().GetAccesserExtraData();
+    }
+    if (aceeDeviceId == localUdid && acerDeviceId == remoteUdid) {
+        return acl.GetAccessee().GetAccesseeExtraData();
+    }
+    return "";
+}
+
 DM_EXPORT DmOfflineParam DeviceProfileConnector::FilterNeedDeleteACL(const std::string &localDeviceId,
     uint32_t localTokenId, const std::string &remoteDeviceId, const std::string &extra)
 {
     LOGI("localDeviceId %{public}s, remoteDeviceId %{public}s",
         GetAnonyString(localDeviceId).c_str(), GetAnonyString(remoteDeviceId).c_str());
-    DmOfflineParam offlineParam;
+    DmOfflineParam offlineParam = {};
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(localDeviceId, userId,
         remoteDeviceId);
@@ -1368,20 +1382,148 @@ DM_EXPORT void DeviceProfileConnector::DeleteAclForRemoteUserRemoved(
     }
 }
 
-DM_EXPORT void DeviceProfileConnector::DeleteAccessControlList(const std::string &udid)
+DM_EXPORT DmOfflineParam DeviceProfileConnector::FilterNeedDeleteACL(const std::string &peerUdid)
 {
-    LOGI("Udid: %{public}s.", GetAnonyString(udid).c_str());
-    if (udid.empty()) {
-        LOGE("DeleteAccessControlList udid is empty.");
-        return;
+    std::string localUdid = GetLocalDeviceId();
+    LOGI("localUdid %{public}s, peerUdid %{public}s",
+        GetAnonyString(localUdid).c_str(), GetAnonyString(peerUdid).c_str());
+    DmOfflineParam offlineParam;
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(localUdid, userId,
+        peerUdid);
+    if (profiles.empty()) {
+        LOGE("Acl is empty.");
+        return offlineParam;
     }
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("Size is %{public}zu", profiles.size());
-    for (const auto &item : profiles) {
-        if (item.GetTrustDeviceId() == udid) {
-            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
+
+    FilterNeedDeleteACLInfos(profiles, localUdid, peerUdid, offlineParam);
+    return offlineParam;
+}
+
+bool DeviceProfileConnector::IsAuthNewVersion(const DistributedDeviceProfile::AccessControlProfile &acl,
+    const std::string localUdid, const std::string remoteUdid)
+{
+    std::string extraInfo = GetAclVersionInfo(localUdid, remoteUdid, acl);
+    JsonObject extraInfoJson(extraInfo);
+    if (extraInfoJson.IsDiscarded()) {
+        LOGE("IsAuthNewVersion extraInfoJson error");
+        return false;
+    }
+    if (!extraInfoJson[TAG_DMVERSION].IsString()) {
+        LOGE("IsAuthNewVersion PARAM_KEY_OS_VERSION error");
+        return false;
+    }
+    std::string dmVersion = extraInfoJson[TAG_DMVERSION].Get<std::string>();
+    if (CompareVersion(dmVersion, std::string(DM_VERSION_5_1_0)) || dmVersion == std::string(DM_VERSION_5_1_0)) {
+        return true;
+    }
+    return false;
+}
+
+void DeviceProfileConnector::FilterNeedDeleteACLInfos(
+    std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
+    const std::string &localUdid, const std::string &peerUdid, DmOfflineParam &offlineParam)
+{
+    for (auto &item : profiles) {
+        if (item.GetTrustDeviceId() != peerUdid) {
+            continue;
+        }
+        bool isNewVersion = IsAuthNewVersion(item, localUdid, peerUdid);
+        offlineParam.isNewVersion = isNewVersion;
+        // find need delete acl
+        if (isNewVersion && FindTargetAclIncludeLnn(item, localUdid, peerUdid, offlineParam)) {
+            continue;
+        }
+        if (!isNewVersion && FindTargetAclIncludeLnnOld(item, localUdid, peerUdid, offlineParam)) {
+            continue;
         }
     }
+}
+
+bool DeviceProfileConnector::FindTargetAclIncludeLnn(const DistributedDeviceProfile::AccessControlProfile &acl,
+    const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam)
+{
+    bool isMatch = false;
+    if (acl.GetAccesser().GetAccesserDeviceId() == remoteUdid &&
+        acl.GetAccessee().GetAccesseeDeviceId() == localUdid) {
+        if (!IsLnnAcl(acl) && (acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
+            offlineParam.hasUserAcl = true;
+        }
+        if (!IsLnnAcl(acl)) {
+            ProcessInfo processInfo;
+            processInfo.pkgName = acl.GetAccessee().GetAccesseeBundleName();
+            processInfo.userId = acl.GetAccessee().GetAccesseeUserId();
+            offlineParam.processVec.push_back(processInfo);
+        }
+        CacheAceeAclId(acl, offlineParam.needDelAclInfos);
+        LOGI("Src del acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
+            ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+            GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
+            acl.GetBindLevel());
+        isMatch = true;
+    }
+
+    if (acl.GetAccessee().GetAccesseeDeviceId() == remoteUdid &&
+        acl.GetAccesser().GetAccesserDeviceId() == localUdid) {
+        if (!IsLnnAcl(acl) && (acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
+            offlineParam.hasUserAcl = true;
+        }
+        if (!IsLnnAcl(acl)) {
+            ProcessInfo processInfo;
+            processInfo.pkgName = acl.GetAccesser().GetAccesserBundleName();
+            processInfo.userId = acl.GetAccesser().GetAccesserUserId();
+            offlineParam.processVec.push_back(processInfo);
+        }
+        CacheAcerAclId(acl, offlineParam.needDelAclInfos);
+        LOGI("Sink del acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
+            ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+            GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
+            acl.GetBindLevel());
+        isMatch = true;
+    }
+    return isMatch;
+}
+
+bool DeviceProfileConnector::FindTargetAclIncludeLnnOld(const DistributedDeviceProfile::AccessControlProfile &acl,
+    const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam)
+{
+    bool isMatch = false;
+    if (acl.GetAccesser().GetAccesserDeviceId() == remoteUdid &&
+        acl.GetAccessee().GetAccesseeDeviceId() == localUdid) {
+        if ((acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
+            offlineParam.hasUserAcl = true;
+        }
+        ProcessInfo processInfo;
+        processInfo.pkgName = acl.GetAccessee().GetAccesseeBundleName();
+        processInfo.userId = acl.GetAccessee().GetAccesseeUserId();
+        offlineParam.processVec.push_back(processInfo);
+        offlineParam.peerUserId = acl.GetAccesser().GetAccesserUserId();
+        CacheAceeAclId(acl, offlineParam.needDelAclInfos);
+        LOGI("Src del acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
+            ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+            GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
+            acl.GetBindLevel());
+        isMatch = true;
+    }
+
+    if (acl.GetAccessee().GetAccesseeDeviceId() == remoteUdid &&
+        acl.GetAccesser().GetAccesserDeviceId() == localUdid) {
+        if ((acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
+            offlineParam.hasUserAcl = true;
+        }
+        ProcessInfo processInfo;
+        processInfo.pkgName = acl.GetAccesser().GetAccesserBundleName();
+        processInfo.userId = acl.GetAccesser().GetAccesserUserId();
+        offlineParam.processVec.push_back(processInfo);
+        offlineParam.peerUserId = acl.GetAccessee().GetAccesseeUserId();
+        CacheAcerAclId(acl, offlineParam.needDelAclInfos);
+        LOGI("Sink del acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
+            ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+            GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
+            acl.GetBindLevel());
+        isMatch = true;
+    }
+    return isMatch;
 }
 
 DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(const std::string &pkgName,
@@ -2771,6 +2913,9 @@ void DeviceProfileConnector::UpdatePeerUserId(AccessControlProfile profile, std:
 void DeviceProfileConnector::SetProcessInfoPkgName(const DistributedDeviceProfile::AccessControlProfile &acl,
     std::vector<OHOS::DistributedHardware::ProcessInfo> &processInfoVec, bool isAccer)
 {
+    if (IsLnnAcl(acl)) {
+        return;
+    }
     OHOS::DistributedHardware::ProcessInfo processInfo;
     if (isAccer) {
         if (acl.GetBindType() == DM_IDENTICAL_ACCOUNT || acl.GetBindLevel() == USER) {

@@ -811,9 +811,8 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
             processInfoVec.push_back(processInfo);
         } else if (static_cast<uint32_t>(item.second) == SERVICE || static_cast<uint32_t>(item.second) == APP) {
             LOGI("The offline device is PEER_TO_PEER_TYPE bind type, %{public}" PRIu32, item.second);
-            processInfoVec = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(
-                requestDeviceId, trustDeviceId, item.first);
-            std::set<ProcessInfo> processInfoSet(processInfoVec.begin(), processInfoVec.end());
+            CHECK_NULL_VOID(listener_);
+            std::set<ProcessInfo> processInfoSet = listener_->GetAlreadyOnlineProcess();
             processInfoVec.assign(processInfoSet.begin(), processInfoSet.end());
         }
         deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, trustDeviceId, isOnline);
@@ -2044,7 +2043,8 @@ void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &inf
         CHECK_NULL_VOID(listener_);
         listener_->SetExistPkgName(pkgNameSet);
         CHECK_NULL_VOID(deviceStateMgr_);
-        deviceStateMgr_->OnDeviceOffline(info.peerUdid);
+        bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(info.peerUdid);
+        deviceStateMgr_->OnDeviceOffline(info.peerUdid, isOnline);
     }
 }
 
@@ -2171,6 +2171,22 @@ bool DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, 
     }
 }
 
+void DeviceManagerServiceImpl::DeleteAndNotifyOffline(const std::string &udid)
+{
+    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().FilterNeedDeleteACL(udid);
+    if (offlineParam.isNewVersion) {
+        DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+    } else {
+        for (auto item : offlineParam.needDelAclInfos) {
+            DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.accessControlId);
+        }
+        CHECK_NULL_VOID(hiChainAuthConnector_);
+        hiChainAuthConnector_->DeleteCredential(udid, MultipleUserConnector::GetCurrentAccountUserID(),
+            offlineParam.peerUserId);
+    }
+    NotifyDeviceOrAppOffline(offlineParam, udid);
+}
+
 void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
 {
     LOGI("udid: %{public}s.", GetAnonyString(udid).c_str());
@@ -2178,7 +2194,7 @@ void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
         LOGE("HandleDeviceNotTrust udid is empty.");
         return;
     }
-    DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
+    DeleteAndNotifyOffline(udid);
     CHECK_NULL_VOID(hiChainConnector_);
     hiChainConnector_->DeleteAllGroupByUdid(udid);
 }
@@ -2256,7 +2272,8 @@ void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, co
             CHECK_NULL_VOID(listener_);
             listener_->SetExistPkgName(pkgNameSet);
             CHECK_NULL_VOID(deviceStateMgr_);
-            deviceStateMgr_->OnDeviceOffline(remoteUdid);
+            bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(remoteUdid);
+            deviceStateMgr_->OnDeviceOffline(remoteUdid, isOnline);
         }
     }
 }
@@ -2336,7 +2353,8 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
         LOGI("after clear target acl, No user acl exist, report offline");
         CHECK_NULL_VOID(softbusConnector_);
         softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
-        softbusConnector_->HandleDeviceOffline(remoteUdid);
+        bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(remoteUdid);
+        softbusConnector_->HandleDeviceOffline(remoteUdid, isOnline);
     }
     //third, not lnn acl, determin if delete Credential
     if (offlineParam.allLnnAclInfos.empty()) {
@@ -2373,7 +2391,8 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
         LOGI("after clear target acl, No user acl exist, report offline");
         CHECK_NULL_VOID(softbusConnector_);
         softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
-        softbusConnector_->HandleDeviceOffline(remoteUdid);
+        bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(remoteUdid);
+        softbusConnector_->HandleDeviceOffline(remoteUdid, isOnline);
     }
     //third, not lnn acl, determin if delete Credential
     if (offlineParam.allLnnAclInfos.empty()) {
@@ -2407,7 +2426,8 @@ void DeviceManagerServiceImpl::HandleServiceUnBindEvent(int32_t userId, const st
     if (!offlineParam.allLeftAppOrSvrAclInfos.empty() && offlineParam.allUserAclInfos.empty()) {
         LOGI("after clear target acl, No user acl exist, report offline");
         softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
-        softbusConnector_->HandleDeviceOffline(remoteUdid);
+        bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(remoteUdid);
+        softbusConnector_->HandleDeviceOffline(remoteUdid, isOnline);
     }
 }
 
@@ -2943,7 +2963,8 @@ int32_t DeviceManagerServiceImpl::DeleteAcl(const std::string &pkgName, const st
         if (offlineParam.leftAclNumber != 0) {
             LOGI("The pkgName unbind app-level type leftAclNumber not zero.");
             softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
-            softbusConnector_->HandleDeviceOffline(remoteUdid);
+            bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(remoteUdid);
+            softbusConnector_->HandleDeviceOffline(remoteUdid, isOnline);
             return DM_OK;
         }
         if (offlineParam.leftAclNumber == 0) {
@@ -3372,7 +3393,8 @@ void DeviceManagerServiceImpl::NotifyDeviceOrAppOffline(DmOfflineParam &offlineP
         }
         CHECK_NULL_VOID(listener_);
         listener_->SetExistPkgName(pkgNameSet);
-        softbusConnector_->HandleDeviceOffline(remoteUdid);
+        bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(remoteUdid);
+        softbusConnector_->HandleDeviceOffline(remoteUdid, isOnline);
         return;
     }
     if (!offlineParam.hasUserAcl && offlineParam.allUserAclInfos.empty() &&
@@ -3380,7 +3402,8 @@ void DeviceManagerServiceImpl::NotifyDeviceOrAppOffline(DmOfflineParam &offlineP
         LOGI("left service or app acl");
         CHECK_NULL_VOID(softbusConnector_);
         softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
-        softbusConnector_->HandleDeviceOffline(remoteUdid);
+        bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(remoteUdid);
+        softbusConnector_->HandleDeviceOffline(remoteUdid, isOnline);
         return;
     }
     NotifyDeviceOffline(offlineParam, remoteUdid);
@@ -3403,14 +3426,16 @@ void DeviceManagerServiceImpl::NotifyDeviceOffline(DmOfflineParam &offlineParam,
         std::vector<ProcessInfo> processVec = { processInfo };
         CHECK_NULL_VOID(softbusConnector_);
         softbusConnector_->SetProcessInfoVec(processVec);
-        softbusConnector_->HandleDeviceOffline(remoteUdid);
+        bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(remoteUdid);
+        softbusConnector_->HandleDeviceOffline(remoteUdid, isOnline);
     }
     if (!offlineParam.hasUserAcl && offlineParam.allUserAclInfos.empty() &&
         offlineParam.allLeftAppOrSvrAclInfos.empty()) {
         LOGI("not left acl");
         CHECK_NULL_VOID(softbusConnector_);
         softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
-        softbusConnector_->HandleDeviceOffline(remoteUdid);
+        bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(remoteUdid);
+        softbusConnector_->HandleDeviceOffline(remoteUdid, isOnline);
     }
 }
 

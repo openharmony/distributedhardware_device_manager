@@ -323,6 +323,7 @@ private:
     bool GetPinMatchFlag(uint64_t tokenId, const DmAuthInfo &dmAuthInfo);
     int32_t UpdateLocalServiceInfoToDp(const DmAuthInfo &dmAuthInfo,
         const DistributedDeviceProfile::LocalServiceInfo &dpServiceInfo);
+    void DeleteAndNotifyOffline(const std::string &udid);
 private:
     std::shared_ptr<DmTimer> timer_;
     std::map<std::string, DmAuthInfo> tokenIdPinCodeMap_;
