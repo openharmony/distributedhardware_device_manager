@@ -167,7 +167,6 @@ public:
         std::string content);
     std::shared_ptr<DiscoveryCallback> GetDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId);
     void GetCallBack(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap);
-    void OnServiceOnline(const std::vector<int64_t> &serviceIds);
 //this code line need delete: 172 - 172
     void OnServicePublishResult(int64_t serviceId, int32_t publishResult);
     void OnServiceDiscoveryResult(const std::string &pkgName, const std::string &serviceType, int32_t resReason);

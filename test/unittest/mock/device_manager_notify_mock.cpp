@@ -31,15 +31,5 @@ int32_t DeviceManagerNotify::RegisterGetDeviceIconInfoCallback(const std::string
     return DmDeviceManagerNotify::dmDeviceManagerNotify->RegisterGetDeviceIconInfoCallback(pkgName, uk, callback);
 }
 
-int32_t DeviceManagerNotify::RegisterServiceStateCallback(const std::string &key,
-    std::shared_ptr<ServiceInfoStateCallback> callback)
-{
-    return DmDeviceManagerNotify::dmDeviceManagerNotify->RegisterServiceStateCallback(key, callback);
-}
-
-int32_t DeviceManagerNotify::UnRegisterServiceStateCallback(const std::string &key)
-{
-    return DmDeviceManagerNotify::dmDeviceManagerNotify->UnRegisterServiceStateCallback(key);
-}
 } // namespace DistributedHardware
 } // namespace OHOS

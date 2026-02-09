@@ -125,18 +125,6 @@ public:
     void OnBindResult(const PeerTargetId &targetId, int32_t result, int32_t status, std::string content) override {}
 };
 
-class ServiceDiscoveryCallbackTest : public ServiceDiscoveryCallback {
-public:
-    void OnServiceFound(const DiscoveryServiceInfo &service) override {}
-    void OnServiceDiscoveryResult(int32_t resReason) override {}
-};
-
-class ServiceInfoStateCallbackTest : public ServiceInfoStateCallback {
-public:
-    void OnServiceOnline(int64_t serviceId) override {}
-    void OnServiceOffline(int64_t serviceId) override {}
-};
-
 class ServicePublishCallbackTest : public ServicePublishCallback {
 public:
     ServicePublishCallbackTest() = default;
