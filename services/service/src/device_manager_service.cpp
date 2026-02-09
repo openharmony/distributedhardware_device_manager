@@ -111,8 +111,6 @@ namespace {
     constexpr const char* LOCAL_FOREGROUND_USERID = "local_foreground_userId";
     constexpr const char* LOCAL_BACKGROUND_USERID = "local_background_userId";
     constexpr int32_t GENERATE_SERVICE_ID_RETRY_TIME = 3;
-    constexpr int32_t SERVICE_UNPUBLISHED_STATE = 0;
-    constexpr int32_t SERVICE_PUBLISHED_STATE = 1;
 }
 //LCOV_EXCL_START
 DeviceManagerService::~DeviceManagerService()

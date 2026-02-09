@@ -24,16 +24,6 @@ class IpcNotifyServiceDiscoverResultReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcNotifyServiceDiscoverResultReq);
 
 public:
-    int32_t GetDiscServiceId() const
-    {
-        return discServiceId_;
-    }
-
-    void SetDiscServiceId(int32_t discServiceId)
-    {
-        discServiceId_ = discServiceId;
-    }
-
     int32_t GetResult() const
     {
         return result_;
@@ -44,9 +34,19 @@ public:
         result_ = result;
     }
 
+    std::string GetServiceType() const
+    {
+        return serviceType_;
+    }
+
+    void SetServiceType(const std::string &serviceType)
+    {
+        serviceType_ = serviceType;
+    }
+
 private:
-    int32_t discServiceId_ { 0 };
     int32_t result_ { 0 };
+    std::string serviceType_ = "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

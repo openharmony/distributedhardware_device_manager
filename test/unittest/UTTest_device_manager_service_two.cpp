@@ -34,7 +34,6 @@ namespace DistributedHardware {
 namespace {
 constexpr const char* PARAM_KEY_TARGET_ID = "TARGET_ID";
 constexpr int32_t NUM_5 = 5;
-constexpr int32_t SERVICE_PUBLISHED_STATE = 1;
 void DeletePermission()
 {
     const int32_t permsNum = 1;

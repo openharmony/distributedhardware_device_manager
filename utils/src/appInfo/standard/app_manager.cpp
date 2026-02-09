@@ -35,7 +35,6 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 const uint32_t MAX_CONTAINER_SIZE = 1000;
-constexpr int32_t SERVICE_PUBLISHED_STATE = 1;
 constexpr int32_t DEVICE_UUID_LENGTH = 65;
 }
 DM_IMPLEMENT_SINGLE_INSTANCE(AppManager);
