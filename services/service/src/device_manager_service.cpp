@@ -19,6 +19,7 @@
 #include <dlfcn.h>
 #include <functional>
 #include <openssl/rand.h>
+#include <thread>
 #include "app_manager.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
@@ -112,6 +113,14 @@ namespace {
     constexpr const char* LOCAL_BACKGROUND_USERID = "local_background_userId";
     constexpr int32_t GENERATE_SERVICE_ID_RETRY_TIME = 3;
     constexpr int32_t SERVICE_PUBLISHED_STATE = 1;
+    constexpr uint64_t DEFAULT_TOKEN_ID = 0;
+    constexpr const char* DEFAULT_PKG_NAME = "";
+    constexpr uint64_t DEFAULT_SERVICE_ID = 0;
+    constexpr int32_t DM_MAX_SERVICE_TYPE = 15;
+    constexpr int32_t DM_MAX_SERVICE_NAME = 64;
+    constexpr int32_t DM_MIN_SERVICE_DISPLAYNAME = 7;
+    constexpr int32_t DM_MAX_SERVICE_DISPLAYNAME = 128;
+    constexpr int32_t DM_MAX_CUSTOMDATA = 1024;
 }
 //LCOV_EXCL_START
 DeviceManagerService::~DeviceManagerService()
@@ -124,11 +133,48 @@ DeviceManagerService::~DeviceManagerService()
 #endif
 }
 
+//this code line need delete : Init, instead by InitSrvBind
 int32_t DeviceManagerService::Init()
 {
     InitSoftbusListener();
     InitDMServiceListener();
     LOGI("Init success, dm service single instance initialized.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::InitSrvBind()
+{
+    InitSoftbusListener();
+    InitDMServiceListener();
+    LOGI("Init success, dm service single instance initialized.");
+    int32_t ret = HandleProcessRestart();
+    if (ret != DM_OK) {
+        LOGE("HandleProcessRestart failed, ret: %{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t DeviceManagerService::HandleProcessRestart()
+{
+    LOGI("Handle DM Process Restart start");
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("DM Serivce adapter resident not load");
+        return ERR_DM_INIT_FAILED;
+    }
+
+    int32_t ret = dmServiceImplExtResident_->HandleDMRestart();
+    if (ret != DM_OK) {
+        LOGE("Update ServiceId Cache failed, ret: %{public}d", ret);
+        return ret;
+    }
+    ret = dmServiceImplExtResident_->SetServiceNodeKeyInfo(DM_PKG_NAME);
+    if (ret != DM_OK) {
+        LOGE("Set ServiceId NodeKeyInfo failed, ret: %{public}d", ret);
+        return ret;
+    }
+#endif
+    LOGI("Handle DM Process Restart success");
     return DM_OK;
 }
 
@@ -360,6 +406,7 @@ void DeviceManagerService::UninitSoftbusListener()
     LOGI("SoftbusListener uninit.");
 }
 
+//this code line need delete : InitDMServiceListener, instead by InitDMServiceListenerSrvBind
 int32_t DeviceManagerService::InitDMServiceListener()
 {
     if (listener_ == nullptr) {
@@ -389,6 +436,46 @@ int32_t DeviceManagerService::InitDMServiceListener()
     }
     InitTaskOfDelTimeOutAcl();
     DeviceProfileConnector::GetInstance().DeleteDpInvalidAcl();
+#endif
+    LOGI("Init success.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::InitDMServiceListenerSrvBind()
+{
+    if (listener_ == nullptr) {
+        listener_ = std::make_shared<DeviceManagerServiceListener>();
+    }
+    if (advertiseMgr_ == nullptr) {
+        advertiseMgr_ = std::make_shared<AdvertiseManager>(softbusListener_);
+    }
+    if (discoveryMgr_ == nullptr) {
+        discoveryMgr_ = std::make_shared<DiscoveryManager>(softbusListener_, listener_);
+    }
+    if (pinHolder_ == nullptr) {
+        pinHolder_ = std::make_shared<PinHolder>(listener_);
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (hiChainConnector_ == nullptr) {
+        hiChainConnector_ = std::make_shared<DmServiceHiChainConnector>();
+    }
+    if (credentialMgr_ == nullptr) {
+        credentialMgr_ = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    }
+    CHECK_NULL_RETURN(DMCommTool::GetInstance(), ERR_DM_POINT_NULL);
+    DMCommTool::GetInstance()->Init();
+    int32_t currentUserId = MultipleUserConnector::GetFirstForegroundUserId();
+    if (IsPC() && !MultipleUserConnector::IsUserUnlocked(currentUserId)) {
+        HandleUserStopEvent(currentUserId);
+    }
+    InitTaskOfDelTimeOutAcl();
+    DeviceProfileConnector::GetInstance().DeleteDpInvalidAcl();
+    if (IsDMServiceAdapterResidentLoad()) {
+        int32_t ret = dmServiceImplExtResident_->SubscribeAllServiceInfo();
+        if (ret != DM_OK) {
+            LOGE("SubscribeAllServiceInfo failed, ret: %{public}d", ret);
+        }
+    }
 #endif
     LOGI("Init success.");
     return DM_OK;
@@ -1182,12 +1269,43 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
     return ret;
 }
 
+//this code line need delete : HandleDeviceStatusChange, instead by HandleDeviceStatusChangeSrvBind
 void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline)
 {
     LOGD("start, devState = %{public}d", devState);
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceStatusChange(devState, devInfo, isOnline);
     }
+}
+
+void DeviceManagerService::HandleDeviceStatusChangeSrvBind(DmDeviceState devState,
+    DmDeviceInfo &devInfo, const bool isOnline)
+{
+    LOGD("start, devState = %{public}d", devState);
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleDeviceStatusChange(devState, devInfo, isOnline);
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (IsDMServiceAdapterResidentLoad()) {
+        int32_t ret = dmServiceImplExtResident_->GetServiceNodeKeyInfo(DM_PKG_NAME, devInfo.networkId);
+        if (ret == DM_OK) {
+            char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+            GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+            std::string localUdid = std::string(localUdidTemp);
+            std::string peerNetworkId = devInfo.networkId;
+            ffrt::submit([dmServiceImplExtResident = dmServiceImplExtResident_,
+                peerNetworkId = peerNetworkId, localUdid = localUdid]() {
+                    dmServiceImplExtResident->SyncServiceInfoOnline(localUdid, peerNetworkId);
+            });
+        }
+        std::string peerUdid(devInfo.deviceId);
+        int32_t state = static_cast<int32_t>(devState);
+        std::string udidHash = Crypto::GetUdidHash(peerUdid);
+        LOGI("devState=%{public}d, peerUdid=%{public}s, udidhash=%{public}s",
+            state, GetAnonyString(peerUdid).c_str(), GetAnonyString(udidHash).c_str());
+        dmServiceImplExtResident_->HandleServiceStatusChange(devState, peerUdid);
+    }
+#endif
 }
 
 int DeviceManagerService::OnSessionOpened(int sessionId, int result)
@@ -2232,6 +2350,7 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
     return pinHolder_->DestroyPinHolder(pkgName, targetId, pinType, payload);
 }
 
+//this code line need delete : DpAclAdd, instead by rewrite DpAclAdd
 int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
 {
     if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
@@ -2245,6 +2364,45 @@ int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
     dmServiceImpl_->DpAclAdd(udid);
     return DM_OK;
 }
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+int32_t DeviceManagerService::DpAclAdd(const std::string &udid, int64_t accessControlId)
+{
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
+        LOGE("The caller does not have permission to call DpAclAdd.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("DpAclAdd failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    dmServiceImpl_->DpAclAdd(udid);
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("SetDnPolicy failed, instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    for (const DistributedDeviceProfile::AccessControlProfile &profile : profiles) {
+        if (profile.GetAccessControlId() == accessControlId) {
+            DistributedDeviceProfile::Accessee accessee = profile.GetAccessee();
+            int32_t peerUserId = accessee.GetAccesseeUserId();
+            ServiceStateBindParameter bindParam = {
+                DEFAULT_TOKEN_ID,
+                DEFAULT_PKG_NAME,
+                static_cast<int32_t>(DistributedDeviceProfile::BindType::SAME_ACCOUNT),
+                udid,
+                peerUserId,
+                DEFAULT_SERVICE_ID
+            };
+            LOGI("call resident BindServiceOnline in DpAclAdd.");
+            dmServiceImplExtResident_->BindServiceOnline(bindParam);
+            break;
+        }
+    }
+    return DM_OK;
+}
+#endif
 
 int32_t DeviceManagerService::GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId,
                                                      int32_t &securityLevel)
@@ -2299,7 +2457,7 @@ bool DeviceManagerService::CheckAccessControl(const DmAccessCaller &caller, cons
         LOGE("GetAccessUdidByNetworkId failed.");
         return false;
     }
-    return dmServiceImpl_->CheckAccessControl(caller, srcUdid, callee, sinkUdid); 
+    return dmServiceImpl_->CheckAccessControl(caller, srcUdid, callee, sinkUdid);
 }
 
 bool DeviceManagerService::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
@@ -2638,6 +2796,7 @@ void DeviceManagerService::HandleCommonEventTimeout(const std::string &localUdid
     UpdateAcl(localUdid, updateUdids, foregroundUserIds, backgroundUserIds);
 }
 
+//this code line need delete : UpdateAcl, instead by UpdateAclSrvBind
 void DeviceManagerService::UpdateAcl(const std::string &localUdid,
     const std::vector<std::string> &peerUdids, const std::vector<int32_t> &foregroundUserIds,
     const std::vector<int32_t> &backgroundUserIds)
@@ -2649,6 +2808,47 @@ void DeviceManagerService::UpdateAcl(const std::string &localUdid,
     }
     discoveryMgr_->GetCommonDependencyObj()->HandleAccountCommonEvent(localUdid, peerUdids, foregroundUserIds,
         backgroundUserIds);
+}
+
+void DeviceManagerService::UpdateAclSrvBind(const std::string &localUdid,
+    const std::vector<std::string> &peerUdids, const std::vector<int32_t> &foregroundUserIds,
+    const std::vector<int32_t> &backgroundUserIds)
+{
+    CHECK_NULL_VOID(discoveryMgr_);
+    if (!discoveryMgr_->IsCommonDependencyReady() || discoveryMgr_->GetCommonDependencyObj() == nullptr) {
+        LOGE("IsCommonDependencyReady failed or GetCommonDependencyObj() is nullptr.");
+        return;
+    }
+    std::vector<DmUserRemovedServiceInfo> serviceInfos;
+    discoveryMgr_->GetCommonDependencyObj()->HandleAccountCommonEvent(localUdid, peerUdids, foregroundUserIds,
+        backgroundUserIds, serviceInfos);
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("IsDMServiceAdapterResidentLoad failed.");
+        return;
+    }
+    for (auto &item : serviceInfos) {
+        if (item.isActive == true) {
+            for (size_t i = 0; i < item.serviceIds.size(); i++) {
+                ServiceStateBindParameter bindParam = {
+                    item.localTokenId,
+                    item.localPkgName,
+                    item.bindType,
+                    item.peerUdid,
+                    item.peerUserId,
+                    item.serviceIds[i]
+                };
+                dmServiceImplExtResident_->BindServiceOnline(bindParam);
+            }
+        } else {
+            for (size_t i = 0; i < item.serviceIds.size(); i++) {
+                DistributedDeviceProfile::ServiceInfo dpServiceInfo;
+                DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
+                    item.peerUdid, item.serviceIds[i], dpServiceInfo);
+                dmServiceImplExtResident_->BindServiceOffline(item.localTokenId, item.localPkgName,
+                    item.bindType, item.peerUdid, dpServiceInfo);
+            }
+        }
+    }
 }
 
 void DeviceManagerService::UpdateAclAndDeleteGroup(const std::string &localUdid,
@@ -2665,6 +2865,7 @@ void DeviceManagerService::UpdateAclAndDeleteGroup(const std::string &localUdid,
 }
 #endif
 
+//this code line need delete : HandleAccountLogout, instead by HandleAccountLogoutSrvBind
 void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string &accountId,
     const std::string &accountName)
 {
@@ -2719,6 +2920,41 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
     }
 }
 
+void DeviceManagerService::HandleAccountLogoutSrvBind(int32_t userId, const std::string &accountId,
+    const std::string &accountName)
+{
+    LOGI("UserId: %{public}d, accountId: %{public}s, accountName: %{public}s", userId,
+        GetAnonyString(accountId).c_str(), GetAnonyString(accountName).c_str());
+
+    if (IsDMServiceAdapterResidentLoad()) {
+        dmServiceImplExtResident_->ClearCacheWhenLogout(userId, accountId);
+    }
+
+    if (!IsDMServiceImplReady()) {
+        LOGE("Init impl failed.");
+        return;
+    }
+
+    std::multimap<std::string, int32_t> deviceMap;
+    std::vector<std::string> peerUdids;
+    std::vector<std::string> dualPeerUdids;
+    std::string localUdid;
+
+    PrepareLogoutDeviceInfo(userId, accountId, deviceMap, peerUdids, dualPeerUdids, localUdid);
+    ProcessDualPeerDeviceLogout(userId, accountId, dualPeerUdids, peerUdids);
+
+    if (!peerUdids.empty()) {
+        char accountIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        if (Crypto::GetAccountIdHash(accountId, reinterpret_cast<uint8_t *>(accountIdHash)) != DM_OK) {
+            LOGE("GetAccountHash failed.");
+            return;
+        }
+        NotifyRemoteLocalLogout(peerUdids, std::string(accountIdHash), accountName, userId);
+    }
+    ProcessDeviceServiceLogout(userId, accountId, deviceMap, localUdid);
+}
+
+//this code line need delete : HandleUserRemoved, instead by HandleUserRemovedSrvBind
 void DeviceManagerService::HandleUserRemoved(int32_t removedUserId)
 {
     LOGI("PreUserId %{public}d.", removedUserId);
@@ -2737,6 +2973,47 @@ void DeviceManagerService::HandleUserRemoved(int32_t removedUserId)
         // Send UserId Removed broadcast
         SendUserRemovedBroadCast(peerUdids, removedUserId);
         dmServiceImpl_->HandleUserRemoved(peerUdids, removedUserId);
+    }
+}
+
+void DeviceManagerService::HandleUserRemovedSrvBind(int32_t removedUserId)
+{
+    LOGI("PreUserId %{public}d.", removedUserId);
+    if (!IsDMServiceImplReady()) {
+        LOGE("Init impl failed.");
+        return;
+    }
+    std::multimap<std::string, int32_t> deviceMap = dmServiceImpl_->GetDeviceIdAndUserId(removedUserId);
+    std::vector<std::string> peerUdids;
+    for (const auto &item : deviceMap) {
+        if (find(peerUdids.begin(), peerUdids.end(), item.first) == peerUdids.end()) {
+            peerUdids.emplace_back(item.first);
+        }
+    }
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = static_cast<std::string>(localDeviceId);
+    if (!peerUdids.empty()) {
+        // Send UserId Removed broadcast
+        SendUserRemovedBroadCast(peerUdids, removedUserId);
+        std::vector<DmUserRemovedServiceInfo> serviceInfos;
+        dmServiceImpl_->HandleUserRemoved(peerUdids, removedUserId, serviceInfos);
+        if (!IsDMServiceAdapterResidentLoad()) {
+            LOGE("IsDMServiceAdapterResidentLoad failed.");
+            return;
+        }
+        for (auto &item : serviceInfos) {
+            for (size_t i = 0; i < item.serviceIds.size(); i++) {
+                DistributedDeviceProfile::ServiceInfo dpServiceInfo;
+                DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
+                    item.peerUdid, item.serviceIds[i], dpServiceInfo);
+                dmServiceImplExtResident_->BindServiceOffline(item.localTokenId, item.localPkgName,
+                    item.bindType, item.peerUdid, dpServiceInfo);
+                LOGI("HandleUserRemoved item.peerUserId = %{public}d.", item.peerUserId);
+                dmServiceImplExtResident_->DeleteServiceInfoForAccountEvent(item.peerUserId, item.peerUdid,
+                    localUdid);
+            }
+        }
     }
 }
 
@@ -2789,6 +3066,7 @@ void DeviceManagerService::SendUserIdsBroadCast(const std::vector<std::string> &
     softbusListener_->SendAclChangedBroadcast(broadCastMsg);
 }
 
+//this code line need delete : HandleUserIdsBroadCast, instead by HandleUserIdsBroadCastSrvBind
 void DeviceManagerService::HandleUserIdsBroadCast(const std::vector<UserIdInfo> &remoteUserIdInfos,
     const std::string &remoteUdid, bool isNeedResponse)
 {
@@ -2836,6 +3114,108 @@ void DeviceManagerService::HandleUserIdsBroadCast(const std::vector<UserIdInfo> 
     }
 }
 
+void DeviceManagerService::HandleUserIdsBroadCastSrvBind(const std::vector<UserIdInfo> &remoteUserIdInfos,
+    const std::string &remoteUdid, bool isNeedResponse)
+{
+    LOGI("rmtUdid: %{public}s, rmtUserIds: %{public}s, isNeedResponse: %{public}s,",
+        GetAnonyString(remoteUdid).c_str(), GetUserIdInfoList(remoteUserIdInfos).c_str(),
+        isNeedResponse ? "true" : "false");
+
+    if (isNeedResponse) {
+        ProcessUserIdResponse(remoteUdid);
+    }
+
+    std::vector<uint32_t> foregroundUserIds;
+    std::vector<uint32_t> backgroundUserIds;
+    ExtractForegroundAndBackgroundUserIds(remoteUserIdInfos, foregroundUserIds, backgroundUserIds);
+    ProcessServiceSyncEvent(foregroundUserIds, backgroundUserIds, remoteUdid);
+}
+
+void DeviceManagerService::ProcessUserIdResponse(const std::string &remoteUdid)
+{
+    std::vector<int32_t> foregroundUserVec;
+    std::vector<int32_t> backgroundUserVec;
+    int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
+    int32_t retBack = MultipleUserConnector::GetBackgroundUserIds(backgroundUserVec);
+
+    if (IsPC()) {
+        MultipleUserConnector::ClearLockedUser(foregroundUserVec, backgroundUserVec);
+    }
+
+    if (retFront != DM_OK || retBack != DM_OK) {
+        LOGE("Get userid failed, retFront: %{public}d, retBack: %{public}d, frontUserNum:%{public}d,"
+             "backUserNum: %{public}d", retFront, retBack, static_cast<int32_t>(foregroundUserVec.size()),
+             static_cast<int32_t>(backgroundUserVec.size()));
+        return;
+    }
+
+    LOGE("Send back local frontuserids: %{public}s, backuserids: %{public}s",
+        GetIntegerList(foregroundUserVec).c_str(), GetIntegerList(backgroundUserVec).c_str());
+    std::vector<std::string> remoteUdids = { remoteUdid };
+    SendUserIdsBroadCast(remoteUdids, foregroundUserVec, backgroundUserVec, false);
+}
+
+void DeviceManagerService::ExtractForegroundAndBackgroundUserIds(
+    const std::vector<UserIdInfo> &remoteUserIdInfos,
+    std::vector<uint32_t> &foregroundUserIds, std::vector<uint32_t> &backgroundUserIds)
+{
+    std::vector<UserIdInfo> foregroundUserIdInfos;
+    std::vector<UserIdInfo> backgroundUserIdInfos;
+    GetFrontAndBackUserIdInfos(remoteUserIdInfos, foregroundUserIdInfos, backgroundUserIdInfos);
+
+    for (const auto &u : foregroundUserIdInfos) {
+        foregroundUserIds.push_back(static_cast<uint32_t>(u.userId));
+    }
+    for (const auto &u : backgroundUserIdInfos) {
+        backgroundUserIds.push_back(static_cast<uint32_t>(u.userId));
+    }
+}
+
+void DeviceManagerService::ProcessServiceSyncEvent(const std::vector<uint32_t> &foregroundUserIds,
+    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
+{
+    if (softbusListener_ != nullptr) {
+        softbusListener_->SetForegroundUserIdsToDSoftBus(remoteUdid, foregroundUserIds);
+    }
+
+    if (!IsDMServiceImplReady()) {
+        return;
+    }
+
+    std::vector<DmUserRemovedServiceInfo> serviceInfos;
+    dmServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid, IsPC(), serviceInfos);
+
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("IsDMServiceAdapterResidentLoad failed.");
+        return;
+    }
+
+    for (auto &item : serviceInfos) {
+        if (item.isActive == true) {
+            for (size_t i = 0; i < item.serviceIds.size(); i++) {
+                ServiceStateBindParameter bindParam = {
+                    item.localTokenId,
+                    item.localPkgName,
+                    item.bindType,
+                    item.peerUdid,
+                    item.peerUserId,
+                    item.serviceIds[i]
+                };
+                dmServiceImplExtResident_->BindServiceOnline(bindParam);
+            }
+        } else {
+            for (size_t i = 0; i < item.serviceIds.size(); i++) {
+                DistributedDeviceProfile::ServiceInfo dpServiceInfo;
+                DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
+                    item.peerUdid, item.serviceIds[i], dpServiceInfo);
+                dmServiceImplExtResident_->BindServiceOffline(item.localTokenId, item.localPkgName,
+                    item.bindType, item.peerUdid, dpServiceInfo);
+            }
+        }
+    }
+}
+
+//this code line need delete : ProcessSyncUserIds, instead by ProcessSyncUserIdsSrvBind
 void DeviceManagerService::ProcessSyncUserIds(const std::vector<uint32_t> &foregroundUserIds,
     const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
 {
@@ -2852,6 +3232,74 @@ void DeviceManagerService::ProcessSyncUserIds(const std::vector<uint32_t> &foreg
     }
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid, IsPC());
+    }
+}
+
+void DeviceManagerService::ProcessActiveServiceBind(const DmUserRemovedServiceInfo &serviceInfo)
+{
+    LOGI("ProcessActiveServiceBind start.");
+    for (size_t i = 0; i < serviceInfo.serviceIds.size(); i++) {
+        ServiceStateBindParameter bindParam = {
+            serviceInfo.localTokenId,
+            serviceInfo.localPkgName,
+            serviceInfo.bindType,
+            serviceInfo.peerUdid,
+            serviceInfo.peerUserId,
+            serviceInfo.serviceIds[i]
+        };
+        dmServiceImplExtResident_->BindServiceOnline(bindParam);
+    }
+}
+
+void DeviceManagerService::ProcessInactiveServiceBind(const DmUserRemovedServiceInfo &serviceInfo)
+{
+    LOGI("ProcessInactiveServiceBind start.");
+    for (size_t i = 0; i < serviceInfo.serviceIds.size(); i++) {
+        DistributedDeviceProfile::ServiceInfo dpServiceInfo;
+        DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
+            serviceInfo.peerUdid, serviceInfo.serviceIds[i], dpServiceInfo);
+        dmServiceImplExtResident_->BindServiceOffline(serviceInfo.localTokenId, serviceInfo.localPkgName,
+            serviceInfo.bindType, serviceInfo.peerUdid, dpServiceInfo);
+    }
+}
+
+void DeviceManagerService::ProcessServiceInfosByState(const std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    LOGI("ProcessServiceInfosByState start.");
+    for (auto &item : serviceInfos) {
+        if (item.isActive == true) {
+            ProcessActiveServiceBind(item);
+        } else {
+            ProcessInactiveServiceBind(item);
+        }
+    }
+}
+
+void DeviceManagerService::ProcessSyncUserIdsSrvBind(const std::vector<uint32_t> &foregroundUserIds,
+    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
+{
+    LOGI("process sync foregroundUserIds: %{public}s, backgroundUserIds: %{public}s, remote udid: %{public}s",
+        GetIntegerList<uint32_t>(foregroundUserIds).c_str(), GetIntegerList<uint32_t>(backgroundUserIds).c_str(),
+        GetAnonyString(remoteUdid).c_str());
+
+    if (softbusListener_ != nullptr) {
+        softbusListener_->SetForegroundUserIdsToDSoftBus(remoteUdid, foregroundUserIds);
+    }
+    std::lock_guard<std::mutex> autoLock(timerLocks_);
+    if (timer_ != nullptr) {
+        timer_->DeleteTimer(std::string(USER_SWITCH_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
+    }
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = static_cast<std::string>(localDeviceId);
+    if (IsDMServiceImplReady()) {
+        std::vector<DmUserRemovedServiceInfo> serviceInfos;
+        dmServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid, IsPC(), serviceInfos);
+        if (!IsDMServiceAdapterResidentLoad()) {
+            LOGE("IsDMServiceAdapterResidentLoad failed.");
+            return;
+        }
+        ProcessServiceInfosByState(serviceInfos);
     }
 }
 
@@ -2896,6 +3344,7 @@ void DeviceManagerService::SendCommonEventBroadCast(const std::vector<std::strin
     softbusListener_->SendAclChangedBroadcast(broadCastMsg);
 }
 
+//this code line need delete : HandleCommonEventBroadCast, instead by HandleCommonEventBroadCastSrvBind
 void DeviceManagerService::HandleCommonEventBroadCast(const std::vector<UserIdInfo> &remoteUserIdInfos,
     const std::string &remoteUdid, bool isNeedResponse)
 {
@@ -2934,6 +3383,88 @@ void DeviceManagerService::HandleCommonEventBroadCast(const std::vector<UserIdIn
     }
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleCommonEventBroadCast(foregroundUserIds, backgroundUserIds, remoteUdid);
+    }
+}
+
+void DeviceManagerService::HandleCommonEventBroadCastSrvBind(const std::vector<UserIdInfo> &remoteUserIdInfos,
+    const std::string &remoteUdid, bool isNeedResponse)
+{
+    LOGI("rmtUdid: %{public}s, rmtUserIds: %{public}s, isNeedResponse: %{public}s,",
+        GetAnonyString(remoteUdid).c_str(), GetUserIdInfoList(remoteUserIdInfos).c_str(),
+        isNeedResponse ? "true" : "false");
+
+    if (isNeedResponse) {
+        std::vector<int32_t> foregroundUserVec;
+        int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
+        std::vector<int32_t> backgroundUserVec;
+        int32_t retBack = MultipleUserConnector::GetBackgroundUserIds(backgroundUserVec);
+        MultipleUserConnector::ClearLockedUser(foregroundUserVec, backgroundUserVec);
+        if (retFront != DM_OK || retBack != DM_OK) {
+            LOGE("retFront: %{public}d, retBack: %{public}d, frontuserids: %{public}s, backuserids: %{public}s",
+                retFront, retBack, GetIntegerList(foregroundUserVec).c_str(),
+                GetIntegerList(backgroundUserVec).c_str());
+        } else {
+            LOGE("Send back local frontuserids: %{public}s, backuserids: %{public}s",
+                GetIntegerList(foregroundUserVec).c_str(), GetIntegerList(backgroundUserVec).c_str());
+            std::vector<std::string> remoteUdids = { remoteUdid };
+            SendCommonEventBroadCast(remoteUdids, foregroundUserVec, backgroundUserVec, false);
+        }
+    }
+
+    std::vector<UserIdInfo> foregroundUserIdInfos;
+    std::vector<UserIdInfo> backgroundUserIdInfos;
+    GetFrontAndBackUserIdInfos(remoteUserIdInfos, foregroundUserIdInfos, backgroundUserIdInfos);
+
+    // Notify received remote foreground userids to dsoftbus
+    std::vector<uint32_t> foregroundUserIds;
+    for (const auto &u : foregroundUserIdInfos) {
+        foregroundUserIds.push_back(static_cast<uint32_t>(u.userId));
+    }
+    std::vector<uint32_t> backgroundUserIds;
+    for (const auto &u : backgroundUserIdInfos) {
+        backgroundUserIds.push_back(static_cast<uint32_t>(u.userId));
+    }
+
+    ProcessCommonEventServiceSync(foregroundUserIds, backgroundUserIds, remoteUdid);
+}
+
+void DeviceManagerService::ProcessCommonEventServiceSync(const std::vector<uint32_t> &foregroundUserIds,
+    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
+{
+    if (!IsDMServiceImplReady()) {
+        return;
+    }
+
+    std::vector<DmUserRemovedServiceInfo> serviceInfos;
+    dmServiceImpl_->HandleCommonEventBroadCast(foregroundUserIds, backgroundUserIds, remoteUdid, serviceInfos);
+
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("IsDMServiceAdapterResidentLoad failed.");
+        return;
+    }
+
+    for (auto &item : serviceInfos) {
+        if (item.isActive == true) {
+            for (size_t i = 0; i < item.serviceIds.size(); i++) {
+                ServiceStateBindParameter bindParam = {
+                    item.localTokenId,
+                    item.localPkgName,
+                    item.bindType,
+                    item.peerUdid,
+                    item.peerUserId,
+                    item.serviceIds[i]
+                };
+                dmServiceImplExtResident_->BindServiceOnline(bindParam);
+            }
+        } else {
+            for (size_t i = 0; i < item.serviceIds.size(); i++) {
+                DistributedDeviceProfile::ServiceInfo dpServiceInfo;
+                DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
+                    item.peerUdid, item.serviceIds[i], dpServiceInfo);
+                dmServiceImplExtResident_->BindServiceOffline(item.localTokenId, item.localPkgName,
+                    item.bindType, item.peerUdid, dpServiceInfo);
+            }
+        }
     }
 }
 
@@ -3145,6 +3676,33 @@ void DeviceManagerService::SendDeviceUnBindBroadCast(const std::vector<std::stri
     softbusListener_->SendAclChangedBroadcast(broadCastMsg);
 }
 
+void DeviceManagerService::SendUnBindServiceBroadCast(const std::vector<std::string> &peerUdids,
+    int32_t localUserId, uint64_t localTokenId, int64_t serviceId)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::SERVICEINFO_UNBIND;
+    msg.userId = static_cast<uint32_t>(localUserId);
+    msg.tokenId = localTokenId;
+    msg.peerUdids = peerUdids;
+    msg.serviceId = serviceId;
+    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+    CHECK_NULL_VOID(softbusListener_);
+    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+}
+
+void DeviceManagerService::SendUnRegServiceBroadCast(const std::vector<std::string> &peerUdids,
+    int32_t localUserId, int64_t serviceId)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::SERVICEINFO_UNREGISTER;
+    msg.userId = static_cast<uint32_t>(localUserId);
+    msg.peerUdids = peerUdids;
+    msg.serviceId = serviceId;
+    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+    CHECK_NULL_VOID(softbusListener_);
+    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+}
+
 int32_t DeviceManagerService::CalculateBroadCastDelayTime()
 {
     int64_t timeDiff = 0;
@@ -3182,7 +3740,11 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
         CHECK_NULL_VOID(softbusListener_);
         softbusListener_->SendAclChangedBroadcast(broadCastMsg);
     };
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
+#else
+    std::thread(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION)).detach();
+#endif
 }
 
 void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
@@ -3201,7 +3763,11 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
         CHECK_NULL_VOID(softbusListener_);
         softbusListener_->SendAclChangedBroadcast(broadCastMsg);
     };
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
+#else
+    std::thread(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION)).detach();
+#endif
 }
 
 void DeviceManagerService::SendAppUnInstallBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
@@ -3219,7 +3785,11 @@ void DeviceManagerService::SendAppUnInstallBroadCast(const std::vector<std::stri
         CHECK_NULL_VOID(softbusListener_);
         softbusListener_->SendAclChangedBroadcast(broadCastMsg);
     };
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
+#else
+    std::thread(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION)).detach();
+#endif
 }
 
 void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
@@ -3285,6 +3855,32 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
     return;
 }
 
+void DeviceManagerService::HandleAccountLogoutEvent(int32_t userId, const std::string &accountId,
+    const std::string &peerUdid)
+{
+    std::vector<DmUserRemovedServiceInfo> serviceInfos;
+    dmServiceImpl_->HandleAccountLogoutEvent(userId, accountId, peerUdid, serviceInfos);
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("IsDMServiceAdapterResidentLoad failed.");
+        return;
+    }
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    for (auto &item : serviceInfos) {
+        for (size_t i = 0; i < item.serviceIds.size(); i++) {
+            DistributedDeviceProfile::ServiceInfo dpServiceInfo;
+            DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
+                item.peerUdid, item.serviceIds[i], dpServiceInfo);
+            dmServiceImplExtResident_->BindServiceOffline(item.localTokenId, item.localPkgName,
+                item.bindType, item.peerUdid, dpServiceInfo);
+            dmServiceImplExtResident_->DeleteServiceInfoForAccountEvent(item.peerUserId, item.peerUdid,
+                localUdid);
+        }
+    }
+}
+
+//this code line need delete : ParseRelationShipChangeType, instead by ParseRelationShipChangeTypeSrvBind
 bool DeviceManagerService::ParseRelationShipChangeType(const RelationShipChangeMsg &relationShipMsg)
 {
     switch (relationShipMsg.type) {
@@ -3329,6 +3925,155 @@ bool DeviceManagerService::ParseRelationShipChangeType(const RelationShipChangeM
             return false;
     }
     return true;
+}
+
+void DeviceManagerService::ProcessAccountLogout(const RelationShipChangeMsg &relationShipMsg)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::submit([=]() {
+        HandleAccountLogoutEvent(relationShipMsg.userId, relationShipMsg.accountId, relationShipMsg.peerUdid);
+    });
+#else
+    std::thread([=]() {
+        HandleAccountLogoutEvent(relationShipMsg.userId, relationShipMsg.accountId, relationShipMsg.peerUdid);
+    }).detach();
+#endif
+}
+
+void DeviceManagerService::ProcessDeviceUnBind(const RelationShipChangeMsg &relationShipMsg)
+{
+    dmServiceImpl_->HandleDevUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
+        static_cast<int32_t>(relationShipMsg.tokenId));
+}
+
+void DeviceManagerService::ProcessServiceUnBind(const RelationShipChangeMsg &relationShipMsg)
+{
+    dmServiceImpl_->HandleServiceUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
+        static_cast<int32_t>(relationShipMsg.tokenId));
+}
+
+void DeviceManagerService::ProcessSyncUserId(const RelationShipChangeMsg &relationShipMsg)
+{
+    if (relationShipMsg.isNewEvent) {
+    #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+        ffrt::submit([=]() {
+            HandleCommonEventBroadCast(relationShipMsg.userIdInfos,
+                relationShipMsg.peerUdid, relationShipMsg.syncUserIdFlag);
+        });
+    #else
+        std::thread([=]() {
+            HandleCommonEventBroadCast(relationShipMsg.userIdInfos,
+                relationShipMsg.peerUdid, relationShipMsg.syncUserIdFlag);
+        }).detach();
+    #endif
+    } else {
+    #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+        ffrt::submit([=]() {
+            HandleUserIdsBroadCast(relationShipMsg.userIdInfos,
+                relationShipMsg.peerUdid, relationShipMsg.syncUserIdFlag);
+        });
+    #else
+        std::thread([=]() {
+            HandleUserIdsBroadCast(relationShipMsg.userIdInfos,
+                relationShipMsg.peerUdid, relationShipMsg.syncUserIdFlag);
+        }).detach();
+    #endif
+    }
+}
+
+void DeviceManagerService::ProcessDelUser(const RelationShipChangeMsg &relationShipMsg)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::submit([=]() {
+        HandleRemoteUserRemoved(relationShipMsg.userId, relationShipMsg.peerUdid);
+    });
+#else
+    std::thread([=]() {
+        HandleRemoteUserRemoved(relationShipMsg.userId, relationShipMsg.peerUdid);
+    }).detach();
+#endif
+}
+
+void DeviceManagerService::ProcessServiceInfoUnbind(const RelationShipChangeMsg &relationShipMsg)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::submit([=]() {
+        HandleServiceUnBindTargetEvent(relationShipMsg.peerUdid,
+            relationShipMsg.userId, relationShipMsg.tokenId, relationShipMsg.serviceId);
+    });
+#else
+    std::thread([=]() {
+        HandleServiceUnBindTargetEvent(relationShipMsg.peerUdid,
+            relationShipMsg.userId, relationShipMsg.tokenId, relationShipMsg.serviceId);
+    }).detach();
+#endif
+}
+
+bool DeviceManagerService::ParseRelationShipChangeTypeSrvBind(const RelationShipChangeMsg &relationShipMsg)
+{
+    switch (relationShipMsg.type) {
+        case RelationShipChangeType::ACCOUNT_LOGOUT:
+            ProcessAccountLogout(relationShipMsg);
+            break;
+        case RelationShipChangeType::DEVICE_UNBIND:
+            ProcessDeviceUnBind(relationShipMsg);
+            break;
+        case RelationShipChangeType::APP_UNBIND:
+            ParseAppUnBindRelationShip(relationShipMsg);
+            break;
+        case RelationShipChangeType::SERVICE_UNBIND:
+            ProcessServiceUnBind(relationShipMsg);
+            break;
+        case RelationShipChangeType::SYNC_USERID:
+            ProcessSyncUserId(relationShipMsg);
+            break;
+        case RelationShipChangeType::DEL_USER:
+            ProcessDelUser(relationShipMsg);
+            break;
+        case RelationShipChangeType::STOP_USER:
+            HandleUserStopBroadCast(relationShipMsg.userId, relationShipMsg.peerUdid);
+            break;
+        case RelationShipChangeType::SHARE_UNBIND:
+            HandleShareUnbindBroadCast(relationShipMsg.userId, relationShipMsg.credId);
+            break;
+        case RelationShipChangeType::APP_UNINSTALL:
+            ProcessUninstApp(relationShipMsg.userId, static_cast<int32_t>(relationShipMsg.tokenId));
+            break;
+        case RelationShipChangeType::SERVICEINFO_UNBIND:
+            ProcessServiceInfoUnbind(relationShipMsg);
+            break;
+        case RelationShipChangeType::SERVICEINFO_UNREGISTER:
+            HandleServiceUnRegEvent(relationShipMsg.peerUdid, relationShipMsg.userId, relationShipMsg.serviceId);
+            break;
+        default:
+            LOGI("Dm have not this event type.");
+            return false;
+    }
+    return true;
+}
+
+void DeviceManagerService::HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid)
+{
+    std::vector<DmUserRemovedServiceInfo> serviceInfos;
+    dmServiceImpl_->HandleRemoteUserRemoved(userId, remoteUdid, serviceInfos);
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("IsDMServiceAdapterResidentLoad failed.");
+        return;
+    }
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = static_cast<std::string>(localDeviceId);
+    for (auto &item : serviceInfos) {
+        for (size_t i = 0; i < item.serviceIds.size(); i++) {
+            DistributedDeviceProfile::ServiceInfo dpServiceInfo;
+            DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
+                item.peerUdid, item.serviceIds[i], dpServiceInfo);
+            dmServiceImplExtResident_->BindServiceOffline(item.localTokenId, item.localPkgName,
+                item.bindType, item.peerUdid, dpServiceInfo);
+            dmServiceImplExtResident_->DeleteServiceInfoForAccountEvent(item.peerUserId, item.peerUdid,
+                localUdid);
+        }
+    }
 }
 
 void DeviceManagerService::ParseAppUnBindRelationShip(const RelationShipChangeMsg &relationShipMsg)
@@ -3867,7 +4612,7 @@ void DeviceManagerService::GetNotifyRemoteUnBindAppWay(int32_t userId, int32_t t
             wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
         }
     }
-    
+
     if (!bleUdids.empty()) {
         isBleWay = true;
     } else {
@@ -4181,8 +4926,8 @@ int32_t DeviceManagerService::SetLocalDeviceName(const std::string &pkgName, con
 #else
     CHECK_NULL_RETURN(listener_, ERR_DM_POINT_NULL);
     ProcessInfo processInfo = {.pkgName = pkgName};
-    MultipleUserConnector::GetCallerUserId(processInfo.userId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    MultipleUserConnector::GetCallerUserId(processInfo.userId);
     ffrt::submit([listener = listener_, deviceName = deviceName, processInfo = processInfo]() {
         CHECK_NULL_VOID(listener);
         listener->OnSetLocalDeviceNameResult(processInfo, deviceName, DM_OK);
@@ -4381,6 +5126,7 @@ void DeviceManagerService::NotifyRemoteLocalLogout(const std::vector<std::string
 #endif
 }
 
+//this code line need delete : ProcessSyncAccountLogout, instead by ProcessSyncAccountLogoutSrvBind
 void DeviceManagerService::ProcessSyncAccountLogout(const std::string &accountId, const std::string &peerUdid,
     int32_t userId)
 {
@@ -4918,7 +5664,8 @@ int32_t DeviceManagerService::StopPublishService(int64_t serviceId)
     int64_t tokenIdCaller = static_cast<int64_t>(IPCSkeleton::GetCallingTokenID());
     ServiceInfoProfile serviceInfo;
     int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId, serviceInfo);
-    if (ret != DM_OK || serviceInfo.publishState == SERVICE_UNPUBLISHED_STATE || serviceInfo.tokenId != tokenIdCaller) {
+    if (ret != DM_OK || serviceInfo.publishState == DMPublishState::SERVICE_UNPUBLISHED_STATE ||
+        serviceInfo.tokenId != tokenIdCaller) {
         LOGE("Invalid parameter, serviceId or publish state is invalid.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -4951,7 +5698,7 @@ int32_t DeviceManagerService::UpdateServiceInfo(int64_t serviceId)
         return ret;
     }
     serviceInfoProfile.serviceId = 0;
-    serviceInfoProfile.publishState = SERVICE_UNPUBLISHED_STATE;
+    serviceInfoProfile.publishState = DMPublishState::SERVICE_UNPUBLISHED_STATE;
     ret = DeviceProfileConnector::GetInstance().PutServiceInfoProfile(serviceInfoProfile);
     if (ret != DM_OK) {
         LOGE("PutServiceInfoProfile failed, ret: %{public}d", ret);
@@ -5090,6 +5837,627 @@ int32_t DeviceManagerService::GetAuthTypeByUdidHash(const std::string &udidHash,
     return DM_OK;
 }
 
+uint64_t DeviceManagerService::GetSubjectTokenId(const std::map<std::string, std::string> &unbindParam)
+{
+    LOGI("satrt.");
+    auto it = unbindParam.find(PARAM_KEY_SUBJECT_SERVICE_ONES);
+    if (it == unbindParam.end()) {
+        LOGE("input unbind parameter not contains isProxyUnbind");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    JsonObject allProxyObj;
+    allProxyObj.Parse(it->second);
+    if (allProxyObj.IsDiscarded()) {
+        LOGE("event prase error.");
+        return ERR_DM_FAILED;
+    }
+    std::string tokenIdStr = "tokenId";
+    int64_t subjectTokenId;
+    for (auto const &item : allProxyObj.Items()) {
+        if (!item.Contains(tokenIdStr) || !IsInt64(item, tokenIdStr)) {
+            LOGE("tokenId invalid");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+        subjectTokenId = item[tokenIdStr].Get<int64_t>();
+    }
+    return static_cast<uint64_t>(subjectTokenId);
+}
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+int32_t DeviceManagerService::RegisterServiceInfo(const DmRegisterServiceInfo& regServiceInfo, int64_t &serviceId)
+{
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The callerdoes not have permission to cal1 RegisterServiceInfo.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    int32_t ret = ValidateDmRegisterServiceInfo(regServiceInfo);
+    if (ret != DM_OK) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("StartPublishService failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->RegisterServiceInfo(regServiceInfo, serviceId);
+}
+
+int32_t DeviceManagerService::ValidateDmRegisterServiceInfo(const DmRegisterServiceInfo& regServiceInfo)
+{
+    if (regServiceInfo.serviceOwnerPkgName.empty() ||
+        regServiceInfo.serviceType.empty() ||
+        regServiceInfo.serviceType.size() > DM_MAX_SERVICE_TYPE ||
+        regServiceInfo.serviceName.empty() ||
+        regServiceInfo.serviceName.size() > DM_MAX_SERVICE_NAME ||
+        regServiceInfo.serviceDisplayName.size() < DM_MIN_SERVICE_DISPLAYNAME ||
+        regServiceInfo.serviceDisplayName.size() > DM_MAX_SERVICE_DISPLAYNAME ||
+        regServiceInfo.customData.size() > DM_MAX_CUSTOMDATA ||
+        regServiceInfo.timeStamp < 0 ||
+        regServiceInfo.serviceCode.empty() ||
+        regServiceInfo.customData.empty()) {
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::UnRegisterServiceInfo(int64_t serviceId)
+{
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The callerdoes not have permission to cal1 RegisterServiceInfo.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("UnRegisterServiceInfo failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+
+    char localdeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localdeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localdeviceId);
+    int32_t localUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::multimap<std::string, int32_t> deviceMap =
+        DeviceProfileConnector::GetInstance().GetDeviceIdAndUserId(localUdid, localUserId);
+    std::vector<std::string> peerUdids;
+    for (const auto &item : deviceMap) {
+        if (find(peerUdids.begin(), peerUdids.end(), item.first) == peerUdids.end()) {
+            peerUdids.emplace_back(item.first);
+        }
+    }
+    if (!peerUdids.empty()) {
+        SendUnRegServiceBroadCast(peerUdids, localUserId, serviceId);
+    }
+
+    int32_t ret = dmServiceImplExtResident_->UnRegisterServiceInfo(serviceId);
+    if (ret != DM_OK) {
+        LOGE("UnRegisterServiceInfo failed, ret: %{public}d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::StartPublishService(const std::string &pkgName, int64_t serviceId,
+    const DmPublishServiceParam &publishServiceParam)
+{
+    LOGI("StartPublishService start, pkgName: %{public}s", pkgName.c_str());
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission to call StantPublishService.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("StartPublishService failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImplExtResident_->StartPublishService(pkgName, serviceId, publishServiceParam);
+}
+
+int32_t DeviceManagerService::StopPublishService(const std::string &pkgName, int64_t serviceId)
+{
+    LOGI("StopPublishService start, pkgName: %{public}s, serviceId: %{public}s",
+        pkgName.c_str(), std::to_string(serviceId).c_str());
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission to call StantPublishService.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("StopPublishService failed, adapter instance not init or init failed");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->StopPublishService(processInfo, serviceId);
+}
+
+int32_t DeviceManagerService::StartDiscoveryService(const std::string &pkgName, const DmDiscoveryServiceParam &disParam)
+{
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission to call StantPublishService.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("StartDiscovering failed, adapter instance not init or init failed");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    return dmServiceImplExtResident_->StartDiscoveryService(processInfo, disParam);
+}
+
+int32_t DeviceManagerService::StopDiscoveryService(const std::string &pkgName,
+    const DmDiscoveryServiceParam &discParam)
+{
+    LOGI("StopDiscoveryService start, pkgName: %{public}s", pkgName.c_str());
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission to call StantPublishService.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("StopDiscoveryService failed, adapter instance not init or init failed");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    return dmServiceImplExtResident_->StopDiscoveryService(processInfo, discParam);
+}
+
+int32_t DeviceManagerService::RegServiceStateCallback(const std::string &pkgName, int64_t serviceId)
+{
+    LOGI("RegServiceStateCallback called, pkgName: %{public}s, serviceId: %{public}" PRId64,
+        pkgName.c_str(), serviceId);
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission to call GetDeviceInfo.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (serviceId < 0) {
+        LOGE("Invalid parameter, serviceId is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("RegServiceStateCallback failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    int32_t result = dmServiceImplExtResident_->RegisterServiceStateCallback(pkgName, serviceId);
+    LOGI("RegisterServiceStateCallback result: %{public}d", result);
+    return result;
+}
+
+int32_t DeviceManagerService::ClearServiceStateCallback(const std::string &pkgName, int32_t userId)
+{
+    LOGI("ClearServiceStateCallback called, pkgName: %{public}s, userId: %{public}d",
+        pkgName.c_str(), userId);
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("ClearServiceStateCallback failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    int32_t result = dmServiceImplExtResident_->ClearServiceStateCallback(pkgName, userId);
+    LOGI("ClearServiceStateCallback result: %{public}d", result);
+    return result;
+}
+
+int32_t DeviceManagerService::UnRegServiceStateCallback(const std::string &pkgName, int64_t serviceId)
+{
+    LOGI("UnRegServiceStateCallback called, pkgName: %{public}s, serviceId: %{public}" PRId64,
+        pkgName.c_str(), serviceId);
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission to call GetDeviceInfo.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (serviceId < 0) {
+        LOGE("Invalid parameter, serviceId is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("UnRegServiceStateCallback failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    int32_t result = dmServiceImplExtResident_->UnRegisterServiceStateCallback(pkgName, serviceId);
+    LOGI("UnRegisterServiceStateCallback result: %{public}d", result);
+    return result;
+}
+
+int32_t DeviceManagerService::SyncServiceInfoByServiceId(const std::string &pkgName, int32_t localUserId,
+    const std::string &networkId, int64_t serviceId)
+{
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller: %{public}s does not have permission to call LeaveLNN.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("no proxy permission");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->SyncServiceInfoByServiceId(pkgName, localUserId, networkId, serviceId);
+}
+
+int32_t DeviceManagerService::SyncAllServiceInfo(const std::string &pkgName, int32_t localUserId,
+    const std::string &networkId)
+{
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller: %{public}s does not have permission to call LeaveLNN.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("no proxy permission");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->SyncAllServiceInfo(pkgName, localUserId, networkId);
+}
+
+int32_t DeviceManagerService::GetLocalServiceInfoByServiceId(int64_t serviceId, DmRegisterServiceInfo &serviceInfo)
+{
+    LOGI("GetLocalServiceInfoByServiceId, serviceId: %{public}" PRId64, serviceId);
+    if (serviceId <= 0) {
+        LOGE("Invalid serviceId");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string pkgName = "";
+    if (!PermissionManager::GetInstance().CheckSystemSA(pkgName)) {
+        LOGE("The caller does not have system SA permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGW("GetLocalServiceInfoByServiceId fail, adapter instance not init or init failed.");
+        return ERR_DM_FAILED;
+    }
+    int32_t ret = dmServiceImplExtResident_->GetLocalServiceInfoByServiceId(serviceId, serviceInfo);
+    if (ret != DM_OK) {
+        LOGE("GetLocalServiceInfoByServiceId from resident failed, ret: %{public}d", ret);
+        return ret;
+    }
+    LOGI("GetLocalServiceInfoByServiceId success");
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GetTrustServiceInfo(const std::string &pkgName,
+    const std::map<std::string, std::string> &paramMap, std::vector<DmServiceInfo> &serviceList)
+{
+    LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!PermissionManager::GetInstance().CheckSystemSA(pkgName)) {
+        LOGE("The caller does not have system SA permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGW("GetTrustServiceInfo fail, adapter instance not init or init failed.");
+        return ERR_DM_FAILED;
+    }
+    int32_t ret = dmServiceImplExtResident_->GetTrustServiceInfo(pkgName, paramMap, serviceList);
+    if (ret != DM_OK) {
+        LOGE("GetTrustServiceInfo from resident failed, ret: %{public}d", ret);
+        return ret;
+    }
+    LOGI("GetTrustServiceInfo success");
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GetRegisterServiceInfo(const std::map<std::string, std::string> &param,
+    std::vector<DmRegisterServiceInfo> &regServiceInfos)
+{
+    LOGI("GetRegisterServiceInfo Start");
+    std::string pkgName = "";
+    if (!PermissionManager::GetInstance().CheckSystemSA(pkgName)) {
+        LOGE("The caller does not have system SA permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGW("GetRegisterServiceInfo fail, adapter instance not init or init failed.");
+        return ERR_DM_FAILED;
+    }
+    int32_t ret = dmServiceImplExtResident_->GetRegisterServiceInfo(param, regServiceInfos);
+    if (ret != DM_OK) {
+        LOGE("GetRegisterServiceInfo from resident failed, ret: %{public}d", ret);
+        return ret;
+    }
+    LOGI("GetRegisterServiceInfo success");
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::UpdateServiceInfo(int64_t serviceId, const DmRegisterServiceInfo &regServiceInfo)
+{
+    LOGI("UpdateServiceInfo start.");
+    if (serviceId <= 0) {
+        LOGE("serviceId is invalid.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (IsDMServiceAdapterResidentLoad()) {
+        return dmServiceImplExtResident_->UpdateServiceInfo(serviceId, regServiceInfo);
+    }
+    return ERR_DM_FAILED;
+}
+
+int32_t DeviceManagerService::GetPeerServiceInfoByServiceId(const std::string &networkId, int64_t serviceId,
+    DmRegisterServiceInfo &serviceInfo)
+{
+    LOGI("GetPeerServiceInfoByServiceId, serviceId: %{public}" PRId64, serviceId);
+    if (serviceId <= 0 || networkId == "") {
+        LOGE("Invalid serviceId or networkId.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string pkgName = "";
+    if (!PermissionManager::GetInstance().CheckSystemSA(pkgName)) {
+        LOGE("The caller does not have system SA permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGW("GetPeerServiceInfoByServiceId fail, adapter instance not init or init failed.");
+        return ERR_DM_FAILED;
+    }
+    int32_t ret = dmServiceImplExtResident_->GetPeerServiceInfoByServiceId(networkId, serviceId, serviceInfo);
+    if (ret != DM_OK) {
+        LOGE("GetPeerServiceInfoByServiceId from resident failed, ret: %{public}d", ret);
+        return ret;
+    }
+    LOGI("GetPeerServiceInfoByServiceId success");
+    return DM_OK;
+}
+
+void DeviceManagerService::ProcessProxyUnbindService(const std::map<std::string, std::string> &unbindParam,
+    int32_t userId, const std::string &udid, const std::string &netWorkId, int64_t serviceId)
+{
+    LOGI("ProcessProxyUnbindService start.");
+    uint64_t subjectTokenId = GetSubjectTokenId(unbindParam);
+    std::vector<uint64_t> peerTokenId = {};
+    DeviceProfileConnector::GetInstance().GetPeerTokenIdForServiceProxyUnbind(userId, subjectTokenId,
+        udid, serviceId, peerTokenId);
+    std::map<std::string, std::string> wifiDevices;
+    wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
+    NotifyRemoteUnBindServiceByWifi(userId, subjectTokenId, peerTokenId, serviceId, wifiDevices);
+}
+
+void DeviceManagerService::ClassifyDevicesByNetworkType(const std::vector<std::string> &peerUdids,
+    std::vector<std::string> &bleUdids, std::map<std::string, std::string> &wifiDevices)
+{
+    LOGI("ClassifyDevicesByNetworkType start.");
+    for (const auto &udid : peerUdids) {
+        std::string netWorkId = "";
+        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
+        if (netWorkId.empty()) {
+            LOGE("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        int32_t networkType = 0;
+        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+        if (ret != DM_OK || networkType <= 0) {
+            LOGE("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
+        if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
+            bleUdids.push_back(udid);
+        } else {
+            wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
+        }
+    }
+}
+
+void DeviceManagerService::NotifyRemoteUnbindService(const std::map<std::string, std::string> &unbindParam,
+    const std::string &netWorkId, int64_t serviceId)
+{
+    uint64_t localTokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+    std::vector<std::string> peerUdids;
+    std::string udid = "";
+    SoftbusListener::GetUdidByNetworkId(netWorkId.c_str(), udid);
+    peerUdids.push_back(udid);
+
+    bool isProxyUnbind = false;
+    auto it = unbindParam.find(PARAM_KEY_IS_PROXY_UNBIND);
+    if (it != unbindParam.end()) {
+        isProxyUnbind = (it->second == "true");
+    }
+
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::map<std::string, std::string> wifiDevices;
+    std::vector<uint64_t> peerTokenId = {};
+
+    if (isProxyUnbind) {
+        ProcessProxyUnbindService(unbindParam, userId, udid, netWorkId, serviceId);
+        return;
+    }
+
+    std::vector<std::string> bleUdids;
+    ClassifyDevicesByNetworkType(peerUdids, bleUdids, wifiDevices);
+
+    if (!bleUdids.empty()) {
+        SendUnBindServiceBroadCast(peerUdids, userId, localTokenId, serviceId);
+    } else {
+        NotifyRemoteUnBindServiceByWifi(userId, localTokenId, peerTokenId, serviceId, wifiDevices);
+    }
+}
+
+void DeviceManagerService::NotifyRemoteUnBindServiceByWifi(int32_t userId, uint64_t localTokenId,
+    std::vector<uint64_t> &peerTokenId, int64_t serviceId,
+    const std::map<std::string, std::string> &wifiDevices)
+{
+    LOGI("NotifyRemoteUnBindServiceByWifi start.");
+    for (const auto &it : wifiDevices) {
+        char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+        GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+        std::string localUdid = std::string(localUdidTemp);
+        UnbindServiceProxyParam param;
+        param.userId = userId;
+        param.localTokenId = localTokenId;
+        param.peerTokenId = peerTokenId;
+        param.localUdid = localUdid;
+        param.peerNetworkId = it.second;
+        param.serviceId = serviceId;
+        CHECK_NULL_VOID(DMCommTool::GetInstance());
+        int32_t res = DMCommTool::GetInstance()->SendUnBindServiceProxyObj(param);
+        if (res != DM_OK) {
+            LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
+            continue;
+        }
+        std::lock_guard<std::mutex> autoLock(timerLocks_);
+        if (timer_ == nullptr) {
+            timer_ = std::make_shared<DmTimer>();
+        }
+        std::string udid = it.first;
+        std::string networkId = it.second;
+        timer_->StartTimer(std::string(SERVICE_UNBIND_PROXY_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid),
+            USER_SWITCH_BY_WIFI_TIMEOUT_S, [this, networkId] (std::string name) {
+                DMCommTool::GetInstance()->StopSocket(networkId);
+            });
+    }
+}
+
+int32_t DeviceManagerService::UnbindServiceTarget(const std::string &pkgName,
+    const std::map<std::string, std::string> &unbindParam, const std::string &netWorkId,
+    int64_t serviceId)
+{
+    LOGI("DeviceManagerService::UnbindServiceTarget start");
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    NotifyRemoteUnbindService(unbindParam, netWorkId, serviceId);
+    int32_t ret = dmServiceImplExtResident_->UnbindServiceTarget(pkgName, unbindParam,
+        netWorkId, serviceId);
+    LOGI("UnAuthenticateDevice 11 get ret %{public}d.", ret);
+    if (ret != DM_OK) {
+        LOGE("UnbindServiceTarget failed, %{public}d.", ret);
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+void DeviceManagerService::HandleServiceUnBindTargetEvent(std::string peerUdid, int32_t userId,
+    uint64_t tokenId, int64_t serviceId)
+{
+    LOGI("HandleServiceUnBindTargetEvent");
+    if (IsDMServiceAdapterResidentLoad()) {
+        dmServiceImplExtResident_->HandleServiceUnBindTargetEvent(peerUdid, userId, tokenId, serviceId);
+    }
+    return;
+}
+
+void DeviceManagerService::HandleServiceUnRegEvent(std::string peerUdid, int32_t userId,
+    int64_t serviceId)
+{
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return;
+    }
+
+    ffrt::submit([dmServiceImplExtResident = dmServiceImplExtResident_, peerUdid, serviceId]() {
+        dmServiceImplExtResident->HandleServiceUnRegEvent(peerUdid, serviceId);
+    });
+    return;
+}
+
+int32_t DeviceManagerService::BindServiceOnline(const ServiceStateBindParameter &bindParam)
+{
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->BindServiceOnline(bindParam);
+}
+
+int32_t DeviceManagerService::BindServiceOffline(uint64_t tokenId, const std::string &pkgName, int32_t bindType,
+    const std::string &peerUdid, const DistributedDeviceProfile::ServiceInfo &serviceInfo)
+{
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->BindServiceOffline(tokenId, pkgName, bindType, peerUdid, serviceInfo);
+}
+
+int32_t DeviceManagerService::HandleRemoteDied(const ProcessInfo &processInfo)
+{
+    LOGI("HandleRemoteDied called, pkgName: %{public}s, userId: %{public}d",
+        processInfo.pkgName.c_str(), processInfo.userId);
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("HandleRemoteDied failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    int32_t result = dmServiceImplExtResident_->HandleRemoteDied(processInfo);
+    LOGI("HandleRemoteDied result: %{public}d", result);
+    return result;
+}
+
+int32_t DeviceManagerService::HandleSoftbusRestart()
+{
+    LOGI("HandleSoftbusRestart start");
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("HandleSoftbusRestart failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    int32_t result = dmServiceImplExtResident_->HandleSoftbusRestart();
+    LOGI("HandleSoftbusRestart result: %{public}d", result);
+    return result;
+}
+
+int32_t DeviceManagerService::HandleServiceStatusChange(DmDeviceState devState, const std::string &peerUdid)
+{
+    LOGI("HandleServiceStatusChange start");
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("HandleServiceStatusChange failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    int32_t result = dmServiceImplExtResident_->HandleServiceStatusChange(devState, peerUdid);
+    LOGI("HandleServiceStatusChange result: %{public}d", result);
+    return result;
+}
+
 void DeviceManagerService::ProcessReceiveRspSvcUnbindProxy(const std::string &remoteUdid)
 {
     LOGI("ProcessReceiveRspSvcUnbindProxy remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
@@ -5107,6 +6475,39 @@ void DeviceManagerService::ProcessUnBindServiceProxy(const UnbindServiceProxyPar
     uint64_t peerTokenId = param.localTokenId;
     std::vector<uint64_t> localTokenId = param.peerTokenId;
     std::string peerUdid = param.localUdid;
+    if (IsDMServiceAdapterResidentLoad()) {
+        dmServiceImplExtResident_->HandleProcessUnBindServiceProxy(peerUserId, peerTokenId, localTokenId,
+            param.serviceId, peerUdid);
+    }
 }
+
+void DeviceManagerService::ProcessSyncAccountLogoutSrvBind(const std::string &accountId, const std::string &peerUdid,
+    int32_t userId)
+{
+    LOGI("Start. process udid: %{public}s", GetAnonyString(peerUdid).c_str());
+    if (!IsDMServiceImplReady()) {
+        LOGE("Imp instance not init or init failed.");
+        return;
+    }
+    std::vector<DmUserRemovedServiceInfo> serviceInfos;
+    dmServiceImpl_->HandleAccountLogoutEvent(userId, accountId, peerUdid, serviceInfos);
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("IsDMServiceAdapterResidentLoad failed.");
+        return;
+    }
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = static_cast<std::string>(localDeviceId);
+    for (auto &item : serviceInfos) {
+        for (size_t i = 0; i < item.serviceIds.size(); i++) {
+            DistributedDeviceProfile::ServiceInfo dpServiceInfo;
+            DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
+                item.peerUdid, item.serviceIds[i], dpServiceInfo);
+            dmServiceImplExtResident_->BindServiceOffline(item.localTokenId, item.localPkgName,
+                item.bindType, item.peerUdid, dpServiceInfo);
+        }
+    }
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS

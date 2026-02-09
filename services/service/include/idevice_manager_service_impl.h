@@ -287,6 +287,23 @@ public:
     virtual int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId) = 0;
     virtual int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength) = 0;
     virtual int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo) = 0;
+
+    //this code line mock start
+    virtual void HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
+    virtual void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
+    virtual void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
+    virtual void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
+    virtual void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
+    virtual void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
+        const std::string &remoteUdid, std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
+    //this code line mock end
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

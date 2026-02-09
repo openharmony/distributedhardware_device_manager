@@ -125,6 +125,54 @@ public:
     virtual int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo) = 0;
     virtual int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo) = 0;
     virtual int32_t InitSoftbusServer() = 0;
+
+    //this code line mock start
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    virtual int32_t HandleDMRestart() = 0;
+    virtual int32_t SetServiceNodeKeyInfo(const std::string &pkgName) = 0;
+    virtual int32_t SubscribeAllServiceInfo() = 0;
+    virtual int32_t SyncServiceInfoOnline(const std::string &localUdid, const std::string &networkId) = 0;
+    virtual int32_t HandleServiceStatusChange(DmDeviceState devState, const std::string &peerUdid) = 0;
+    virtual int32_t BindServiceOnline(const ServiceStateBindParameter &bindParam) = 0;
+    virtual int32_t BindServiceOffline(uint64_t tokenId, const std::string &pkgName, int32_t bindType,
+        const std::string &peerUdid, const DistributedDeviceProfile::ServiceInfo &serviceInfo) = 0;
+    virtual int32_t GetServiceNodeKeyInfo(const std::string &pkgName, const std::string &networkId) = 0;
+    virtual void HandleProcessUnBindServiceProxy(int32_t peerUserId, uint64_t peerTokenId,
+        const std::vector<uint64_t> &localTokenId, int64_t serviceId, const std::string &peerUdid) = 0;
+    virtual int32_t DeleteServiceInfoForAccountEvent(int32_t peerUserId, const std::string &peerUdid,
+        const std::string &localUdid) = 0;
+    virtual int32_t RegisterServiceInfo(const DmRegisterServiceInfo &regServiceInfo, int64_t &serviceId) = 0;
+    virtual int32_t UnRegisterServiceInfo(int64_t serviceId) = 0;
+    virtual int32_t StartPublishService(const std::string &pkgName, int64_t serviceId,
+        const DmPublishServiceParam &publishServiceParam) = 0;
+    virtual int32_t StopPublishService(const ProcessInfo &processInfo, int64_t serviceId) = 0;
+    virtual int32_t StartDiscoveryService(const ProcessInfo &processInfo, const DmDiscoveryServiceParam &discParam) = 0;
+    virtual int32_t StopDiscoveryService(const ProcessInfo &processInfo, const DmDiscoveryServiceParam &discParam) = 0;
+    virtual int32_t RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId) = 0;
+    virtual int32_t ClearServiceStateCallback(const std::string &pkgName, int32_t userId) = 0;
+    virtual int32_t UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId) = 0;
+    virtual int32_t SyncServiceInfoByServiceId(const std::string &pkgName, int32_t localUserId,
+        const std::string &networkId, int64_t serviceId) = 0;
+    virtual int32_t SyncAllServiceInfo(const std::string &pkgName,
+        int32_t localUserId, const std::string &networkId) = 0;
+    virtual int32_t GetLocalServiceInfoByServiceId(int64_t serviceId, DmRegisterServiceInfo &serviceInfo) = 0;
+    virtual int32_t GetTrustServiceInfo(const std::string &pkgName, const std::map<std::string, std::string> &param,
+        std::vector<DmServiceInfo> &serviceInfo) = 0;
+    virtual int32_t GetRegisterServiceInfo(const std::map<std::string, std::string> &param,
+        std::vector<DmRegisterServiceInfo> &regServiceInfos) = 0;
+    virtual int32_t HandleSoftbusRestart() = 0;
+    virtual void HandleServiceUnBindTargetEvent(std::string peerUdid, int32_t userId, uint64_t tokenId,
+        int64_t serviceId) = 0;
+    virtual void HandleServiceUnRegEvent(const std::string &peerUdid, int64_t serviceId) = 0;
+    virtual int32_t UnbindServiceTarget(const std::string &pkgName,
+        const std::map<std::string, std::string> &unbindParam, const std::string &netWorkId,
+        int64_t serviceId) = 0;
+    virtual int32_t GetPeerServiceInfoByServiceId(const std::string &networkId, int64_t serviceId,
+        DmRegisterServiceInfo &serviceInfo) = 0;
+    virtual int32_t UpdateServiceInfo(int64_t serviceId, const DmRegisterServiceInfo &regServiceInfo);
+    virtual int32_t HandleRemoteDied(const ProcessInfo &processInfo) = 0;
+#endif
+    //this code line mock end
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);
