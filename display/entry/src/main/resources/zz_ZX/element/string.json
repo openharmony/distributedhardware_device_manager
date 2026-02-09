@@ -91,6 +91,18 @@
         {
             "name":"dm_confirm_proxy",
             "value":"[TS_1085103]_\"%s\" would like to connect to this device. Please select which services it can access:"
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"[TS_1174758]_%1$s would like to access the %2$s service on your device. Trust this device?"
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"[TS_1174759]_The %2$s app on %1$s would like to access the %3$s service on your device. Trust this app?"
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"[TS_1174760]_%s would like to connect to services on your device. Select services to authorize:"
         }
     ]
 }

@@ -125,6 +125,20 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"L'app %2$s su %1$s vorrebbe accedere al servizio %3$s sul tuo dispositivo. Vuoi considerare affidabile questa app?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s vorrebbe connettersi ai servizi sul tuo dispositivo. Seleziona i servizi da autorizzare:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

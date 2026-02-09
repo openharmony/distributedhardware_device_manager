@@ -125,6 +125,20 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"La aplicación %2$s de %1$s quiere acceder al servicio %3$s en tu dispositivo. ¿Confiar en esta aplicación?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s quiere conectarse a los servicios de tu dispositivo. Selecciona los servicios que quieres autorizar:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

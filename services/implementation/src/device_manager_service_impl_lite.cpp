@@ -852,46 +852,6 @@ int32_t DeviceManagerServiceImpl::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
     return DM_OK;
 }
 
-//this code line mock start
-void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId,
-    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
-{
-    return;
-}
-
-void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid,
-    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
-{
-    return;
-}
-
-void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
-    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid,
-    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
-{
-    return;
-}
-
-void DeviceManagerServiceImpl::HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId,
-    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
-{
-    return;
-}
-
-void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
-    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus,
-    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
-{
-    return;
-}
-
-void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
-    const std::string &remoteUdid, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
-{
-    return;
-}
-//this code line mock end
-
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

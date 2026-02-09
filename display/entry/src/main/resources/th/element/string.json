@@ -125,6 +125,20 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"แอป %2$s บน %1$s ต้องการเข้าถึงบริการ %3$s บนอุปกรณ์ของคุณ เชื่อถือแอปนี้หรือไม่",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s ต้องการเชื่อมต่อกับบริการบนอุปกรณ์ของคุณ เลือกบริการที่จะอนุญาต:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

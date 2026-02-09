@@ -148,14 +148,14 @@
         },
         {
             "name":"serve_confirm_trust",
-            "value":"%1$s的%2$s请求访问本机%3$s服务，是否信任此应用？",
+            "value":"%1$s的%2$s请求访问本机%3$s服务，是否信任本应用？",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"serve_confirm_trust_nohost",
-            "value":"%1$s请求访问本机%2$s服务，是否信任此应用？",
+            "value":"%1$s请求访问本机%2$s服务，是否信任本应用？",
             "attr":{
                 "priority":"translate"
             }

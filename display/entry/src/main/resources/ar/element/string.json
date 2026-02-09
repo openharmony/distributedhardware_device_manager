@@ -125,6 +125,20 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"يريد تطبيق %2$s على \u202a%1$s\u202c الوصول إلى خدمة %3$s على جهازك. هل تريد منح هذا التطبيق الإذن؟",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"يريد \u202a%s\u202c الاتصال بالخدمات على جهازك. حدد الخدمات التي تريد منحها الإذن:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

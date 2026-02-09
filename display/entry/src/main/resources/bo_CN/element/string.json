@@ -125,6 +125,20 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"%1$sཡི་%2$sནས་སྒྲིག་ཆས་འདིའི་%3$sཞབས་ཞུ་རེ་ཞུ་བྱེད་ལ། ཉེར་སྤྱོད་འདིར་ཡིད་ཆེས་བྱེད་དམ།",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%sནས་སྒྲིག་ཆས་འདིའི་ཞབས་ཞུ་རེ་ཞུ་བྱེད་ལ། དབང་སྤྲོད་བྱེད་པའི་ཞབས་ཞུ་འདེམས་རོགས།",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }
