@@ -12,32 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//this code line need delete: 1 - 100
-//delete this file
-#ifndef OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
-#define OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
-
-#include "dm_device_info.h"
+ 
+#ifndef OHOS_DM_IPC_GET_TRUST_SERVICE_INFO_RSP_H
+#define OHOS_DM_IPC_GET_TRUST_SERVICE_INFO_RSP_H
+ 
 #include "ipc_req.h"
+#include "dm_device_info.h"
+ 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcRegisterServiceInfoNewReq : public IpcReq {
-    DECLARE_IPC_MODEL(IpcRegisterServiceInfoNewReq);
-
+class IpcGetTrustServiceInfoRsp : public IpcRsp {
+    DECLARE_IPC_MODEL(IpcGetTrustServiceInfoRsp);
 public:
-    ServiceRegInfo GetServiceRegInfo() const
+    std::vector<DmServiceInfo> GetServiceInfoVec() const
     {
-        return serviceRegInfo_;
+        return serviceInfoVec_;
     }
-    
-    void SetServiceRegInfo(const ServiceRegInfo& serviceRegInfo)
+    void SetServiceInfoVec(std::vector<DmServiceInfo> &serviceInfoVec)
     {
-        serviceRegInfo_ = serviceRegInfo;
+        serviceInfoVec_ = serviceInfoVec;
     }
-
 private:
-    ServiceRegInfo serviceRegInfo_;
+    std::vector<DmServiceInfo> serviceInfoVec_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
+#endif // OHOS_DM_IPC_GET_TRUST_SERVICE_INFO_RSP_H

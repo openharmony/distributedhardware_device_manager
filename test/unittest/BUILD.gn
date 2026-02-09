@@ -55,6 +55,7 @@ group("unittest") {
     ":UTTest_dm_common_event_manager",
     ":UTTest_dm_credential_manager",
     ":UTTest_dm_crypto",
+    ":UTTest_dm_crypto_mgr",
     ":UTTest_dm_device_state_manager",
     ":UTTest_dm_device_state_manager_two",
     ":UTTest_dm_deviceprofile_connector",
@@ -1860,6 +1861,25 @@ ohos_unittest("UTTest_dm_crypto") {
 }
 
 ## UnitTest UTTest_dm_crypto }}}
+
+## UnitTest UTTest_dm_crypto_mgr {{{
+ohos_unittest("UTTest_dm_crypto_mgr") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources = [ "${devicemanager_path}/test/unittest/UTTest_dm_crypto_mgr.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_dm_crypto_mgr }}}
 
 ## UnitTest UTTest_dm_account_common_event {{{
 ohos_unittest("UTTest_dm_account_common_event") {
