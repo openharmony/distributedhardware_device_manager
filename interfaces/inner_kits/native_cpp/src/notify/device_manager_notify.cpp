@@ -1619,8 +1619,6 @@ void DeviceManagerNotify::OnServiceOffline(const DmRegisterServiceState &registe
 {
     std::string pkgName = registerServiceState.pkgName;
     int64_t serviceId = registerServiceState.serviceId;
-    LOGI("RegisterServiceStateCallback->DeviceManagerNotify::OnServiceOffline: pkgName=%{public}s,
-        serviceId=%{public}" PRId64, pkgName.c_str(), serviceId);
     std::shared_ptr<ServiceInfoStateCallback> callbackInfo;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
