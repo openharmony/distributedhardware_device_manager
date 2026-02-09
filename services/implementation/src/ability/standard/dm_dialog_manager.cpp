@@ -63,7 +63,6 @@ void DmDialogManager::ShowServiceBindConfirmDialog(const std::string param)
     std::string appOperationStr = "";
     std::string customDescriptionStr = "";
     std::string hostPkgLabel = "";
-    int32_t deviceType = -1;
     {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> lock(mutex_);
@@ -82,7 +81,7 @@ void DmDialogManager::ShowServiceBindConfirmDialog(const std::string param)
                 customDescriptionStr = jsonObject[TAG_CUSTOM_DESCRIPTION].Get<std::string>();
             }
             if (IsInt32(jsonObject, TAG_LOCAL_DEVICE_TYPE)) {
-                deviceType = jsonObject[TAG_LOCAL_DEVICE_TYPE].Get<std::int32_t>();
+                deviceType_ = jsonObject[TAG_LOCAL_DEVICE_TYPE].Get<std::int32_t>();
             }
             if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
                 hostPkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
@@ -106,7 +105,6 @@ void DmDialogManager::ShowServiceBindConfirmDialog(const std::string param)
         deviceName_ = deviceName;
         appOperationStr_ = appOperationStr;
         customDescriptionStr_ = customDescriptionStr;
-        deviceType_ = deviceType;
         hostPkgLabel_ = hostPkgLabel;
     }
     ConnectExtension();

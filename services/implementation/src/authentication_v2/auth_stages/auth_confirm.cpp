@@ -200,19 +200,17 @@ void AuthSrcConfirmState::NegotiateAcl(std::shared_ptr<DmAuthContext> context, J
 
 static void NegotiateP2PAclAccesser(std::shared_ptr<DmAuthContext> context, JsonObject &aclNegoResult)
 {
-    if (context->accesser.aclProfiles.count(DM_POINT_TO_POINT) != 0) {
-        auto profile = context->accesser.aclProfiles[DM_POINT_TO_POINT];
-        std::string extraData = profile.GetAccessee().GetAccesseeExtraData();
-        JsonObject jsonExtra(extraData);
-        if (jsonExtra.Contains(TAG_SERVICE_ID) && jsonExtra[TAG_SERVICE_ID].IsArray()) {
-            auto tmpServiceId = jsonExtra[TAG_SERVICE_ID];
-            for (auto& id : tmpServiceId.Items()) {
-                int64_t idValue = id.Get<int64_t>();
-                if (idValue == context->accessee.serviceId) {
-                    LOGI("have point_to_point acl.");
-                    aclNegoResult["pointTopointAcl"] = DM_POINT_TO_POINT;
-                    context->accesser.isAuthed = true;
-                }
+    auto profile = context->accesser.aclProfiles[DM_POINT_TO_POINT];
+    std::string extraData = profile.GetAccessee().GetAccesseeExtraData();
+    JsonObject jsonExtra(extraData);
+    if (jsonExtra.Contains(TAG_SERVICE_ID) && jsonExtra[TAG_SERVICE_ID].IsArray()) {
+        auto tmpServiceId = jsonExtra[TAG_SERVICE_ID];
+        for (auto& id : tmpServiceId.Items()) {
+            int64_t idValue = id.Get<int64_t>();
+            if (idValue == context->accessee.serviceId) {
+                LOGI("have point_to_point acl.");
+                aclNegoResult["pointTopointAcl"] = DM_POINT_TO_POINT;
+                context->accesser.isAuthed = true;
             }
         }
     }
@@ -245,7 +243,9 @@ void AuthSrcConfirmState::NegotiateAclSrvBind(std::shared_ptr<DmAuthContext> con
     }
     if (accesseeAclList.Contains("pointTopointAcl") && accesserAclList.Contains("pointTopointAcl")) {
         if (context->isServiceBind) {
-            NegotiateP2PAcl(context, aclNegoResult);
+            if (context->accesser.aclProfiles.count(DM_POINT_TO_POINT) != 0) {
+                NegotiateP2PAclAccesser(context, aclNegoResult);
+            }
         } else {
             LOGI("have point_to_point acl.");
             aclNegoResult["pointTopointAcl"] = DM_POINT_TO_POINT;
@@ -293,24 +293,30 @@ void AuthSrcConfirmState::NegotiateProxyAcl(std::shared_ptr<DmAuthContext> conte
     }
 }
 
-static void NegotiateProxyP2PAclAccesser(DmProxyAuthContext& item, JsonObject &aclNegoResult)
+static void NegotiateProxyP2PAclAccesserInner(std::vector<DmProxyAuthContext>::iterator item,
+    JsonObject &aclNegoResult, JsonObject &jsonExtra)
+{
+    if (jsonExtra.Contains(TAG_SERVICE_ID) && jsonExtra[TAG_SERVICE_ID].IsArray()) {
+        auto tmpServiceId = jsonExtra[TAG_SERVICE_ID];
+        for (auto& id : tmpServiceId.Items()) {
+            int64_t idValue = id.Get<int64_t>();
+            if (idValue == item->proxyAccessee.serviceId) {
+                LOGI("have point_to_point acl pkgName: %{public}s.", item->proxyAccesser.pkgName.c_str());
+                aclNegoResult["pointTopointAcl"] = DM_POINT_TO_POINT;
+                item->proxyAccesser.aclTypeList = aclNegoResult.Dump();
+                item->proxyAccesser.isAuthed = true;
+            }
+        }
+    }
+}
+
+static void NegotiateProxyP2PAclAccesser(std::vector<DmProxyAuthContext>::iterator item, JsonObject &aclNegoResult)
 {
     if (item->proxyAccesser.aclProfiles.count(DM_POINT_TO_POINT) != 0) {
         auto profile = item->proxyAccesser.aclProfiles[DM_POINT_TO_POINT];
         std::string extraData = profile.GetAccessee().GetAccesseeExtraData();
         JsonObject jsonExtra(extraData);
-        if (jsonExtra.Contains(TAG_SERVICE_ID) && jsonExtra[TAG_SERVICE_ID].IsArray()) {
-            auto tmpServiceId = jsonExtra[TAG_SERVICE_ID];
-            for (auto& id : tmpServiceId.Items()) {
-                int64_t idValue = id.Get<int64_t>();
-                if (idValue == item->proxyAccessee.serviceId) {
-                    LOGI("have point_to_point acl pkgName: %{public}s.", item->proxyAccesser.pkgName.c_str());
-                    aclNegoResult["pointTopointAcl"] = DM_POINT_TO_POINT;
-                    item->proxyAccesser.aclTypeList = aclNegoResult.Dump();
-                    item->proxyAccesser.isAuthed = true;
-                }
-            }
-        }
+        NegotiateProxyP2PAclAccesserInner(item, aclNegoResult, jsonExtra);
     }
 }
 
@@ -1478,19 +1484,17 @@ void AuthSinkConfirmState::NegotiateAcl(std::shared_ptr<DmAuthContext> context, 
 
 static void NegotiateP2PAclAccessee(std::shared_ptr<DmAuthContext> context, JsonObject &aclNegoResult)
 {
-    if (context->accessee.aclProfiles.count(DM_POINT_TO_POINT) != 0) {
-        auto profile = context->accessee.aclProfiles[DM_POINT_TO_POINT];
-        std::string extraData = profile.GetAccessee().GetAccesseeExtraData();
-        JsonObject jsonExtra(extraData);
-        if (jsonExtra.Contains(TAG_SERVICE_ID) && jsonExtra[TAG_SERVICE_ID].IsArray()) {
-            auto tmpServiceId = jsonExtra[TAG_SERVICE_ID];
-            for (auto& id : tmpServiceId.Items()) {
-                int64_t idValue = id.Get<int64_t>();
-                if (idValue == context->accessee.serviceId) {
-                    LOGI("have point_to_point acl.");
-                    aclNegoResult["pointTopointAcl"] = DM_POINT_TO_POINT;
-                    context->accessee.isAuthed = true;
-                }
+    auto profile = context->accessee.aclProfiles[DM_POINT_TO_POINT];
+    std::string extraData = profile.GetAccessee().GetAccesseeExtraData();
+    JsonObject jsonExtra(extraData);
+    if (jsonExtra.Contains(TAG_SERVICE_ID) && jsonExtra[TAG_SERVICE_ID].IsArray()) {
+        auto tmpServiceId = jsonExtra[TAG_SERVICE_ID];
+        for (auto& id : tmpServiceId.Items()) {
+            int64_t idValue = id.Get<int64_t>();
+            if (idValue == context->accessee.serviceId) {
+                LOGI("have point_to_point acl.");
+                aclNegoResult["pointTopointAcl"] = DM_POINT_TO_POINT;
+                context->accessee.isAuthed = true;
             }
         }
     }
@@ -1523,7 +1527,9 @@ void AuthSinkConfirmState::NegotiateAclSrvBind(std::shared_ptr<DmAuthContext> co
     }
     if (accesseeAclList.Contains("pointTopointAcl") && accesserAclList.Contains("pointTopointAcl")) {
         if (context->isServiceBind) {
-            NegotiateP2PAclAccessee(context, aclNegoResult);
+            if (context->accessee.aclProfiles.count(DM_POINT_TO_POINT) != 0) {
+                NegotiateP2PAclAccessee(context, aclNegoResult);
+            }
         } else {
             LOGI("have point_to_point acl.");
             aclNegoResult["pointTopointAcl"] = DM_POINT_TO_POINT;
@@ -1568,24 +1574,30 @@ void AuthSinkConfirmState::NegotiateProxyAcl(std::shared_ptr<DmAuthContext> cont
     }
 }
 
-static void NegotiateProxyP2PAclAccessee(DmProxyAuthContext& item, JsonObject &aclNegoResult)
+static void NegotiateProxyP2PAclAccesseeInner(std::vector<DmProxyAuthContext>::iterator item,
+    JsonObject &aclNegoResult, JsonObject &jsonExtra)
+{
+    if (jsonExtra.Contains(TAG_SERVICE_ID) && jsonExtra[TAG_SERVICE_ID].IsArray()) {
+        auto tmpServiceId = jsonExtra[TAG_SERVICE_ID];
+        for (auto& id : tmpServiceId.Items()) {
+            int64_t idValue = id.Get<int64_t>();
+            if (idValue == item->proxyAccessee.serviceId) {
+                LOGI("have point_to_point acl pkgName: %{public}s.", item->proxyAccesser.pkgName.c_str());
+                aclNegoResult["pointTopointAcl"] = DM_POINT_TO_POINT;
+                item->proxyAccessee.aclTypeList = aclNegoResult.Dump();
+                item->proxyAccessee.isAuthed = true;
+            }
+        }
+    }
+}
+
+static void NegotiateProxyP2PAclAccessee(std::vector<DmProxyAuthContext>::iterator item, JsonObject &aclNegoResult)
 {
     if (item->proxyAccessee.aclProfiles.count(DM_POINT_TO_POINT) != 0) {
         auto profile = item->proxyAccessee.aclProfiles[DM_POINT_TO_POINT];
         std::string extraData = profile.GetAccessee().GetAccesseeExtraData();
         JsonObject jsonExtra(extraData);
-        if (jsonExtra.Contains(TAG_SERVICE_ID) && jsonExtra[TAG_SERVICE_ID].IsArray()) {
-            auto tmpServiceId = jsonExtra[TAG_SERVICE_ID];
-            for (auto& id : tmpServiceId.Items()) {
-                int64_t idValue = id.Get<int64_t>();
-                if (idValue == item->proxyAccessee.serviceId) {
-                    LOGI("have point_to_point acl pkgName: %{public}s.", item->proxyAccesser.pkgName.c_str());
-                    aclNegoResult["pointTopointAcl"] = DM_POINT_TO_POINT;
-                    item->proxyAccessee.aclTypeList = aclNegoResult.Dump();
-                    item->proxyAccessee.isAuthed = true;
-                }
-            }
-        }
+        NegotiateProxyP2PAclAccesseeInner(item, aclNegoResult, jsonExtra);
     }
 }
 
@@ -1890,7 +1902,9 @@ bool AuthSinkConfirmState::ProcessUserOption(std::shared_ptr<DmAuthContext> cont
     }
     return context->subjectProxyOnes.size() > 0 || context->IsCallingProxyAsSubject;
 }
-static bool ProcessUserOptionSrvBindInner(std::shared_ptr<DmAuthContext> context, JsonObject appDataObj)
+
+bool AuthSinkConfirmState::ProcessUserOptionSrvBindInner(std::shared_ptr<DmAuthContext> context,
+    JsonObject &appDataObj)
 {
     if (!context->IsProxyBind) {
         if (!IsUserAuthorizeProxy(appDataObj, context)) {

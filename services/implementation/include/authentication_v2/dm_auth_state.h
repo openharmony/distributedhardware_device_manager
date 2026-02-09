@@ -332,6 +332,7 @@ private:
     // this code line need delete:359
     bool ProcessServerAuthorize(std::shared_ptr<DmAuthContext> context);
     bool ProcessServerAuthorizeSrvBind(std::shared_ptr<DmAuthContext> context);
+    bool ProcessUserOptionSrvBindInner(std::shared_ptr<DmAuthContext> context, JsonObject &appDataObj);
     bool IsUserAuthorize(JsonObject &paramObj, DmProxyAccess &access);
     bool IsUserAuthorizeProxy(JsonObject &paramObj, std::shared_ptr<DmAuthContext> context);
     bool IsUserAuthorizeService(JsonObject &paramObj, DmProxyAccess &accesser, DmProxyAccess &accessee);
