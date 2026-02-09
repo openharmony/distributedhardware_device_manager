@@ -974,10 +974,8 @@ int32_t AuthManager::BindTargetSrvBind(const std::string &pkgName, const PeerTar
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (context_->isServiceBind) {
-        LOGI("CheckSrcNegotiateSrvParam enter.");
         ret = CheckSrcNegotiateSrvParam(pkgName, targetId.serviceId, bindParam);
         if (ret != DM_OK) {
-            LOGE("AuthManager::BindTarget failed, check service param failed.");
             return ERR_DM_INPUT_PARA_INVALID;
         }
     }
@@ -1632,7 +1630,6 @@ void AuthManager::ParseServiceJsonObject(const JsonObject &jsonObject)
             return;
         }
         DmProxyAuthContext proxyAuthContext;
-        // proxyAuthContext.proxyContextId = Crypto::Sha256(bundleName + peerBundleName);
         if (std::find(context_->subjectServiceOnes.begin(), context_->subjectServiceOnes.end(), proxyAuthContext) ==
             context_->subjectServiceOnes.end()) {
             proxyAuthContext.proxyAccesser.pkgName = item[PARAM_KEY_LOCAL_PKGNAME].Get<std::string>();

@@ -942,7 +942,8 @@ static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
         return;
     }
     std::vector<DistributedDeviceProfile::ServiceInfo> dpServiceInfos;
-    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfosByUdid(context->accessee.deviceId, dpServiceInfos);
+    int32_t ret =
+        DeviceProfileConnector::GetInstance().GetServiceInfosByUdid(context->accessee.deviceId, dpServiceInfos);
     if (ret != DM_OK) {
         LOGE("SetServiceInfos::Get all serviceinfos");
         return;

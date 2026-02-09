@@ -112,7 +112,7 @@ typedef struct DmAclIdParam {
     std::string pkgName;
     std::unordered_set<int64_t> tokenIds;
 } DmAclIdParam;
-// this code line need delete: compile dependence start 
+// this code line need delete: compile dependence start
 typedef struct DmLocalUserRemovedInfo {
     std::string localUdid = "";
     int32_t preUserId = 0;
@@ -130,7 +130,7 @@ typedef struct DmCacheOfflineInputParam {
     OHOS::DistributedHardware::DMAclQuadInfo info;
     std::string accountIdHash = "";
 } DmCacheOfflineOutputParam;
-// this code line need delete: compile dependence end 
+// this code line need delete: compile dependence end
 typedef struct DmOfflineParam {
     uint32_t bindType;
     std::vector<OHOS::DistributedHardware::ProcessInfo> processVec;
