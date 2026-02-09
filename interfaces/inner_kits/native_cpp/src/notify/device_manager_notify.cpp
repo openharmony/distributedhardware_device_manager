@@ -1567,8 +1567,7 @@ void DeviceManagerNotify::OnServiceOnline(const DmRegisterServiceState &register
     int64_t serviceId = registerServiceState.serviceId;
     std::shared_ptr<ServiceInfoStateCallback> callbackInfo;
     {
-        for (const auto &[key, callback] : serviceStateCallback_)
-        {
+        for (const auto &[key, callback] : serviceStateCallback_) {
             const auto &[pkgName, serviceId] = key;
             LOGI("DeviceManagerNotify::OnServiceOnline start, pkgName: %{public}s, serviceId: %{public}" PRId64,
                  pkgName.c_str(), serviceId);
