@@ -127,8 +127,6 @@ void UnRegisterServiceDiscoveryCallbackFuzzTest(FuzzedDataProvider &fdp)
     int32_t discoveryServiceId = fdp.ConsumeIntegral<int32_t>();
     DeviceManagerNotify::GetInstance().UnRegisterServiceDiscoveryCallback(discoveryServiceId);
 }
-
-
 }
 }
 
