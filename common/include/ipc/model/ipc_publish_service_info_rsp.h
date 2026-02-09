@@ -24,6 +24,7 @@ class IpcPublishServiceInfoRsp : public IpcRsp {
     DECLARE_IPC_MODEL(IpcPublishServiceInfoRsp);
 
 public:
+//this code line need delete: 28 - 36
     int32_t GetRegServiceId() const
     {
         return regServiceId_;
@@ -45,6 +46,7 @@ public:
     }
 
 private:
+//this code line need delete: 50 - 50
     int32_t regServiceId_ = 0;
     int64_t serviceId_ = 0;
 };
