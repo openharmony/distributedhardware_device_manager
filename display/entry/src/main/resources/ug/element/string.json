@@ -125,6 +125,20 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"نۆۋەتتە %1$s دىكى «%2$s» بۇ ئۈسكۈنىدىن %3$s مۇلازىمىتىنى ئىشلەتمەكچى، بۇ ئەپكە ئىشىنەمسىز؟",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"بۇ ئۈسكۈنىدىكى مۇلازىمەتكە ‎%s‎ ئۇلانماقچى، ئىجازەتلەيدىغان مۇلازىمەت تاللاڭ:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

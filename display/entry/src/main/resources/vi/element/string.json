@@ -125,6 +125,20 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Ứng dụng %2$s trên %1$s muốn truy cập dịch vụ %3$s trên thiết bị của bạn. Tin tưởng ứng dụng này?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s muốn kết nối với các dịch vụ trên thiết bị của bạn. Chọn dịch vụ cần cấp quyền:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

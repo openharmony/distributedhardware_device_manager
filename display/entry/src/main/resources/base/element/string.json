@@ -148,21 +148,21 @@
         },
         {
             "name":"serve_confirm_trust",
-            "value":"The %1$s %2$s requesting access to this device's %3$s  service. Do you trust this app?",
+            "value":"The %2$s app on %1$s would like to access the %3$s service on your device. Trust this app?",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"serve_confirm_trust_nohost",
-            "value":"The %1$s is requesting access to this device's %2$s  service. Do you trust this app?",
+            "value":"%1$s would like to access the %2$s service on your device. Trust this device?",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"serve_agency_confirm_proxy",
-            "value":"%s is requesting to connect to a local service. Please select the service to authorize:",
+            "value":"%s would like to connect to services on your device. Select services to authorize:",
             "attr":{
                 "priority":"translate"
             }

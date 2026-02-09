@@ -100,7 +100,7 @@
         },
         {
             "name":"dm_authenticating",
-            "value":"Authenticating¡­",
+            "value":"Authenticating…",
             "attr":{
                 "priority":"translate"
             }
@@ -122,6 +122,20 @@
         {
             "name":"dm_connect",
             "value":"Connect to %s",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"The %2$s app on %1$s would like to access the %3$s service on your device. Trust this app?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s would like to connect to services on your device. Select services to authorise:",
             "attr":{
                 "priority":"translate"
             }

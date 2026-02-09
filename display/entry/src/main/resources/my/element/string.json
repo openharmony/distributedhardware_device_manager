@@ -125,6 +125,20 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"%1$s ရှိ %2$s အက်ပ်က သင့်စက်ရှိ %3$s ဝန်ဆောင်မှုကို ဝင်ရောက် သုံးစွဲလိုပါသည်။ ဤအက်ပ်ကို ယုံကြည်ပါသလား။",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s က သင့်စက်ရှိ ဝန်ဆောင်မှုများနှင့် ချိတ်ဆက်လိုပါသည်။ ခွင့်ပြုမည့် ဝန်ဆောင်မှုများကို ရွေးပါ-",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -125,6 +125,20 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"%1$s 的%2$s請求存取本機%3$s服務。信任本應用程式？",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s 請求連接本機服務，請選擇授權的服務：",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

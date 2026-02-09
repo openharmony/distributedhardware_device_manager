@@ -125,6 +125,20 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"ແອັບ %2$s ໃນ %1$s ຕ້ອງການເຂົ້າເຖິງການບໍລິການ %3$s ໃນອຸປະກອນຂອງທ່ານ. ເຊື່ອໝັ້ນແອັບນີ້ບໍ?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s ຕ້ອງການເຊື່ອມຕໍ່ກັບການບໍລິການໃນອຸປະກອນຂອງທ່ານ. ເລືອກການບໍລິການທີ່ຈະອະນຸຍາດ:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

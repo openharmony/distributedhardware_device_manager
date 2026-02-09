@@ -125,6 +125,20 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"%1$s cihazındaki %2$s uygulaması cihazınızdaki %3$s servisine erişmek istiyor. Bu uygulamaya güvenilsin mi?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s cihazınızdaki servislere bağlanmak istiyor. Yetkilendirilecek servisleri seçin:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -93,7 +93,7 @@
         },
         {
             "name":"dm_authenticating",
-            "value":"Mengautentikasi…",
+            "value":"Mengautentikasiâ€¦",
             "attr":{
                 "priority":"translate"
             }
@@ -122,6 +122,20 @@
         {
             "name":"dm_confirm_proxy",
             "value":"\"%s\" ingin terhubung ke perangkat ini. Pilih layanan apa saja yang dapat diakses olehnya:",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Aplikasi %2$s di %1$s ingin mengakses layanan %3$s di perangkat Anda. Percayai aplikasi ini?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s ingin terhubung ke layanan yang ada di perangkat Anda. Pilih layanan yang akan diotorisasi:",
             "attr":{
                 "priority":"translate"
             }
