@@ -12,32 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//this code line need delete: 1 - 100
-//delete this file
-#ifndef OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
-#define OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
-
+ 
+#ifndef OHOS_DM_IPC_GET_LOCAL_SERVICEINFO_EXT_RSP_H
+#define OHOS_DM_IPC_GET_LOCAL_SERVICEINFO_EXT_RSP_H
+ 
+#include "ipc_rsp.h"
 #include "dm_device_info.h"
-#include "ipc_req.h"
+ 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcRegisterServiceInfoNewReq : public IpcReq {
-    DECLARE_IPC_MODEL(IpcRegisterServiceInfoNewReq);
-
+class IpcGetLocalServiceInfoExtRsp : public IpcRsp {
+    DECLARE_IPC_MODEL(IpcGetLocalServiceInfoExtRsp);
+ 
 public:
-    ServiceRegInfo GetServiceRegInfo() const
+    const DmRegisterServiceInfo &GetServiceInfo() const
     {
-        return serviceRegInfo_;
+        return serviceInfo_;
     }
-    
-    void SetServiceRegInfo(const ServiceRegInfo& serviceRegInfo)
+    void SetServiceInfo(const DmRegisterServiceInfo &serviceInfo)
     {
-        serviceRegInfo_ = serviceRegInfo;
+        serviceInfo_ = serviceInfo;
     }
-
+ 
 private:
-    ServiceRegInfo serviceRegInfo_;
+    DmRegisterServiceInfo serviceInfo_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
+#endif // OHOS_DM_IPC_GET_LOCAL_SERVICEINFO_EXT_RSP_H
