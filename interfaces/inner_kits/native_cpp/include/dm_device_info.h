@@ -514,8 +514,7 @@ typedef enum DMSrvMediumType {
     SERVICE_MEDIUM_TYPE_BUTT,
 } DMSrvMediumType;
 
-typedef enum DMPublishState
-{
+typedef enum DMPublishState {
     SERVICE_UNPUBLISHED_STATE = 0,
     SERVICE_PUBLISHED_STATE,
 } DMPublishState;
@@ -586,18 +585,18 @@ typedef struct DmAuthInfo {
 } DmAuthInfo;
 
 typedef struct DmRegisterServiceInfo {
-    int32_t userId;                              // 服务所属前台
+    int32_t userId;
     int64_t displayId;
-    uint64_t serviceOwnerTokenId;                 // 服务所属业务
-    std::string serviceOwnerPkgName;             // 服务所属业务
-    uint64_t serviceRegisterTokenId;              // 注册服务的业
-    std::string serviceType;                     // 15字节
-    std::string serviceName;                     // 64字节，应用
-    std::string serviceDisplayName;              // 7-128字节，展
-    std::string customData;                      // 0-1024字节，
-    std::string serviceCode;                     // 服务短码
-    uint32_t dataLen;                            // 自定义字段长
-    int64_t timeStamp;                           // 注册时间（单
+    uint64_t serviceOwnerTokenId;
+    std::string serviceOwnerPkgName;
+    uint64_t serviceRegisterTokenId;
+    std::string serviceType;
+    std::string serviceName;
+    std::string serviceDisplayName;
+    std::string customData;
+    std::string serviceCode;
+    uint32_t dataLen;
+    int64_t timeStamp;
     std::string description;
 } DmRegisterServiceInfo;
 
@@ -608,12 +607,12 @@ typedef struct DmPublishServiceParam {
 } DmPublishServiceParam;
 
 typedef struct DmDiscoveryServiceParam {
-    std::string serviceType; //15字节 必选
-    std::string serviceName; //64字节 可选 DM根据总线基于type过滤
-    std::string serviceDisplayName; //暂定7～128字节 显示名称 展
+    std::string serviceType;
+    std::string serviceName;
+    std::string serviceDisplayName;
     DmExchangeFreq freq;
     DMSrvMediumType medium;
-    DMSrvDiscoveryMode mode; //只能主动发现，该值可以省略
+    DMSrvDiscoveryMode mode;
     bool operator==(const DmDiscoveryServiceParam &other) const
     {
         return (serviceType == other.serviceType) && (serviceName == other.serviceName) &&
@@ -627,19 +626,19 @@ typedef struct DmServiceInfo {
     int64_t serviceId;
     int64_t displayId;
     int8_t publishState;
-    std::string deviceId; // uuid hash 字段
+    std::string deviceId;
     std::string networkId;
     DmAuthForm authform;
-    uint64_t serviceOwnerTokenId; // 服务所属业务的tokenId
-    std::string serviceOwnerPkgName; // 服务所属业务自定义的pkgNa
-    uint64_t serviceRegisterTokenId; // 注册服务的业务的tokenId，
-    std::string serviceType; // 15字节
-    std::string serviceName; // 64字节，应用对该服务起一个自定义
-    std::string serviceDisplayName; // 暂定7-128字节，显示名称，
-    std::string serviceCode; // 服务编码
-    std::string customData; // 0-1024字节，业务自定义字段
-    uint32_t dataLen; // 自定义字段长度
-    int64_t timeStamp; // 注册的时间戳
+    uint64_t serviceOwnerTokenId;
+    std::string serviceOwnerPkgName;
+    uint64_t serviceRegisterTokenId;
+    std::string serviceType;
+    std::string serviceName;
+    std::string serviceDisplayName;
+    std::string serviceCode;
+    std::string customData;
+    uint32_t dataLen;
+    int64_t timeStamp;
     std::string description;
     bool operator==(const DmServiceInfo &other) const
     {
@@ -699,7 +698,6 @@ typedef struct ServiceStateBindParameter {
     int64_t serviceId = -1;
 } ServiceStateBindParameter;
 
-//add by zqz
 typedef struct ServiceSyncInfo {
     std::string pkgName;
     int32_t localUserId = 0;

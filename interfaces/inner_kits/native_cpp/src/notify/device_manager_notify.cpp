@@ -1585,19 +1585,16 @@ void DeviceManagerNotify::OnServiceOnline(const DmRegisterServiceState &register
         }
         callbackInfo = iter->second;
     }
-    if (callbackInfo == nullptr)
-    {
+    if (callbackInfo == nullptr) {
         LOGE("OnServiceOnline error, registered service state callback is nullptr.");
         return;
     }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]()
-                 { ServiceInfoOnline(callbackInfo, serviceInfo); });
+    ffrt::submit([=]() { ServiceInfoOnline(callbackInfo, serviceInfo); });
 #else
     LOGI("called the message is ServiceInfoOnline(callbackInfo, serviceInfo)");
-    std::thread serviceOnline([=]() { 
-        ServiceInfoOnline(callbackInfo, serviceInfo); });
+    std::thread serviceOnline([=]() { ServiceInfoOnline(callbackInfo, serviceInfo); });
     int32_t ret = pthread_setname_np(serviceOnline.native_handle(), SERVICE_ONLINE);
     if (ret != DM_OK) {
         LOGE("DeviceManagerNotify serviceOnline setname failed.");
@@ -1639,17 +1636,14 @@ void DeviceManagerNotify::OnServiceOffline(const DmRegisterServiceState &registe
         }
         callbackInfo = iter->second;
     }
-    if (callbackInfo == nullptr)
-    {
+    if (callbackInfo == nullptr) {
         LOGE("OnServiceOffline error, registered service state callback is nullptr.");
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]()
-                 { ServiceInfoOffline(callbackInfo, serviceInfo); });
+    ffrt::submit([=]() { ServiceInfoOffline(callbackInfo, serviceInfo); });
 #else
-    std::thread serviceOnline([=]() {
-        ServiceInfoOffline(callbackInfo, serviceInfo); });
+    std::thread serviceOnline([=]() { ServiceInfoOffline(callbackInfo, serviceInfo); });
     int32_t ret = pthread_setname_np(serviceOnline.native_handle(), SERVICE_ONLINE);
     if (ret != DM_OK) {
         LOGE("DeviceManagerNotify serviceOnline setname failed.");
@@ -1658,9 +1652,10 @@ void DeviceManagerNotify::OnServiceOffline(const DmRegisterServiceState &registe
     LOGD("ServiceOffline thread detached");
 #endif
 }
-// zl online&offline
+
 void DeviceManagerNotify::ServiceInfoOffline(const std::shared_ptr<ServiceInfoStateCallback> &callback,
-    const DmServiceInfo &dmServiceInfo) {
+    const DmServiceInfo &dmServiceInfo) 
+{
     if (callback == nullptr) {
         LOGE("error,ServiceInfoOffline not register.");
         return;
@@ -1669,7 +1664,7 @@ void DeviceManagerNotify::ServiceInfoOffline(const std::shared_ptr<ServiceInfoSt
          dmServiceInfo.serviceId);
     callback->OnServiceOffline(dmServiceInfo);
 }
-// zl online&offline
+
 int32_t DeviceManagerNotify::RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
     std::shared_ptr<ServiceInfoStateCallback> callback)
 {
@@ -1691,8 +1686,7 @@ int32_t DeviceManagerNotify::UnRegisterServiceStateCallback(const std::string &p
 {
     LOGI("UnRegisterServiceStateCallback: pkgName=%{public}s, serviceId=%{public}" PRId64,
          pkgName.c_str(), serviceId);
-    if (pkgName.empty() || serviceId < 0)
-    {
+    if (pkgName.empty() || serviceId < 0) {
         LOGE("Invalid parameter.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1750,8 +1744,7 @@ void DeviceManagerNotify::OnServicePublishResult(const std::string &pkgName, int
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = servicePublishCallbacks_.find(key);
-        if (iter == servicePublishCallbacks_.end())
-        {
+        if (iter == servicePublishCallbacks_.end()) {
             LOGE("OnServicePublishResult error, callback not registered for serviceId");
             return;
         }
@@ -1797,8 +1790,7 @@ void DeviceManagerNotify::OnServiceDiscoveryResult(const std::string &pkgName, c
     std::lock_guard<std::mutex> autolock(lock_);
     std::pair<std::string, std::string> key = std::make_pair(pkgName, serviceType);
     auto iter = discoveryServiceCallbacks_.find(key);
-    if (iter == discoveryServiceCallbacks_.end())
-    {
+    if (iter == discoveryServiceCallbacks_.end()) {
         LOGE("error, callback not register for pkgName %{public}s", GetAnonyString(pkgName).c_str());
         return;
     }
@@ -1817,8 +1809,7 @@ void DeviceManagerNotify::OnServiceFound(const std::string &pkgName, const DmSer
     std::lock_guard<std::mutex> autolock(lock_);
     std::pair<std::string, std::string> key = std::make_pair(pkgName, dmServiceInfo.serviceType);
     auto iter = discoveryServiceCallbacks_.find(key);
-    if (iter == discoveryServiceCallbacks_.end())
-    {
+    if (iter == discoveryServiceCallbacks_.end()) {
         LOGE("error, callback not register for pkgName %{public}s", GetAnonyString(pkgName).c_str());
         return;
     }
@@ -1835,8 +1826,7 @@ void DeviceManagerNotify::RegisterSyncServiceInfoCallback(const std::string &pkg
     const std::string &networkId, std::shared_ptr<SyncServiceInfoCallback> callback, int64_t serviceId)
 {
     if (pkgName.empty() || networkId.empty() || callback == nullptr ||
-        localUserId < 0 || serviceId < 0)
-    {
+        localUserId < 0 || serviceId < 0) {
         LOGE("RegisterSyncServiceInfoCallback error: Invalid parameter.");
         return;
     }
@@ -1857,12 +1847,10 @@ void DeviceManagerNotify::RegisterSyncServiceInfoCallback(const std::string &pkg
     }
     syncServiceInfoCallback_[pkgName][serviceSyncInfo] = callback;
 }
-// add by zqz
 void DeviceManagerNotify::UnRegisterSyncServiceInfoCallback(const std::string &pkgName, int32_t localUserId,
     const std::string &networkId, int64_t serviceId)
 {
-    if (pkgName.empty() || networkId.empty() || localUserId < 0 || serviceId < 0)
-    {
+    if (pkgName.empty() || networkId.empty() || localUserId < 0 || serviceId < 0) {
         LOGE("UnRegisterSyncServiceInfoCallback error: Invalid parameter.");
         return;
     }
@@ -1880,7 +1868,6 @@ void DeviceManagerNotify::UnRegisterSyncServiceInfoCallback(const std::string &p
         }
     }
 }
-// add by zqz
 void DeviceManagerNotify::OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
     int32_t result, const std::string &content)
 {
