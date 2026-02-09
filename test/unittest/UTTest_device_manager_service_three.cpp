@@ -29,9 +29,7 @@ using namespace testing;
 using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
-constexpr int8_t SERVICE_UNPUBLISHED_STATE = 0;
 constexpr int32_t DP_PERMISSION_DENIED = 98566155;
-constexpr int32_t SERVICE_PUBLISHED_STATE = 1;
 void DeviceManagerServiceThreeTest::SetUp()
 {
     const int32_t permsNum = 4;

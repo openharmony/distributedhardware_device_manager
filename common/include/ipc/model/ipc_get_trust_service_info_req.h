@@ -12,32 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//this code line need delete: 1 - 100
-//delete this file
-#ifndef OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
-#define OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
-
-#include "dm_device_info.h"
+ 
+#ifndef OHOS_DM_IPC_GET_TRUST_SERVICE_INFO_REQ_H
+#define OHOS_DM_IPC_GET_TRUST_SERVICE_INFO_REQ_H
+ 
 #include "ipc_req.h"
+ 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcRegisterServiceInfoNewReq : public IpcReq {
-    DECLARE_IPC_MODEL(IpcRegisterServiceInfoNewReq);
-
+class IpcGetTrustServiceInfoReq : public IpcReq {
+    DECLARE_IPC_MODEL(IpcGetTrustServiceInfoReq);
 public:
-    ServiceRegInfo GetServiceRegInfo() const
+    std::map<std::string, std::string> GetParamMap() const
     {
-        return serviceRegInfo_;
+        return paramMap_;
     }
-    
-    void SetServiceRegInfo(const ServiceRegInfo& serviceRegInfo)
+    void SetParamMap(const std::map<std::string, std::string> &paramMap)
     {
-        serviceRegInfo_ = serviceRegInfo;
+        paramMap_ = paramMap;
     }
-
 private:
-    ServiceRegInfo serviceRegInfo_;
+    std::map<std::string, std::string> paramMap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
+#endif // OHOS_DM_IPC_GET_TRUST_SERVICE_INFO_REQ_H

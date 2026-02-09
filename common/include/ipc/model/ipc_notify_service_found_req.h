@@ -24,6 +24,20 @@ class IpcNotifyServiceFoundReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcNotifyServiceFoundReq);
 
 public:
+    DmServiceInfo GetDmServiceInfo() const
+    {
+        return dmServiceInfo_;
+    }
+
+    void SetDmServiceInfo(const DmServiceInfo &dmServiceInfo)
+    {
+        dmServiceInfo_ = dmServiceInfo;
+    }
+
+private:
+    DmServiceInfo dmServiceInfo_;
+//this code line need delete: 40- 63
+public:
     int32_t GetDiscServiceId() const
     {
         return discServiceId_;

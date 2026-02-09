@@ -344,8 +344,16 @@ int32_t CryptoMgr::ProcessSessionKey(const uint8_t *sessionKey, const uint32_t k
     {
         std::lock_guard<ffrt::mutex> lock(sessionKeyMtx_);
         sessionKey_.key = (uint8_t*)calloc(keyLen, sizeof(uint8_t));
+        if (sessionKey_.key == nullptr) {
+            LOGE("calloc failed.");
+            return ERR_DM_PROCESS_SESSION_KEY_FAILED;
+        }
         if (memcpy_s(sessionKey_.key, keyLen, sessionKey, keyLen) != DM_OK) {
             LOGE("memcpy_s failed.");
+            (void)memset_s(sessionKey_.key, keyLen, 0, keyLen);
+            free(sessionKey_.key);
+            sessionKey_.key = nullptr;
+            sessionKey_.keyLen = 0;
             return ERR_DM_PROCESS_SESSION_KEY_FAILED;
         }
         sessionKey_.keyLen = keyLen;
