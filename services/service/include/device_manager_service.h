@@ -40,6 +40,9 @@
 #include "dm_screen_common_event.h"
 #include "relationship_sync_mgr.h"
 #include "local_service_info.h"
+//this code line mock start
+#include "service_info.h"
+//this code line mock end
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 #include "dm_publish_common_event.h"
 #endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
@@ -53,8 +56,9 @@ public:
     DeviceManagerService() {}
 
     ~DeviceManagerService();
-
+    //this code line need delete :Init, instead by InitSrvBind
     int32_t Init();
+    int32_t InitSrvBind();
 
     int32_t InitSoftbusListener();
 
@@ -69,13 +73,15 @@ public:
     DM_EXPORT void UnRegisterCallerAppId(const std::string &pkgName, const int32_t userId);
     
     void UninitSoftbusListener();
-
+    //this code line need delete : InitDMServiceListener, instead by InitDMServiceListenerSrvBind
     int32_t InitDMServiceListener();
+    int32_t InitDMServiceListenerSrvBind();
 
     DM_EXPORT void UninitDMServiceListener();
 
     int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                  std::vector<DmDeviceInfo> &deviceList);
+    int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList);
 
     int32_t ShiftLNNGear(const std::string &pkgName, const std::string &callerId, bool isRefresh, bool isWakeUp);
 
@@ -114,8 +120,9 @@ public:
         const std::string &extra);
 
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
-
+    //this code line need delete : HandleDeviceStatusChange, instead by HandleDeviceStatusChangeSrvBind
     void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline);
+    void HandleDeviceStatusChangeSrvBind(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline);
 
     int OnSessionOpened(int sessionId, int result);
 
@@ -193,8 +200,9 @@ public:
     
     int32_t UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &unbindParam);
-
+    //this code line need delete : DpAclAdd,instead by rewrite DpAclAdd
     int32_t DpAclAdd(const std::string &udid);
+    int32_t DpAclAdd(const std::string &udid, int64_t accessControlId);
 
     int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId, int32_t &networkType);
     int32_t IsSameAccount(const std::string &networkId);
@@ -203,25 +211,49 @@ public:
     bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
     void HandleDeviceNotTrust(const std::string &msg);
+    int32_t GetLocalServiceInfoByServiceId(int64_t serviceId, DmRegisterServiceInfo &serviceInfo);
+    int32_t GetTrustServiceInfo(const std::string &pkgName, const std::map<std::string, std::string> &paramMap,
+        std::vector<DmServiceInfo> &serviceList);
+    int32_t GetRegisterServiceInfo(const std::map<std::string, std::string> &param,
+        std::vector<DmRegisterServiceInfo> &regServiceInfos);
+    int32_t GetPeerServiceInfoByServiceId(const std::string &networkId, int64_t serviceId,
+        DmRegisterServiceInfo &serviceInfo);
+    int32_t UpdateServiceInfo(int64_t serviceId, const DmRegisterServiceInfo &regServiceInfo);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void HandleCredentialDeleted(const char *credId, const char *credInfo);
     void HandleDeviceTrustedChange(const std::string &msg);
+    //this code line need delete : ParseRelationShipChangeType, instead by ParseRelationShipChangeTypeSrvBind
     bool ParseRelationShipChangeType(const RelationShipChangeMsg &relationShipMsg);
+    bool ParseRelationShipChangeTypeSrvBind(const RelationShipChangeMsg &relationShipMsg);
+    // Helper functions for ParseRelationShipChangeTypeSrvBind
+    void ProcessAccountLogout(const RelationShipChangeMsg &relationShipMsg);
+    void ProcessDeviceUnBind(const RelationShipChangeMsg &relationShipMsg);
+    void ProcessServiceUnBind(const RelationShipChangeMsg &relationShipMsg);
+    void ProcessSyncUserId(const RelationShipChangeMsg &relationShipMsg);
+    void ProcessDelUser(const RelationShipChangeMsg &relationShipMsg);
+    void ProcessServiceInfoUnbind(const RelationShipChangeMsg &relationShipMsg);
     void HandleUserIdCheckSumChange(const std::string &msg);
     void HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid);
     void HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid,
         const std::vector<std::string> &acceptEventUdids);
     std::set<std::pair<std::string, std::string>> GetProxyInfosByParseExtra(const std::string &pkgName,
         const std::string &extra, std::vector<std::pair<int64_t, int64_t>> &agentToProxyVec);
+    //this code line need delete : StartServiceDiscovery
     int32_t StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam);
+    //this code line need delete : StopServiceDiscovery
     int32_t StopServiceDiscovery(const std::string &pkgName, int32_t discServiceId);
     int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam);
+    //this code line need delete : UnbindServiceTarget
     int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
+    //this code line need delete : RegisterServiceInfo
     int32_t RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId);
+    //this code line need delete : UnRegisterServiceInfo
     int32_t UnRegisterServiceInfo(int32_t regServiceId);
+    //this code line need delete : StartPublishService
     int32_t StartPublishService(const std::string &pkgName,
         PublishServiceParam &publishServiceParam, int64_t &serviceId);
+    //this code line need delete : StopPublishService
     int32_t StopPublishService(int64_t serviceId);
     int32_t OpenAuthSessionWithPara(int64_t serviceId);
 #endif
@@ -237,16 +269,20 @@ public:
         const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately);
     int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclList);
+    //this code line need delete : ProcessSyncUserIds, instead by ProcessSyncUserIdsSrvBind
     void ProcessSyncUserIds(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
+    void ProcessSyncUserIdsSrvBind(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
+    void ProcessActiveServiceBind(const DmUserRemovedServiceInfo &serviceInfo);
+    void ProcessInactiveServiceBind(const DmUserRemovedServiceInfo &serviceInfo);
+    void ProcessServiceInfosByState(const std::vector<DmUserRemovedServiceInfo> &serviceInfos);
 
     void ProcessUninstApp(int32_t userId, int32_t tokenId);
     void ProcessUnBindApp(int32_t userId, int32_t tokenId, const std::string &extra, const std::string &udid);
 
     int32_t SetLocalDisplayNameToSoftbus(const std::string &displayName);
     void RemoveNotifyRecord(const ProcessInfo &processInfo);
-    int32_t RegDevStateCallbackToService(const std::string &pkgName);
-    int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList);
     void HandleDeviceUnBind(const char *peerUdid, const GroupInformation &groupInfo);
     int32_t GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid);
     int32_t GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
@@ -271,6 +307,7 @@ public:
     bool IsPC();
     int32_t GetDeviceNetworkIdList(const std::string &pkgName, const NetworkIdQueryFilter &queryFilter,
         std::vector<std::string> &networkIds);
+    //this code line need delete : ProcessSyncAccountLogout, instead by ProcessSyncAccountLogoutSrvBind
     void ProcessSyncAccountLogout(const std::string &accountId, const std::string &peerUdid, int32_t userId);
     int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m);
     int32_t UnRegisterPinHolderCallback(const std::string &pkgName);
@@ -296,8 +333,36 @@ public:
     int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength);
     int32_t RegisterAuthCodeInvalidCallback(const std::string &pkgName);
     int32_t UnRegisterAuthCodeInvalidCallback(const std::string &pkgName);
+    int32_t HandleProcessRestart();
+    int32_t RegDevStateCallbackToService(const std::string &pkgName);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    int32_t RegisterServiceInfo(const DmRegisterServiceInfo &regServiceInfo, int64_t &serviceId);
+    int32_t UnRegisterServiceInfo(int64_t serviceId);
+    int32_t ValidateDmRegisterServiceInfo(const DmRegisterServiceInfo& regServiceInfo);
+    int32_t StartPublishService(const std::string &pkgName, int64_t serviceId,
+        const DmPublishServiceParam &publishServiceParam);
+    int32_t StopPublishService(const std::string &pkgName, int64_t serviceId);
+    int32_t StartDiscoveryService(const std::string &pkgName, const DmDiscoveryServiceParam &disParam);
+    int32_t StopDiscoveryService(const std::string &pkgName, const DmDiscoveryServiceParam &discParam);
+    int32_t SyncServiceInfoByServiceId(const std::string &pkgName, int32_t localUserId,
+        const std::string &networkId, int64_t serviceId);
+    int32_t SyncAllServiceInfo(const std::string &pkgName, int32_t localUserId, const std::string &networkId);
+    int32_t UnbindServiceTarget(const std::string &pkgName,
+        const std::map<std::string, std::string> &unbindParam, const std::string &netWorkId,
+        int64_t serviceId);
+    int32_t BindServiceOnline(const ServiceStateBindParameter &bindParam);
+    int32_t BindServiceOffline(uint64_t tokenId, const std::string &pkgName, int32_t bindType,
+        const std::string &peerUdid, const DistributedDeviceProfile::ServiceInfo &serviceInfo);
+    int32_t RegServiceStateCallback(const std::string &pkgName, int64_t serviceId);
+    int32_t ClearServiceStateCallback(const std::string &pkgName, int32_t userId);
+    int32_t UnRegServiceStateCallback(const std::string &pkgName, int64_t serviceId);
+    int32_t HandleRemoteDied(const ProcessInfo &processInfo);
+    int32_t HandleSoftbusRestart();
+    int32_t HandleServiceStatusChange(DmDeviceState devState, const std::string &peerUdid);
     void ProcessReceiveRspSvcUnbindProxy(const std::string &remoteUdid);
     void ProcessUnBindServiceProxy(const UnbindServiceProxyParam &param);
+    void ProcessSyncAccountLogoutSrvBind(const std::string &accountId, const std::string &peerUdid, int32_t userId);
+#endif
 private:
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();
@@ -322,6 +387,10 @@ private:
     void SendServiceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId);
     void SendAccountLogoutBroadCast(const std::vector<std::string> &peerUdids, const std::string &accountId,
         const std::string &accountName, int32_t userId);
+    void SendUnBindServiceBroadCast(const std::vector<std::string> &peerUdids,
+        int32_t localUserId, uint64_t localTokenId, int64_t serviceId);
+    void SendUnRegServiceBroadCast(const std::vector<std::string> &peerUdids,
+        int32_t localUserId, int64_t peer_serviceId);
     /**
      * @brief send local foreground or background userids by broadcast
      *
@@ -347,6 +416,7 @@ private:
     void ProcessCheckSumByBT(std::string networkId, std::vector<int32_t> foregroundUserIds,
         std::vector<int32_t> backgroundUserIds);
     void AddHmlInfoToBindParam(int32_t actionId, std::string &bindParam);
+    uint64_t GetSubjectTokenId(const std::map<std::string, std::string> &unbindParam);
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void SubscribeAccountCommonEvent();
@@ -361,11 +431,34 @@ private:
         std::string &anoyDeviceId);
     DM_EXPORT int32_t GetUdidHashByAnoyDeviceId(const std::string &anoyDeviceId,
         std::string &udidHash);
+    //this code line need delete : HandleAccountLogout, instead by HandleAccountLogoutSrvBind
     void HandleAccountLogout(int32_t userId, const std::string &accountId, const std::string &accountName);
+    void HandleAccountLogoutSrvBind(int32_t userId, const std::string &accountId, const std::string &accountName);
+    // Helper functions for HandleAccountLogoutSrvBind
+    void PrepareLogoutDeviceInfo(int32_t userId, const std::string &accountId,
+        std::multimap<std::string, int32_t> &deviceMap, std::vector<std::string> &peerUdids,
+        std::vector<std::string> &dualPeerUdids, std::string &localUdid);
+    void ProcessDualPeerDeviceLogout(int32_t userId, const std::string &accountId,
+        const std::vector<std::string> &dualPeerUdids, const std::vector<std::string> &peerUdids);
+    void ProcessDeviceServiceLogout(int32_t userId, const std::string &accountId,
+        const std::multimap<std::string, int32_t> &deviceMap, const std::string &localUdid);
+    //this code line need delete : HandleUserRemoved, instead by HandleUserRemovedSrvBind
     void HandleUserRemoved(int32_t removedUserId);
+    void HandleUserRemovedSrvBind(int32_t removedUserId);
+    //this code line need delete : HandleUserIdsBroadCast, instead by HandleUserIdsBroadCastSrvBind
     void HandleUserIdsBroadCast(const std::vector<UserIdInfo> &remoteUserIdInfos,
         const std::string &remoteUdid, bool isNeedResponse);
+    void HandleUserIdsBroadCastSrvBind(const std::vector<UserIdInfo> &remoteUserIdInfos,
+        const std::string &remoteUdid, bool isNeedResponse);
+    // Helper functions for HandleUserIdsBroadCastSrvBind
+    void ProcessUserIdResponse(const std::string &remoteUdid);
+    void ExtractForegroundAndBackgroundUserIds(const std::vector<UserIdInfo> &remoteUserIdInfos,
+        std::vector<uint32_t> &foregroundUserIds, std::vector<uint32_t> &backgroundUserIds);
+    void ProcessServiceSyncEvent(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     void HandleShareUnbindBroadCast(const int32_t userId, const std::string &credId);
+    void HandleServiceUnBindTargetEvent(std::string peerUdid, int32_t userId, uint64_t tokenId, int64_t serviceId);
+    void HandleServiceUnRegEvent(std::string peerUdid, int32_t userId, int64_t serviceId);
     bool InitDPLocalServiceInfo(const DMLocalServiceInfo &serviceInfo,
         DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceItem);
     void InitServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceItem,
@@ -410,14 +503,26 @@ private:
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
     void HandleCommonEventTimeout(const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds,
         const std::vector<int32_t> &backgroundUserIds, const std::string &udid);
+    //this code line need delete : UpdateAcl, instead by UpdateAclSrvBind
     void UpdateAcl(const std::string &localUdid, const std::vector<std::string> &peerUdids,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    void UpdateAclSrvBind(const std::string &localUdid, const std::vector<std::string> &peerUdids,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    //this code line need delete : HandleCommonEventBroadCast, instead by HandleCommonEventBroadCastSrvBind
     void HandleCommonEventBroadCast(const std::vector<UserIdInfo> &remoteUserIdInfos,
         const std::string &remoteUdid, bool isNeedResponse);
+    void HandleCommonEventBroadCastSrvBind(const std::vector<UserIdInfo> &remoteUserIdInfos,
+        const std::string &remoteUdid, bool isNeedResponse);
+    // Helper functions for HandleCommonEventBroadCastSrvBind
+    void ProcessCommonEventServiceSync(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     void SendCommonEventBroadCast(const std::vector<std::string> &peerUdids,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
         bool isNeedResponse);
     void HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId, int32_t beforeUserId);
+    void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid);
+    void HandleAccountLogoutEvent(int32_t userId, const std::string &accountId,
+        const std::string &peerUdid);
     void GetHoOsTypeUdids(std::vector<std::string> &peerUdids);
     void DeleteHoDevice(const std::vector<int32_t> &foreGroundUserIds, const std::vector<int32_t> &backGroundUserIds);
     void HandleAccountLogoutEventCallback(const std::string &commonEventType, int32_t currentUserId,
@@ -425,6 +530,14 @@ private:
     void InitTaskOfDelTimeOutAcl();
     bool IsExportAuthInfoValid(const DmAuthInfo &dmAuthInfo);
     bool IsImportAuthInfoValid(const DmAuthInfo &dmAuthInfo);
+    void NotifyRemoteUnbindService(const std::map<std::string, std::string> &unbindParam,
+        const std::string &netWorkId, int64_t serviceId);
+    void ProcessProxyUnbindService(const std::map<std::string, std::string> &unbindParam,
+        int32_t userId, const std::string &udid, const std::string &netWorkId, int64_t serviceId);
+    void ClassifyDevicesByNetworkType(const std::vector<std::string> &peerUdids,
+        std::vector<std::string> &bleUdids, std::map<std::string, std::string> &wifiDevices);
+    void NotifyRemoteUnBindServiceByWifi(int32_t userId, uint64_t localTokenId, std::vector<uint64_t> &peerTokenId,
+        int64_t serviceId, const std::map<std::string, std::string> &wifiDevices);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();
@@ -445,6 +558,7 @@ private:
     void GetLocalUserIdFromDataBase(std::vector<int32_t> &foregroundUsers, std::vector<int32_t> &backgroundUsers);
     void PutLocalUserIdToDataBase(const std::vector<int32_t> &foregroundUsers,
         const std::vector<int32_t> &backgroundUsers);
+    //this code line need delete : 502-509
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t UpdateServiceInfo(int64_t serviceId);
     int32_t GenerateServiceId(int64_t &serviceId);

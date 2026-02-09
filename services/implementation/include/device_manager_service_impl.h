@@ -212,6 +212,24 @@ public:
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
     int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo);
     int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength);
+
+    //this code line mock start
+    void HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
+        const std::string &remoteUdid, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    //this code line mock end
+
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId, std::string &peerUdid);

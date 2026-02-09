@@ -34,7 +34,11 @@ enum class RelationShipChangeType : uint32_t {
     SYNC_USERID = 6,
     STOP_USER = 7,
     SHARE_UNBIND = 8,
-    TYPE_MAX = 9
+    //this code line mock start
+    SERVICEINFO_UNBIND = 9,
+    SERVICEINFO_UNREGISTER = 10,
+    //this code line mock end
+    TYPE_MAX = 11
 };
 
 struct UserIdInfo {
@@ -65,6 +69,7 @@ struct RelationShipChangeMsg {
     std::string credId;
     bool isNewEvent;
     uint8_t broadCastId;
+    int64_t serviceId;
 
     explicit RelationShipChangeMsg();
     bool ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) const;
