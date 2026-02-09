@@ -165,6 +165,18 @@ const char* DM_BUSINESS_ID = "business_id";
 const char* PARAM_KEY_IS_SERVICE_BIND = "isServiceBind";
 const char* BIND_CALLER_IS_SYSTEM_SA = "bindCallerIsSystemSA";
 const char* SERVICE_USER_DATA = "serviceUserData";
+// this code line need delete: compile dependence start
+const char* TAG_SERVICE_ID_EXT = "serviceId";
+const char* PARAM_KEY_LOCAL_USER_ID = "localUserId";
+const char* PARAM_KEY_IS_PROXY_QUERY = "isProxyQuery";
+const char* PARAM_KEY_PKG_NAME = "pkgName";
+const char* PARAM_KEY_TOKEN_ID = "tokenId";
+const char* PARAM_KEY_SERVICE_CODE = "serviceCode";
+const char* PARAM_KEY_SUBJECT_SERVICE_ONES = "subjectServiceOnes";
+const char* PARAM_KEY_LOCAL_PKGNAME = "local_pkgName";
+const char* PARAM_KEY_LOCAL_TOKENID = "local_tokenId";
+const char* PARAM_KEY_PEER_SERVICEID = "peer_serviceId";
+// this code line need delete: compile dependence end
 
 // errCode map
 const std::map<int32_t, int32_t> MAP_ERROR_CODE = {

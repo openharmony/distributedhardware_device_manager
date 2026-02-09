@@ -4063,6 +4063,108 @@ DM_EXPORT bool DeviceProfileConnector::AuthOnceAclIsActive(const std::string &pe
     }
     return false;
 }
+// this code line need delete:compile dependence start
+DM_EXPORT int32_t DeviceProfileConnector::GetServiceInfosByUdid(const std::string &udid,
+    std::vector<DistributedDeviceProfile::ServiceInfo> &serviceInfos)
+{
+    return DM_OK;
+}
+DM_EXPORT int32_t DeviceProfileConnector::GetServiceInfosByUdidAndUserId(const std::string &udid, int32_t userId,
+    std::vector<DistributedDeviceProfile::ServiceInfo> &serviceInfos)
+{
+    return DM_OK;
+}
+DM_EXPORT int32_t DeviceProfileConnector::GetServiceInfoByUdidAndServiceId(const std::string &udid, int64_t serviceId,
+    DistributedDeviceProfile::ServiceInfo &dpServiceInfo)
+{
+    return DM_OK;
+}
+DM_EXPORT int32_t DeviceProfileConnector::PutServiceInfo(const DistributedDeviceProfile::ServiceInfo &dpServiceInfo)
+{
+    return DM_OK;
+}
+DM_EXPORT int32_t DeviceProfileConnector::DeleteServiceInfo(const DistributedDeviceProfile::ServiceInfo &serviceInfo)
+{
+    return DM_OK;
+}
+DM_EXPORT void DeviceProfileConnector::GetPeerTokenIdForServiceProxyUnbind(int32_t userId, uint64_t localTokenId,
+    const std::string &peerUdid, int64_t serviceId, std::vector<uint64_t> &peerTokenId)
+{
+    (void)userId;
+    (void)localTokenId;
+    (void)peerUdid;
+    (void)serviceId;
+    (void)peerTokenId;
+}
+DM_EXPORT bool DeviceProfileConnector::DeleteAclForAccountLogOut(const DMAclQuadInfo &info, const std::string &accountId,
+    DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    return true;
+}
+DM_EXPORT bool DeviceProfileConnector::DeleteAclByActhash(const DMAclQuadInfo &info, const std::string &accountIdHash,
+    DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    return true;
+}
+DM_EXPORT void DeviceProfileConnector::CacheOfflineParam(const DmCacheOfflineInputParam &inputParam,
+    DmOfflineParam &offlineParam, bool &notifyOffline, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    (void)inputParam;
+    (void)offlineParam;
+    (void)notifyOffline;
+    (void)serviceInfos;
+}
+DM_EXPORT void DeviceProfileConnector::DeleteAclForUserRemoved(const DmLocalUserRemovedInfo &userRemovedInfo,
+    std::multimap<std::string, int32_t> &peerUserIdMap, DmOfflineParam &offlineParam,
+    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    (void)userRemovedInfo;
+    (void)peerUserIdMap;
+    (void)offlineParam;
+    (void)serviceInfos;
+}
+DM_EXPORT void DeviceProfileConnector::DeleteAclForRemoteUserRemoved(
+    DmRemoteUserRemovedInfo &userRemovedInfo, DmOfflineParam &offlineParam,
+    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    (void)userRemovedInfo;
+    (void)offlineParam;
+    (void)serviceInfos;
+}
+DM_EXPORT void DeviceProfileConnector::HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds,
+    const std::string &remoteUdid, const std::vector<int32_t> &localUserIds, std::string &localUdid,
+    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+        (void)remoteUserIds;
+        (void)remoteUdid;
+        (void)localUserIds;
+        (void)localUdid;
+        (void)serviceInfos;
+}
+DM_EXPORT void DeviceProfileConnector::HandleSyncBackgroundUserIdEvent(
+    const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
+    const std::vector<int32_t> &localUserIds, std::string &localUdid,
+    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    (void)remoteUserIds;
+    (void)remoteUdid;
+    (void)localUserIds;
+    (void)localUdid;
+    (void)serviceInfos;
+}
+DM_EXPORT int32_t DeviceProfileConnector::HandleAccountCommonEvent(const std::string &localUdid,
+    const std::vector<std::string> &deviceVec,
+    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
+    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    (void)localUdid;
+    (void)deviceVec;
+    (void)foregroundUserIds;
+    (void)backgroundUserIds;
+    (void)serviceInfos;
+    return DM_OK;
+}
+// this code line need delete:compile dependence end
 
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {

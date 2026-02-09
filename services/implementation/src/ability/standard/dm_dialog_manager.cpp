@@ -26,6 +26,7 @@
 #include "json_object.h"
 #include "parameter.h"
 #include "dm_single_instance.h"
+#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -58,6 +59,11 @@ DmDialogManager::~DmDialogManager()
 
 void DmDialogManager::ShowServiceBindConfirmDialog(const std::string param)
 {
+    std::string deviceName = "";
+    std::string appOperationStr = "";
+    std::string customDescriptionStr = "";
+    std::string hostPkgLabel = "";
+    int32_t deviceType = -1;
     {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> lock(mutex_);
@@ -67,19 +73,19 @@ void DmDialogManager::ShowServiceBindConfirmDialog(const std::string param)
         JsonObject jsonObject(param);
         if (!jsonObject.IsDiscarded()) {
             if (IsString(jsonObject, TAG_REQUESTER)) {
-                deviceName_ = jsonObject[TAG_REQUESTER].Get<std::string>();
+                deviceName = jsonObject[TAG_REQUESTER].Get<std::string>();
             }
             if (IsString(jsonObject, TAG_APP_OPERATION)) {
-                appOperationStr_ = jsonObject[TAG_APP_OPERATION].Get<std::string>();
+                appOperationStr = jsonObject[TAG_APP_OPERATION].Get<std::string>();
             }
             if (IsString(jsonObject, TAG_CUSTOM_DESCRIPTION)) {
-                customDescriptionStr_ = jsonObject[TAG_CUSTOM_DESCRIPTION].Get<std::string>();
+                customDescriptionStr = jsonObject[TAG_CUSTOM_DESCRIPTION].Get<std::string>();
             }
             if (IsInt32(jsonObject, TAG_LOCAL_DEVICE_TYPE)) {
-                deviceType_ = jsonObject[TAG_LOCAL_DEVICE_TYPE].Get<std::int32_t>();
+                deviceType = jsonObject[TAG_LOCAL_DEVICE_TYPE].Get<std::int32_t>();
             }
             if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
-                hostPkgLabel_ = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
+                hostPkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
             }
             if (IsBool(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
                 isProxyBind_ = jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<bool>();
@@ -94,8 +100,14 @@ void DmDialogManager::ShowServiceBindConfirmDialog(const std::string param)
                 title_ = jsonObject[TITLE].Get<std::string>();
             }
         }
+
         bundleName_ = DM_UI_BUNDLE_NAME;
         abilityName_ = CONFIRM_ABILITY_NAME;
+        deviceName_ = deviceName;
+        appOperationStr_ = appOperationStr;
+        customDescriptionStr_ = customDescriptionStr;
+        deviceType_ = deviceType;
+        hostPkgLabel_ = hostPkgLabel;
     }
     ConnectExtension();
 }

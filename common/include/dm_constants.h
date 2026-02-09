@@ -175,7 +175,18 @@ DM_EXPORT extern const char* DM_BUSINESS_ID;
 DM_EXPORT extern const char* PARAM_KEY_IS_SERVICE_BIND;
 DM_EXPORT extern const char* BIND_CALLER_IS_SYSTEM_SA;
 DM_EXPORT extern const char* SERVICE_USER_DATA;
-
+// this code line need delete: compile dependence start
+DM_EXPORT extern const char* PARAM_KEY_SUBJECT_SERVICE_ONES;
+DM_EXPORT extern const char* PARAM_KEY_LOCAL_PKGNAME;
+DM_EXPORT extern const char* PARAM_KEY_LOCAL_TOKENID;
+DM_EXPORT extern const char* PARAM_KEY_PEER_SERVICEID;
+DM_EXPORT extern const char* PARAM_KEY_LOCAL_USER_ID;
+DM_EXPORT extern const char* PARAM_KEY_IS_PROXY_QUERY;
+DM_EXPORT extern const char* PARAM_KEY_PKG_NAME;
+DM_EXPORT extern const char* PARAM_KEY_TOKEN_ID;
+DM_EXPORT extern const char* PARAM_KEY_SERVICE_CODE;
+DM_EXPORT extern const char* TAG_SERVICE_ID_EXT;
+// this code line need delete: compile dependence end
 // screen state
 enum ScreenState {
     DM_SCREEN_UNKNOWN = -1,
