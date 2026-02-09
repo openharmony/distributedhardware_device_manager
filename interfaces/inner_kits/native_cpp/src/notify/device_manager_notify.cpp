@@ -1573,7 +1573,7 @@ void DeviceManagerNotify::OnServiceOnline(const DmRegisterServiceState &register
                  pkgName.c_str(), serviceId);
         }
         std::lock_guard<std::mutex> autoLock(lock_);
-        std::pair key = std::make_pair(pkgName, serviceId);
+        auto key = std::make_pair(pkgName, serviceId);
 
         auto iter = serviceStateCallback_.find(key);
         if (iter == serviceStateCallback_.end()) {
@@ -1622,7 +1622,7 @@ void DeviceManagerNotify::OnServiceOffline(const DmRegisterServiceState &registe
     std::shared_ptr<ServiceInfoStateCallback> callbackInfo;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        std::pair key = std::make_pair(pkgName, serviceId);
+        auto key = std::make_pair(pkgName, serviceId);
         auto iter = serviceStateCallback_.find(key);
         if (iter == serviceStateCallback_.end()) {
             LOGW("OnServiceOffline: callback not found for key: %{public}s-%" PRId64,
@@ -1669,7 +1669,7 @@ int32_t DeviceManagerNotify::RegisterServiceStateCallback(const std::string &pkg
         LOGE("Invalid parameter.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::pair key = std::make_pair(pkgName, serviceId);
+    auto key = std::make_pair(pkgName, serviceId);
     std::lock_guard<std::mutex> autolock(lock_);
     CHECK_SIZE_RETURN(serviceStateCallback_, ERR_DM_CALLBACK_REGISTER_FAILED);
     serviceStateCallback_[key] = callback;
@@ -1685,7 +1685,7 @@ int32_t DeviceManagerNotify::UnRegisterServiceStateCallback(const std::string &p
         LOGE("Invalid parameter.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::pair key = std::make_pair(pkgName, serviceId);
+    auto key = std::make_pair(pkgName, serviceId);
     std::lock_guard<std::mutex> autolock(lock_);
     if (serviceStateCallback_.find(key) == serviceStateCallback_.end()) {
         LOGE("Invalid parameter.");
