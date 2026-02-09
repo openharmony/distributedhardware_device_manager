@@ -2048,6 +2048,36 @@ void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &inf
     }
 }
 
+void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId,
+    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    LOGI("localUdid %{public}s, localUserId %{public}d, peerUdid %{public}s, peerUserId %{public}d.",
+        GetAnonyString(info.localUdid).c_str(), info.localUserId, GetAnonyString(info.peerUdid).c_str(),
+        info.peerUserId);
+    DmOfflineParam offlineParam;
+    bool notifyOffline = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId,
+        offlineParam, serviceInfos);
+    DeleteGroupByBundleName(info.localUdid, info.localUserId, offlineParam.needDelAclInfos);
+    CHECK_NULL_VOID(hiChainAuthConnector_);
+    {
+        std::lock_guard lock(logoutMutex_);
+        hiChainAuthConnector_->DeleteCredential(info.peerUdid, info.localUserId, info.peerUserId);
+        DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+    }
+
+    std::set<std::string> pkgNameSet;
+    GetBundleName(info, pkgNameSet, notifyOffline);
+    if (notifyOffline) {
+        CHECK_NULL_VOID(softbusConnector_);
+        softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
+        CHECK_NULL_VOID(listener_);
+        listener_->SetExistPkgName(pkgNameSet);
+        CHECK_NULL_VOID(deviceStateMgr_);
+        bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(info.peerUdid);
+        deviceStateMgr_->OnDeviceOffline(info.peerUdid, isOnline);
+    }
+}
+
 void DeviceManagerServiceImpl::GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet,
     bool &notifyOffline)
 {
@@ -2082,7 +2112,7 @@ void DeviceManagerServiceImpl::GetBundleName(const DMAclQuadInfo &info, std::set
         }
     }
 }
-
+// this code line need delete:2122-2144
 void DeviceManagerServiceImpl::HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId)
 {
     LOGI("PreUserId %{public}d.", preUserId);
@@ -2107,6 +2137,34 @@ void DeviceManagerServiceImpl::HandleUserRemoved(std::vector<std::string> peerUd
     DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
 }
 
+void DeviceManagerServiceImpl::HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId,
+    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    LOGI("PreUserId %{public}d.", preUserId);
+    char localDeviceId[DEVICE_UUID_LENGTH];
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    DmLocalUserRemovedInfo userRemovedInfo;
+    userRemovedInfo.localUdid = reinterpret_cast<char *>(localDeviceId);
+    userRemovedInfo.preUserId = preUserId;
+    userRemovedInfo.peerUdids = peerUdids;
+    std::multimap<std::string, int32_t> peerUserIdMap;     // key: peerUdid  value: peerUserId
+    DmOfflineParam offlineParam;
+    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(userRemovedInfo, peerUserIdMap,
+        offlineParam, serviceInfos);
+    CHECK_NULL_VOID(hiChainConnector_);
+    hiChainConnector_->DeleteAllGroup(preUserId);
+
+    if (peerUserIdMap.empty()) {
+        LOGE("peerUserIdMap is empty");
+        return;
+    }
+    CHECK_NULL_VOID(hiChainAuthConnector_);
+    for (const auto &item : peerUserIdMap) {
+        hiChainAuthConnector_->DeleteCredential(item.first, preUserId, item.second);
+    }
+    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+}
+// this code line need delete:2174-2192
 void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid)
 {
     LOGI("remoteUdid %{public}s, userId %{public}d", GetAnonyString(remoteUdid).c_str(), userId);
@@ -2124,6 +2182,29 @@ void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t userId, const std
     }
     CHECK_NULL_VOID(hiChainConnector_);
     hiChainConnector_->DeleteGroupByACL(delInfoVec, localUserIds);
+    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+}
+
+void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid,
+    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    LOGI("remoteUdid %{public}s, userId %{public}d", GetAnonyString(remoteUdid).c_str(), userId);
+    DmRemoteUserRemovedInfo userRemovedInfo;
+    userRemovedInfo.peerUserId = userId;
+    userRemovedInfo.peerUdid = remoteUdid;
+    DmOfflineParam offlineParam;
+    DeviceProfileConnector::GetInstance().DeleteAclForRemoteUserRemoved(userRemovedInfo, offlineParam, serviceInfos);
+    if (userRemovedInfo.localUserIds.empty()) {
+        return;
+    }
+    CHECK_NULL_VOID(hiChainAuthConnector_);
+    std::vector<std::pair<int32_t, std::string>> delInfoVec;
+    for (int32_t localUserId : userRemovedInfo.localUserIds) {
+        delInfoVec.push_back(std::pair<int32_t, std::string>(localUserId, remoteUdid));
+        hiChainAuthConnector_->DeleteCredential(remoteUdid, localUserId, userId);
+    }
+    CHECK_NULL_VOID(hiChainConnector_);
+    hiChainConnector_->DeleteGroupByACL(delInfoVec, userRemovedInfo.localUserIds);
     DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
 }
 
@@ -2234,7 +2315,7 @@ std::multimap<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndUser
     std::string localUdid = std::string(localUdidTemp);
     return DeviceProfileConnector::GetInstance().GetDeviceIdAndUserId(userId, accountId, localUdid);
 }
-
+// this code line need delete:2317-2358
 void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
     const std::string &remoteUdid)
 {
@@ -2254,6 +2335,49 @@ void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, co
         DMAclQuadInfo info = {item.first, item.second, remoteUdid, remoteUserId};
         bool notifyOffline = DeviceProfileConnector::GetInstance().DeleteAclByActhash(info,
             remoteAccountHash, offlineParam);
+
+        CHECK_NULL_VOID(hiChainConnector_);
+        hiChainConnector_->DeleteAllGroup(item.second, remoteUdid);
+        CHECK_NULL_VOID(hiChainAuthConnector_);
+        {
+            std::lock_guard lock(logoutMutex_);
+            hiChainAuthConnector_->DeleteCredential(remoteUdid, item.second, remoteUserId);
+            DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+        }
+
+        std::set<std::string> pkgNameSet;
+        GetBundleName(info, pkgNameSet, notifyOffline);
+        if (notifyOffline) {
+            CHECK_NULL_VOID(softbusConnector_);
+            softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
+            CHECK_NULL_VOID(listener_);
+            listener_->SetExistPkgName(pkgNameSet);
+            CHECK_NULL_VOID(deviceStateMgr_);
+            bool isOnline = SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(remoteUdid);
+            deviceStateMgr_->OnDeviceOffline(remoteUdid, isOnline);
+        }
+    }
+}
+
+void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
+    const std::string &remoteUdid, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    std::multimap<std::string, int32_t> devIdAndUserMap =
+        DeviceProfileConnector::GetInstance().GetDevIdAndUserIdByActHash(localUdid, remoteUdid,
+            remoteUserId, remoteAccountHash);
+    CHECK_NULL_VOID(listener_);
+    std::string uuid = "";
+    SoftbusCache::GetInstance().GetUuidByUdid(remoteUdid, uuid);
+    listener_->OnDeviceTrustChange(remoteUdid, uuid, DmAuthForm::IDENTICAL_ACCOUNT);
+    for (const auto &item : devIdAndUserMap) {
+        DmOfflineParam offlineParam;
+        LOGI("remoteUdid %{public}s.", GetAnonyString(remoteUdid).c_str());
+        DMAclQuadInfo info = {item.first, item.second, remoteUdid, remoteUserId};
+        bool notifyOffline = DeviceProfileConnector::GetInstance().DeleteAclByActhash(info,
+            remoteAccountHash, offlineParam, serviceInfos);
 
         CHECK_NULL_VOID(hiChainConnector_);
         hiChainConnector_->DeleteAllGroup(item.second, remoteUdid);
@@ -2430,7 +2554,7 @@ void DeviceManagerServiceImpl::HandleServiceUnBindEvent(int32_t userId, const st
         softbusConnector_->HandleDeviceOffline(remoteUdid, isOnline);
     }
 }
-
+// this code line need delete:2543-2571
 void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
     const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus)
 {
@@ -2459,6 +2583,37 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
         localUserIds, localUdid);
     DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
         localUserIds, localUdid);
+}
+
+void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
+    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus,
+    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    LOGI("remote udid: %{public}s, foregroundUserIds: %{public}s, backgroundUserIds: %{public}s",
+        GetAnonyString(remoteUdid).c_str(), GetIntegerList<uint32_t>(foregroundUserIds).c_str(),
+        GetIntegerList<uint32_t>(backgroundUserIds).c_str());
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    std::vector<int32_t> rmtFrontUserIdsTemp(foregroundUserIds.begin(), foregroundUserIds.end());
+    std::vector<int32_t> rmtBackUserIdsTemp(backgroundUserIds.begin(), backgroundUserIds.end());
+    std::vector<int32_t> localUserIds;
+    int32_t ret = MultipleUserConnector::GetForegroundUserIds(localUserIds);
+    if (ret != DM_OK) {
+        LOGE("Get foreground userids failed, ret: %{public}d", ret);
+        return;
+    }
+    if (isCheckUserStatus) {
+        MultipleUserConnector::ClearLockedUser(localUserIds);
+    }
+    DmOfflineParam offlineParam;
+    DeviceProfileConnector::GetInstance().UpdateACL(localUdid, localUserIds, remoteUdid,
+        rmtFrontUserIdsTemp, rmtBackUserIdsTemp, offlineParam);
+    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+    DeviceProfileConnector::GetInstance().HandleSyncBackgroundUserIdEvent(rmtBackUserIdsTemp, remoteUdid,
+        localUserIds, localUdid, serviceInfos);
+    DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
+        localUserIds, localUdid, serviceInfos);
 }
 
 void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
@@ -3193,7 +3348,7 @@ void DeviceManagerServiceImpl::SetBindCallerInfoToBindParam(const std::map<std::
     bindParamTmp["bindCallerProcessName"] = bindCallerInfo.processName;
     bindParamTmp["bindCallerIsSystemSA"] = std::to_string(bindCallerInfo.isSystemSA);
 }
-
+// this code line need delete:3336-3362
 void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
     const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
 {
@@ -3220,6 +3375,35 @@ void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint
         localUserIds, localUdid);
     DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
         localUserIds, localUdid);
+}
+
+void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
+    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid,
+    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+{
+    LOGI("remote udid: %{public}s, foregroundUserIds: %{public}s, backgroundUserIds: %{public}s",
+        GetAnonyString(remoteUdid).c_str(), GetIntegerList<uint32_t>(foregroundUserIds).c_str(),
+        GetIntegerList<uint32_t>(backgroundUserIds).c_str());
+    std::vector<int32_t> rmtFrontUserIdsTemp(foregroundUserIds.begin(), foregroundUserIds.end());
+    std::vector<int32_t> rmtBackUserIdsTemp(backgroundUserIds.begin(), backgroundUserIds.end());
+    std::vector<int32_t> localUserIds;
+    int32_t ret = MultipleUserConnector::GetForegroundUserIds(localUserIds);
+    if (ret != DM_OK) {
+        LOGE("Get foreground userids failed, ret: %{public}d", ret);
+        return;
+    }
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    MultipleUserConnector::ClearLockedUser(localUserIds);
+    DmOfflineParam offlineParam;
+    DeviceProfileConnector::GetInstance().UpdateACL(localUdid, localUserIds, remoteUdid,
+        rmtFrontUserIdsTemp, rmtBackUserIdsTemp, offlineParam);
+    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+    DeviceProfileConnector::GetInstance().HandleSyncBackgroundUserIdEvent(rmtBackUserIdsTemp, remoteUdid,
+        localUserIds, localUdid, serviceInfos);
+    DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
+        localUserIds, localUdid, serviceInfos);
 }
 
 bool DeviceManagerServiceImpl::CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
@@ -3279,7 +3463,7 @@ int32_t DeviceManagerServiceImpl::BindServiceTarget(const std::string &pkgName, 
     bindParamTmp[PARAM_KEY_IS_SERVICE_BIND] = "true";
     return BindTarget(pkgName, targetId, bindParamTmp);
 }
-
+// this code line need delete:3451-3487
 int32_t DeviceManagerServiceImpl::UnbindServiceTarget(const std::string &pkgName, int64_t serviceId)
 {
     if (pkgName.empty()) {
@@ -3310,6 +3494,34 @@ int32_t DeviceManagerServiceImpl::UnbindServiceTarget(const std::string &pkgName
         LOGE("failed, DeleteServiceInfoProfile failed.");
         return ret;
     }
+    ret = UnBindDevice(pkgName, peerDeviceId, bindLevel);
+    if (ret != DM_OK) {
+        LOGE("failed, UnBindDevice failed.");
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::UnbindServiceTargetSrvBind(const std::string &pkgName, int64_t serviceId)
+{
+    if (pkgName.empty()) {
+        LOGE("failed, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int64_t tokenIdCaller = IPCSkeleton::GetCallingTokenID();
+    std::string peerDeviceId = "";
+    int32_t bindLevel = -1;
+    LOGI("start pkgName:%{public}s, serviceId:%{public}" PRId64 ", tokenId:%{public}" PRId64,
+         pkgName.c_str(), serviceId, tokenIdCaller);
+    int32_t ret = DeleteAclExtraDataServiceId(serviceId, tokenIdCaller, peerDeviceId, bindLevel);
+    if (ret != DM_OK) {
+        LOGE("failed, DeleteAclExtraDataServiceId failed.");
+        return ret;
+    }
+
+    int32_t userId = -1;
+    MultipleUserConnector::GetCallerUserId(userId);
+
     ret = UnBindDevice(pkgName, peerDeviceId, bindLevel);
     if (ret != DM_OK) {
         LOGE("failed, UnBindDevice failed.");

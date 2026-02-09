@@ -132,14 +132,22 @@ public:
     int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
         const std::string &udid, uint64_t &tokenId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId, const std::string &accountId);
+    // this code line need delete:138-139
     void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid);
+    void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
+        const std::string &remoteUdid, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, int32_t peerTokenId);
+    // this code line need delete:147-148
     void HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId);
     void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId);
+    void HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     void HandleUserSwitched(const std::vector<std::string> &deviceVec, int32_t currentUserId,
         int32_t beforeUserId);
@@ -152,9 +160,15 @@ public:
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);
     int32_t ProcessAppUninstall(int32_t userId, int32_t accessTokenId);
     void ProcessUnBindApp(int32_t userId, int32_t accessTokenId, const std::string &extra, const std::string &udid);
+    // this code line need delete:166-167
     void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus);
     void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid);
+    void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId);
     int32_t SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList);
@@ -167,8 +181,12 @@ public:
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
     void HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
         int32_t remoteTokenId);
+    // this code line need delete:187-188
     void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
+    void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     std::vector<std::string> GetDeviceIdByUserIdAndTokenId(int32_t userId, int32_t tokenId);
     bool CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);

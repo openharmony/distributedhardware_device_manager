@@ -96,7 +96,7 @@ NegotiateProcess::NegotiateProcess()
     handlers_[NegotiateSpec(CredType::DM_P2P_CREDTYPE, AclType::DM_P2P_ACL, AuthType::DM_IMPORT_AUTHTYPE)] =
         std::make_unique<P2pCredP2pAclImportAuthType>();
 }
-
+// this code line need delete:100-126
 int32_t NegotiateProcess::HandleNegotiateResult(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
@@ -125,7 +125,37 @@ int32_t NegotiateProcess::HandleNegotiateResult(std::shared_ptr<DmAuthContext> c
     return HandleProxyNegotiateResult(context, ret);
 }
 
+int32_t NegotiateProcess::HandleNegotiateResultSrvBind(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    std::string credTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
+        context->accesser.credTypeList : context->accessee.credTypeList;
+    std::string aclTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
+        context->accesser.aclTypeList : context->accessee.aclTypeList;
+    CredType credType = ConvertCredType(credTypeList);
+    AclType aclType = ConvertAclType(aclTypeList);
+    AuthType authType = ConvertAuthType(context->authType);
+    LOGI("credType %{public}d, aclType %{public}d, authType %{public}d.",
+        static_cast<int32_t>(credType), static_cast<int32_t>(aclType), static_cast<int32_t>(authType));
+    int32_t ret = ERR_DM_CAPABILITY_NEGOTIATE_FAILED;
+    NegotiateSpec negotiateSpec(credType, aclType, authType);
+    auto handler = handlers_.find(negotiateSpec);
+    if (handler != handlers_.end() && handler->second != nullptr) {
+        ret = handler->second->NegotiateHandle(context);
+    } else {
+        return ret;
+    }
+    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    if (!context->IsProxyBind || targetList.empty() ||
+        (credType == CredType::DM_IDENTICAL_CREDTYPE && aclType == AclType::DM_IDENTICAL_ACL) ||
+        (credType == CredType::DM_SHARE_CREDTYPE && aclType == AclType::DM_SHARE_ACL)) {
+        return ret;
+    }
+    return HandleProxyNegotiateResult(context, ret);
+}
+
 //LCOV_EXCL_START
+// this code line need delete: 159-181
 int32_t NegotiateProcess::HandleProxyNegotiateResult(std::shared_ptr<DmAuthContext> context, int32_t result)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
@@ -134,6 +164,31 @@ int32_t NegotiateProcess::HandleProxyNegotiateResult(std::shared_ptr<DmAuthConte
     }
     bool isTrust = true;
     for (auto &app : context->subjectProxyOnes) {
+        std::string credTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
+            app.proxyAccesser.credTypeList : app.proxyAccessee.credTypeList;
+        std::string aclTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
+            app.proxyAccesser.aclTypeList : app.proxyAccessee.aclTypeList;
+        CredType credType = ConvertCredType(credTypeList);
+        AclType aclType = ConvertAclType(aclTypeList);
+        if (credType == CredType::DM_P2P_CREDTYPE && aclType == AclType::DM_P2P_ACL) {
+            app.needBind = false;
+            app.needAgreeCredential = false;
+            app.needAuth = false;
+            app.IsNeedSetProxyRelationShip = IsNeedSetProxyRelationShip(context, app);
+        }
+    }
+    return DM_OK;
+}
+
+int32_t NegotiateProcess::HandleProxyNegotiateResultSrvBind(std::shared_ptr<DmAuthContext> context, int32_t result)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    if (!context->IsProxyBind || targetList.empty()) {
+        return DM_OK;
+    }
+    bool isTrust = true;
+    for (auto &app : targetList) {
         std::string credTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
             app.proxyAccesser.credTypeList : app.proxyAccessee.credTypeList;
         std::string aclTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
