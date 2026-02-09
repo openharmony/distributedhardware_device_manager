@@ -318,6 +318,8 @@ struct DmAuthContext {
     CleanNotifyCallback cleanNotifyCallback{nullptr};
     StopTimerAndDelDpCallback stopTimerAndDelDpCallback{nullptr};
     std::vector<int64_t> serviceId; // sync service id
+    // sync service infos and send service info to source
+    std::vector<DistributedDeviceProfile::ServiceInfo> serviceInfos;
 
     std::string GetDeviceId(DmAuthSide side);
     int32_t GetUserId(DmAuthSide side);
