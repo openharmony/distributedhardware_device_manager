@@ -54,7 +54,6 @@ namespace {
     const int64_t DM_MIN_RANDOM = 1;
     const int64_t DM_MAX_RANDOM_INT64 = INT64_MAX;
     const int32_t CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID = 0;
-    constexpr int8_t SERVICE_UNPUBLISHED_STATE = 0;
     const int32_t INVALID_USERID = -1;
 }
 
