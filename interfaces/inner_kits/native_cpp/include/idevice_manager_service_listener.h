@@ -174,9 +174,9 @@ public:
     virtual void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
         const std::string &deviceName, int32_t code) = 0;
     virtual void SetExistPkgName(const std::set<std::string> &pkgNameSet) = 0;
-    virtual void OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,
-        const DiscoveryServiceInfo &discServiceInfo) = 0;
-    virtual void OnServiceDiscoveryResult(const ProcessInfo &processInfo, int32_t discServiceId, int32_t reason) = 0;
+    virtual void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) = 0;
+    virtual void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
+        int32_t reason) = 0;
 
     virtual std::string GetLocalDisplayDeviceName() = 0;
     virtual int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) = 0;

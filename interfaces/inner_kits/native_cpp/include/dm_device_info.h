@@ -374,7 +374,11 @@ typedef enum {
     UN_REG_CREDENTIAL_AUTH_STATUS_NOTIFY = 8,
     REG_AUTH_CODE_INVALID = 9,
     UN_REG_AUTH_CODE_INVALID = 10,
-    MAX = 11,
+    // zl online&offline
+    REG_SERVICE_STATE = 11,
+    UN_REG_SERVICE_STATE = 12,
+
+    MAX = 13,
 } DmCommonNotifyEvent;
 
 DM_EXPORT extern const char* DEVICE_TYPE_UNKNOWN_STRING;
@@ -512,6 +516,23 @@ typedef enum DMSrvMediumType {
     SERVICE_MEDIUM_TYPE_BUTT,
 } DMSrvMediumType;
 
+typedef enum DMPublishState
+{
+    SERVICE_UNPUBLISHED_STATE = 0,
+    SERVICE_PUBLISHED_STATE,
+} DMPublishState;
+typedef struct DmUserRemovedServiceInfo
+{
+    int64_t localTokenId = 0;
+    std::string localPkgName = "";
+    int32_t bindType = 0;
+    std::string peerUdid = "";
+    std::vector<int64_t> serviceIds = {};
+    bool isActive = false;
+    int32_t peerUserId = 0;
+    std::map<int32_t, std::vector<int64_t>> bindTypeToServiceIdMap;
+} DmUserRemovedServiceInfo;
+//this code line need delete: 535-574
 typedef struct DiscoveryServiceParam {
     std::string serviceName;
     std::string serviceType;
@@ -566,6 +587,154 @@ typedef struct DmAuthInfo {
     std::string description;        /** Description information on the three-party interface */
     std::string extraInfo;      /** Extended configuration information */
 } DmAuthInfo;
+
+typedef struct DmRegisterServiceInfo {
+    int32_t userId;                              // 服务所属前台
+    int64_t displayId;
+    uint64_t serviceOwnerTokenId;                 // 服务所属业务
+    std::string serviceOwnerPkgName;             // 服务所属业务
+    uint64_t serviceRegisterTokenId;              // 注册服务的业
+    std::string serviceType;                     // 15字节
+    std::string serviceName;                     // 64字节，应用
+    std::string serviceDisplayName;              // 7-128字节，展
+    std::string customData;                      // 0-1024字节，
+    std::string serviceCode;                     // 服务短码
+    uint32_t dataLen;                            // 自定义字段长
+    int64_t timeStamp;                           // 注册时间（单
+    std::string description;
+} DmRegisterServiceInfo;
+
+typedef struct DmPublishServiceParam {
+    DMSrvDiscoveryMode discoverMode;
+    DMSrvMediumType media;
+    DmExchangeFreq freq;
+} DmPublishServiceParam;
+
+typedef struct DmDiscoveryServiceParam {
+    std::string serviceType; //15字节 必选
+    std::string serviceName; //64字节 可选 DM根据总线基于type过滤
+    std::string serviceDisplayName; //暂定7～128字节 显示名称 展
+    DmExchangeFreq freq;
+    DMSrvMediumType medium;
+    DMSrvDiscoveryMode mode; //只能主动发现，该值可以省略
+    bool operator==(const DmDiscoveryServiceParam &other) const
+    {
+        return (serviceType == other.serviceType) && (serviceName == other.serviceName) &&
+            (serviceDisplayName == other.serviceDisplayName) && (freq == other.freq) &&
+            (medium == other.medium) && (mode == other.mode);
+    }
+} DmDiscoveryServiceParam;
+
+typedef struct DmServiceInfo {
+    int32_t userId;
+    int64_t serviceId;
+    int64_t displayId;
+    int8_t publishState;
+    std::string deviceId; // uuid hash 字段
+    std::string networkId;
+    DmAuthForm authform;
+    uint64_t serviceOwnerTokenId; // 服务所属业务的tokenId
+    std::string serviceOwnerPkgName; // 服务所属业务自定义的pkgNa
+    uint64_t serviceRegisterTokenId; // 注册服务的业务的tokenId，
+    std::string serviceType; // 15字节
+    std::string serviceName; // 64字节，应用对该服务起一个自定义
+    std::string serviceDisplayName; // 暂定7-128字节，显示名称，
+    std::string serviceCode; // 服务编码
+    std::string customData; // 0-1024字节，业务自定义字段
+    uint32_t dataLen; // 自定义字段长度
+    int64_t timeStamp; // 注册的时间戳
+    std::string description;
+    bool operator==(const DmServiceInfo &other) const
+    {
+        return (deviceId == other.deviceId) && (userId == other.userId) &&
+            (serviceId == other.serviceId);
+    }
+    bool operator<(const DmServiceInfo &other) const
+    {
+        return (deviceId < other.deviceId) && (userId < other.userId) &&
+            (serviceId < other.serviceId);
+    }
+} DmServiceInfo;
+
+/**
+ * @brief Service state change event definition.
+ */
+typedef enum DmServiceState {
+    /**
+     * Service status is unknown.
+     */
+    SERVICE_STATE_UNKNOWN = -1,
+    /**
+     * Service online action, which indicates the Service is physically online.
+     */
+    SERVICE_STATE_ONLINE = 0,
+    /**
+     * Service offline action, which Indicates the device is physically offline.
+     */
+    SERVICE_STATE_OFFLINE = 2,
+    /**
+     * Service change action, which Indicates the device is physically change.
+     */
+    SERVICE_INFO_CHANGED = 3,
+} DmServiceState;
+ 
+typedef struct DmRegisterServiceState {
+    int32_t userId = 0;
+    uint64_t tokenId = 0;
+    std::string pkgName = "";
+    int64_t serviceId = 0;
+ 
+    bool operator==(const DmRegisterServiceState& other) const
+    {
+        return userId == other.userId &&
+              tokenId == other.tokenId &&
+              pkgName == other.pkgName &&
+              serviceId == other.serviceId;
+    }
+} DmRegisterServiceState;
+
+typedef struct ServiceStateBindParameter {
+    uint64_t tokenId = 0;
+    std::string pkgName = "";
+    int32_t bindType = 0;
+    std::string peerUdid = "";
+    int32_t peerUserId = 0;
+    int64_t serviceId = -1;
+} ServiceStateBindParameter;
+
+//add by zqz
+typedef struct ServiceSyncInfo {
+    std::string pkgName;
+    int32_t localUserId = 0;
+    std::string networkId;
+    int64_t serviceId = 0;
+    int32_t callerUserId = 0;
+    uint32_t callerTokenId = 0;
+ 
+    bool operator==(const ServiceSyncInfo &other) const
+    {
+        return (pkgName == other.pkgName) && (localUserId == other.localUserId) &&
+            (networkId == other.networkId) && (serviceId == other.serviceId);
+    }
+ 
+    bool operator<(const ServiceSyncInfo &other) const
+    {
+        return (pkgName < other.pkgName) ||
+            (pkgName == other.pkgName && localUserId < other.localUserId) ||
+            (pkgName == other.pkgName && localUserId == other.localUserId && networkId < other.networkId) ||
+            (pkgName == other.pkgName && localUserId == other.localUserId && networkId == other.networkId &&
+                serviceId < other.serviceId);
+    }
+} ServiceSyncInfo;
+
+typedef struct UnbindServiceProxyParam {
+    int32_t userId = -1;
+    uint64_t localTokenId = 0;
+    std::vector<uint64_t> peerTokenId = {};
+    std::string localUdid = "";
+    std::string peerNetworkId = "";
+    int64_t serviceId = -1;
+} UnbindServiceProxyParam;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

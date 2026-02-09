@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+//this code line need delete: 1 - 100 delete this file
 #ifndef OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
 #define OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
 

@@ -81,6 +81,7 @@
 #include "securec.h"
 #include "ipc_auth_info_req.h"
 #include "ipc_auth_info_rsp.h"
+#include "ipc_sync_service_callback_req.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ipc_model_codec.h"
 #include "iservice_registry.h"
@@ -3147,6 +3148,22 @@ int32_t DeviceManagerImpl::GetUdidsByDeviceIds(const std::string &pkgName, const
         anonyLocalUdid_);
     return result;
 }
+void DeviceManagerImpl::SyncServiceCallbacksToService(
+    std::map<DmCommonNotifyEvent, std::set<std::pair<std::string, int64_t>>> &callbackMap)
+{
+    if (callbackMap.size() == 0) {
+        LOGI("callbackMap is empty.");
+        return;
+    }
+    for (auto iter : callbackMap) {
+        if (iter.second.size() == 0) {
+            continue;
+        }
+        for (auto item : iter.second) {
+            SyncCallbackToServiceForServiceInfo(iter.first, item.first, item.second);
+        }
+    }
+}
 
 int32_t DeviceManagerImpl::StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam,
     std::shared_ptr<ServiceDiscoveryCallback> callback)
@@ -3202,6 +3219,42 @@ int32_t DeviceManagerImpl::StopServiceDiscovery(const std::string &pkgName, int3
     }
     DeviceManagerNotify::GetInstance().UnRegisterServiceDiscoveryCallback(discoveryServiceId);
     LOGI("StopServiceDiscovery completed");
+    return DM_OK;
+}
+int32_t DeviceManagerImpl::SyncCallbackToServiceForServiceInfo(DmCommonNotifyEvent dmCommonNotifyEvent,
+    const std::string &pkgName, int64_t serviceId)
+{
+    LOGD("Enter SyncCallbackToServiceForServiceInfo, dmCommonNotifyEvent: %{public}d, "
+         "pkgName: %{public}s, serviceId: %{public}" PRId64, 
+         dmCommonNotifyEvent, pkgName.c_str(), serviceId);
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (serviceId < 0) {
+        LOGE("Invalid serviceId.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDmCommonNotifyEventValid(dmCommonNotifyEvent)) {
+        LOGE("Invalid dmCommonNotifyEvent: %{public}d.", dmCommonNotifyEvent);
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::shared_ptr<IpcSyncServiceCallbackReq> req = std::make_shared<IpcSyncServiceCallbackReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetServiceId(serviceId);
+    req->SetDmCommonNotifyEvent(static_cast<int32_t>(dmCommonNotifyEvent));
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    int32_t ret = ipcClientProxy_->SendRequest(SYNC_SERVICE_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("Send Request failed ret: %{public}d", ret);
+        return ret;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
     return DM_OK;
 }
 
@@ -3262,37 +3315,50 @@ int32_t DeviceManagerImpl::UnbindServiceTarget(const std::string &pkgName, int64
     LOGI("Completed");
     return DM_OK;
 }
-
 int32_t DeviceManagerImpl::RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
     std::shared_ptr<ServiceInfoStateCallback> callback)
 {
-    if (pkgName.empty() || serviceId == 0) {
+    LOGI("Enter RegisterServiceStateCallback, pkgName: %{public}s, serviceId: %{public}" PRId64,
+        pkgName.c_str(), serviceId);
+    if (pkgName.empty() || serviceId < 0) {
         LOGE("RegisterServiceStateCallback failed: input pkgName or serviceId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::string key = std::to_string(serviceId);
-    int32_t ret = DeviceManagerNotify::GetInstance().RegisterServiceStateCallback(key, callback);
+    int32_t ret = DeviceManagerNotify::GetInstance().RegisterServiceStateCallback(pkgName, serviceId, callback);
     if (ret != DM_OK) {
-        LOGE("error: register callback failed: %{public}d", ret);
+        LOGE("RegisterServiceStateCallback failed: Notify register error %{public}d", ret);
         return ret;
     }
-    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
+    ret = SyncCallbackToServiceForServiceInfo(DmCommonNotifyEvent::REG_SERVICE_STATE, pkgName, serviceId);
+    if (ret != DM_OK) {
+        LOGE("error: register callback failed: %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterServiceStateCallback(pkgName, serviceId);
+        return ret;
+    }
+    LOGI("RegisterServiceStateCallback success, pkgName: %{public}s, serviceId: %{public}" PRId64,
+        pkgName.c_str(), serviceId);
     return DM_OK;
 }
-
 int32_t DeviceManagerImpl::UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId)
 {
-    if (pkgName.empty() || serviceId == 0) {
+    LOGD("Enter UnRegisterServiceStateCallback, pkgName: %{public}s, serviceId: %{public}" PRId64,
+        pkgName.c_str(), serviceId);
+    if (pkgName.empty() || serviceId < 0) {
         LOGE("UnRegisterServiceStateCallback failed: input pkgName or serviceId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::string key = std::to_string(serviceId);
-    int32_t ret = DeviceManagerNotify::GetInstance().UnRegisterServiceStateCallback(key);
+    int32_t ret = SyncCallbackToServiceForServiceInfo(DmCommonNotifyEvent::UN_REG_SERVICE_STATE, pkgName, serviceId);
     if (ret != DM_OK) {
         LOGE("error: unregister callback failed: %{public}d", ret);
         return ret;
     }
-    SyncCallbackToService(DmCommonNotifyEvent::UN_REG_DEVICE_STATE, pkgName);
+    ret = DeviceManagerNotify::GetInstance().UnRegisterServiceStateCallback(pkgName, serviceId);
+    if (ret != DM_OK) {
+        LOGE("UnRegisterServiceStateCallback failed: Notify unregister error %{public}d", ret);
+        return ret;
+    }
+    LOGI("UnRegisterServiceStateCallback success, pkgName: %{public}s, serviceId: %{public}" PRId64,
+         pkgName.c_str(), serviceId);
     return DM_OK;
 }
 

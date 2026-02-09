@@ -13,43 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_IPC_UNREGISTER_SERVICE_INFO_REQ_H
-#define OHOS_DM_IPC_UNREGISTER_SERVICE_INFO_REQ_H
+#ifndef OHOS_DM_NEW_IPC_REGISTER_SERVICE_INFO_REQ_H
+#define OHOS_DM_NEW_IPC_REGISTER_SERVICE_INFO_REQ_H
 
 #include "dm_device_info.h"
 #include "ipc_req.h"
-
 namespace OHOS {
 namespace DistributedHardware {
-class IpcUnRegisterServiceInfoReq : public IpcReq {
-    DECLARE_IPC_MODEL(IpcUnRegisterServiceInfoReq);
-
+class IpcRegisterServiceInfoReq : public IpcReq {
+    DECLARE_IPC_MODEL(IpcRegisterServiceInfoReq);
 public:
-//this code line need delete: 29 - 37
-    int32_t GetRegServiceId() const
+    DmRegisterServiceInfo GetRegisterServiceInfo() const
     {
-        return regServiceId_;
+        return regServiceInfo_;
     }
-    
-    void SetRegServiceId(int32_t regServiceId)
+    void SetRegisterServiceInfo(const DmRegisterServiceInfo &regServiceInfo)
     {
-        regServiceId_ = regServiceId;
+        regServiceInfo_ = regServiceInfo;
     }
-    int64_t GetServiceId() const
-    {
-        return serviceId_;
-    }
-
-    void SetServiceId(const int64_t &serviceId)
-    {
-        serviceId_ = serviceId;
-    }
-
 private:
-//this code line need delete: 50 - 50
-    int32_t regServiceId_ = 0;
-    int64_t serviceId_ = 0;
+    DmRegisterServiceInfo regServiceInfo_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_UNREGISTER_SERVICE_INFO_REQ_H
+#endif // OHOS_DM_NEW_IPC_REGISTER_SERVICE_INFO_REQ_H

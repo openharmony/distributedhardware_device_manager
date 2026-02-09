@@ -527,7 +527,7 @@ bool IpcModelCodec::DecodeStringVector(MessageParcel &parcel, std::vector<std::s
     }
     return true;
 }
-
+//this code line need delete: 531 - 637
 bool IpcModelCodec::EncodeSrvDiscParam(const DiscoveryServiceParam &param, MessageParcel &parcel)
 {
     bool bRet = true;
@@ -704,6 +704,194 @@ bool IpcModelCodec::DecodeDmAuthInfo(MessageParcel &parcel, DmAuthInfo &dmAuthIn
     READ_HELPER_RET(parcel, String, dmAuthInfo.description, false);
     READ_HELPER_RET(parcel, String, dmAuthInfo.extraInfo, false);
     return true;
+}
+
+bool IpcModelCodec::EncodeDmRegServiceInfo(const DmRegisterServiceInfo &regServiceInfo, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteInt32(regServiceInfo.userId));
+    bRet = (bRet && parcel.WriteInt64(regServiceInfo.displayId));
+    bRet = (bRet && parcel.WriteUint64(regServiceInfo.serviceOwnerTokenId));
+    bRet = (bRet && parcel.WriteString(regServiceInfo.serviceOwnerPkgName));
+    bRet = (bRet && parcel.WriteUint64(regServiceInfo.serviceRegisterTokenId));
+    bRet = (bRet && parcel.WriteString(regServiceInfo.serviceType));
+    bRet = (bRet && parcel.WriteString(regServiceInfo.serviceName));
+    bRet = (bRet && parcel.WriteString(regServiceInfo.serviceDisplayName));
+    bRet = (bRet && parcel.WriteString(regServiceInfo.serviceCode));
+    bRet = (bRet && parcel.WriteString(regServiceInfo.customData));
+    bRet = (bRet && parcel.WriteUint32(regServiceInfo.dataLen));
+    bRet = (bRet && parcel.WriteInt64(regServiceInfo.timeStamp));
+    bRet = (bRet && parcel.WriteString(regServiceInfo.description));
+    return bRet;
+}
+
+bool IpcModelCodec::DecodeDmRegServiceInfo(MessageParcel &parcel, DmRegisterServiceInfo &regServiceInfo)
+{
+    READ_HELPER_RET(parcel, Int32, regServiceInfo.userId, false);
+    READ_HELPER_RET(parcel, Int64, regServiceInfo.displayId, false);
+    READ_HELPER_RET(parcel, Uint64, regServiceInfo.serviceOwnerTokenId, false);
+    READ_HELPER_RET(parcel, String, regServiceInfo.serviceOwnerPkgName, false);
+    READ_HELPER_RET(parcel, Uint64, regServiceInfo.serviceRegisterTokenId, false);
+    READ_HELPER_RET(parcel, String, regServiceInfo.serviceType, false);
+    READ_HELPER_RET(parcel, String, regServiceInfo.serviceName, false);
+    READ_HELPER_RET(parcel, String, regServiceInfo.serviceDisplayName, false);
+    READ_HELPER_RET(parcel, String, regServiceInfo.serviceCode, false);
+    READ_HELPER_RET(parcel, String, regServiceInfo.customData, false);
+    READ_HELPER_RET(parcel, Uint32, regServiceInfo.dataLen, false);
+    READ_HELPER_RET(parcel, Int64, regServiceInfo.timeStamp, false);
+    READ_HELPER_RET(parcel, String, regServiceInfo.description, false);
+    return true;
+}
+
+bool IpcModelCodec::EncodeDmSrvDiscParam(const DmDiscoveryServiceParam &param, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteString(param.serviceName));
+    bRet = (bRet && parcel.WriteString(param.serviceType));
+    bRet = (bRet && parcel.WriteString(param.serviceDisplayName));
+    bRet = (bRet && parcel.WriteInt32(param.freq));
+    bRet = (bRet && parcel.WriteInt32(param.medium));
+    bRet = (bRet && parcel.WriteInt32(param.mode));
+    return bRet;
+}
+
+bool IpcModelCodec::DecodeDmSrvDiscParam(MessageParcel &parcel, DmDiscoveryServiceParam &param)
+{
+    READ_HELPER_RET(parcel, String, param.serviceName, false);
+    READ_HELPER_RET(parcel, String, param.serviceType, false);
+    READ_HELPER_RET(parcel, String, param.serviceDisplayName, false);
+    int32_t freq = 0;
+    READ_HELPER_RET(parcel, Int32, freq, false);
+    param.freq = static_cast<DmExchangeFreq>(freq);
+    int32_t medium = 0;
+    READ_HELPER_RET(parcel, Int32, medium, false);
+    param.medium = static_cast<DMSrvMediumType>(medium);
+    int32_t mode = 0;
+    READ_HELPER_RET(parcel, Int32, mode, false);
+    param.mode = static_cast<DMSrvDiscoveryMode>(mode);
+    return true;
+}
+
+bool IpcModelCodec::EncodeDmPublishServiceParam(const DmPublishServiceParam &publishServiceParam, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(publishServiceParam.discoverMode)));
+    bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(publishServiceParam.media)));
+    bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(publishServiceParam.freq)));
+    return bRet;
+}
+
+bool IpcModelCodec::DecodeDmPublishServiceParam(MessageParcel &parcel, DmPublishServiceParam &publishServiceParam)
+{
+    int32_t discoverMode = static_cast<int32_t>(DMSrvDiscoveryMode::SERVICE_PUBLISH_MODE_ACTIVE);
+    READ_HELPER_RET(parcel, Int32, discoverMode, false);
+    publishServiceParam.discoverMode = static_cast<DMSrvDiscoveryMode>(discoverMode);
+    int32_t media = static_cast<int32_t>(DMSrvMediumType::SERVICE_MEDIUM_TYPE_AUTO);
+    READ_HELPER_RET(parcel, Int32, media, false);
+    publishServiceParam.media = static_cast<DMSrvMediumType>(media);
+    int32_t freq = static_cast<int32_t>(DmExchangeFreq::DM_LOW);
+    READ_HELPER_RET(parcel, Int32, freq, false);
+    publishServiceParam.freq = static_cast<DmExchangeFreq>(freq);
+    return true;
+}
+// zl online&offline
+bool IpcModelCodec::EncodeDmServiceInfo(const DmServiceInfo &serviceInfo, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteInt32(serviceInfo.userId));
+    bRet = (bRet && parcel.WriteInt64(serviceInfo.serviceId));
+    bRet = (bRet && parcel.WriteInt64(serviceInfo.displayId));
+    bRet = (bRet && parcel.WriteString(serviceInfo.deviceId));
+    bRet = (bRet && parcel.WriteString(serviceInfo.networkId));
+    bRet = (bRet && parcel.WriteUint64(serviceInfo.serviceOwnerTokenId));
+    bRet = (bRet && parcel.WriteString(serviceInfo.serviceOwnerPkgName));
+    bRet = (bRet && parcel.WriteUint64(serviceInfo.serviceRegisterTokenId));
+    bRet = (bRet && parcel.WriteString(serviceInfo.serviceType));
+    bRet = (bRet && parcel.WriteString(serviceInfo.serviceName));
+    bRet = (bRet && parcel.WriteString(serviceInfo.serviceDisplayName));
+    bRet = (bRet && parcel.WriteInt32(serviceInfo.publishState));
+    bRet = (bRet && parcel.WriteString(serviceInfo.serviceCode));
+    bRet = (bRet && parcel.WriteString(serviceInfo.customData));
+    bRet = (bRet && parcel.WriteUint32(serviceInfo.dataLen));
+    bRet = (bRet && parcel.WriteInt64(serviceInfo.timeStamp));
+    bRet = (bRet && parcel.WriteString(serviceInfo.description));
+    bRet = (bRet && parcel.WriteInt32(serviceInfo.authform));
+    return bRet;
+}
+// zl online&offline
+bool IpcModelCodec::DecodeDmServiceInfo(MessageParcel &parcel, DmServiceInfo &serviceInfo)
+{
+    READ_HELPER_RET(parcel, Int32, serviceInfo.userId, false);
+    READ_HELPER_RET(parcel, Int64, serviceInfo.serviceId, false);
+    READ_HELPER_RET(parcel, Int64, serviceInfo.displayId, false);
+    READ_HELPER_RET(parcel, String, serviceInfo.deviceId, false);
+    READ_HELPER_RET(parcel, String, serviceInfo.networkId, false);
+    READ_HELPER_RET(parcel, Uint64, serviceInfo.serviceOwnerTokenId, false);
+    READ_HELPER_RET(parcel, String, serviceInfo.serviceOwnerPkgName, false);
+    READ_HELPER_RET(parcel, Uint64, serviceInfo.serviceRegisterTokenId, false);
+    READ_HELPER_RET(parcel, String, serviceInfo.serviceType, false);
+    READ_HELPER_RET(parcel, String, serviceInfo.serviceName, false);
+    READ_HELPER_RET(parcel, String, serviceInfo.serviceDisplayName, false);
+    int32_t publishState = 0;
+    READ_HELPER_RET(parcel, Int32, publishState, false);
+    serviceInfo.publishState = static_cast<int8_t>(publishState);
+    READ_HELPER_RET(parcel, String, serviceInfo.serviceCode, false);
+    READ_HELPER_RET(parcel, String, serviceInfo.customData, false);
+    READ_HELPER_RET(parcel, Uint32, serviceInfo.dataLen, false);
+    READ_HELPER_RET(parcel, Int64, serviceInfo.timeStamp, false);
+    READ_HELPER_RET(parcel, String, serviceInfo.description, false);
+    int32_t authform = 0;
+    READ_HELPER_RET(parcel, Int32, authform, false);
+    serviceInfo.authform = static_cast<DmAuthForm>(authform);
+    return true;
+}
+// zl online&offline
+bool IpcModelCodec::DecodeDmRegisterServiceState(MessageParcel &parcel, DmRegisterServiceState &dmRegisterServiceState)
+{
+    bool bRet = true;
+    std::string pkgName;
+    bRet = (bRet && parcel.ReadString(pkgName));
+    dmRegisterServiceState.pkgName = pkgName;
+
+    bRet = (bRet && parcel.ReadInt64(dmRegisterServiceState.serviceId));
+    bRet = (bRet && parcel.ReadInt32(dmRegisterServiceState.userId));
+    bRet = (bRet && parcel.ReadUint64(dmRegisterServiceState.tokenId));
+
+    return bRet;
+}
+// zl online&offline
+bool IpcModelCodec::EncodeDmRegisterServiceState(const DmRegisterServiceState &serviceInfo, MessageParcel &parcel)
+{
+    bool bRet = true;
+    std::string pkgNameStr(serviceInfo.pkgName);
+    bRet = (bRet && parcel.WriteString(pkgNameStr));
+    bRet = (bRet && parcel.WriteInt64(serviceInfo.serviceId));
+    bRet = (bRet && parcel.WriteInt32(serviceInfo.userId));
+    bRet = (bRet && parcel.WriteUint64(serviceInfo.tokenId));
+    return bRet;
+}
+
+// add by zqz
+bool IpcModelCodec::EncodeServiceSyncInfo(const ServiceSyncInfo &serviceSyncInfo, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteString(serviceSyncInfo.pkgName));
+    bRet = (bRet && parcel.WriteInt32(serviceSyncInfo.localUserId));
+    bRet = (bRet && parcel.WriteString(serviceSyncInfo.networkId));
+    bRet = (bRet && parcel.WriteInt64(serviceSyncInfo.serviceId));
+    bRet = (bRet && parcel.WriteInt32(serviceSyncInfo.callerUserId));
+    bRet = (bRet && parcel.WriteUint32(serviceSyncInfo.callerTokenId));
+    return bRet;
+}
+// add by zqz
+void IpcModelCodec::DecodeServiceSyncInfo(MessageParcel &parcel, ServiceSyncInfo &serviceSyncInfo)
+{
+    serviceSyncInfo.pkgName = parcel.ReadString();
+    serviceSyncInfo.localUserId = parcel.ReadInt32();
+    serviceSyncInfo.networkId = parcel.ReadString();
+    serviceSyncInfo.serviceId = parcel.ReadInt64();
+    serviceSyncInfo.callerUserId = parcel.ReadInt32();
+    serviceSyncInfo.callerTokenId = parcel.ReadUint32();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

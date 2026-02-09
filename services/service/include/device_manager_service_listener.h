@@ -90,9 +90,9 @@ public:
     void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
         const std::string &deviceName, int32_t code) override;
     void SetExistPkgName(const std::set<std::string> &pkgNameSet) override;
-    void OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,
-        const DiscoveryServiceInfo &discServiceInfo) override;
-    void OnServiceDiscoveryResult(const ProcessInfo &processInfo, int32_t discServiceId, int32_t reason) override;
+    void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) override;
+    void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
+        int32_t reason) override;
     void OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
         const DmDeviceInfo &info, const std::vector<int64_t> &serviceIds) override;
 
