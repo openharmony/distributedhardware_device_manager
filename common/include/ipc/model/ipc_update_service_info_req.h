@@ -29,18 +29,22 @@ public:
     {
         return regServiceInfo_;
     }
+
     void SetRegisterServiceInfo(const DmRegisterServiceInfo &regServiceInfo)
     {
         regServiceInfo_ = regServiceInfo;
     }
+
     int64_t GetServiceId() const
     {
         return serviceId_;
     }
+
     void SetServiceId(int64_t serviceId)
     {
         serviceId_ = serviceId;
     }
+
 private:
     DmRegisterServiceInfo regServiceInfo_;
     int64_t serviceId_;

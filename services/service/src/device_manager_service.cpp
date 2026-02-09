@@ -111,6 +111,7 @@ namespace {
     constexpr const char* LOCAL_FOREGROUND_USERID = "local_foreground_userId";
     constexpr const char* LOCAL_BACKGROUND_USERID = "local_background_userId";
     constexpr int32_t GENERATE_SERVICE_ID_RETRY_TIME = 3;
+    constexpr int32_t SERVICE_PUBLISHED_STATE = 1;
 }
 //LCOV_EXCL_START
 DeviceManagerService::~DeviceManagerService()
@@ -2298,7 +2299,7 @@ bool DeviceManagerService::CheckAccessControl(const DmAccessCaller &caller, cons
         LOGE("GetAccessUdidByNetworkId failed.");
         return false;
     }
-    return dmServiceImpl_->CheckAccessControl(caller, srcUdid, callee, sinkUdid); 
+    return dmServiceImpl_->CheckAccessControl(caller, srcUdid, callee, sinkUdid);
 }
 
 bool DeviceManagerService::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
@@ -3866,7 +3867,7 @@ void DeviceManagerService::GetNotifyRemoteUnBindAppWay(int32_t userId, int32_t t
             wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
         }
     }
-    
+
     if (!bleUdids.empty()) {
         isBleWay = true;
     } else {

@@ -18,19 +18,23 @@
 
 #include "dm_device_info.h"
 #include "ipc_req.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcRegisterServiceInfoReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcRegisterServiceInfoReq);
+
 public:
     DmRegisterServiceInfo GetRegisterServiceInfo() const
     {
         return regServiceInfo_;
     }
+
     void SetRegisterServiceInfo(const DmRegisterServiceInfo &regServiceInfo)
     {
         regServiceInfo_ = regServiceInfo;
     }
+
 private:
     DmRegisterServiceInfo regServiceInfo_;
 };

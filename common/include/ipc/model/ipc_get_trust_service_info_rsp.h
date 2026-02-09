@@ -12,13 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_DM_IPC_GET_TRUST_SERVICE_INFO_RSP_H
 #define OHOS_DM_IPC_GET_TRUST_SERVICE_INFO_RSP_H
- 
+
 #include "ipc_req.h"
 #include "dm_device_info.h"
- 
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcGetTrustServiceInfoRsp : public IpcRsp {
@@ -32,7 +32,6 @@ public:
     {
         serviceInfoVec_ = serviceInfoVec;
     }
- 
 private:
     std::vector<DmServiceInfo> serviceInfoVec_;
 };

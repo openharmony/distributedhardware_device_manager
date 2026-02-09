@@ -518,6 +518,7 @@ typedef enum DMPublishState {
     SERVICE_UNPUBLISHED_STATE = 0,
     SERVICE_PUBLISHED_STATE,
 } DMPublishState;
+
 typedef struct DmUserRemovedServiceInfo {
     int64_t localTokenId = 0;
     std::string localPkgName = "";
@@ -673,13 +674,13 @@ typedef enum DmServiceState {
      */
     SERVICE_INFO_CHANGED = 3,
 } DmServiceState;
- 
+
 typedef struct DmRegisterServiceState {
     int32_t userId = 0;
     uint64_t tokenId = 0;
     std::string pkgName = "";
     int64_t serviceId = 0;
- 
+
     bool operator==(const DmRegisterServiceState& other) const
     {
         return userId == other.userId &&
@@ -698,6 +699,7 @@ typedef struct ServiceStateBindParameter {
     int64_t serviceId = -1;
 } ServiceStateBindParameter;
 
+//add by zqz
 typedef struct ServiceSyncInfo {
     std::string pkgName;
     int32_t localUserId = 0;
@@ -705,13 +707,13 @@ typedef struct ServiceSyncInfo {
     int64_t serviceId = 0;
     int32_t callerUserId = 0;
     uint32_t callerTokenId = 0;
- 
+
     bool operator==(const ServiceSyncInfo &other) const
     {
         return (pkgName == other.pkgName) && (localUserId == other.localUserId) &&
             (networkId == other.networkId) && (serviceId == other.serviceId);
     }
- 
+
     bool operator<(const ServiceSyncInfo &other) const
     {
         return (pkgName < other.pkgName) ||

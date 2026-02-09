@@ -12,33 +12,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_DM_IPC_GET_PEER_SERVICEINFO_BY_SERVICEID_REQ_H
 #define OHOS_DM_IPC_GET_PEER_SERVICEINFO_BY_SERVICEID_REQ_H
- 
+
 #include "ipc_req.h"
- 
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcGetPeerServiceInfoByServiceIdReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcGetPeerServiceInfoByServiceIdReq);
 public:
+
     std::string GetNetworkId() const
     {
         return networkId_;
     }
+
     void SetNetworkId(const std::string &networkId)
     {
         networkId_ = networkId;
     }
+
     int64_t GetServiceId() const
     {
         return serviceId_;
     }
+
     void SetServiceId(int64_t serviceId)
     {
         serviceId_ = serviceId;
     }
+
 private:
     std::string networkId_;
     int64_t serviceId_;

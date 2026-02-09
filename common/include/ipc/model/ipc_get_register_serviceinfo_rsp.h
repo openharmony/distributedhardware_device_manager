@@ -12,23 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_DM_IPC_GET_REGISTER_SERVICEINFO_RSP_H
 #define OHOS_DM_IPC_GET_REGISTER_SERVICEINFO_RSP_H
- 
- 
+
+
 #include "ipc_rsp.h"
 #include "dm_device_info.h"
- 
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcGetRegisterServiceInfoRsp : public IpcRsp {
     DECLARE_IPC_MODEL(IpcGetRegisterServiceInfoRsp);
+
 public:
     std::vector<DmRegisterServiceInfo> GetRegisterServiceInfos() const
     {
         return regServiceInfos_;
     }
+
     void SetRegisterServiceInfos(const std::vector<DmRegisterServiceInfo> &regServiceInfos)
     {
         regServiceInfos_ = regServiceInfos;
