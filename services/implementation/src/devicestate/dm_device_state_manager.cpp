@@ -167,7 +167,7 @@ void DmDeviceStateManager::OnDeviceOffline(std::string deviceId, const bool isOn
     ProcessDeviceStateChange(DEVICE_STATE_OFFLINE, devInfo, processInfoVec, isOnline);
     softbusConnector_->ClearProcessInfo();
 }
-
+// this code line need delete: 172-205
 void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
     std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid, const bool isOnline)
 {
@@ -203,7 +203,45 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     }
 }
 
+void DmDeviceStateManager::HandleDeviceStatusChangeSrvBind(DmDeviceState devState, DmDeviceInfo &devInfo,
+    std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid, const bool isOnline)
+{
+    LOGI("Handle device status change: devState=%{public}d, deviceId=%{public}s.", devState,
+        GetAnonyString(devInfo.deviceId).c_str());
+    switch (devState) {
+        case DEVICE_STATE_ONLINE:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+            RegisterOffLineTimer(devInfo);
+#endif
+            SaveOnlineDeviceInfo(devInfo);
+            // need implement in the future
+            // DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
+            ProcessDeviceStateChange(devState, devInfo, processInfoVec, isOnline);
+            break;
+        case DEVICE_STATE_OFFLINE:
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+            StartOffLineTimer(peerUdid);
+#endif
+            DeleteOfflineDeviceInfo(devInfo);
+            if (softbusConnector_ != nullptr) {
+                std::string udid;
+                softbusConnector_->GetUdidByNetworkId(devInfo.networkId, udid);
+                softbusConnector_->EraseUdidFromMap(udid);
+            }
+            ProcessDeviceStateChange(devState, devInfo, processInfoVec, isOnline);
+            break;
+        case DEVICE_INFO_CHANGED:
+            ChangeDeviceInfo(devInfo);
+            ProcessDeviceStateChange(devState, devInfo, processInfoVec, isOnline);
+            break;
+        default:
+            LOGE("HandleDeviceStatusChange error, unknown device state = %{public}d", devState);
+            break;
+    }
+}
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+// this code line need delete: 246-282
 void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
     std::vector<ProcessInfo> &processInfoVec, const bool isOnline)
 {
@@ -225,6 +263,36 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
         for (const auto &serviceInfo : serviceInfos) {
             remoteServiceIds.insert(serviceInfo.serviceId);
         }
+    }
+    LOGI("ProcessDeviceStateChange, remoteServiceIds size: %{public}zu", remoteServiceIds.size());
+
+    CHECK_NULL_VOID(listener_);
+    for (const auto &item : processInfoVec) {
+        if (!item.pkgName.empty()) {
+            LOGI("ProcessDeviceStateChange, pkgName = %{public}s", item.pkgName.c_str());
+            if (!remoteServiceIds.empty() && devState == DEVICE_STATE_ONLINE) {
+                std::vector<int64_t> remoteServiceIdVec(remoteServiceIds.begin(), remoteServiceIds.end());
+                listener_->OnDeviceStateChange(item, devState, devInfo, remoteServiceIdVec);
+            } else {
+                listener_->OnDeviceStateChange(item, devState, devInfo, isOnline);
+            }
+        }
+    }
+}
+
+void DmDeviceStateManager::ProcessDeviceStateChangeSrvBind(const DmDeviceState devState, const DmDeviceInfo &devInfo,
+    std::vector<ProcessInfo> &processInfoVec, const bool isOnline)
+{
+    LOGI("begin, devState = %{public}d networkId: %{public}s.", devState, GetAnonyString(devInfo.networkId).c_str());
+    std::unordered_set<int64_t> remoteTokenIds;
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid(localDeviceId);
+    CHECK_NULL_VOID(softbusConnector_);
+    std::string udid = softbusConnector_->GetDeviceUdidByUdidHash(devInfo.deviceId);
+    DeviceProfileConnector::GetInstance().GetRemoteTokenIds(localUdid, udid, remoteTokenIds);
+    std::unordered_set<int64_t> remoteServiceIds;
+    for (const auto &item : remoteTokenIds) {
     }
     LOGI("ProcessDeviceStateChange, remoteServiceIds size: %{public}zu", remoteServiceIds.size());
 

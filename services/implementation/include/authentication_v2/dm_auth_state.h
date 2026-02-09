@@ -160,10 +160,18 @@ public:
     void SetAclInfo(std::shared_ptr<DmAuthContext> context);
     void FilterProfilesByContext(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
         std::shared_ptr<DmAuthContext> context);
+    // this code line need delete: 164
     void UpdateCredInfo(std::shared_ptr<DmAuthContext> context);
+    void UpdateCredInfoSrvBind(std::shared_ptr<DmAuthContext> context);
+    // this code line need delete: 167
     bool IsNeedBind(std::shared_ptr<DmAuthContext> context);
+    bool IsNeedBindSrvBind(std::shared_ptr<DmAuthContext> context);
+    // this code line need delete: 170
     bool IsNeedAgreeCredential(std::shared_ptr<DmAuthContext> context);
+    bool IsNeedAgreeCredentialSrvBind(std::shared_ptr<DmAuthContext> context);
+    // this code line need delete: 173
     bool IsNeedAuth(std::shared_ptr<DmAuthContext> context);
+    bool IsNeedAuthSrvBind(std::shared_ptr<DmAuthContext> context);
     bool GetSessionKey(std::shared_ptr<DmAuthContext> context);
     bool IsAclHasCredential(const DistributedDeviceProfile::AccessControlProfile &profile,
         const std::string &credInfoJson, std::string &credId);
@@ -195,21 +203,35 @@ public:
         const DistributedDeviceProfile::AccessControlProfile &profile, const std::string &localUdid);
 protected:
     bool NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context);
+    // this code line need delete: 207
     bool NeedAgreeAcl(std::shared_ptr<DmAuthContext> context);
+    bool NeedAgreeAclSrvBind(std::shared_ptr<DmAuthContext> context);
+    // this code line need delete: 210
     bool ProxyNeedAgreeAcl(std::shared_ptr<DmAuthContext> context);
+    bool ProxyNeedAgreeAclSrvBind(std::shared_ptr<DmAuthContext> context);
     bool GetReuseSkId(std::shared_ptr<DmAuthContext> context, int32_t &skId);
+    // this code line need delete: 214
     void GetReuseACL(std::shared_ptr<DmAuthContext> context, DistributedDeviceProfile::AccessControlProfile &profile);
+    void GetReuseACLSrvBind(std::shared_ptr<DmAuthContext> context,
+        DistributedDeviceProfile::AccessControlProfile &profile);
     bool ValidateCredInfoStructure(const JsonItemObject &credInfo);
     uint32_t GetCredType(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo);
+    // this code line need delete: 220-221
     int32_t GetProxyCredInfo(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo,
+        const std::vector<std::string> &tokenIdHashList);
+    int32_t GetProxyCredInfoSrvBind(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo,
         const std::vector<std::string> &tokenIdHashList);
     uint32_t GetCredentialType(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo);
     bool HaveSameTokenId(std::shared_ptr<DmAuthContext> context, const std::vector<std::string> &tokenIdHashList);
+    // this code line need delete: 227
     void SetProcessInfo(std::shared_ptr<DmAuthContext> context);
+    void SetProcessInfoSrvBind(std::shared_ptr<DmAuthContext> context);
     bool IsMatchCredentialAndP2pACL(JsonObject &credInfo, std::string &credId,
         const DistributedDeviceProfile::AccessControlProfile &profile);
     DmAuthScope GetAuthorizedScope(int32_t bindLevel);
+    // this code line need delete: 233
     void BindFail(std::shared_ptr<DmAuthContext> context);
+    void BindFailSrvBind(std::shared_ptr<DmAuthContext> context);
     void HandlePinResultAndCallback(std::shared_ptr<DmAuthContext> context, const std::string &pkgName);
     void DeleteAcl(std::shared_ptr<DmAuthContext> context, bool isDelLnnAcl,
         std::vector<std::pair<int64_t, int64_t>> &tokenIds);
@@ -219,7 +241,11 @@ protected:
         JsonObject &credInfo);
     void GetP2PCredInfoByUserId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
         JsonObject &credInfo);
+    // this code line need delete: 245-247
     void CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &targetProfiles,
+        JsonObject &credInfo, const std::string &localUdid);
+    void CompatibleAclAndCredInfoSrvBind(std::shared_ptr<DmAuthContext> context, const int32_t userId,
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &targetProfiles,
         JsonObject &credInfo, const std::string &localUdid);
 };

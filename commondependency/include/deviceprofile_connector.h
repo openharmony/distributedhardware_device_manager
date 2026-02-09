@@ -112,7 +112,6 @@ typedef struct DmAclIdParam {
     std::string pkgName;
     std::unordered_set<int64_t> tokenIds;
 } DmAclIdParam;
-
 // this code line need delete: compile dependence start
 typedef struct DmLocalUserRemovedInfo {
     std::string localUdid = "";
@@ -433,7 +432,7 @@ public:
     DM_EXPORT int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-	// this code line need delete:compile dependence end
+    // this code line need delete:compile dependence end
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,

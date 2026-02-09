@@ -246,7 +246,7 @@ bool DmAuthState::NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context)
 
     return true;
 }
-
+// this code line need delete:250-283
 bool DmAuthState::NeedAgreeAcl(std::shared_ptr<DmAuthContext> context)
 {
     if (context == nullptr) {
@@ -282,6 +282,42 @@ bool DmAuthState::NeedAgreeAcl(std::shared_ptr<DmAuthContext> context)
     return ProxyNeedAgreeAcl(context);
 }
 
+bool DmAuthState::NeedAgreeAclSrvBind(std::shared_ptr<DmAuthContext> context)
+{
+    if (context == nullptr) {
+        return true;
+    }
+    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    if (context->direction == DM_AUTH_SOURCE) {
+        if (context->accesser.isUserLevelAuthed) {
+            LOGI("accesser user level authed");
+            return false;
+        }
+        if (!context->IsProxyBind || targetList.empty()) {
+            LOGI("accesser is authed");
+            return !context->accesser.isAuthed;
+        }
+        if (context->IsCallingProxyAsSubject && !context->accesser.isAuthed) {
+            LOGI("accesser is not authed");
+            return true;
+        }
+        return ProxyNeedAgreeAcl(context);
+    }
+    if (context->accessee.isUserLevelAuthed) {
+        LOGI("accessee user level authed");
+        return false;
+    }
+    if (!context->IsProxyBind || targetList.empty()) {
+        LOGI("accessee is authed");
+        return !context->accessee.isAuthed;
+    }
+    if (context->IsCallingProxyAsSubject && !context->accessee.isAuthed) {
+        LOGI("accessee is not authed");
+        return true;
+    }
+    return ProxyNeedAgreeAcl(context);
+}
+// this code line need delete: 321-341
 bool DmAuthState::ProxyNeedAgreeAcl(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
@@ -297,6 +333,29 @@ bool DmAuthState::ProxyNeedAgreeAcl(std::shared_ptr<DmAuthContext> context)
         return false;
     }
     for (const auto &app : context->subjectProxyOnes) {
+        if (!app.proxyAccessee.isAuthed || app.IsNeedSetProxyRelationShip) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool DmAuthState::ProxyNeedAgreeAclSrvBind(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    if (!context->IsProxyBind || targetList.empty()) {
+        return false;
+    }
+    if (context->direction == DM_AUTH_SOURCE) {
+        for (const auto &app : targetList) {
+            if (!app.proxyAccesser.isAuthed || app.IsNeedSetProxyRelationShip) {
+                return true;
+            }
+        }
+        return false;
+    }
+    for (const auto &app : targetList) {
         if (!app.proxyAccessee.isAuthed || app.IsNeedSetProxyRelationShip) {
             return true;
         }
@@ -336,7 +395,7 @@ bool DmAuthState::GetReuseSkId(std::shared_ptr<DmAuthContext> context, int32_t &
     }
     return false;
 }
-
+// this code line need delete: 399-434
 void DmAuthState::GetReuseACL(std::shared_ptr<DmAuthContext> context,
     DistributedDeviceProfile::AccessControlProfile &profile)
 {
@@ -359,6 +418,44 @@ void DmAuthState::GetReuseACL(std::shared_ptr<DmAuthContext> context,
         }
     }
     for (auto &app : context->subjectProxyOnes) {
+        DmProxyAccess &proxyAccess = context->direction == DM_AUTH_SOURCE ? app.proxyAccesser : app.proxyAccessee;
+        JsonObject aclList;
+        if (!proxyAccess.aclTypeList.empty()) {
+            aclList.Parse(proxyAccess.aclTypeList);
+        }
+        if (!aclList.IsDiscarded() && aclList.Contains("pointTopointAcl") &&
+            proxyAccess.aclProfiles.find(DM_POINT_TO_POINT) != proxyAccess.aclProfiles.end() &&
+            !proxyAccess.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeCredentialIdStr().empty() &&
+            !proxyAccess.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserCredentialIdStr().empty()) {
+            profile = proxyAccess.aclProfiles[DM_POINT_TO_POINT];
+            return;
+        }
+    }
+}
+
+void DmAuthState::GetReuseACLSrvBind(std::shared_ptr<DmAuthContext> context,
+    DistributedDeviceProfile::AccessControlProfile &profile)
+{
+    if (context == nullptr) {
+        return;
+    }
+    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    if (!context->IsProxyBind || targetList.empty()) {
+        return;
+    }
+    DmAccess &access = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
+    if (!access.aclTypeList.empty()) {
+        JsonObject aclTypeListJson;
+        aclTypeListJson.Parse(access.aclTypeList);
+        if (!aclTypeListJson.IsDiscarded() && aclTypeListJson.Contains("pointTopointAcl") &&
+            access.aclProfiles.find(DM_POINT_TO_POINT) != access.aclProfiles.end() &&
+            !access.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeCredentialIdStr().empty() &&
+            !access.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserCredentialIdStr().empty()) {
+            profile = access.aclProfiles[DM_POINT_TO_POINT];
+            return;
+        }
+    }
+    for (auto &app : targetList) {
         DmProxyAccess &proxyAccess = context->direction == DM_AUTH_SOURCE ? app.proxyAccesser : app.proxyAccessee;
         JsonObject aclList;
         if (!proxyAccess.aclTypeList.empty()) {
@@ -484,7 +581,7 @@ uint32_t DmAuthState::GetCredType(std::shared_ptr<DmAuthContext> context, const 
     }
     return DM_INVALIED_TYPE;
 }
-
+// this code line need delete: 585-620
 int32_t DmAuthState::GetProxyCredInfo(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo,
     const std::vector<std::string> &tokenIdHashList)
 {
@@ -499,6 +596,44 @@ int32_t DmAuthState::GetProxyCredInfo(std::shared_ptr<DmAuthContext> context, co
         return static_cast<int32_t>(DM_INVALIED_TYPE);
     }
     for (auto &app : context->subjectProxyOnes) {
+        if (std::find(tokenIdHashList.begin(), tokenIdHashList.end(), app.proxyAccesser.tokenIdHash)
+            != tokenIdHashList.end() &&
+            std::find(tokenIdHashList.begin(), tokenIdHashList.end(), app.proxyAccessee.tokenIdHash)
+            != tokenIdHashList.end()) {
+            JsonObject appCredInfo(credInfo.Dump());
+            appCredInfo[FILED_CRED_TYPE] = DM_POINT_TO_POINT;
+            JsonObject credInfoJson;
+            std::string credInfoJsonStr = context->direction == DM_AUTH_SOURCE ? app.proxyAccesser.credInfoJson :
+                app.proxyAccessee.credInfoJson;
+            if (!credInfoJsonStr.empty()) {
+                credInfoJson.Parse(credInfoJsonStr);
+            }
+            credInfoJson.Insert(credInfo[FILED_CRED_ID].Get<std::string>(), appCredInfo);
+            if (context->direction == DM_AUTH_SOURCE) {
+                app.proxyAccesser.credInfoJson = credInfoJson.Dump();
+            } else {
+                app.proxyAccessee.credInfoJson = credInfoJson.Dump();
+            }
+        }
+    }
+    return DM_OK;
+}
+
+int32_t DmAuthState::GetProxyCredInfoSrvBind(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo,
+    const std::vector<std::string> &tokenIdHashList)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind) {
+        return DM_OK;
+    }
+    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    if (targetList.empty()) {
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!credInfo.Contains(FILED_CRED_ID) || !credInfo[FILED_CRED_ID].IsString()) {
+        return static_cast<int32_t>(DM_INVALIED_TYPE);
+    }
+    for (auto &app : targetList) {
         if (std::find(tokenIdHashList.begin(), tokenIdHashList.end(), app.proxyAccesser.tokenIdHash)
             != tokenIdHashList.end() &&
             std::find(tokenIdHashList.begin(), tokenIdHashList.end(), app.proxyAccessee.tokenIdHash)
@@ -637,7 +772,7 @@ void DmAuthState::DeleteRedundancyAcl(std::shared_ptr<DmAuthContext> context, Js
         }
     }
 }
-
+// this code line need delete: 776-804
 void DmAuthState::SetProcessInfo(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_VOID(context);
@@ -662,6 +797,37 @@ void DmAuthState::SetProcessInfo(std::shared_ptr<DmAuthContext> context)
             processInfo.userId = localAccess.userId;
             processInfo.pkgName = context->direction == DmAuthDirection::DM_AUTH_SOURCE ? app.proxyAccesser.bundleName :
                 app.proxyAccessee.bundleName;
+            processInfoVec.push_back(processInfo);
+        }
+    }
+    context->softbusConnector->SetProcessInfoVec(processInfoVec);
+}
+
+void DmAuthState::SetProcessInfoSrvBind(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    DmAccess localAccess = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
+        context->accesser : context->accessee;
+    std::vector<ProcessInfo> processInfoVec;
+    ProcessInfo processInfo;
+    processInfo.userId = localAccess.userId;
+    uint32_t bindLevel = static_cast<uint32_t>(localAccess.bindLevel);
+    if (bindLevel == APP || bindLevel == SERVICE) {
+        processInfo.pkgName = localAccess.pkgName;
+    } else if (bindLevel == USER) {
+        processInfo.pkgName = std::string(DM_PKG_NAME);
+    } else {
+        LOGE("bindlevel error %{public}d.", bindLevel);
+        return;
+    }
+    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    processInfoVec.push_back(processInfo);
+    if (context->IsProxyBind && !targetList.empty()) {
+        for (auto &app : targetList) {
+            ProcessInfo processInfo;
+            processInfo.userId = localAccess.userId;
+            processInfo.pkgName = context->direction ==
+                DmAuthDirection::DM_AUTH_SOURCE ? app.proxyAccesser.bundleName : app.proxyAccessee.bundleName;
             processInfoVec.push_back(processInfo);
         }
     }
@@ -721,7 +887,7 @@ bool DmAuthState::IsAclHasCredential(const DistributedDeviceProfile::AccessContr
     }
     return false;
 }
-
+// this code line need delete: 891-915
 void DmAuthState::UpdateCredInfo(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_VOID(context);
@@ -748,6 +914,33 @@ void DmAuthState::UpdateCredInfo(std::shared_ptr<DmAuthContext> context)
         context->accesser.userId : context->accessee.userId, tokenIds);
 }
 
+void DmAuthState::UpdateCredInfoSrvBind(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    if (!context->IsProxyBind || targetList.empty() || context->reUseCreId.empty()) {
+        return;
+    }
+    std::vector<std::string> tokenIds;
+    bool isAuthed = context->direction == DM_AUTH_SOURCE ? context->accesser.isAuthed : context->accessee.isAuthed;
+    if (context->IsCallingProxyAsSubject && !isAuthed) {
+        tokenIds.push_back(std::to_string(context->accesser.tokenId));
+        tokenIds.push_back(std::to_string(context->accessee.tokenId));
+    }
+    for (auto &app : targetList) {
+        if (context->direction == DM_AUTH_SOURCE ? app.proxyAccesser.isAuthed : app.proxyAccessee.isAuthed) {
+            continue;
+        }
+        tokenIds.push_back(std::to_string(app.proxyAccesser.tokenId));
+        tokenIds.push_back(std::to_string(app.proxyAccessee.tokenId));
+    }
+    if (tokenIds.empty()) {
+        return;
+    }
+    context->hiChainAuthConnector->AddTokensToCredential(context->reUseCreId, context->direction == DM_AUTH_SOURCE ?
+        context->accesser.userId : context->accessee.userId, tokenIds);
+}
+// this code line need delete: 944-968
 bool DmAuthState::IsNeedBind(std::shared_ptr<DmAuthContext> context)
 {
     if (context == nullptr) {
@@ -774,6 +967,33 @@ bool DmAuthState::IsNeedBind(std::shared_ptr<DmAuthContext> context)
     return false;
 }
 
+bool DmAuthState::IsNeedBindSrvBind(std::shared_ptr<DmAuthContext> context)
+{
+    if (context == nullptr) {
+        return true;
+    }
+    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    if (!context->IsProxyBind || targetList.empty()) {
+        LOGI("no proxy");
+        return context->needBind;
+    }
+    if (context->authType == DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE) {
+        LOGI("authType is import pin code");
+        return true;
+    }
+    if (context->needBind && context->needAgreeCredential && context->IsCallingProxyAsSubject) {
+        LOGI("subject need bind");
+        return context->needBind;
+    }
+    for (const auto &app : targetList) {
+        if (app.needBind || app.IsNeedSetProxyRelationShip) {
+            LOGI("proxy need bind");
+            return true;
+        }
+    }
+    return false;
+}
+// this code line need delete: 997-1017
 bool DmAuthState::IsNeedAgreeCredential(std::shared_ptr<DmAuthContext> context)
 {
     if (context == nullptr) {
@@ -796,6 +1016,29 @@ bool DmAuthState::IsNeedAgreeCredential(std::shared_ptr<DmAuthContext> context)
     return true;
 }
 
+bool DmAuthState::IsNeedAgreeCredentialSrvBind(std::shared_ptr<DmAuthContext> context)
+{
+    if (context == nullptr) {
+        return true;
+    }
+    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    if (!context->IsProxyBind || targetList.empty()) {
+        LOGI("no proxy");
+        return context->needAgreeCredential;
+    }
+    if (!context->needAgreeCredential) {
+        LOGI("subject not need agree credential");
+        return context->needAgreeCredential;
+    }
+    for (const auto &app : targetList) {
+        if (!app.needAgreeCredential) {
+            LOGI("proxy not need agree credential");
+            return app.needAgreeCredential;
+        }
+    }
+    return true;
+}
+// this code line need delete: 1042-1062
 bool DmAuthState::IsNeedAuth(std::shared_ptr<DmAuthContext> context)
 {
     if (context == nullptr) {
@@ -810,6 +1053,29 @@ bool DmAuthState::IsNeedAuth(std::shared_ptr<DmAuthContext> context)
         return context->needAuth;
     }
     for (const auto &app : context->subjectProxyOnes) {
+        if (!app.needAuth) {
+            LOGI("proxy not need auth");
+            return app.needAuth;
+        }
+    }
+    return true;
+}
+
+bool DmAuthState::IsNeedAuthSrvBind(std::shared_ptr<DmAuthContext> context)
+{
+    if (context == nullptr) {
+        return true;
+    }
+    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    if (!context->IsProxyBind || targetList.empty()) {
+        LOGI("no proxy");
+        return context->needAuth;
+    }
+    if (!context->needAuth) {
+        LOGI("subject not need auth");
+        return context->needAuth;
+    }
+    for (const auto &app : targetList) {
         if (!app.needAuth) {
             LOGI("proxy not need auth");
             return app.needAuth;
@@ -918,11 +1184,20 @@ void DmAuthState::GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::s
 bool DmAuthState::IsMatchCredentialAndP2pACL(JsonObject &credInfo, std::string &credId,
     const DistributedDeviceProfile::AccessControlProfile &profile)
 {
+    LOGI("IsMatchCredentialAndP2pACL 1:%{public}d, 2:%{public}d, 3:%{public}d",
+        credInfo.Contains(credId),
+        credInfo[credId].Contains(FILED_AUTHORIZED_SCOPE),
+        credInfo[credId][FILED_AUTHORIZED_SCOPE].IsNumberInteger());
+    LOGI("credId %{public}s contain credInfoJson.", credId.c_str());
     if (!credInfo.Contains(credId) || !credInfo[credId].Contains(FILED_AUTHORIZED_SCOPE) ||
         !credInfo[credId][FILED_AUTHORIZED_SCOPE].IsNumberInteger()) {
         return false;
     }
     int32_t authorizedScope = credInfo[credId][FILED_AUTHORIZED_SCOPE].Get<int32_t>();
+    LOGI("IsMatchCredentialAndP2pACL authorizedScope:%{public}d, DM_AUTH_SCOPE_USER:%{public}d, "
+        "GetBindLevel:%{public}d",
+        authorizedScope,
+        static_cast<int32_t>(DM_AUTH_SCOPE_USER), profile.GetBindLevel());
     if (authorizedScope == static_cast<int32_t>(DM_AUTH_SCOPE_USER) && profile.GetBindLevel() == USER) {
         return true;
     }
@@ -932,7 +1207,7 @@ bool DmAuthState::IsMatchCredentialAndP2pACL(JsonObject &credInfo, std::string &
     }
     return false;
 }
-
+// this code line need delete: 1210-1251
 void DmAuthState::BindFail(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_VOID(context);
@@ -958,6 +1233,50 @@ void DmAuthState::BindFail(std::shared_ptr<DmAuthContext> context)
     }
     if (context->IsProxyBind && !context->subjectProxyOnes.empty()) {
         for (auto &app : context->subjectProxyOnes) {
+            DmProxyAccess &proxyAccess = context->direction == DM_AUTH_SOURCE ? app.proxyAccesser : app.proxyAccessee;
+            if (proxyAccess.isAuthed || proxyAccess.transmitSessionKeyId == 0) {
+                continue;
+            }
+            DeviceProfileConnector::GetInstance().DeleteSessionKey(access.userId, proxyAccess.transmitSessionKeyId);
+            tokenIds.push_back(std::make_pair(app.proxyAccesser.tokenId, app.proxyAccessee.tokenId));
+        }
+    }
+    if (access.isGeneratedTransmitThisBind && !access.transmitCredentialId.empty()) {
+        context->hiChainAuthConnector->DeleteCredential(access.userId, access.transmitCredentialId);
+    } else if (!context->reUseCreId.empty()) {
+        RemoveTokenIdsFromCredential(context, context->reUseCreId, tokenIds);
+    } else {
+        LOGE("no credential");
+    }
+    DeleteAcl(context, isDelLnnAcl, tokenIds);
+}
+
+void DmAuthState::BindFailSrvBind(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    CHECK_NULL_VOID(context->hiChainAuthConnector);
+    if (context->reason == DM_BIND_TRUST_TARGET) {
+        return;
+    }
+    bool isDelLnnAcl = false;
+    DmAccess &access = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
+    if (access.isGeneratedLnnCredThisBind) {
+        if (!access.lnnCredentialId.empty()) {
+            context->hiChainAuthConnector->DeleteCredential(access.userId, access.lnnCredentialId);
+        }
+        if (access.lnnSessionKeyId != 0) {
+            DeviceProfileConnector::GetInstance().DeleteSessionKey(access.userId, access.lnnSessionKeyId);
+        }
+        isDelLnnAcl = true;
+    }
+    std::vector<std::pair<int64_t, int64_t>> tokenIds;
+    if (!access.isAuthed && access.transmitSessionKeyId != 0) {
+        DeviceProfileConnector::GetInstance().DeleteSessionKey(access.userId, access.transmitSessionKeyId);
+        tokenIds.push_back(std::make_pair(context->accesser.tokenId, context->accessee.tokenId));
+    }
+    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    if (context->IsProxyBind && !targetList.empty()) {
+        for (auto &app : targetList) {
             DmProxyAccess &proxyAccess = context->direction == DM_AUTH_SOURCE ? app.proxyAccesser : app.proxyAccessee;
             if (proxyAccess.isAuthed || proxyAccess.transmitSessionKeyId == 0) {
                 continue;
@@ -1270,7 +1589,7 @@ void DmAuthState::GetP2PCredInfoByUserId(std::shared_ptr<DmAuthContext> context,
         LOGE("QueryCredentialInfo failed ret %{public}d.", ret);
     }
 }
-
+// this code line need delete: 1592-1628
 void DmAuthState::CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> context, const int32_t userId,
     const std::vector<DistributedDeviceProfile::AccessControlProfile> &targetProfiles,
     JsonObject &credInfo, const std::string &localUdid)
@@ -1301,6 +1620,52 @@ void DmAuthState::CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> contex
     for (const auto &profile : targetProfiles) {
         bool isAcer = profile.GetAccesser().GetAccesserDeviceId() == localUdid;
         bool isAcee = profile.GetAccessee().GetAccesseeDeviceId() == localUdid;
+        if ((!credInfo.Contains(profile.GetAccesser().GetAccesserCredentialIdStr()) && isAcer) ||
+            (!credInfo.Contains(profile.GetAccessee().GetAccesseeCredentialIdStr()) && isAcee)) {
+            LOGI("delete profileId: %{public}" PRId64"", profile.GetAccessControlId());
+            DeleteAclSKAndCredId(context, userId, profile, localUdid);
+        }
+    }
+}
+
+void DmAuthState::CompatibleAclAndCredInfoSrvBind(std::shared_ptr<DmAuthContext> context, const int32_t userId,
+    const std::vector<DistributedDeviceProfile::AccessControlProfile> &targetProfiles,
+    JsonObject &credInfo, const std::string &localUdid)
+{
+    LOGI("start");
+    CHECK_NULL_VOID(context);
+    for (const auto &item : credInfo.Items()) {
+        if (!item.Contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
+            continue;
+        }
+        std::string credId = item[FILED_CRED_ID].Get<std::string>();
+        LOGI("credId: %{public}s", GetAnonyString(credId).c_str());
+        bool isExistAcl = false;
+        for (const auto &profile : targetProfiles) {
+            bool isAcer = profile.GetAccesser().GetAccesserDeviceId() == localUdid;
+            bool isAcee = profile.GetAccessee().GetAccesseeDeviceId() == localUdid;
+            bool iscredr = profile.GetAccesser().GetAccesserCredentialIdStr() == credId;
+            bool iscrede = profile.GetAccessee().GetAccesseeCredentialIdStr() == credId;
+            LOGI("isAcer: %{public}d, isAcee: %{public}d, iscredr: %{public}d, iscrede: %{public}d",
+                isAcer, isAcee, iscredr, iscrede);
+            if ((credId == profile.GetAccesser().GetAccesserCredentialIdStr() && isAcer) ||
+                (credId == profile.GetAccessee().GetAccesseeCredentialIdStr() && isAcee)) {
+                isExistAcl = true;
+            }
+        }
+        if (!isExistAcl) {
+            LOGI("DeleteCredential credId:%{public}s", GetAnonyString(credId).c_str());
+            CHECK_NULL_VOID(context->hiChainAuthConnector);
+            context->hiChainAuthConnector->DeleteCredential(userId, credId);
+        }
+    }
+    for (const auto &profile : targetProfiles) {
+        bool isAcer = profile.GetAccesser().GetAccesserDeviceId() == localUdid;
+        bool isAcee = profile.GetAccessee().GetAccesseeDeviceId() == localUdid;
+        bool iscredInfor = credInfo.Contains(profile.GetAccesser().GetAccesserCredentialIdStr());
+        bool iscredInfoe = credInfo.Contains(profile.GetAccessee().GetAccesseeCredentialIdStr());
+        LOGI("isAcer: %{public}d, isAcee: %{public}d, iscredInfor: %{public}d, iscredInfoe: %{public}d",
+            isAcer, isAcee, iscredInfor, iscredInfoe);
         if ((!credInfo.Contains(profile.GetAccesser().GetAccesserCredentialIdStr()) && isAcer) ||
             (!credInfo.Contains(profile.GetAccessee().GetAccesseeCredentialIdStr()) && isAcee)) {
             LOGI("delete profileId: %{public}" PRId64"", profile.GetAccessControlId());

@@ -4167,6 +4167,7 @@ DM_EXPORT int32_t DeviceProfileConnector::HandleAccountCommonEvent(const std::st
     return DM_OK;
 }
 // this code line need delete:compile dependence end
+
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {
     return &DeviceProfileConnector::GetInstance();
