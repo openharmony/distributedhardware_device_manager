@@ -1483,7 +1483,7 @@ void DeviceManagerNotify::UnRegisterPinHolderCallback(const std::string &pkgName
     std::lock_guard<std::mutex> autoLock(lock_);
     pinHolderCallback_.erase(pkgName);
 }
-//this code line need delete: 1487 - 1507
+//this code line need delete: 1487 - 1559
 void DeviceManagerNotify::RegisterServiceDiscoveryCallback(int32_t discoveryServiceId,
     std::shared_ptr<ServiceDiscoveryCallback> callback)
 {
