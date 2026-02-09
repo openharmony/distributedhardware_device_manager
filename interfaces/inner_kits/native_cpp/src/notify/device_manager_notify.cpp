@@ -1577,8 +1577,7 @@ void DeviceManagerNotify::OnServiceOnline(const DmRegisterServiceState &register
         std::pair key = std::make_pair(pkgName, serviceId);
 
         auto iter = serviceStateCallback_.find(key);
-        if (iter == serviceStateCallback_.end())
-        {
+        if (iter == serviceStateCallback_.end()) {
             LOGW("OnServiceOnline: callback not found for key: %{public}s-%" PRId64,
                  pkgName.c_str(), serviceId);
             return;
@@ -1628,8 +1627,7 @@ void DeviceManagerNotify::OnServiceOffline(const DmRegisterServiceState &registe
         std::lock_guard<std::mutex> autoLock(lock_);
         std::pair key = std::make_pair(pkgName, serviceId);
         auto iter = serviceStateCallback_.find(key);
-        if (iter == serviceStateCallback_.end())
-        {
+        if (iter == serviceStateCallback_.end()) {
             LOGW("OnServiceOffline: callback not found for key: %{public}s-%" PRId64,
                  pkgName.c_str(), serviceId);
             return;
@@ -1654,7 +1652,7 @@ void DeviceManagerNotify::OnServiceOffline(const DmRegisterServiceState &registe
 }
 
 void DeviceManagerNotify::ServiceInfoOffline(const std::shared_ptr<ServiceInfoStateCallback> &callback,
-    const DmServiceInfo &dmServiceInfo) 
+    const DmServiceInfo &dmServiceInfo)
 {
     if (callback == nullptr) {
         LOGE("error,ServiceInfoOffline not register.");
@@ -1749,8 +1747,7 @@ void DeviceManagerNotify::OnServicePublishResult(const std::string &pkgName, int
             return;
         }
         tempCbk = iter->second;
-        if (publishResult != DM_OK)
-        {
+        if (publishResult != DM_OK) {
             servicePublishCallbacks_.erase(key);
             LOGI("OnServicePublishResult: Removed callback for serviceId");
         }
