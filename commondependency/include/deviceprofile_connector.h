@@ -112,6 +112,7 @@ typedef struct DmAclIdParam {
     std::string pkgName;
     std::unordered_set<int64_t> tokenIds;
 } DmAclIdParam;
+
 // this code line need delete: compile dependence start
 typedef struct DmLocalUserRemovedInfo {
     std::string localUdid = "";
@@ -394,7 +395,7 @@ public:
     DM_EXPORT std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> GetAuthOnceAclInfos(const std::string &peerUdid);
     DM_EXPORT bool AuthOnceAclIsActive(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId);
     DM_EXPORT bool CheckAccessControlProfileByTokenId(int32_t tokenId);
-	// this code line need delete:compile dependence start
+    // this code line need delete:compile dependence start
     DM_EXPORT int32_t GetServiceInfosByUdid(const std::string &udid,
         std::vector<DistributedDeviceProfile::ServiceInfo> &serviceInfos);
     DM_EXPORT int32_t GetServiceInfosByUdidAndUserId(const std::string &udid, int32_t userId,

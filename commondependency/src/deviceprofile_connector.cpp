@@ -4097,12 +4097,14 @@ DM_EXPORT void DeviceProfileConnector::GetPeerTokenIdForServiceProxyUnbind(int32
     (void)peerTokenId;
 }
 DM_EXPORT bool DeviceProfileConnector::DeleteAclForAccountLogOut(const DMAclQuadInfo &info,
-    const std::string &accountId, DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+    const std::string &accountId, DmOfflineParam &offlineParam,
+    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
 {
     return true;
 }
-DM_EXPORT bool DeviceProfileConnector::DeleteAclByActhash(const DMAclQuadInfo &info, const std::string &accountIdHash,
-    DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
+DM_EXPORT bool DeviceProfileConnector::DeleteAclByActhash(const DMAclQuadInfo &info,
+    const std::string &accountIdHash, DmOfflineParam &offlineParam,
+    std::vector<DmUserRemovedServiceInfo> &serviceInfos)
 {
     return true;
 }
@@ -4165,7 +4167,6 @@ DM_EXPORT int32_t DeviceProfileConnector::HandleAccountCommonEvent(const std::st
     return DM_OK;
 }
 // this code line need delete:compile dependence end
-
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {
     return &DeviceProfileConnector::GetInstance();
