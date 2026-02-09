@@ -3229,7 +3229,7 @@ int32_t DeviceManagerImpl::SyncCallbackToServiceForServiceInfo(DmCommonNotifyEve
     const std::string &pkgName, int64_t serviceId)
 {
     LOGD("Enter SyncCallbackToServiceForServiceInfo, dmCommonNotifyEvent: %{public}d, "
-         "pkgName: %{public}s, serviceId: %{public}" PRId64, 
+         "pkgName: %{public}s, serviceId: %{public}" PRId64,
          dmCommonNotifyEvent, pkgName.c_str(), serviceId);
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");

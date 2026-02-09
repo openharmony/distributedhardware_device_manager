@@ -1596,11 +1596,10 @@ void DeviceManagerNotify::OnServiceOnline(const DmRegisterServiceState &register
                  { ServiceInfoOnline(callbackInfo, serviceInfo); });
 #else
     LOGI("called the message is ServiceInfoOnline(callbackInfo, serviceInfo)");
-    std::thread serviceOnline([=]()
-                              { ServiceInfoOnline(callbackInfo, serviceInfo); });
+    std::thread serviceOnline([=]() { 
+        ServiceInfoOnline(callbackInfo, serviceInfo); });
     int32_t ret = pthread_setname_np(serviceOnline.native_handle(), SERVICE_ONLINE);
-    if (ret != DM_OK)
-    {
+    if (ret != DM_OK) {
         LOGE("DeviceManagerNotify serviceOnline setname failed.");
     }
     serviceOnline.detach();
@@ -1611,8 +1610,7 @@ void DeviceManagerNotify::OnServiceOnline(const DmRegisterServiceState &register
 void DeviceManagerNotify::ServiceInfoOnline(const std::shared_ptr<ServiceInfoStateCallback> &callback,
     const DmServiceInfo &dmServiceInfo)
 {
-    if (callback == nullptr)
-    {
+    if (callback == nullptr) {
         LOGE("error,ServiceInfoOnline not register.");
         return;
     }
@@ -1626,8 +1624,8 @@ void DeviceManagerNotify::OnServiceOffline(const DmRegisterServiceState &registe
 {
     std::string pkgName = registerServiceState.pkgName;
     int64_t serviceId = registerServiceState.serviceId;
-    LOGI("RegisterServiceStateCallback->DeviceManagerNotify::OnServiceOffline: pkgName=%{public}s, serviceId=%{public}" PRId64,
-         pkgName.c_str(), serviceId);
+    LOGI("RegisterServiceStateCallback->DeviceManagerNotify::OnServiceOffline: pkgName=%{public}s,
+        serviceId=%{public}" PRId64, pkgName.c_str(), serviceId);
     std::shared_ptr<ServiceInfoStateCallback> callbackInfo;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -1650,11 +1648,10 @@ void DeviceManagerNotify::OnServiceOffline(const DmRegisterServiceState &registe
     ffrt::submit([=]()
                  { ServiceInfoOffline(callbackInfo, serviceInfo); });
 #else
-    std::thread serviceOnline([=]()
-                              { ServiceInfoOffline(callbackInfo, serviceInfo); });
+    std::thread serviceOnline([=]() {
+        ServiceInfoOffline(callbackInfo, serviceInfo); });
     int32_t ret = pthread_setname_np(serviceOnline.native_handle(), SERVICE_ONLINE);
-    if (ret != DM_OK)
-    {
+    if (ret != DM_OK) {
         LOGE("DeviceManagerNotify serviceOnline setname failed.");
     }
     serviceOnline.detach();
@@ -1663,10 +1660,8 @@ void DeviceManagerNotify::OnServiceOffline(const DmRegisterServiceState &registe
 }
 // zl online&offline
 void DeviceManagerNotify::ServiceInfoOffline(const std::shared_ptr<ServiceInfoStateCallback> &callback,
-    const DmServiceInfo &dmServiceInfo)
-{
-    if (callback == nullptr)
-    {
+    const DmServiceInfo &dmServiceInfo) {
+    if (callback == nullptr) {
         LOGE("error,ServiceInfoOffline not register.");
         return;
     }
@@ -1680,8 +1675,7 @@ int32_t DeviceManagerNotify::RegisterServiceStateCallback(const std::string &pkg
 {
     LOGI("RegisterServiceStateCallback: pkgName=%{public}s, serviceId=%{public}" PRId64,
          pkgName.c_str(), serviceId);
-    if (pkgName.empty() || serviceId < 0 || callback == nullptr)
-    {
+    if (pkgName.empty() || serviceId < 0 || callback == nullptr) {
         LOGE("Invalid parameter.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1704,8 +1698,7 @@ int32_t DeviceManagerNotify::UnRegisterServiceStateCallback(const std::string &p
     }
     std::pair key = std::make_pair(pkgName, serviceId);
     std::lock_guard<std::mutex> autolock(lock_);
-    if (serviceStateCallback_.find(key) == serviceStateCallback_.end())
-    {
+    if (serviceStateCallback_.find(key) == serviceStateCallback_.end()) {
         LOGE("Invalid parameter.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1731,8 +1724,7 @@ void DeviceManagerNotify::RegisterLeaveLnnCallback(const std::string &networkId,
 void DeviceManagerNotify::RegisterServicePublishCallback(const std::string &pkgName,
     int64_t serviceId, std::shared_ptr<ServicePublishCallback> callback)
 {
-    if (callback == nullptr)
-    {
+    if (callback == nullptr) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
@@ -1770,8 +1762,7 @@ void DeviceManagerNotify::OnServicePublishResult(const std::string &pkgName, int
             LOGI("OnServicePublishResult: Removed callback for serviceId");
         }
     }
-    if (tempCbk == nullptr)
-    {
+    if (tempCbk == nullptr) {
         LOGE("OnServicePublishResult error, registered callback is nullptr");
         return;
     }
@@ -1782,8 +1773,7 @@ void DeviceManagerNotify::OnServicePublishResult(const std::string &pkgName, int
 void DeviceManagerNotify::RegisterServiceDiscoveryCallback(const std::string &pkgName, const std::string &serviceType,
     std::shared_ptr<ServiceDiscoveryCallback> callback)
 {
-    if (callback == nullptr)
-    {
+    if (callback == nullptr) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
@@ -1813,8 +1803,7 @@ void DeviceManagerNotify::OnServiceDiscoveryResult(const std::string &pkgName, c
         return;
     }
     tempCbk = iter->second;
-    if (tempCbk == nullptr)
-    {
+    if (tempCbk == nullptr) {
         LOGE("OnServiceFound error, registered service discovery callback is nullptr.");
         return;
     }
@@ -1834,8 +1823,7 @@ void DeviceManagerNotify::OnServiceFound(const std::string &pkgName, const DmSer
         return;
     }
     tempCbk = iter->second;
-    if (tempCbk == nullptr)
-    {
+    if (tempCbk == nullptr) {
         LOGE("OnServiceFound error, registered service discovery callback is nullptr.");
         return;
     }
@@ -1859,13 +1847,11 @@ void DeviceManagerNotify::RegisterSyncServiceInfoCallback(const std::string &pkg
     serviceSyncInfo.networkId = networkId;
     serviceSyncInfo.serviceId = serviceId;
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (syncServiceInfoCallback_.size() >= MAX_CONTAINER_SIZE)
-    {
+    if (syncServiceInfoCallback_.size() >= MAX_CONTAINER_SIZE) {
         LOGE("syncServiceInfoCallback_ map size is more than max size");
         return;
     }
-    if (syncServiceInfoCallback_.count(pkgName) == 0)
-    {
+    if (syncServiceInfoCallback_.count(pkgName) == 0) {
         CHECK_SIZE_VOID(syncServiceInfoCallback_);
         syncServiceInfoCallback_[pkgName] = std::map<ServiceSyncInfo, std::shared_ptr<SyncServiceInfoCallback>>();
     }
@@ -1887,11 +1873,9 @@ void DeviceManagerNotify::UnRegisterSyncServiceInfoCallback(const std::string &p
     serviceSyncInfo.networkId = networkId;
     serviceSyncInfo.serviceId = serviceId;
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (syncServiceInfoCallback_.count(pkgName) > 0)
-    {
+    if (syncServiceInfoCallback_.count(pkgName) > 0) {
         syncServiceInfoCallback_[pkgName].erase(serviceSyncInfo);
-        if (syncServiceInfoCallback_[pkgName].empty())
-        {
+        if (syncServiceInfoCallback_[pkgName].empty()) {
             syncServiceInfoCallback_.erase(pkgName);
         }
     }
@@ -1904,16 +1888,14 @@ void DeviceManagerNotify::OnSyncServiceInfoResult(const ServiceSyncInfo &service
     std::shared_ptr<SyncServiceInfoCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        if (syncServiceInfoCallback_.count(pkgName) == 0)
-        {
+        if (syncServiceInfoCallback_.count(pkgName) == 0) {
             LOGE("OnSyncServiceInfoResult error, registered callback is empty");
             return;
         }
 
         tempCbk = syncServiceInfoCallback_[pkgName][serviceSyncInfo];
     }
-    if (tempCbk == nullptr)
-    {
+    if (tempCbk == nullptr) {
         LOGE("OnSyncServiceInfoResult error, registered callback is nullptr");
         return;
     }
@@ -1927,12 +1909,10 @@ void DeviceManagerNotify::GetServiceCallBack(
 {
     std::lock_guard<std::mutex> autoLock(lock_);
     std::set<std::pair<std::string, int64_t>> statePkgnameSet;
-    for (auto it : serviceStateCallback_)
-    {
+    for (auto it : serviceStateCallback_) {
         statePkgnameSet.insert(it.first);
     }
-    if (statePkgnameSet.size() > 0)
-    {
+    if (statePkgnameSet.size() > 0) {
         serviceCallbackMap[DmCommonNotifyEvent::REG_SERVICE_STATE] = statePkgnameSet;
     }
 }

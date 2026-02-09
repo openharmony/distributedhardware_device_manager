@@ -2730,7 +2730,8 @@ ON_IPC_SET_REQUEST(GET_LOCAL_SERVICEINFO_BY_SERVICEID, std::shared_ptr<IpcReq> p
 ON_IPC_READ_RESPONSE(GET_LOCAL_SERVICEINFO_BY_SERVICEID, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
-    std::shared_ptr<IpcGetLocalServiceInfoExtRsp> pRsp = std::static_pointer_cast<IpcGetLocalServiceInfoExtRsp>(pBaseRsp);
+    std::shared_ptr<IpcGetLocalServiceInfoExtRsp> pRsp =
+        std::static_pointer_cast<IpcGetLocalServiceInfoExtRsp>(pBaseRsp);
  
     DmRegisterServiceInfo serviceInfo;
     IpcModelCodec::DecodeDmRegServiceInfo(reply, serviceInfo);
@@ -2790,7 +2791,8 @@ ON_IPC_SET_REQUEST(GET_REGISTER_SERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, 
 ON_IPC_READ_RESPONSE(GET_REGISTER_SERVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
-    std::shared_ptr<IpcGetRegisterServiceInfoRsp> pRsp = std::static_pointer_cast<IpcGetRegisterServiceInfoRsp>(pBaseRsp);
+    std::shared_ptr<IpcGetRegisterServiceInfoRsp> pRsp =
+        std::static_pointer_cast<IpcGetRegisterServiceInfoRsp>(pBaseRsp);
  
     int32_t regServiceInfoSize = reply.ReadInt32();
     if (regServiceInfoSize > 0 && regServiceInfoSize <= DM_MAX_TRUST_DEVICE_NUM) {

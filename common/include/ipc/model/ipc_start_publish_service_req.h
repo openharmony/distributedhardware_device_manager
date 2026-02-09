@@ -60,7 +60,7 @@ private:
 //this code line need delete: 61 - 61
     PublishServiceParam publishServiceParam_;
     DmPublishServiceParam publishDmServiceParam_;
- 	int64_t serviceId_ = 0;
+    int64_t serviceId_ = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

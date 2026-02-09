@@ -519,8 +519,7 @@ typedef enum DMPublishState
     SERVICE_UNPUBLISHED_STATE = 0,
     SERVICE_PUBLISHED_STATE,
 } DMPublishState;
-typedef struct DmUserRemovedServiceInfo
-{
+typedef struct DmUserRemovedServiceInfo {
     int64_t localTokenId = 0;
     std::string localPkgName = "";
     int32_t bindType = 0;
