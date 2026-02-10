@@ -3879,8 +3879,7 @@ void DeviceManagerService::HandleAccountLogoutEvent(int32_t userId, const std::s
         }
     }
 }
-
-//this code line need delete : ParseRelationShipChangeType, instead by ParseRelationShipChangeTypeSrvBind
+//delete start
 bool DeviceManagerService::ParseRelationShipChangeType(const RelationShipChangeMsg &relationShipMsg)
 {
     switch (relationShipMsg.type) {
@@ -3926,6 +3925,7 @@ bool DeviceManagerService::ParseRelationShipChangeType(const RelationShipChangeM
     }
     return true;
 }
+//delete end
 
 void DeviceManagerService::ProcessAccountLogout(const RelationShipChangeMsg &relationShipMsg)
 {
@@ -4009,7 +4009,7 @@ void DeviceManagerService::ProcessServiceInfoUnbind(const RelationShipChangeMsg 
 #endif
 }
 
-bool DeviceManagerService::ParseRelationShipChangeTypeSrvBind(const RelationShipChangeMsg &relationShipMsg)
+bool DeviceManagerService::ParseRelationShipChangeType(const RelationShipChangeMsg &relationShipMsg)
 {
     switch (relationShipMsg.type) {
         case RelationShipChangeType::ACCOUNT_LOGOUT:

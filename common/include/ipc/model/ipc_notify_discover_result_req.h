@@ -24,7 +24,6 @@ class IpcNotifyDiscoverResultReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcNotifyDiscoverResultReq);
 
 public:
-//this code line need delete:28 - 46
     /**
      * @tc.name: IpcNotifyDiscoverResultReq::GetSubscribeId
      * @tc.desc: Get SubscribeId of the Ipc Notify Discover Result Request
@@ -64,7 +63,7 @@ public:
     {
         result_ = result;
     }
-
+    //delete start
     std::string GetServiceType() const
     {
         return serviceType_;
@@ -74,11 +73,13 @@ public:
     {
         serviceType_ = serviceType;
     }
-
+    //delete end
 private:
     uint16_t subscribeId_ { 0 };
     int32_t result_ { 0 };
+    //delete start
     std::string serviceType_ = "";
+    //delete end
 };
 } // namespace DistributedHardware
 } // namespace OHOS

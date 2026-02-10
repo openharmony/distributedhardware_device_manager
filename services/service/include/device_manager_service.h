@@ -222,10 +222,10 @@ public:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void HandleCredentialDeleted(const char *credId, const char *credInfo);
     void HandleDeviceTrustedChange(const std::string &msg);
-    //this code line need delete : ParseRelationShipChangeType, instead by ParseRelationShipChangeTypeSrvBind
     bool ParseRelationShipChangeType(const RelationShipChangeMsg &relationShipMsg);
+    //delete start
     bool ParseRelationShipChangeTypeSrvBind(const RelationShipChangeMsg &relationShipMsg);
-    // Helper functions for ParseRelationShipChangeTypeSrvBind
+    //delete end
     void ProcessAccountLogout(const RelationShipChangeMsg &relationShipMsg);
     void ProcessDeviceUnBind(const RelationShipChangeMsg &relationShipMsg);
     void ProcessServiceUnBind(const RelationShipChangeMsg &relationShipMsg);

@@ -50,7 +50,7 @@ const char* TAG_SESSION_HEARTBEAT = "session_heartbeat";
 const char* TAG_BUNDLE_NAME = "bundleName";
 const char* TAG_TOKENID = "tokenId";
 const char* TAG_REMAINING_FROZEN_TIME = "remainingFrozenTime";
-
+const char* TAG_SERVICE_ID_EXT = "serviceId";
 //The following constant are provided only for HiLink.
 const char *EXT_PART = "ext_part";
 
@@ -164,9 +164,11 @@ const char* TITLE = "title";
 const char* DM_BUSINESS_ID = "business_id";
 const char* PARAM_KEY_IS_SERVICE_BIND = "isServiceBind";
 const char* BIND_CALLER_IS_SYSTEM_SA = "bindCallerIsSystemSA";
-const char* SERVICE_USER_DATA = "serviceUserData";
 // this code line need delete: compile dependence start
 const char* TAG_SERVICE_ID_EXT = "serviceId";
+// this code line need delete: compile dependence end
+
+const char* SERVICE_USER_DATA = "serviceUserData";
 const char* PARAM_KEY_LOCAL_USER_ID = "localUserId";
 const char* PARAM_KEY_IS_PROXY_QUERY = "isProxyQuery";
 const char* PARAM_KEY_PKG_NAME = "pkgName";
@@ -176,7 +178,6 @@ const char* PARAM_KEY_SUBJECT_SERVICE_ONES = "subjectServiceOnes";
 const char* PARAM_KEY_LOCAL_PKGNAME = "local_pkgName";
 const char* PARAM_KEY_LOCAL_TOKENID = "local_tokenId";
 const char* PARAM_KEY_PEER_SERVICEID = "peer_serviceId";
-// this code line need delete: compile dependence end
 
 // errCode map
 const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
