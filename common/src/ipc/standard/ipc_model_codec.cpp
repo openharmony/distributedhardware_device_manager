@@ -328,7 +328,7 @@ bool IpcModelCodec::EncodeDmDeviceIconInfo(const DmDeviceIconInfo &deviceIconInf
 
 bool IpcModelCodec::EncodeServiceIds(const std::vector<int64_t> &serviceIds, MessageParcel &parcel)
 {
-    int32_t size = serviceIds.size();
+    int32_t size = static_cast<int32_t>(serviceIds.size());
     if (!parcel.WriteInt32(size)) {
         return false;
     }

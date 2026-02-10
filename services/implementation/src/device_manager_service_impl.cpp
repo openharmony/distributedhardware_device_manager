@@ -3565,7 +3565,7 @@ int32_t DeviceManagerServiceImpl::DeleteAclExtraDataServiceId(int64_t serviceId,
             json.Erase(TAG_SERVICE_ID);
             item.SetExtraData(json.Dump());
             udid = item.GetAccessee().GetAccesseeDeviceId();
-            bindLevel = item.GetBindLevel();
+            bindLevel = static_cast<int32_t>(item.GetBindLevel());
             DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
         }
     }
