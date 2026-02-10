@@ -19,8 +19,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DeviceManager::~DeviceManager() = default;
-
 DeviceManager &DeviceManager::GetInstance()
 {
     return DeviceManagerImpl::GetInstance();

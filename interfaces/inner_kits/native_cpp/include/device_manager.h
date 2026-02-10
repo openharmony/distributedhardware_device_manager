@@ -25,8 +25,6 @@ class DeviceManager {
 public:
     DM_EXPORT static DeviceManager &GetInstance();
 
-    virtual ~DeviceManager();
-
 public:
     /**
      * @brief Initialize DeviceManager.
@@ -702,7 +700,7 @@ public:
         const std::string &networkId, int64_t serviceId,
         std::shared_ptr<SyncServiceInfoCallback> callback) { return 0; }
     virtual int32_t SyncAllServiceInfo(const std::string &pkgName, int32_t localUserId,
-        const std::string &networkId, std::shared_ptr<SyncServiceInfoCallback> callback);
+        const std::string &networkId, std::shared_ptr<SyncServiceInfoCallback> callback) = 0;
     virtual int32_t GetLocalServiceInfoByServiceId(int64_t serviceId, DmRegisterServiceInfo &serviceInfo) { return 0; }
     virtual int32_t GetTrustServiceInfo(const std::string &pkgName, const std::map<std::string, std::string> &param,
         std::vector<DmServiceInfo> &serviceInfo) { return 0; }
