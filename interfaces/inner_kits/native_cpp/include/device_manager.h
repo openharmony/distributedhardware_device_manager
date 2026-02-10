@@ -24,6 +24,7 @@ namespace DistributedHardware {
 class DeviceManager {
 public:
     DM_EXPORT static DeviceManager &GetInstance();
+    virtual ~DeviceManager();
 
 public:
     /**
@@ -653,6 +654,9 @@ public:
     virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
     virtual bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
     virtual bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
+    virtual int32_t GetUdidsByDeviceIds(const std::string &pkgName, const std::vector<std::string> deviceIdList,
+        std::map<std::string, std::string> &deviceIdToUdidMap) { return 0; }
+//this code line need delete: 659 - 661
     virtual int32_t GetIdentificationByDeviceIds(const std::string &pkgName,
         const std::vector<std::string> deviceIdList,
         std::map<std::string, std::string> &deviceIdentificationMap) { return 0; }
@@ -661,10 +665,12 @@ public:
     virtual int32_t StopServiceDiscovery(const std::string &pkgName, int32_t discoveryServiceId) = 0;
     virtual int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback) = 0;
+//this code line need delete: 665 - 665
     virtual int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId) = 0;
     virtual int32_t RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
         std::shared_ptr<ServiceInfoStateCallback> callback) = 0;
     virtual int32_t UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId) = 0;
+//this code line need delete: 670 - 674
     virtual int32_t StartPublishService(const std::string &pkgName, const PublishServiceParam &publishServiceParam,
         std::shared_ptr<ServicePublishCallback> callback, int64_t &serviceId) = 0;
     virtual int32_t StopPublishService(int64_t serviceId) = 0;
@@ -681,6 +687,32 @@ public:
     virtual int32_t UnRegisterAuthCodeInvalidCallback(const std::string &pkgName) { return 0; }
     virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
         int32_t pinExchangeType, DmAuthInfo &dmAuthInfo) { return 0; }
+    virtual int32_t RegisterServiceInfo(const DmRegisterServiceInfo &regServiceInfo, int64_t &serviceId) { return 0; }
+    virtual int32_t UnRegisterServiceInfo(int64_t serviceId) { return 0; };
+    virtual int32_t StartPublishService(const std::string &pkgName, int64_t serviceId,
+        const DmPublishServiceParam &publishServiceParam,
+        std::shared_ptr<ServicePublishCallback> callback) { return 0; };
+    virtual int32_t StopPublishService(const std::string &pkgName, int64_t serviceId) { return 0; };
+    virtual int32_t StartDiscoveryService(const std::string &pkgName, const DmDiscoveryServiceParam &disParam,
+        std::shared_ptr<ServiceDiscoveryCallback> callback) { return 0; }
+    virtual int32_t StopDiscoveryService(const std::string &pkgName,
+        const DmDiscoveryServiceParam &discParam) { return 0; }
+    virtual int32_t SyncServiceInfoByServiceId(const std::string &pkgName, int32_t localUserId,
+        const std::string &networkId, int64_t serviceId,
+        std::shared_ptr<SyncServiceInfoCallback> callback) { return 0; }
+    virtual int32_t SyncAllServiceInfo(const std::string &pkgName, int32_t localUserId,
+        const std::string &networkId, std::shared_ptr<SyncServiceInfoCallback> callback) = 0;
+    virtual int32_t GetLocalServiceInfoByServiceId(int64_t serviceId, DmRegisterServiceInfo &serviceInfo) { return 0; }
+    virtual int32_t GetTrustServiceInfo(const std::string &pkgName, const std::map<std::string, std::string> &param,
+        std::vector<DmServiceInfo> &serviceInfo) { return 0; }
+    virtual int32_t GetRegisterServiceInfo(const std::map<std::string, std::string> &param,
+        std::vector<DmRegisterServiceInfo> &regServiceInfos) { return 0; }
+    virtual int32_t GetPeerServiceInfoByServiceId(const std::string &networkId, int64_t serviceId,
+        DmRegisterServiceInfo &serviceInfo) { return 0; }
+    virtual int32_t UnbindServiceTarget(const std::string &pkgName,
+        const std::map<std::string, std::string> &unbindParam, const std::string &netWorkId,
+        int64_t serviceId) { return 0; }
+    virtual int32_t UpdateServiceInfo(int64_t serviceId, const DmRegisterServiceInfo &regServiceInfo) { return 0; }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

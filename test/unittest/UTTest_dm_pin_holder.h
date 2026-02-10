@@ -276,6 +276,8 @@ public:
     }
     virtual void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service)
     {
+        (void)processInfo;
+        (void)service;
     }
 
     virtual void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
@@ -322,6 +324,42 @@ public:
     virtual std::set<ProcessInfo> GetAlreadyOnlineProcess() override
     {
         return std::set<ProcessInfo> {};
+    }
+
+    virtual int32_t OnServiceInfoOnline(const DmRegisterServiceState &registerServiceState,
+        const DmServiceInfo &serviceInfo) override
+    {
+        (void)registerServiceState;
+        (void)serviceInfo;
+        return 0;
+    }
+
+    virtual int32_t OnServiceInfoOffline(const DmRegisterServiceState &registerServiceState,
+        const DmServiceInfo &serviceInfo) override
+    {
+        (void)registerServiceState;
+        (void)serviceInfo;
+        return 0;
+    }
+
+    virtual void OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
+        int32_t result, const std::string &content) override
+    {
+        (void)serviceSyncInfo;
+        (void)result;
+        (void)content;
+    }
+
+    virtual void OnServiceStateCallbackAdd(const ProcessInfo &processInfo,
+        const std::vector<DmServiceInfo> &serviceList) override
+    {
+        (void)processInfo;
+        (void)serviceList;
+    }
+
+    virtual void OnServiceStateOnlineResult(const ServiceStateBindParameter &bindParam) override
+    {
+        (void)bindParam;
     }
 };
 } // namespace DistributedHardware

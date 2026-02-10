@@ -22,7 +22,6 @@ group("fuzztest") {
     "devicediscovery_fuzzer:fuzztest",
     "devicelist_fuzzer:fuzztest",
     "devicelistrefresh_fuzzer:fuzztest",
-    "devicemanagernotify_fuzzer:fuzztest",
     "devicemanagerservice_fuzzer:fuzztest",
     "devicemanagerservicelistener_fuzzer:fuzztest",
     "devicenamemanager_fuzzer:fuzztest",

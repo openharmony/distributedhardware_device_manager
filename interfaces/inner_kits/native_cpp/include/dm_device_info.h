@@ -376,6 +376,7 @@ typedef enum {
     UN_REG_AUTH_CODE_INVALID = 10,
     REG_SERVICE_STATE = 11,
     UN_REG_SERVICE_STATE = 12,
+
     MAX = 13,
 } DmCommonNotifyEvent;
 
@@ -518,7 +519,6 @@ typedef enum DMPublishState {
     SERVICE_UNPUBLISHED_STATE = 0,
     SERVICE_PUBLISHED_STATE,
 } DMPublishState;
-
 typedef struct DmUserRemovedServiceInfo {
     int64_t localTokenId = 0;
     std::string localPkgName = "";
@@ -529,7 +529,8 @@ typedef struct DmUserRemovedServiceInfo {
     int32_t peerUserId = 0;
     std::map<int32_t, std::vector<int64_t>> bindTypeToServiceIdMap;
 } DmUserRemovedServiceInfo;
-//this code line need delete: 535-574
+
+//delete start
 typedef struct DiscoveryServiceParam {
     std::string serviceName;
     std::string serviceType;
@@ -569,6 +570,7 @@ typedef struct PublishServiceParam {
     DMSrvMediumType media;
     DmExchangeFreq freq;
 } PublishServiceParam;
+//delete end
 
 typedef struct DmAuthInfo {
     int32_t userId = 0;     /** User ID of the current caller */

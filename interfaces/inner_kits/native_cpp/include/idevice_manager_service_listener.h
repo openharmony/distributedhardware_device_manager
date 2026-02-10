@@ -20,7 +20,6 @@
 
 #include "dm_device_info.h"
 #include "dm_device_profile_info.h"
-
 namespace OHOS {
 namespace DistributedHardware {
 class IDeviceManagerServiceListener {
@@ -174,10 +173,9 @@ public:
     virtual void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
         const std::string &deviceName, int32_t code) = 0;
     virtual void SetExistPkgName(const std::set<std::string> &pkgNameSet) = 0;
-    virtual void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) = 0;
     virtual void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
         int32_t reason) = 0;
-
+    virtual void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) = 0;
     virtual std::string GetLocalDisplayDeviceName() = 0;
     virtual int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) = 0;
     virtual int32_t OpenAuthSessionWithPara(int64_t serviceId) = 0;
@@ -189,7 +187,16 @@ public:
     virtual void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId,
         int32_t retCode) {}
     virtual void OnAuthCodeInvalid(const std::string &pkgName) {}
+    virtual void OnServiceStateCallbackAdd(const ProcessInfo &processInfo,
+        const std::vector<DmServiceInfo> &serviceList) = 0;
+    virtual void OnServiceStateOnlineResult(const ServiceStateBindParameter &bindParam) = 0;
     virtual std::set<ProcessInfo> GetAlreadyOnlineProcess() = 0;
+    virtual int32_t OnServiceInfoOnline(const DmRegisterServiceState &registerServiceState,
+        const DmServiceInfo &serviceInfo) = 0;
+    virtual int32_t OnServiceInfoOffline(const DmRegisterServiceState &registerServiceState,
+        const DmServiceInfo &serviceInfo) = 0;
+    virtual void OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
+        int32_t result, const std::string &content) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

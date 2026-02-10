@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,10 +25,21 @@ class IpcGetLocalServiceInfoExtRsp : public IpcRsp {
     DECLARE_IPC_MODEL(IpcGetLocalServiceInfoExtRsp);
 
 public:
+    /**
+     * @tc.name: IpcGetLocalServiceInfoExtRsp::GetServiceInfo
+     * @tc.desc: Get service info
+     * @tc.type: FUNC
+     */
     const DmRegisterServiceInfo &GetServiceInfo() const
     {
         return serviceInfo_;
     }
+ 
+    /**
+     * @tc.name: IpcGetLocalServiceInfoExtRsp::SetServiceInfo
+     * @tc.desc: Set service info
+     * @tc.type: FUNC
+     */
     void SetServiceInfo(const DmRegisterServiceInfo &serviceInfo)
     {
         serviceInfo_ = serviceInfo;

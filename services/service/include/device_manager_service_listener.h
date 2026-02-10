@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -90,9 +90,10 @@ public:
     void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
         const std::string &deviceName, int32_t code) override;
     void SetExistPkgName(const std::set<std::string> &pkgNameSet) override;
-    void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) override;
+    //delete start
     void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
         int32_t reason) override;
+    void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) override;
     void OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
         const DmDeviceInfo &info, const std::vector<int64_t> &serviceIds) override;
 
@@ -103,7 +104,18 @@ public:
     void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
     void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode) override;
     void OnAuthCodeInvalid(const std::string &pkgName) override;
+    //delete start
     std::set<ProcessInfo> GetAlreadyOnlineProcess() override;
+    //delete end
+    int32_t OnServiceInfoOnline(const DmRegisterServiceState &registerServiceState,
+        const DmServiceInfo &serviceInfo) override;
+    int32_t OnServiceInfoOffline(const DmRegisterServiceState &registerServiceState,
+        const DmServiceInfo &serviceInfo) override;
+    void OnServiceStateCallbackAdd(const ProcessInfo &processInfo,
+        const std::vector<DmServiceInfo> &serviceList) override;
+    void OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
+        int32_t result, const std::string &content) override;
+    void OnServiceStateOnlineResult(const ServiceStateBindParameter &bindParam) override;
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
         const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
@@ -162,6 +174,8 @@ private:
     static std::unordered_set<std::string> highPriorityPkgNameSet_;
     static std::mutex actUnrelatedPkgNameLock_;
     static std::set<std::string> actUnrelatedPkgName_;
+    static std::mutex alreadyNotifyPkgNameServiceLock_;
+    static std::map<std::string, DmServiceInfo> alreadyOnlinePkgNameService_;
 #endif
 };
 } // namespace DistributedHardware

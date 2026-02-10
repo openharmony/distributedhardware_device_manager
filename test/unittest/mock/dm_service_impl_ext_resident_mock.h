@@ -53,6 +53,15 @@ public:
     MOCK_METHOD(void, HandleScreenLockEvent, (bool));
     MOCK_METHOD(int32_t, OpenAuthSessionWithPara, (const std::string &, int32_t, bool));
     MOCK_METHOD(void, HandleUserSwitchEvent, (int32_t, int32_t));
+    MOCK_METHOD(int32_t, StartServiceDiscovery, (const ProcessInfo &, const DiscoveryServiceParam &));
+    MOCK_METHOD(int32_t, StopServiceDiscovery, (int32_t));
+    MOCK_METHOD(int32_t, OpenAuthSessionWithPara, (int64_t));
+    MOCK_METHOD(int32_t, StartPublishService, (const ProcessInfo &, const PublishServiceParam &));
+    MOCK_METHOD(int32_t, StopPublishService, (int64_t));
+    MOCK_METHOD(bool, CheckBuildLink, (const DmSaCaller &, const DmSaCallee &, bool, bool));
+    MOCK_METHOD(int32_t, ImportAuthInfo, (const DmAuthInfo &));
+    MOCK_METHOD(int32_t, ExportAuthInfo, (DmAuthInfo &));
+    MOCK_METHOD(int32_t, InitSoftbusServer, ());
 };
 } // namespace DistributedHardware
 } // namespace OHOS

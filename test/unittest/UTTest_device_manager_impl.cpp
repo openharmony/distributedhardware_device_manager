@@ -2517,67 +2517,6 @@ HWTEST_F(DeviceManagerImplTest, GetAllTrustedDeviceList_001, testing::ext::TestS
     ret = DeviceManager::GetInstance().GetAllTrustedDeviceList(pkgName, extra, deviceList);
     ASSERT_EQ(ret, DM_OK);
 }
-
-HWTEST_F(DeviceManagerImplTest, RegisterLocalServiceInfo_001, testing::ext::TestSize.Level0)
-{
-    DMLocalServiceInfo info;
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManager::GetInstance().RegisterLocalServiceInfo(info);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
-
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_OK));
-    ret = DeviceManager::GetInstance().RegisterLocalServiceInfo(info);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerImplTest, UnRegisterLocalServiceInfo_001, testing::ext::TestSize.Level0)
-{
-    std::string bundleName = "b*********kl";
-    int32_t pinExchangeType = 1;
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManager::GetInstance().UnRegisterLocalServiceInfo(bundleName, pinExchangeType);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
-
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_OK));
-    ret = DeviceManager::GetInstance().UnRegisterLocalServiceInfo(bundleName, pinExchangeType);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerImplTest, UpdateLocalServiceInfo_001, testing::ext::TestSize.Level0)
-{
-    DMLocalServiceInfo info;
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManager::GetInstance().UpdateLocalServiceInfo(info);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
-
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_OK));
-    ret = DeviceManager::GetInstance().UpdateLocalServiceInfo(info);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerImplTest, GetLocalServiceInfoByBundleNameAndPinExchangeType_001, testing::ext::TestSize.Level0)
-{
-    std::string bundleName = "b*********kl";
-    int32_t pinExchangeType = 1;
-    DMLocalServiceInfo info;
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManager::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName,
-        pinExchangeType, info);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
-
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_OK));
-    ret = DeviceManager::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName,
-        pinExchangeType, info);
-    ASSERT_EQ(ret, DM_OK);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

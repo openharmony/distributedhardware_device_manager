@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -185,6 +185,8 @@ public:
     virtual ~ServiceDiscoveryCallback()
     {
     }
+//this code line need delete: 189 - 189
+    virtual void OnServiceFound(const DiscoveryServiceInfo &service) = 0;
     virtual void OnServiceFound(const DmServiceInfo &service) = 0;
     virtual void OnServiceDiscoveryResult(int32_t resReason) = 0;
 };
@@ -194,8 +196,12 @@ public:
     virtual ~ServiceInfoStateCallback()
     {
     }
+//this code line need delete: 200 - 201
+    virtual void OnServiceOnline(int64_t serviceId) = 0;
+    virtual void OnServiceOffline(int64_t serviceId) = 0;
     virtual void OnServiceOnline(const DmServiceInfo &serviceInfo) = 0;
     virtual void OnServiceOffline(const DmServiceInfo &serviceInfo) = 0;
+    virtual void OnServiceInfoChange(const DmServiceInfo &serviceInfo) = 0;
 };
 
 class ServicePublishCallback {

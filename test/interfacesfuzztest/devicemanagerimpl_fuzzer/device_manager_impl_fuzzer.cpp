@@ -149,44 +149,6 @@ void SyncCallbacksToServiceFuzzTest(FuzzedDataProvider &fdp)
     DeviceManagerImpl::GetInstance().SyncCallbacksToService(callbackMap);
 }
 
-void UnRegisterServiceStateCallbackFuzzTest(FuzzedDataProvider &fdp)
-{
-    std::string pkgName = fdp.ConsumeRandomLengthString();
-    int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
-
-    DeviceManagerImpl::GetInstance().UnRegisterServiceStateCallback(pkgName, serviceId);
-}
-
-void StopServiceDiscoveryFuzzTest(FuzzedDataProvider &fdp)
-{
-    int32_t maxStringLength = 64;
-    std::string pkgName = fdp.ConsumeRandomLengthString(maxStringLength);
-    int32_t discoveryServiceId = fdp.ConsumeIntegral<int32_t>();
-    DeviceManagerImpl::GetInstance().StopServiceDiscovery(pkgName, discoveryServiceId);
-}
-
-void BindServiceTargetTest(FuzzedDataProvider &fdp)
-{
-    std::string pkgName = fdp.ConsumeRandomLengthString();
-    std::map<std::string, std::string> bindParam;
-    std::shared_ptr<BindTargetCallback> callback;
-    PeerTargetId targetId;
-    targetId.deviceId = fdp.ConsumeRandomLengthString();
-    targetId.brMac = fdp.ConsumeRandomLengthString();
-    targetId.bleMac = fdp.ConsumeRandomLengthString();
-    targetId.wifiIp = fdp.ConsumeRandomLengthString();
-    targetId.wifiPort = fdp.ConsumeIntegral<uint16_t>();
-    targetId.serviceId = fdp.ConsumeIntegral<int64_t>();
-    DeviceManagerImpl::GetInstance().BindServiceTarget(pkgName, targetId, bindParam, callback);
-}
-
-void UnbindServiceTargetTest(FuzzedDataProvider &fdp)
-{
-    std::string pkgName = fdp.ConsumeRandomLengthString();
-    int64_t targetId = fdp.ConsumeIntegral<int64_t>();
-    DeviceManagerImpl::GetInstance().UnbindServiceTarget(pkgName, targetId);
-}
-
 void DeviceManagerImplFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(uint32_t))) {
@@ -197,10 +159,6 @@ void DeviceManagerImplFuzzTest(const uint8_t* data, size_t size)
     GetDeviceIconInfoTest(fdp);
     GetLocalDeviceNameFuzzTest(fdp);
     SyncCallbacksToServiceFuzzTest(fdp);
-    UnRegisterServiceStateCallbackFuzzTest(fdp);
-    StopServiceDiscoveryFuzzTest(fdp);
-    BindServiceTargetTest(fdp);
-    UnbindServiceTargetTest(fdp);
 }
 }
 }

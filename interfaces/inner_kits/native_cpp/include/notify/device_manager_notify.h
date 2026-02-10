@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -88,9 +88,14 @@ public:
         std::shared_ptr<SetRemoteDeviceNameCallback> callback);
     void OnSetRemoteDeviceNameResult(const std::string &pkgName, const std::string &deviceId, int32_t code);
     void UnRegisterPinHolderCallback(const std::string &pkgName);
+//this code line need delete: 92 - 93
     void RegisterServiceDiscoveryCallback(int32_t discoveryServiceId,
         std::shared_ptr<ServiceDiscoveryCallback> callback);
     void UnRegisterServiceDiscoveryCallback(int32_t discoveryServiceId);
+    //delete start
+    int32_t RegisterServiceStateCallback(const std::string &key, std::shared_ptr<ServiceInfoStateCallback> callback);
+    int32_t UnRegisterServiceStateCallback(const std::string &key);
+    //delete end
     int32_t RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
         std::shared_ptr<ServiceInfoStateCallback> callback);
     int32_t UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId);
@@ -100,15 +105,15 @@ public:
         int64_t serviceId, std::shared_ptr<ServicePublishCallback> callback);
     void UnRegisterServicePublishCallback(const std::string &pkgName, int64_t serviceId);
     void RegisterServiceDiscoveryCallback(const std::string &pkgName, const std::string &serviceType,
-        std::shared_ptr<ServiceDiscoveryCallback> callback);
+    std::shared_ptr<ServiceDiscoveryCallback> callback);
     void UnRegisterServiceDiscoveryCallback(const std::string &pkgName, const std::string &serviceType);
-    void RegisterLeaveLnnCallback(const std::string &networkId, std::shared_ptr<LeaveLNNCallback> callback);
-    void RegisterAuthCodeInvalidCallback(const std::string &pkgName, std::shared_ptr<AuthCodeInvalidCallback> cb);
-    void UnRegisterAuthCodeInvalidCallback(const std::string &pkgName);
     void RegisterSyncServiceInfoCallback(const std::string &pkgName, int32_t localUserId,
         const std::string &networkId, std::shared_ptr<SyncServiceInfoCallback> callback, int64_t serviceId = 0);
     void UnRegisterSyncServiceInfoCallback(const std::string &pkgName, int32_t localUserId,
         const std::string &networkId, int64_t serviceId = 0);
+    void RegisterLeaveLnnCallback(const std::string &networkId, std::shared_ptr<LeaveLNNCallback> callback);
+    void RegisterAuthCodeInvalidCallback(const std::string &pkgName, std::shared_ptr<AuthCodeInvalidCallback> cb);
+    void UnRegisterAuthCodeInvalidCallback(const std::string &pkgName);
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
     static void DeviceInfoOffline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -167,9 +172,15 @@ public:
         std::string content);
     std::shared_ptr<DiscoveryCallback> GetDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId);
     void GetCallBack(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap);
-//this code line need delete: 172 - 172
-    void OnServicePublishResult(int64_t serviceId, int32_t publishResult);
+    //delete start
+    void OnServiceFound(int32_t discoveryServiceId, const DiscoveryServiceInfo &service);
+    void OnServiceDiscoveryResult(int32_t discoveryServiceId, int32_t resReason);
+    //delete end
     void OnServiceDiscoveryResult(const std::string &pkgName, const std::string &serviceType, int32_t resReason);
+    void OnServiceOnline(const std::vector<int64_t> &serviceIds);
+    //delete start
+    void OnServicePublishResult(int64_t serviceId, int32_t publishResult);
+    //delete end
     void OnServicePublishResult(const std::string &pkgName, int64_t serviceId, int32_t publishResult);
     void OnLeaveLNNResult(const std::string &networkId, int32_t retCode);
     void OnAuthCodeInvalid(const std::string &pkgName);
@@ -206,14 +217,14 @@ private:
     std::map<std::string, std::shared_ptr<SetLocalDeviceNameCallback>> setLocalDeviceNameCallback_;
     std::map<std::string,
         std::map<std::string, std::shared_ptr<SetRemoteDeviceNameCallback>>> setRemoteDeviceNameCallback_;
-//this code line need delete: 211 - 213
+    //this code line need delete: 211 - 213
     std::map<int32_t, std::shared_ptr<ServiceDiscoveryCallback>> serviceDiscoveryCallbacks_;
-    // std::map<std::string, std::shared_ptr<ServiceInfoStateCallback>> serviceStateCallback_;
     std::map<int64_t, std::shared_ptr<ServicePublishCallback>> servicePublishCallback_;
     std::map<std::pair<std::string, int64_t>, std::shared_ptr<ServiceInfoStateCallback>> serviceStateCallback_;
     std::map<std::pair<std::string, int64_t>, std::shared_ptr<ServicePublishCallback>> servicePublishCallbacks_;
     std::map<std::pair<std::string, std::string>, std::shared_ptr<ServiceDiscoveryCallback>> discoveryServiceCallbacks_;
     std::map<std::string, std::map<ServiceSyncInfo, std::shared_ptr<SyncServiceInfoCallback>>> syncServiceInfoCallback_;
+
     std::map<std::string, std::shared_ptr<LeaveLNNCallback>> leaveLnnCallback_;
     std::map<std::string, std::shared_ptr<AuthCodeInvalidCallback>> authCodeInvalidCallback_;
 };

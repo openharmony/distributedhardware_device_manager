@@ -25,11 +25,10 @@
 #include "json_object.h"
 #include "local_service_info.h"
 #include "parameter.h"
+//this code line need delete: 29 - 29
 #include "service_info_profile_new.h"
-#include "trusted_device_info.h"
-// this code line need delete: compile dependence start
 #include "service_info.h"
-// this code line need delete: compile dependence end
+#include "trusted_device_info.h"
 
 enum AllowAuthType {
     ALLOW_AUTH_ONCE = 1,
@@ -193,14 +192,13 @@ public:
     virtual int32_t HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid) = 0;
     virtual int32_t HandleUserStop(int32_t stopUserId, const std::string &localUdid,
         const std::vector<std::string> &acceptEventUdids) = 0;
+//this code line need delete: 195 - 196
     virtual int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
     virtual int32_t GetAllAuthOnceAclInfos(std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> &aclInfos) = 0;
-    //this code line mock start
     virtual int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
-        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
-    //this code line mock end
+ 	    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
+ 	    std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
 };
 
 class DeviceProfileConnector : public IDeviceProfileConnector {
@@ -230,7 +228,7 @@ public:
     DM_EXPORT std::vector<int32_t> SyncAclByBindType(std::string pkgName,
         std::vector<int32_t> bindTypeVec, std::string localDeviceId, std::string targetDeviceId);
     int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm);
-
+//this code line need delete: 231 - 242
     DM_EXPORT bool DeleteAclForAccountLogOut(const DMAclQuadInfo &info, const std::string &accountId,
         DmOfflineParam &offlineParam);
     DM_EXPORT bool DeleteAclByActhash(const DMAclQuadInfo &info, const std::string &accountIdHash,
@@ -242,6 +240,16 @@ public:
         std::multimap<std::string, int32_t> &peerUserIdMap, DmOfflineParam &offlineParam);
     DM_EXPORT void DeleteAclForRemoteUserRemoved(std::string peerUdid,
         int32_t peerUserId, std::vector<int32_t> &userIds, DmOfflineParam &offlineParam);
+    DM_EXPORT bool DeleteAclByActhash(const DMAclQuadInfo &info, const std::string &accountIdHash,
+        DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    DM_EXPORT void CacheOfflineParam(const DmCacheOfflineInputParam &inputParam,
+        DmOfflineParam &offlineParam, bool &notifyOffline, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    DM_EXPORT void DeleteAclForUserRemoved(const DmLocalUserRemovedInfo &userRemovedInfo,
+        std::multimap<std::string, int32_t> &peerUserIdMap, DmOfflineParam &offlineParam,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    DM_EXPORT void DeleteAclForRemoteUserRemoved(
+        DmRemoteUserRemovedInfo &userRemovedInfo, DmOfflineParam &offlineParam,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     DM_EXPORT DmOfflineParam DeleteAccessControlList(const std::string &pkgName,
         const std::string &localDeviceId, const std::string &remoteDeviceId, int32_t bindLevel,
         const std::string &extra);
@@ -250,6 +258,7 @@ public:
         int32_t userId);
     DM_EXPORT DistributedDeviceProfile::AccessControlProfile GetAccessControlProfileByAccessControlId(
         int64_t accessControlId);
+    DM_EXPORT void DeleteAccessControlList(const std::string &udid);
     DM_EXPORT std::vector<std::pair<int64_t, int64_t>> GetAgentToProxyVecFromAclByUserId(
         const std::string &localDeviceId, const std::string &targetDeviceId, int32_t userId);
     DM_EXPORT bool CheckSrcDevIdInAclForDevBind(const std::string &pkgName,
@@ -284,6 +293,7 @@ public:
         int32_t tokenId, const std::string &localUdid, int32_t peerTokenId);
     DM_EXPORT void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
         const std::string &localUdid, int32_t localUserId, const std::string &localAccountId);
+//this code line need delete: 299 - 303
     DM_EXPORT int32_t GetServiceInfoProfileByServiceId(int64_t serviceId, ServiceInfoProfile &serviceInfoProfile);
     DM_EXPORT int32_t GetServiceInfoProfileByRegServiceId(int32_t regServiceId, ServiceInfoProfile &serviceInfoProfile);
     DM_EXPORT int32_t GetServiceInfoProfileByTokenId(int64_t tokenId, std::vector<ServiceInfoProfile> &serviceInfos);
@@ -305,6 +315,7 @@ public:
     DM_EXPORT void HandleUserSwitched(
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &activeProfiles,
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &inActiveProfiles);
+//this code line need delete: 321 - 322
     DM_EXPORT void HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds,
         const std::string &remoteUdid, const std::vector<int32_t> &localUserIds, std::string &localUdid);
     std::vector<ProcessInfo> GetOfflineProcessInfo(std::string &localUdid, const std::vector<int32_t> &localUserIds,
@@ -319,9 +330,14 @@ public:
         const std::string &peerAccountHash);
     DM_EXPORT std::multimap<std::string, int32_t> GetDeviceIdAndUserId(
         const std::string &localUdid, int32_t localUserId);
+//this code line need delete: 339 - 341
     DM_EXPORT void HandleSyncBackgroundUserIdEvent(
         const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &localUserIds, std::string &localUdid);
+    DM_EXPORT void HandleSyncBackgroundUserIdEvent(
+        const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
+        const std::vector<int32_t> &localUserIds, std::string &localUdid,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     DM_EXPORT int32_t DeleteSessionKey(int32_t userId, int32_t sessionKeyId);
     DM_EXPORT int32_t GetSessionKey(int32_t userId, int32_t sessionKeyId,
         std::vector<unsigned char> &sessionKeyArray);
@@ -376,8 +392,12 @@ public:
     DM_EXPORT void AclHashVecFromJson(const JsonItemObject &itemObject, std::vector<AclHashItem> &values);
     void DeleteCacheAcl(std::vector<int64_t> delAclIdVec,
         std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles);
+//this code line need delete: 400 - 402
     DM_EXPORT int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    DM_EXPORT int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     DM_EXPORT bool CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
     DM_EXPORT bool CheckSinkAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
@@ -399,7 +419,6 @@ public:
     DM_EXPORT std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> GetAuthOnceAclInfos(const std::string &peerUdid);
     DM_EXPORT bool AuthOnceAclIsActive(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId);
     DM_EXPORT bool CheckAccessControlProfileByTokenId(int32_t tokenId);
-    // this code line need delete:compile dependence start
     DM_EXPORT int32_t GetServiceInfosByUdid(const std::string &udid,
         std::vector<DistributedDeviceProfile::ServiceInfo> &serviceInfos);
     DM_EXPORT int32_t GetServiceInfosByUdidAndUserId(const std::string &udid, int32_t userId,
@@ -410,29 +429,13 @@ public:
     DM_EXPORT int32_t DeleteServiceInfo(const DistributedDeviceProfile::ServiceInfo &serviceInfo);
     DM_EXPORT void GetPeerTokenIdForServiceProxyUnbind(int32_t userId, uint64_t localTokenId,
         const std::string &peerUdid, int64_t serviceId, std::vector<uint64_t> &peerTokenId);
+//delete start
     DM_EXPORT bool DeleteAclForAccountLogOut(const DMAclQuadInfo &info, const std::string &accountId,
         DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    DM_EXPORT bool DeleteAclByActhash(const DMAclQuadInfo &info, const std::string &accountIdHash,
-        DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    DM_EXPORT void CacheOfflineParam(const DmCacheOfflineInputParam &inputParam,
-        DmOfflineParam &offlineParam, bool &notifyOffline, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    DM_EXPORT void DeleteAclForUserRemoved(const DmLocalUserRemovedInfo &userRemovedInfo,
-        std::multimap<std::string, int32_t> &peerUserIdMap, DmOfflineParam &offlineParam,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    DM_EXPORT void DeleteAclForRemoteUserRemoved(
-        DmRemoteUserRemovedInfo &userRemovedInfo, DmOfflineParam &offlineParam,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     DM_EXPORT void HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds,
         const std::string &remoteUdid, const std::vector<int32_t> &localUserIds, std::string &localUdid,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    DM_EXPORT void HandleSyncBackgroundUserIdEvent(
-        const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
-        const std::vector<int32_t> &localUserIds, std::string &localUdid,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    DM_EXPORT int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
-        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    // this code line need delete:compile dependence end
+//delete end
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,
@@ -476,6 +479,22 @@ private:
         const std::vector<int32_t> &remoteFrontUserIds);
     void SetProcessInfoPkgName(const DistributedDeviceProfile::AccessControlProfile &acl,
         std::vector<OHOS::DistributedHardware::ProcessInfo> &processInfoVec, bool isAccer);
+    bool TryUpdateStatusForForeground(DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds, bool &isActive);
+    bool ShouldActivateForForegroundSync(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &localUdid, const std::string &remoteUdid,
+        const std::vector<int32_t> &localUserIds, const std::vector<int32_t> &remoteUserIds,
+        bool &isAccesserLocal);
+    bool MatchAccountByHash(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DMAclQuadInfo &info, const std::string &accountIdHash, bool &isAccesserLocal);
+    void CacheOfflineParamInternal(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DMAclQuadInfo &info, const std::string &accountIdHash, DmOfflineParam &offlineParam,
+        bool &notifyOffline, std::vector<DmUserRemovedServiceInfo> *serviceInfos);
+    bool HandleAccountLogoutItem(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DMAclQuadInfo &info, const std::string &accountId, DmOfflineParam &offlineParam,
+        bool &notifyOffline, std::vector<DmUserRemovedServiceInfo> *serviceInfos);
+    bool BuildServiceInfoFromAccessee(const DistributedDeviceProfile::AccessControlProfile &profile,
+        DmUserRemovedServiceInfo &serviceInfo);
     bool CheckAclStatusNotMatch(const DistributedDeviceProfile::AccessControlProfile &profile,
         const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds,
         const std::vector<int32_t> &backgroundUserIds);
@@ -544,12 +563,15 @@ private:
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
     bool CheckExtWhiteList(const std::string &bundleName);
+//this code line need delete: 565 - 567
     void ConverToDmServiceInfoProfile(const DistributedDeviceProfile::ServiceInfoProfileNew &dpServiceInfo,
         ServiceInfoProfile &dmServiceInfo);
     bool MatchAccesseeByBothUserIdAndPeerUdid(const std::string &peerUdid, int32_t peerUserId,
         int32_t localUserId, const DistributedDeviceProfile::AccessControlProfile &aclProfile);
     bool MatchAccesserByBothUserIdAndPeerUdid(const std::string &peerUdid, int32_t peerUserId,
         int32_t localUserId, const DistributedDeviceProfile::AccessControlProfile &aclProfile);
+    bool HasServiceId(const DistributedDeviceProfile::AccessControlProfile &profile,
+        int64_t serviceId);
 };
 
 extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();

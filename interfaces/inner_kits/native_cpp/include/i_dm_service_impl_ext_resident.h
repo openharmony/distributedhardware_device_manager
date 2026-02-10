@@ -18,7 +18,9 @@
 
 #include "idevice_manager_service_listener.h"
 #include "isa_specification_verify.h"
-
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "service_info.h"
+#endif
 namespace OHOS {
 namespace DistributedHardware {
 class IDMServiceImplExtResident {
@@ -114,9 +116,11 @@ public:
     virtual void HandleScreenLockEvent(bool isLock) = 0;
     virtual int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) = 0;
     virtual void HandleUserSwitchEvent(int32_t currentUserId, int32_t beforeUserId) = 0;
+//this code line need delete: 118 - 119
     virtual int32_t StartServiceDiscovery(const ProcessInfo &processInfo, const DiscoveryServiceParam &discParam) = 0;
     virtual int32_t StopServiceDiscovery(int32_t discServiceId) = 0;
     virtual int32_t OpenAuthSessionWithPara(int64_t serviceId) = 0;
+//this code line need delete: 122 - 124
     virtual int32_t StartPublishService(const ProcessInfo &processInfo,
         const PublishServiceParam &publishServiceParam) = 0;
     virtual int32_t StopPublishService(int64_t serviceId) = 0;

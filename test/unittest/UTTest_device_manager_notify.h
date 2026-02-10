@@ -125,13 +125,6 @@ public:
     void OnBindResult(const PeerTargetId &targetId, int32_t result, int32_t status, std::string content) override {}
 };
 
-class ServicePublishCallbackTest : public ServicePublishCallback {
-public:
-    ServicePublishCallbackTest() = default;
-    virtual ~ServicePublishCallbackTest() = default;
-    void OnServicePublishResult(int64_t serviceId, int32_t reason) override {}
-};
-
 class AuthCodeInvalidCallbackTest : public AuthCodeInvalidCallback {
 public:
     virtual ~AuthCodeInvalidCallbackTest()
