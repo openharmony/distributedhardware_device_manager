@@ -654,8 +654,8 @@ public:
     virtual bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
     virtual bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
     virtual int32_t GetIdentificationByDeviceIds(const std::string &pkgName,
- 	        const std::vector<std::string> deviceIdList,
- 	        std::map<std::string, std::string> &deviceIdentificationMap) { return 0; }
+ 	    const std::vector<std::string> deviceIdList,
+ 	    std::map<std::string, std::string> &deviceIdentificationMap) { return 0; }
     virtual int32_t StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam,
         std::shared_ptr<ServiceDiscoveryCallback> callback) = 0;
     virtual int32_t StopServiceDiscovery(const std::string &pkgName, int32_t discoveryServiceId) = 0;
