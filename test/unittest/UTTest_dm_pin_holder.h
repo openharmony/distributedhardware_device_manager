@@ -276,6 +276,8 @@ public:
     }
     virtual void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service)
     {
+        (void)processInfo;
+        (void)service;
     }
 
     virtual void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
@@ -322,20 +324,6 @@ public:
     virtual std::set<ProcessInfo> GetAlreadyOnlineProcess() override
     {
         return std::set<ProcessInfo> {};
-    }
-
-    virtual void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
-        int32_t reason) override
-    {
-        (void)processInfo;
-        (void)serviceType;
-        (void)reason;
-    }
-
-    virtual void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) override
-    {
-        (void)processInfo;
-        (void)service;
     }
 
     virtual int32_t OnServiceInfoOnline(const DmRegisterServiceState &registerServiceState,

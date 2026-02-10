@@ -164,9 +164,6 @@ const char* TITLE = "title";
 const char* DM_BUSINESS_ID = "business_id";
 const char* PARAM_KEY_IS_SERVICE_BIND = "isServiceBind";
 const char* BIND_CALLER_IS_SYSTEM_SA = "bindCallerIsSystemSA";
-// this code line need delete: compile dependence start
-const char* TAG_SERVICE_ID_EXT = "serviceId";
-// this code line need delete: compile dependence end
 
 const char* SERVICE_USER_DATA = "serviceUserData";
 const char* PARAM_KEY_LOCAL_USER_ID = "localUserId";

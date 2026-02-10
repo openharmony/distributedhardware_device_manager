@@ -54,16 +54,6 @@ public:
         serviceType_ = serviceType;
     }
 
-    std::string GetServiceType() const
-    {
-        return serviceType_;
-    }
- 	 
- 	void SetServiceType(const std::string &serviceType)
-    {
-        serviceType_ = serviceType;
-    }
-
 private:
     int32_t discServiceId_ { 0 };
     int32_t result_ { 0 };

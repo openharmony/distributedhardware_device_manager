@@ -3879,53 +3879,6 @@ void DeviceManagerService::HandleAccountLogoutEvent(int32_t userId, const std::s
         }
     }
 }
-//delete start
-bool DeviceManagerService::ParseRelationShipChangeType(const RelationShipChangeMsg &relationShipMsg)
-{
-    switch (relationShipMsg.type) {
-        case RelationShipChangeType::ACCOUNT_LOGOUT:
-            dmServiceImpl_->HandleAccountLogoutEvent(relationShipMsg.userId, relationShipMsg.accountId,
-                relationShipMsg.peerUdid);
-            break;
-        case RelationShipChangeType::DEVICE_UNBIND:
-            dmServiceImpl_->HandleDevUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
-                static_cast<int32_t>(relationShipMsg.tokenId));
-            break;
-        case RelationShipChangeType::APP_UNBIND:
-            ParseAppUnBindRelationShip(relationShipMsg);
-            break;
-        case RelationShipChangeType::SERVICE_UNBIND:
-            dmServiceImpl_->HandleServiceUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
-                static_cast<int32_t>(relationShipMsg.tokenId));
-            break;
-        case RelationShipChangeType::SYNC_USERID:
-            if (relationShipMsg.isNewEvent) {
-                HandleCommonEventBroadCast(relationShipMsg.userIdInfos,
-                    relationShipMsg.peerUdid, relationShipMsg.syncUserIdFlag);
-            } else {
-                HandleUserIdsBroadCast(relationShipMsg.userIdInfos,
-                    relationShipMsg.peerUdid, relationShipMsg.syncUserIdFlag);
-            }
-            break;
-        case RelationShipChangeType::DEL_USER:
-            dmServiceImpl_->HandleRemoteUserRemoved(relationShipMsg.userId, relationShipMsg.peerUdid);
-            break;
-        case RelationShipChangeType::STOP_USER:
-            HandleUserStopBroadCast(relationShipMsg.userId, relationShipMsg.peerUdid);
-            break;
-        case RelationShipChangeType::SHARE_UNBIND:
-            HandleShareUnbindBroadCast(relationShipMsg.userId, relationShipMsg.credId);
-            break;
-        case RelationShipChangeType::APP_UNINSTALL:
-            ProcessUninstApp(relationShipMsg.userId, static_cast<int32_t>(relationShipMsg.tokenId));
-            break;
-        default:
-            LOGI("Dm have not this event type.");
-            return false;
-    }
-    return true;
-}
-//delete end
 
 void DeviceManagerService::ProcessAccountLogout(const RelationShipChangeMsg &relationShipMsg)
 {

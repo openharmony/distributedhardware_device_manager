@@ -199,7 +199,6 @@ public:
     virtual int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
  	    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
  	    std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
-    virtual int32_t GetAllAuthOnceAclInfos(std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> &aclInfos) = 0;
 };
 
 class DeviceProfileConnector : public IDeviceProfileConnector {
@@ -241,8 +240,6 @@ public:
         std::multimap<std::string, int32_t> &peerUserIdMap, DmOfflineParam &offlineParam);
     DM_EXPORT void DeleteAclForRemoteUserRemoved(std::string peerUdid,
         int32_t peerUserId, std::vector<int32_t> &userIds, DmOfflineParam &offlineParam);
-    DM_EXPORT bool DeleteAclForAccountLogOut(const DMAclQuadInfo &info, const std::string &accountId,
-        DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     DM_EXPORT bool DeleteAclByActhash(const DMAclQuadInfo &info, const std::string &accountIdHash,
         DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     DM_EXPORT void CacheOfflineParam(const DmCacheOfflineInputParam &inputParam,
@@ -321,9 +318,6 @@ public:
 //this code line need delete: 321 - 322
     DM_EXPORT void HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds,
         const std::string &remoteUdid, const std::vector<int32_t> &localUserIds, std::string &localUdid);
-    DM_EXPORT void HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds,
-        const std::string &remoteUdid, const std::vector<int32_t> &localUserIds, std::string &localUdid,
- 	    std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     std::vector<ProcessInfo> GetOfflineProcessInfo(std::string &localUdid, const std::vector<int32_t> &localUserIds,
         const std::string &remoteUdid, const std::vector<int32_t> &remoteUserIds);
     DM_EXPORT std::map<int32_t, int32_t> GetUserIdAndBindLevel(
@@ -403,7 +397,7 @@ public:
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
     DM_EXPORT int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
- 	    std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     DM_EXPORT bool CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
     DM_EXPORT bool CheckSinkAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
@@ -438,25 +432,8 @@ public:
 //delete start
     DM_EXPORT bool DeleteAclForAccountLogOut(const DMAclQuadInfo &info, const std::string &accountId,
         DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    DM_EXPORT bool DeleteAclByActhash(const DMAclQuadInfo &info, const std::string &accountIdHash,
-        DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    DM_EXPORT void CacheOfflineParam(const DmCacheOfflineInputParam &inputParam,
-        DmOfflineParam &offlineParam, bool &notifyOffline, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    DM_EXPORT void DeleteAclForUserRemoved(const DmLocalUserRemovedInfo &userRemovedInfo,
-        std::multimap<std::string, int32_t> &peerUserIdMap, DmOfflineParam &offlineParam,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    DM_EXPORT void DeleteAclForRemoteUserRemoved(
-        DmRemoteUserRemovedInfo &userRemovedInfo, DmOfflineParam &offlineParam,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     DM_EXPORT void HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds,
         const std::string &remoteUdid, const std::vector<int32_t> &localUserIds, std::string &localUdid,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    DM_EXPORT void HandleSyncBackgroundUserIdEvent(
-        const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
-        const std::vector<int32_t> &localUserIds, std::string &localUdid,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
-    DM_EXPORT int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
-        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
 //delete end
 private:

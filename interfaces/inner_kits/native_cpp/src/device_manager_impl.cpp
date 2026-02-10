@@ -3747,42 +3747,7 @@ int32_t DeviceManagerImpl::StopDiscoveryService(const std::string &pkgName, cons
     LOGI("StopServiceDiscovery completed");
     return DM_OK;
 }
-int32_t DeviceManagerImpl::SyncCallbackToServiceForServiceInfo(DmCommonNotifyEvent dmCommonNotifyEvent,
-                                                               const std::string &pkgName, int64_t serviceId)
-{
-    LOGD("Enter SyncCallbackToServiceForServiceInfo, dmCommonNotifyEvent: %{public}d, "
-         "pkgName: %{public}s, serviceId: %{public}" PRId64,
-         dmCommonNotifyEvent, pkgName.c_str(), serviceId);
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (serviceId < 0) {
-        LOGE("Invalid serviceId.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (!IsDmCommonNotifyEventValid(dmCommonNotifyEvent)) {
-        LOGE("Invalid dmCommonNotifyEvent: %{public}d.", dmCommonNotifyEvent);
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    std::shared_ptr<IpcSyncServiceCallbackReq> req = std::make_shared<IpcSyncServiceCallbackReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    req->SetServiceId(serviceId);
-    req->SetDmCommonNotifyEvent(static_cast<int32_t>(dmCommonNotifyEvent));
-    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
-    int32_t ret = ipcClientProxy_->SendRequest(SYNC_SERVICE_CALLBACK, req, rsp);
-    if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
-        return ret;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("Failed with ret %{public}d", ret);
-        return ret;
-    }
-    return DM_OK;
-}
+
 int32_t DeviceManagerImpl::SyncServiceInfoByServiceId(const std::string &pkgName, int32_t localUserId,
                                                       const std::string &networkId, int64_t serviceId,
                                                       std::shared_ptr<SyncServiceInfoCallback> callback)
@@ -3976,23 +3941,6 @@ int32_t DeviceManagerImpl::GetPeerServiceInfoByServiceId(const std::string &netw
     serviceInfo = rsp->GetServiceInfo();
     LOGI("GetPeerServiceInfoByServiceId success.");
     return DM_OK;
-}
-
-void DeviceManagerImpl::SyncServiceCallbacksToService(
-    std::map<DmCommonNotifyEvent, std::set<std::pair<std::string, int64_t>>> &callbackMap)
-{
-    if (callbackMap.size() == 0) {
-        LOGI("callbackMap is empty.");
-        return;
-    }
-    for (auto iter : callbackMap) {
-        if (iter.second.size() == 0) {
-            continue;
-        }
-        for (auto item : iter.second) {
-            SyncCallbackToServiceForServiceInfo(iter.first, item.first, item.second);
-        }
-    }
 }
 
 int32_t DeviceManagerImpl::UnbindServiceTarget(const std::string &pkgName,

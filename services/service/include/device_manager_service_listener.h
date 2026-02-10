@@ -91,11 +91,6 @@ public:
         const std::string &deviceName, int32_t code) override;
     void SetExistPkgName(const std::set<std::string> &pkgNameSet) override;
     //delete start
-    void OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,
-        const DiscoveryServiceInfo &discServiceInfo) override;
-    //this code line need delete :97
-    void OnServiceDiscoveryResult(const ProcessInfo &processInfo, int32_t discServiceId, int32_t reason) override;
-    //delete end
     void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
         int32_t reason) override;
     void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) override;
