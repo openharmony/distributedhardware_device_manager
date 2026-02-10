@@ -440,8 +440,8 @@ public:
     virtual bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual int32_t GetIdentificationByDeviceIds(const std::string &pkgName,
- 	        const std::vector<std::string> deviceIdList,
- 	        std::map<std::string, std::string> &deviceIdentificationMap) override;
+ 	    const std::vector<std::string> deviceIdList,
+ 	    std::map<std::string, std::string> &deviceIdentificationMap) override;
     virtual int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback) override;
     virtual int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId) override;
