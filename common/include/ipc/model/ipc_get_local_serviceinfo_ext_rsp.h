@@ -12,18 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_DM_IPC_GET_LOCAL_SERVICEINFO_EXT_RSP_H
 #define OHOS_DM_IPC_GET_LOCAL_SERVICEINFO_EXT_RSP_H
- 
+
 #include "ipc_rsp.h"
 #include "dm_device_info.h"
- 
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcGetLocalServiceInfoExtRsp : public IpcRsp {
     DECLARE_IPC_MODEL(IpcGetLocalServiceInfoExtRsp);
- 
+
 public:
     const DmRegisterServiceInfo &GetServiceInfo() const
     {
@@ -33,7 +33,7 @@ public:
     {
         serviceInfo_ = serviceInfo;
     }
- 
+
 private:
     DmRegisterServiceInfo serviceInfo_;
 };

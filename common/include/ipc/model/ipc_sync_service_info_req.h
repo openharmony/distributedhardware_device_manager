@@ -12,19 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_DM_IPC_SYNC_SERVICE_INFO_REQ_H
 #define OHOS_DM_IPC_SYNC_SERVICE_INFO_REQ_H
- 
+
 #include "ipc_req.h"
- 
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcSyncServiceInfoReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcSyncServiceInfoReq);
- 
+
 public:
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoReq::SetLocalUserId
      * @tc.desc: Ipc Set LocalUserId Request Set LocalUserId
@@ -34,7 +34,7 @@ public:
     {
         localUserId_ = localUserId;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoReq::GetLocalUserId
      * @tc.desc: Ipc Get LocalUserId Request Get LocalUserId
@@ -44,7 +44,7 @@ public:
     {
         return localUserId_;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoReq::SetNetworkId
      * @tc.desc: Ipc Set NetworkId Request Set NetworkId
@@ -54,7 +54,7 @@ public:
     {
         networkId_ = networkId;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoReq::GetNetworkId
      * @tc.desc: Ipc Get NetworkId Request Get NetworkId
@@ -64,7 +64,7 @@ public:
     {
         return networkId_;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoReq::SetServiceId
      * @tc.desc: Ipc Set ServiceId Request Set ServiceId
@@ -74,7 +74,7 @@ public:
     {
         serviceId_ = serviceId;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoReq::GetServiceId
      * @tc.desc: Ipc Get ServiceId Request Get ServiceId
@@ -84,7 +84,7 @@ public:
     {
         return serviceId_;
     }
- 
+
 private:
     int32_t localUserId_ = 0;
     std::string networkId_;
@@ -92,4 +92,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_SYNC_SERVICE_INFO_REQ_H
+#endif // OHOS_DM_IPC_SYNC_SERVICE_INFO_REQ_H

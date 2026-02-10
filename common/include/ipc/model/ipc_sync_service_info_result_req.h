@@ -12,13 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_DM_IPC_SYNC_SERVICE_INFO_RESULT_REQ_H
 #define OHOS_DM_IPC_SYNC_SERVICE_INFO_RESULT_REQ_H
- 
+
 #include "ipc_req.h"
 #include "dm_device_info.h"
- 
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcSyncServiceInfoResultReq : public IpcReq {
@@ -33,7 +33,7 @@ public:
     {
         serviceSyncInfo_ = serviceSyncInfo;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoResultReq::SetServiceSyncInfo
      * @tc.desc: Ipc Get ServiceSyncInfo Request Get ServiceSyncInfo
@@ -43,7 +43,7 @@ public:
     {
         return serviceSyncInfo_;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoResultReq::SetResult
      * @tc.desc: Ipc Set Result Request Set Result
@@ -53,7 +53,7 @@ public:
     {
         result_ = result;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoResultReq::GetResult
      * @tc.desc: Ipc Get Result Request Get Result
@@ -63,7 +63,7 @@ public:
     {
         return result_;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoResultReq::SetContent
      * @tc.desc: Ipc Set Content Request Set Content
@@ -73,7 +73,7 @@ public:
     {
         content_ = content;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoResultReq::GetContent
      * @tc.desc: Ipc Get Content Request Get Content
@@ -83,7 +83,7 @@ public:
     {
         return content_;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoResultReq::SetServiceId
      * @tc.desc: Ipc Set ServiceId Request Set ServiceId
@@ -93,7 +93,7 @@ public:
     {
         serviceId_ = serviceId;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceInfoResultReq::GetServiceId
      * @tc.desc: Ipc Get ServiceId Request Get ServiceId
@@ -103,7 +103,7 @@ public:
     {
         return serviceId_;
     }
- 
+
 private:
     ServiceSyncInfo serviceSyncInfo_;
     int32_t result_ = 0;
@@ -112,4 +112,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_SYNC_SERVICE_INFO_REQ_H
+#endif // OHOS_DM_IPC_SYNC_SERVICE_INFO_REQ_H

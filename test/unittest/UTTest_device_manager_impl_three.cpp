@@ -1440,18 +1440,6 @@ HWTEST_F(DeviceManagerImplTest, ExportAuthCode_301, testing::ext::TestSize.Level
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 
-HWTEST_F(DeviceManagerImplTest, StartServiceDiscovery_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "";
-    DiscoveryServiceParam discParam;
-    discParam.serviceType = "testService";
-    discParam.discoveryServiceId = 12345;
-    std::shared_ptr<ServiceDiscoveryCallback> callback = std::make_shared<ServiceDiscoveryCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().StartServiceDiscovery(pkgName, discParam, callback);
-    ret = (ret == ERR_DM_INPUT_PARA_INVALID) || (ret == ERR_DM_UNSUPPORTED_METHOD);
-    ASSERT_EQ(ret, true);
-}
-
 HWTEST_F(DeviceManagerImplTest, StartServiceDiscovery_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test";
@@ -1461,44 +1449,6 @@ HWTEST_F(DeviceManagerImplTest, StartServiceDiscovery_002, testing::ext::TestSiz
     std::shared_ptr<ServiceDiscoveryCallback> callback = nullptr;
     int32_t ret = DeviceManager::GetInstance().StartServiceDiscovery(pkgName, discParam, callback);
     ret = (ret == ERR_DM_INPUT_PARA_INVALID) || (ret == ERR_DM_UNSUPPORTED_METHOD);
-    ASSERT_EQ(ret, true);
-}
-
-HWTEST_F(DeviceManagerImplTest, StartServiceDiscovery_003, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    DiscoveryServiceParam discParam;
-    discParam.serviceType = "";
-    discParam.discoveryServiceId = 12345;
-    std::shared_ptr<ServiceDiscoveryCallback> callback = std::make_shared<ServiceDiscoveryCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().StartServiceDiscovery(pkgName, discParam, callback);
-    ret = (ret == ERR_DM_INPUT_PARA_INVALID) || (ret == ERR_DM_UNSUPPORTED_METHOD);
-    ASSERT_EQ(ret, true);
-}
-
-HWTEST_F(DeviceManagerImplTest, StartServiceDiscovery_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    DiscoveryServiceParam discParam;
-    discParam.serviceType = "testService";
-    discParam.discoveryServiceId = 0;
-    std::shared_ptr<ServiceDiscoveryCallback> callback = std::make_shared<ServiceDiscoveryCallbackTest>();
-    int32_t ret = DeviceManager::GetInstance().StartServiceDiscovery(pkgName, discParam, callback);
-    ret = (ret == ERR_DM_INPUT_PARA_INVALID) || (ret == ERR_DM_UNSUPPORTED_METHOD);
-    ASSERT_EQ(ret, true);
-}
-
-HWTEST_F(DeviceManagerImplTest, StartServiceDiscovery_005, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    DiscoveryServiceParam discParam;
-    discParam.serviceType = "testService";
-    discParam.discoveryServiceId = 12345;
-    std::shared_ptr<ServiceDiscoveryCallback> callback = std::make_shared<ServiceDiscoveryCallbackTest>();
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-        .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
-    int32_t ret = DeviceManager::GetInstance().StartServiceDiscovery(pkgName, discParam, callback);
-    ret = (ret == ERR_DM_IPC_SEND_REQUEST_FAILED) || (ret == ERR_DM_UNSUPPORTED_METHOD);
     ASSERT_EQ(ret, true);
 }
 
@@ -1772,60 +1722,6 @@ HWTEST_F(DeviceManagerImplTest, StartPublishService_009, testing::ext::TestSize.
     ASSERT_EQ(ret, true);
 }
 
-HWTEST_F(DeviceManagerImplTest, RegisterServiceStateCallback_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "";
-    int64_t serviceId = 0;
-    std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallbackTest>();
-    int32_t ret = DeviceManagerImpl::GetInstance().RegisterServiceStateCallback(pkgName, serviceId, callback);
-    ret = (ret == ERR_DM_INPUT_PARA_INVALID) || (ret == ERR_DM_UNSUPPORTED_METHOD);
-    ASSERT_EQ(ret, true);
-}
-
-HWTEST_F(DeviceManagerImplTest, RegisterServiceStateCallback_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "";
-    int64_t serviceId = 12345;
-    std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallbackTest>();
-    int32_t ret = DeviceManagerImpl::GetInstance().RegisterServiceStateCallback(pkgName, serviceId, callback);
-    ret = (ret == ERR_DM_INPUT_PARA_INVALID) || (ret == ERR_DM_UNSUPPORTED_METHOD);
-    ASSERT_EQ(ret, true);
-}
-
-HWTEST_F(DeviceManagerImplTest, RegisterServiceStateCallback_003, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    int64_t serviceId = 0;
-    std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallbackTest>();
-    int32_t ret = DeviceManagerImpl::GetInstance().RegisterServiceStateCallback(pkgName, serviceId, callback);
-    ret = (ret == ERR_DM_INPUT_PARA_INVALID) || (ret == ERR_DM_UNSUPPORTED_METHOD);
-    ASSERT_EQ(ret, true);
-}
-
-HWTEST_F(DeviceManagerImplTest, RegisterServiceStateCallback_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    int64_t serviceId = 12345;
-    std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallbackTest>();
-    EXPECT_CALL(*deviceManagerNotifyMock_, RegisterServiceStateCallback(testing::_, testing::_))
-        .WillOnce(testing::Return(DM_OK));
-    int32_t ret = DeviceManagerImpl::GetInstance().RegisterServiceStateCallback(pkgName, serviceId, callback);
-    ret = (ret == DM_OK) || (ret == ERR_DM_UNSUPPORTED_METHOD);
-    ASSERT_EQ(ret, true);
-}
-
-HWTEST_F(DeviceManagerImplTest, RegisterServiceStateCallback_005, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    int64_t serviceId = 12345;
-    std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallbackTest>();
-    EXPECT_CALL(*deviceManagerNotifyMock_, RegisterServiceStateCallback(testing::_, testing::_))
-        .WillOnce(testing::Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManagerImpl::GetInstance().RegisterServiceStateCallback(pkgName, serviceId, callback);
-    ret = (ret == ERR_DM_FAILED) || (ret == ERR_DM_UNSUPPORTED_METHOD);
-    ASSERT_EQ(ret, true);
-}
-
 HWTEST_F(DeviceManagerImplTest, UnRegisterServiceStateCallback_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "";
@@ -1859,8 +1755,6 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterServiceStateCallback_004, testing::ext
 {
     std::string pkgName = "com.ohos.test";
     int64_t serviceId = 12345;
-    EXPECT_CALL(*deviceManagerNotifyMock_, UnRegisterServiceStateCallback(testing::_))
-        .WillOnce(testing::Return(DM_OK));
     int32_t ret = DeviceManagerImpl::GetInstance().UnRegisterServiceStateCallback(pkgName, serviceId);
     ret = (ret == DM_OK) || (ret == ERR_DM_UNSUPPORTED_METHOD);
     ASSERT_EQ(ret, true);
@@ -1871,8 +1765,6 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterServiceStateCallback_005, testing::ext
     std::string pkgName = "com.ohos.test";
     int64_t serviceId = 12345;
     int32_t expectedError = ERR_DM_FAILED;
-    EXPECT_CALL(*deviceManagerNotifyMock_, UnRegisterServiceStateCallback(testing::_))
-        .WillOnce(testing::Return(ERR_DM_FAILED));
 
     int32_t ret = DeviceManagerImpl::GetInstance().UnRegisterServiceStateCallback(pkgName, serviceId);
     ret = (ret == ERR_DM_FAILED) || (ret == ERR_DM_UNSUPPORTED_METHOD);

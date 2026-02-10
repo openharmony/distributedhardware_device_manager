@@ -467,6 +467,8 @@ public:
     virtual int32_t UnRegisterAuthCodeInvalidCallback(const std::string &pkgName) override;
     virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
         int32_t pinExchangeType, DmAuthInfo &dmAuthInfo) override;
+    void SyncServiceCallbacksToService(
+        std::map<DmCommonNotifyEvent, std::set<std::pair<std::string, int64_t>>> &callbackMap);
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;
@@ -488,6 +490,8 @@ private:
     bool CheckAclByIpcCode(const DmAccessCaller &caller, const DmAccessCallee &callee,
         const DMIpcCmdInterfaceCode &ipcCode);
     void ConvertLocalServiceInfoToAuthInfo(const DMLocalServiceInfo &info, DmAuthInfo &dmAuthInfo);
+    int32_t SyncCallbackToServiceForServiceInfo(DmCommonNotifyEvent dmCommonNotifyEvent,
+        const std::string &pkgName, int64_t serviceId);
 private:
 #if !defined(__LITEOS_M__)
     std::shared_ptr<IpcClientProxy> ipcClientProxy_ =

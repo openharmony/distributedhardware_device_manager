@@ -274,18 +274,14 @@ public:
         (void)isEnable160m;
         return 0;
     }
-    virtual void OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,
-        const DiscoveryServiceInfo &discServiceInfo)
+    virtual void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service)
     {
-        (void)processInfo;
-        (void)discServiceId;
-        (void)discServiceInfo;
     }
 
-    virtual void OnServiceDiscoveryResult(const ProcessInfo &processInfo, int32_t discServiceId, int32_t reason)
+    virtual void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
+        int32_t reason)
     {
         (void)processInfo;
-        (void)discServiceId;
         (void)reason;
     }
 

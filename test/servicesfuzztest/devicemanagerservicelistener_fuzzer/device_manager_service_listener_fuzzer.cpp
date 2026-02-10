@@ -38,39 +38,6 @@ void DeviceManagerServiceListenerFuzzTest(FuzzedDataProvider &fdp)
     listener.OnServicePublishResult(processInfo, serviceId, publishResult);
 }
 
-void OnServiceFoundFuzzTest(FuzzedDataProvider &fdp)
-{
-    int32_t pkgNameSize = 64;
-    int32_t serviceInfoSize = 32;
-    ProcessInfo processInfo;
-    processInfo.userId = fdp.ConsumeIntegral<int32_t>();
-    processInfo.pkgName = fdp.ConsumeRandomLengthString(pkgNameSize);
-    int32_t discServiceId = fdp.ConsumeIntegral<int32_t>();
-
-    DiscoveryServiceInfo discServiceInfo;
-    discServiceInfo.pkgName = fdp.ConsumeRandomLengthString(serviceInfoSize);
-    discServiceInfo.serviceInfo.serviceId = fdp.ConsumeIntegral<int64_t>();
-    discServiceInfo.serviceInfo.serviceType = fdp.ConsumeRandomLengthString(serviceInfoSize);
-    discServiceInfo.serviceInfo.serviceName = fdp.ConsumeRandomLengthString(serviceInfoSize);
-    discServiceInfo.serviceInfo.serviceDisplayName = fdp.ConsumeRandomLengthString(serviceInfoSize);
-
-    DeviceManagerServiceListener listener;
-    listener.OnServiceFound(processInfo, discServiceId, discServiceInfo);
-}
-
-void OnServiceDiscoveryResultFuzzTest(FuzzedDataProvider &fdp)
-{
-    int32_t pkgNameSize = 64;
-    ProcessInfo processInfo;
-    processInfo.userId = fdp.ConsumeIntegral<int32_t>();
-    processInfo.pkgName = fdp.ConsumeRandomLengthString(pkgNameSize);
-    int32_t discServiceId = fdp.ConsumeIntegral<int32_t>();
-    int32_t reason = fdp.ConsumeIntegral<int32_t>();
-
-    DeviceManagerServiceListener listener;
-    listener.OnServiceDiscoveryResult(processInfo, discServiceId, reason);
-}
-
 void OnServicePublishResultFuzzTest(FuzzedDataProvider &fdp)
 {
     int32_t pkgNameSize = 128;
@@ -97,8 +64,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
     FuzzedDataProvider fdp(data, size);
     OHOS::DistributedHardware::DeviceManagerServiceListenerFuzzTest(fdp);
-    OHOS::DistributedHardware::OnServiceFoundFuzzTest(fdp);
-    OHOS::DistributedHardware::OnServiceDiscoveryResultFuzzTest(fdp);
     OHOS::DistributedHardware::OnServicePublishResultFuzzTest(fdp);
 
     return 0;

@@ -1198,25 +1198,26 @@ int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(const std::string 
 #endif
 }
 
-void DeviceManagerServiceListener::OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,
-    const DiscoveryServiceInfo &discServiceInfo)
+void DeviceManagerServiceListener::OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service)
 {
+    LOGI("OnServiceFound start");
     std::shared_ptr<IpcNotifyServiceFoundReq> pReq = std::make_shared<IpcNotifyServiceFoundReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     pReq->SetProcessInfo(processInfo);
-    pReq->SetDiscServiceId(discServiceId);
-    pReq->SetDiscServiceInfo(discServiceInfo);
+    pReq->SetPkgName(processInfo.pkgName);
+    pReq->SetDmServiceInfo(service);
     ipcServerListener_.SendRequest(NOTIFY_SERVICE_FOUND, pReq, pRsp);
 }
 
-void DeviceManagerServiceListener::OnServiceDiscoveryResult(const ProcessInfo &processInfo, int32_t discServiceId,
-    int32_t reason)
+void DeviceManagerServiceListener::OnServiceDiscoveryResult(const ProcessInfo &processInfo,
+    const std::string &serviceType, int32_t reason)
 {
     std::shared_ptr<IpcNotifyServiceDiscoverResultReq> pReq = std::make_shared<IpcNotifyServiceDiscoverResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     pReq->SetProcessInfo(processInfo);
-    pReq->SetDiscServiceId(discServiceId);
+    pReq->SetPkgName(processInfo.pkgName);
     pReq->SetResult(reason);
+    pReq->SetServiceType(serviceType);
     ipcServerListener_.SendRequest(NOTIFY_SERVICE_DISCOVERY_RESULT, pReq, pRsp);
 }
 

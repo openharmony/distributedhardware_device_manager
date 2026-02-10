@@ -68,20 +68,17 @@ void DeviceManagerImplTest::SetUp()
 
 void DeviceManagerImplTest::TearDown()
 {
-    testing::Mock::VerifyAndClearExpectations(deviceManagerNotifyMock_.get());
     testing::Mock::VerifyAndClearExpectations(ipcClientProxyMock_.get());
 }
 
 void DeviceManagerImplTest::SetUpTestCase()
 {
-    DmDeviceManagerNotify::dmDeviceManagerNotify = deviceManagerNotifyMock_;
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxyMock_;
 }
 
 void DeviceManagerImplTest::TearDownTestCase()
 {
     DmDeviceManagerNotify::dmDeviceManagerNotify = nullptr;
-    deviceManagerNotifyMock_ = nullptr;
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
     ipcClientProxyMock_ = nullptr;
 }

@@ -56,18 +56,32 @@ public:
     static bool DecodeNetworkIdQueryFilter(MessageParcel &parcel, NetworkIdQueryFilter &queryFilter);
     static bool EncodeStringVector(const std::vector<std::string> &vec, MessageParcel &parcel);
     static bool DecodeStringVector(MessageParcel &parcel, std::vector<std::string> &vec);
+//this code line need delete: 60 - 63
     static bool EncodeSrvDiscParam(const DiscoveryServiceParam &param, MessageParcel &parcel);
     static bool DecodeSrvDiscParam(MessageParcel &parcel, DiscoveryServiceParam &param);
     static bool EncodeSrvDiscServiceInfo(const DiscoveryServiceInfo &serviceInfo, MessageParcel &parcel);
     static bool DecodeSrvDiscServiceInfo(MessageParcel &parcel, DiscoveryServiceInfo &serviceInfo);
     static bool EncodeServiceIds(const std::vector<int64_t> &serviceIds, MessageParcel &parcel);
     static void DecodeServiceIds(std::vector<int64_t> &serviceIds, MessageParcel &parcel);
+//this code line need delete: 67 - 70
     static bool EncodeServiceRegInfo(const ServiceRegInfo &serRegInfo, MessageParcel &parcel);
     static bool DecodeServiceRegInfo(MessageParcel &parcel, ServiceRegInfo &serRegInfo);
     static bool EncodePublishServiceParam(const PublishServiceParam &publishServiceParam, MessageParcel &parcel);
     static bool DecodePublishServiceParam(MessageParcel &parcel, PublishServiceParam &publishServiceParam);
     static bool EncodeDmAuthInfo(const DmAuthInfo &dmAuthInfo, MessageParcel &parcel);
     static bool DecodeDmAuthInfo(MessageParcel &parcel, DmAuthInfo &dmAuthInfo);
+    static bool EncodeDmRegServiceInfo(const DmRegisterServiceInfo &regServiceInfo, MessageParcel &parcel);
+    static bool DecodeDmRegServiceInfo(MessageParcel &parcel, DmRegisterServiceInfo &regServiceInfo);
+    static bool EncodeDmSrvDiscParam(const DmDiscoveryServiceParam &param, MessageParcel &parcel);
+    static bool DecodeDmSrvDiscParam(MessageParcel &parcel, DmDiscoveryServiceParam &param);
+    static bool EncodeDmPublishServiceParam(const DmPublishServiceParam &publishServiceParam, MessageParcel &parcel);
+    static bool DecodeDmPublishServiceParam(MessageParcel &parcel, DmPublishServiceParam &publishServiceParam);
+    static bool EncodeDmServiceInfo(const DmServiceInfo &serviceInfo, MessageParcel &parcel);
+    static bool DecodeDmServiceInfo(MessageParcel &parcel, DmServiceInfo &serviceInfo);
+    static bool EncodeDmRegisterServiceState(const DmRegisterServiceState &registerServiceState, MessageParcel &parcel);
+    static bool DecodeDmRegisterServiceState(MessageParcel &parcel, DmRegisterServiceState &dmRegisterServiceState);
+    static bool EncodeServiceSyncInfo(const ServiceSyncInfo &serviceSyncInfo, MessageParcel &parcel);
+    static void DecodeServiceSyncInfo(MessageParcel &parcel, ServiceSyncInfo &serviceSyncInfo);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

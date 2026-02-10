@@ -29,7 +29,7 @@ public:
     {
         return serviceRegInfo_;
     }
-    
+
     void SetServiceRegInfo(const ServiceRegInfo& serviceRegInfo)
     {
         serviceRegInfo_ = serviceRegInfo;

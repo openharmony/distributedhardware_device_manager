@@ -12,17 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_DM_IPC_SYNC_SERVICE_CALLBACK_REQ_H
 #define OHOS_DM_IPC_SYNC_SERVICE_CALLBACK_REQ_H
- 
+
 #include "ipc_req.h"
 // zl online&offline
 namespace OHOS {
 namespace DistributedHardware {
 class IpcSyncServiceCallbackReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcSyncServiceCallbackReq);
- 
+
 public:
     /**
      * @tc.name: IpcSyncServiceCallbackReq::GetDmCommonNotifyEvent
@@ -33,7 +33,7 @@ public:
     {
         return dmCommonNotifyEvent_;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceCallbackReq::SetDmCommonNotifyEvent
      * @tc.desc: Set notifyEvent of the Ipc Request
@@ -43,7 +43,7 @@ public:
     {
         dmCommonNotifyEvent_ = dmCommonNotifyEvent;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceCallbackReq::GetServiceId
      * @tc.desc: Get serviceId of the Ipc Request
@@ -53,7 +53,7 @@ public:
     {
         return serviceId_;
     }
- 
+
     /**
      * @tc.name: IpcSyncServiceCallbackReq::SetServiceId
      * @tc.desc: Set serviceId of the Ipc Request
@@ -69,4 +69,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_SYNC_SERVICE_CALLBACK_REQ_H
+#endif // OHOS_DM_IPC_SYNC_SERVICE_CALLBACK_REQ_H

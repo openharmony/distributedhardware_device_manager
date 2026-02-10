@@ -12,18 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef OHOS_DM_IPC_NOTIFY_SERVICE_STATE_REQ_H
 #define OHOS_DM_IPC_NOTIFY_SERVICE_STATE_REQ_H
- 
+
 #include "dm_device_info.h"
 #include "ipc_req.h"
- 
+
 namespace OHOS {
 namespace DistributedHardware {
 class IpcNotifyServiceStateReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcNotifyServiceStateReq);
- 
+
 public:
     /**
      * @tc.name: IpcNotifyServiceStateReq::GetServiceState
@@ -61,17 +61,17 @@ public:
     {
         dmServiceInfo_ = dmServiceInfo;
     }
- 
+
     DmRegisterServiceState GetDmRegisterServiceState()
     {
         return registerServiceState_;
     }
- 
+
     void SetDmRegisterServiceState(const DmRegisterServiceState &registerServiceState)
     {
         registerServiceState_ = registerServiceState;
     }
- 
+
 private:
     int32_t serviceState_ { 0 };
     DmServiceInfo dmServiceInfo_;
@@ -79,4 +79,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_NOTIFY_SERVICE_STATE_REQ_H
+#endif // OHOS_DM_IPC_NOTIFY_SERVICE_STATE_REQ_H

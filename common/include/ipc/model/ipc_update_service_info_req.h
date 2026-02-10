@@ -51,4 +51,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_UPDATE_SERVICE_INFO_REQ_H
+#endif // OHOS_DM_IPC_UPDATE_SERVICE_INFO_REQ_H

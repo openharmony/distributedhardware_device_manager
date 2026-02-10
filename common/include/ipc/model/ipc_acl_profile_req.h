@@ -44,21 +44,11 @@ public:
     {
         str_ = str;
     }
-    /**
-     * @tc.name: IpcAclProfileReq::GetAccessControlId
-     * @tc.desc: Ipc get accessControlId
-     * @tc.type: FUNC
-     */
+
     const int64_t &GetAccessControlId() const
     {
         return accessControlId_;
     }
-     
-    /**
-     * @tc.name: IpcAclProfileReq::SetAccessControlId
-     * @tc.desc: Ipc set accessControlId
-     * @tc.type: FUNC
-     */
     void SetAccessControlId(int64_t accessControlId)
     {
         accessControlId_ = accessControlId;
