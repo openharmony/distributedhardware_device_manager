@@ -13,38 +13,38 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_IPC_GET_UDIDS_BY_DEVICEIDS_RSP_H
-#define OHOS_DM_IPC_GET_UDIDS_BY_DEVICEIDS_RSP_H
+#ifndef OHOS_DM_IPC_GET_IDENTIFICATION_BY_DEVICEIDS_REQ_H
+#define OHOS_DM_IPC_GET_IDENTIFICATION_BY_DEVICEIDS_REQ_H
 
 #include "ipc_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcGetUdidsByDeviceIdsRsp : public IpcRsp {
-    DECLARE_IPC_MODEL(IpcGetUdidsByDeviceIdsRsp);
+class IpcGetIdentificationByDeviceIdsReq : public IpcReq {
+    DECLARE_IPC_MODEL(IpcGetIdentificationByDeviceIdsReq);
 public:
     /**
-     * @tc.name: IpcGetUdidsByDeviceIdsRsp::GetDeviceIdToUdidMap
-     * @tc.desc: Get DeviceIdToUdidMap of the Ipc Get Udids By Devices Response
+     * @tc.name: IpcGetIdentificationByDeviceIdsReq::GetDeviceIdList
+     * @tc.desc: Get DeviceIdList of the Ipc Get Identification By Devices Request
      * @tc.type: FUNC
      */
-    std::map<std::string, std::string> GetDeviceIdToUdidMap() const
+    std::vector<std::string> GetDeviceIdList() const
     {
-        return deviceIdToUdidMap_;
+        return deviceIdList_;
     }
 
     /**
-     * @tc.name: IpcGetUdidsByDeviceIdsRsp::SetDeviceIdToUdidMap
-     * @tc.desc: Set DeviceIdToUdidMap of the Ipc Get Udids By Devices Response
+     * @tc.name: IpcGetIdentificationByDeviceIdsReq::SetDeviceIdList
+     * @tc.desc: Set DeviceIdList of the Ipc Get Identification By Devices Request
      * @tc.type: FUNC
      */
-    void SetDeviceIdToUdidMap(const std::map<std::string, std::string> &deviceIdToUdidMap)
+    void SetDeviceIdList(const std::vector<std::string> &deviceIdList)
     {
-        deviceIdToUdidMap_ = deviceIdToUdidMap;
+        deviceIdList_ = deviceIdList;
     }
 private:
-    std::map<std::string, std::string> deviceIdToUdidMap_;
+    std::vector<std::string> deviceIdList_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_GET_UDIDS_BY_DEVICEIDS_RSP_H
+#endif // OHOS_DM_IPC_GET_IDENTIFICATION_BY_DEVICEIDS_REQ_H

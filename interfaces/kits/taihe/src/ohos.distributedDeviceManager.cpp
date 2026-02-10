@@ -1387,7 +1387,7 @@ void DeviceManagerImpl::ClearBundleCallbacks(const std::string &bundleName)
     ClearDiscoverCallbacks(bundleName);
 }
 
-::taihe::array<::ohos::distributedDeviceManager::DeviceIdToUdid> DeviceManagerImpl::GetUdidsByDeviceIds(
+::taihe::array<::ohos::distributedDeviceManager::DeviceIdentification> DeviceManagerImpl::GetIdentificationByDeviceIds(
     ::taihe::array_view<::taihe::string> deviceIdList)
 {
     if (!IsInit()) {
@@ -1410,21 +1410,21 @@ void DeviceManagerImpl::ClearBundleCallbacks(const std::string &bundleName)
         deviceIdListVec.push_back(std::string(deviceId));
     }
 
-    std::map<std::string, std::string> deviceIdToUdidMap;
-    int32_t ret = DeviceManager::GetInstance().GetUdidsByDeviceIds(bundleName_,
-        deviceIdListVec, deviceIdToUdidMap);
+    std::map<std::string, std::string> deviceIdentificationMap;
+    int32_t ret = DeviceManager::GetInstance().GetIdentificationByDeviceIds(
+        bundleName_, deviceIdListVec, deviceIdentificationMap);
     if (ret != DM_OK) {
-        LOGE("GetUdidsByDeviceIds failed, ret %{public}d", ret);
+        LOGE("GetIdentificationByDeviceIds failed, ret %{public}d", ret);
         CreateBusinessError(ret);
         return {};
     }
 
-    std::vector<::ohos::distributedDeviceManager::DeviceIdToUdid> result;
-    for (const auto& pair : deviceIdToUdidMap) {
-        result.emplace_back(::ohos::distributedDeviceManager::DeviceIdToUdid{
+    std::vector<::ohos::distributedDeviceManager::DeviceIdentification> result;
+    for (const auto& pair : deviceIdentificationMap) {
+        result.emplace_back(::ohos::distributedDeviceManager::DeviceIdentification{
             ::taihe::string(pair.first), ::taihe::string(pair.second)});
     }
-    return ::taihe::array<::ohos::distributedDeviceManager::DeviceIdToUdid>(
+    return ::taihe::array<::ohos::distributedDeviceManager::DeviceIdentification>(
         ::taihe::copy_data_t{}, result.data(), result.size());
 }
 
