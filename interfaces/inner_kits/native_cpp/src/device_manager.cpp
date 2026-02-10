@@ -23,5 +23,7 @@ DeviceManager &DeviceManager::GetInstance()
 {
     return DeviceManagerImpl::GetInstance();
 }
+
+DeviceManager::~DeviceManager() = default;
 } // namespace DistributedHardware
 } // namespace OHOS

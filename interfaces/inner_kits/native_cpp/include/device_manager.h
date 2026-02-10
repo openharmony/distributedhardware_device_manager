@@ -24,6 +24,7 @@ namespace DistributedHardware {
 class DeviceManager {
 public:
     DM_EXPORT static DeviceManager &GetInstance();
+    virtual ~DeviceManager();
 
 public:
     /**
