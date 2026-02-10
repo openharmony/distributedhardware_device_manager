@@ -2406,7 +2406,7 @@ int32_t DeviceManagerImpl::SetDnPolicy(const std::string &pkgName, std::map<std:
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "SetDnPolicy", ret, anonyLocalUdid_);
         LOGE("Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+        return ret;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
@@ -2734,7 +2734,7 @@ int32_t DeviceManagerImpl::GetDeviceProfileInfoList(const std::string &pkgName,
         LOGE("error: Send Request failed ret: %{public}d", ret);
         DeviceManagerNotify::GetInstance().OnGetDeviceProfileInfoListResult(pkgName, {},
             ERR_DM_IPC_SEND_REQUEST_FAILED);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+        return ret;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
@@ -2769,7 +2769,7 @@ int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
         deviceIconInfo.InitByDmDeviceIconInfoFilterOptions(filterOptions);
         DeviceManagerNotify::GetInstance().OnGetDeviceIconInfoResult(pkgName, deviceIconInfo,
             ERR_DM_IPC_SEND_REQUEST_FAILED);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+        return ret;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
@@ -2798,7 +2798,7 @@ int32_t DeviceManagerImpl::PutDeviceProfileInfoList(const std::string &pkgName,
     int32_t ret = ipcClientProxy_->SendRequest(PUT_DEVICE_PROFILE_INFO_LIST, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+        return ret;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
@@ -2820,8 +2820,8 @@ int32_t DeviceManagerImpl::GetLocalDisplayDeviceName(const std::string &pkgName,
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DISPLAY_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
         LOGE("error: Send Request failed ret: %{public}d", ret);
+        return ret;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
@@ -2944,7 +2944,7 @@ int32_t DeviceManagerImpl::SetLocalDeviceName(const std::string &pkgName, const 
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
         DeviceManagerNotify::GetInstance().OnSetLocalDeviceNameResult(pkgName, ERR_DM_IPC_SEND_REQUEST_FAILED);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+        return ret;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
@@ -2982,7 +2982,7 @@ int32_t DeviceManagerImpl::SetRemoteDeviceName(const std::string &pkgName, const
         LOGE("error: Send Request failed ret: %{public}d", ret);
         DeviceManagerNotify::GetInstance().OnSetRemoteDeviceNameResult(pkgName, deviceId,
             ERR_DM_IPC_SEND_REQUEST_FAILED);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+        return ret;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
@@ -3007,7 +3007,7 @@ int32_t DeviceManagerImpl::RestoreLocalDeviceName(const std::string &pkgName)
     int32_t ret = ipcClientProxy_->SendRequest(RESTORE_LOCAL_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+        return ret;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
@@ -3029,7 +3029,7 @@ int32_t DeviceManagerImpl::GetDeviceNetworkIdList(const std::string &bundleName,
     int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_NETWORK_ID_LIST, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+        return ret;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {

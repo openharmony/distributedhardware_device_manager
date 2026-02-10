@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-    constexpr uint32_t MAX_SESSION_KEY_LENGTH = 16;
+    constexpr uint32_t MAX_SESSION_KEY_LENGTH = 512;
 }
 void DmCryptoMgrTest::SetUp()
 {

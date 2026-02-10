@@ -66,6 +66,7 @@ void DeviceManagerServiceThreeTest::TearDown()
     Mock::VerifyAndClearExpectations(deviceManagerServiceImplMock_.get());
     Mock::VerifyAndClearExpectations(deviceProfileConnectorMock_.get());
     Mock::VerifyAndClearExpectations(deviceNameManagerMock_.get());
+    Mock::VerifyAndClearExpectations(appManagerMock_.get());
 }
 
 void DeviceManagerServiceThreeTest::SetUpTestCase()
@@ -79,6 +80,7 @@ void DeviceManagerServiceThreeTest::SetUpTestCase()
         distributedDeviceProfileClientMock_;
     DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
     DmDeviceNameManager::dmDeviceNameManager_ = deviceNameManagerMock_;
+    DmAppManager::dmAppManager = appManagerMock_;
 }
 
 void DeviceManagerServiceThreeTest::TearDownTestCase()
@@ -97,6 +99,8 @@ void DeviceManagerServiceThreeTest::TearDownTestCase()
     distributedDeviceProfileClientMock_ = nullptr;
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
     multipleUserConnectorMock_ = nullptr;
+    DmAppManager::dmAppManager = nullptr;
+    appManagerMock_ = nullptr;
 }
 
 namespace {
@@ -272,6 +276,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, CheckCredential_301, testing::ext::TestS
 HWTEST_F(DeviceManagerServiceThreeTest, RegisterUiStateCallback_301, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
+    EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().RegisterUiStateCallback(pkgName);
@@ -281,6 +286,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, RegisterUiStateCallback_301, testing::ex
 HWTEST_F(DeviceManagerServiceThreeTest, UnRegisterUiStateCallback_301, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
+    EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().UnRegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
@@ -307,6 +313,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, BindTarget_301, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
 
     bindParam.insert(std::make_pair(PARAM_KEY_META_TYPE, pkgName));
+    EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
     ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);

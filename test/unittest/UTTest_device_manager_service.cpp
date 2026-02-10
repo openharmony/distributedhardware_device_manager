@@ -1473,6 +1473,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_001, testing::ext::Te
 HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
+    EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().RegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, DM_OK);
@@ -1482,8 +1483,17 @@ HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_003, testing::ext::Te
 {
     std::string pkgName = "pkgName";
     DeletePermission();
+    EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().RegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_004, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "pkgName";
+    EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().RegisterUiStateCallback(pkgName);
+    EXPECT_EQ(ret, ERR_DM_NOT_SYSTEM_APP);
 }
 
 HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_001, testing::ext::TestSize.Level1)
@@ -1496,6 +1506,7 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_001, testing::ext::
 HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
+    EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().UnRegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, DM_OK);
@@ -1505,8 +1516,17 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_003, testing::ext::
 {
     std::string pkgName = "pkgName";
     DeletePermission();
+    EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().UnRegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_004, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "pkgName";
+    EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().UnRegisterUiStateCallback(pkgName);
+    EXPECT_EQ(ret, ERR_DM_NOT_SYSTEM_APP);
 }
 
 HWTEST_F(DeviceManagerServiceTest, NotifyEvent_001, testing::ext::TestSize.Level1)
@@ -1516,21 +1536,10 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_001, testing::ext::TestSize.Level
     std::string event;
     std::string msg = "";
     DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
-    msg =  R"(
-    {
-        "authType" : 1,
-        "userId" : "123",
-        "credentialData" : "cryptosupportData",
-        "CRYPTOSUPPORT" : "cryptosupportTest",
-        "credentialType" : 1,
-        "credentialId" : "104",
-        "NETWORK_ID" : "108",
-        "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
-        "serverPk" : "hello",
-        "pkInfoSignature" : "world",
-        "pkInfo" : "pkginfo",
-        "peerDeviceId" : "3515656546"
-    })";
+    msg =  R"({"authType" : 1, "userId" : "123", "credentialData" : "cryptosupportData",
+        "CRYPTOSUPPORT" : "cryptosupportTest", "credentialType" : 1, "credentialId" : "104",
+        "NETWORK_ID" : "108", "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
+        "serverPk" : "hello", "pkInfoSignature" : "world", "pkInfo" : "pkginfo", "peerDeviceId" : "3515656546"})";
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
     std::string commonEventType = "helloworld";
@@ -1670,8 +1679,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_004, testing::ext::
     std::string netWorkId = "netWorkId";
     int32_t networkType = 0;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _))
-        .WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().GetNetworkTypeByNetworkId(pkgName, netWorkId, networkType);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
