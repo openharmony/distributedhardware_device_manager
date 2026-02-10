@@ -2624,7 +2624,7 @@ napi_value DeviceManagerNapi::JsRestoreLocalDeviceName(napi_env env, napi_callba
     return result;
 }
 
-napi_value DeviceManagerNapi::GetUdidsByDeviceIds(napi_env env, napi_callback_info info)
+napi_value DeviceManagerNapi::GetIdentificationByDeviceIds(napi_env env, napi_callback_info info)
 {
     LOGI("In");
     napi_value result = nullptr;
@@ -2654,20 +2654,20 @@ napi_value DeviceManagerNapi::GetUdidsByDeviceIds(napi_env env, napi_callback_in
         CreateBusinessError(env, ERR_DM_INPUT_PARA_INVALID);
         return result;
     }
-    std::map<std::string, std::string> deviceIdToUdidMap;
-    int32_t ret = DeviceManager::GetInstance().GetUdidsByDeviceIds(deviceManagerWrapper->bundleName_,
-        deviceIdList, deviceIdToUdidMap);
+    std::map<std::string, std::string> deviceIdentificationMap;
+    int32_t ret = DeviceManager::GetInstance().GetIdentificationByDeviceIds(
+        deviceManagerWrapper->bundleName_, deviceIdList, deviceIdentificationMap);
     if (ret != DM_OK) {
-        LOGE("GetUdidsByDeviceIds failed, ret %{public}d", ret);
+        LOGE("GetIdentificationByDeviceIds failed, ret %{public}d", ret);
         CreateBusinessError(env, ret);
         return result;
     }
-    ConstructOutput(env, result, deviceIdList, deviceIdToUdidMap);
+    ConstructOutput(env, result, deviceIdList, deviceIdentificationMap);
     return result;
 }
 
 void DeviceManagerNapi::ConstructOutput(napi_env env, napi_value &result,
-    const std::vector<std::string> &deviceIdList, std::map<std::string, std::string> &deviceIdToUdidMap)
+    const std::vector<std::string> &deviceIdList, std::map<std::string, std::string> &deviceIdentificationMap)
 {
     bool isArray = false;
     napi_status status = napi_ok;
@@ -2680,7 +2680,7 @@ void DeviceManagerNapi::ConstructOutput(napi_env env, napi_value &result,
     }
     int32_t index = 0;
     for (const auto& deviceId : deviceIdList) {
-        std::string udid = deviceIdToUdidMap[deviceId];
+        std::string udid = deviceIdentificationMap[deviceId];
         napi_value obj;
         status = napi_create_object(env, &obj);
         if (status != napi_ok) {
@@ -2873,7 +2873,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("restoreLocalDeviceName", JsRestoreLocalDeviceName),
         DECLARE_NAPI_FUNCTION("restoreLocalDeivceName", JsRestoreLocalDeviceName),
         DECLARE_NAPI_FUNCTION("getDeviceNetworkIdList", JsGetDeviceNetworkIdList),
-        DECLARE_NAPI_FUNCTION("getUdidsByDeviceIds", GetUdidsByDeviceIds),
+        DECLARE_NAPI_FUNCTION("getIdentificationByDeviceIds", GetIdentificationByDeviceIds),
         DECLARE_NAPI_FUNCTION("setHeartbeatPolicy", SetHeartbeatPolicy)};
 
     napi_property_descriptor static_prop[] = {
