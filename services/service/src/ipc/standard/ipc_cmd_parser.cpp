@@ -2057,7 +2057,7 @@ ON_IPC_CMD(GET_IDENTIFICATION_BY_DEVICEIDS, MessageParcel &data, MessageParcel &
     IpcModelCodec::DecodeStringVector(data, deviceIdList);
     std::map<std::string, std::string> deviceIdentificationMap;
     int32_t result = DeviceManagerService::GetInstance().GetIdentificationByDeviceIds(
-        pkgName, deviceIdList, deviceIdToUdidMap);
+        pkgName, deviceIdList, deviceIdentificationMap);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
