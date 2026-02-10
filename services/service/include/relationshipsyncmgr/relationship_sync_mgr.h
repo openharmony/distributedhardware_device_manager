@@ -86,6 +86,8 @@ struct RelationShipChangeMsg {
     void ToDelUserPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToStopUserPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToShareUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
+    void ToServiceUnbindTargetPayLoad(uint8_t *&msg, uint32_t &len) const;
+    void ToServiceUnRegPayLoad(uint8_t *&msg, uint32_t &len) const;
     cJSON *ToPayLoadJson() const;
 
     bool FromAccountLogoutPayLoad(const cJSON *payloadJson);
@@ -98,12 +100,18 @@ struct RelationShipChangeMsg {
     bool FromShareUnbindPayLoad(const cJSON *payloadJson);
     bool FromAppUninstallPayLoad(const cJSON *payloadJson);
     bool GetBroadCastId(const cJSON *payloadJson, uint32_t userIdNum);
+    bool FromServiceUnbindTargetPayLoad(const cJSON *payloadJson);
+    bool FromServiceUnRegPayLoad(const cJSON *payloadJson);
 
     std::string ToJson() const;
     bool FromJson(const std::string &msgJson);
 
     const std::string ToString() const;
     const std::string ToMapKey() const;
+private:
+    bool HandleBroadcastPayLoadByType(uint8_t *&msg, uint32_t &len) const;
+    bool HandleBroadcastPayLoadBase(uint8_t *&msg, uint32_t &len) const;
+    bool HandleBroadcastPayLoadExt(uint8_t *&msg, uint32_t &len) const;
 };
 
 class ReleationShipSyncMgr {

@@ -71,7 +71,7 @@ public:
     DM_EXPORT void RegisterCallerAppId(const std::string &pkgName, const int32_t userId);
 
     DM_EXPORT void UnRegisterCallerAppId(const std::string &pkgName, const int32_t userId);
-    
+
     void UninitSoftbusListener();
     //this code line need delete : InitDMServiceListener, instead by InitDMServiceListenerSrvBind
     int32_t InitDMServiceListener();
@@ -197,7 +197,7 @@ public:
 
     int32_t BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam);
-    
+
     int32_t UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &unbindParam);
     //this code line need delete : DpAclAdd,instead by rewrite DpAclAdd

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,10 +23,21 @@ namespace DistributedHardware {
 class IpcGetTrustServiceInfoReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcGetTrustServiceInfoReq);
 public:
+    /**
+     * @tc.name: IpcGetTrustServiceInfoReq::GetParamMap
+     * @tc.desc: Get ParamMap of the Ipc get trust service info by request
+     * @tc.type: FUNC
+     */
     std::map<std::string, std::string> GetParamMap() const
     {
         return paramMap_;
     }
+ 
+    /**
+     * @tc.name: IpcGetTrustServiceInfoReq::SetParamMap
+     * @tc.desc: Set ParamMap of the Ipc set trust service info by request
+     * @tc.type: FUNC
+     */
     void SetParamMap(const std::map<std::string, std::string> &paramMap)
     {
         paramMap_ = paramMap;

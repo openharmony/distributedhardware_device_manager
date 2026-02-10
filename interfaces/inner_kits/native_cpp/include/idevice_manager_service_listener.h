@@ -190,6 +190,18 @@ public:
         int32_t retCode) {}
     virtual void OnAuthCodeInvalid(const std::string &pkgName) {}
     virtual std::set<ProcessInfo> GetAlreadyOnlineProcess() = 0;
+    virtual void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
+        int32_t reason) = 0;
+    virtual void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) = 0;
+    virtual int32_t OnServiceInfoOnline(const DmRegisterServiceState &registerServiceState,
+        const DmServiceInfo &serviceInfo) = 0;
+    virtual int32_t OnServiceInfoOffline(const DmRegisterServiceState &registerServiceState,
+        const DmServiceInfo &serviceInfo) = 0;
+    virtual void OnServiceStateCallbackAdd(const ProcessInfo &processInfo,
+        const std::vector<DmServiceInfo> &serviceList) = 0;
+    virtual void OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
+        int32_t result, const std::string &content) = 0;
+    virtual void OnServiceStateOnlineResult(const ServiceStateBindParameter &bindParam) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

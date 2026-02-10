@@ -155,17 +155,6 @@ public:
     void OnBindResult(const PeerTargetId &targetId, int32_t result, int32_t status, std::string content) override {}
 };
 
-class MockServicePublishCallback : public ServicePublishCallback {
-public:
-    void OnPublishResult(int32_t result, const std::string &publishId) {}
-};
-
-class ServicePublishCallbackTest : public ServicePublishCallback {
-public:
-    ServicePublishCallbackTest() = default;
-    virtual ~ServicePublishCallbackTest() = default;
-    void OnServicePublishResult(int64_t serviceId, int32_t reason) override {}
-};
 class LeaveLNNCallbackTest : public LeaveLNNCallback {
 public:
     virtual ~LeaveLNNCallbackTest()
