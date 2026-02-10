@@ -51,6 +51,11 @@
 #include "ipc_get_local_display_device_name_req.h"
 #include "ipc_get_local_display_device_name_rsp.h"
 #include "ipc_get_localserviceinfo_rsp.h"
+#include "ipc_get_local_serviceinfo_ext_rsp.h"
+#include "ipc_get_peerserviceinfo_by_serviceid_req.h"
+#include "ipc_get_register_serviceinfo_rsp.h"
+#include "ipc_notify_dmfa_result_req.h"
+#include "ipc_get_trust_service_info_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_get_identification_by_deviceIds_req.h"
@@ -62,6 +67,7 @@
 #include "ipc_put_device_profile_info_list_req.h"
 #include "ipc_publish_service_info_rsp.h"
 #include "ipc_register_serviceinfo_req.h"
+//this code line need delete: 71 - 71
 #include "ipc_register_service_info_new_req.h"
 #include "ipc_set_credential_req.h"
 #include "ipc_set_credential_rsp.h"
@@ -78,10 +84,14 @@
 #include "ipc_unbind_service_target_req.h"
 #include "ipc_unpublish_req.h"
 #include "ipc_unregister_service_info_req.h"
+#include "ipc_update_service_info_req.h"
 #include "securec.h"
 #include "ipc_auth_info_req.h"
 #include "ipc_auth_info_rsp.h"
+#include "ipc_register_service_info_req.h"
 #include "ipc_sync_service_callback_req.h"
+#include "ipc_sync_service_info_req.h"
+#include "ipc_sync_service_info_result_req.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ipc_model_codec.h"
 #include "iservice_registry.h"
@@ -2246,7 +2256,7 @@ int32_t DeviceManagerImpl::DestroyPinHolder(const std::string &pkgName, const Pe
     }
     return DM_OK;
 }
-
+//this code line need delete: 2260 - 2283
 int32_t DeviceManagerImpl::DpAclAdd(const int64_t accessControlId, const std::string &udid, const int32_t bindType)
 {
     if (bindType != IDENTICAL_ACCOUNT) {
@@ -3169,6 +3179,7 @@ void DeviceManagerImpl::SyncServiceCallbacksToService(
     }
 }
 
+//this code line need delete: 3187 - 3242
 int32_t DeviceManagerImpl::StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam,
     std::shared_ptr<ServiceDiscoveryCallback> callback)
 {
@@ -3293,7 +3304,7 @@ int32_t DeviceManagerImpl::BindServiceTarget(const std::string &pkgName, const P
     LOGI("Completed");
     return DM_OK;
 }
-
+//this code line need delete: 3276 - 3317
 int32_t DeviceManagerImpl::UnbindServiceTarget(const std::string &pkgName, int64_t serviceId)
 {
     if (pkgName.empty() || serviceId == 0) {
@@ -3343,6 +3354,7 @@ int32_t DeviceManagerImpl::RegisterServiceStateCallback(const std::string &pkgNa
         pkgName.c_str(), serviceId);
     return DM_OK;
 }
+//this code line need delete: 3294 - 3413
 int32_t DeviceManagerImpl::UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId)
 {
     LOGD("Enter UnRegisterServiceStateCallback, pkgName: %{public}s, serviceId: %{public}" PRId64,
@@ -3582,6 +3594,464 @@ void DeviceManagerImpl::ConvertLocalServiceInfoToAuthInfo(const DMLocalServiceIn
             return;
         }
     }
+}
+
+int32_t DeviceManagerImpl::RegisterServiceInfo(const DmRegisterServiceInfo &regServiceInfo, int64_t &serviceId)
+{
+    LOGI("Start");
+    std::shared_ptr<IpcRegisterServiceInfoReq> req = std::make_shared<IpcRegisterServiceInfoReq>();
+    std::shared_ptr<IpcPublishServiceInfoRsp> rsp = std::make_shared<IpcPublishServiceInfoRsp>();
+    req->SetRegisterServiceInfo(regServiceInfo);
+    int32_t ret = ipcClientProxy_->SendRequest(REGISTER_SERVICE_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret: %{public}d", ret);
+        return ret;
+    }
+    serviceId = rsp->GetServiceId();
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnRegisterServiceInfo(int64_t serviceId)
+{
+    std::shared_ptr<IpcUnRegisterServiceInfoReq> req = std::make_shared<IpcUnRegisterServiceInfoReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetServiceId(serviceId);
+    int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_SERVICE_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret: %{public}d", ret);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::StartPublishService(const std::string &pkgName, int64_t serviceId,
+                                               const DmPublishServiceParam &publishServiceParam,
+                                               std::shared_ptr<ServicePublishCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("StartPublishService error: pkgName %{public}s invalid para", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start, pkgName %{public}s", pkgName.c_str());
+    DeviceManagerNotify::GetInstance().RegisterServicePublishCallback(pkgName, serviceId, callback);
+
+    std::shared_ptr<IpcStartPublishServiceReq> req = std::make_shared<IpcStartPublishServiceReq>();
+    std::shared_ptr<IpcPublishServiceInfoRsp> rsp = std::make_shared<IpcPublishServiceInfoRsp>();
+    req->SetPkgName(pkgName);
+    req->SetServiceId(serviceId);
+    req->SetDmPublishServiceParam(publishServiceParam);
+    int32_t ret = ipcClientProxy_->SendRequest(START_PUBLISH_SERVICE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StartPublishService error: Send Request failed ret: %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterServicePublishCallback(pkgName, serviceId);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StartPublishService error: Failed with ret %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterServicePublishCallback(pkgName, serviceId);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::StopPublishService(const std::string &pkgName, int64_t serviceId)
+{
+    if (pkgName.empty() || serviceId == 0) {
+        LOGE("StopPublishService error: pkgName is empty");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::shared_ptr<IpcStopPublishServiceReq> req = std::make_shared<IpcStopPublishServiceReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetServiceId(serviceId);
+    int32_t ret = ipcClientProxy_->SendRequest(STOP_PUBLISH_SERVICE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StopPublishService error: Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StopPublishService failed with ret: %{public}d", ret);
+        return ret;
+    }
+    DeviceManagerNotify::GetInstance().UnRegisterServicePublishCallback(pkgName, serviceId);
+    LOGI("StopPublishService completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::StartDiscoveryService(const std::string &pkgName, const DmDiscoveryServiceParam &discParam,
+                                                 std::shared_ptr<ServiceDiscoveryCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr || discParam.serviceType.empty()) {
+        LOGE("error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().RegisterServiceDiscoveryCallback(pkgName,
+        discParam.serviceType, callback);
+    std::shared_ptr<IpcStartServiceDiscoveryReq> req = std::make_shared<IpcStartServiceDiscoveryReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetDmDiscParam(discParam);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    int32_t ret = ipcClientProxy_->SendRequest(START_SERVICE_DISCOVERING, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StartServiceDiscovery error: Send Request failed ret: %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterServiceDiscoveryCallback(pkgName, discParam.serviceType);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StartServiceDiscovery error: Failed with ret %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterServiceDiscoveryCallback(pkgName, discParam.serviceType);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::StopDiscoveryService(const std::string &pkgName, const DmDiscoveryServiceParam &discParam)
+{
+    if (pkgName.empty()) {
+        LOGE("error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::shared_ptr<IpcStartServiceDiscoveryReq> req = std::make_shared<IpcStartServiceDiscoveryReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetDmDiscParam(discParam);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    int32_t ret = ipcClientProxy_->SendRequest(STOP_SERVICE_DISCOVERING, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("StopServiceDiscovery error: Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("StopServiceDiscovery error: Failed with ret %{public}d :", ret);
+        return ret;
+    }
+    DeviceManagerNotify::GetInstance().UnRegisterServiceDiscoveryCallback(pkgName, discParam.serviceType);
+    LOGI("StopServiceDiscovery completed");
+    return DM_OK;
+}
+int32_t DeviceManagerImpl::SyncCallbackToServiceForServiceInfo(DmCommonNotifyEvent dmCommonNotifyEvent,
+                                                               const std::string &pkgName, int64_t serviceId)
+{
+    LOGD("Enter SyncCallbackToServiceForServiceInfo, dmCommonNotifyEvent: %{public}d, "
+         "pkgName: %{public}s, serviceId: %{public}" PRId64,
+         dmCommonNotifyEvent, pkgName.c_str(), serviceId);
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (serviceId < 0) {
+        LOGE("Invalid serviceId.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDmCommonNotifyEventValid(dmCommonNotifyEvent)) {
+        LOGE("Invalid dmCommonNotifyEvent: %{public}d.", dmCommonNotifyEvent);
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::shared_ptr<IpcSyncServiceCallbackReq> req = std::make_shared<IpcSyncServiceCallbackReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetServiceId(serviceId);
+    req->SetDmCommonNotifyEvent(static_cast<int32_t>(dmCommonNotifyEvent));
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    int32_t ret = ipcClientProxy_->SendRequest(SYNC_SERVICE_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("Send Request failed ret: %{public}d", ret);
+        return ret;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+int32_t DeviceManagerImpl::SyncServiceInfoByServiceId(const std::string &pkgName, int32_t localUserId,
+                                                      const std::string &networkId, int64_t serviceId,
+                                                      std::shared_ptr<SyncServiceInfoCallback> callback)
+{
+    if (pkgName.empty() || networkId.empty() || callback == nullptr ||
+        localUserId < 0 || serviceId <= 0) {
+        LOGE("DeviceManagerImpl::SyncServiceInfoByServiceId failed: input error.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    DeviceManagerNotify::GetInstance().RegisterSyncServiceInfoCallback(pkgName, localUserId,
+                                                                       networkId, callback, serviceId);
+
+    std::shared_ptr<IpcSyncServiceInfoReq> req = std::make_shared<IpcSyncServiceInfoReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetLocalUserId(localUserId);
+    req->SetNetworkId(networkId);
+    req->SetServiceId(serviceId);
+
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    int32_t ret = ipcClientProxy_->SendRequest(SYNC_SERVICE_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("SyncServiceInfoByServiceId error: Send Request failed ret: %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterSyncServiceInfoCallback(pkgName, localUserId,
+                                                                             networkId, serviceId);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("SyncServiceInfoByServiceId error: Failed with ret %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterSyncServiceInfoCallback(pkgName, localUserId,
+                                                                             networkId, serviceId);
+        return ret;
+    }
+
+    LOGI("Completed");
+    return DM_OK;
+}
+int32_t DeviceManagerImpl::SyncAllServiceInfo(const std::string &pkgName, int32_t localUserId,
+                                              const std::string &networkId,
+                                              std::shared_ptr<SyncServiceInfoCallback> callback)
+{
+    if (pkgName.empty() || networkId.empty() || callback == nullptr || localUserId < 0) {
+        LOGE("DeviceManagerImpl::SyncAllServiceInfo failed: input error.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    DeviceManagerNotify::GetInstance().RegisterSyncServiceInfoCallback(pkgName, localUserId,
+                                                                       networkId, callback);
+
+    std::shared_ptr<IpcSyncServiceInfoReq> req = std::make_shared<IpcSyncServiceInfoReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetLocalUserId(localUserId);
+    req->SetNetworkId(networkId);
+    req->SetServiceId(0);
+
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    int32_t ret = ipcClientProxy_->SendRequest(SYNC_SERVICE_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("SyncAllServiceInfo error: Send Request failed ret: %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterSyncServiceInfoCallback(pkgName, localUserId,
+                                                                             networkId);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("SyncAllServiceInfo error: Failed with ret %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterSyncServiceInfoCallback(pkgName, localUserId,
+                                                                             networkId);
+        return ret;
+    }
+
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetLocalServiceInfoByServiceId(int64_t serviceId, DmRegisterServiceInfo &serviceInfo)
+{
+    LOGI("GetLocalServiceInfoByServiceId Start");
+    if (serviceId <= 0) {
+        LOGE("Invalid serviceId");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::shared_ptr<IpcStopPublishServiceReq> req = std::make_shared<IpcStopPublishServiceReq>();
+    std::shared_ptr<IpcGetLocalServiceInfoExtRsp> rsp = std::make_shared<IpcGetLocalServiceInfoExtRsp>();
+    req->SetServiceId(serviceId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+
+    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_SERVICEINFO_BY_SERVICEID, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("SendRequest failed, ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("GetLocalServiceInfoByServiceId failed, ret: %{public}d", ret);
+        return ret;
+    }
+    serviceInfo = rsp->GetServiceInfo();
+    LOGI("GetLocalServiceInfoByServiceId success");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetTrustServiceInfo(const std::string &pkgName,
+                                               const std::map<std::string, std::string> &param,
+                                               std::vector<DmServiceInfo> &serviceInfoList)
+{
+    LOGI("GetTrustServiceInfo Start");
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGD("Start, pkgName: %{public}s", GetAnonyString(pkgName).c_str());
+    std::string paramStr = ConvertMapToJsonString(param);
+    std::shared_ptr<IpcNotifyDMFAResultReq> req = std::make_shared<IpcNotifyDMFAResultReq>();
+    std::shared_ptr<IpcGetTrustServiceInfoRsp> rsp = std::make_shared<IpcGetTrustServiceInfoRsp>();
+    req->SetPkgName(pkgName);
+    req->SetJsonParam(paramStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+
+    int32_t ret = ipcClientProxy_->SendRequest(GET_TRUST_SERVICE_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("SendRequest failed, ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("GetTrustServiceInfo failed, ret: %{public}d", ret);
+        return ret;
+    }
+    serviceInfoList = rsp->GetServiceInfoVec();
+    LOGI("GetTrustServiceInfo success, service info size %{public}zu", serviceInfoList.size());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetRegisterServiceInfo(const std::map<std::string, std::string> &param,
+                                                  std::vector<DmRegisterServiceInfo> &regServiceInfos)
+{
+    LOGI("GetRegisterServiceInfo Start");
+    std::string paramStr = ConvertMapToJsonString(param);
+    std::shared_ptr<IpcNotifyDMFAResultReq> req = std::make_shared<IpcNotifyDMFAResultReq>();
+    std::shared_ptr<IpcGetRegisterServiceInfoRsp> rsp = std::make_shared<IpcGetRegisterServiceInfoRsp>();
+    req->SetJsonParam(paramStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+
+    int32_t ret = ipcClientProxy_->SendRequest(GET_REGISTER_SERVICE_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("SendRequest failed, ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("GetRegisterServiceInfo failed, ret: %{public}d", ret);
+        return ret;
+    }
+    regServiceInfos = rsp->GetRegisterServiceInfos();
+    LOGI("GetRegisterServiceInfo success");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetPeerServiceInfoByServiceId(const std::string &networkId, int64_t serviceId,
+                                                         DmRegisterServiceInfo &serviceInfo)
+{
+    LOGI("GetPeerServiceInfoByServiceId Start");
+    if (networkId == "" || serviceId <= 0) {
+        LOGE("Invalid networkId or serviceId.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::shared_ptr<IpcGetPeerServiceInfoByServiceIdReq> req = std::make_shared<IpcGetPeerServiceInfoByServiceIdReq>();
+    std::shared_ptr<IpcGetLocalServiceInfoExtRsp> rsp = std::make_shared<IpcGetLocalServiceInfoExtRsp>();
+    req->SetNetworkId(networkId);
+    req->SetServiceId(serviceId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+
+    int32_t ret = ipcClientProxy_->SendRequest(GET_PEER_SERVICEINFO_BY_SERVICEID, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("SendRequest failed, ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("GetPeerServiceInfoByServiceId failed, ret: %{public}d", ret);
+        return ret;
+    }
+    serviceInfo = rsp->GetServiceInfo();
+    LOGI("GetPeerServiceInfoByServiceId success.");
+    return DM_OK;
+}
+
+void DeviceManagerImpl::SyncServiceCallbacksToService(
+    std::map<DmCommonNotifyEvent, std::set<std::pair<std::string, int64_t>>> &callbackMap)
+{
+    if (callbackMap.size() == 0) {
+        LOGI("callbackMap is empty.");
+        return;
+    }
+    for (auto iter : callbackMap) {
+        if (iter.second.size() == 0) {
+            continue;
+        }
+        for (auto item : iter.second) {
+            SyncCallbackToServiceForServiceInfo(iter.first, item.first, item.second);
+        }
+    }
+}
+
+int32_t DeviceManagerImpl::UnbindServiceTarget(const std::string &pkgName,
+                                               const std::map<std::string, std::string> &unbindParam,
+                                               const std::string &netWorkId,
+                                               int64_t serviceId)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerImpl::UnbindServiceTarget error: Invalid para, pkgName: %{public}s",
+             pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("UnbindServiceTarget Start, pkgName: %{public}s", pkgName.c_str());
+    std::string unbindParamStr = ConvertMapToJsonString(unbindParam);
+    std::shared_ptr<IpcBindTargetReq> req = std::make_shared<IpcBindTargetReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetBindParam(unbindParamStr);
+    req->SetNetWorkId(netWorkId);
+    req->SetServiceId(serviceId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    int32_t ret = ipcClientProxy_->SendRequest(UNBIND_SERVICE_TARGET, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("UnbindServiceTarget error: Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("UnbindServiceTarget error: Failed with ret %{public}d", ret);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UpdateServiceInfo(int64_t serviceId, const DmRegisterServiceInfo &regServiceInfo)
+{
+    LOGI("UpdateServiceInfo start.");
+    if (serviceId <= 0) {
+        LOGE("DeviceManagerImpl::UpdateServiceInfo error: serviceId is invalid.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::shared_ptr<IpcUpdateServiceInfoReq> req = std::make_shared<IpcUpdateServiceInfoReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetServiceId(serviceId);
+    req->SetRegisterServiceInfo(regServiceInfo);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    int32_t ret = ipcClientProxy_->SendRequest(UPDATE_LOCALSERVICE_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("error:Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("error: failed with ret %{public}d", ret);
+        return ret;
+    }
+    LOGI("End");
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

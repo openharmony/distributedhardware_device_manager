@@ -1334,6 +1334,7 @@ void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName)
     ipcServerListener_.SendRequest(ON_AUTH_CODE_INVALID, pReq, pRsp);
 }
 
+//delete start
 std::set<ProcessInfo> DeviceManagerServiceListener::GetAlreadyOnlineProcess()
 {
     std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
@@ -1350,6 +1351,7 @@ std::set<ProcessInfo> DeviceManagerServiceListener::GetAlreadyOnlineProcess()
     }
     return processInfoSet;
 }
+//delete end
 
 int32_t DeviceManagerServiceListener::OnServiceInfoOnline(const DmRegisterServiceState &registerServiceState,
     const DmServiceInfo &serviceInfo)
@@ -1358,6 +1360,7 @@ int32_t DeviceManagerServiceListener::OnServiceInfoOnline(const DmRegisterServic
         std::to_string(registerServiceState.serviceId).c_str());
     std::shared_ptr<IpcNotifyServiceStateReq> pReq = std::make_shared<IpcNotifyServiceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+
     std::string notifyPkgName = registerServiceState.pkgName;
     {
         std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameServiceLock_);
@@ -1390,7 +1393,7 @@ int32_t DeviceManagerServiceListener::OnServiceInfoOnline(const DmRegisterServic
     }
     return DM_OK;
 }
- 
+
 int32_t DeviceManagerServiceListener::OnServiceInfoOffline(const DmRegisterServiceState &registerServiceState,
     const DmServiceInfo &serviceInfo)
 {
@@ -1398,6 +1401,7 @@ int32_t DeviceManagerServiceListener::OnServiceInfoOffline(const DmRegisterServi
         std::to_string(registerServiceState.serviceId).c_str());
     std::shared_ptr<IpcNotifyServiceStateReq> pReq = std::make_shared<IpcNotifyServiceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+
     std::string notifyPkgName = registerServiceState.pkgName;
     {
         std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameServiceLock_);
@@ -1408,6 +1412,7 @@ int32_t DeviceManagerServiceListener::OnServiceInfoOffline(const DmRegisterServi
     pReq->SetDmRegisterServiceState(registerServiceState);
     pReq->SetDmServiceInfo(serviceInfo);
     pReq->SetServiceState(DmServiceState::SERVICE_STATE_OFFLINE);
+
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
     ProcessInfo processInfoTemp;
     for (const auto &item : processInfos) {

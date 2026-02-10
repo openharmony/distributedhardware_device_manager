@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -90,11 +90,12 @@ public:
     void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
         const std::string &deviceName, int32_t code) override;
     void SetExistPkgName(const std::set<std::string> &pkgNameSet) override;
-    //this code line need delete :Init, instead by InitSrvBind
+    //delete start
     void OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,
         const DiscoveryServiceInfo &discServiceInfo) override;
     //this code line need delete :97
     void OnServiceDiscoveryResult(const ProcessInfo &processInfo, int32_t discServiceId, int32_t reason) override;
+    //delete end
     void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
         int32_t reason) override;
     void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) override;
@@ -108,7 +109,9 @@ public:
     void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
     void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode) override;
     void OnAuthCodeInvalid(const std::string &pkgName) override;
+    //delete start
     std::set<ProcessInfo> GetAlreadyOnlineProcess() override;
+    //delete end
     int32_t OnServiceInfoOnline(const DmRegisterServiceState &registerServiceState,
         const DmServiceInfo &serviceInfo) override;
     int32_t OnServiceInfoOffline(const DmRegisterServiceState &registerServiceState,

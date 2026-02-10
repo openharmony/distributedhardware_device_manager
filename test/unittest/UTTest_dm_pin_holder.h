@@ -323,7 +323,8 @@ public:
     {
         return std::set<ProcessInfo> {};
     }
-    void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
+
+    virtual void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
         int32_t reason) override
     {
         (void)processInfo;
@@ -331,13 +332,13 @@ public:
         (void)reason;
     }
 
-    void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) override
+    virtual void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) override
     {
         (void)processInfo;
         (void)service;
     }
 
-    int32_t OnServiceInfoOnline(const DmRegisterServiceState &registerServiceState,
+    virtual int32_t OnServiceInfoOnline(const DmRegisterServiceState &registerServiceState,
         const DmServiceInfo &serviceInfo) override
     {
         (void)registerServiceState;
@@ -345,7 +346,7 @@ public:
         return 0;
     }
 
-    int32_t OnServiceInfoOffline(const DmRegisterServiceState &registerServiceState,
+    virtual int32_t OnServiceInfoOffline(const DmRegisterServiceState &registerServiceState,
         const DmServiceInfo &serviceInfo) override
     {
         (void)registerServiceState;
@@ -353,14 +354,7 @@ public:
         return 0;
     }
 
-    void OnServiceStateCallbackAdd(const ProcessInfo &processInfo,
-        const std::vector<DmServiceInfo> &serviceList) override
-    {
-        (void)processInfo;
-        (void)serviceList;
-    }
-
-    void OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
+    virtual void OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
         int32_t result, const std::string &content) override
     {
         (void)serviceSyncInfo;
@@ -368,7 +362,14 @@ public:
         (void)content;
     }
 
-    void OnServiceStateOnlineResult(const ServiceStateBindParameter &bindParam) override
+    virtual void OnServiceStateCallbackAdd(const ProcessInfo &processInfo,
+        const std::vector<DmServiceInfo> &serviceList) override
+    {
+        (void)processInfo;
+        (void)serviceList;
+    }
+
+    virtual void OnServiceStateOnlineResult(const ServiceStateBindParameter &bindParam) override
     {
         (void)bindParam;
     }

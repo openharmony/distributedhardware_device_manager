@@ -444,6 +444,7 @@ public:
         std::map<std::string, std::string> &deviceIdentificationMap) override;
     virtual int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback) override;
+//this code line need delete: 447 - 450
     virtual int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId) override;
     virtual int32_t StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam,
         std::shared_ptr<ServiceDiscoveryCallback> callback) override;
@@ -451,6 +452,7 @@ public:
     virtual int32_t RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
         std::shared_ptr<ServiceInfoStateCallback> callback) override;
     virtual int32_t UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId) override;
+//this code line need delete: 447 - 459
     virtual int32_t StartPublishService(const std::string &pkgName, const PublishServiceParam &publishServiceParam,
         std::shared_ptr<ServicePublishCallback> callback, int64_t &serviceId) override;
     virtual int32_t StopPublishService(int64_t serviceId) override;
@@ -467,8 +469,31 @@ public:
     virtual int32_t UnRegisterAuthCodeInvalidCallback(const std::string &pkgName) override;
     virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
         int32_t pinExchangeType, DmAuthInfo &dmAuthInfo) override;
+    virtual int32_t RegisterServiceInfo(const DmRegisterServiceInfo &regServiceInfo, int64_t &serviceId) override;
+    virtual int32_t UnRegisterServiceInfo(int64_t serviceId) override;
+    virtual int32_t StartPublishService(const std::string &pkgName, int64_t serviceId,
+        const DmPublishServiceParam &publishServiceParam, std::shared_ptr<ServicePublishCallback> callback) override;
+    virtual int32_t StopPublishService(const std::string &pkgName, int64_t serviceId) override;
+    virtual int32_t StartDiscoveryService(const std::string &pkgName, const DmDiscoveryServiceParam &disParam,
+        std::shared_ptr<ServiceDiscoveryCallback> callback) override;
+    virtual int32_t StopDiscoveryService(const std::string &pkgName, const DmDiscoveryServiceParam &discParam) override;
+    virtual int32_t SyncServiceInfoByServiceId(const std::string &pkgName, int32_t localUserId,
+        const std::string &networkId, int64_t serviceId, std::shared_ptr<SyncServiceInfoCallback> callback) override;
+    virtual int32_t SyncAllServiceInfo(const std::string &pkgName, int32_t localUserId,
+        const std::string &networkId, std::shared_ptr<SyncServiceInfoCallback> callback) override;
+    virtual int32_t GetLocalServiceInfoByServiceId(int64_t serviceId, DmRegisterServiceInfo &serviceInfo) override;
+    virtual int32_t GetTrustServiceInfo(const std::string &pkgName, const std::map<std::string, std::string> &param,
+        std::vector<DmServiceInfo> &serviceInfo) override;
+    virtual int32_t GetRegisterServiceInfo(const std::map<std::string, std::string> &param,
+        std::vector<DmRegisterServiceInfo> &regServiceInfos) override;
+    virtual int32_t GetPeerServiceInfoByServiceId(const std::string &networkId, int64_t serviceId,
+        DmRegisterServiceInfo &serviceInfo) override;
+    virtual int32_t UnbindServiceTarget(const std::string &pkgName,
+        const std::map<std::string, std::string> &unbindParam, const std::string &netWorkId,
+        int64_t serviceId) override;
     void SyncServiceCallbacksToService(
         std::map<DmCommonNotifyEvent, std::set<std::pair<std::string, int64_t>>> &callbackMap);
+    virtual int32_t UpdateServiceInfo(int64_t serviceId, const DmRegisterServiceInfo &regServiceInfo) override;
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;
