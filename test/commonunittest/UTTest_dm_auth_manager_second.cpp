@@ -591,7 +591,6 @@ HWTEST_F(DmAuthManagerTest, GetConnectAddr_002, testing::ext::TestSize.Level1)
 HWTEST_F(DmAuthManagerTest, SinkAuthenticateFinish_001, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseState_ = std::make_shared<AuthResponseFinishState>();
-    authManager_->authPtr_ = authManager_->authenticationMap_[1];
     authManager_->isFinishOfLocal_ = true;
     authManager_->SinkAuthenticateFinish();
     ASSERT_EQ(authManager_->authResponseState_, nullptr);
@@ -601,7 +600,6 @@ HWTEST_F(DmAuthManagerTest, SrcAuthenticateFinish_001, testing::ext::TestSize.Le
 {
     authManager_->isFinishOfLocal_ = true;
     authManager_->authResponseContext_->state = 5;
-    authManager_->authPtr_ = authManager_->authenticationMap_[1];
     authManager_->SrcAuthenticateFinish();
     usleep(600);
     ASSERT_EQ(authManager_->authRequestState_, nullptr);
@@ -611,7 +609,6 @@ HWTEST_F(DmAuthManagerTest, SrcAuthenticateFinish_002, testing::ext::TestSize.Le
 {
     authManager_->isFinishOfLocal_ = false;
     authManager_->authResponseContext_->state = 7;
-    authManager_->authPtr_ = authManager_->authenticationMap_[1];
     authManager_->SrcAuthenticateFinish();
     usleep(600);
     ASSERT_EQ(authManager_->authRequestState_, nullptr);
@@ -1132,10 +1129,72 @@ HWTEST_F(DmAuthManagerTest, IsAuthTypeSupported_001, testing::ext::TestSize.Leve
 
 HWTEST_F(DmAuthManagerTest, IsAuthTypeSupported_002, testing::ext::TestSize.Level1)
 {
-    int32_t authType = 7;
-    authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
+    int32_t authType = DmAuthType::AUTH_TYPE_NFC;
     bool ret = authManager_->IsAuthTypeSupported(authType);
     ASSERT_EQ(ret, true);
+}
+
+HWTEST_F(DmAuthManagerTest, IsAuthTypeSupported_003, testing::ext::TestSize.Level1)
+{
+    int32_t authType = DmAuthType::AUTH_TYPE_CRE;
+    bool ret = authManager_->IsAuthTypeSupported(authType);
+    ASSERT_EQ(ret, true);
+}
+
+HWTEST_F(DmAuthManagerTest, IsAuthTypeSupported_004, testing::ext::TestSize.Level1)
+{
+    int32_t authType = DmAuthType::AUTH_TYPE_PIN;
+    bool ret = authManager_->IsAuthTypeSupported(authType);
+    ASSERT_EQ(ret, true);
+}
+
+HWTEST_F(DmAuthManagerTest, IsAuthTypeSupported_005, testing::ext::TestSize.Level1)
+{
+    int32_t authType = DmAuthType::AUTH_TYPE_QR_CODE;
+    bool ret = authManager_->IsAuthTypeSupported(authType);
+    ASSERT_EQ(ret, true);
+}
+
+HWTEST_F(DmAuthManagerTest, IsAuthTypeSupported_006, testing::ext::TestSize.Level1)
+{
+    int32_t authType = DmAuthType::AUTH_TYPE_NFC;
+    bool ret = authManager_->IsAuthTypeSupported(authType);
+    ASSERT_EQ(ret, true);
+}
+
+HWTEST_F(DmAuthManagerTest, IsAuthTypeSupported_007, testing::ext::TestSize.Level1)
+{
+    int32_t authType = DmAuthType::AUTH_TYPE_NO_INTER_ACTION;
+    bool ret = authManager_->IsAuthTypeSupported(authType);
+    ASSERT_EQ(ret, true);
+}
+
+HWTEST_F(DmAuthManagerTest, IsAuthTypeSupported_008, testing::ext::TestSize.Level1)
+{
+    int32_t authType = DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE;
+    bool ret = authManager_->IsAuthTypeSupported(authType);
+    ASSERT_EQ(ret, true);
+}
+
+HWTEST_F(DmAuthManagerTest, IsAuthTypeSupported_009, testing::ext::TestSize.Level1)
+{
+    int32_t authType = DmAuthType::AUTH_TYPE_UNKNOW;
+    bool ret = authManager_->IsAuthTypeSupported(authType);
+    ASSERT_EQ(ret, false);
+}
+
+HWTEST_F(DmAuthManagerTest, IsAuthTypeSupported_010, testing::ext::TestSize.Level1)
+{
+    int32_t authType = -1;
+    bool ret = authManager_->IsAuthTypeSupported(authType);
+    ASSERT_EQ(ret, false);
+}
+
+HWTEST_F(DmAuthManagerTest, IsAuthTypeSupported_011, testing::ext::TestSize.Level1)
+{
+    int32_t authType = 8;
+    bool ret = authManager_->IsAuthTypeSupported(authType);
+    ASSERT_EQ(ret, false);
 }
 
 HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_001, testing::ext::TestSize.Level1)
@@ -1208,9 +1267,8 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_007, testing::ext::TestSize.Leve
     std::string deviceId = "512156";
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authenticationMap_.clear();
     int32_t ret = authManager_->CheckAuthParamVaild(pkgName, authType, deviceId, extra);
-    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_AUTH_TYPE);
+    ASSERT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
 }
 
 HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_008, testing::ext::TestSize.Level1)
@@ -1221,7 +1279,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_008, testing::ext::TestSize.Leve
     std::string deviceId = "512156";
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
     authManager_->authRequestState_ = nullptr;
     int32_t ret = authManager_->CheckAuthParamVaild(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
@@ -1235,7 +1292,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_009, testing::ext::TestSize.Leve
     std::string deviceId = "512156";
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
     authManager_->authRequestState_ = std::make_shared<AuthRequestInitState>();
     authManager_->authResponseState_ = nullptr;
     int32_t ret = authManager_->CheckAuthParamVaild(pkgName, authType, deviceId, extra);
@@ -1250,7 +1306,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_010, testing::ext::TestSize.Leve
     std::string deviceId = "512156";
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
     authManager_->authRequestState_ = std::make_shared<AuthRequestInitState>();
     authManager_->authResponseState_ = std::make_shared<AuthResponseInitState>();
     int32_t ret = authManager_->CheckAuthParamVaild(pkgName, authType, deviceId, extra);
@@ -1267,7 +1322,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_0011, testing::ext::TestSize.Lev
     authManager_->importAuthCode_ = "156161";
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
     authManager_->authRequestState_ = std::make_shared<AuthRequestInitState>();
     authManager_->authResponseState_ = std::make_shared<AuthResponseInitState>();
     authManager_->softbusConnector_->discoveryDeviceInfoMap_.clear();
@@ -1285,7 +1339,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_0012, testing::ext::TestSize.Lev
     authManager_->importAuthCode_ = "";
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
     std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
     authManager_->softbusConnector_->discoveryDeviceInfoMap_.emplace(deviceId, infoPtr);
     authManager_->authRequestState_ = std::make_shared<AuthRequestInitState>();
@@ -1304,7 +1357,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_0013, testing::ext::TestSize.Lev
     authManager_->importAuthCode_ = "156161";
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
     authManager_->authRequestState_ = nullptr;
     authManager_->authResponseState_ = nullptr;
     authManager_->softbusConnector_->discoveryDeviceInfoMap_.clear();
@@ -1322,7 +1374,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_0014, testing::ext::TestSize.Lev
     authManager_->importAuthCode_ = "";
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
     std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
     authManager_->softbusConnector_->discoveryDeviceInfoMap_.emplace(deviceId, infoPtr);
     authManager_->authRequestState_ = nullptr;
@@ -1341,7 +1392,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_0015, testing::ext::TestSize.Lev
     authManager_->importAuthCode_ = "";
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
     std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
     authManager_->softbusConnector_->discoveryDeviceInfoMap_.emplace(deviceId, infoPtr);
     authManager_->authRequestState_ = nullptr;
@@ -1714,7 +1764,7 @@ HWTEST_F(DmAuthManagerTest, BindTarget_006, testing::ext::TestSize.Level1)
     int sessionId = 1;
     int64_t logicalSessionId = 888;
     int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam, sessionId, logicalSessionId);
-    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_AUTH_TYPE);
+    ASSERT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
 }
 } // namespace
 } // namespace DistributedHardware

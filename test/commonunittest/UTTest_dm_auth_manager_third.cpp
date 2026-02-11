@@ -397,18 +397,16 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt001, testing::ext::TestSize.Leve
     int32_t sessionId = 0;
     g_accountId = "test";
     authManager_->authResponseContext_->localAccountId = "test";
-    authManager_->authenticationMap_.clear();
     authManager_->authResponseContext_->hostPkgName = "test";
     authManager_->importPkgName_ = "test";
     authManager_->importAuthCode_ = "12345";
     authManager_->ProcRespNegotiateExt(sessionId);
-    ASSERT_EQ(authManager_->authResponseContext_->reply, ERR_DM_UNSUPPORTED_AUTH_TYPE);
+    ASSERT_NE(authManager_->authResponseContext_->reply, ERR_DM_UNSUPPORTED_AUTH_TYPE);
     g_accountId = "";
 }
 
 HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt002, testing::ext::TestSize.Level1)
 {
-    authManager_->authenticationMap_.clear();
     authManager_->authResponseContext_->hostPkgName = "test";
     authManager_->authResponseContext_->localAccountId = "test";
     authManager_->importAuthCode_ = "12345";
@@ -416,7 +414,7 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt002, testing::ext::TestSize.Leve
     g_accountId = "ohosAnonymousUid";
     int32_t sessionId = 0;
     authManager_->ProcRespNegotiateExt(sessionId);
-    ASSERT_EQ(authManager_->authResponseContext_->reply, ERR_DM_UNSUPPORTED_AUTH_TYPE);
+    ASSERT_NE(authManager_->authResponseContext_->reply, ERR_DM_UNSUPPORTED_AUTH_TYPE);
     g_accountId = "";
 }
 
