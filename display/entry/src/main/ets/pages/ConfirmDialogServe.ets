@@ -170,8 +170,8 @@ struct ConfirmCustomDialog {
 
     console.log(TAG + 'aboutToAppear execute PinCustomDialog')
     let context = getContext() as common.UIAbilityContext;
-    let myconfig=context.config
-    this.notdark=myconfig.colorMode.toString();
+    let myconfig = context.config
+    this.notdark = myconfig.colorMode.toString();
     this.fontSizeScale = context.config?.fontSizeScale ?? 1;
     console.log('=-= fontScale:' + this.fontSizeScale);
     this.setMarginValue();
@@ -181,13 +181,13 @@ struct ConfirmCustomDialog {
     }
     let customDescriptionStr: string = AppStorage.get('customDescriptionStr') as string;
     let hostPkgLabel: string = AppStorage.get('hostPkgLabel') as string;
-    if (this.isServiceBind&&this.appDataList.length>0) {
+    if (this.isServiceBind && this.appDataList.length > 0) {
       this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.serve_agency_confirm_proxy').id, this.peerDeviceName);
-    } else if(this.appDataList.length>0) {
-      if(hostPkgLabel!=null) {
-        this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.serve_confirm_trust').id, this.peerDeviceName,hostPkgLabel,this.appDataList[0].serviceDisplayName);
+    } else if (this.appDataList.length > 0) {
+      if (hostPkgLabel != null) {
+        this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.serve_confirm_trust').id, this.peerDeviceName, hostPkgLabel, this.appDataList[0].serviceDisplayName);
       } else {
-        this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.serve_confirm_trust_nohost').id,  this.peerDeviceName,this.appDataList[0].serviceDisplayName);
+        this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.serve_confirm_trust_nohost').id, this.peerDeviceName, this.appDataList[0].serviceDisplayName);
       }
      
     }
@@ -210,7 +210,7 @@ struct ConfirmCustomDialog {
         this.destruction();
         console.info('click cancel times run out');
       }
-    }, 1000)
+    }, 1000);
     console.log(TAG + 'deviceInfo.deviceType:' + deviceInfo.deviceType);
     
     this.listener.on('change', () => {
@@ -294,12 +294,14 @@ struct ConfirmCustomDialog {
 
   getAppDataList(): AppData[] {
     try {
-      let  jsonStr = AppStorage.get('serviceUserData') as string;
-       jsonStr = jsonStr.replace(/"serviceId":\s*\d+/g, (match) => {
-  
-      const numStr = match.split(':')[1].trim();
-      return `"serviceId": "${numStr}"`;
-    });
+      let jsonStr = AppStorage.get('serviceUserData') as string;
+      if (!jsonStr) {
+        return [];
+      }
+      jsonStr = jsonStr.replace(/"serviceId":\s*\d+/g, (match) => {
+        const numStr = match.split(':')[1].trim();
+        return `"serviceId": "${numStr}"`;
+      });
       return JsonUtil.parse(jsonStr) as AppData[];
     } catch (err) {
       console.error('Failed to parse data:', err);
@@ -361,17 +363,17 @@ struct ConfirmCustomDialog {
   }
 
   private toggleSelection(app: AppData, index: number, checked: boolean) {
-  if (checked) {
-    if (!this.selectedAppDataList.some(item => item.serviceId  === app.serviceId )) {
-      this.selectedAppDataList = [...this.selectedAppDataList,
-        { serviceDisplayName: app.serviceDisplayName,serviceId:app.serviceId }];
+    if (checked) {
+      if (!this.selectedAppDataList.some(item => item.serviceId === app.serviceId)) {
+        this.selectedAppDataList = [...this.selectedAppDataList,
+          { serviceDisplayName: app.serviceDisplayName, serviceId: app.serviceId }];
+      }
+    } else {
+      this.selectedAppDataList = this.selectedAppDataList.filter(
+        item => item.serviceId !== app.serviceId
+      );
     }
-  } else {
-    this.selectedAppDataList = this.selectedAppDataList.filter(
-      item => item.serviceId  !== app.serviceId 
-    );
   }
-}
 
   getImages(peerdeviceType: number): Resource {
     console.info('peerdeviceType is ' + peerdeviceType);
@@ -436,7 +438,7 @@ struct ConfirmCustomDialog {
 
   build() {
 
-   if ( this.isPhone) {
+    if (this.isPhone) {
       GridRow({
         columns: { xs: 4, sm: 8, md: this.isPC ? 24 : 12 },
         gutter: { x: 4 },
@@ -986,7 +988,7 @@ struct ConfirmCustomDialog {
 
                       Stack(){
                         List({ space: 0 }) {
-                          ForEach(this.appDataList.slice(0, 4), (app: AppData, index: number) => {
+                          ForEach(this.appDataList.slice(0, 5), (app: AppData, index: number) => {
                             ListItem() {
                            
                               Row() {
@@ -1420,7 +1422,7 @@ struct ConfirmCustomDialog {
       .height('auto')
   } else if(this.isCar) {
           Scroll(){
-          Column() {    
+          Column() {
                 this.Symbol();
                 Column() {
                   Text(this.title)
@@ -1445,7 +1447,6 @@ struct ConfirmCustomDialog {
                 })
                 .accessibilityGroup(true)
                 .accessibilityLevel('yes')
-  
                 Column() {
                   Scroll(){
                     Column(){
@@ -1460,12 +1461,11 @@ struct ConfirmCustomDialog {
                         })
                         .accessibilityGroup(true)
                         .accessibilityLevel('yes')
-                        .textOverflow({ overflow: TextOverflow.None })  
+                        .textOverflow({ overflow: TextOverflow.None })
                         .onAreaChange((o, n) => {
-                    this.descriptionHeight = n.height as number;
-                    console.info(`**descriptionHeight**:${this.descriptionHeight}`)
-                  })
-
+                          this.descriptionHeight = n.height as number;
+                          console.info(`**descriptionHeight**:${this.descriptionHeight}`)
+                        })
                       Stack(){
                         List({ space: 0 }) {
                           ForEach(this.appDataList, (app: AppData, index: number) => {
@@ -1508,7 +1508,6 @@ struct ConfirmCustomDialog {
                       .padding(12) 
                       }
                       .height(64)
-                      //.borderRadius({top:12, bottom: 12,left: 12, right: 12})
                           }, (app: AppData) => app.serviceDisplayName)
                         }
                         .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
@@ -1545,8 +1544,6 @@ struct ConfirmCustomDialog {
                 .margin({ left: 16, right: 16,bottom: 16 })
                 .width(440)
                 .height('auto')
-  
-
                   Button($r('app.string.dm_allow_always'))
                     .margin({ top: 0, bottom: 12 })
                     .padding({ top: 9.5, bottom: 9.5 })
@@ -1575,9 +1572,9 @@ struct ConfirmCustomDialog {
                     .accessibilityGroup(true)
                     .accessibilityLevel('yes')
                      .border({
-                          width: { top: 0.05, right: 0.05, bottom: 0.05, left: 0.05 }, // 设置四边宽度
-                          color: $r('app.color.car_border'), // 使用系统颜色资源作为边框颜色
-                          radius: { topLeft: 24, topRight: 24, bottomLeft: 24, bottomRight: 24 } // 可选：设置圆角半径
+                          width: { top: 0.05, right: 0.05, bottom: 0.05, left: 0.05 },
+                          color: $r('app.color.car_border'),
+                          radius: { topLeft: 24, topRight: 24, bottomLeft: 24, bottomRight: 24 }
                })
 
   
@@ -1610,12 +1607,10 @@ struct ConfirmCustomDialog {
                     .accessibilityGroup(true)
                     .accessibilityLevel('yes')
                     .border({
-                          width: { top: 0.05, right: 0.05, bottom: 0.05, left: 0.05 }, // 设置四边宽度
-                          color: $r('app.color.car_border'), // 使用系统颜色资源作为边框颜色
-                          radius: { topLeft: 24, topRight: 24, bottomLeft: 24, bottomRight: 24 } // 可选：设置圆角半径
+                          width: { top: 0.05, right: 0.05, bottom: 0.05, left: 0.05 },
+                          color: $r('app.color.car_border'),
+                          radius: { topLeft: 24, topRight: 24, bottomLeft: 24, bottomRight: 24 }
                })
-
-  
                   Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
                     .padding({ top: 9.5, bottom: 9.5 })
                     .fontColor($r('app.color.sys_color_font_secondary'))
@@ -1655,9 +1650,9 @@ struct ConfirmCustomDialog {
                     .accessibilityGroup(true)
                     .accessibilityLevel('yes')
                     .border({
-                          width: { top: 0.05, right: 0.05, bottom: 0.05, left: 0.05 }, // 设置四边宽度
-                          color: $r('app.color.car_border'), // 使用系统颜色资源作为边框颜色
-                          radius: { topLeft: 24, topRight: 24, bottomLeft: 24, bottomRight: 24 } // 可选：设置圆角半径
+                          width: { top: 0.05, right: 0.05, bottom: 0.05, left: 0.05 },
+                          color: $r('app.color.car_border'),
+                          radius: { topLeft: 24, topRight: 24, bottomLeft: 24, bottomRight: 24 }
                })
                     .margin({ bottom: 24 })
               }
@@ -1672,18 +1667,18 @@ struct ConfirmCustomDialog {
               .borderRadius($r('sys.float.alert_container_shape'))
               .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
               .border({
-                          width: { top: 0.05, right: 0.05, bottom: 0.05, left: 0.05 }, // 设置四边宽度
-                          color: '#FFFFFF', // 使用系统颜色资源作为边框颜色
-                          radius: { topLeft: 24, topRight: 24, bottomLeft: 24, bottomRight: 24 } // 可选：设置圆角半径
+                          width: { top: 0.05, right: 0.05, bottom: 0.05, left: 0.05 },
+                          color: '#FFFFFF',
+                          radius: { topLeft: 24, topRight: 24, bottomLeft: 24, bottomRight: 24 }
                })
               .opacity(this.notdark=='1'?1:0.9)
            }.constraintSize({ maxHeight: '80%'})
             .scrollBar(BarState.On)
             .scrollable(ScrollDirection.None)
             .onAreaChange((o, n) => {
-                    this.outsidescrollHeight = n.height as number;
-                    console.info(`**outsidescrollHeight**:${this.outsidescrollHeight}`)
-                  })
+              this.outsidescrollHeight = n.height as number;
+              console.info(`**outsidescrollHeight**:${this.outsidescrollHeight}`)
+            })
 
 
     } else {

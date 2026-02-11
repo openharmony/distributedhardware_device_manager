@@ -58,7 +58,6 @@ export default class ConfirmUIExtAbility extends UIExtensionAbility {
         if (want.parameters.metaType != undefined) {
             AppStorage.setOrCreate('metaType', want.parameters.metaType);
         }
-        
         let param: Record<string, UIExtensionContentSession> = {
             'session': session
         }
@@ -75,7 +74,7 @@ export default class ConfirmUIExtAbility extends UIExtensionAbility {
         session.setWindowBackgroundColor('#00000000');
         let extensionHostWindow = session.getUIExtensionHostWindowProxy();
         extensionHostWindow.hideNonSecureWindows(true);
-        session.setWindowPrivacyMode(false);
+        session.setWindowPrivacyMode(true);
         AppStorage.setOrCreate('ConfirmSession', session);
     }
 
