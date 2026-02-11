@@ -121,6 +121,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_201, testing::ext::Te
 {
     DeletePermission();
     std::string pkgName = "pkgName";
+    EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().RegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -133,6 +134,7 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_201, testing::ext::
 {
     DeletePermission();
     std::string pkgName = "pkgName";
+    EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().UnRegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }

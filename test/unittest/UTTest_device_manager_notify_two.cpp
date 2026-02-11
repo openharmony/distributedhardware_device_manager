@@ -740,7 +740,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline_003, testing::ext::TestSize.Le
 HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline_004, testing::ext::TestSize.Level0)
 {
     // 1. set pkgName not null
-    std::string pkgName = "com.ohos.test";
+    std::string pkgName = "com.ohos.testoffline004";
     // set Callback not null
     int count = 0;
     std::shared_ptr<DeviceStateCallback> callback = std::make_shared<DeviceStateCallbackTest>(count);
@@ -759,6 +759,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline_004, testing::ext::TestSize.Le
     DeviceManagerNotify::GetInstance().OnDeviceOffline(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceOffline called
     ASSERT_NE(count, 1);
+    DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
 }
 
 /*

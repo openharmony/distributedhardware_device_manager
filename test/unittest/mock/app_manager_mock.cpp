@@ -30,6 +30,11 @@ bool AppManager::IsSystemSA()
     return DmAppManager::dmAppManager->IsSystemSA();
 }
 
+bool AppManager::IsSystemApp()
+{
+    return DmAppManager::dmAppManager->IsSystemApp();
+}
+
 int32_t AppManager::GetNativeTokenIdByName(std::string &processName, int64_t &tokenId)
 {
     return DmAppManager::dmAppManager->GetNativeTokenIdByName(processName, tokenId);

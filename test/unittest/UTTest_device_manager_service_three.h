@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 
+#include "app_manager_mock.h"
 #include "common_event_support.h"
 #include "device_manager_service.h"
 #include "device_manager_service_listener.h"
@@ -61,6 +62,8 @@ public:
         std::make_shared<MultipleUserConnectorMock>();
     static inline std::shared_ptr<DeviceNameManagerMock> deviceNameManagerMock_ =
         std::make_shared<DeviceNameManagerMock>();
+    static inline std::shared_ptr<AppManagerMock> appManagerMock_ =
+        std::make_shared<AppManagerMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

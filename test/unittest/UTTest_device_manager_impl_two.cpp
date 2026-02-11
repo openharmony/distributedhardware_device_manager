@@ -1962,7 +1962,7 @@ HWTEST_F(DeviceManagerImplTest, SetDnPolicy_202, testing::ext::TestSize.Level0)
     EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
                 .Times(1).WillOnce(testing::Return(ERR_DM_INPUT_PARA_INVALID));
     int32_t ret = DeviceManager::GetInstance().SetDnPolicy(pkgName, policy);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerImplTest, SetDnPolicy_203, testing::ext::TestSize.Level0)

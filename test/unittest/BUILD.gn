@@ -561,6 +561,7 @@ ohos_unittest("UTTest_device_manager_service_three") {
 
   sources = [
     "UTTest_device_manager_service_three.cpp",
+    "mock/app_manager_mock.cpp",
     "mock/device_manager_service_impl_mock.cpp",
     "mock/device_manager_service_mock.cpp",
     "mock/device_name_manager_mock.cpp",
@@ -583,6 +584,7 @@ ohos_unittest("UTTest_device_manager_service_three") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
