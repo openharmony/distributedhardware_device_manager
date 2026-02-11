@@ -496,7 +496,7 @@ std::string GetAnonyJsonString(const std::string &value)
     const std::set<std::string> sensitiveKey = { "LOCALDEVICEID", "localAccountId", "networkId", "lnnPublicKey",
         "transmitPublicKey", "DEVICEID", "deviceId", "keyValue", "deviceName", "REMOTE_DEVICE_NAME", "data" };
     std::vector<JsonItemObject> paramJsonVec = paramJson.Items();
-    for (auto &element : paramJsonVec.Items()) {
+    for (auto &element : paramJsonVec) {
         if (element.IsString() && sensitiveKey.find(element.Key()) != sensitiveKey.end()) {
             paramJson[element.Key()] = GetAnonyString(element.Get<std::string>());
         }
