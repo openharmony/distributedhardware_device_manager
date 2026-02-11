@@ -85,7 +85,7 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
 
 void DmDeviceStateManager::DeleteOfflineDeviceInfo(const DmDeviceInfo &info)
 {
-    LOGI("DmDeviceStateManager::OnDeviceOffline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
+    LOGI("begin, deviceId = %{public}s", GetAnonyString(std::string(info.deviceId)).c_str());
     {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
@@ -149,7 +149,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
 
 void DmDeviceStateManager::OnDeviceOffline(std::string deviceId, const bool isOnline)
 {
-    LOGI("OnDeviceOffline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
+    LOGI("DmDeviceStateManager::OnDeviceOffline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo devInfo;
     {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
