@@ -150,6 +150,8 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
         int32_t leftLen = thumbnailSize - idx * MSG_MAX_SIZE;
         int32_t sliceLen = (leftLen > MSG_MAX_SIZE) ? MSG_MAX_SIZE : leftLen;
         jsonObj[TAG_APP_THUMBNAIL] = authRequestContext_->appThumbnail.substr(idx * MSG_MAX_SIZE, sliceLen);
+        LOGI("TAG_APP_THUMBNAIL encode, idx %{public}d, sliceLen %{public}d, thumbnailSize %{public}d", idx,
+            (uint32_t)sliceLen, thumbnailSize);
         jsonStrVec.push_back(jsonThumbnailObj.Dump());
     }
     return jsonStrVec;
@@ -652,8 +654,6 @@ void AuthMessageProcessor::ParseNegotiateMessage(const JsonObject &json)
     }
     if (IsString(json, TAG_ACCOUNT_GROUPID)) {
         authResponseContext_->accountGroupIdHash = json[TAG_ACCOUNT_GROUPID].Get<std::string>();
-    } else {
-        authResponseContext_->accountGroupIdHash = OLD_VERSION_ACCOUNT;
     }
     if (IsString(json, TAG_HOST)) {
         authResponseContext_->hostPkgName = json[TAG_HOST].Get<std::string>();
@@ -692,8 +692,6 @@ void AuthMessageProcessor::ParseRespNegotiateMessage(const JsonObject &json)
     }
     if (IsString(json, TAG_ACCOUNT_GROUPID)) {
         authResponseContext_->accountGroupIdHash = json[TAG_ACCOUNT_GROUPID].Get<std::string>();
-    } else {
-        authResponseContext_->accountGroupIdHash = OLD_VERSION_ACCOUNT;
     }
     if (IsString(json, TAG_NET_ID)) {
         authResponseContext_->networkId = json[TAG_NET_ID].Get<std::string>();

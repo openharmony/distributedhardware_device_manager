@@ -95,6 +95,7 @@ namespace {
     constexpr const char* APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:appUninstallByWifi";
     constexpr const char* APP_UNBIND_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:appUnbindByWifi";
     constexpr const char* ACCOUNT_COMMON_EVENT_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:accountCommonEventByWifi";
+    constexpr const char* SERVICE_UNBIND_PROXY_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:serviceUnbindProxyByWifi";
     const int32_t USER_SWITCH_BY_WIFI_TIMEOUT_S = 2;
     const int32_t SEND_DELAY_MAX_TIME = 5;
     const int32_t SEND_DELAY_MIN_TIME = 0;
@@ -2692,13 +2693,15 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
         if (find(peerHOUdids.begin(), peerHOUdids.end(), item.first) != peerHOUdids.end()) {
             LOGI("dualUdid: %{public}s", GetAnonyString(item.first).c_str());
             dualPeerUdids.emplace_back(item.first);
+            continue;
         }
         peerUdids.emplace_back(item.first);
     }
     if (!dualPeerUdids.empty()) {
         //logout notify cast+
         if (IsDMServiceAdapterResidentLoad()) {
-            dmServiceImplExtResident_->AccountIdLogout(userId, accountId, peerUdids);
+            LOGI("logout notify userId: %{public}d, accountId: %{public}s", userId, GetAnonyString(accountId).c_str());
+            dmServiceImplExtResident_->AccountIdLogout(userId, accountId, dualPeerUdids);
         }
     }
     if (!peerUdids.empty()) {
@@ -2707,6 +2710,8 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
             LOGE("GetAccountHash failed.");
             return;
         }
+        LOGI("NotifyRemoteLogout, userId: %{public}d, accountId: %{public}s, accountName: %{public}s",
+            userId, GetAnonyString(accountId).c_str(), GetAnonyString(accountName).c_str());
         NotifyRemoteLocalLogout(peerUdids, std::string(accountIdHash), accountName, userId);
     }
     for (const auto &item : deviceMap) {

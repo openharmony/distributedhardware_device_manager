@@ -431,7 +431,6 @@ HWTEST_F(AuthRequestStateTest, Enter_008, testing::ext::TestSize.Level1)
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authRequestState_ = std::make_shared<AuthRequestReplyState>();
     authManager->authResponseContext_->sessionId = 1;
-    authManager->authPtr_ = authManager->authenticationMap_[1];
     authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
     authManager->authMessageProcessor_->SetRequestContext(authManager->authRequestContext_);
     authManager->SetAuthRequestState(authRequestState);
@@ -491,7 +490,6 @@ HWTEST_F(AuthRequestStateTest, Enter_012, testing::ext::TestSize.Level1)
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager->authPtr_ = authManager->authenticationMap_[1];
     authManager->authResponseContext_->groupId = "111";
     authManager->authResponseContext_->groupName = "222";
     authManager->authResponseContext_->code = 123;
@@ -560,7 +558,6 @@ HWTEST_F(AuthRequestStateTest, Enter_014, testing::ext::TestSize.Level1)
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager->authRequestState_ = std::make_shared<AuthRequestNetworkState>();
-    authManager->authPtr_ = authManager->authenticationMap_[1];
     authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
     authManager->authMessageProcessor_->SetRequestContext(authManager->authRequestContext_);
     authManager->softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authManager);
@@ -616,7 +613,6 @@ HWTEST_F(AuthRequestStateTest, Enter_016, testing::ext::TestSize.Level1)
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestFinishState>();
     authManager->timer_ = std::make_shared<DmTimer>();
-    authManager->authPtr_ = authManager->authenticationMap_[1];
     authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();

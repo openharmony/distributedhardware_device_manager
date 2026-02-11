@@ -320,6 +320,7 @@ struct DmAuthContext {
     void SetCredentialId(DmAuthSide side, DmAuthScope authorizedScope, const std::string &credentialId);
     void SetPublicKey(DmAuthSide side, DmAuthScope authorizedScope, const std::string &publicKey);
     std::string GetAccountId(DmAuthSide side);
+    std::string GetAclBundleName(const DmAuthDirection &direction, DmProxyAuthContext &proxyAuthContext);
 };
 }  // namespace DistributedHardware
 }  // namespace OHOS

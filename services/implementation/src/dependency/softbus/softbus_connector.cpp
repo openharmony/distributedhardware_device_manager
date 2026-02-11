@@ -622,7 +622,7 @@ void SoftbusConnector::OnSoftbusJoinLNNResult(ConnectionAddr *addr, const char *
         LOGE("addr is null.");
         return;
     }
-    if (addr->type != CONNECTION_ADDR_SESSION_WITH_KEY) {
+    if (addr->type != CONNECTION_ADDR_SESSION) {
         LOGI("addr type is not session.");
         return;
     }
@@ -824,7 +824,7 @@ void SoftbusConnector::HandleDeviceOffline(std::string deviceId, const bool isOn
 
 void SoftbusConnector::OnSessionOpened(int32_t sessionId, int32_t result)
 {
-    LOGI("SoftbusConnector::OnSessionOpened");
+    LOGI("SoftbusConnector::OnSessionOpened. sessionId:%{public}d, result:%{public}d", sessionId, result);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string peerUdid = "";
     int32_t ret = softbusSession_->GetPeerDeviceId(sessionId, peerUdid);

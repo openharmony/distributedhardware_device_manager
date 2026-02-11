@@ -26,9 +26,9 @@
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const int32_t DM_MIN_RANDOM = 1;
-const int32_t DM_MAX_RANDOM_UINT16 = INT16_MAX;
-const int32_t DM_INVALID_FLAG_ID = 0;
+const uint16_t DM_MIN_RANDOM = 1;
+const uint16_t DM_MAX_RANDOM_UINT16 = UINT16_MAX;
+const uint16_t DM_INVALID_FLAG_ID = 0;
 const int32_t DM_MIN_PINCODE_SIZE = 6;
 const int32_t DM_MAX_PINCODE_SIZE = 1024;
 const int32_t DM_MAX_RANDOM = 9;
@@ -66,9 +66,13 @@ uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
 uint16_t GenUniqueRandUint(std::set<uint16_t> &randUint16Set)
 {
     uint16_t randUint = DM_INVALID_FLAG_ID;
+    if (randUint16Set.size() == DM_MAX_RANDOM_UINT16) {
+        LOGE("The randUint16Set cache size exceed the limit.");
+        return randUint;
+    }
     bool isExist = false;
     do {
-        randUint = GenRandInt(DM_MIN_RANDOM, DM_MAX_RANDOM_UINT16);
+        randUint = GenRandUint(DM_MIN_RANDOM, DM_MAX_RANDOM_UINT16);
         if (randUint16Set.find(randUint) != randUint16Set.end()) {
             LOGE("The randUint: %{public}d is exist.", randUint);
             isExist = true;

@@ -120,7 +120,7 @@ int32_t IpcModelCodec::DecodeDmDeviceProfileInfoFilterOptions(MessageParcel &par
 {
     filterOptions.isCloud = parcel.ReadBool();
     uint32_t size = parcel.ReadUint32();
-    if (size > MAX_DEVICE_PROFILE_SIZE) {
+    if (size > static_cast<uint32_t>(MAX_DEVICE_PROFILE_SIZE)) {
         LOGE("size more than %{public}d,", MAX_DEVICE_PROFILE_SIZE);
         return ERR_DM_IPC_WRITE_FAILED;
     }
@@ -328,7 +328,7 @@ bool IpcModelCodec::EncodeDmDeviceIconInfo(const DmDeviceIconInfo &deviceIconInf
 
 bool IpcModelCodec::EncodeServiceIds(const std::vector<int64_t> &serviceIds, MessageParcel &parcel)
 {
-    int32_t size = serviceIds.size();
+    int32_t size = static_cast<int32_t>(serviceIds.size());
     if (!parcel.WriteInt32(size)) {
         return false;
     }
@@ -344,7 +344,7 @@ void IpcModelCodec::DecodeServiceIds(std::vector<int64_t> &serviceIds, MessagePa
 {
     const int32_t MAX_SERVICE_IDS_SIZE = 1024;
     int32_t size = parcel.ReadInt32();
-    if (size > MAX_SERVICE_IDS_SIZE) {
+    if (size < 0 || size > MAX_SERVICE_IDS_SIZE) {
         LOGE("DecodeServiceIds: size %d", size);
         return;
     }
@@ -403,6 +403,62 @@ void IpcModelCodec::DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devI
     devInfo.extraData = parcel.ReadString();
 }
 
+bool IpcModelCodec::EncodeNetworkIdQueryFilter(const NetworkIdQueryFilter &queryFilter, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteString(queryFilter.wiseDeviceId));
+    bRet = (bRet && parcel.WriteInt32(queryFilter.onlineStatus));
+    bRet = (bRet && parcel.WriteString(queryFilter.deviceType));
+    bRet = (bRet && parcel.WriteString(queryFilter.deviceProductId));
+    bRet = (bRet && parcel.WriteString(queryFilter.deviceModel));
+    return bRet;
+}
+
+bool IpcModelCodec::DecodeNetworkIdQueryFilter(MessageParcel &parcel, NetworkIdQueryFilter &queryFilter)
+{
+    READ_HELPER_RET(parcel, String, queryFilter.wiseDeviceId, false);
+    READ_HELPER_RET(parcel, Int32, queryFilter.onlineStatus, false);
+    READ_HELPER_RET(parcel, String, queryFilter.deviceType, false);
+    READ_HELPER_RET(parcel, String, queryFilter.deviceProductId, false);
+    READ_HELPER_RET(parcel, String, queryFilter.deviceModel, false);
+    return true;
+}
+
+bool IpcModelCodec::EncodeStringVector(const std::vector<std::string> &vec, MessageParcel &parcel)
+{
+    uint32_t num = static_cast<uint32_t>(vec.size());
+    if (!parcel.WriteUint32(num)) {
+        LOGE("WriteUint32 num failed");
+        return false;
+    }
+    bool bRet = true;
+    for (uint32_t k = 0; k < num; k++) {
+        std::string str = vec[k];
+        bRet = parcel.WriteString(vec[k]);
+        if (!bRet) {
+            LOGE("EncodeStringVector failed");
+            break;
+        }
+    }
+    return bRet;
+}
+
+bool IpcModelCodec::DecodeStringVector(MessageParcel &parcel, std::vector<std::string> &vec)
+{
+    uint32_t num = 0;
+    READ_HELPER_RET(parcel, Uint32, num, false);
+    if (num > IPC_VECTOR_MAX_SIZE || num == 0) {
+        LOGE("num is Invalid value, num = %{public}u", num);
+        return false;
+    }
+    for (uint32_t k = 0; k < num; k++) {
+        std::string str = "";
+        READ_HELPER_RET(parcel, String, str, false);
+        vec.emplace_back(str);
+    }
+    return true;
+}
+
 bool IpcModelCodec::EncodeLocalServiceInfo(const DMLocalServiceInfo &serviceInfo, MessageParcel &parcel)
 {
     bool bRet = true;
@@ -456,7 +512,7 @@ bool IpcModelCodec::DecodeLocalServiceInfos(MessageParcel &parcel, std::vector<D
     uint32_t num = 0;
     READ_HELPER_RET(parcel, Uint32, num, false);
     bool bRet = true;
-    if (num > IPC_VECTOR_MAX_SIZE || num < 0) {
+    if (num > IPC_VECTOR_MAX_SIZE || num == 0) {
         LOGE("num is Invalid value, num = %{public}u", num);
         return false;
     }
@@ -470,62 +526,6 @@ bool IpcModelCodec::DecodeLocalServiceInfos(MessageParcel &parcel, std::vector<D
         serviceInfos.emplace_back(serviceInfo);
     }
     return bRet;
-}
-
-bool IpcModelCodec::EncodeNetworkIdQueryFilter(const NetworkIdQueryFilter &queryFilter, MessageParcel &parcel)
-{
-    bool bRet = true;
-    bRet = (bRet && parcel.WriteString(queryFilter.wiseDeviceId));
-    bRet = (bRet && parcel.WriteInt32(queryFilter.onlineStatus));
-    bRet = (bRet && parcel.WriteString(queryFilter.deviceType));
-    bRet = (bRet && parcel.WriteString(queryFilter.deviceProductId));
-    bRet = (bRet && parcel.WriteString(queryFilter.deviceModel));
-    return bRet;
-}
-
-bool IpcModelCodec::DecodeNetworkIdQueryFilter(MessageParcel &parcel, NetworkIdQueryFilter &queryFilter)
-{
-    READ_HELPER_RET(parcel, String, queryFilter.wiseDeviceId, false);
-    READ_HELPER_RET(parcel, Int32, queryFilter.onlineStatus, false);
-    READ_HELPER_RET(parcel, String, queryFilter.deviceType, false);
-    READ_HELPER_RET(parcel, String, queryFilter.deviceProductId, false);
-    READ_HELPER_RET(parcel, String, queryFilter.deviceModel, false);
-    return true;
-}
-
-bool IpcModelCodec::EncodeStringVector(const std::vector<std::string> &vec, MessageParcel &parcel)
-{
-    uint32_t num = static_cast<uint32_t>(vec.size());
-    if (!parcel.WriteUint32(num)) {
-        LOGE("WriteUint32 num failed");
-        return false;
-    }
-    bool bRet = true;
-    for (uint32_t k = 0; k < num; k++) {
-        std::string str = vec[k];
-        bRet = parcel.WriteString(vec[k]);
-        if (!bRet) {
-            LOGE("EncodeStringVector failed");
-            break;
-        }
-    }
-    return bRet;
-}
-
-bool IpcModelCodec::DecodeStringVector(MessageParcel &parcel, std::vector<std::string> &vec)
-{
-    uint32_t num = 0;
-    READ_HELPER_RET(parcel, Uint32, num, false);
-    if (num > IPC_VECTOR_MAX_SIZE || num < 0) {
-        LOGE("num is Invalid value, num = %{public}u", num);
-        return false;
-    }
-    for (uint32_t k = 0; k < num; k++) {
-        std::string str = "";
-        READ_HELPER_RET(parcel, String, str, false);
-        vec.emplace_back(str);
-    }
-    return true;
 }
 
 bool IpcModelCodec::EncodeSrvDiscParam(const DiscoveryServiceParam &param, MessageParcel &parcel)

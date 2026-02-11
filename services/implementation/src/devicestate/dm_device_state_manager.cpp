@@ -62,7 +62,7 @@ int32_t DmDeviceStateManager::RegisterSoftbusStateCallback()
 
 void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
 {
-    LOGI("begin, deviceId = %{public}s", GetAnonyString(std::string(info.deviceId)).c_str());
+    LOGI("SaveOnlineDeviceInfo begin, deviceId = %{public}s", GetAnonyString(std::string(info.deviceId)).c_str());
     std::string udid;
     if (SoftbusConnector::GetUdidByNetworkId(info.networkId, udid) == DM_OK) {
         std::string uuid;
@@ -149,7 +149,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
 
 void DmDeviceStateManager::OnDeviceOffline(std::string deviceId, const bool isOnline)
 {
-    LOGI("OnDeviceOffline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
+    LOGI("DmDeviceStateManager::OnDeviceOffline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo devInfo;
     {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -506,27 +506,27 @@ void DmDeviceStateManager::DeleteOffLineTimer(const std::string &peerUdid)
 
 void DmDeviceStateManager::StartEventThread()
 {
-    LOGD("StartEventThread begin");
+    LOGI("StartEventThread begin");
     eventTask_.threadRunning_ = true;
     eventTask_.queueThread_ = std::thread([this]() { this->ThreadLoop(); });
-    LOGD("StartEventThread complete");
+    LOGI("StartEventThread complete");
 }
 
 void DmDeviceStateManager::StopEventThread()
 {
-    LOGD("StopEventThread begin");
+    LOGI("StopEventThread begin");
     eventTask_.threadRunning_ = false;
     eventTask_.queueCond_.notify_all();
     eventTask_.queueFullCond_.notify_all();
     if (eventTask_.queueThread_.joinable()) {
         eventTask_.queueThread_.join();
     }
-    LOGD("StopEventThread complete");
+    LOGI("StopEventThread complete");
 }
 
 int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
 {
-    LOGD("AddTask begin, eventId: %{public}d", task->GetEventId());
+    LOGI("AddTask begin, eventId: %{public}d", task->GetEventId());
     {
         std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
         while (eventTask_.queue_.size() >= DM_EVENT_QUEUE_CAPACITY) {
@@ -535,13 +535,13 @@ int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
         eventTask_.queue_.push(task);
     }
     eventTask_.queueCond_.notify_one();
-    LOGD("AddTask complete");
+    LOGI("AddTask complete");
     return DM_OK;
 }
 
 void DmDeviceStateManager::ThreadLoop()
 {
-    LOGD("ThreadLoop begin");
+    LOGI("ThreadLoop begin");
     int32_t ret = pthread_setname_np(pthread_self(), THREAD_LOOP);
     if (ret != DM_OK) {
         LOGE("ThreadLoop setname failed.");
@@ -563,16 +563,16 @@ void DmDeviceStateManager::ThreadLoop()
             RunTask(task);
         }
     }
-    LOGD("ThreadLoop end");
+    LOGI("ThreadLoop end");
 }
 
 void DmDeviceStateManager::RunTask(const std::shared_ptr<NotifyEvent> &task)
 {
-    LOGD("RunTask begin, eventId: %{public}d", task->GetEventId());
+    LOGI("RunTask begin, eventId: %{public}d", task->GetEventId());
     if (task->GetEventId() == DM_NOTIFY_EVENT_ONDEVICEREADY) {
         OnDbReady(std::string(DM_PKG_NAME), task->GetDeviceId());
     }
-    LOGD("RunTask complete");
+    LOGI("RunTask complete");
 }
 
 DmAuthForm DmDeviceStateManager::GetAuthForm(const std::string &networkId)
@@ -627,7 +627,7 @@ void DmDeviceStateManager::GetNotifyEventInfos(std::vector<DmDeviceInfo> &device
 
 int32_t DmDeviceStateManager::ProcNotifyEvent(const int32_t eventId, const std::string &deviceId)
 {
-    LOGD("ProcNotifyEvent in, eventId: %{public}d", eventId);
+    LOGI("ProcNotifyEvent in, eventId: %{public}d", eventId);
     return AddTask(std::make_shared<NotifyEvent>(eventId, deviceId));
 }
 
@@ -676,7 +676,7 @@ void DmDeviceStateManager::ChangeDeviceInfo(const DmDeviceInfo &info)
 
 std::string DmDeviceStateManager::GetUdidByNetWorkId(std::string networkId)
 {
-    LOGI("networkId %{public}s", GetAnonyString(networkId).c_str());
+    LOGI("DmDeviceStateManager::GetUdidByNetWorkId networkId %{public}s", GetAnonyString(networkId).c_str());
     {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
