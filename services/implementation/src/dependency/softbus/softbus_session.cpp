@@ -20,6 +20,8 @@
 #include "dm_dfx_constants.h"
 #include "dm_hitrace.h"
 #include "dm_log.h"
+#include "dm_softbus_cache.h"
+#include "multiple_user_connector.h"
 #include "json_object.h"
 #include "softbus_connector.h"
 #include "softbus_error_code.h"
@@ -133,6 +135,7 @@ int SoftbusSession::OnSessionOpened(int sessionId, int result)
         LOGI("Session callback is not registered.");
         return DM_OK;
     }
+    CHECK_NULL_RETURN(sessionCallback_, ERR_DM_POINT_NULL);
     int32_t sessionSide = GetSessionSide(sessionId);
     sessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
     return DM_OK;

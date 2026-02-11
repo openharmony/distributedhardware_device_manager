@@ -106,10 +106,6 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
 {
     LOGI("DmAuthManager constructor");
     authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener_);
-    authenticationMap_[AUTH_TYPE_PIN] = nullptr;
-    authenticationMap_[AUTH_TYPE_IMPORT_AUTH_CODE] = nullptr;
-    authenticationMap_[AUTH_TYPE_CRE] = nullptr;
-    authenticationMap_[AUTH_TYPE_NFC] = nullptr;
     dmVersion_ = DM_VERSION_5_0_5;
 }
 
@@ -325,11 +321,6 @@ int32_t DmAuthManager::GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
 void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    auto iter = authenticationMap_.find(authType);
-    if (iter != authenticationMap_.end()) {
-        authPtr_ = iter->second;
-    }
-
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }
@@ -1028,8 +1019,6 @@ void DmAuthManager::AbilityNegotiate()
     if (!IsAuthTypeSupported(authResponseContext_->authType)) {
         LOGE("DmAuthManager::AuthenticateDevice authType %{public}d not support.", authResponseContext_->authType);
         authResponseContext_->reply = ERR_DM_UNSUPPORTED_AUTH_TYPE;
-    } else {
-        authPtr_ = authenticationMap_[authResponseContext_->authType];
     }
 
     if (IsAuthCodeReady(authResponseContext_->hostPkgName)) {
@@ -1511,7 +1500,7 @@ void DmAuthManager::SinkAuthenticateFinish()
     listener_->OnSinkBindResult(processInfo_, peerTargetId_, authResponseContext_->reply,
         authResponseContext_->state, GenerateBindResultContent());
     if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH &&
-        (authResponseContext_->authType == AUTH_TYPE_NFC || authPtr_ != nullptr)) {
+        (authResponseContext_->authType == AUTH_TYPE_NFC || authResponseContext_->authType == AUTH_TYPE_PIN)) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_CONFIRM_SHOW);
     }
@@ -1582,7 +1571,7 @@ void DmAuthManager::SrcAuthenticateFinish()
     }
     if ((authResponseContext_->state == AuthState::AUTH_REQUEST_JOIN ||
         authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) &&
-        (authResponseContext_->authType == AUTH_TYPE_NFC || authPtr_ != nullptr)) {
+        (authResponseContext_->authType == AUTH_TYPE_NFC || authResponseContext_->authType == AUTH_TYPE_PIN)) {
         CHECK_NULL_VOID(authUiStateMgr_);
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
     }
@@ -1664,7 +1653,6 @@ void DmAuthManager::ResetParams()
     isFinishOfLocal_ = true;
     authResponseContext_ = nullptr;
     authMessageProcessor_ = nullptr;
-    authPtr_ = nullptr;
     authRequestStateTemp_ = nullptr;
     authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
     bundleName_ = "";
@@ -2367,8 +2355,9 @@ bool DmAuthManager::IsSrc()
 
 bool DmAuthManager::IsAuthTypeSupported(const int32_t &authType)
 {
-    if (authenticationMap_.find(authType) == authenticationMap_.end()) {
-        LOGE("IsAuthTypeSupported failed, authType is not supported.");
+    LOGI("authType: %{public}d", authType);
+    if (authType < DmAuthType::AUTH_TYPE_CRE || authType >= DmAuthType::AUTH_TYPE_UNKNOW) {
+        LOGE("IsAuthTypeSupported failed, authType: %{public}d is not supported.", authType);
         return false;
     }
     return true;
@@ -2868,8 +2857,6 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
     if (!IsAuthTypeSupported(authResponseContext_->authType)) {
         LOGE("DmAuthManager::AuthenticateDevice authType %{public}d not support.", authResponseContext_->authType);
         authResponseContext_->reply = ERR_DM_UNSUPPORTED_AUTH_TYPE;
-    } else {
-        authPtr_ = authenticationMap_[authResponseContext_->authType];
     }
     if (IsAuthCodeReady(authResponseContext_->hostPkgName)) {
         authResponseContext_->isAuthCodeReady = true;

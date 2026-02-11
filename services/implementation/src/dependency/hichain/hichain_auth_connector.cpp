@@ -173,7 +173,7 @@ int32_t HiChainAuthConnector::ProcessAuthData(int64_t requestId, std::string aut
 
 int32_t HiChainAuthConnector::ProcessCredData(int64_t authReqId, const std::string &data)
 {
-    LOGI("HiChainAuthConnector::ProcessAuthData start.");
+    LOGI("HiChainAuthConnector::ProcessCredData start.");
     const CredAuthManager *credAuthManager = GetCredAuthInstance();
     int32_t ret = credAuthManager->processCredData(authReqId, reinterpret_cast<const uint8_t *>(data.c_str()),
         data.length(), &deviceAuthCallback_);
@@ -181,6 +181,7 @@ int32_t HiChainAuthConnector::ProcessCredData(int64_t authReqId, const std::stri
         LOGE("Hichain processData failed ret %{public}d.", ret);
         return ERR_DM_FAILED;
     }
+    LOGI("HiChainAuthConnector::ProcessCredData leave.");
     return DM_OK;
 }
 
@@ -224,7 +225,7 @@ int32_t HiChainAuthConnector::ExportCredential(int32_t osAccountId, const std::s
 int32_t HiChainAuthConnector::AgreeCredential(int32_t osAccountId, const std::string selfCredId,
     const std::string &authParams, std::string &credId)
 {
-    LOGI("start.");
+    LOGI("HiChainAuthConnector::AgreeCredential start.");
     char *returnData = NULL;
     const CredManager *credManager = GetCredMgrInstance();
     int32_t ret = credManager->agreeCredential(osAccountId, selfCredId.c_str(), authParams.c_str(), &returnData);
@@ -240,22 +241,23 @@ int32_t HiChainAuthConnector::AgreeCredential(int32_t osAccountId, const std::st
 
 int32_t HiChainAuthConnector::DeleteCredential(int32_t osAccountId, const std::string &credId)
 {
-    LOGI("start. osAccountId=%{public}s, credId=%{public}s", GetAnonyInt32(osAccountId).c_str(),
-        GetAnonyString(credId).c_str());
+    LOGI("HiChainAuthConnector::DeleteCredential start. osAccountId=%{public}d, credId=%{public}s", osAccountId,
+        credId.c_str());
     const CredManager *credManager = GetCredMgrInstance();
     int32_t ret = credManager->deleteCredential(osAccountId, credId.c_str());
     if (ret != HC_SUCCESS) {
         LOGE("Hichain deleteCredential failed ret %{public}d.", ret);
         return ERR_DM_FAILED;
     }
+    LOGI("HiChainAuthConnector::DeleteCredential leave.");
     return DM_OK;
 }
 
 int32_t HiChainAuthConnector::AuthCredential(int32_t osAccountId, int64_t authReqId, const std::string &credId,
     const std::string &pinCode)
 {
-    LOGI("start. osAccountId=%{public}s, credId=%{public}s", GetAnonyInt32(osAccountId).c_str(),
-        GetAnonyString(credId).c_str());
+    LOGI("HiChainAuthConnector::AuthCredential start. osAccountId=%{public}d, credId=%{public}s", osAccountId,
+        credId.c_str());
     if (credId.empty() && pinCode.empty()) {
         LOGE("HiChainAuthConnector::AuthCredential failed, credId and pinCode is empty.");
         return ERR_DM_FAILED;
@@ -276,6 +278,7 @@ int32_t HiChainAuthConnector::AuthCredential(int32_t osAccountId, int64_t authRe
         LOGE("HiChainAuthConnector::AuthCredential failed ret %{public}d.", ret);
         return ERR_DM_FAILED;
     }
+    LOGI("HiChainAuthConnector::AuthCredential leave.");
     return DM_OK;
 }
 
@@ -323,7 +326,7 @@ bool HiChainAuthConnector::onTransmit(int64_t requestId, const uint8_t *data, ui
 
 char *HiChainAuthConnector::onRequest(int64_t requestId, int operationCode, const char *reqParams)
 {
-    LOGI("start.");
+    LOGI("HiChainAuthConnector::onRequest start.");
     auto dmDeviceAuthCallback = GetDeviceAuthCallback(requestId);
     if (dmDeviceAuthCallback == nullptr) {
         LOGE("HiChainAuthConnector::onRequest dmDeviceAuthCallback_ is nullptr.");
@@ -334,7 +337,7 @@ char *HiChainAuthConnector::onRequest(int64_t requestId, int operationCode, cons
 
 void HiChainAuthConnector::onFinish(int64_t requestId, int operationCode, const char *returnData)
 {
-    LOGI("reqId:%{public}" PRId64 ", operation:%{public}d.",
+    LOGI("HiChainAuthConnector::onFinish reqId:%{public}" PRId64 ", operation:%{public}d.",
         requestId, operationCode);
     (void)returnData;
     auto dmDeviceAuthCallback = GetDeviceAuthCallback(requestId);
@@ -347,7 +350,7 @@ void HiChainAuthConnector::onFinish(int64_t requestId, int operationCode, const 
 
 void HiChainAuthConnector::onError(int64_t requestId, int operationCode, int errorCode, const char *errorReturn)
 {
-    LOGI("reqId:%{public}" PRId64 ", operation:%{public}d, errorCode:%{public}d.",
+    LOGI("HichainAuthenCallBack::onError reqId:%{public}" PRId64 ", operation:%{public}d, errorCode:%{public}d.",
         requestId, operationCode, errorCode);
     (void)operationCode;
     (void)errorReturn;
@@ -357,7 +360,7 @@ void HiChainAuthConnector::onError(int64_t requestId, int operationCode, int err
         return;
     }
     int32_t dmErrorCode = ERR_DM_FAILED;
-    if (errorCode == PROOF_MISMATCH) {
+    if (errorCode == static_cast<int>(PROOF_MISMATCH)) {
         dmErrorCode = ERR_DM_HICHAIN_PROOFMISMATCH;
     }
     dmDeviceAuthCallback->AuthDeviceError(requestId, dmErrorCode);
@@ -365,7 +368,7 @@ void HiChainAuthConnector::onError(int64_t requestId, int operationCode, int err
 
 void HiChainAuthConnector::onSessionKeyReturned(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen)
 {
-    LOGI("start.");
+    LOGI("HiChainAuthConnector::onSessionKeyReturned start.");
     if (sessionKeyLen > HICHAIN_DATA_SIZE) {
         LOGE("sessionKeyLen = %{public}u is invalid.", sessionKeyLen);
         return;
@@ -381,7 +384,7 @@ void HiChainAuthConnector::onSessionKeyReturned(int64_t requestId, const uint8_t
 
 int32_t HiChainAuthConnector::GenerateCredential(std::string &localUdid, int32_t osAccountId, std::string &publicKey)
 {
-    LOGI("start.");
+    LOGI("HiChainAuthConnector::GenerateCredential start.");
     JsonObject jsonObj;
     jsonObj["osAccountId"] = osAccountId;
     jsonObj["deviceId"] = localUdid;
@@ -477,7 +480,7 @@ int32_t HiChainAuthConnector::QueryCredInfoByCredId(int32_t userId, const std::s
 
 bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAccountId, int32_t peerOsAccountId)
 {
-    LOGI("start, deviceId: %{public}s, peerOsAccountId: %{public}s",
+    LOGI("QueryCredential start, deviceId: %{public}s, peerOsAccountId: %{public}s",
         GetAnonyString(localUdid).c_str(), GetAnonyInt32(peerOsAccountId).c_str());
     JsonObject jsonObj;
     jsonObj["osAccountId"] = osAccountId;
@@ -508,7 +511,7 @@ bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAcc
 
 int32_t HiChainAuthConnector::GetCredential(std::string &localUdid, int32_t osAccountId, std::string &publicKey)
 {
-    LOGI("start");
+    LOGI("HiChainAuthConnector::GetCredential");
     JsonObject jsonObj;
     jsonObj["osAccountId"] = osAccountId;
     jsonObj["deviceId"] = localUdid;
@@ -539,7 +542,7 @@ int32_t HiChainAuthConnector::GetCredential(std::string &localUdid, int32_t osAc
 int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, int32_t peerOsAccountId, std::string deviceId,
     std::string publicKey)
 {
-    LOGI("start, deviceId: %{public}s, peerOsAccountId: %{public}s",
+    LOGI("ImportCredential start, deviceId: %{public}s, peerOsAccountId: %{public}s",
         GetAnonyString(deviceId).c_str(), GetAnonyInt32(peerOsAccountId).c_str());
     JsonObject jsonObj;
     jsonObj["osAccountId"] = osAccountId;
@@ -560,7 +563,7 @@ int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, int32_t peer
 
 int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int32_t userId, int32_t peerUserId)
 {
-    LOGI("start, deviceId: %{public}s, peerUserId: %{public}d",
+    LOGI("DeleteCredential start, deviceId: %{public}s, peerUserId: %{public}d",
         GetAnonyString(deviceId).c_str(), peerUserId);
     JsonObject jsonObj;
     jsonObj["deviceId"] = deviceId;

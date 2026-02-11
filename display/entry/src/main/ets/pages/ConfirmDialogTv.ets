@@ -50,7 +50,7 @@ struct ConfirmCustomDialog {
   @State isAvailableType: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
   @State title: string = '';
-  @State mLocalWidth: number = 0;
+  @State mLocalWidth: number = 1;
   controller?: CustomDialogController;
   isPC: boolean = false;
   aboutToAppear() {
@@ -60,7 +60,7 @@ struct ConfirmCustomDialog {
       this.mLocalWidth = display.getDefaultDisplaySync().width;
     } catch (err) {
       console.error('Failed to get display width:', err);
-      this.mLocalWidth = 0;
+      this.mLocalWidth = 1;
     }
     let context = getContext() as common.UIAbilityContext;
 

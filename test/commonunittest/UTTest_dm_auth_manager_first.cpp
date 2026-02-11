@@ -548,7 +548,6 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_002, testing::ext::TestSize.Level
     authManager_->authResponseState_ = nullptr;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
     std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
     authManager_->softbusConnector_->discoveryDeviceInfoMap_.emplace(deviceId, infoPtr);
     int32_t ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
@@ -1422,7 +1421,6 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_004, testing::ext::TestSize.Level
     authManager_->authResponseState_ = nullptr;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
     int32_t ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, DM_OK);
 

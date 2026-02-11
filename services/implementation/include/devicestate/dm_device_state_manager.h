@@ -97,6 +97,7 @@ public:
     bool CheckIsOnline(const std::string &udid);
     void DeleteOffLineTimer(const std::string &peerUdid);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo, std::vector<ProcessInfo> &processInfos);
+    void HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId, int32_t errcode);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void StartDelTimerByDP(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId);
 #endif

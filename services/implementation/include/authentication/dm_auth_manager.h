@@ -605,7 +605,6 @@ private:
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<AuthUiStateManager> authUiStateMgr_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
-    std::map<int32_t, std::shared_ptr<IAuthentication>> authenticationMap_;
     std::shared_ptr<AuthRequestState> authRequestState_ = nullptr;
     std::shared_ptr<AuthRequestState> authRequestStateTemp_ = nullptr;
     std::shared_ptr<AuthResponseState> authResponseState_ = nullptr;
@@ -619,7 +618,6 @@ private:
     bool isFinishOfLocal_ = true;
     int32_t authTimes_ = 0;
     int32_t action_ = USER_OPERATION_TYPE_CANCEL_AUTH;
-    std::shared_ptr<IAuthentication> authPtr_;
     bool isAddingMember_ = false;
     std::string importPkgName_ = "";
     std::string importAuthCode_ = "";
