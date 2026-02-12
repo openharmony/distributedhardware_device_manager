@@ -565,6 +565,7 @@ typedef struct DmAuthInfo {
     DMLocalServiceInfoPinExchangeType pinExchangeType; /**1:pin box;2:qr from dp; 3:nfc from DP; 5:import 6:ultrasonic*/
     std::string description;        /** Description information on the three-party interface */
     std::string extraInfo;      /** Extended configuration information */
+    std::string regPkgName;      /** The pkgName of the currently registered service */
 } DmAuthInfo;
 } // namespace DistributedHardware
 } // namespace OHOS

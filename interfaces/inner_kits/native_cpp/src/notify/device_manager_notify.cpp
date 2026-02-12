@@ -1730,21 +1730,21 @@ void DeviceManagerNotify::UnRegisterAuthCodeInvalidCallback(const std::string &p
     authCodeInvalidCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::OnAuthCodeInvalid(const std::string &pkgName)
+void DeviceManagerNotify::OnAuthCodeInvalid(const std::string &regPkgName, const std::string &pinConsumerPkgName)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (regPkgName.empty()) {
+        LOGE("Invalid parameter, regPkgName is empty.");
         return;
     }
-    LOGI("in, pkgName:%{public}s", pkgName.c_str());
+    LOGI("in, regPkgName:%{public}s, pinConsumerPkgName:%{public}s", regPkgName.c_str(), pinConsumerPkgName.c_str());
     std::shared_ptr<AuthCodeInvalidCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
-        if (authCodeInvalidCallback_.count(pkgName) == 0) {
+        if (authCodeInvalidCallback_.count(pinConsumerPkgName) == 0) {
             LOGE("AuthCodeInvalidCallback error, device state callback not register.");
             return;
         }
-        tempCbk = authCodeInvalidCallback_[pkgName];
+        tempCbk = authCodeInvalidCallback_[pinConsumerPkgName];
     }
     if (tempCbk == nullptr) {
         LOGE("AuthCodeInvalidCallback error, registered device state callback is nullptr.");
@@ -1756,7 +1756,7 @@ void DeviceManagerNotify::OnAuthCodeInvalid(const std::string &pkgName)
     std::thread authCodeInvalid([=]() { AuthCodeInvalid(tempCbk); });
     int32_t ret = pthread_setname_np(authCodeInvalid.native_handle(), AUTH_CODE_INVALID);
     if (ret != DM_OK) {
-        LOGE("DeviceManagerNotify AuthCodeInvalid setname failed, pkgName:%{public}s", pkgName.c_str());
+        LOGE("DeviceManagerNotify AuthCodeInvalid setname failed, regPkgName:%{public}s", regPkgName.c_str());
     }
     authCodeInvalid.detach();
 #endif

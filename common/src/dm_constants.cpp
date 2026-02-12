@@ -213,5 +213,6 @@ const char* META_TOKEN = "metaToken";
 const char* PIN_ERROR_COUNT = "pinErrorCount";
 const char* PIN_MATCH_FLAG = "pinMatchFlag";
 const char* TAG_ONE_TIME_PIN_CODE_FLAG = "oneTimePinCodeFlag";
+const char* REG_PKGNAME = "regPkgName";
 } // namespace DistributedHardware
 } // namespace OHOS

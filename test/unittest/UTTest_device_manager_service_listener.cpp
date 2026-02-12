@@ -984,29 +984,32 @@ HWTEST_F(DeviceManagerServiceListenerTest, OpenAuthSessionWithPara_001, testing:
 HWTEST_F(DeviceManagerServiceListenerTest, OnAuthCodeInvalid_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
+    std::string pinConsumerPkgName = "ohos.devicemanager.pinConsumerPkgName.test";
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    listener_->OnAuthCodeInvalid(pkgName);
+    listener_->OnAuthCodeInvalid(pkgName, pinConsumerPkgName);
     EXPECT_NE(listener_, nullptr);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, OnAuthCodeInvalid_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
+    std::string pinConsumerPkgName = "ohos.devicemanager.pinConsumerPkgName.test";
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    listener_->OnAuthCodeInvalid(pkgName);
+    listener_->OnAuthCodeInvalid(pkgName, pinConsumerPkgName);
     EXPECT_TRUE(pkgName.empty());
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, OnAuthCodeInvalid_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
+    std::string pinConsumerPkgName = "ohos.devicemanager.pinConsumerPkgName.test";
     ProcessInfo targetProcessInfo;
     targetProcessInfo.pkgName = pkgName;
     std::vector<ProcessInfo> processInfos;
     processInfos.push_back(targetProcessInfo);
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(processInfos));
-    listener_->OnAuthCodeInvalid(pkgName);
+    listener_->OnAuthCodeInvalid(pkgName, pinConsumerPkgName);
     EXPECT_NE(listener_, nullptr);
 }
 } // namespace

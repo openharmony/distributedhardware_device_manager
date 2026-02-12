@@ -2595,4 +2595,4 @@ ohos_unittest("UTTest_dm_service_hichain_connector") {
   ]
 }
 
-## UnitTest UTTest_dm_service_hichain_connector}}}
+## UnitTest UTTest_dm_service_hichain_connector }}}

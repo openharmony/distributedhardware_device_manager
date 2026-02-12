@@ -3578,6 +3578,7 @@ void DeviceManagerServiceImpl::InitDpServiceInfo(const DmAuthInfo &dmAuthInfo,
     extraInfoObj[PIN_MATCH_FLAG] = pinMatchFlag;
     extraInfoObj[PIN_ERROR_COUNT] = errorCount;
     extraInfoObj[TAG_TOKENID] = tokenId;
+    extraInfoObj[REG_PKGNAME] = dmAuthInfo.regPkgName;
     dpServiceInfo.SetExtraInfo(extraInfoObj.Dump());
 }
 
@@ -3616,7 +3617,14 @@ void DeviceManagerServiceImpl::StartAuthInfoTimer(const DmAuthInfo &dmAuthInfo, 
     timer_->StartTimer(taskName, BIND_TARGET_PIN_TIMEOUT, [this, dmAuthInfo](std::string name) {
         DeviceManagerServiceImpl::StopAuthInfoTimerAndDeleteDP(dmAuthInfo.pinConsumerPkgName,
             static_cast<int32_t>(dmAuthInfo.pinExchangeType), dmAuthInfo.pinConsumerTokenId);
-            listener_->OnAuthCodeInvalid(dmAuthInfo.pinConsumerPkgName);
+            if (!dmAuthInfo.regPkgName.empty()) {
+                //The regPkgName is used to replace the pinConsumerPkgName to register authCodeInvalid
+                //The regPkgName and pinConsumerPkgName are not the same
+                listener_->OnAuthCodeInvalid(dmAuthInfo.regPkgName, dmAuthInfo.pinConsumerPkgName);
+            } else {
+                //The regPkgName is empty, the pinConsumerPkgName is the actual registrant and also the actual user
+                listener_->OnAuthCodeInvalid(dmAuthInfo.pinConsumerPkgName, dmAuthInfo.pinConsumerPkgName);
+            }
     });
 }
 void DeviceManagerServiceImpl::StopAuthInfoTimerAndDeleteDP(const std::string &pkgName, int32_t pinExchangeType,
