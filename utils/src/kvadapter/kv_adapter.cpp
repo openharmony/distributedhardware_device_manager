@@ -18,6 +18,7 @@
 #include <mutex>
 #include <unistd.h>
 
+#include "cJSON.h"
 #include "datetime_ex.h"
 #include "string_ex.h"
 
@@ -25,6 +26,7 @@
 #include "dm_anonymous.h"
 #include "dm_error_type.h"
 #include "dm_log.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -297,11 +299,6 @@ int32_t KVAdapter::GetOstypeCountByPrefix(const std::string &prefix, int32_t &co
         }
     }
     return DM_OK;
-}
-
-extern "C" IKVAdapter* CreateKVAdapter()
-{
-    return static_cast<IKVAdapter*>(new KVAdapter());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

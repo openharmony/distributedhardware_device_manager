@@ -22,10 +22,6 @@
 #include "dm_device_info.h"
 #include "json_object.h"
 
-#ifndef DM_EXPORT
-#define DM_EXPORT __attribute__ ((visibility ("default")))
-#endif // DM_EXPORT
-
 namespace OHOS {
 namespace DistributedHardware {
 extern const char* PRINT_LIST_SPLIT;
@@ -40,9 +36,9 @@ std::string GetAnonyInt32List(const std::vector<int32_t> &values);
 bool IsNumberString(const std::string &inputString);
 bool IsString(const JsonItemObject &jsonObj, const std::string &key);
 DM_EXPORT bool IsUint16(const JsonItemObject &jsonObj, const std::string &key);
-DM_EXPORT bool IsInt32(const JsonItemObject &jsonObj, const std::string &key);
+bool IsInt32(const JsonItemObject &jsonObj, const std::string &key);
 bool IsUint32(const JsonItemObject &jsonObj, const std::string &key);
-DM_EXPORT bool IsInt64(const JsonItemObject &jsonObj, const std::string &key);
+bool IsInt64(const JsonItemObject &jsonObj, const std::string &key);
 bool IsUint64(const JsonItemObject &jsonObj, const std::string &key);
 bool IsArray(const JsonItemObject &jsonObj, const std::string &key);
 bool IsBool(const JsonItemObject &jsonObj, const std::string &key);
