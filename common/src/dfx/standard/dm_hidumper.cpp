@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,7 +48,6 @@ const std::unordered_map<std::string, HidumperFlag> MAP_ARGS = {
     { std::string(ARGS_HELP_INFO), HidumperFlag::HIDUMPER_GET_HELP },
     { std::string(HIDUMPER_GET_TRUSTED_LIST_INFO), HidumperFlag::HIDUMPER_GET_TRUSTED_LIST },
 };
-
 } // namespace
 int32_t HiDumpHelper::HiDump(const std::vector<std::string>& args, std::string &result)
 {

@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "dm_device_info.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 const char* DEVICE_TYPE_UNKNOWN_STRING = "UNKNOWN";

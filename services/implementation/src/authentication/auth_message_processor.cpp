@@ -149,9 +149,9 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
         jsonThumbnailObj[TAG_THUMBNAIL_SIZE] = thumbnailSize;
         int32_t leftLen = thumbnailSize - idx * MSG_MAX_SIZE;
         int32_t sliceLen = (leftLen > MSG_MAX_SIZE) ? MSG_MAX_SIZE : leftLen;
-        jsonObj[TAG_APP_THUMBNAIL] = authRequestContext_->appThumbnail.substr(idx * MSG_MAX_SIZE, sliceLen);
         LOGI("TAG_APP_THUMBNAIL encode, idx %{public}d, sliceLen %{public}d, thumbnailSize %{public}d", idx,
             (uint32_t)sliceLen, thumbnailSize);
+        jsonObj[TAG_APP_THUMBNAIL] = authRequestContext_->appThumbnail.substr(idx * MSG_MAX_SIZE, sliceLen);
         jsonStrVec.push_back(jsonThumbnailObj.Dump());
     }
     return jsonStrVec;

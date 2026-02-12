@@ -374,11 +374,11 @@ public:
     static napi_value JsGetDeviceIconInfo(napi_env env, napi_callback_info info);
     static napi_value JsPutDeviceProfileInfoList(napi_env env, napi_callback_info info);
     static napi_value JsGetLocalDisplayDeviceName(napi_env env, napi_callback_info info);
+    static napi_value JsGetDeviceNetworkIdList(napi_env env, napi_callback_info info);
     static napi_value JsSetLocalDeviceName(napi_env env, napi_callback_info info);
     static napi_value JsSetRemoteDeviceName(napi_env env, napi_callback_info info);
     static napi_value JsRestoreLocalDeviceName(napi_env env, napi_callback_info info);
     static napi_value GetIdentificationByDeviceIds(napi_env env, napi_callback_info info);
-    static napi_value JsGetDeviceNetworkIdList(napi_env env, napi_callback_info info);
     static DeviceManagerNapi *GetDeviceManagerNapi(std::string &bundleName);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType, std::string &extra);
@@ -424,10 +424,10 @@ private:
         PutDeviceProfileInfoListAsyncCallbackInfo *jsCallback);
     static napi_value GetLocalDisplayDeviceNamePromise(napi_env env,
         GetLocalDisplayDeviceNameAsyncCallbackInfo *jsCallback);
-    static napi_value SetLocalDeviceNamePromise(napi_env env, SetLocalDeviceNameAsyncCallbackInfo *jsCallback);
-    static napi_value SetRemoteDeviceNamePromise(napi_env env, SetRemoteDeviceNameAsyncCallbackInfo *jsCallback);
     static napi_value GetDeviceNetworkIdListPromise(napi_env env,
         GetDeviceNetworkIdListAsyncCallbackInfo *jsCallback);
+    static napi_value SetLocalDeviceNamePromise(napi_env env, SetLocalDeviceNameAsyncCallbackInfo *jsCallback);
+    static napi_value SetRemoteDeviceNamePromise(napi_env env, SetRemoteDeviceNameAsyncCallbackInfo *jsCallback);
     static void ConstructOutput(napi_env env, napi_value &result, const std::vector<std::string> &deviceIdList,
         std::map<std::string, std::string> &deviceIdentificationMap);
 private:
