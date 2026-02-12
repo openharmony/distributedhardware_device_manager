@@ -46,9 +46,20 @@ public:
     {
         processInfo_ = processInfo;
     }
+
+    const std::string GetPinConsumerPkgName() const
+    {
+        return pinConsumerPkgName_;
+    }
+
+    void SetPinConsumerPkgName(const std::string &pinConsumerPkgName)
+    {
+        pinConsumerPkgName_ = pinConsumerPkgName;
+    }
 private:
     std::string pkgName_;
     ProcessInfo processInfo_;
+    std::string pinConsumerPkgName_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

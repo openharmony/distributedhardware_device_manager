@@ -1279,11 +1279,12 @@ void DeviceManagerServiceListener::SetNeedNotifyProcessInfos(const ProcessInfo &
     return;
 }
 
-void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName)
+void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &regPkgName,
+    const std::string &pinConsumerPkgName)
 {
-    LOGI("OnAuthCodeInvalid : %{public}s", pkgName.c_str());
-    if (pkgName.empty()) {
-        LOGE("OnAuthCodeInvalid: pkgName is empty, skip IPC request");
+    LOGI("in, regPkgName:%{public}s, pinConsumerPkgName:%{public}s", regPkgName.c_str(), pinConsumerPkgName.c_str());
+    if (regPkgName.empty()) {
+        LOGE("OnAuthCodeInvalid: regPkgName is empty, skip IPC request");
         return;
     }
     std::shared_ptr<IpcReq> pReq = std::make_shared<IpcReq>();
@@ -1291,7 +1292,7 @@ void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName)
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
     ProcessInfo processInfoTemp;
     for (const auto &item : processInfos) {
-        if (item.pkgName == pkgName) {
+        if (item.pkgName == regPkgName) {
             processInfoTemp = item;
         }
     }
@@ -1301,6 +1302,7 @@ void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName)
     }
     pReq->SetPkgName(processInfoTemp.pkgName);
     pReq->SetProcessInfo(processInfoTemp);
+    pReq->SetPinConsumerPkgName(pinConsumerPkgName);
     ipcServerListener_.SendRequest(ON_AUTH_CODE_INVALID, pReq, pRsp);
 }
 

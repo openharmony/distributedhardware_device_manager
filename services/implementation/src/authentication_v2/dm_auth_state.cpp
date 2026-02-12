@@ -1112,12 +1112,36 @@ void DmAuthState::HandlePinResultAndCallback(std::shared_ptr<DmAuthContext> cont
     DmAuthState::UpdatePinErrorCount(pkgName, context->authType);
     ++count;
     if (count >= PIN_CODE_COUNT_MAX_NUM) {
+        std::string regPkgName = "";
+        std::string pinConsumerPkgName = "";
+        GetRegPkgNameAndPinConsumerPkgName(pkgName, context->authType, regPkgName, pinConsumerPkgName);
         if (context->stopTimerAndDelDpCallback) {
             context->stopTimerAndDelDpCallback(pkgName, context->authType, tokenId);
         }
         if (context->listener != nullptr) {
-            context->listener->OnAuthCodeInvalid(context->accessee.pkgName);
+            context->listener->OnAuthCodeInvalid(regPkgName, pinConsumerPkgName);
         }
+    }
+}
+
+void DmAuthState::GetRegPkgNameAndPinConsumerPkgName(const std::string &bundleName, int32_t pinExchangeType,
+    std::string &regPkgName, std::string &pinConsumerPkgName)
+{
+    DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    JsonObject extraInfoObj;
+    if (!GetServiceExtraInfo(bundleName, pinExchangeType, srvInfo, extraInfoObj)) {
+        LOGE("load extra info failed, use default values");
+        regPkgName = bundleName;
+        pinConsumerPkgName = bundleName;
+        return;
+    }
+    pinConsumerPkgName = srvInfo.GetBundleName();
+    if (IsString(extraInfoObj, REG_PKGNAME)) {
+        regPkgName = extraInfoObj[REG_PKGNAME].Get<std::string>();
+    }
+    if (regPkgName.empty()) {
+        LOGI("regPkgName is empty");
+        regPkgName = pinConsumerPkgName;
     }
 }
 

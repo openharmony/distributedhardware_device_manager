@@ -2606,8 +2606,9 @@ ON_IPC_READ_RESPONSE(GET_AUTHTYPE_BY_UDIDHASH, MessageParcel &reply, std::shared
 
 ON_IPC_CMD(ON_AUTH_CODE_INVALID, MessageParcel &data, MessageParcel &reply)
 {
-    std::string pkgName = data.ReadString();
-    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(pkgName);
+    std::string regPkgName = data.ReadString();
+    std::string pinConsumerPkgName = data.ReadString();
+    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(regPkgName, pinConsumerPkgName);
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }

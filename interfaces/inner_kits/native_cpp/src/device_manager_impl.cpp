@@ -3505,6 +3505,9 @@ void DeviceManagerImpl::ConvertLocalServiceInfoToAuthInfo(const DMLocalServiceIn
     if (IsString(extraJson, BIZ_SINK_PKGNAME)) {
         dmAuthInfo.bizSinkPkgName = extraJson[BIZ_SINK_PKGNAME].Get<std::string>();
     }
+    if (IsString(extraJson, REG_PKGNAME)) {
+        dmAuthInfo.regPkgName = extraJson[REG_PKGNAME].Get<std::string>();
+    }
     if (IsString(extraJson, META_TOKEN)) {
         std::string metaTokenStr = extraJson[META_TOKEN].Get<std::string>();
         if (metaTokenStr.size() >= DM_MAX_META_TOKEN_LEN) {

@@ -2320,9 +2320,14 @@ ON_IPC_SET_REQUEST(ON_AUTH_CODE_INVALID, std::shared_ptr<IpcReq> pBaseReq, Messa
 {
     CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    if (!data.WriteString(pkgName)) {
-        LOGE("write pkgName failed");
+    std::string regPkgName = pReq->GetPkgName();
+    std::string pinConsumerPkgName = pReq->GetPinConsumerPkgName();
+    if (!data.WriteString(regPkgName)) {
+        LOGE("write regPkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(pinConsumerPkgName)) {
+        LOGE("write pinConsumerPkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

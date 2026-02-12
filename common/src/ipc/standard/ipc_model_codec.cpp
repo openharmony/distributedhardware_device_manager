@@ -652,6 +652,7 @@ bool IpcModelCodec::EncodeDmAuthInfo(const DmAuthInfo &dmAuthInfo, MessageParcel
     bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(dmAuthInfo.pinExchangeType)));
     bRet = (bRet && parcel.WriteString(dmAuthInfo.description));
     bRet = (bRet && parcel.WriteString(dmAuthInfo.extraInfo));
+    bRet = (bRet && parcel.WriteString(dmAuthInfo.regPkgName));
     return bRet;
 }
 
@@ -703,6 +704,7 @@ bool IpcModelCodec::DecodeDmAuthInfo(MessageParcel &parcel, DmAuthInfo &dmAuthIn
 
     READ_HELPER_RET(parcel, String, dmAuthInfo.description, false);
     READ_HELPER_RET(parcel, String, dmAuthInfo.extraInfo, false);
+    READ_HELPER_RET(parcel, String, dmAuthInfo.regPkgName, false);
     return true;
 }
 } // namespace DistributedHardware

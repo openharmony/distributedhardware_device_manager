@@ -102,7 +102,7 @@ public:
     void OnServicePublishResult(const ProcessInfo &processInfo, int64_t serviceId, int32_t publishResult) override;
     void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
     void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode) override;
-    void OnAuthCodeInvalid(const std::string &pkgName) override;
+    void OnAuthCodeInvalid(const std::string &regPkgName, const std::string &pinConsumerPkgName) override;
     std::set<ProcessInfo> GetAlreadyOnlineProcess() override;
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,

@@ -192,6 +192,8 @@ public:
     void DeleteInvalidCredAndAcl(std::shared_ptr<DmAuthContext> context);
     void DeleteAclSKAndCredId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
         const DistributedDeviceProfile::AccessControlProfile &profile, const std::string &localUdid);
+    void GetRegPkgNameAndPinConsumerPkgName(const std::string &bundleName, int32_t pinExchangeType,
+        std::string &regPkgName, std::string &pinConsumerPkgName);
 protected:
     bool NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context);
     bool NeedAgreeAcl(std::shared_ptr<DmAuthContext> context);

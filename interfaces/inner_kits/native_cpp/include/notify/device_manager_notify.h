@@ -157,7 +157,7 @@ public:
     void OnServiceOnline(const std::vector<int64_t> &serviceIds);
     void OnServicePublishResult(int64_t serviceId, int32_t publishResult);
     void OnLeaveLNNResult(const std::string &networkId, int32_t retCode);
-    void OnAuthCodeInvalid(const std::string &pkgName);
+    void OnAuthCodeInvalid(const std::string &regPkgName, const std::string &pinConsumerPkgName);
 
 private:
 #if !defined(__LITEOS_M__)
