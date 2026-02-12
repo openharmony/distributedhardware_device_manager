@@ -3,6 +3,18 @@
     {
       "name": "start_window_background",
       "value": "#FFFFFF"
+    },
+    {
+      "name": "sys_color_font_secondary",
+      "value": "$ohos:color:font_secondary"
+    },
+    {
+      "name": "car_border",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "background",
+      "value": "#001e1e1e"
     }
   ]
 }

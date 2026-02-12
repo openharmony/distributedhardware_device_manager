@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,18 +46,25 @@ export default class ConfirmUIExtAbility extends UIExtensionAbility {
         if (want.parameters.appUserData) {
             AppStorage.setOrCreate('appUserData', want.parameters.appUserData);
         }
+        if (want.parameters.isServiceBind) {
+            AppStorage.setOrCreate('isServiceBind', want.parameters.isServiceBind);
+        }
         if (want.parameters.title) {
             AppStorage.setOrCreate('title', want.parameters.title);
+        }
+        if(want.parameters.serviceUserData){
+            AppStorage.setOrCreate('serviceUserData', want.parameters.serviceUserData);
         }
         if (want.parameters.metaType != undefined) {
             AppStorage.setOrCreate('metaType', want.parameters.metaType);
         }
-
         let param: Record<string, UIExtensionContentSession> = {
             'session': session
         }
         let storage: LocalStorage = new LocalStorage(param);
-        if (deviceInfo.deviceType === 'wearable') {
+        if(AppStorage.get('isServiceBind') != null ? AppStorage.get('isServiceBind') as boolean:false) {
+            session.loadContent('pages/ConfirmDialogServe', storage);
+        } else if (deviceInfo.deviceType === 'wearable') {
             session.loadContent('pages/ConfirmDialogWearable', storage);
         } else if (deviceInfo.deviceType === 'tv') {
             session.loadContent('pages/ConfirmDialogTv', storage);
