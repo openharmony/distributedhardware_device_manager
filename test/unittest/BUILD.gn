@@ -90,6 +90,7 @@ group("unittest") {
     ":UTTest_ipc_server_stub",
     ":UTTest_json_object",
     ":UTTest_json_str_handle",
+    ":UTTest_dm_language_manager",
     ":UTTest_kv_adapter_manager",
     ":UTTest_mine_hichain_connector",
     ":UTTest_mine_softbus_listener",
@@ -2613,3 +2614,26 @@ ohos_unittest("UTTest_dm_service_hichain_connector") {
 }
 
 ## UnitTest UTTest_dm_service_hichain_connector}}}
+
+## UnitTest UTTest_dm_language_manager {{{
+ohos_unittest("UTTest_dm_language_manager") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/services/implementation/include",
+    "${devicemanager_path}/services/implementation/include/i18n",
+  ]
+
+  sources = [ "${devicemanager_path}/test/unittest/UTTest_dm_language_manager.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "cJSON:cjson_static",
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_dm_language_manager }}}
