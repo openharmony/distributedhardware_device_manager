@@ -40,7 +40,7 @@ namespace {
     const int32_t DEVICE_UNBIND_PAYLOAD_LEN = 7;
     /**
      * @brief app unbind payload length 6 bytes
-     * |      2 bytes         |         4 bytes          |         4 bytes              | 1 bytes     |
+     * |      2 bytes         |         4 bytes          |      4 bytes                 | 1 bytes     |
      * | userid lower 2 bytes |  token id lower 4 bytes  |  peertoken id lower 4 bytes  | broadcastId |
      */
     const int32_t APP_UNBIND_PAYLOAD_LEN = 11;
@@ -702,6 +702,7 @@ bool RelationShipChangeMsg::FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloa
             isForegroundUser = false;
         }
     }
+
     return GetBroadCastId(payloadJson, userIdNum);
 }
 
@@ -1010,7 +1011,7 @@ const std::string RelationShipChangeMsg::ToString() const
     ret << ", accountName: " << GetAnonyString(accountName);
     ret << ", syncUserIdFlag: " << std::to_string(syncUserIdFlag);
     ret << ", userIds: " << GetUserIdInfoList(userIdInfos);
-    ret << ", broadCastId: " << std::to_string(broadCastId) << " }";
+    ret << ", broadCastId: " << std::to_string(broadCastId) + " }";
     return ret.str();
 }
 

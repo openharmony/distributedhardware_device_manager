@@ -28,6 +28,7 @@
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 #include "iremote_stub.h"
+#include "dm_single_instance.h"
 #include "system_ability.h"
 
 #include "dm_device_info.h"

@@ -37,7 +37,7 @@ namespace {
 const uint32_t MAX_CONTAINER_SIZE = 1000;
 constexpr int32_t SERVICE_PUBLISHED_STATE = 1;
 constexpr int32_t DEVICE_UUID_LENGTH = 65;
-}
+};
 DM_IMPLEMENT_SINGLE_INSTANCE(AppManager);
 
 const std::string AppManager::GetAppId()
@@ -128,7 +128,6 @@ int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &a
     std::string appIdKey = pkgName + "#" + std::to_string(userId);
     std::lock_guard<std::mutex> lock(appIdMapLock_);
     if (appIdMap_.find(appIdKey) == appIdMap_.end()) {
-        LOGE("appIdKey %{public}s get appid failed.", appIdKey.c_str());
         return ERR_DM_FAILED;
     }
     LOGI("PkgName %{public}s, userId %{public}d, appId %{public}s.",
@@ -301,7 +300,8 @@ DM_EXPORT int32_t AppManager::GetCallerProcessName(std::string &processName)
         return ERR_DM_FAILED;
     }
 
-    LOGI("Get process name: %{public}s success.", processName.c_str());
+    LOGI("Get process name: %{public}s success, tokenCaller ID == %{public}s.", processName.c_str(),
+        GetAnonyInt32(tokenCaller).c_str());
     return DM_OK;
 }
 
