@@ -49,6 +49,11 @@ int AccessTokenKit::VerifyAccessToken(AccessTokenID tokenID, const std::string& 
 {
     return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->VerifyAccessToken(tokenID, permissionName);
 }
+
+bool AccessTokenKit::IsSystemAppByFullTokenID(uint64_t fullTokenId)
+{
+    return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->IsSystemAppByFullTokenID(fullTokenId);
+}
 } // namespace AccessToken
 } // namespace Security
 

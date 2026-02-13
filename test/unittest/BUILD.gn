@@ -310,7 +310,10 @@ ohos_unittest("UTTest_app_manager_two") {
     "${devicemanager_path}/test/commonunittest",
   ]
 
-  sources = [ "${devicemanager_path}/test/unittest/UTTest_app_manager_two.cpp" ]
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_app_manager_two.cpp",
+    "${devicemanager_path}/test/unittest/mock/accesstoken_kit_mock.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
