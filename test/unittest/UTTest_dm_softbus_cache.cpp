@@ -294,6 +294,258 @@ HWTEST_F(DMSoftbusCacheTest, GetDeviceInfoByDeviceId_001, testing::ext::TestSize
     EXPECT_EQ(uuid, "uuidTest");
     SoftbusCache::GetInstance().DeleteDeviceInfo();
 }
+
+HWTEST_F(DMSoftbusCacheTest, SaveDeviceInfo_001, testing::ext::TestSize.Level1)
+{
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+    DmDeviceInfo deviceInfo = {
+        .deviceId = "deviceIdTest",
+        .deviceName = "deviceNameTest",
+        .deviceTypeId = 1,
+        .networkId = "networkidTest"
+    };
+    uint8_t udidBuf[UDID_BUF_LEN] = "testUdid";
+    uint8_t uuidBuf[UUID_BUF_LEN] = "testUuid";
+
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, NodeDeviceInfoKey::NODE_KEY_UDID, _, _))
+        .WillOnce(::testing::DoAll(
+            ::testing::SetArrayArgument<3>(udidBuf, udidBuf + strlen((char*)udidBuf) + 1),
+            Return(DM_OK)));
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, NodeDeviceInfoKey::NODE_KEY_UUID, _, _))
+        .WillOnce(::testing::DoAll(
+            ::testing::SetArrayArgument<3>(uuidBuf, uuidBuf + strlen((char*)uuidBuf) + 1),
+            Return(DM_OK)));
+
+    SoftbusCache::GetInstance().SaveDeviceInfo(deviceInfo);
+
+    std::string udid = "testUdid";
+    std::string retrievedUuid;
+    EXPECT_EQ(SoftbusCache::GetInstance().GetUuidByUdid(udid, retrievedUuid), DM_OK);
+    EXPECT_EQ(retrievedUuid, "testUuid");
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+}
+
+HWTEST_F(DMSoftbusCacheTest, SaveDeviceInfo_002, testing::ext::TestSize.Level1)
+{
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+    DmDeviceInfo deviceInfo = {
+        .deviceId = "deviceIdTest",
+        .deviceName = "deviceNameTest",
+        .deviceTypeId = 1,
+        .networkId = ""
+    };
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceInfosMutex_);
+        size_t sizeBefore = SoftbusCache::GetInstance().deviceInfo_.size();
+        SoftbusCache::GetInstance().SaveDeviceInfo(deviceInfo);
+        size_t sizeAfter = SoftbusCache::GetInstance().deviceInfo_.size();
+        EXPECT_EQ(sizeBefore, sizeAfter);
+    }
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+}
+
+HWTEST_F(DMSoftbusCacheTest, DeleteDeviceInfo_001, testing::ext::TestSize.Level1)
+{
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+    DmDeviceInfo deviceInfo = {
+        .deviceId = "deviceIdTest",
+        .deviceName = "deviceNameTest",
+        .deviceTypeId = 1,
+        .networkId = "networkidTest"
+    };
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceInfosMutex_);
+        SoftbusCache::GetInstance().deviceInfo_["testUdid"] =
+            std::pair<std::string, DmDeviceInfo>("testUuid", deviceInfo);
+    }
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceInfosMutex_);
+        EXPECT_EQ(SoftbusCache::GetInstance().deviceInfo_.size(), 1u);
+    }
+
+    SoftbusCache::GetInstance().DeleteDeviceInfo(deviceInfo);
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceInfosMutex_);
+        EXPECT_EQ(SoftbusCache::GetInstance().deviceInfo_.size(), 0u);
+    }
+}
+
+HWTEST_F(DMSoftbusCacheTest, DeleteDeviceInfo_002, testing::ext::TestSize.Level1)
+{
+    DmDeviceInfo deviceInfo1 = {
+        .deviceId = "deviceIdTest1",
+        .deviceName = "deviceNameTest1",
+        .deviceTypeId = 1,
+        .networkId = "networkidTest1"
+    };
+    DmDeviceInfo deviceInfo2 = {
+        .deviceId = "deviceIdTest2",
+        .deviceName = "deviceNameTest2",
+        .deviceTypeId = 2,
+        .networkId = "networkidTest2"
+    };
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceInfosMutex_);
+        SoftbusCache::GetInstance().deviceInfo_["testUdid1"] =
+            std::pair<std::string, DmDeviceInfo>("testUuid1", deviceInfo1);
+        SoftbusCache::GetInstance().deviceInfo_["testUdid2"] =
+            std::pair<std::string, DmDeviceInfo>("testUuid2", deviceInfo2);
+        EXPECT_EQ(SoftbusCache::GetInstance().deviceInfo_.size(), 2u);
+    }
+
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceInfosMutex_);
+        EXPECT_EQ(SoftbusCache::GetInstance().deviceInfo_.size(), 0u);
+    }
+}
+
+HWTEST_F(DMSoftbusCacheTest, ChangeDeviceInfo_001, testing::ext::TestSize.Level1)
+{
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+    DmDeviceInfo deviceInfo = {
+        .deviceId = "deviceIdTest",
+        .deviceName = "deviceNameTest",
+        .deviceTypeId = 1,
+        .networkId = "networkidTest"
+    };
+    uint8_t udidBuf[UDID_BUF_LEN] = "testUdid";
+    uint8_t uuidBuf[UUID_BUF_LEN] = "testUuid";
+    uint8_t uuidBufUpdated[UUID_BUF_LEN] = "testUuidUpdated";
+
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, NodeDeviceInfoKey::NODE_KEY_UDID, _, _))
+        .WillOnce(::testing::DoAll(
+            ::testing::SetArrayArgument<3>(udidBuf, udidBuf + strlen((char*)udidBuf) + 1),
+            Return(DM_OK)))
+        .WillOnce(::testing::DoAll(
+            ::testing::SetArrayArgument<3>(udidBuf, udidBuf + strlen((char*)udidBuf) + 1),
+            Return(DM_OK)));
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, NodeDeviceInfoKey::NODE_KEY_UUID, _, _))
+        .WillOnce(::testing::DoAll(
+            ::testing::SetArrayArgument<3>(uuidBuf, uuidBuf + strlen((char*)uuidBuf) + 1),
+            Return(DM_OK)))
+        .WillOnce(::testing::DoAll(
+            ::testing::SetArrayArgument<3>(uuidBufUpdated, uuidBufUpdated + strlen((char*)uuidBufUpdated) + 1),
+            Return(DM_OK)));
+
+    SoftbusCache::GetInstance().SaveDeviceInfo(deviceInfo);
+
+    DmDeviceInfo updatedDeviceInfo = {
+        .deviceId = "deviceIdTest",
+        .deviceName = "updatedDeviceName",
+        .deviceTypeId = 2,
+        .networkId = "networkidTest"
+    };
+
+    SoftbusCache::GetInstance().ChangeDeviceInfo(updatedDeviceInfo);
+
+    DmDeviceInfo retrievedInfo;
+    std::string udid = "testUdid";
+    EXPECT_EQ(SoftbusCache::GetInstance().GetUuidByUdid(udid, udid), DM_OK);
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+}
+
+HWTEST_F(DMSoftbusCacheTest, SaveDeviceSecurityLevel_001, testing::ext::TestSize.Level1)
+{
+    const char *networkId = "testNetworkId";
+    int32_t securityLevel = 1;
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceSecurityLevelMutex_);
+        SoftbusCache::GetInstance().deviceSecurityLevel_.clear();
+        EXPECT_EQ(SoftbusCache::GetInstance().deviceSecurityLevel_.size(), 0u);
+    }
+
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, NodeDeviceInfoKey::NODE_KEY_DEVICE_SECURITY_LEVEL, _, _))
+        .WillOnce(::testing::DoAll(
+            ::testing::SetArrayArgument<3>((uint8_t*)&securityLevel, (uint8_t*)&securityLevel + sizeof(int32_t)),
+            Return(DM_OK)));
+
+    SoftbusCache::GetInstance().SaveDeviceSecurityLevel(networkId);
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceSecurityLevelMutex_);
+        EXPECT_EQ(SoftbusCache::GetInstance().deviceSecurityLevel_.size(), 1u);
+        EXPECT_EQ(SoftbusCache::GetInstance().deviceSecurityLevel_[std::string(networkId)], 1);
+    }
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceSecurityLevelMutex_);
+        SoftbusCache::GetInstance().deviceSecurityLevel_.clear();
+    }
+}
+
+HWTEST_F(DMSoftbusCacheTest, DeleteDeviceSecurityLevel_001, testing::ext::TestSize.Level1)
+{
+    const char *networkId = "testNetworkId";
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceSecurityLevelMutex_);
+        SoftbusCache::GetInstance().deviceSecurityLevel_[std::string(networkId)] = 1;
+        EXPECT_EQ(SoftbusCache::GetInstance().deviceSecurityLevel_.size(), 1u);
+    }
+
+    SoftbusCache::GetInstance().DeleteDeviceSecurityLevel(networkId);
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceSecurityLevelMutex_);
+        EXPECT_EQ(SoftbusCache::GetInstance().deviceSecurityLevel_.size(), 0u);
+    }
+}
+
+HWTEST_F(DMSoftbusCacheTest, GetDeviceNameFromCache_001, testing::ext::TestSize.Level1)
+{
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+    DmDeviceInfo deviceInfo = {
+        .deviceId = "deviceIdTest",
+        .deviceName = "deviceNameTest",
+        .deviceTypeId = 1,
+        .networkId = "networkid"
+    };
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceInfosMutex_);
+        SoftbusCache::GetInstance().deviceInfo_.clear();
+        SoftbusCache::GetInstance().deviceInfo_["udid"] = std::pair<std::string, DmDeviceInfo>("uuid", deviceInfo);
+    }
+
+    std::string deviceName = "";
+    EXPECT_EQ(SoftbusCache::GetInstance().GetDeviceNameFromCache("udid", deviceName), DM_OK);
+    EXPECT_EQ(deviceName, "deviceNameTest");
+
+    deviceName = "";
+    EXPECT_NE(SoftbusCache::GetInstance().GetDeviceNameFromCache("test", deviceName), DM_OK);
+    EXPECT_TRUE(deviceName.empty());
+
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+}
+
+HWTEST_F(DMSoftbusCacheTest, CheckIsOnlineByPeerUdid_001, testing::ext::TestSize.Level1)
+{
+    DmDeviceInfo deviceInfo = {
+        .deviceId = "deviceIdTest",
+        .deviceName = "deviceNameTest",
+        .deviceTypeId = 1,
+        .networkId = "networkid"
+    };
+
+    {
+        std::lock_guard<ffrt::mutex> mutexLock(SoftbusCache::GetInstance().deviceInfosMutex_);
+        SoftbusCache::GetInstance().deviceInfo_.clear();
+        SoftbusCache::GetInstance().deviceInfo_["udid"] = std::pair<std::string, DmDeviceInfo>("uuid", deviceInfo);
+    }
+
+    EXPECT_TRUE(SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid("udid"));
+    EXPECT_FALSE(SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid("testUdid"));
+
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
