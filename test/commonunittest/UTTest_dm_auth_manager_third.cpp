@@ -120,8 +120,14 @@ void DmAuthManagerTest::TearDown()
     g_isIdenticalAccountReturnBoolValue = false;
     g_leftAclNumber = 0;
 }
-void DmAuthManagerTest::SetUpTestCase() {}
-void DmAuthManagerTest::TearDownTestCase() {}
+void DmAuthManagerTest::SetUpTestCase()
+{
+    InitDeviceAuthService();
+}
+void DmAuthManagerTest::TearDownTestCase()
+{
+    DestroyDeviceAuthService();
+}
 
 HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level1)
 {

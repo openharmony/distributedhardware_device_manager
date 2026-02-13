@@ -32,9 +32,11 @@ void AuthResponseStateTest::TearDown()
 }
 void AuthResponseStateTest::SetUpTestCase()
 {
+    InitDeviceAuthService();
 }
 void AuthResponseStateTest::TearDownTestCase()
 {
+    DestroyDeviceAuthService();
 }
 
 namespace {

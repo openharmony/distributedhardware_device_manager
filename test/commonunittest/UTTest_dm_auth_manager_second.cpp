@@ -56,6 +56,7 @@ void DmAuthManagerTest::TearDown()
 }
 void DmAuthManagerTest::SetUpTestCase()
 {
+    InitDeviceAuthService();
     hiChainConnectorMock_ = std::make_shared<HiChainConnectorMock>();
     DmHiChainConnector::dmHiChainConnector = hiChainConnectorMock_;
     multipleUserConnectorMock_ = std::make_shared<MultipleUserConnectorMock>();
@@ -83,6 +84,7 @@ void DmAuthManagerTest::TearDownTestCase()
     deviceProfileConnectorMock_ = nullptr;
     DmCrypto::dmCrypto = nullptr;
     cryptoMock_ = nullptr;
+    DestroyDeviceAuthService();
 }
 
 namespace {
