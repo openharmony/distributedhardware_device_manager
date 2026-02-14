@@ -47,6 +47,7 @@ group("unittest") {
     ":UTTest_dm_auth_attest_common",
     ":UTTest_dm_auth_cert",
     ":UTTest_dm_anonymous",
+    ":UTTest_dm_anonymous_two",
     ":UTTest_dm_auth_manager_first",
     ":UTTest_dm_auth_manager_second",
     ":UTTest_dm_auth_manager_third",
@@ -909,6 +910,30 @@ ohos_unittest("UTTest_dm_anonymous") {
 }
 
 ## UnitTest UTTest_dm_anonymous }}}
+
+## UnitTest UTTest_dm_anonymous_two {{{
+ohos_unittest("UTTest_dm_anonymous_two") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources = [
+    "${common_path}/src/dm_anonymous.cpp",
+    "${common_path}/src/dm_error_message.cpp",
+    "${devicemanager_path}/test/unittest/UTTest_dm_anonymous_two.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_dm_anonymous_two }}}
 
 ## UnitTest UTTest_dm_timer {{{
 ohos_unittest("UTTest_dm_timer") {
