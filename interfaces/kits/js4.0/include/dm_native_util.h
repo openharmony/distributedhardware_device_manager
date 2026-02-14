@@ -42,7 +42,7 @@ enum DMBussinessErrorCode {
     // Failed to obtain the service.
     DM_ERR_OBTAIN_SERVICE = 11600102,
     // Authentication invalid.
-    DM_ERR_AUTHENTICATION_INVALID = 11600103,
+    DM_ERR_AUTHENTICALTION_INVALID = 11600103,
     // Discovery invalid.
     DM_ERR_DISCOVERY_INVALID = 11600104,
     // Publish invalid.
@@ -109,10 +109,10 @@ void DmDeviceIconInfoToJs(const napi_env &env, const DmDeviceIconInfo &deviceIco
 void DmDeviceProfileInfoToJsArray(const napi_env &env, const std::vector<DmDeviceProfileInfo> &devInfos,
     napi_value &arrayResult);
 bool JsToDmDeviceProfileInfos(const napi_env &env, const napi_value &jsObj, std::vector<DmDeviceProfileInfo> &devInfos);
-void JsToDiscoveryParam(const napi_env &env, const napi_value &object,
-    std::map<std::string, std::string> &discParam);
 void JsToDmDeviceNetworkIdFilterOptions(const napi_env &env, const napi_value &object,
     NetworkIdQueryFilter &info);
+void JsToDiscoveryParam(const napi_env &env, const napi_value &object,
+    std::map<std::string, std::string> &discParam);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_NATIVE_UTIL_H

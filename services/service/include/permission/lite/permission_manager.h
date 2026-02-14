@@ -36,6 +36,7 @@ public:
     bool CheckWhiteListSystemSA(const std::string &pkgName);
     std::unordered_set<std::string> GetWhiteListSystemSA();
     bool CheckSystemSA(const std::string &pkgName);
+    std::unordered_set<std::string> GetSystemSA();
     bool CheckProcessNameValidOnSetDnPolicy(const std::string &processName);
     bool CheckProcessNameValidOnGetDeviceInfo(const std::string &processName);
     bool CheckProcessNameValidModifyLocalDeviceName(const std::string &processName);

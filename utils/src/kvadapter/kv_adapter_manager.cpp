@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,7 +47,7 @@ std::string ComposeOsTypePrefix()
 
 DM_EXPORT int32_t KVAdapterManager::Init()
 {
-    LOGI("Init Kv-Adapter manager");
+    LOGI("Init Kv-Adapter");
     {
         std::lock_guard<ffrt::mutex> lock(idCacheMapMtx_);
         idCacheMap_.clear();
@@ -127,7 +127,6 @@ DM_EXPORT int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value
     {
         std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
         CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
-
         if (kvAdapter_->Get(dmKey, valueStr) != DM_OK) {
             LOGE("Get kv value failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
             return ERR_DM_FAILED;

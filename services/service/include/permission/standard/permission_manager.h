@@ -16,6 +16,8 @@
 #ifndef OHOS_DM_PERMISSION_STANDARD_PERMISSION_MANAGER_H
 #define OHOS_DM_PERMISSION_STANDARD_PERMISSION_MANAGER_H
 
+#include <cstdint>
+#include <string>
 #include <unordered_set>
 #include "dm_single_instance.h"
 
@@ -35,6 +37,7 @@ public:
     bool CheckWhiteListSystemSA(const std::string &pkgName);
     std::unordered_set<std::string> GetWhiteListSystemSA();
     bool CheckSystemSA(const std::string &pkgName);
+    std::unordered_set<std::string> GetSystemSA();
     bool CheckProcessNameValidOnSetDnPolicy(const std::string &processName);
     bool CheckProcessNameValidOnGetDeviceInfo(const std::string &processName);
     bool CheckProcessNameValidModifyLocalDeviceName(const std::string &processName);

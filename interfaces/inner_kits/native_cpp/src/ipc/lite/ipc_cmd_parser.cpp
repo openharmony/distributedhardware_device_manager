@@ -21,7 +21,6 @@
 #include "dm_log.h"
 #include "dm_subscribe_info.h"
 #include "ipc_cmd_register.h"
-#include "ipc_common_param_req.h"
 #include "ipc_def.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_info_by_network_req.h"
@@ -385,95 +384,6 @@ ON_IPC_SET_REQUEST(SYNC_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, IpcIo &reque
 ON_IPC_READ_RESPONSE(SYNC_CALLBACK, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     return SetRspErrCode(reply, pBaseRsp);
-}
-
-ON_IPC_SET_REQUEST(START_DISCOVERING, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-                   size_t buffLen)
-{
-    LOGI("start.");
-    if (pBaseReq == nullptr) {
-        LOGE("pBaseReq is null");
-        return ERR_DM_FAILED;
-    }
-    std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    std::string discParaStr = pReq->GetFirstParam();
-    std::string filterOpStr = pReq->GetSecondParam();
-
-    IpcIoInit(&request, buffer, buffLen, 0);
-    WriteString(&request, pkgName.c_str());
-    WriteString(&request, discParaStr.c_str());
-    WriteString(&request, filterOpStr.c_str());
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(START_DISCOVERING, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    LOGI("start.");
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
-    return SetRspErrCode(reply, pBaseRsp);
-}
-
-ON_IPC_SET_REQUEST(STOP_DISCOVERING, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-                   size_t buffLen)
-{
-    LOGI("start.");
-    if (pBaseReq == nullptr) {
-        LOGE("pBaseReq is null");
-        return ERR_DM_FAILED;
-    }
-    std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    std::string discParaStr = pReq->GetFirstParam();
-
-    IpcIoInit(&request, buffer, buffLen, 0);
-    WriteString(&request, pkgName.c_str());
-    WriteString(&request, discParaStr.c_str());
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(STOP_DISCOVERING, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    LOGI("start.");
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
-    return SetRspErrCode(reply, pBaseRsp);
-}
-
-ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-                   size_t buffLen)
-{
-    if (pBaseReq == nullptr) {
-        LOGE("pBaseReq is null");
-        return ERR_DM_FAILED;
-    }
-    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-
-    IpcIoInit(&request, buffer, buffLen, 0);
-    WriteString(&request, pkgName.c_str());
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_INFO, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
-    std::shared_ptr<IpcGetLocalDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceInfoRsp>(pBaseRsp);
-    DmDeviceInfo deviceInfo;
-    DecodeDmDeviceInfo(reply, deviceInfo);
-    int32_t ret = 0;
-    ReadInt32(&reply, &ret);
-    pRsp->SetLocalDeviceInfo(deviceInfo);
-    pRsp->SetErrCode(ret);
-    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

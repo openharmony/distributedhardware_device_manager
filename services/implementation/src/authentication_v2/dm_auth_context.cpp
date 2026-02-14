@@ -77,5 +77,12 @@ std::string DmAuthContext::GetAccountId(DmAuthSide side)
     DmAccess &remoteAccess = (direction == DM_AUTH_SOURCE) ? accessee : accesser;
     return (side == DM_AUTH_LOCAL_SIDE) ? localAccess.accountId : remoteAccess.accountId;
 }
+
+std::string DmAuthContext::GetAclBundleName(const DmAuthDirection &direction, DmProxyAuthContext &proxyAuthContext)
+{
+    DmProxyAccess &access =
+        (direction == DM_AUTH_SOURCE) ? proxyAuthContext.proxyAccesser : proxyAuthContext.proxyAccessee;
+    return !access.pkgName.empty() ? access.pkgName : access.bundleName;
+}
 }  // namespace DistributedHardware
 }  // namespace OHOS

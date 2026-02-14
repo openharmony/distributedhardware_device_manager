@@ -18,10 +18,6 @@
 
 #include <string>
 
-#ifndef DM_EXPORT
-#define DM_EXPORT __attribute__ ((visibility ("default")))
-#endif // DM_EXPORT
-
 namespace OHOS {
 namespace DistributedHardware {
 
@@ -33,8 +29,8 @@ typedef struct DmKVValue {
     int64_t lastModifyTime;
     explicit DmKVValue() : udidHash(""), appID(""), anoyDeviceId(""), salt(""), lastModifyTime(0) {}
 } DmKVValue;
-DM_EXPORT void ConvertDmKVValueToJson(const DmKVValue &kvValue, std::string &result);
-DM_EXPORT void ConvertJsonToDmKVValue(const std::string &result, DmKVValue &kvValue);
+void ConvertDmKVValueToJson(const DmKVValue &kvValue, std::string &result);
+void ConvertJsonToDmKVValue(const std::string &result, DmKVValue &kvValue);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_KV_INFO_H

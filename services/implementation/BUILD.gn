@@ -262,6 +262,8 @@ if (defined(ohos_lite)) {
       defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
     }
 
+    public_external_deps = [ "cJSON:cjson" ]
+
     if (support_msdp) {
       sources += [ "src/dependency/MSDP/spatial_location_callback_impl.cpp" ]
       defines += [ "SUPPORT_MSDP" ]
