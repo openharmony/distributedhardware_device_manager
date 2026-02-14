@@ -39,6 +39,7 @@ public:
     virtual AccessTokenID GetNativeTokenId(const std::string &) = 0;
     virtual AccessTokenID GetHapTokenID(int32_t, const std::string &, int32_t) = 0;
     virtual int VerifyAccessToken(AccessTokenID tokenID, const std::string& permissionName) = 0;
+    virtual bool IsSystemAppByFullTokenID(uint64_t) = 0;
 
     static std::shared_ptr<AccessTokenKitInterface> GetOrCreateAccessTokenKit();
     static void ReleaseAccessTokenKit();
@@ -57,6 +58,7 @@ public:
     MOCK_METHOD(AccessTokenID, GetNativeTokenId, (const std::string &));
     MOCK_METHOD(AccessTokenID, GetHapTokenID, (int32_t, const std::string &, int32_t));
     MOCK_METHOD(int, VerifyAccessToken, (AccessTokenID, const std::string&));
+    MOCK_METHOD(bool, IsSystemAppByFullTokenID, (uint64_t));
 };
 } // namespace DistributedHardware
 } // namespace OHOS

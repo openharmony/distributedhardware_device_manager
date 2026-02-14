@@ -356,5 +356,144 @@ HWTEST_F(AppManagerTest, GetBundleNameForSelf_001, testing::ext::TestSize.Level2
     EXPECT_EQ(result, DM_OK);
     EXPECT_EQ(bundleName, "");
 }
+
+HWTEST_F(AppManagerTest, GetBundleNameForSelf_002, testing::ext::TestSize.Level2)
+{
+    ASSERT_TRUE(client_ != nullptr);
+
+    // Test GetBundleManagerProxy failed - return nullptr for systemAbilityManager
+    EXPECT_CALL(*client_, GetSystemAbilityManager())
+        .Times(INVOKE_COUNT)
+        .WillOnce(Return(nullptr));
+
+    std::string bundleName = "";
+    auto result = AppManager::GetInstance().GetBundleNameForSelf(bundleName);
+    EXPECT_EQ(result, ERR_DM_GET_BMS_FAILED);
+}
+
+HWTEST_F(AppManagerTest, GetBundleNameForSelf_003, testing::ext::TestSize.Level2)
+{
+    ASSERT_TRUE(client_ != nullptr);
+    auto systemAbilityManager = sptr<SystemAbilityManagerMock>(new (std::nothrow) SystemAbilityManagerMock());
+
+    EXPECT_CALL(*client_, GetSystemAbilityManager())
+        .Times(INVOKE_COUNT)
+        .WillOnce(Return(systemAbilityManager));
+
+    // Test GetSystemAbility failed - return nullptr for bundleMgr
+    EXPECT_CALL(*systemAbilityManager, GetSystemAbility(_))
+        .Times(INVOKE_COUNT)
+        .WillOnce(Return(nullptr));
+
+    std::string bundleName = "";
+    auto result = AppManager::GetInstance().GetBundleNameForSelf(bundleName);
+    EXPECT_EQ(result, ERR_DM_GET_BMS_FAILED);
+}
+
+HWTEST_F(AppManagerTest, GetBundleNameForSelf_004, testing::ext::TestSize.Level2)
+{
+    ASSERT_TRUE(client_ != nullptr);
+    auto bundleMgr = sptr<BundleMgrMock>(new (std::nothrow) BundleMgrMock());
+    auto systemAbilityManager = sptr<SystemAbilityManagerMock>(new (std::nothrow) SystemAbilityManagerMock());
+
+    EXPECT_CALL(*systemAbilityManager, GetSystemAbility(_))
+        .Times(INVOKE_COUNT)
+        .WillOnce(Return(bundleMgr));
+    EXPECT_CALL(*client_, GetSystemAbilityManager())
+        .Times(INVOKE_COUNT)
+        .WillOnce(Return(systemAbilityManager));
+
+    // Test GetBundleInfoForSelf failed
+    EXPECT_CALL(*bundleMgr, GetBundleInfoForSelf(_, _))
+        .Times(INVOKE_COUNT)
+        .WillOnce(Return(ERR_FAILED_VALUE));
+
+    std::string bundleName = "";
+    auto result = AppManager::GetInstance().GetBundleNameForSelf(bundleName);
+    EXPECT_EQ(result, ERR_DM_GET_BUNDLE_NAME_FAILED);
+}
+
+HWTEST_F(AppManagerTest, GetCallerName_003, testing::ext::TestSize.Level2)
+{
+    ASSERT_TRUE(skeleton_ != nullptr);
+    ASSERT_TRUE(token_ != nullptr);
+
+    // Test TOKEN_NATIVE success branch
+    EXPECT_CALL(*skeleton_, GetCallingTokenID()).WillRepeatedly(Return(VALUABLE_TOKEN_ID));
+    EXPECT_CALL(*token_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_NATIVE));
+
+    NativeTokenInfo nativeTokenInfo;
+    nativeTokenInfo.processName = "test_process";
+    EXPECT_CALL(*token_, GetNativeTokenInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(nativeTokenInfo), Return(ERR_OK)));
+
+    bool isSystemSA = false;
+    std::string output;
+    auto ret = AppManager::GetInstance().GetCallerName(isSystemSA, output);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_TRUE(isSystemSA);
+    EXPECT_EQ(output, "test_process");
+}
+
+HWTEST_F(AppManagerTest, GetCallerProcessName_003, testing::ext::TestSize.Level2)
+{
+    ASSERT_TRUE(skeleton_ != nullptr);
+    ASSERT_TRUE(token_ != nullptr);
+
+    // Test TOKEN_HAP success branch - system app
+    EXPECT_CALL(*skeleton_, GetCallingTokenID()).WillRepeatedly(Return(VALUABLE_TOKEN_ID));
+    EXPECT_CALL(*skeleton_, GetCallingFullTokenID()).WillOnce(Return(VALUABLE_TOKEN_ID));
+    EXPECT_CALL(*token_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_HAP));
+
+    HapTokenInfo hapTokenInfo;
+    hapTokenInfo.bundleName = "test_bundle";
+    EXPECT_CALL(*token_, GetHapTokenInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(hapTokenInfo), Return(ERR_OK)));
+
+    // Mock IsSystemAppByFullTokenID to return true
+    EXPECT_CALL(*token_, IsSystemAppByFullTokenID(_))
+        .WillOnce(Return(true));
+
+    std::string output;
+    auto ret = AppManager::GetInstance().GetCallerProcessName(output);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(output, "test_bundle");
+}
+
+HWTEST_F(AppManagerTest, IsSystemApp_001, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(skeleton_ != nullptr);
+
+    // Test with valid system app token ID
+    uint64_t fullSystemAppTokenId = 0x01000000; // System app token ID pattern
+    EXPECT_CALL(*skeleton_, GetCallingFullTokenID())
+        .Times(INVOKE_COUNT)
+        .WillOnce(Return(fullSystemAppTokenId));
+
+    // Mock IsSystemAppByFullTokenID to return true
+    EXPECT_CALL(*token_, IsSystemAppByFullTokenID(_))
+        .WillOnce(Return(true));
+
+    auto ret = AppManager::GetInstance().IsSystemApp();
+    EXPECT_TRUE(ret);
+}
+
+HWTEST_F(AppManagerTest, IsSystemApp_002, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(skeleton_ != nullptr);
+
+    // Test with non-system app token ID
+    uint64_t nonSystemAppTokenId = 0x02000000; // Non-system app token ID pattern
+    EXPECT_CALL(*skeleton_, GetCallingFullTokenID())
+        .Times(INVOKE_COUNT)
+        .WillOnce(Return(nonSystemAppTokenId));
+
+    // Mock IsSystemAppByFullTokenID to return false
+    EXPECT_CALL(*token_, IsSystemAppByFullTokenID(_))
+        .WillOnce(Return(false));
+
+    auto ret = AppManager::GetInstance().IsSystemApp();
+    EXPECT_FALSE(ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
