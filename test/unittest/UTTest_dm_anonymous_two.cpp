@@ -19,7 +19,6 @@
 #include "gtest/gtest.h"
 #include <climits>
 #include <cerrno>
-#include "dm_anonymous.h"
 #include "UTTest_dm_anonymous_two.h"
 
 namespace OHOS {
