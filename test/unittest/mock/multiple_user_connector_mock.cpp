@@ -56,7 +56,7 @@ int32_t MultipleUserConnector::GetUserIdByDisplayId(int32_t displayId)
 
 void MultipleUserConnector::GetTokenIdAndForegroundUserId(uint32_t &tokenId, int32_t &userId)
 {
-    return DmMultipleUserConnector::dmMultipleUserConnector->GetTokenIdAndForegroundUserId(tokenId, userId);
+    DmMultipleUserConnector::dmMultipleUserConnector->GetTokenIdAndForegroundUserId(tokenId, userId);
 }
 
 std::string MultipleUserConnector::GetOhosAccountIdByUserId(int32_t userId)
@@ -71,12 +71,17 @@ std::string MultipleUserConnector::GetAccountNickName(int32_t userId)
 
 void MultipleUserConnector::GetCallerUserId(int32_t &userId)
 {
-    return DmMultipleUserConnector::dmMultipleUserConnector->GetCallerUserId(userId);
+    DmMultipleUserConnector::dmMultipleUserConnector->GetCallerUserId(userId);
 }
 
 void MultipleUserConnector::SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo)
 {
-    return DmMultipleUserConnector::dmMultipleUserConnector->SetAccountInfo(userId, dmAccountInfo);
+    DmMultipleUserConnector::dmMultipleUserConnector->SetAccountInfo(userId, dmAccountInfo);
+}
+
+DMAccountInfo MultipleUserConnector::GetCurrentDMAccountInfo()
+{
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetCurrentDMAccountInfo();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

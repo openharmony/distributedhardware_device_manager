@@ -47,5 +47,21 @@ int32_t Crypto::ConvertUdidHashToAnoyDeviceId(const std::string &appId, const st
 {
     return DmCrypto::dmCrypto->ConvertUdidHashToAnoyDeviceId(appId, udidHash, kvValue);
 }
+
+void Crypto::DmGenerateStrHash(const void *data, size_t dataSize, unsigned char *outBuf, uint32_t outBufLen,
+    uint32_t startIndex)
+{
+    DmCrypto::dmCrypto->DmGenerateStrHash(data, dataSize, outBuf, outBufLen, startIndex);
+}
+
+std::string Crypto::Sha256(const std::string &text, bool isUpper)
+{
+    return DmCrypto::dmCrypto->Sha256(text, isUpper);
+}
+
+std::string Crypto::Sha256(const void *data, size_t size, bool isUpper)
+{
+    return DmCrypto::dmCrypto->Sha256(data, size, isUpper);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
