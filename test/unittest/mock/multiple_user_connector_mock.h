@@ -37,7 +37,8 @@ public:
     virtual std::string GetOhosAccountIdByUserId(int32_t userId) = 0;
     virtual std::string GetAccountNickName(int32_t userId) = 0;
     virtual void GetCallerUserId(int32_t &userId) = 0;
-    virtual void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo);
+    virtual void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo) = 0;
+    virtual DMAccountInfo GetCurrentDMAccountInfo() = 0;
 public:
     static inline std::shared_ptr<DmMultipleUserConnector> dmMultipleUserConnector = nullptr;
 };
@@ -56,6 +57,7 @@ public:
     MOCK_METHOD(std::string, GetAccountNickName, (int32_t));
     MOCK_METHOD(void, GetCallerUserId, (int32_t &));
     MOCK_METHOD(void, SetAccountInfo, (int32_t, DMAccountInfo));
+    MOCK_METHOD(DMAccountInfo, GetCurrentDMAccountInfo, ());
 };
 }
 }

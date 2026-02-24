@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,10 @@ public:
     virtual std::string GetGroupIdHash(const std::string &groupId) = 0;
     virtual int32_t ConvertUdidHashToAnoyDeviceId(const std::string &appId, const std::string &udidHash,
         DmKVValue &kvValue) = 0;
+    virtual void DmGenerateStrHash(const void *data, size_t dataSize, unsigned char *outBuf, uint32_t outBufLen,
+        uint32_t startIndex) = 0;
+    virtual std::string Sha256(const std::string &text, bool isUpper) = 0;
+    virtual std::string Sha256(const void *data, size_t size, bool isUpper) = 0;
 public:
     static inline std::shared_ptr<DmCrypto> dmCrypto = nullptr;
 };
@@ -45,6 +49,9 @@ public:
     MOCK_METHOD(std::string, GetGroupIdHash, (const std::string &));
     MOCK_METHOD(int32_t, ConvertUdidHashToAnoyDeviceId, (const std::string &, const std::string &, DmKVValue &));
     MOCK_METHOD(int32_t, RAND_bytes, (unsigned char *, int32_t));
+    MOCK_METHOD(void, DmGenerateStrHash, (const void *, size_t, unsigned char *, uint32_t, uint32_t));
+    MOCK_METHOD(std::string, Sha256, (const std::string &, bool));
+    MOCK_METHOD(std::string, Sha256, (const void *data, size_t, bool));
 };
 }
 }
