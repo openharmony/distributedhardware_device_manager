@@ -1370,12 +1370,14 @@ bool HiChainConnector::IsNeedDelete(std::string &groupName, int32_t userId,
 void HiChainConnector::DeleteHoDevice(const std::string &peerUdid, const std::vector<int32_t> &foreGroundUserIds,
     const std::vector<int32_t> &backGroundUserIds)
 {
+    if (peerUdid.empty() || foreGroundUserIds.empty() || backGroundUserIds.empty()) {
+        LOGE("invalid input param.");
+        return;
+    }
     LOGI("peerudid %{public}s, foreGroundUserIds %{public}s, backGroundUserIds %{public}s.",
         GetAnonyString(peerUdid).c_str(), GetIntegerList(foreGroundUserIds).c_str(),
         GetIntegerList(backGroundUserIds).c_str());
-    std::vector<int32_t> localUserIds(foreGroundUserIds.begin(), foreGroundUserIds.end());
-    std::copy(backGroundUserIds.begin(), backGroundUserIds.end(), std::back_inserter(localUserIds));
-    for (const auto &item : localUserIds) {
+    for (const auto &item : backGroundUserIds) {
         std::vector<GroupInfo> groupList;
         GetRelatedGroupsCommon(item, peerUdid, DM_PKG_NAME_EXT, groupList);
         for (auto &iter : groupList) {

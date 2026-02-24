@@ -603,6 +603,7 @@ public:
     virtual ~AuthSrcDataSyncState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+    void GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId);
 };
 
 class AuthSinkFinishState : public DmAuthState {

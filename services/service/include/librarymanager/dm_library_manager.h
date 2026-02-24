@@ -18,12 +18,12 @@
 #include <atomic>
 #include <chrono>
 #include <dlfcn.h>
+#include <string>
 #include <memory>
 #include <mutex>
-#include <shared_mutex>
-#include <string>
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
+#include <shared_mutex>
 
 #include "dm_log.h"
 #include "dm_timer.h"
@@ -35,9 +35,12 @@ constexpr int32_t LIB_UNLOAD_TRIGGER_FREE_TIMESPAN = 60;
 class DMLibraryManager {
 public:
     DMLibraryManager();
+
     static DMLibraryManager& GetInstance();
+
     template<typename FuncType>
     FuncType GetFunction(const std::string& libraryPath, const std::string& functionName);
+
     void Release(const std::string& libraryPath);
 
 private:
@@ -76,6 +79,11 @@ private:
 template<typename FuncType>
 FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std::string& functionName)
 {
+    if (libraryPath.empty()) {
+        LOGE("libraryPath is empty");
+        return nullptr;
+    }
+
     auto libInfo = GetOrCreateLibrary(libraryPath);
     {
         std::shared_lock<std::shared_mutex> readLock(libInfo->mutex);
@@ -98,8 +106,7 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
     void* sym = dlsym(libInfo->handle, functionName.c_str());
     if (sym == nullptr) {
         libInfo->refCount--;
-        LOGE("dlsym failed for %{public}s: %{public}s, refCount: %{public}d",
-            libraryPath.c_str(), dlerror(), libInfo->refCount.load());
+        LOGE("dlsym failed for %{public}s: %{public}s", libraryPath.c_str(), dlerror());
         return nullptr;
     }
     auto now = std::chrono::steady_clock::now();
