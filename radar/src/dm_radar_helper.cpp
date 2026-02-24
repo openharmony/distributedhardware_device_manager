@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1084,6 +1084,7 @@ int32_t DmRadarHelper::ReportGetTrustDeviceListResultFailed(std::string hostName
     std::string funcName, std::vector<DmDeviceInfo> &deviceInfoList,
     int32_t errCode, std::string localUdid, std::string discoverDevList)
 {
+    std::string anonyLocalUdid = GetAnonyUdid(localUdid);
     HiSysEventParam params[] = {
         {.name = "ORG_PKG", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)ORGPKGNAME }, .arraySize = 0, },
@@ -1101,7 +1102,7 @@ int32_t DmRadarHelper::ReportGetTrustDeviceListResultFailed(std::string hostName
         {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
             .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
         {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING,
-            .v = { .s = (char *)localUdid.c_str() }, .arraySize = 0, },
+            .v = { .s = (char *)anonyLocalUdid.c_str() }, .arraySize = 0, },
         {.name = "DISCOVERY_DEVICE_LIST", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)discoverDevList.c_str() }, .arraySize = 0, },
         {.name = "ERROR_CODE", .t = HISYSEVENT_INT32, .v = { .i32 = GetErrCode(errCode), }, .arraySize = 0, },
@@ -1122,6 +1123,7 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
         static std::string TrustCallerName = "";
         if (deviceCount > 0 && TrustCallerName != hostName) {
             TrustCallerName = hostName;
+            std::string anonyLocalUdid = GetAnonyUdid(localUdid);
             HiSysEventParam params[] = {
                 {.name = "ORG_PKG", .t = HISYSEVENT_STRING,
                     .v = { .s = (char *)ORGPKGNAME }, .arraySize = 0, },
@@ -1139,7 +1141,7 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
                 {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
                     .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
                 {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING,
-                    .v = { .s = (char *)localUdid.c_str() }, .arraySize = 0, },
+                    .v = { .s = (char *)anonyLocalUdid.c_str() }, .arraySize = 0, },
                 {.name = "DISCOVERY_DEVICE_LIST", .t = HISYSEVENT_STRING,
                     .v = { .s = (char *)discoverDevList.c_str() }, .arraySize = 0, },
             };
@@ -1161,6 +1163,7 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
 int32_t DmRadarHelper::ReportDmBehaviorResultSucc(std::string hostName, std::string funcName,
     int32_t errCode, std::string localUdid)
 {
+    std::string anonyLocalUdid = GetAnonyUdid(localUdid);
     HiSysEventParam params[] = {
         {.name = "ORG_PKG", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)ORGPKGNAME }, .arraySize = 0, },
@@ -1176,7 +1179,7 @@ int32_t DmRadarHelper::ReportDmBehaviorResultSucc(std::string hostName, std::str
         {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
             .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
         {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING,
-            .v = { .s = (char *)localUdid.c_str() }, .arraySize = 0, },
+            .v = { .s = (char *)anonyLocalUdid.c_str() }, .arraySize = 0, },
         };
     size_t len = sizeof(params) / sizeof(params[0]);
     return OH_HiSysEvent_Write(
@@ -1191,6 +1194,7 @@ void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName,
     if (errCode == DM_OK) {
         res = ReportDmBehaviorResultSucc(hostName, funcName, errCode, localUdid);
     } else {
+        std::string anonyLocalUdid = GetAnonyUdid(localUdid);
         HiSysEventParam params[] = {
             {.name = "ORG_PKG", .t = HISYSEVENT_STRING,
                 .v = { .s = (char *)ORGPKGNAME }, .arraySize = 0, },
@@ -1206,7 +1210,7 @@ void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName,
             {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
                 .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
             {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING,
-                .v = { .s = (char *)localUdid.c_str() }, .arraySize = 0, },
+                .v = { .s = (char *)anonyLocalUdid.c_str() }, .arraySize = 0, },
             {.name = "ERROR_CODE", .t = HISYSEVENT_INT32, .v = { .i32 = GetErrCode(errCode), }, .arraySize = 0, },
         };
         size_t len = sizeof(params) / sizeof(params[0]);
@@ -1225,6 +1229,7 @@ int32_t DmRadarHelper::ReportGetLocalDevInfoResultSucc(std::string hostName,
 {
     std::string devType = ConvertHexToString(info.deviceTypeId);
     std::string localNetId = GetAnonyUdid(info.networkId);
+    std::string anonyLocalUdid = GetAnonyUdid(localUdid);
     HiSysEventParam params[] = {
         {.name = "ORG_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)ORGPKGNAME }, .arraySize = 0, },
         {.name = "HOST_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)hostName.c_str() }, .arraySize = 0, },
@@ -1238,7 +1243,7 @@ int32_t DmRadarHelper::ReportGetLocalDevInfoResultSucc(std::string hostName,
         {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
             .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
         {.name = "DEV_TYPE", .t = HISYSEVENT_STRING, .v = { .s = (char *)devType.c_str() }, .arraySize = 0, },
-        {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING, .v = { .s = (char *)localUdid.c_str() }, .arraySize = 0, },
+        {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING, .v = { .s = (char *)anonyLocalUdid.c_str() }, .arraySize = 0, },
         {.name = "LOCAL_NET_ID", .t = HISYSEVENT_STRING, .v = { .s = (char *)localNetId.c_str() }, .arraySize = 0, },
     };
     size_t len = sizeof(params) / sizeof(params[0]);
@@ -1265,6 +1270,7 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
         } else {
             std::string devType = ConvertHexToString(info.deviceTypeId);
             std::string localNetId = GetAnonyUdid(info.networkId);
+            std::string anonyLocalUdid = GetAnonyUdid(localUdid);
             HiSysEventParam params[] = {
                 {.name = "ORG_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)ORGPKGNAME }, .arraySize = 0, },
                 {.name = "HOST_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)hostName.c_str() }, .arraySize = 0, },
@@ -1279,7 +1285,7 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
                     .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
                 {.name = "DEV_TYPE", .t = HISYSEVENT_STRING, .v = { .s = (char *)devType.c_str() }, .arraySize = 0, },
                 {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING,
-                    .v = { .s = (char *)localUdid.c_str() }, .arraySize = 0, },
+                    .v = { .s = (char *)anonyLocalUdid.c_str() }, .arraySize = 0, },
                 {.name = "LOCAL_NET_ID", .t = HISYSEVENT_STRING,
                     .v = { .s = (char *)localNetId.c_str() }, .arraySize = 0, },
                 {.name = "ERROR_CODE", .t = HISYSEVENT_INT32, .v = { .i32 = GetErrCode(errCode), }, .arraySize = 0, },
@@ -1302,6 +1308,7 @@ int32_t DmRadarHelper::ReportGetDeviceInfoResultSucc(std::string hostName,
     std::string devType = ConvertHexToString(info.deviceTypeId);
     std::string peerUdid = GetAnonyUdid(info.deviceId);
     std::string peerNetId = GetAnonyUdid(info.networkId);
+    std::string anonyLocalUdid = GetAnonyUdid(localUdid);
     HiSysEventParam params[] = {
         {.name = "ORG_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)ORGPKGNAME }, .arraySize = 0, },
         {.name = "HOST_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)hostName.c_str() }, .arraySize = 0, },
@@ -1314,7 +1321,7 @@ int32_t DmRadarHelper::ReportGetDeviceInfoResultSucc(std::string hostName,
             .v = { .i32 = static_cast<int32_t>(StageRes::STAGE_SUCC), }, .arraySize = 0, },
         {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
             .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
-        {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING, .v = { .s = (char *)localUdid.c_str() }, .arraySize = 0, },
+        {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING, .v = { .s = (char *)anonyLocalUdid.c_str() }, .arraySize = 0, },
         {.name = "DEV_TYPE", .t = HISYSEVENT_STRING, .v = { .s = (char *)devType.c_str() }, .arraySize = 0, },
         {.name = "PEER_UDID", .t = HISYSEVENT_STRING, .v = { .s = (char *)peerUdid.c_str() }, .arraySize = 0, },
         {.name = "PEER_NET_ID", .t = HISYSEVENT_STRING, .v = { .s = (char *)peerNetId.c_str() }, .arraySize = 0, },
@@ -1338,6 +1345,7 @@ void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
             std::string devType = ConvertHexToString(info.deviceTypeId);
             std::string peerUdid = GetAnonyUdid(info.deviceId);
             std::string peerNetId = GetAnonyUdid(info.networkId);
+            std::string anonyLocalUdid = GetAnonyUdid(localUdid);
             HiSysEventParam params[] = {
                 {.name = "ORG_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)ORGPKGNAME }, .arraySize = 0, },
                 {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
@@ -1352,7 +1360,7 @@ void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
                 {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
                     .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
                 {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING,
-                    .v = { .s = (char *)localUdid.c_str() }, .arraySize = 0, },
+                    .v = { .s = (char *)anonyLocalUdid.c_str() }, .arraySize = 0, },
                 {.name = "DEV_TYPE", .t = HISYSEVENT_STRING,
                     .v = { .s = (char *)devType.c_str() }, .arraySize = 0, },
                 {.name = "PEER_UDID", .t = HISYSEVENT_STRING,
