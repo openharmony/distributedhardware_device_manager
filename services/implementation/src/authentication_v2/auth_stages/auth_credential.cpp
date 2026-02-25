@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,7 @@ namespace {
 constexpr const char* TAG_LOWER_DEVICE_ID = "deviceId";
 constexpr const char* TAG_LOWER_USER_ID = "userId";
 constexpr const char* DM_AUTH_CREDENTIAL_OWNER = "DM";
+constexpr const char* DELETE_CREDENTIAL_TASK = "DeleteCredentialTask";
 const int32_t GENERATE_CERT_TIMEOUT = 300; // 300ms
 
 // decrypt process
@@ -814,7 +815,8 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
         context->accessee.isGeneratedLnnCredThisBind = true;
 
        // Delete temporary credentials sync
-        ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
+        ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);},
+            ffrt::task_attr().name(DELETE_CREDENTIAL_TASK));
     }
 
     DmAuthScope authorizedScope = GetAuthorizedScope(context->accessee.bindLevel);
@@ -835,7 +837,8 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
     }
     context->accessee.isGeneratedTransmitThisBind = true;
     // Delete temporary transport credentials sync
-    ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
+    ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);},
+        ffrt::task_attr().name(DELETE_CREDENTIAL_TASK));
 
     std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_RESP_CREDENTIAL_EXCHANGE, context);
     LOGI("AuthSinkCredentialExchangeState::Action leave.");
@@ -867,7 +870,8 @@ int32_t AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_pt
         }
         context->accesser.isGeneratedLnnCredThisBind = true;
         // Delete temporary lnn credentials sync
-        ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
+        ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);},
+            ffrt::task_attr().name(DELETE_CREDENTIAL_TASK));
     }
     DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
     if (context->accesser.bindLevel == static_cast<int32_t>(APP) ||
@@ -888,7 +892,8 @@ int32_t AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_pt
     }
     context->accesser.isGeneratedTransmitThisBind = true;
     // Delete temporary transport credentials sync
-    ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
+    ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);},
+        ffrt::task_attr().name(DELETE_CREDENTIAL_TASK));
     return DM_OK;
 }
 

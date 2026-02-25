@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,6 +53,7 @@ SERVER_ON_PIN_HOLDER_EVENT, UNBIND_TARGET_RESULT, REMOTE_DEVICE_TRUST_CHANGE, SE
 SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, SINK_BIND_TARGET_RESULT, GET_DEVICE_PROFILE_INFO_LIST_RESULT,
 GET_DEVICE_ICON_INFO_RESULT, SET_LOCAL_DEVICE_NAME_RESULT, SET_REMOTE_DEVICE_NAME_RESULT, SERVICE_PUBLISH_RESULT,
 ON_AUTH_CODE_INVALID};
+constexpr const char* RECLAIM_MEMMGR_FILE_MEM_FOR_DMTASK = "ReclaimMemmgrFileMemForDMTask";
 }
 
 DM_IMPLEMENT_SINGLE_INSTANCE(IpcServerStub);
@@ -167,7 +168,7 @@ void IpcServerStub::HandleSoftBusServerAdd()
         LOGI("HandleSoftBusServerAdd After 5mins.");
         ReclaimMemmgrFileMemForDM();
     };
-    ffrt::submit(task, ffrt::task_attr().delay(RECLAIM_DELAY_TIME));
+    ffrt::submit(task, ffrt::task_attr().name(RECLAIM_MEMMGR_FILE_MEM_FOR_DMTASK).delay(RECLAIM_DELAY_TIME));
     return;
 }
 //LCOV_EXCL_STOP

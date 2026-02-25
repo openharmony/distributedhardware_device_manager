@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -121,6 +121,16 @@ namespace {
     constexpr int32_t DM_MIN_SERVICE_DISPLAYNAME = 7;
     constexpr int32_t DM_MAX_SERVICE_DISPLAYNAME = 128;
     constexpr int32_t DM_MAX_CUSTOMDATA = 1024;
+    constexpr const char* SYNC_SERVICE_INFO_ONLINE_TASK = "SyncServiceInfoOnlineTask";
+    constexpr const char* SEND_APP_UN_BIND_BROAD_CAST_TASK = "SendAppUnBindBroadCastTask";
+    constexpr const char* SEND_APP_UN_INSTALL_BROAD_CAST_TASK = "SendAppUnInstallBroadCastTask";
+    constexpr const char* HANDLE_ACCOUNT_LOGOUT_EVENT_TASK = "HandleAccountLogoutEventTask";
+    constexpr const char* HANDLE_COMMON_EVENT_BROAD_CAST_TASK = "HandleCommonEventBroadCastTask";
+    constexpr const char* HANDLE_USER_IDS_BROAD_CAST_TASK = "HandleUserIdsBroadCastTask";
+    constexpr const char* HANDLE_REMOTE_USER_REMOVED_TASK = "HandleRemoteUserRemovedTask";
+    constexpr const char* HANDLE_SERVICE_UN_BIND_TARGET_EVENT_TASK = "HandleServiceUnBindTargetEventTask";
+    constexpr const char* ON_SET_LOCAL_DEVICE_NAME_RESULT_TASK = "OnSetLocalDeviceNameResultTask";
+    constexpr const char* HANDLE_SERVICE_UN_REG_EVENT_TASK = "HandleServiceUnRegEventTask";
 }
 //LCOV_EXCL_START
 DeviceManagerService::~DeviceManagerService()
@@ -1296,7 +1306,8 @@ void DeviceManagerService::HandleDeviceStatusChangeSrvBind(DmDeviceState devStat
             ffrt::submit([dmServiceImplExtResident = dmServiceImplExtResident_,
                 peerNetworkId = peerNetworkId, localUdid = localUdid]() {
                     dmServiceImplExtResident->SyncServiceInfoOnline(localUdid, peerNetworkId);
-            });
+            },
+                ffrt::task_attr().name(SYNC_SERVICE_INFO_ONLINE_TASK));
         }
         std::string peerUdid(devInfo.deviceId);
         int32_t state = static_cast<int32_t>(devState);
@@ -3749,7 +3760,8 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
         softbusListener_->SendAclChangedBroadcast(broadCastMsg);
     };
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
+    ffrt::submit(task,
+        ffrt::task_attr().name(SEND_APP_UN_BIND_BROAD_CAST_TASK).delay(delayTime * DELAY_TIME_SEC_CONVERSION));
 #else
     std::thread(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION)).detach();
 #endif
@@ -3772,7 +3784,8 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
         softbusListener_->SendAclChangedBroadcast(broadCastMsg);
     };
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
+    ffrt::submit(task,
+        ffrt::task_attr().name(SEND_APP_UN_BIND_BROAD_CAST_TASK).delay(delayTime * DELAY_TIME_SEC_CONVERSION));
 #else
     std::thread(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION)).detach();
 #endif
@@ -3794,7 +3807,8 @@ void DeviceManagerService::SendAppUnInstallBroadCast(const std::vector<std::stri
         softbusListener_->SendAclChangedBroadcast(broadCastMsg);
     };
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
+    ffrt::submit(task,
+        ffrt::task_attr().name(SEND_APP_UN_INSTALL_BROAD_CAST_TASK).delay(delayTime * DELAY_TIME_SEC_CONVERSION));
 #else
     std::thread(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION)).detach();
 #endif
@@ -3893,7 +3907,8 @@ void DeviceManagerService::ProcessAccountLogout(const RelationShipChangeMsg &rel
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() {
         HandleAccountLogoutEvent(relationShipMsg.userId, relationShipMsg.accountId, relationShipMsg.peerUdid);
-    });
+    },
+        ffrt::task_attr().name(HANDLE_ACCOUNT_LOGOUT_EVENT_TASK));
 #else
     std::thread([=]() {
         HandleAccountLogoutEvent(relationShipMsg.userId, relationShipMsg.accountId, relationShipMsg.peerUdid);
@@ -3920,7 +3935,8 @@ void DeviceManagerService::ProcessSyncUserId(const RelationShipChangeMsg &relati
         ffrt::submit([=]() {
             HandleCommonEventBroadCast(relationShipMsg.userIdInfos,
                 relationShipMsg.peerUdid, relationShipMsg.syncUserIdFlag);
-        });
+        },
+            ffrt::task_attr().name(HANDLE_COMMON_EVENT_BROAD_CAST_TASK));
     #else
         std::thread([=]() {
             HandleCommonEventBroadCast(relationShipMsg.userIdInfos,
@@ -3932,7 +3948,8 @@ void DeviceManagerService::ProcessSyncUserId(const RelationShipChangeMsg &relati
         ffrt::submit([=]() {
             HandleUserIdsBroadCast(relationShipMsg.userIdInfos,
                 relationShipMsg.peerUdid, relationShipMsg.syncUserIdFlag);
-        });
+        },
+            ffrt::task_attr().name(HANDLE_USER_IDS_BROAD_CAST_TASK));
     #else
         std::thread([=]() {
             HandleUserIdsBroadCast(relationShipMsg.userIdInfos,
@@ -3947,7 +3964,8 @@ void DeviceManagerService::ProcessDelUser(const RelationShipChangeMsg &relationS
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() {
         HandleRemoteUserRemoved(relationShipMsg.userId, relationShipMsg.peerUdid);
-    });
+    },
+        ffrt::task_attr().name(HANDLE_REMOTE_USER_REMOVED_TASK));
 #else
     std::thread([=]() {
         HandleRemoteUserRemoved(relationShipMsg.userId, relationShipMsg.peerUdid);
@@ -3961,7 +3979,8 @@ void DeviceManagerService::ProcessServiceInfoUnbind(const RelationShipChangeMsg 
     ffrt::submit([=]() {
         HandleServiceUnBindTargetEvent(relationShipMsg.peerUdid,
             relationShipMsg.userId, relationShipMsg.tokenId, relationShipMsg.serviceId);
-    });
+    },
+        ffrt::task_attr().name(HANDLE_SERVICE_UN_BIND_TARGET_EVENT_TASK));
 #else
     std::thread([=]() {
         HandleServiceUnBindTargetEvent(relationShipMsg.peerUdid,
@@ -4892,7 +4911,8 @@ int32_t DeviceManagerService::SetLocalDeviceName(const std::string &pkgName, con
     ffrt::submit([listener = listener_, deviceName = deviceName, processInfo = processInfo]() {
         CHECK_NULL_VOID(listener);
         listener->OnSetLocalDeviceNameResult(processInfo, deviceName, DM_OK);
-    });
+    },
+        ffrt::task_attr().name(ON_SET_LOCAL_DEVICE_NAME_RESULT_TASK));
 #else
     std::thread([listener = listener_, deviceName = deviceName, processInfo = processInfo]() {
         CHECK_NULL_VOID(listener);
@@ -6359,7 +6379,8 @@ void DeviceManagerService::HandleServiceUnRegEvent(std::string peerUdid, int32_t
 
     ffrt::submit([dmServiceImplExtResident = dmServiceImplExtResident_, peerUdid, serviceId]() {
         dmServiceImplExtResident->HandleServiceUnRegEvent(peerUdid, serviceId);
-    });
+    },
+        ffrt::task_attr().name(HANDLE_SERVICE_UN_REG_EVENT_TASK));
     return;
 }
 

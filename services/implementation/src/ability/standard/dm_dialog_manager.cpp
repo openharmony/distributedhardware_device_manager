@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -176,10 +176,11 @@ void DmDialogManager::ShowPinDialog(const std::string param)
         pinCode_ = param;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([]() { DmDialogManager::GetInstance().ConnectExtension(); });
+    ffrt::submit([]() { DmDialogManager::GetInstance().ConnectExtension(); },
+        ffrt::task_attr().name(CONNECT_PIN_DIALOG));
 #else
     std::thread pinDilog([]() { DmDialogManager::GetInstance().ConnectExtension(); });
-    int32_t ret = pthread_setname_np(pinDilog.native_handle(), CONNECT_PIN_DIALOG.c_str());
+    int32_t ret = pthread_setname_np(pinDilog.native_handle(), CONNECT_PIN_DIALOG);
     if (ret != DM_OK) {
         LOGE("pinDilog setname failed.");
     }

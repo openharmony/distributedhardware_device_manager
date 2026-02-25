@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,9 +32,7 @@ namespace OHOS {
 namespace DistributedHardware {
 using OHOS::EventFwk::MatchingSkills;
 using OHOS::EventFwk::CommonEventManager;
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* DEAL_THREAD = "package_common_event";
-#endif
 const std::string APP_ID = "appId";
 const std::string ACCESS_TOKEN_ID = "accessTokenId";
 constexpr int32_t MAX_TRY_TIMES = 3;
@@ -151,9 +149,9 @@ void DmPackageEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { callback_(appId, receiveEvent, accessTokenId); });
+    ffrt::submit([=]() { callback_(appId, receiveEvent, accessTokenId); }, ffrt::task_attr().name(DEAL_THREAD));
 #else
-    std::thread dealThread([=]() { callback_(appId, receiveEvent); });
+    std::thread dealThread([=]() { callback_(appId, receiveEvent, accessTokenId); });
     int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
     if (ret != DM_OK) {
         LOGE("dealThread setname failed.");

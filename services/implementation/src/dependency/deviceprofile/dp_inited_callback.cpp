@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const std::string PUT_ALL_TRUSTED_DEVICES_TASK = "PutAllTrustedDevicesTask";
+constexpr const char* PUT_ALL_TRUSTED_DEVICES_TASK = "PutAllTrustedDevicesTask";
 }
 
 //LCOV_EXCL_START
@@ -49,7 +49,7 @@ int32_t DpInitedCallback::OnDpInited()
 {
     LOGE("In.");
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { PutAllTrustedDevices(); });
+    ffrt::submit([=]() { PutAllTrustedDevices(); }, ffrt::task_attr().name(PUT_ALL_TRUSTED_DEVICES_TASK));
 #else
     std::thread putAllTrustedDevicesTask([=]() { PutAllTrustedDevices(); });
     if (pthread_setname_np(putAllTrustedDevicesTask.native_handle().c_str(), PUT_ALL_TRUSTED_DEVICES_TASK) != DM_OK) {
