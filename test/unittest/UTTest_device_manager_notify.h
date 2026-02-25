@@ -40,60 +40,114 @@ public:
 
 class DmInitCallbackTest : public DmInitCallback {
 public:
-    explicit DmInitCallbackTest(int &count);
+    explicit DmInitCallbackTest(int &count) : count_(&count) {}
     virtual ~DmInitCallbackTest() {}
-    void OnRemoteDied() override;
+    void OnRemoteDied() override 
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
 private:
     int *count_ = nullptr;
 };
 
 class DeviceStateCallbackTest : public DeviceStateCallback {
 public:
-    explicit DeviceStateCallbackTest(int &count);
+    explicit DeviceStateCallbackTest(int &count) : count_(&count) {}
     virtual ~DeviceStateCallbackTest() {}
-    void OnDeviceOnline(const DmDeviceInfo &deviceInfo) override;
-    void OnDeviceReady(const DmDeviceInfo &deviceInfo) override;
-    void OnDeviceOffline(const DmDeviceInfo &deviceInfo) override;
-    void OnDeviceChanged(const DmDeviceInfo &deviceInfo) override;
+    void OnDeviceOnline(const DmDeviceInfo &deviceInfo) override
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
+    void OnDeviceReady(const DmDeviceInfo &deviceInfo) override
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
+    void OnDeviceOffline(const DmDeviceInfo &deviceInfo) override
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
+    void OnDeviceChanged(const DmDeviceInfo &deviceInfo) override
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
 private:
     int *count_ = nullptr;
 };
 
 class DiscoveryCallbackTest : public DiscoveryCallback {
 public:
-    explicit DiscoveryCallbackTest(int &count);
+    explicit DiscoveryCallbackTest(int &count) : count_(&count) {}
     virtual ~DiscoveryCallbackTest() {}
-    void OnDiscoverySuccess(uint16_t subscribeId) override;
-    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override;
-    void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override;
+    void OnDiscoverySuccess(uint16_t subscribeId) override
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
+    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
+    void OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo) override
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
 private:
     int *count_ = nullptr;
 };
 
 class PublishCallbackTest : public PublishCallback {
 public:
-    explicit PublishCallbackTest(int &count);
+    explicit PublishCallbackTest(int &count) : count_(&count) {}
     virtual  ~PublishCallbackTest() {}
-    void OnPublishResult(int32_t publishId, int32_t failedReason) override;
+    void OnPublishResult(int32_t publishId, int32_t failedReason) override
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
 private:
     int *count_ = nullptr;
 };
 
 class AuthenticateCallbackTest : public AuthenticateCallback {
 public:
-    explicit AuthenticateCallbackTest(int &count);
+    explicit AuthenticateCallbackTest(int &count) : count_(&count) {}
     virtual ~AuthenticateCallbackTest() {}
-    void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
-                              int32_t reason) override;
+    void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status, int32_t reason) override
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
 private:
     int *count_ = nullptr;
 };
 
 class DeviceManagerFaCallbackTest : public DeviceManagerUiCallback {
 public:
-    explicit DeviceManagerFaCallbackTest(int &count);
+    explicit DeviceManagerFaCallbackTest(int &count) : count_(&count) {}
     virtual ~DeviceManagerFaCallbackTest() {}
-    void OnCall(const std::string &paramJson) override;
+    void OnCall(const std::string &paramJson) override
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
 private:
     int *count_ = nullptr;
 };
@@ -125,12 +179,44 @@ public:
     void OnBindResult(const PeerTargetId &targetId, int32_t result, int32_t status, std::string content) override {}
 };
 
+class ServiceDiscoveryCallbackTest : public ServiceDiscoveryCallback {
+public:
+    void OnServiceFound(const DmServiceInfo &service) override {}
+    void OnServiceDiscoveryResult(int32_t resReason) override {}
+};
+
+class ServiceInfoStateCallbackTest : public ServiceInfoStateCallback {
+public:
+    void OnServiceOnline(const DmServiceInfo &serviceInfo) override {}
+    void OnServiceOffline(const DmServiceInfo &serviceInfo) override {}
+    void OnServiceInfoChange(const DmServiceInfo &serviceInfo) override {}
+};
+
+class ServicePublishCallbackTest : public ServicePublishCallback {
+public:
+    ServicePublishCallbackTest() = default;
+    virtual ~ServicePublishCallbackTest() = default;
+    void OnServicePublishResult(int64_t serviceId, int32_t reason) override {}
+};
+
 class AuthCodeInvalidCallbackTest : public AuthCodeInvalidCallback {
 public:
-    virtual ~AuthCodeInvalidCallbackTest()
-    {
-    }
+    virtual ~AuthCodeInvalidCallbackTest() {}
     void OnAuthCodeInvalid() override {};
+};
+
+class SyncServiceInfoCallbackTest : public SyncServiceInfoCallback {
+public:
+    explicit SyncServiceInfoCallbackTest(int *count) : count_(count) {}
+    virtual ~SyncServiceInfoCallbackTest() override {}
+    void OnSyncServiceInfoResult(int32_t result, std::string content) override
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
+private:
+    int *count_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
