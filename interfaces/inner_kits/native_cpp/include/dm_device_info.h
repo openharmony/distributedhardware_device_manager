@@ -728,14 +728,14 @@ typedef struct ServiceSyncInfo {
 
 typedef struct UnbindServiceProxyParam {
     int32_t userId = -1;
- 	uint64_t localTokenId = 0;
- 	uint64_t subjectTokenId = 0;
- 	int64_t serviceId = -1;
- 	std::vector<uint64_t> peerTokenId = {};
- 	std::string localUdid = "";
- 	std::string peerNetworkId = "";
- 	std::string peerUdid = "";
- 	bool isProxyUnbind = false;
+    uint64_t localTokenId = 0;
+    uint64_t subjectTokenId = 0;
+    int64_t serviceId = -1;
+    std::vector<uint64_t> peerTokenId = {};
+    std::string localUdid = "";
+    std::string peerNetworkId = "";
+    std::string peerUdid = "";
+    bool isProxyUnbind = false;
 } UnbindServiceProxyParam;
 } // namespace DistributedHardware
 } // namespace OHOS
