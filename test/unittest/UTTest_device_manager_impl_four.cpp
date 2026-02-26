@@ -57,51 +57,6 @@
 using namespace testing;
 namespace OHOS {
 namespace DistributedHardware {
-constexpr int32_t DM_STRING_LENGTH_MAX = 1024;
-void DeviceManagerImplTest::SetUp()
-{
-    const int32_t permsNum = 2;
-    const int32_t indexZero = 0;
-    const int32_t indexOne = 1;
-    uint64_t tokenId;
-    const char *perms[permsNum];
-    perms[indexZero] = "ohos.permission.ACCESS_SERVICE_DM";
-    perms[indexOne] = "ohos.permission.DISTRIBUTED_DATASYNC";
-    NativeTokenInfoParams infoInstance = {
-        .dcapsNum = 0,
-        .permsNum = permsNum,
-        .aclsNum = 0,
-        .dcaps = NULL,
-        .perms = perms,
-        .acls = NULL,
-        .processName = "dsoftbus_service",
-        .aplStr = "system_core",
-    };
-    tokenId = GetAccessTokenId(&infoInstance);
-    SetSelfTokenID(tokenId);
-    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
-}
-
-void DeviceManagerImplTest::TearDown()
-{
-    testing::Mock::VerifyAndClearExpectations(deviceManagerNotifyMock_.get());
-    testing::Mock::VerifyAndClearExpectations(ipcClientProxyMock_.get());
-}
-
-void DeviceManagerImplTest::SetUpTestCase()
-{
-    DmDeviceManagerNotify::dmDeviceManagerNotify = deviceManagerNotifyMock_;
-    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxyMock_;
-}
-
-void DeviceManagerImplTest::TearDownTestCase()
-{
-    DmDeviceManagerNotify::dmDeviceManagerNotify = nullptr;
-    deviceManagerNotifyMock_ = nullptr;
-    DeviceManagerImpl::GetInstance().ipcClientProxy_ = nullptr;
-    ipcClientProxyMock_ = nullptr;
-}
-
 namespace {
 HWTEST_F(DeviceManagerImplTest, UnbindServiceTarget_001, testing::ext::TestSize.Level1)
 {

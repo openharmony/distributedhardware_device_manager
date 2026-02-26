@@ -173,14 +173,15 @@ public:
 
 class SyncServiceInfoCallbackTest : public SyncServiceInfoCallback {
 public:
-    void OnSyncServiceInfoResult(int32_t result,std::string content) override
+    void OnSyncServiceInfoResult(int32_t result, std::string content) override
     {
-        if(count_!=nullptr){
-            *count_= *count_+1;
+        if(count_ != nullptr)
+        {
+            *count_ = *count_ + 1;
         }
     }
 private:
-    int *count_= nullptr;
+    int *count_ = nullptr;
 };
 
 class MockServicePublishCallback : public ServicePublishCallback {
