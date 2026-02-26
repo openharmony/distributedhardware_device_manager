@@ -1126,7 +1126,7 @@ void DmAuthState::HandlePinResultAndCallback(std::shared_ptr<DmAuthContext> cont
             context->stopTimerAndDelDpCallback(pkgName, context->authType, tokenId);
         }
         if (context->listener != nullptr) {
-            context->listener->OnAuthCodeInvalid(context->accessee.pkgName, "");
+            context->listener->OnAuthCodeInvalid(context->accessee.pkgName);
         }
     }
 }

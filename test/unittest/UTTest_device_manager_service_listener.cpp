@@ -985,7 +985,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthCodeInvalid_001, testing::ext::
 {
     std::string pkgName = "com.ohos.test";
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    listener_->OnAuthCodeInvalid(pkgName, "");
+    listener_->OnAuthCodeInvalid(pkgName);
     EXPECT_NE(listener_, nullptr);
 }
 
@@ -993,7 +993,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthCodeInvalid_002, testing::ext::
 {
     std::string pkgName;
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    listener_->OnAuthCodeInvalid(pkgName, "");
+    listener_->OnAuthCodeInvalid(pkgName);
     EXPECT_TRUE(pkgName.empty());
 }
 
@@ -1006,7 +1006,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthCodeInvalid_003, testing::ext::
     processInfos.push_back(targetProcessInfo);
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(processInfos));
-    listener_->OnAuthCodeInvalid(pkgName, "");
+    listener_->OnAuthCodeInvalid(pkgName);
     EXPECT_NE(listener_, nullptr);
 }
 } // namespace
