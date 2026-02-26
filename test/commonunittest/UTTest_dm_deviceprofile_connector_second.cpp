@@ -252,20 +252,6 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByDeviceIdAndUserId_201,
     EXPECT_TRUE(ret.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAclForAccountLogOut_001, testing::ext::TestSize.Level1)
-{
-    std::string localUdid = "local_device_id";
-    int32_t localUserId = 1;
-    std::string peerUdid = "peer_device_id";
-    int32_t peerUserId = 2;
-    DmOfflineParam offlineParam;
-    DMAclQuadInfo info = {localUdid, localUserId, peerUdid, peerUserId};
-    std::string accountId = "accountId";
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl(_)).WillOnce(Return(DM_OK));
-    int32_t result = connector.DeleteAclForAccountLogOut(info, accountId, offlineParam);
-    EXPECT_EQ(result, false);
-}
-
 HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAppBindLevel_001, testing::ext::TestSize.Level1)
 {
     DmOfflineParam offlineParam;

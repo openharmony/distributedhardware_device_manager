@@ -284,6 +284,7 @@ public:
         int32_t reason)
     {
         (void)processInfo;
+        (void)serviceType;
         (void)reason;
     }
 
@@ -342,6 +343,14 @@ public:
         return 0;
     }
 
+    virtual int32_t OnServiceInfoChange(const DmRegisterServiceState &registerServiceState,
+        const DmServiceInfo &serviceInfo) override
+    {
+        (void)registerServiceState;
+        (void)serviceInfo;
+        return 0;
+    }
+
     virtual void OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
         int32_t result, const std::string &content) override
     {
@@ -350,16 +359,25 @@ public:
         (void)content;
     }
 
-    virtual void OnServiceStateCallbackAdd(const ProcessInfo &processInfo,
-        const std::vector<DmServiceInfo> &serviceList) override
-    {
-        (void)processInfo;
-        (void)serviceList;
-    }
-
     virtual void OnServiceStateOnlineResult(const ServiceStateBindParameter &bindParam) override
     {
         (void)bindParam;
+    }
+
+    virtual void OnServiceStateOfflineResult(uint64_t tokenId, const std::string &pkgName, int32_t bindType,
+        const std::string &peerUdid, const DistributedDeviceProfile::ServiceInfo &serviceInfo) override
+    {
+        (void)tokenId;
+        (void)pkgName;
+        (void)bindType;
+        (void)peerUdid;
+        (void)serviceInfo;
+    }
+
+    virtual void OnAuthCodeInvalid(const std::string &pkgName, const std::string &consumerPkgName) override
+    {
+        (void)pkgName;
+        (void)consumerPkgName;
     }
 };
 } // namespace DistributedHardware

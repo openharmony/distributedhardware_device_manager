@@ -85,21 +85,28 @@ int32_t AuthSinkDataSyncState::VerifyCertificate(std::shared_ptr<DmAuthContext> 
 static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("SetServiceInfos::start");
+    CHECK_NULL_VOID(context);
     if (!context->isServiceBind) {
+        return;
+    }
+    std::vector<DistributedDeviceProfile::ServiceInfo> dpServiceInfos;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfosByUdid(context->accessee.deviceId,
+        dpServiceInfos);
+    if (ret != DM_OK) {
+        LOGE("SetServiceInfos::Get all serviceinfos");
         return;
     }
     std::unordered_set<int32_t> seenServiceIds;
     if (!context->IsProxyBind || context->IsCallingProxyAsSubject) {
         DistributedDeviceProfile::ServiceInfo dpServiceInfo;
-        int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
-            context->accessee.deviceId, context->accessee.serviceId, dpServiceInfo);
-        if (ret != DM_OK) {
-            LOGE("SetServiceInfos::Get proxy service failed");
-            return;
+        for (auto info : dpServiceInfos) {
+            if (info.GetServiceId() == context->accessee.serviceId) {
+                LOGI("SetServiceInfos::servicecode:%{public}s", info.GetServiceCode().c_str());
+                context->serviceInfos.emplace_back(info);
+                seenServiceIds.insert(info.GetServiceId());
+                break;
+            }
         }
-        LOGI("SetServiceInfos::servicecode:%{public}s", dpServiceInfo.GetServiceCode().c_str());
-        context->serviceInfos.emplace_back(dpServiceInfo);
-        seenServiceIds.insert(dpServiceInfo.GetServiceId());
     }
     if (context->IsProxyBind && context->subjectServiceOnes.empty()) {
         LOGE("SetServiceInfos::Is proxy bind but no subject list");
@@ -110,21 +117,21 @@ static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
         if (seenServiceIds.find(item.proxyAccessee.serviceId) != seenServiceIds.end()) {
             continue;
         }
-        int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
-            context->accessee.deviceId, item.proxyAccessee.serviceId, dpServiceInfo);
-        if (ret != DM_OK) {
-            LOGE("SetServiceInfos::Get subject service failed");
-            continue;
+        for (auto info : dpServiceInfos) {
+            if (info.GetServiceId() == item.proxyAccessee.serviceId) {
+                LOGI("SetServiceInfos::servicecode:%{public}s", info.GetServiceCode().c_str());
+                context->serviceInfos.emplace_back(info);
+                seenServiceIds.insert(info.GetServiceId());
+                break;
+            }
         }
-        LOGI("SetServiceInfos::servicecode:%{public}s", dpServiceInfo.GetServiceCode().c_str());
-        context->serviceInfos.push_back(dpServiceInfo);
-        seenServiceIds.insert(dpServiceInfo.GetServiceId());
     }
 }
 
 static void CompareServiceInfos(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("CompareServiceInfos::start");
+    CHECK_NULL_VOID(context);
     if (!context->isServiceBind || !context->IsProxyBind) {
         return;
     }
@@ -141,52 +148,11 @@ static void CompareServiceInfos(std::shared_ptr<DmAuthContext> context)
             context->serviceId.push_back(dpServiceInfo.GetServiceId());
         }
     }
+    context->serviceInfos.clear();
 }
 
 // Received 180 synchronization message, send 190 message
-// this code line need delete:148-187
 int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
-{
-    LOGI("AuthSinkDataSyncState::Action start");
-    CHECK_NULL_RETURN(context, ERR_DM_FAILED);
-    if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) &&
-        CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_4)) {
-        bool verifyRet = VerifyFlagXor(context);
-        if (!verifyRet) {
-            LOGE("VerifyFlagXor failed, ret: %{public}d", verifyRet);
-            return ERR_DM_BIND_PIN_XOR_MISMATCH;
-        }
-    }
-    // verify device cert
-    int32_t ret = VerifyCertificate(context);
-    if (ret != DM_OK) {
-        LOGE("AuthSinkNegotiateStateMachine::Action cert verify fail!");
-        context->reason = ret;
-        return ret;
-    }
-    // Query the ACL of the sink end. Compare the ACLs at both ends.
-    CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
-    context->softbusConnector->SyncLocalAclListProcess({context->accessee.deviceId, context->accessee.userId},
-        {context->accesser.deviceId, context->accesser.userId}, context->accesser.aclStrList, false);
-    if (GetSessionKey(context)) {
-        DerivativeSessionKey(context);
-    }
-    // Synchronize the local SP information, the format is uncertain, not done for now
-    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-    SetAclInfo(context);
-    if (NeedAgreeAcl(context)) {
-        UpdateCredInfo(context);
-        context->authMessageProcessor->PutAccessControlList(context,
-            context->accessee, context->accesser.deviceId);
-    }
-    context->softbusConnector->SyncAclList();
-    context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_DATA_SYNC, context);
-    context->accessee.deviceName = context->softbusConnector->GetLocalDeviceName();
-    LOGI("AuthSinkDataSyncState::Action ok");
-    return DM_OK;
-}
-
-int32_t AuthSinkDataSyncState::ActionSrvBind(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkDataSyncState::Action start");
     CHECK_NULL_RETURN(context, ERR_DM_FAILED);
@@ -236,103 +202,91 @@ DmAuthStateType AuthSinkDataSyncState::GetStateType()
 }
 //LCOV_EXCL_STOP
 
-// this code line need delete:240-284
+void AuthSinkDataSyncState::ProcessMainAccesseeSessionKey(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    context->accessee.transmitCredentialId = context->reUseCreId;
+    if (context->IsCallingProxyAsSubject && !context->accessee.isAuthed) {
+        std::string suffix = "";
+        if (context->isServiceBind) {
+            suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
+                context->accesser.tokenIdHash + context->accessee.tokenIdHash +
+                std::to_string(context->accessee.serviceId);
+        } else {
+            suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
+                context->accesser.tokenIdHash + context->accessee.tokenIdHash;
+        }
+
+        CHECK_NULL_VOID(context->authMessageProcessor);
+        int32_t skId = 0;
+        int32_t ret = context->authMessageProcessor->SaveDerivativeSessionKeyToDP(
+            context->accessee.userId, suffix, skId);
+        if (ret == DM_OK) {
+            context->accessee.transmitSkTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
+            context->accessee.transmitSessionKeyId = skId;
+        } else {
+            LOGE("AuthSinkDataSyncState::Action DP save user session key failed");
+        }
+    }
+}
+
+void AuthSinkDataSyncState::ProcessSingleProxyAccessee(std::shared_ptr<DmAuthContext> context, DmProxyAuthContext& app)
+{
+    CHECK_NULL_VOID(context);
+    std::string suffix = "";
+    if (context->isServiceBind) {
+        suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
+            app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash +
+            std::to_string(app.proxyAccessee.serviceId);
+    } else {
+        suffix =  context->accesser.deviceIdHash + context->accessee.deviceIdHash +
+            app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
+    }
+
+    CHECK_NULL_VOID(context->authMessageProcessor);
+    int32_t skId = 0;
+    int32_t ret = context->authMessageProcessor->SaveDerivativeSessionKeyToDP(
+        context->accessee.userId, suffix, skId);
+    if (ret != DM_OK) {
+        LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+        return;
+    }
+
+    app.proxyAccessee.skTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
+    app.proxyAccessee.transmitSessionKeyId = skId;
+
+    if (!context->reUseCreId.empty()) {
+        app.proxyAccessee.transmitCredentialId = context->reUseCreId;
+    } else {
+        app.proxyAccessee.transmitCredentialId = context->accessee.transmitCredentialId;
+    }
+}
+
 int32_t AuthSinkDataSyncState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        return DM_OK;
-    }
-    context->accessee.transmitCredentialId = context->reUseCreId;
-    if (context->IsCallingProxyAsSubject && !context->accessee.isAuthed) {
-        int32_t skId = 0;
-        std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
-            context->accesser.tokenIdHash + context->accessee.tokenIdHash;
-        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-        int32_t ret =
-            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
-        if (ret != DM_OK) {
-            LOGE("AuthSinkDataSyncState::Action DP save user session key failed");
-            return ret;
-        }
-        context->accessee.transmitSkTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
-        context->accessee.transmitSessionKeyId = skId;
-    }
-    for (auto &app : context->subjectProxyOnes) {
-        if (app.proxyAccessee.isAuthed) {
-            continue;
-        }
-        int32_t skId = 0;
-        std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
-            app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
-        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-        int32_t ret =
-            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
-        if (ret != DM_OK) {
-            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
-            return ret;
-        }
-        app.proxyAccessee.skTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
-        app.proxyAccessee.transmitSessionKeyId = skId;
-        if (!context->reUseCreId.empty()) {
-            app.proxyAccessee.transmitCredentialId = context->reUseCreId;
-            continue;
-        }
-        app.proxyAccessee.transmitCredentialId = context->accessee.transmitCredentialId;
-    }
-    return DM_OK;
-}
 
-int32_t AuthSinkDataSyncState::DerivativeSessionKeySrvBind(std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     if (!context->IsProxyBind || targetList.empty()) {
         return DM_OK;
     }
-    context->accessee.transmitCredentialId = context->reUseCreId;
-    if (context->IsCallingProxyAsSubject && !context->accessee.isAuthed) {
-        int32_t skId = 0;
-        std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
-            context->accesser.tokenIdHash + context->accessee.tokenIdHash;
-        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-        int32_t ret =
-            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
-        if (ret != DM_OK) {
-            LOGE("AuthSinkDataSyncState::Action DP save user session key failed");
-            return ret;
-        }
-        context->accessee.transmitSkTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
-        context->accessee.transmitSessionKeyId = skId;
-    }
+
+    ProcessMainAccesseeSessionKey(context);
     for (auto &app : targetList) {
         if (app.proxyAccessee.isAuthed) {
             continue;
         }
-        int32_t skId = 0;
-        std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
-            app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
-        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-        int32_t ret =
-            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
-        if (ret != DM_OK) {
-            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
-            return ret;
-        }
-        app.proxyAccessee.skTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
-        app.proxyAccessee.transmitSessionKeyId = skId;
-        if (!context->reUseCreId.empty()) {
-            app.proxyAccessee.transmitCredentialId = context->reUseCreId;
-            continue;
-        }
-        app.proxyAccessee.transmitCredentialId = context->accessee.transmitCredentialId;
+
+        ProcessSingleProxyAccessee(context, app);
     }
+
     return DM_OK;
 }
 
-static void PutServiceInfos(std::shared_ptr<DmAuthContext> context)
+static void PutServiceInfos(const std::shared_ptr<DmAuthContext> context)
 {
     LOGI("PutServiceInfos::Action start");
+    CHECK_NULL_VOID(context);
     if (!context->isServiceBind || context->serviceInfos.empty()) {
         return;
     }
@@ -346,56 +300,33 @@ static void PutServiceInfos(std::shared_ptr<DmAuthContext> context)
     }
 }
 
+static void DeleteServiceInfos(const std::shared_ptr<DmAuthContext> context)
+{
+    LOGI("DeleteServiceInfos::Action start");
+    CHECK_NULL_VOID(context);
+    if (!context->isServiceBind || context->serviceId.empty()) {
+        return;
+    }
+    for (auto &item : context->serviceId) {
+        LOGI("DeleteServiceInfos::Delete service info");
+        DistributedDeviceProfile::ServiceInfo info;
+        int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(context->accessee.deviceId,
+            item, info);
+        if (ret != DM_OK) {
+            LOGE("DeleteServiceInfos::Get service info failed, service id:%{public}" PRId64, item);
+        }
+        ret = DeviceProfileConnector::GetInstance().DeleteServiceInfo(info);
+    }
+}
+
 // Received 190 message, sent 200 message
-// this code line need delete:351-391
 int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcDataSyncState::Action start");
     CHECK_NULL_RETURN(context, ERR_DM_FAILED);
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_FAILED);
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_FAILED);
-    if (NeedAgreeAcl(context)) {
-        if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) &&
-            CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_4)) {
-            bool verifyRet = VerifyFlagXor(context);
-            if (!verifyRet) {
-                LOGE("VerifyFlagXor failed, ret: %{public}d", verifyRet);
-                return ERR_DM_FAILED;
-            }
-        }
-        // Query the ACL of the sink end. Compare the ACLs at both ends.
-        context->softbusConnector->SyncLocalAclListProcess({context->accesser.deviceId, context->accesser.userId},
-            {context->accessee.deviceId, context->accessee.userId}, context->accessee.aclStrList, false);
-        context->accesser.deviceName = context->softbusConnector->GetLocalDeviceName();
-        // Save this acl
-        SetAclInfo(context);
-        UpdateCredInfo(context);
-        context->authMessageProcessor->PutAccessControlList(context, context->accesser, context->accessee.deviceId);
-        // Synchronize the local SP information, the format is uncertain, not done for now
-        context->softbusConnector->SyncAclList();
-    }
-
-    std::string peerDeviceId = "";
-    GetPeerDeviceId(context, peerDeviceId);
-    bool isNeedJoinLnn = context->softbusConnector->CheckIsNeedJoinLnn(peerDeviceId, context->accessee.addr);
-    // Trigger networking
-    if ((!context->accesser.isOnline || isNeedJoinLnn) && context->isNeedJoinLnn) {
-        JoinLnn(context);
-    }
-    context->reason = DM_OK;
-    context->reply = DM_OK;
-    context->state = static_cast<int32_t>(GetStateType());
-    context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_REQ_FINISH, context);
-    LOGI("AuthSrcDataSyncState::Action ok");
-    return DM_OK;
-}
-
-int32_t AuthSrcDataSyncState::ActionSrvBind(std::shared_ptr<DmAuthContext> context)
-{
-    LOGI("AuthSrcDataSyncState::Action start");
-    CHECK_NULL_RETURN(context, ERR_DM_FAILED);
-    CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_FAILED);
-    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_FAILED);
+    DeleteServiceInfos(context);
     if (NeedAgreeAcl(context)) {
         if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) &&
             CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_4)) {

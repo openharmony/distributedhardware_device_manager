@@ -205,28 +205,10 @@ int32_t AuthSrcCredentialAuthDoneState::SendCredentialAuthMessage(std::shared_pt
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
-// this code line need delete: 209-224
 int32_t AuthSrcCredentialAuthDoneState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        int32_t skId = 0;
-        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-        int32_t ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accesser.userId, skId);
-        if (ret != DM_OK) {
-            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
-            return ret;
-        }
-        SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
-        return DM_OK;
-    }
-    return DerivativeProxySessionKey(context);
-}
-
-int32_t AuthSrcCredentialAuthDoneState::DerivativeSessionKeySrvBind(std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     if (!context->IsProxyBind || targetList.empty()) {
         int32_t skId = 0;
         CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
@@ -240,7 +222,6 @@ int32_t AuthSrcCredentialAuthDoneState::DerivativeSessionKeySrvBind(std::shared_
     }
     return DerivativeProxySessionKey(context);
 }
-// this code line need delete: 244-291
 int32_t AuthSrcCredentialAuthDoneState::DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
@@ -265,56 +246,7 @@ int32_t AuthSrcCredentialAuthDoneState::DerivativeProxySessionKey(std::shared_pt
         }
         SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
     }
-    for (auto &app : context->subjectProxyOnes) {
-        if (app.proxyAccesser.isAuthed) {
-            continue;
-        }
-        int32_t skId = 0;
-        std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
-            app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
-        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-        int32_t ret =
-            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
-        if (ret != DM_OK) {
-            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
-            return ret;
-        }
-        app.proxyAccesser.skTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
-        app.proxyAccesser.transmitSessionKeyId = skId;
-        if (!context->reUseCreId.empty()) {
-            app.proxyAccesser.transmitCredentialId = context->reUseCreId;
-            continue;
-        }
-        app.proxyAccesser.transmitCredentialId = context->accesser.transmitCredentialId;
-    }
-    return DM_OK;
-}
-
-int32_t AuthSrcCredentialAuthDoneState::DerivativeProxySessionKeySrvBind(std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    if (!context->reUseCreId.empty()) {
-        context->accesser.transmitCredentialId = context->reUseCreId;
-    }
-    if (context->IsCallingProxyAsSubject && !context->accesser.isAuthed) {
-        int32_t skId = 0;
-        int32_t ret = 0;
-        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-        if (!context->reUseCreId.empty()) {
-            std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
-            context->accesser.tokenIdHash + context->accessee.tokenIdHash;
-            ret = context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
-            context->accesser.transmitCredentialId = context->reUseCreId;
-        } else {
-            ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accesser.userId, skId);
-        }
-        if (ret != DM_OK) {
-            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
-            return ret;
-        }
-        SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
-    }
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     for (auto &app : targetList) {
         if (app.proxyAccesser.isAuthed) {
             continue;
@@ -363,7 +295,6 @@ DmAuthStateType AuthSinkCredentialAuthNegotiateState::GetStateType()
 {
     return DmAuthStateType::AUTH_SINK_CREDENTIAL_AUTH_NEGOTIATE_STATE;
 }
-// this code line need delete: 367-419
 int32_t AuthSinkCredentialAuthNegotiateState::Action(std::shared_ptr<DmAuthContext> context)
 {
     int32_t ret = g_authCredentialTransmitDecryptProcess(context, ON_TRANSMIT);
@@ -402,61 +333,7 @@ int32_t AuthSinkCredentialAuthNegotiateState::Action(std::shared_ptr<DmAuthConte
         context->accessee.lnnSessionKeyId = skId;
     } else {  // Twice transport cred auth
         context->isAppCredentialVerified = true;
-        if (!context->IsProxyBind || context->subjectProxyOnes.empty() ||
-            (context->IsCallingProxyAsSubject && !context->accessee.isAuthed)) {
-            CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_FAILED);
-            ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accessee.userId, skId);
-            if (ret != DM_OK) {
-                LOGE("DP save user session key failed %{public}d", ret);
-                return ret;
-            }
-            context->accessee.transmitSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
-            context->accessee.transmitSessionKeyId = skId;
-        }
-        DerivativeSessionKey(context);
-    }
-    return DM_OK;
-}
-
-int32_t AuthSinkCredentialAuthNegotiateState::ActionSrvBind(std::shared_ptr<DmAuthContext> context)
-{
-    int32_t ret = g_authCredentialTransmitDecryptProcess(context, ON_TRANSMIT);
-    if (ret != DM_OK) {
-        return ret;
-    }
-
-    // Construct and send 171 message
-    ret = AuthCredentialTransmitSend(context, DmMessageType::MSG_TYPE_RESP_CREDENTIAL_AUTH_NEGOTIATE);
-    if (ret != DM_OK) {
-        return ret;
-    }
-
-    if (context->authStateMachine->WaitExpectEvent(ON_SESSION_KEY_RETURNED) != ON_SESSION_KEY_RETURNED) {
-        LOGE("AuthSinkCredentialAuthNegotiateState::Action Hichain auth SINK transmit data failed");
-        return ERR_DM_FAILED;
-    }
-
-    if (context->authStateMachine->WaitExpectEvent(ON_FINISH) != ON_FINISH) {
-        LOGE("AuthSinkCredentialAuthNegotiateState::Action Hichain auth SINK transmit data failed");
-        return ERR_DM_FAILED;
-    }
-    int32_t skId;
-
-    // First lnn cred auth, second time receiving 161 message
-    if (context->accessee.isGenerateLnnCredential == true &&
-        context->accessee.bindLevel != static_cast<int32_t>(USER) &&
-        context->isAppCredentialVerified == true) {
-        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_FAILED);
-        ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accessee.userId, skId);
-        if (ret != DM_OK) {
-            LOGE("AuthSinkCredentialAuthNegotiateState::Action DP save user session key failed");
-            return ret;
-        }
-        context->accessee.lnnSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
-        context->accessee.lnnSessionKeyId = skId;
-    } else {  // Twice transport cred auth
-        context->isAppCredentialVerified = true;
-        auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+        auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
         if (!context->IsProxyBind || targetList.empty() ||
             (context->IsCallingProxyAsSubject && !context->accessee.isAuthed)) {
             CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_FAILED);
@@ -472,42 +349,10 @@ int32_t AuthSinkCredentialAuthNegotiateState::ActionSrvBind(std::shared_ptr<DmAu
     }
     return DM_OK;
 }
-// this code line need delete: 476-505
 int32_t AuthSinkCredentialAuthNegotiateState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        return DM_OK;
-    }
-    for (auto &app : context->subjectProxyOnes) {
-        if (app.proxyAccessee.isAuthed) {
-            continue;
-        }
-        int32_t skId = 0;
-        std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
-            app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
-        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-        int32_t ret =
-            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
-        if (ret != DM_OK) {
-            LOGE("AuthSinkCredentialAuthNegotiateState::Action DP save user session key failed %{public}d", ret);
-            return ret;
-        }
-        app.proxyAccessee.skTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
-        app.proxyAccessee.transmitSessionKeyId = skId;
-        if (!context->reUseCreId.empty()) {
-            app.proxyAccessee.transmitCredentialId = context->reUseCreId;
-            continue;
-        }
-        app.proxyAccessee.transmitCredentialId = context->accessee.transmitCredentialId;
-    }
-    return DM_OK;
-}
-
-int32_t AuthSinkCredentialAuthNegotiateState::DerivativeSessionKeySrvBind(std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     if (!context->IsProxyBind || targetList.empty()) {
         return DM_OK;
     }
@@ -583,39 +428,12 @@ std::string AuthCredentialAgreeState::CreateAuthParamsString(DmAuthScope authori
     LOGI("AuthCredentialAgreeState::CreateAuthParamsString leave.");
     return jsonObj.Dump();
 }
-// this code line need delete: 587-611
 void AuthCredentialAgreeState::GenerateTokenIds(const std::shared_ptr<DmAuthContext> &context,
     JsonObject &jsonObj)
 {
     CHECK_NULL_VOID(context);
     std::vector<std::string> tokenIds;
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        tokenIds.push_back(std::to_string(context->accesser.tokenId));
-        tokenIds.push_back(std::to_string(context->accessee.tokenId));
-        jsonObj[TAG_AUTHORIZED_APP_LIST] = tokenIds;
-        return;
-    }
-    if (context->IsCallingProxyAsSubject) {
-        tokenIds.push_back(std::to_string(context->accesser.tokenId));
-        tokenIds.push_back(std::to_string(context->accessee.tokenId));
-    }
-    for (auto &app : context->subjectProxyOnes) {
-        tokenIds.push_back(std::to_string(app.proxyAccesser.tokenId));
-        tokenIds.push_back(std::to_string(app.proxyAccessee.tokenId));
-    }
-    if (tokenIds.empty()) {
-        LOGE("no tokenId.");
-        return;
-    }
-    jsonObj[TAG_AUTHORIZED_APP_LIST] = tokenIds;
-}
-
-void AuthCredentialAgreeState::GenerateTokenIdsSrvBind(const std::shared_ptr<DmAuthContext> &context,
-    JsonObject &jsonObj)
-{
-    CHECK_NULL_VOID(context);
-    std::vector<std::string> tokenIds;
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     if (!context->IsProxyBind || targetList.empty()) {
         tokenIds.push_back(std::to_string(context->accesser.tokenId));
         tokenIds.push_back(std::to_string(context->accessee.tokenId));
@@ -936,14 +754,14 @@ DmAuthStateType AuthSrcSKDeriveState::GetStateType()
 
 static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
 {
-    // date.0109
     LOGI("SetServiceInfos::Action start");
+    CHECK_NULL_VOID(context);
     if (!context->isServiceBind) {
         return;
     }
     std::vector<DistributedDeviceProfile::ServiceInfo> dpServiceInfos;
-    int32_t ret =
-        DeviceProfileConnector::GetInstance().GetServiceInfosByUdid(context->accessee.deviceId, dpServiceInfos);
+    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfosByUdid(context->accessee.deviceId,
+        dpServiceInfos);
     if (ret != DM_OK) {
         LOGE("SetServiceInfos::Get all serviceinfos");
         return;
@@ -952,41 +770,8 @@ static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
         context->serviceInfos.emplace_back(info);
     }
 }
-// this code line need delete: 955-986
-int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
-{
-    LOGI("AuthSrcSKDeriveState::Action start.");
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-    // First authentication lnn cred
-    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != static_cast<int32_t>(USER)) {
-        int32_t skId = 0;
-        // derive lnn sk
-        std::string suffix = context->accesser.lnnCredentialId + context->accessee.lnnCredentialId;
-        int32_t ret =
-            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
-        if (ret != DM_OK) {
-            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
-            return ret;
-        }
-        context->accesser.lnnSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
-        context->accesser.lnnSessionKeyId = skId;
-        SetAuthContext(skId, context->accesser.lnnSkTimeStamp, context->accesser.lnnSessionKeyId);
-    }
-    // derive transmit sk
-    DerivativeSessionKey(context);
-    // wait cert generate
-    std::unique_lock cvLock(context->certCVMtx_);
-    context->certCV_.wait_for(cvLock, std::chrono::milliseconds(GENERATE_CERT_TIMEOUT),
-        [=] {return !context->accesser.cert.empty();});
-    // send 180
-    std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_DATA_SYNC, context);
-    LOGI("AuthSrcSKDeriveState::Action() leave.");
-    CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
-    return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
-}
 
-int32_t AuthSrcSKDeriveState::ActionSrvBind(std::shared_ptr<DmAuthContext> context)
+int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcSKDeriveState::Action start.");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
@@ -1010,7 +795,7 @@ int32_t AuthSrcSKDeriveState::ActionSrvBind(std::shared_ptr<DmAuthContext> conte
     DerivativeSessionKey(context);
     SetServiceInfos(context);
     // wait cert generate
-    std::unique_lock cvLock(context->certCVMtx_);
+    std::unique_lock<ffrt::mutex> cvLock(context->certCVMtx_);
     context->certCV_.wait_for(cvLock, std::chrono::milliseconds(GENERATE_CERT_TIMEOUT),
         [=] {return !context->accesser.cert.empty();});
     // send 180
@@ -1019,37 +804,12 @@ int32_t AuthSrcSKDeriveState::ActionSrvBind(std::shared_ptr<DmAuthContext> conte
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
-// this code line need delete: 1022-1044
 int32_t AuthSrcSKDeriveState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     // no proxy
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        int32_t skId = 0;
-        // derive transmit sk
-        std::string suffix = context->accesser.transmitCredentialId + context->accessee.transmitCredentialId;
-        int32_t ret =
-            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
-        if (ret != DM_OK) {
-            LOGE("AuthSrcSKDeriveState::Action DP save user session key failed");
-            return ret;
-        }
-        context->accesser.transmitSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
-        context->accesser.transmitSessionKeyId = skId;
-        SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
-        return DM_OK;
-    }
-    // proxy
-    return DerivativeProxySessionKey(context);
-}
-
-int32_t AuthSrcSKDeriveState::DerivativeSessionKeySrvBind(std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-    // no proxy
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     if (!context->IsProxyBind || targetList.empty()) {
         int32_t skId = 0;
         // derive transmit sk
@@ -1068,7 +828,6 @@ int32_t AuthSrcSKDeriveState::DerivativeSessionKeySrvBind(std::shared_ptr<DmAuth
     // proxy
     return DerivativeProxySessionKey(context);
 }
-// this code line need delete: 1071-1119
 int32_t AuthSrcSKDeriveState::DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
@@ -1095,57 +854,7 @@ int32_t AuthSrcSKDeriveState::DerivativeProxySessionKey(std::shared_ptr<DmAuthCo
         }
         SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
     }
-    for (auto &app : context->subjectProxyOnes) {
-        if (app.proxyAccesser.isAuthed) {
-            continue;
-        }
-        int32_t skId = 0;
-        std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
-            app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
-        int32_t ret =
-            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
-        if (ret != DM_OK) {
-            LOGE("AuthSrcSKDeriveState::Action DP save user session key failed");
-            return ret;
-        }
-        app.proxyAccesser.skTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
-        app.proxyAccesser.transmitSessionKeyId = skId;
-        if (!context->reUseCreId.empty()) {
-            app.proxyAccesser.transmitCredentialId = context->reUseCreId;
-            continue;
-        }
-        app.proxyAccesser.transmitCredentialId = context->accesser.transmitCredentialId;
-    }
-    return DM_OK;
-}
-
-int32_t AuthSrcSKDeriveState::DerivativeProxySessionKeySrvBind(std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-    if (!context->reUseCreId.empty()) {
-        context->accesser.transmitCredentialId = context->reUseCreId;
-    }
-    if (context->IsCallingProxyAsSubject && !context->accesser.isAuthed) {
-        int32_t skId = 0;
-        int32_t ret = 0;
-        if (!context->reUseCreId.empty()) {
-            std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
-            context->accesser.tokenIdHash + context->accessee.tokenIdHash;
-            ret = context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
-            context->accesser.transmitCredentialId = context->reUseCreId;
-        } else {
-            // derive transmit sk
-            std::string suffix = context->accesser.transmitCredentialId + context->accessee.transmitCredentialId;
-            ret = context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
-        }
-        if (ret != DM_OK) {
-            LOGE("AuthSrcSKDeriveState::Action DP save user session key failed");
-            return ret;
-        }
-        SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
-    }
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     for (auto &app : targetList) {
         if (app.proxyAccesser.isAuthed) {
             continue;
@@ -1215,43 +924,11 @@ int32_t AuthSinkSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
-// this code line need delete: 1217-1247
 int32_t AuthSinkSKDeriveState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        return DM_OK;
-    }
-    for (auto &app : context->subjectProxyOnes) {
-        if (app.proxyAccessee.isAuthed) {
-            continue;
-        }
-        int32_t skId = 0;
-        std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
-            app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
-        int32_t ret =
-            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
-        if (ret != DM_OK) {
-            LOGE("AuthSinkSKDeriveState::Action DP save user session key failed %{public}d", ret);
-            return ret;
-        }
-        app.proxyAccessee.skTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
-        app.proxyAccessee.transmitSessionKeyId = skId;
-        if (!context->reUseCreId.empty()) {
-            app.proxyAccessee.transmitCredentialId = context->reUseCreId;
-            continue;
-        }
-        app.proxyAccessee.transmitCredentialId = context->accessee.transmitCredentialId;
-    }
-    return DM_OK;
-}
-
-int32_t AuthSinkSKDeriveState::DerivativeSessionKeySrvBind(std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     if (!context->IsProxyBind || targetList.empty()) {
         return DM_OK;
     }

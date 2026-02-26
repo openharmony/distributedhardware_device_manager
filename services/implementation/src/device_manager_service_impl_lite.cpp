@@ -397,6 +397,11 @@ std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrus
     return tmp;
 }
 
+void DeviceManagerServiceImpl::LoadHardwareFwkService()
+{
+    return;
+}
+
 int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
 {
     (void)udid;
@@ -473,15 +478,6 @@ std::multimap<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndUser
     (void)accountId;
     return std::multimap<std::string, int32_t> {};
 }
-// this code line need delete:482-489
-void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
-    const std::string &remoteUdid)
-{
-    (void)remoteUserId;
-    (void)remoteAccountHash;
-    (void)remoteUdid;
-    return;
-}
 
 void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
     const std::string &remoteUdid, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
@@ -520,26 +516,12 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
     (void)peerTokenId;
     return;
 }
-// this code line need delete:529-534
-void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId)
-{
-    (void)info;
-    (void)accountId;
-    return;
-}
 
 void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId,
     std::vector<DmUserRemovedServiceInfo> &serviceInfos)
 {
     (void)info;
     (void)accountId;
-    return;
-}
-// this code line need delete:544-549
-void DeviceManagerServiceImpl::HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId)
-{
-    (void)peerUdids;
-    (void)preUserId;
     return;
 }
 
@@ -624,16 +606,6 @@ void DeviceManagerServiceImpl::ProcessUnBindApp(int32_t userId, int32_t accessTo
     (void)udid;
     return;
 }
-// this code line need delete:632-641
-void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
-    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus)
-{
-    (void)foregroundUserIds;
-    (void)backgroundUserIds;
-    (void)remoteUdid;
-    (void)isCheckUserStatus;
-    return;
-}
 
 void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
     const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus,
@@ -643,6 +615,7 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
     (void)backgroundUserIds;
     (void)remoteUdid;
     (void)isCheckUserStatus;
+    (void)serviceInfos;
     return;
 }
 
@@ -664,13 +637,6 @@ void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &cre
     (void)credId;
     (void)userId;
     (void)localUdid;
-    return;
-}
-// this code line need delete:675-680
-void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid)
-{
-    (void)preUserId;
-    (void)remoteUdid;
     return;
 }
 
@@ -755,15 +721,6 @@ void DeviceManagerServiceImpl::HandleServiceUnBindEvent(int32_t userId, const st
     (void)remoteTokenId;
     return;
 }
-// this code line need delete:764-771
-void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
-    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
-{
-    (void)foregroundUserIds;
-    (void)backgroundUserIds;
-    (void)remoteUdid;
-    return;
-}
 
 void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
     const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid,
@@ -772,6 +729,7 @@ void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint
     (void)foregroundUserIds;
     (void)backgroundUserIds;
     (void)remoteUdid;
+    (void)serviceInfos;
     return;
 }
 

@@ -17,7 +17,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DM_IMPLEMENT_SINGLE_INSTANCE(NegotiateProcess);
+const char* const TAG_SERVICE_ID = "serviceId";
+IMPLEMENT_SINGLE_INSTANCE(NegotiateProcess);
 
 int32_t OnlyPinBind(std::shared_ptr<DmAuthContext> context)
 {
@@ -96,7 +97,47 @@ NegotiateProcess::NegotiateProcess()
     handlers_[NegotiateSpec(CredType::DM_P2P_CREDTYPE, AclType::DM_P2P_ACL, AuthType::DM_IMPORT_AUTHTYPE)] =
         std::make_unique<P2pCredP2pAclImportAuthType>();
 }
-// this code line need delete:100-126
+
+static bool IsServiceInAclExtraData(const std::string &extraData, int64_t &serviceId)
+{
+    if (extraData.empty()) {
+        return false;
+    }
+    JsonObject aclServiceId(extraData);
+    if (aclServiceId.IsDiscarded()) {
+        return false;
+    }
+    if (aclServiceId.Contains(TAG_SERVICE_ID) && aclServiceId[TAG_SERVICE_ID].IsArray()) {
+        auto tmpServiceId = aclServiceId[TAG_SERVICE_ID];
+        for (auto& id : tmpServiceId.Items()) {
+            int64_t idValue = id.Get<int64_t>();
+            if (idValue == serviceId) {
+                LOGI("Is service in acl extra data check success, service id:%{public}" PRId64, serviceId);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+static bool IsNeedUpdateServiceAcl(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, false);
+    int64_t remoteServiceId = context->accessee.serviceId;
+
+    DmAccess &subject = (context->direction == DmAuthDirection::DM_AUTH_SOURCE) ?
+        context->accesser : context->accessee;
+
+    auto it = subject.aclProfiles.find(DM_POINT_TO_POINT);
+    if (it == subject.aclProfiles.end()) {
+        return true;
+    }
+    std::string accesseeExtra = it->second.GetAccessee().GetAccesseeExtraData();
+
+    bool exists = IsServiceInAclExtraData(accesseeExtra, remoteServiceId);
+    return !exists;
+}
+
 int32_t NegotiateProcess::HandleNegotiateResult(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
@@ -117,73 +158,32 @@ int32_t NegotiateProcess::HandleNegotiateResult(std::shared_ptr<DmAuthContext> c
     } else {
         return ret;
     }
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty() ||
-        (credType == CredType::DM_IDENTICAL_CREDTYPE && aclType == AclType::DM_IDENTICAL_ACL) ||
-        (credType == CredType::DM_SHARE_CREDTYPE && aclType == AclType::DM_SHARE_ACL)) {
-        return ret;
+    if (context->isServiceBind &&
+        credType == CredType::DM_P2P_CREDTYPE &&
+        aclType == AclType::DM_P2P_ACL &&
+        IsNeedUpdateServiceAcl(context)) {
+        context->needBind = true;
+        context->needAgreeCredential = true;
+        context->needAuth = true;
+        ret = DM_OK;
     }
-    return HandleProxyNegotiateResult(context, ret);
-}
-
-int32_t NegotiateProcess::HandleNegotiateResultSrvBind(std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    std::string credTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
-        context->accesser.credTypeList : context->accessee.credTypeList;
-    std::string aclTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
-        context->accesser.aclTypeList : context->accessee.aclTypeList;
-    CredType credType = ConvertCredType(credTypeList);
-    AclType aclType = ConvertAclType(aclTypeList);
-    AuthType authType = ConvertAuthType(context->authType);
-    LOGI("credType %{public}d, aclType %{public}d, authType %{public}d.",
-        static_cast<int32_t>(credType), static_cast<int32_t>(aclType), static_cast<int32_t>(authType));
-    int32_t ret = ERR_DM_CAPABILITY_NEGOTIATE_FAILED;
-    NegotiateSpec negotiateSpec(credType, aclType, authType);
-    auto handler = handlers_.find(negotiateSpec);
-    if (handler != handlers_.end() && handler->second != nullptr) {
-        ret = handler->second->NegotiateHandle(context);
-    } else {
-        return ret;
-    }
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     if (!context->IsProxyBind || targetList.empty() ||
         (credType == CredType::DM_IDENTICAL_CREDTYPE && aclType == AclType::DM_IDENTICAL_ACL) ||
         (credType == CredType::DM_SHARE_CREDTYPE && aclType == AclType::DM_SHARE_ACL)) {
         return ret;
     }
+    if (context->isServiceBind) {
+        return HandleServiceNegotiateResult(context, ret);
+    }
     return HandleProxyNegotiateResult(context, ret);
 }
 
 //LCOV_EXCL_START
-// this code line need delete: 159-181
 int32_t NegotiateProcess::HandleProxyNegotiateResult(std::shared_ptr<DmAuthContext> context, int32_t result)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        return DM_OK;
-    }
-    bool isTrust = true;
-    for (auto &app : context->subjectProxyOnes) {
-        std::string credTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
-            app.proxyAccesser.credTypeList : app.proxyAccessee.credTypeList;
-        std::string aclTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
-            app.proxyAccesser.aclTypeList : app.proxyAccessee.aclTypeList;
-        CredType credType = ConvertCredType(credTypeList);
-        AclType aclType = ConvertAclType(aclTypeList);
-        if (credType == CredType::DM_P2P_CREDTYPE && aclType == AclType::DM_P2P_ACL) {
-            app.needBind = false;
-            app.needAgreeCredential = false;
-            app.needAuth = false;
-            app.IsNeedSetProxyRelationShip = IsNeedSetProxyRelationShip(context, app);
-        }
-    }
-    return DM_OK;
-}
-
-int32_t NegotiateProcess::HandleProxyNegotiateResultSrvBind(std::shared_ptr<DmAuthContext> context, int32_t result)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     if (!context->IsProxyBind || targetList.empty()) {
         return DM_OK;
     }
@@ -200,6 +200,41 @@ int32_t NegotiateProcess::HandleProxyNegotiateResultSrvBind(std::shared_ptr<DmAu
             app.needAgreeCredential = false;
             app.needAuth = false;
             app.IsNeedSetProxyRelationShip = IsNeedSetProxyRelationShip(context, app);
+        }
+    }
+    return DM_OK;
+}
+
+int32_t NegotiateProcess::HandleServiceNegotiateResult(std::shared_ptr<DmAuthContext> context, int32_t result)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind || context->subjectServiceOnes.empty()) {
+        return DM_OK;
+    }
+    for (auto &app : context->subjectServiceOnes) {
+        std::string credTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
+            app.proxyAccesser.credTypeList : app.proxyAccessee.credTypeList;
+        std::string aclTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
+            app.proxyAccesser.aclTypeList : app.proxyAccessee.aclTypeList;
+        CredType credType = ConvertCredType(credTypeList);
+        AclType aclType = ConvertAclType(aclTypeList);
+        if (credType == CredType::DM_P2P_CREDTYPE && aclType == AclType::DM_P2P_ACL) {
+            int64_t remoteServiceId = context->accessee.serviceId;
+            DmProxyAccess &acc = (context->direction == DmAuthDirection::DM_AUTH_SOURCE) ?
+                app.proxyAccesser : app.proxyAccessee;
+            bool needServiceAclUpdate = true;
+            auto pit = acc.aclProfiles.find(DM_POINT_TO_POINT);
+            if (pit != acc.aclProfiles.end()) {
+                std::string se = pit->second.GetAccessee().GetAccesseeExtraData();
+                needServiceAclUpdate = !(IsServiceInAclExtraData(se, remoteServiceId));
+                LOGI("HandleServiceNegotiateResult needServiceAclUpdate %{public}d, remoteServiceId %{public}" PRId64,
+                    needServiceAclUpdate, remoteServiceId);
+            }
+
+            app.needBind = needServiceAclUpdate;
+            app.needAgreeCredential = needServiceAclUpdate;
+            app.needAuth = needServiceAclUpdate;
+            app.IsNeedSetProxyRelationShip = needServiceAclUpdate;
         }
     }
     return DM_OK;

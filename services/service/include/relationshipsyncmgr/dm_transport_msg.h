@@ -99,6 +99,7 @@ struct UnBindAppMsg {
         : userId_(userId), tokenId_(tokenId), extra_(extra), udid_(udid) {}
 };
 
+
 void ToJson(cJSON *jsonObject, const UnBindAppMsg &unBindAppMsg);
 void FromJson(const cJSON *jsonObject, UnBindAppMsg &unBindAppMsg);
 void ToJson(cJSON *jsonObject, const UnbindServiceProxyParam &unBindServiceMsg);

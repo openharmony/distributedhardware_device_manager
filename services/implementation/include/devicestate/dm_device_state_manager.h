@@ -86,10 +86,7 @@ public:
     int32_t ProcNotifyEvent(const int32_t eventId, const std::string &deviceId);
     void SaveOnlineDeviceInfo(const DmDeviceInfo &info);
     void DeleteOfflineDeviceInfo(const DmDeviceInfo &info);
-    // this code line need delete: 90-91
     void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
-        std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid, const bool isOnline);
-    void HandleDeviceStatusChangeSrvBind(DmDeviceState devState, DmDeviceInfo &devInfo,
         std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid, const bool isOnline);
     void OnDbReady(const std::string &pkgName, const std::string &uuid);
     void ChangeDeviceInfo(const DmDeviceInfo &info);
@@ -119,10 +116,7 @@ private:
     int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
     void DeleteCredential(const DmAclIdParam &acl);
 #endif
-    // this code line need delete: 123-124
     void ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
-        std::vector<ProcessInfo> &processInfoVec, const bool isOnline);
-    void ProcessDeviceStateChangeSrvBind(const DmDeviceState devState, const DmDeviceInfo &devInfo,
         std::vector<ProcessInfo> &processInfoVec, const bool isOnline);
 private:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

@@ -222,16 +222,6 @@ void SetSyncMsgJsonFuzzTest(const uint8_t* data, size_t size)
     dmAuthMessageProcessor_->SetSyncMsgJson(context_, accessSide, accessToSync, syncMsgJson);
 }
 
-void GetAccesseeServiceInfoFuzzTest(const uint8_t* data, size_t size)
-{
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
-    int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
-    dmAuthMessageProcessor_->GetAccesseeServiceInfo(serviceId);
-}
-
 void AuthMessageProcessorFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int32_t))) {
@@ -291,7 +281,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     /* Run your code on data */
     OHOS::DistributedHardware::AuthMessageProcessorFuzzTest(data, size);
     OHOS::DistributedHardware::SetSyncMsgJsonFuzzTest(data, size);
-    OHOS::DistributedHardware::GetAccesseeServiceInfoFuzzTest(data, size);
 
     return 0;
 }
