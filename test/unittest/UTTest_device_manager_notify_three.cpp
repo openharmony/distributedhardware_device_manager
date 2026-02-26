@@ -1302,21 +1302,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnServiceDiscoveryResult_005, testing::ext::Te
     std::string pkgName = "com.ohos.test";
     std::string serviceType = "testService";
     int32_t resReason = 0;
-    int count = 0;
+    std::shared_ptr<ServiceDiscoveryCallback> callback = std::make_shared<ServiceDiscoveryCallbackTest>();
 
-    class TestServiceDiscoveryCallback : public ServiceDiscoveryCallback {
-    public:
-        explicit TestServiceDiscoveryCallback(int &count) : count_(count) {}
-        void OnServiceFound(const DmServiceInfo &service) override {}
-        void OnServiceDiscoveryResult(int32_t resReason) override {
-            count_++;
-        }
-    private:
-        int &count_;
-    };
-
-    std::shared_ptr<TestServiceDiscoveryCallback> callback =
-        std::make_shared<TestServiceDiscoveryCallback>(count);
     DeviceManagerNotify::GetInstance().RegisterServiceDiscoveryCallback(pkgName, serviceType, callback);
 
     ASSERT_NO_FATAL_FAILURE(
@@ -1337,21 +1324,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnServiceFound_001, testing::ext::TestSize.Lev
 {
     std::string pkgName = "com.ohos.test";
     std::string serviceType = "testService";
-    int count = 0;
+    std::shared_ptr<ServiceDiscoveryCallback> callback = std::make_shared<ServiceDiscoveryCallbackTest>();
 
-    class TestServiceDiscoveryCallback : public ServiceDiscoveryCallback {
-    public:
-        explicit TestServiceDiscoveryCallback(int &count) : count_(count) {}
-        void OnServiceFound(const DmServiceInfo &service) override {
-            count_++;
-        }
-        void OnServiceDiscoveryResult(int32_t resReason) override {}
-    private:
-        int &count_;
-    };
-
-    std::shared_ptr<TestServiceDiscoveryCallback> callback =
-        std::make_shared<TestServiceDiscoveryCallback>(count);
     DeviceManagerNotify::GetInstance().RegisterServiceDiscoveryCallback(pkgName, serviceType, callback);
 
     DmServiceInfo dmServiceInfo;
