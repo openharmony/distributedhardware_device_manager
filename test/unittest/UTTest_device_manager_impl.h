@@ -175,8 +175,7 @@ class SyncServiceInfoCallbackTest : public SyncServiceInfoCallback {
 public:
     void OnSyncServiceInfoResult(int32_t result, std::string content) override
     {
-        if(count_ != nullptr)
-        {
+        if (count_ != nullptr) {
             *count_ = *count_ + 1;
         }
     }
