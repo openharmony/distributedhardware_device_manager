@@ -721,8 +721,6 @@ HWTEST_F(IpcModelCodecTest, EncodeDmSrvDiscParam_003, testing::ext::TestSize.Lev
     EXPECT_EQ(decodedParam.medium, DMSrvMediumType::SERVICE_MEDIUM_TYPE_BUTT);
 }
 
-
-
 /**
  * @tc.name: EncodeDmPublishServiceParam_003
  * @tc.desc: EncodeDmPublishServiceParam with BLE_TRIGGER and DM_SUPER_HIGH

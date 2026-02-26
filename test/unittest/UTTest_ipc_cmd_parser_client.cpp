@@ -541,7 +541,7 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_022, testing::ext::Test
     MessageParcel reply;
     std::shared_ptr<IpcGetRegisterServiceInfoRsp> rsp = std::make_shared<IpcGetRegisterServiceInfoRsp>();
     int32_t regServiceInfoSize  = 1;
-    reply.WriteInt32(regServiceInfoSize );
+    reply.WriteInt32(regServiceInfoSize);
     int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
     ReadResponseFunc ptr = GetResponseFunc(cmdCode);
     if (ptr) {
