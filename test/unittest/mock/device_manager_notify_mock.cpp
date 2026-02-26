@@ -18,6 +18,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify);
 int32_t DeviceManagerNotify::RegisterGetDeviceProfileInfoListCallback(const std::string &pkgName,
     std::shared_ptr<GetDeviceProfileInfoListCallback> callback)
 {
