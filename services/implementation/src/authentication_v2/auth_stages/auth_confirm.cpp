@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,6 +51,7 @@ constexpr const char* TAG_PKG_NAME = "pkgName";
 constexpr const char* TAG_SERVICE_DISPLAY_NAME = "serviceDisplayName";
 constexpr const char* TAG_DESCRIPTION = "description";
 constexpr const char* TAG_EXTRA_DATA = "accesseeExtraData";
+constexpr const char* GENERATE_CERTIFICATE_TASK = "GenerateCertificateTask";
 // authType fallback table
 using FallBackKey = std::pair<std::string, DmAuthType>; // accessee.bundleName, authType
 static std::map<FallBackKey, DmAuthType> g_pinAuthTypeFallBackMap = {
@@ -769,7 +770,7 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
     }
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_USER_CONFIRM, context);
     // generate cert sync
-    ffrt::submit([=]() { GenerateCertificate(context);});
+    ffrt::submit([=]() { GenerateCertificate(context);}, ffrt::task_attr().name(GENERATE_CERTIFICATE_TASK));
     context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
         static_cast<int32_t>(STATUS_DM_SHOW_AUTHORIZE_UI), DM_OK);
     context->listener->OnBindResult(context->processInfo, context->peerTargetId,

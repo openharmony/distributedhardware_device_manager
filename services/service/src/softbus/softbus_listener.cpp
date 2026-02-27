@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,10 +51,9 @@ constexpr int32_t MAX_CACHED_MAP_NUM = 5000;
 constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
-constexpr const char* DEVICE_NOT_TRUST = "deviceNotTrust";
 constexpr const char* DEVICE_SCREEN_STATUS_CHANGE = "deviceScreenStatusChange";
-constexpr const char* CREDENTIAL_AUTH_STATUS = "credentialAuthStatus";
 #endif
+constexpr const char* CREDENTIAL_AUTH_STATUS = "credentialAuthStatus";
 constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
 constexpr static uint8_t BYTE_MASK = 0x0F;
@@ -65,6 +64,13 @@ constexpr uint32_t SOFTBUS_MAX_RETRY_TIME = 10;
 constexpr const char* CUSTOM_DATA_ACTIONID = "actionId";
 constexpr const char* CUSTOM_DATA_NETWORKID = "networkId";
 constexpr const char* CUSTOM_DATA_DISPLAY_NAME = "displayName";
+
+constexpr const char* SOFTBUS_EVENT_QUEUE_HANDLE_TASK = "SoftbusEventQueueHandleTask";
+constexpr const char* SOFTBUS_EVENT_QUEUE_HANDLE_TASK_BY_ADD = "SoftbusEventQueueHandleTaskByAdd";
+constexpr const char* START_DETECT_DEVICE_RISK_TASK = "StartDetectDeviceRiskTask";
+constexpr const char* DEVICE_NOT_TRUST_TASK = "DeviceNotTrustTask";
+constexpr const char* DEVICE_TRUSTED_CHANGE_TASK = "DeviceTrustedChangeTask";
+constexpr const char* DEVICE_USER_ID_CHECK_SUM_CHANGE_TASK = "DeviceUserIdCheckSumChangeTask";
 
 static std::mutex g_deviceMapMutex;
 static std::mutex g_lnnCbkMapMutex;
@@ -261,7 +267,8 @@ void SoftbusListener::OnCredentialAuthStatus(const char *deviceList, uint32_t de
         deviceListStr = std::string(deviceList, deviceListLen);
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { CredentialAuthStatusProcess(deviceListStr, deviceTypeId, errcode); });
+    ffrt::submit([=]() { CredentialAuthStatusProcess(deviceListStr, deviceTypeId, errcode); },
+        ffrt::task_attr().name(CREDENTIAL_AUTH_STATUS));
 #else
     std::thread credentialAuthStatus([=]() { CredentialAuthStatusProcess(deviceListStr, deviceTypeId, errcode); });
     if (pthread_setname_np(credentialAuthStatus.native_handle(), CREDENTIAL_AUTH_STATUS) != DM_OK) {
@@ -341,7 +348,8 @@ void SoftbusListener::SoftbusEventQueueHandle(std::string deviceId)
             LOGI("queue empty, deviceIdHash:%{public}s.", GetAnonyString(deviceId).c_str());
             return;
         } else {
-            ffrt::submit([=]() { SoftbusEventQueueHandle(deviceId); });
+            ffrt::submit([=]() { SoftbusEventQueueHandle(deviceId); },
+                ffrt::task_attr().name(SOFTBUS_EVENT_QUEUE_HANDLE_TASK));
         }
     }
 }
@@ -357,7 +365,8 @@ int32_t SoftbusListener::SoftbusEventQueueAdd(DmSoftbusEvent &dmSoftbusEventInfo
             std::queue<DmSoftbusEvent> eventQueue;
             eventQueue.push(dmSoftbusEventInfo);
             g_dmSoftbusEventQueueMap[deviceId] = eventQueue;
-            ffrt::submit([=]() { SoftbusEventQueueHandle(deviceId); });
+            ffrt::submit([=]() { SoftbusEventQueueHandle(deviceId); },
+                ffrt::task_attr().name(SOFTBUS_EVENT_QUEUE_HANDLE_TASK_BY_ADD));
         } else {
             g_dmSoftbusEventQueueMap[deviceId].push(dmSoftbusEventInfo);
         }
@@ -412,7 +421,8 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     std::string peerUdid;
     GetUdidByNetworkId(info->networkId, peerUdid);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { DeviceManagerService::GetInstance().StartDetectDeviceRisk(); });
+    ffrt::submit([=]() { DeviceManagerService::GetInstance().StartDetectDeviceRisk(); },
+        ffrt::task_attr().name(START_DETECT_DEVICE_RISK_TASK));
     if (SoftbusEventQueueAdd(dmSoftbusEventInfo) != DM_OK) {
         return;
     }
@@ -578,32 +588,35 @@ void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *ms
     std::string softbusMsg = std::string(msg, msgLen);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (type == TrustChangeType::DEVICE_NOT_TRUSTED) {
-        ffrt::submit([=]() { DeviceNotTrust(softbusMsg); });
+        ffrt::submit([=]() { DeviceNotTrust(softbusMsg); }, ffrt::task_attr().name(DEVICE_NOT_TRUST_TASK));
     } else if (type == TrustChangeType::DEVICE_TRUST_RELATIONSHIP_CHANGE) {
-        ffrt::submit([=]() { DeviceTrustedChange(softbusMsg); });
+        ffrt::submit([=]() { DeviceTrustedChange(softbusMsg); },
+            ffrt::task_attr().name(DEVICE_TRUSTED_CHANGE_TASK));
     } else if (type == TrustChangeType::DEVICE_FOREGROUND_USERID_CHANGE) {
-        ffrt::submit([=]() { DeviceUserIdCheckSumChange(softbusMsg); });
+        ffrt::submit([=]() { DeviceUserIdCheckSumChange(softbusMsg); },
+            ffrt::task_attr().name(DEVICE_USER_ID_CHECK_SUM_CHANGE_TASK));
     } else {
         LOGE("Invalied trust change type.");
     }
 #else
     if (type == TrustChangeType::DEVICE_NOT_TRUSTED) {
         std::thread deviceNotTrust([=]() { DeviceNotTrust(softbusMsg); });
-        int32_t ret = pthread_setname_np(deviceNotTrust.native_handle(), DEVICE_NOT_TRUST);
+        int32_t ret = pthread_setname_np(deviceNotTrust.native_handle(), DEVICE_NOT_TRUST_TASK);
         if (ret != DM_OK) {
             LOGE("deviceNotTrust setname failed.");
         }
         deviceNotTrust.detach();
     } else if (type == TrustChangeType::DEVICE_TRUST_RELATIONSHIP_CHANGE) {
         std::thread deviceTrustedChange([=]() { DeviceTrustedChange(softbusMsg); });
-        int32_t ret = pthread_setname_np(deviceTrustedChange.native_handle(), DEVICE_NOT_TRUST);
+        int32_t ret = pthread_setname_np(deviceTrustedChange.native_handle(), DEVICE_TRUSTED_CHANGE_TASK);
         if (ret != DM_OK) {
             LOGE("deviceTrustedChange setname failed.");
         }
         deviceTrustedChange.detach();
     } else if (type == TrustChangeType::DEVICE_FOREGROUND_USERID_CHANGE) {
         std::thread deviceUserIdCheckSumChange([=]() { DeviceUserIdCheckSumChange(softbusMsg); });
-        int32_t ret = pthread_setname_np(deviceUserIdCheckSumChange.native_handle(), DEVICE_NOT_TRUST);
+        int32_t ret = pthread_setname_np(deviceUserIdCheckSumChange.native_handle(),
+            DEVICE_USER_ID_CHECK_SUM_CHANGE_TASK);
         if (ret != DM_OK) {
             LOGE("deviceUserIdCheckSumChange setname failed.");
         }

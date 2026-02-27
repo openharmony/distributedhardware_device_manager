@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,9 +36,7 @@ namespace DistributedHardware {
 using OHOS::EventFwk::MatchingSkills;
 using OHOS::EventFwk::CommonEventManager;
 
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* DEAL_THREAD = "publish_common_event";
-#endif
 constexpr int32_t MAX_TRY_TIMES = 3;
 
 std::vector<std::string> DmPublishEventSubscriber::GetSubscriberEventNameVec() const
@@ -238,7 +236,8 @@ void DmPublishEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 #endif // SUPPORT_WIFI
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { callback_(bluetoothState_, wifiState_, screenState_); });
+    ffrt::submit([=]() { callback_(bluetoothState_, wifiState_, screenState_); },
+        ffrt::task_attr().name(DEAL_THREAD));
 #else
     std::thread dealThread([=]() { callback_(bluetoothState_, wifiState_, screenState_); });
     int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);

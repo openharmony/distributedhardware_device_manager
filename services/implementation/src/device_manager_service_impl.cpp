@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,6 +70,8 @@ const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
 constexpr const char* NEED_JOIN_LNN = "0";
 constexpr const char* NO_NEED_JOIN_LNN = "1";
 constexpr const char* TAG_SERVICE_ID = "serviceId";
+constexpr const char* NOTIFY_CLEAN_EVENT_TASK = "CleanAuthMgrByLogicalSessionIdTask";
+constexpr const char* CLOSE_AUTH_SESSION_TASK = "CloseAuthSessionTask";
 // currently, we just support one bind session in one device at same time
 constexpr size_t MAX_NEW_PROC_SESSION_COUNT_TEMP = 1;
 const int32_t USLEEP_TIME_US_550000 = 550000; // 550ms
@@ -194,7 +196,8 @@ static uint64_t GetTokenId(bool isSrcSide, int32_t displayId, std::string &bundl
 void DeviceManagerServiceImpl::NotifyCleanEvent(uint64_t logicalSessionId, int32_t connDelayCloseTime)
 {
     LOGI("logicalSessionId: %{public}" PRIu64 ".", logicalSessionId);
-    ffrt::submit([=]() { CleanAuthMgrByLogicalSessionId(logicalSessionId, connDelayCloseTime); });
+    ffrt::submit([=]() { CleanAuthMgrByLogicalSessionId(logicalSessionId, connDelayCloseTime); },
+        ffrt::task_attr().name(NOTIFY_CLEAN_EVENT_TASK));
 }
 
 void DeviceManagerServiceImpl::ImportConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId,
@@ -354,7 +357,7 @@ void DeviceManagerServiceImpl::CleanSessionMap(int sessionId, int32_t connDelayC
             connDelayCloseTime = 0; // no need joinlnn specified by business, close directly
         }
     }
-    ffrt::submit(taskFunc, ffrt::task_attr().delay(connDelayCloseTime));
+    ffrt::submit(taskFunc, ffrt::task_attr().name(CLOSE_AUTH_SESSION_TASK).delay(connDelayCloseTime));
     {
         std::lock_guard<ffrt::mutex> lock(mapMutex_);
         std::shared_ptr<Session> session = nullptr;
