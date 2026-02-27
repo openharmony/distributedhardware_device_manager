@@ -376,7 +376,6 @@ typedef enum {
     UN_REG_AUTH_CODE_INVALID = 10,
     REG_SERVICE_STATE = 11,
     UN_REG_SERVICE_STATE = 12,
-
     MAX = 13,
 } DmCommonNotifyEvent;
 
@@ -515,31 +514,6 @@ typedef enum DMSrvMediumType {
     SERVICE_MEDIUM_TYPE_BUTT,
 } DMSrvMediumType;
 
-typedef enum DMPublishState {
-    SERVICE_UNPUBLISHED_STATE = 0,
-    SERVICE_PUBLISHED_STATE,
-} DMPublishState;
-typedef struct DmUserRemovedServiceInfo {
-    int64_t localTokenId = 0;
-    std::string localPkgName = "";
-    int32_t bindType = 0;
-    std::string peerUdid = "";
-    std::vector<int64_t> serviceIds = {};
-    bool isActive = false;
-    int32_t peerUserId = 0;
-    std::map<int32_t, std::vector<int64_t>> bindTypeToServiceIdMap;
-} DmUserRemovedServiceInfo;
-
-//delete start
-typedef struct DiscoveryServiceParam {
-    std::string serviceName;
-    std::string serviceType;
-    int32_t discoveryServiceId = 0;
-    DmExchangeFreq freq;
-    DMSrvMediumType medium;
-    DMSrvDiscoveryMode mode;
-} DiscoveryServiceParam;
-
 typedef struct DiscoveryServiceInfo {
     ServiceInfo serviceInfo;
     std::string pkgName;
@@ -570,7 +544,6 @@ typedef struct PublishServiceParam {
     DMSrvMediumType media;
     DmExchangeFreq freq;
 } PublishServiceParam;
-//delete end
 
 typedef struct DmAuthInfo {
     int32_t userId = 0;     /** User ID of the current caller */
@@ -585,22 +558,100 @@ typedef struct DmAuthInfo {
     DMLocalServiceInfoPinExchangeType pinExchangeType; /**1:pin box;2:qr from dp; 3:nfc from DP; 5:import 6:ultrasonic*/
     std::string description;        /** Description information on the three-party interface */
     std::string extraInfo;      /** Extended configuration information */
+    std::string regPkgName;      /** The pkgName of the currently registered service */
 } DmAuthInfo;
 
+typedef struct UnbindServiceProxyParam {
+    int32_t userId = -1;
+    uint64_t localTokenId = 0;
+    uint64_t subjectTokenId = 0;
+    int64_t serviceId = -1;
+    std::vector<uint64_t> peerTokenId = {};
+    std::string localUdid = "";
+    std::string peerNetworkId = "";
+    std::string peerUdid = "";
+    bool isProxyUnbind = false;
+} UnbindServiceProxyParam;
+
+typedef struct DmServiceInfo {
+    int32_t userId = -1;
+    int64_t serviceId = -1;
+    int64_t displayId = -1;
+    int8_t publishState = -1;
+    std::string deviceId = "";
+    std::string networkId = "";
+    DmAuthForm authform;
+    uint64_t serviceOwnerTokenId = 0;
+    std::string serviceOwnerPkgName = "";
+    uint64_t serviceRegisterTokenId = 0;
+    std::string serviceType = "";
+    std::string serviceName = "";
+    std::string serviceDisplayName = "";
+    std::string serviceCode = "";
+    std::string customData = "";
+    uint32_t dataLen = 0;
+    int64_t timeStamp = -1;
+    std::string description = "";
+    bool operator==(const DmServiceInfo &other) const
+    {
+        return (deviceId == other.deviceId) && (userId == other.userId) &&
+            (serviceId == other.serviceId);
+    }
+    bool operator<(const DmServiceInfo &other) const
+    {
+        return (deviceId < other.deviceId) ||
+            (deviceId == other.deviceId && userId < other.userId) ||
+            (deviceId == other.deviceId && userId == other.userId && serviceId < other.serviceId);
+    }
+} DmServiceInfo;
+
+typedef struct ServiceStateBindParameter {
+    uint64_t tokenId = 0;
+    std::string pkgName = "";
+    int32_t bindType = 0;
+    std::string peerUdid = "";
+    int32_t peerUserId = 0;
+    int64_t serviceId = -1;
+} ServiceStateBindParameter;
+
+typedef struct ServiceSyncInfo {
+    std::string pkgName = "";
+    int32_t localUserId = 0;
+    std::string networkId = "";
+    int64_t serviceId = 0;
+    int32_t callerUserId = 0;
+    uint32_t callerTokenId = 0;
+ 
+    bool operator==(const ServiceSyncInfo &other) const
+    {
+        return (pkgName == other.pkgName) && (localUserId == other.localUserId) &&
+            (networkId == other.networkId) && (serviceId == other.serviceId);
+    }
+ 
+    bool operator<(const ServiceSyncInfo &other) const
+    {
+        return (pkgName < other.pkgName) ||
+            (pkgName == other.pkgName && localUserId < other.localUserId) ||
+            (pkgName == other.pkgName && localUserId == other.localUserId && networkId < other.networkId) ||
+            (pkgName == other.pkgName && localUserId == other.localUserId && networkId == other.networkId &&
+                serviceId < other.serviceId);
+    }
+} ServiceSyncInfo;
+
 typedef struct DmRegisterServiceInfo {
-    int32_t userId;
-    int64_t displayId;
-    uint64_t serviceOwnerTokenId;
-    std::string serviceOwnerPkgName;
-    uint64_t serviceRegisterTokenId;
-    std::string serviceType;
-    std::string serviceName;
-    std::string serviceDisplayName;
-    std::string customData;
-    std::string serviceCode;
-    uint32_t dataLen;
-    int64_t timeStamp;
-    std::string description;
+    int32_t userId = -1;
+    int64_t displayId = -1;
+    uint64_t serviceOwnerTokenId = 0;
+    std::string serviceOwnerPkgName = "";
+    uint64_t serviceRegisterTokenId = 0;
+    std::string serviceType = "";
+    std::string serviceName = "";
+    std::string serviceDisplayName = "";
+    std::string customData = "";
+    std::string serviceCode = "";
+    uint32_t dataLen = 0;
+    int64_t timeStamp = -1;
+    std::string description = "";
 } DmRegisterServiceInfo;
 
 typedef struct DmPublishServiceParam {
@@ -610,9 +661,9 @@ typedef struct DmPublishServiceParam {
 } DmPublishServiceParam;
 
 typedef struct DmDiscoveryServiceParam {
-    std::string serviceType;
-    std::string serviceName;
-    std::string serviceDisplayName;
+    std::string serviceType = "";
+    std::string serviceName = "";
+    std::string serviceDisplayName = "";
     DmExchangeFreq freq;
     DMSrvMediumType medium;
     DMSrvDiscoveryMode mode;
@@ -624,40 +675,22 @@ typedef struct DmDiscoveryServiceParam {
     }
 } DmDiscoveryServiceParam;
 
-typedef struct DmServiceInfo {
-    int32_t userId;
-    int64_t serviceId;
-    int64_t displayId;
-    int8_t publishState;
-    std::string deviceId;
-    std::string networkId;
-    DmAuthForm authform;
-    uint64_t serviceOwnerTokenId;
-    std::string serviceOwnerPkgName;
-    uint64_t serviceRegisterTokenId;
-    std::string serviceType;
-    std::string serviceName;
-    std::string serviceDisplayName;
-    std::string serviceCode;
-    std::string customData;
-    uint32_t dataLen;
-    int64_t timeStamp;
-    std::string description;
-    bool operator==(const DmServiceInfo &other) const
-    {
-        return (deviceId == other.deviceId) && (userId == other.userId) &&
-            (serviceId == other.serviceId);
-    }
-    bool operator<(const DmServiceInfo &other) const
-    {
-        return (deviceId < other.deviceId) && (userId < other.userId) &&
-            (serviceId < other.serviceId);
-    }
-} DmServiceInfo;
+typedef enum DMPublishState {
+    SERVICE_UNPUBLISHED_STATE = 0,
+    SERVICE_PUBLISHED_STATE,
+} DMPublishState;
 
-/**
- * @brief Service state change event definition.
- */
+typedef struct DmUserRemovedServiceInfo {
+    int64_t localTokenId = 0;
+    std::string localPkgName = "";
+    int32_t bindType = 0;
+    std::string peerUdid = "";
+    std::vector<int64_t> serviceIds = {};
+    bool isActive = false;
+    int32_t peerUserId = 0;
+    std::map<int32_t, std::vector<int64_t>> bindTypeToServiceIdMap;
+} DmUserRemovedServiceInfo;
+
 typedef enum DmServiceState {
     /**
      * Service status is unknown.
@@ -691,52 +724,6 @@ typedef struct DmRegisterServiceState {
               serviceId == other.serviceId;
     }
 } DmRegisterServiceState;
-
-typedef struct ServiceStateBindParameter {
-    uint64_t tokenId = 0;
-    std::string pkgName = "";
-    int32_t bindType = 0;
-    std::string peerUdid = "";
-    int32_t peerUserId = 0;
-    int64_t serviceId = -1;
-} ServiceStateBindParameter;
-
-//add by zqz
-typedef struct ServiceSyncInfo {
-    std::string pkgName;
-    int32_t localUserId = 0;
-    std::string networkId;
-    int64_t serviceId = 0;
-    int32_t callerUserId = 0;
-    uint32_t callerTokenId = 0;
-
-    bool operator==(const ServiceSyncInfo &other) const
-    {
-        return (pkgName == other.pkgName) && (localUserId == other.localUserId) &&
-            (networkId == other.networkId) && (serviceId == other.serviceId);
-    }
-
-    bool operator<(const ServiceSyncInfo &other) const
-    {
-        return (pkgName < other.pkgName) ||
-            (pkgName == other.pkgName && localUserId < other.localUserId) ||
-            (pkgName == other.pkgName && localUserId == other.localUserId && networkId < other.networkId) ||
-            (pkgName == other.pkgName && localUserId == other.localUserId && networkId == other.networkId &&
-                serviceId < other.serviceId);
-    }
-} ServiceSyncInfo;
-
-typedef struct UnbindServiceProxyParam {
-    int32_t userId = -1;
-    uint64_t localTokenId = 0;
-    uint64_t subjectTokenId = 0;
-    int64_t serviceId = -1;
-    std::vector<uint64_t> peerTokenId = {};
-    std::string localUdid = "";
-    std::string peerNetworkId = "";
-    std::string peerUdid = "";
-    bool isProxyUnbind = false;
-} UnbindServiceProxyParam;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

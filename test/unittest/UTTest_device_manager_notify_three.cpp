@@ -1066,7 +1066,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnAuthCodeInvalid_001, testing::ext::TestSize.
     std::string pkgName = "ohos.devicemanager.test";
     auto cb = std::make_shared<AuthCodeInvalidCallbackTest>();
     DeviceManagerNotify::GetInstance().authCodeInvalidCallback_[pkgName] = cb;
-    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(pkgName);
+    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(pkgName, "");
     auto it = DeviceManagerNotify::GetInstance().authCodeInvalidCallback_.find(pkgName);
     ASSERT_NE(it, DeviceManagerNotify::GetInstance().authCodeInvalidCallback_.end());
 }
@@ -1075,7 +1075,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnAuthCodeInvalid_002, testing::ext::TestSize.
 {
     DeviceManagerNotify::GetInstance().authCodeInvalidCallback_.clear();
     std::string pkgName;
-    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(pkgName);
+    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(pkgName, "");
     EXPECT_TRUE(pkgName.empty());
 }
 
@@ -1083,7 +1083,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnAuthCodeInvalid_003, testing::ext::TestSize.
 {
     DeviceManagerNotify::GetInstance().authCodeInvalidCallback_.clear();
     std::string pkgName = "ohos.devicemanager.test";
-    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(pkgName);
+    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(pkgName, "");
     auto it = DeviceManagerNotify::GetInstance().authCodeInvalidCallback_.find(pkgName);
     ASSERT_EQ(it, DeviceManagerNotify::GetInstance().authCodeInvalidCallback_.end());
 }
@@ -1093,7 +1093,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnAuthCodeInvalid_004, testing::ext::TestSize.
     DeviceManagerNotify::GetInstance().authCodeInvalidCallback_.clear();
     std::string pkgName = "ohos.devicemanager.test";
     DeviceManagerNotify::GetInstance().authCodeInvalidCallback_[pkgName] = nullptr;
-    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(pkgName);
+    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(pkgName, "");
     auto it = DeviceManagerNotify::GetInstance().authCodeInvalidCallback_.find(pkgName);
     ASSERT_NE(it, DeviceManagerNotify::GetInstance().authCodeInvalidCallback_.end());
     ASSERT_EQ(it->second, nullptr);

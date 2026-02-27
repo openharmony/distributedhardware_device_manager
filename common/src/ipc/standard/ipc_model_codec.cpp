@@ -21,26 +21,26 @@
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-constexpr const char* UK_SEPARATOR = "#";
+constexpr const char *UK_SEPARATOR = "#";
 constexpr int32_t MAX_ICON_SIZE = 4 * 1024 * 1024;
 constexpr uint32_t IPC_VECTOR_MAX_SIZE = 1000;
 }
 
 #define READ_HELPER_RET(parcel, type, out, failRet) \
-    do { \
-        bool ret = (parcel).Read##type((out)); \
-        if (!ret) { \
-            LOGE("read value failed!"); \
-            return failRet; \
-        } \
+    do {                                            \
+        bool ret = (parcel).Read##type((out));      \
+        if (!ret) {                                 \
+            LOGE("read value failed!");             \
+            return failRet;                         \
+        }                                           \
     } while (0)
 
 #define CHECK_CPY_SIZE_RETURN(destSize, srcSize) \
-    do { \
-        if ((destSize) <= (srcSize)) { \
-            LOGE("params size invalid"); \
-            return; \
-        } \
+    do {                                         \
+        if ((destSize) <= (srcSize)) {           \
+            LOGE("params size invalid");         \
+            return;                              \
+        }                                        \
     } while (0)
 
 //LCOV_EXCL_START
@@ -116,7 +116,7 @@ bool IpcModelCodec::EncodeDmAccessCallee(const DmAccessCallee &callee, MessagePa
 }
 
 int32_t IpcModelCodec::DecodeDmDeviceProfileInfoFilterOptions(MessageParcel &parcel,
-    DmDeviceProfileInfoFilterOptions &filterOptions)
+                                                              DmDeviceProfileInfoFilterOptions &filterOptions)
 {
     filterOptions.isCloud = parcel.ReadBool();
     uint32_t size = parcel.ReadUint32();
@@ -134,14 +134,14 @@ int32_t IpcModelCodec::DecodeDmDeviceProfileInfoFilterOptions(MessageParcel &par
 }
 
 bool IpcModelCodec::EncodeDmDeviceProfileInfoFilterOptions(const DmDeviceProfileInfoFilterOptions &filterOptions,
-    MessageParcel &parcel)
+                                                           MessageParcel &parcel)
 {
     bool bRet = true;
     bRet = (bRet && parcel.WriteBool(filterOptions.isCloud));
     uint32_t size = filterOptions.deviceIdList.size();
     bRet = (bRet && parcel.WriteUint32(size));
     if (bRet && size > 0) {
-        for (const auto& item : filterOptions.deviceIdList) {
+        for (const auto &item : filterOptions.deviceIdList) {
             bRet = (bRet && parcel.WriteString(item));
         }
     }
@@ -228,7 +228,7 @@ bool IpcModelCodec::EncodeDmServiceProfileInfo(const DmServiceProfileInfo &svrIn
 }
 
 bool IpcModelCodec::EncodeDmServiceProfileInfos(const std::vector<DmServiceProfileInfo> &svrInfos,
-    MessageParcel &parcel)
+                                                MessageParcel &parcel)
 {
     if (!parcel.WriteInt32((int32_t)svrInfos.size())) {
         return false;
@@ -276,14 +276,14 @@ bool IpcModelCodec::EncodeDmDeviceProfileInfo(const DmDeviceProfileInfo &devInfo
 
 std::string IpcModelCodec::GetDeviceIconInfoUniqueKey(const DmDeviceIconInfoFilterOptions &iconFiter)
 {
-    return iconFiter.productId + UK_SEPARATOR + iconFiter.subProductId + UK_SEPARATOR +
-        iconFiter.internalModel + UK_SEPARATOR + iconFiter.imageType + UK_SEPARATOR + iconFiter.specName;
+    return iconFiter.productId + UK_SEPARATOR + iconFiter.subProductId + UK_SEPARATOR + iconFiter.internalModel +
+           UK_SEPARATOR + iconFiter.imageType + UK_SEPARATOR + iconFiter.specName;
 }
 
 std::string IpcModelCodec::GetDeviceIconInfoUniqueKey(const DmDeviceIconInfo &iconInfo)
 {
-    return iconInfo.productId + UK_SEPARATOR + iconInfo.subProductId + UK_SEPARATOR +
-        iconInfo.internalModel + UK_SEPARATOR + iconInfo.imageType + UK_SEPARATOR + iconInfo.specName;
+    return iconInfo.productId + UK_SEPARATOR + iconInfo.subProductId + UK_SEPARATOR + iconInfo.internalModel +
+           UK_SEPARATOR + iconInfo.imageType + UK_SEPARATOR + iconInfo.specName;
 }
 
 void IpcModelCodec::DecodeDmDeviceIconInfo(MessageParcel &parcel, DmDeviceIconInfo &deviceIconInfo)
@@ -344,7 +344,7 @@ void IpcModelCodec::DecodeServiceIds(std::vector<int64_t> &serviceIds, MessagePa
 {
     const int32_t MAX_SERVICE_IDS_SIZE = 1024;
     int32_t size = parcel.ReadInt32();
-    if (size > MAX_SERVICE_IDS_SIZE) {
+    if (size < 0 || size > MAX_SERVICE_IDS_SIZE) {
         LOGE("DecodeServiceIds: size %d", size);
         return;
     }
@@ -355,7 +355,7 @@ void IpcModelCodec::DecodeServiceIds(std::vector<int64_t> &serviceIds, MessagePa
 }
 
 void IpcModelCodec::DecodeDmDeviceIconInfoFilterOptions(MessageParcel &parcel,
-    DmDeviceIconInfoFilterOptions &filterOptions)
+                                                        DmDeviceIconInfoFilterOptions &filterOptions)
 {
     filterOptions.productId = parcel.ReadString();
     filterOptions.subProductId = parcel.ReadString();
@@ -365,7 +365,7 @@ void IpcModelCodec::DecodeDmDeviceIconInfoFilterOptions(MessageParcel &parcel,
 }
 
 bool IpcModelCodec::EncodeDmDeviceIconInfoFilterOptions(const DmDeviceIconInfoFilterOptions &filterOptions,
-    MessageParcel &parcel)
+                                                        MessageParcel &parcel)
 {
     bool bRet = true;
     bRet = (bRet && parcel.WriteString(filterOptions.productId));
@@ -456,7 +456,7 @@ bool IpcModelCodec::DecodeLocalServiceInfos(MessageParcel &parcel, std::vector<D
     uint32_t num = 0;
     READ_HELPER_RET(parcel, Uint32, num, false);
     bool bRet = true;
-    if (num > IPC_VECTOR_MAX_SIZE || num < 0) {
+    if (num > IPC_VECTOR_MAX_SIZE || num == 0) {
         LOGE("num is Invalid value, num = %{public}u", num);
         return false;
     }
@@ -471,6 +471,7 @@ bool IpcModelCodec::DecodeLocalServiceInfos(MessageParcel &parcel, std::vector<D
     }
     return bRet;
 }
+//LCOV_EXCL_STOP
 
 bool IpcModelCodec::EncodeNetworkIdQueryFilter(const NetworkIdQueryFilter &queryFilter, MessageParcel &parcel)
 {
@@ -527,114 +528,6 @@ bool IpcModelCodec::DecodeStringVector(MessageParcel &parcel, std::vector<std::s
     }
     return true;
 }
-//this code line need delete: 531 - 637
-bool IpcModelCodec::EncodeSrvDiscParam(const DiscoveryServiceParam &param, MessageParcel &parcel)
-{
-    bool bRet = true;
-    bRet = (bRet && parcel.WriteString(param.serviceName));
-    bRet = (bRet && parcel.WriteString(param.serviceType));
-    bRet = (bRet && parcel.WriteInt32(param.discoveryServiceId));
-    bRet = (bRet && parcel.WriteInt32(param.freq));
-    bRet = (bRet && parcel.WriteInt32(param.medium));
-    bRet = (bRet && parcel.WriteInt32(param.mode));
-    return bRet;
-}
-
-bool IpcModelCodec::DecodeSrvDiscParam(MessageParcel &parcel, DiscoveryServiceParam &param)
-{
-    READ_HELPER_RET(parcel, String, param.serviceName, false);
-    READ_HELPER_RET(parcel, String, param.serviceType, false);
-    READ_HELPER_RET(parcel, Int32, param.discoveryServiceId, false);
-    int32_t freq = 0;
-    READ_HELPER_RET(parcel, Int32, freq, false);
-    param.freq = static_cast<DmExchangeFreq>(freq);
-    int32_t medium = 0;
-    READ_HELPER_RET(parcel, Int32, medium, false);
-    param.medium = static_cast<DMSrvMediumType>(medium);
-    int32_t mode = 0;
-    READ_HELPER_RET(parcel, Int32, mode, false);
-    param.mode = static_cast<DMSrvDiscoveryMode>(mode);
-    return true;
-}
-
-bool IpcModelCodec::EncodeSrvDiscServiceInfo(const DiscoveryServiceInfo &serviceInfo, MessageParcel &parcel)
-{
-    bool bRet = true;
-    bRet = (bRet && parcel.WriteString(serviceInfo.pkgName));
-    bRet = (bRet && parcel.WriteInt64(serviceInfo.serviceInfo.serviceId));
-    bRet = (bRet && parcel.WriteString(serviceInfo.serviceInfo.serviceType));
-    bRet = (bRet && parcel.WriteString(serviceInfo.serviceInfo.serviceName));
-    bRet = (bRet && parcel.WriteString(serviceInfo.serviceInfo.serviceDisplayName));
-    return bRet;
-}
-
-bool IpcModelCodec::DecodeSrvDiscServiceInfo(MessageParcel &parcel, DiscoveryServiceInfo &serviceInfo)
-{
-    READ_HELPER_RET(parcel, String, serviceInfo.pkgName, false);
-    READ_HELPER_RET(parcel, Int64, serviceInfo.serviceInfo.serviceId, false);
-    READ_HELPER_RET(parcel, String, serviceInfo.serviceInfo.serviceType, false);
-    READ_HELPER_RET(parcel, String, serviceInfo.serviceInfo.serviceName, false);
-    READ_HELPER_RET(parcel, String, serviceInfo.serviceInfo.serviceDisplayName, false);
-    return true;
-}
-//LCOV_EXCL_STOP
-
-bool IpcModelCodec::EncodeServiceRegInfo(const ServiceRegInfo &serRegInfo, MessageParcel &parcel)
-{
-    bool bRet = true;
-    bRet = (bRet && parcel.WriteInt64(serRegInfo.serviceInfo.serviceId));
-    bRet = (bRet && parcel.WriteString(serRegInfo.serviceInfo.serviceType));
-    bRet = (bRet && parcel.WriteString(serRegInfo.serviceInfo.serviceName));
-    bRet = (bRet && parcel.WriteString(serRegInfo.serviceInfo.serviceDisplayName));
-    bRet = (bRet && parcel.WriteString(serRegInfo.customData));
-    bRet = (bRet && parcel.WriteUint32(serRegInfo.dataLen));
-    return bRet;
-}
-
-bool IpcModelCodec::DecodeServiceRegInfo(MessageParcel &parcel, ServiceRegInfo &serRegInfo)
-{
-    READ_HELPER_RET(parcel, Int64, serRegInfo.serviceInfo.serviceId, false);
-    READ_HELPER_RET(parcel, String, serRegInfo.serviceInfo.serviceType, false);
-    READ_HELPER_RET(parcel, String, serRegInfo.serviceInfo.serviceName, false);
-    READ_HELPER_RET(parcel, String, serRegInfo.serviceInfo.serviceDisplayName, false);
-    READ_HELPER_RET(parcel, String, serRegInfo.customData, false);
-    READ_HELPER_RET(parcel, Uint32, serRegInfo.dataLen, false);
-    return true;
-}
-
-bool IpcModelCodec::EncodePublishServiceParam(const PublishServiceParam &publishServiceParam, MessageParcel &parcel)
-{
-    bool bRet = true;
-    bRet = (bRet && parcel.WriteInt64(publishServiceParam.serviceInfo.serviceId));
-    bRet = (bRet && parcel.WriteString(publishServiceParam.serviceInfo.serviceType));
-    bRet = (bRet && parcel.WriteString(publishServiceParam.serviceInfo.serviceName));
-    bRet = (bRet && parcel.WriteString(publishServiceParam.serviceInfo.serviceDisplayName));
-    bRet = (bRet && parcel.WriteInt32(publishServiceParam.regServiceId));
-    bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(publishServiceParam.discoverMode)));
-    bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(publishServiceParam.media)));
-    bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(publishServiceParam.freq)));
-    return bRet;
-}
-
-bool IpcModelCodec::DecodePublishServiceParam(MessageParcel &parcel, PublishServiceParam &publishServiceParam)
-{
-    READ_HELPER_RET(parcel, Int64, publishServiceParam.serviceInfo.serviceId, false);
-    READ_HELPER_RET(parcel, String, publishServiceParam.serviceInfo.serviceType, false);
-    READ_HELPER_RET(parcel, String, publishServiceParam.serviceInfo.serviceName, false);
-    READ_HELPER_RET(parcel, String, publishServiceParam.serviceInfo.serviceDisplayName, false);
-    READ_HELPER_RET(parcel, Int32, publishServiceParam.regServiceId, false);
-    int32_t discoverMode = static_cast<int32_t>(DMSrvDiscoveryMode::SERVICE_PUBLISH_MODE_ACTIVE);
-    READ_HELPER_RET(parcel, Int32, discoverMode, false);
-    publishServiceParam.discoverMode = static_cast<DMSrvDiscoveryMode>(discoverMode);
-    int32_t media = static_cast<int32_t>(DMSrvMediumType::SERVICE_MEDIUM_TYPE_AUTO);
-    READ_HELPER_RET(parcel, Int32, media, false);
-    publishServiceParam.media = static_cast<DMSrvMediumType>(media);
-    int32_t freq = static_cast<int32_t>(DmExchangeFreq::DM_LOW);
-    READ_HELPER_RET(parcel, Int32, freq, false);
-    publishServiceParam.freq = static_cast<DmExchangeFreq>(freq);
-    return true;
-}
-
 bool IpcModelCodec::EncodeDmAuthInfo(const DmAuthInfo &dmAuthInfo, MessageParcel &parcel)
 {
     bool bRet = true;
@@ -652,6 +545,7 @@ bool IpcModelCodec::EncodeDmAuthInfo(const DmAuthInfo &dmAuthInfo, MessageParcel
     bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(dmAuthInfo.pinExchangeType)));
     bRet = (bRet && parcel.WriteString(dmAuthInfo.description));
     bRet = (bRet && parcel.WriteString(dmAuthInfo.extraInfo));
+    bRet = (bRet && parcel.WriteString(dmAuthInfo.regPkgName));
     return bRet;
 }
 
@@ -703,6 +597,7 @@ bool IpcModelCodec::DecodeDmAuthInfo(MessageParcel &parcel, DmAuthInfo &dmAuthIn
 
     READ_HELPER_RET(parcel, String, dmAuthInfo.description, false);
     READ_HELPER_RET(parcel, String, dmAuthInfo.extraInfo, false);
+    READ_HELPER_RET(parcel, String, dmAuthInfo.regPkgName, false);
     return true;
 }
 
@@ -742,6 +637,7 @@ bool IpcModelCodec::DecodeDmRegServiceInfo(MessageParcel &parcel, DmRegisterServ
     READ_HELPER_RET(parcel, String, regServiceInfo.description, false);
     return true;
 }
+
 
 bool IpcModelCodec::EncodeDmSrvDiscParam(const DmDiscoveryServiceParam &param, MessageParcel &parcel)
 {
@@ -794,7 +690,7 @@ bool IpcModelCodec::DecodeDmPublishServiceParam(MessageParcel &parcel, DmPublish
     publishServiceParam.freq = static_cast<DmExchangeFreq>(freq);
     return true;
 }
-// zl online&offline
+
 bool IpcModelCodec::EncodeDmServiceInfo(const DmServiceInfo &serviceInfo, MessageParcel &parcel)
 {
     bool bRet = true;
@@ -818,7 +714,7 @@ bool IpcModelCodec::EncodeDmServiceInfo(const DmServiceInfo &serviceInfo, Messag
     bRet = (bRet && parcel.WriteInt32(serviceInfo.authform));
     return bRet;
 }
-// zl online&offline
+
 bool IpcModelCodec::DecodeDmServiceInfo(MessageParcel &parcel, DmServiceInfo &serviceInfo)
 {
     READ_HELPER_RET(parcel, Int32, serviceInfo.userId, false);
@@ -845,7 +741,7 @@ bool IpcModelCodec::DecodeDmServiceInfo(MessageParcel &parcel, DmServiceInfo &se
     serviceInfo.authform = static_cast<DmAuthForm>(authform);
     return true;
 }
-// zl online&offline
+
 bool IpcModelCodec::DecodeDmRegisterServiceState(MessageParcel &parcel, DmRegisterServiceState &dmRegisterServiceState)
 {
     bool bRet = true;
@@ -859,7 +755,7 @@ bool IpcModelCodec::DecodeDmRegisterServiceState(MessageParcel &parcel, DmRegist
 
     return bRet;
 }
-// zl online&offline
+
 bool IpcModelCodec::EncodeDmRegisterServiceState(const DmRegisterServiceState &serviceInfo, MessageParcel &parcel)
 {
     bool bRet = true;
@@ -871,7 +767,6 @@ bool IpcModelCodec::EncodeDmRegisterServiceState(const DmRegisterServiceState &s
     return bRet;
 }
 
-// add by zqz
 bool IpcModelCodec::EncodeServiceSyncInfo(const ServiceSyncInfo &serviceSyncInfo, MessageParcel &parcel)
 {
     bool bRet = true;
@@ -883,7 +778,7 @@ bool IpcModelCodec::EncodeServiceSyncInfo(const ServiceSyncInfo &serviceSyncInfo
     bRet = (bRet && parcel.WriteUint32(serviceSyncInfo.callerTokenId));
     return bRet;
 }
-// add by zqz
+
 void IpcModelCodec::DecodeServiceSyncInfo(MessageParcel &parcel, ServiceSyncInfo &serviceSyncInfo)
 {
     serviceSyncInfo.pkgName = parcel.ReadString();
@@ -893,5 +788,5 @@ void IpcModelCodec::DecodeServiceSyncInfo(MessageParcel &parcel, ServiceSyncInfo
     serviceSyncInfo.callerUserId = parcel.ReadInt32();
     serviceSyncInfo.callerTokenId = parcel.ReadUint32();
 }
-} // namespace DistributedHardware
-} // namespace OHOS
+}  // namespace DistributedHardware
+}  // namespace OHOS

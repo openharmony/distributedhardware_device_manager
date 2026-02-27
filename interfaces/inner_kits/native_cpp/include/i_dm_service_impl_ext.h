@@ -107,14 +107,7 @@ public:
     virtual void OnSessionClosed(const int32_t sessionId) = 0;
     virtual void OnBytesReceived(const int32_t sessionId, const std::string message) = 0;
     virtual int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) = 0;
-//this code line need delete: 111 - 112
-    virtual int32_t StartServiceDiscovery(const ProcessInfo &processInfo, const DiscoveryServiceParam &discParam) = 0;
-    virtual int32_t StopServiceDiscovery(int32_t discServiceId) = 0;
     virtual int32_t OpenAuthSessionWithPara(int64_t serviceId) = 0;
-//this code line need delete: 115 - 117
-    virtual int32_t StartPublishService(const ProcessInfo &processInfo,
-        const PublishServiceParam &publishServiceParam) = 0;
-    virtual int32_t StopPublishService(int64_t serviceId) = 0;
     virtual void OnDynamicSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result) = 0;
     virtual void OnDynamicSessionClosed(const int32_t sessionId) = 0;
 };

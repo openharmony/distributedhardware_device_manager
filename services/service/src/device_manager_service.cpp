@@ -20,7 +20,6 @@
 #include <functional>
 #include <openssl/rand.h>
 #include <thread>
-#include <unordered_map>
 #include "app_manager.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
@@ -2310,12 +2309,6 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
-{
-    (void)udid;
-    return ERR_DM_UNSUPPORTED_METHOD;
-}
-
 int32_t DeviceManagerService::DpAclAdd(const std::string &udid, int64_t accessControlId)
 {
     if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
@@ -5276,34 +5269,6 @@ int32_t DeviceManagerService::GetAuthTypeByUdidHash(const std::string &udidHash,
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-int32_t DeviceManagerService::RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId)
-{
-    (void)serviceRegInfo;
-    regServiceId = 0;
-    return ERR_DM_UNSUPPORTED_METHOD;
-}
-
-int32_t DeviceManagerService::UnRegisterServiceInfo(int32_t regServiceId)
-{
-    (void)regServiceId;
-    return ERR_DM_UNSUPPORTED_METHOD;
-}
-
-int32_t DeviceManagerService::StartPublishService(const std::string &pkgName,
-    PublishServiceParam &publishServiceParam, int64_t &serviceId)
-{
-    (void)pkgName;
-    (void)publishServiceParam;
-    serviceId = 0;
-    return ERR_DM_UNSUPPORTED_METHOD;
-}
-
-int32_t DeviceManagerService::StopPublishService(int64_t serviceId)
-{
-    (void)serviceId;
-    return ERR_DM_UNSUPPORTED_METHOD;
-}
-
 int32_t DeviceManagerService::RegisterServiceInfo(const DmRegisterServiceInfo& regServiceInfo, int64_t &serviceId)
 {
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
@@ -5412,20 +5377,6 @@ int32_t DeviceManagerService::StopPublishService(const std::string &pkgName, int
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->StopPublishService(processInfo, serviceId);
-}
-
-int32_t DeviceManagerService::StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam)
-{
-    (void)pkgName;
-    (void)discParam;
-    return ERR_DM_UNSUPPORTED_METHOD;
-}
-
-int32_t DeviceManagerService::StopServiceDiscovery(const std::string &pkgName, int32_t discServiceId)
-{
-    (void)pkgName;
-    (void)discServiceId;
-    return ERR_DM_UNSUPPORTED_METHOD;
 }
 
 int32_t DeviceManagerService::StartDiscoveryService(const std::string &pkgName, const DmDiscoveryServiceParam &disParam)
@@ -5783,13 +5734,6 @@ int32_t DeviceManagerService::UnbindServiceTarget(const std::string &pkgName,
         return ERR_DM_FAILED;
     }
     return DM_OK;
-}
-
-int32_t DeviceManagerService::UnbindServiceTarget(const std::string &pkgName, int64_t serviceId)
-{
-    (void)pkgName;
-    (void)serviceId;
-    return ERR_DM_UNSUPPORTED_METHOD;
 }
 
 int32_t DeviceManagerService::GetSubjectTokenId(const std::map<std::string, std::string> &unbindParam,

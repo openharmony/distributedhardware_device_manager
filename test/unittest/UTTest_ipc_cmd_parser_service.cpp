@@ -1327,7 +1327,7 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_060, testing::ext::TestSize.Level
     serviceInfo.bundleName = "testbundle";
     serviceInfo.extraInfo = "testextra";
     MessageParcel data;
-    std::shared_ptr<IpcRegServiceInfoReq> req = std::make_shared<IpcRegServiceInfoReq>();
+    std::shared_ptr<IpcRegAuthInfoReq> req = std::make_shared<IpcRegAuthInfoReq>();
     req->SetLocalServiceInfo(serviceInfo);
 
     int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -1370,7 +1370,7 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_062, testing::ext::TestSize.Level
     int32_t cmdCode = UPDATE_LOCALSERVICE_INFO;
     DMLocalServiceInfo serviceInfo;
     MessageParcel data;
-    std::shared_ptr<IpcRegServiceInfoReq> req = std::make_shared<IpcRegServiceInfoReq>();
+    std::shared_ptr<IpcRegAuthInfoReq> req = std::make_shared<IpcRegAuthInfoReq>();
     req->SetLocalServiceInfo(serviceInfo);
 
     int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
