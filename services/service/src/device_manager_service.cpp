@@ -2517,12 +2517,12 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
         ffrt::submit([=]() {
             HandleAccountLogoutEventCallback(commonEventType, currentUserId, beforeUserId);
         },
-            ffrt.task_attr.name(HANDLE_ACCOUNT_LOGOUT_EVENT_CALLBACK_TASK));
+            ffrt::task_attr().name(HANDLE_ACCOUNT_LOGOUT_EVENT_CALLBACK_TASK));
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         ffrt::submit([=]() {
             HandleUserRemoved(beforeUserId);
         },
-            ffrt.task_attr.name(HANDLE_USER_REMOVED_TASK)););
+            ffrt::task_attr().name(HANDLE_USER_REMOVED_TASK));
         MultipleUserConnector::DeleteAccountInfoByUserId(beforeUserId);
         MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(),
             MultipleUserConnector::GetCurrentDMAccountInfo());
