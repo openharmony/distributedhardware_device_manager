@@ -54,10 +54,7 @@ public:
      * @tc.desc: Generate Pincode of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    // this code line need delete:58-59
     int32_t BindTarget(const std::string &sessionName, const PeerTargetId &targetId,
-        const std::map<std::string, std::string> &bindParam, int sessionId, uint64_t logicalSessionId);
-    int32_t BindTargetSrvBind(const std::string &sessionName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam, int sessionId, uint64_t logicalSessionId);
 
     /**
@@ -120,7 +117,7 @@ public:
     void SetBindTargetParams(const PeerTargetId &targetId);
     int32_t GetReason();
     int32_t CheckSrcNegotiateSrvParam(const std::string &pkgName, int64_t serviceId,
- 	    const std::map<std::string, std::string> &bindParam);
+        const std::map<std::string, std::string> &bindParam);
 
     // Internal API end
     void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
@@ -144,9 +141,7 @@ private:
     void ParseProxyJsonObject(const JsonObject &jsonObject);
     void ParseServiceJsonObject(const JsonObject &jsonObject);
     void GetBindLevelByBundleName(std::string &bundleName, int32_t userId, int32_t &bindLevel);
-    // this code line need delete:148
     void ParseJsonObject(const JsonObject &jsonObject);
-    void ParseJsonObjectSrvBind(const JsonObject &jsonObject);
     void ParseAccessJsonObject(const JsonObject &jsonObject);
     void GetAuthParam(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
@@ -160,17 +155,12 @@ private:
     int32_t CheckServiceAuthParamVaild(const JsonObject &jsonObject);
     void InitAuthState(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
-    // this code line need delete:164-165
     int32_t AuthenticateDevice(const std::string &sessionName, int32_t authType,
-        const std::string &deviceId, const std::string &extra);
-    int32_t AuthenticateDeviceSrvBind(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
     void ParseUltrasonicSide(const JsonObject &jsonObject);
     void GetBindCallerInfo();
     int32_t GetBindLevel(int32_t bindLevel);
     void GetIsNeedJoinLnnParam(const std::map<std::string, std::string> &bindParam);
-    // this code line need delete:173
-    void ParseServiceInfo(const JsonObject &jsonObject);
     void ParseServiceInfo(const std::string &extra);
     void GetConnDelayCloseTime(const std::string &extra);
     int32_t GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmDeviceType deviceType);

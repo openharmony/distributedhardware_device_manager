@@ -34,11 +34,8 @@ enum class RelationShipChangeType : uint32_t {
     SYNC_USERID = 6,
     STOP_USER = 7,
     SHARE_UNBIND = 8,
-    //this code line mock start
-    SERVICEINFO_UNBIND = 9,
-    SERVICEINFO_UNREGISTER = 10,
-    //this code line mock end
-    TYPE_MAX = 11
+    SERVICEINFO_UNREGISTER = 9,
+    TYPE_MAX = 10
 };
 
 struct UserIdInfo {
@@ -73,6 +70,7 @@ struct RelationShipChangeMsg {
 
     explicit RelationShipChangeMsg();
     bool ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) const;
+    bool ToBroadcastPayLoadTwo(uint8_t *&msg, uint32_t &len) const;
     bool FromBroadcastPayLoad(const cJSON *payloadJson, RelationShipChangeType type);
     bool IsValid() const;
     bool IsChangeTypeValid();
@@ -86,7 +84,6 @@ struct RelationShipChangeMsg {
     void ToDelUserPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToStopUserPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToShareUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
-    void ToServiceUnbindTargetPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToServiceUnRegPayLoad(uint8_t *&msg, uint32_t &len) const;
     cJSON *ToPayLoadJson() const;
 
@@ -100,7 +97,6 @@ struct RelationShipChangeMsg {
     bool FromShareUnbindPayLoad(const cJSON *payloadJson);
     bool FromAppUninstallPayLoad(const cJSON *payloadJson);
     bool GetBroadCastId(const cJSON *payloadJson, uint32_t userIdNum);
-    bool FromServiceUnbindTargetPayLoad(const cJSON *payloadJson);
     bool FromServiceUnRegPayLoad(const cJSON *payloadJson);
 
     std::string ToJson() const;

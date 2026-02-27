@@ -60,6 +60,7 @@ void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
+    InitDeviceAuthService();
     FuzzedDataProvider fdp(data, size);
     std::string str = fdp.ConsumeRandomLengthString();
     int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();

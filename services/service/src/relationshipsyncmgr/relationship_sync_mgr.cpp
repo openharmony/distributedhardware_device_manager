@@ -118,7 +118,68 @@ bool RelationShipChangeMsg::ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) con
         LOGE("invalid");
         return false;
     }
-    return HandleBroadcastPayLoadByType(msg, len);
+    bool ret = false;
+    switch (type) {
+        case RelationShipChangeType::ACCOUNT_LOGOUT:
+            ToAccountLogoutPayLoad(msg, len);
+            ret = true;
+            break;
+        case RelationShipChangeType::DEVICE_UNBIND:
+            ToDeviceUnbindPayLoad(msg, len);
+            ret = true;
+            break;
+        case RelationShipChangeType::APP_UNBIND:
+            ToAppUnbindPayLoad(msg, len);
+            ret = true;
+            break;
+        case RelationShipChangeType::SERVICE_UNBIND:
+            ToServiceUnbindPayLoad(msg, len);
+            ret = true;
+            break;
+        case RelationShipChangeType::SYNC_USERID:
+            ret = ToSyncFrontOrBackUserIdPayLoad(msg, len);
+            break;
+        default:
+            ret = ToBroadcastPayLoadTwo(msg, len);
+            break;
+    }
+    return ret;
+}
+
+bool RelationShipChangeMsg::ToBroadcastPayLoadTwo(uint8_t *&msg, uint32_t &len) const
+{
+    if (!IsValid()) {
+        LOGE("invalid");
+        return false;
+    }
+
+    bool ret = false;
+    switch (type) {
+        case RelationShipChangeType::DEL_USER:
+            ToDelUserPayLoad(msg, len);
+            ret = true;
+            break;
+        case RelationShipChangeType::STOP_USER:
+            ToStopUserPayLoad(msg, len);
+            ret = true;
+            break;
+        case RelationShipChangeType::SHARE_UNBIND:
+            ToShareUnbindPayLoad(msg, len);
+            ret = true;
+            break;
+        case RelationShipChangeType::APP_UNINSTALL:
+            ToAppUninstallPayLoad(msg, len);
+            ret = true;
+            break;
+        case RelationShipChangeType::SERVICEINFO_UNREGISTER:
+            ToServiceUnRegPayLoad(msg, len);
+            ret = true;
+            break;
+        default:
+            LOGE("RelationShipChange type invalid");
+            break;
+    }
+    return ret;
 }
 
 bool RelationShipChangeMsg::HandleBroadcastPayLoadByType(uint8_t *&msg, uint32_t &len) const
@@ -177,10 +238,6 @@ bool RelationShipChangeMsg::HandleBroadcastPayLoadExt(uint8_t *&msg, uint32_t &l
             break;
         case RelationShipChangeType::APP_UNINSTALL:
             ToAppUninstallPayLoad(msg, len);
-            ret = true;
-            break;
-        case RelationShipChangeType::SERVICEINFO_UNBIND:
-            ToServiceUnbindTargetPayLoad(msg, len);
             ret = true;
             break;
         case RelationShipChangeType::SERVICEINFO_UNREGISTER:
@@ -250,9 +307,6 @@ bool RelationShipChangeMsg::FromBroadcastPayLoad(const cJSON *payloadJson, Relat
             break;
         case RelationShipChangeType::APP_UNINSTALL:
             ret = FromAppUninstallPayLoad(payloadJson);
-            break;
-        case RelationShipChangeType::SERVICEINFO_UNBIND:
-            ret = FromServiceUnbindTargetPayLoad(payloadJson);
             break;
         case RelationShipChangeType::SERVICEINFO_UNREGISTER:
             ret = FromServiceUnRegPayLoad(payloadJson);
@@ -335,9 +389,6 @@ bool RelationShipChangeMsg::IsValid() const
             ret = (!userIdInfos.empty() &&
                 (static_cast<uint32_t>(userIdInfos.size()) <= MAX_USER_ID_NUM));
             break;
-        case RelationShipChangeType::SERVICEINFO_UNBIND:
-            ret = (userId != UINT32_MAX && tokenId != UINT64_MAX && serviceId != INT64_MAX);
-            break;
         case RelationShipChangeType::SERVICEINFO_UNREGISTER:
             ret = (userId != UINT32_MAX && serviceId != INT64_MAX);
             break;
@@ -357,7 +408,6 @@ bool RelationShipChangeMsg::IsChangeTypeValid()
         (type == RelationShipChangeType::APP_UNBIND) || (type == RelationShipChangeType::SYNC_USERID) ||
         (type == RelationShipChangeType::DEL_USER) || (type == RelationShipChangeType::STOP_USER) ||
         (type == RelationShipChangeType::SERVICE_UNBIND) || (type == RelationShipChangeType::APP_UNINSTALL) ||
-        (type == RelationShipChangeType::SERVICEINFO_UNBIND) ||
         (type == RelationShipChangeType::SERVICEINFO_UNREGISTER);
 }
 
@@ -372,7 +422,6 @@ bool RelationShipChangeMsg::IsChangeTypeValid(uint32_t type)
         (type == (uint32_t)RelationShipChangeType::SHARE_UNBIND) ||
         (type == (uint32_t)RelationShipChangeType::SERVICE_UNBIND) ||
         (type == (uint32_t)RelationShipChangeType::APP_UNINSTALL) ||
-        (type == (uint32_t)RelationShipChangeType::SERVICEINFO_UNBIND) ||
         (type == (uint32_t)RelationShipChangeType::SERVICEINFO_UNREGISTER);
 }
 
@@ -445,28 +494,6 @@ void RelationShipChangeMsg::ToAppUninstallPayLoad(uint8_t *&msg, uint32_t &len) 
         msg[i] |= (broadCastId >> ((i - TOKENID_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
     }
     len = APP_UNINSTALL_PAYLOAD_LEN;
-}
-
-void RelationShipChangeMsg::ToServiceUnbindTargetPayLoad(uint8_t *&msg, uint32_t &len) const
-{
-    msg = new uint8_t[APP_UNBIND_PAYLOAD_LEN]();
-    for (int i = 0; i < USERID_PAYLOAD_LEN; i++) {
-        msg[i] |= (userId >> (i * BITS_PER_BYTE)) & 0xFF;
-    }
-
-    for (int i = USERID_PAYLOAD_LEN; i < TOKENID_PAYLOAD_LEN; i++) {
-        msg[i] |= (tokenId >> ((i - USERID_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
-    }
-
-    for (int i = TOKENID_PAYLOAD_LEN; i < BROADCAST_PAYLOAD_LEN; i++) {
-        msg[i] |= (serviceId >> ((i - TOKENID_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
-    }
-
-    for (int i = BROADCAST_PAYLOAD_LEN; i < APP_UNBIND_PAYLOAD_LEN; i++) {
-        msg[i] |= (broadCastId >> ((i - BROADCAST_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
-    }
-
-    len = APP_UNBIND_PAYLOAD_LEN;
 }
 
 void RelationShipChangeMsg::ToServiceUnRegPayLoad(uint8_t *&msg, uint32_t &len) const
@@ -721,54 +748,6 @@ bool RelationShipChangeMsg::FromAppUninstallPayLoad(const cJSON *payloadJson)
     return true;
 }
 
-bool RelationShipChangeMsg::FromServiceUnbindTargetPayLoad(const cJSON *payloadJson)
-{
-    if (payloadJson == NULL) {
-        LOGE("App unbind payloadJson is null.");
-        return false;
-    }
-    int32_t arraySize = cJSON_GetArraySize(payloadJson);
-    if (arraySize < ACCOUNT_LOGOUT_PAYLOAD_LEN || arraySize >= INVALIED_PAYLOAD_SIZE) {
-        LOGE("Payload invalied,the size is %{public}d.", arraySize);
-        return false;
-    }
-    userId = 0;
-    for (uint32_t i = 0; i < USERID_PAYLOAD_LEN; i++) {
-        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, i);
-        CHECK_NULL_RETURN(payloadItem, false);
-        if (cJSON_IsNumber(payloadItem)) {
-            userId |= (static_cast<uint8_t>(payloadItem->valueint)) << (i * BITS_PER_BYTE);
-        }
-    }
-    tokenId = 0;
-    for (uint32_t j = USERID_PAYLOAD_LEN; j < TOKENID_PAYLOAD_LEN; j++) {
-        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
-        CHECK_NULL_RETURN(payloadItem, false);
-        if (cJSON_IsNumber(payloadItem)) {
-            tokenId |= (static_cast<uint8_t>(payloadItem->valueint)) <<  ((j - USERID_PAYLOAD_LEN) * BITS_PER_BYTE);
-        }
-    }
-    serviceId = 0;
-    for (uint32_t j = TOKENID_PAYLOAD_LEN; j < BROADCAST_PAYLOAD_LEN; j++) {
-        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
-        CHECK_NULL_RETURN(payloadItem, false);
-        if (cJSON_IsNumber(payloadItem)) {
-            serviceId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
-                ((j - TOKENID_PAYLOAD_LEN) * BITS_PER_BYTE);
-        }
-    }
-    broadCastId = 0;
-    for (uint32_t j = BROADCAST_PAYLOAD_LEN; j < APP_UNBIND_PAYLOAD_LEN; j++) {
-        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
-        CHECK_NULL_RETURN(payloadItem, false);
-        if (cJSON_IsNumber(payloadItem)) {
-            broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
-                ((j - BROADCAST_PAYLOAD_LEN) * BITS_PER_BYTE);
-        }
-    }
-    return true;
-}
-
 bool RelationShipChangeMsg::FromServiceUnRegPayLoad(const cJSON *payloadJson)
 {
     if (payloadJson == NULL) {
@@ -793,7 +772,8 @@ bool RelationShipChangeMsg::FromServiceUnRegPayLoad(const cJSON *payloadJson)
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
         CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
-            serviceId |= (static_cast<uint8_t>(payloadItem->valueint)) <<  ((j - USERID_PAYLOAD_LEN) * BITS_PER_BYTE);
+            serviceId |= (static_cast<uint64_t>(payloadItem->valueint) & 0xFF) <<
+                ((j - USERID_PAYLOAD_LEN) * BITS_PER_BYTE);
         }
     }
     broadCastId = 0;

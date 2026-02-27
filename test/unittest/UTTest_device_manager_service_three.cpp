@@ -320,13 +320,6 @@ HWTEST_F(DeviceManagerServiceThreeTest, BindTarget_301, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 
-HWTEST_F(DeviceManagerServiceThreeTest, DpAclAdd_301, testing::ext::TestSize.Level1)
-{
-    std::string udid = "udid";
-    int32_t ret = DeviceManagerService::GetInstance().DpAclAdd(udid);
-    EXPECT_NE(ret, ERR_DM_NOT_INIT);
-}
-
 HWTEST_F(DeviceManagerServiceThreeTest, IsSameAccount_301, testing::ext::TestSize.Level1)
 {
     std::string udid = "udidTest";
@@ -921,38 +914,17 @@ HWTEST_F(DeviceManagerServiceThreeTest, CheckSinkIsSameAccount_001, testing::ext
 HWTEST_F(DeviceManagerServiceThreeTest, StopServiceDiscovery_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
-    DiscoveryServiceParam discParam;
+    DmDiscoveryServiceParam discParam;
     discParam.serviceType = "testService";
-    discParam.discoveryServiceId = 12345;
+    discParam.serviceName = "name";
+    discParam.serviceDisplayName = "display";
 
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad())
         .Times(AnyNumber()).WillOnce(Return(false));
 
-    int32_t ret = DeviceManagerService::GetInstance().StopServiceDiscovery(pkgName, discParam.discoveryServiceId);
+    int32_t ret = DeviceManagerService::GetInstance().StopDiscoveryService(pkgName, discParam);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, UnbindServiceTarget_005, testing::ext::TestSize.Level1)
-{
-    const std::string pkgName = "com.ohos.test";
-    const int64_t serviceId = 12345;
-
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName, serviceId);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, UnbindServiceTarget_006, testing::ext::TestSize.Level1)
-{
-    const std::string pkgName = "com.ohos.test";
-    const int64_t serviceId = 12345;
-
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).Times(AnyNumber()).WillOnce(Return(false));
-
-    int32_t ret = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName, serviceId);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, OpenAuthSessionWithPara_001, testing::ext::TestSize.Level1)
@@ -966,367 +938,74 @@ HWTEST_F(DeviceManagerServiceThreeTest, OpenAuthSessionWithPara_001, testing::ex
 HWTEST_F(DeviceManagerServiceThreeTest, StartServiceDiscovery_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "";
-    DiscoveryServiceParam discParam;
+    DmDiscoveryServiceParam discParam;
     discParam.serviceType = "testService";
-    discParam.discoveryServiceId = 12345;
+    discParam.serviceName = "name";
+    discParam.serviceDisplayName = "display";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().StartServiceDiscovery(pkgName, discParam);
+    int32_t ret = DeviceManagerService::GetInstance().StartDiscoveryService(pkgName, discParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, StartServiceDiscovery_003, testing::ext::TestSize.Level1)
 {
-    std::string pkgName = "com.ohos.test";
-    DiscoveryServiceParam discParam;
+    std::string pkgName = "";
+    DmDiscoveryServiceParam discParam;
     discParam.serviceType = "";
-    discParam.discoveryServiceId = 12345;
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().StartServiceDiscovery(pkgName, discParam);
+    int32_t ret = DeviceManagerService::GetInstance().StartDiscoveryService(pkgName, discParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, StartServiceDiscovery_004, testing::ext::TestSize.Level1)
 {
-    std::string pkgName = "com.ohos.test";
-    DiscoveryServiceParam discParam;
+    std::string pkgName = "";
+    DmDiscoveryServiceParam discParam;
     discParam.serviceType = "testService";
-    discParam.discoveryServiceId = 0;
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().StartServiceDiscovery(pkgName, discParam);
+    int32_t ret = DeviceManagerService::GetInstance().StartDiscoveryService(pkgName, discParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, StartServiceDiscovery_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
-    DiscoveryServiceParam discParam;
+    DmDiscoveryServiceParam discParam;
     discParam.serviceType = "testService";
-    discParam.discoveryServiceId = 12345;
+    discParam.serviceName = "name";
+    discParam.serviceDisplayName = "display";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
-    int32_t ret = DeviceManagerService::GetInstance().StartServiceDiscovery(pkgName, discParam);
+    int32_t ret = DeviceManagerService::GetInstance().StartDiscoveryService(pkgName, discParam);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, StopServiceDiscovery_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "";
-    int32_t discServiceId = 12345;
+    DmDiscoveryServiceParam discParam;
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().StopServiceDiscovery(pkgName, discServiceId);
+    int32_t ret = DeviceManagerService::GetInstance().StopDiscoveryService(pkgName, discParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, StopServiceDiscovery_003, testing::ext::TestSize.Level1)
 {
-    std::string pkgName = "com.ohos.test";
-    int32_t discServiceId = 0;
+    std::string pkgName = "";
+    DmDiscoveryServiceParam discParam;
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().StopServiceDiscovery(pkgName, discServiceId);
+    int32_t ret = DeviceManagerService::GetInstance().StopDiscoveryService(pkgName, discParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, StopServiceDiscovery_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
-    int32_t discServiceId = 12345;
+    DmDiscoveryServiceParam discParam;
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
-    int32_t ret = DeviceManagerService::GetInstance().StopServiceDiscovery(pkgName, discServiceId);
+    int32_t ret = DeviceManagerService::GetInstance().StopDiscoveryService(pkgName, discParam);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, RegisterServiceInfo_002, testing::ext::TestSize.Level1)
-{
-    ServiceRegInfo serviceRegInfo;
-    serviceRegInfo.serviceInfo.serviceId = 12345;
-    serviceRegInfo.serviceInfo.serviceType = "";
-    serviceRegInfo.serviceInfo.serviceName = "TestService";
-    serviceRegInfo.serviceInfo.serviceDisplayName = "TestServiceDisplay";
-    int32_t regServiceId = 0;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().RegisterServiceInfo(serviceRegInfo, regServiceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, RegisterServiceInfo_003, testing::ext::TestSize.Level1)
-{
-    ServiceRegInfo serviceRegInfo;
-    serviceRegInfo.serviceInfo.serviceId = 12345;
-    serviceRegInfo.serviceInfo.serviceType = "TestService";
-    serviceRegInfo.serviceInfo.serviceName = "";
-    serviceRegInfo.serviceInfo.serviceDisplayName = "TestServiceDisplay";
-    int32_t regServiceId = 0;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().RegisterServiceInfo(serviceRegInfo, regServiceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, RegisterServiceInfo_004, testing::ext::TestSize.Level1)
-{
-    ServiceRegInfo serviceRegInfo;
-    serviceRegInfo.serviceInfo.serviceId = 12345;
-    serviceRegInfo.serviceInfo.serviceType = "TestService";
-    serviceRegInfo.serviceInfo.serviceName = "TestName";
-    serviceRegInfo.serviceInfo.serviceDisplayName = "TestServiceDisplay";
-    int32_t regServiceId = 123456;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceManagerServiceMock_, CheckServiceHasRegistered(_, _, _)).Times(0);
-    int32_t ret = DeviceManagerService::GetInstance().RegisterServiceInfo(serviceRegInfo, regServiceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, RegisterServiceInfo_005, testing::ext::TestSize.Level1)
-{
-    ServiceRegInfo serviceRegInfo;
-    int32_t regServiceId = 12345;
-    serviceRegInfo.serviceInfo.serviceType = "TestService";
-    serviceRegInfo.serviceInfo.serviceName = "TestName";
-    serviceRegInfo.serviceInfo.serviceDisplayName = "TestServiceDisplay";
-    int32_t ret = DeviceManagerService::GetInstance().RegisterServiceInfo(serviceRegInfo, regServiceId);
-    EXPECT_NE(ret, ERR_DM_BIND_COMMON_FAILED);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, RegisterServiceInfo_006, testing::ext::TestSize.Level1)
-{
-    ServiceRegInfo serviceRegInfo;
-    int32_t regServiceId = 12345;
-    serviceRegInfo.serviceInfo.serviceType = "TestService";
-    serviceRegInfo.serviceInfo.serviceName = "TestName";
-    serviceRegInfo.serviceInfo.serviceDisplayName = "TestServiceDisplay";
-    int32_t ret = DeviceManagerService::GetInstance().RegisterServiceInfo(serviceRegInfo, regServiceId);
-    EXPECT_NE(ret, ERR_DM_BIND_COMMON_FAILED);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, UnRegisterServiceInfo_002, testing::ext::TestSize.Level1)
-{
-    int32_t regServiceId = 0;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().UnRegisterServiceInfo(regServiceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StartPublishService_002, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "";
-    PublishServiceParam param;
-    int64_t serviceId = 0;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().StartPublishService(pkgName, param, serviceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StartPublishService_003, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    PublishServiceParam param;
-    param.regServiceId = 0;
-    int64_t serviceId = 0;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().StartPublishService(pkgName, param, serviceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StartPublishService_004, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    int64_t serviceId = 100;
-    ServiceInfoProfile serviceInfotemp;
-    serviceInfotemp.serviceName = "serviceName";
-    serviceInfotemp.serviceType = "serviceType";
-    serviceInfotemp.serviceDisplayName = "serviceDisplayName";
-    serviceInfotemp.regServiceId = 191;
-    PublishServiceParam publishServiceParam;
-    publishServiceParam.regServiceId = 191;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByRegServiceId(_, _)).Times(AnyNumber())
-        .WillOnce(DoAll(SetArgReferee<1>(serviceInfotemp), Return(ERR_DM_FAILED)));
-    int32_t ret = DeviceManagerService::GetInstance().StartPublishService(pkgName, publishServiceParam, serviceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StartPublishService_005, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    int64_t serviceId = 100;
-    ServiceInfoProfile serviceInfotemp;
-    serviceInfotemp.serviceName = "serviceName";
-    serviceInfotemp.serviceType = "serviceType";
-    serviceInfotemp.serviceDisplayName = "serviceDisplayName";
-    serviceInfotemp.regServiceId = 120;
-    serviceInfotemp.tokenId = 0;
-    PublishServiceParam publishServiceParam;
-    publishServiceParam.regServiceId = 191;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByRegServiceId(_, _)).Times(AnyNumber())
-        .WillOnce(DoAll(SetArgReferee<1>(serviceInfotemp), Return(DM_OK)));
-    int32_t ret = DeviceManagerService::GetInstance().StartPublishService(pkgName, publishServiceParam, serviceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StartPublishService_006, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    int64_t serviceId = 100;
-    ServiceInfoProfile serviceInfotemp;
-    serviceInfotemp.serviceId = 100;
-    serviceInfotemp.serviceName = "serviceName";
-    serviceInfotemp.serviceType = "serviceType";
-    serviceInfotemp.serviceDisplayName = "serviceDisplayName";
-    serviceInfotemp.publishState = SERVICE_PUBLISHED_STATE;
-    PublishServiceParam publishServiceParam;
-    publishServiceParam.regServiceId = 191;
-    serviceInfotemp.tokenId = IPCSkeleton::GetCallingTokenID();
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByRegServiceId(_, _)).Times(AnyNumber())
-        .WillOnce(DoAll(SetArgReferee<1>(serviceInfotemp), Return(DM_OK)));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).Times(0);
-    int32_t ret = DeviceManagerService::GetInstance().StartPublishService(pkgName, publishServiceParam, serviceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StartPublishService_007, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    int64_t serviceId = 100;
-    ServiceInfoProfile serviceInfotemp;
-    serviceInfotemp.serviceId = 0;
-    serviceInfotemp.serviceName = "serviceName";
-    serviceInfotemp.serviceType = "serviceType";
-    serviceInfotemp.serviceDisplayName = "serviceDisplayName";
-    PublishServiceParam publishServiceParam;
-    publishServiceParam.regServiceId = 191;
-    serviceInfotemp.tokenId = IPCSkeleton::GetCallingTokenID();
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByRegServiceId(_, _)).Times(AnyNumber())
-        .WillOnce(DoAll(SetArgReferee<1>(serviceInfotemp), Return(DM_OK)));
-    EXPECT_CALL(*deviceManagerServiceMock_, GenerateServiceId(_)).Times(0);
-    int32_t ret = DeviceManagerService::GetInstance().StartPublishService(pkgName, publishServiceParam, serviceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StartPublishService_008, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    int64_t serviceId = 100;
-    ServiceInfoProfile serviceInfotemp;
-    serviceInfotemp.serviceId = 0;
-    serviceInfotemp.serviceName = "serviceName";
-    serviceInfotemp.serviceType = "serviceType";
-    serviceInfotemp.serviceDisplayName = "serviceDisplayName";
-    serviceInfotemp.publishState = 1;
-    PublishServiceParam publishServiceParam;
-    publishServiceParam.regServiceId = 191;
-    serviceInfotemp.tokenId = IPCSkeleton::GetCallingTokenID();
-    int32_t ret = DeviceManagerService::GetInstance().StartPublishService(pkgName, publishServiceParam, serviceId);
-    EXPECT_NE(ret, ERR_DM_BIND_SOFTBUS_ERROR);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StartPublishService_009, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    int64_t serviceId = 100;
-    ServiceInfoProfile serviceInfotemp;
-    serviceInfotemp.serviceId = 0;
-    serviceInfotemp.serviceName = "serviceName";
-    serviceInfotemp.serviceType = "serviceType";
-    serviceInfotemp.serviceDisplayName = "serviceDisplayName";
-    PublishServiceParam publishServiceParam;
-    publishServiceParam.regServiceId = 191;
-    serviceInfotemp.tokenId = IPCSkeleton::GetCallingTokenID();
-    int32_t ret = DeviceManagerService::GetInstance().StartPublishService(pkgName, publishServiceParam, serviceId);
-    EXPECT_NE(ret, ERR_DM_BIND_SOFTBUS_ERROR);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StopPublishService_002, testing::ext::TestSize.Level1)
-{
-    int64_t serviceId = 0;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().StopPublishService(serviceId);
-    EXPECT_NE(ret, ERR_DM_BIND_TIMEOUT_FAILED);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StopPublishService_003, testing::ext::TestSize.Level1)
-{
-    int64_t serviceId = 123456;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByServiceId(serviceId, _)).Times(AnyNumber()).
-        WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManagerService::GetInstance().StopPublishService(serviceId);
-    EXPECT_NE(ret, ERR_DM_BIND_TIMEOUT_FAILED);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StopPublishService_004, testing::ext::TestSize.Level1)
-{
-    int64_t serviceId = 123456;
-    ServiceInfoProfile serviceInfo;
-    serviceInfo.publishState = SERVICE_UNPUBLISHED_STATE;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByServiceId(serviceId, _)).Times(AnyNumber()).
-        WillOnce(DoAll(SetArgReferee<1>(serviceInfo), Return(DM_OK)));
-    int32_t ret = DeviceManagerService::GetInstance().StopPublishService(serviceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StopPublishService_005, testing::ext::TestSize.Level1)
-{
-    int64_t serviceId = 123456;
-    ServiceInfoProfile serviceInfo;
-    serviceInfo.publishState = SERVICE_PUBLISHED_STATE;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByServiceId(serviceId, _)).Times(AnyNumber()).
-        WillOnce(DoAll(SetArgReferee<1>(serviceInfo), Return(DM_OK)));
-    int32_t ret = DeviceManagerService::GetInstance().StopPublishService(serviceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StopPublishService_006, testing::ext::TestSize.Level1)
-{
-    int64_t serviceId = 123456;
-    ServiceInfoProfile serviceInfo;
-    serviceInfo.publishState = SERVICE_PUBLISHED_STATE;
-    serviceInfo.tokenId = IPCSkeleton::GetCallingTokenID();
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByServiceId(serviceId, _)).Times(AnyNumber()).
-        WillOnce(DoAll(SetArgReferee<1>(serviceInfo), Return(DM_OK)));
-    int32_t ret = DeviceManagerService::GetInstance().StopPublishService(serviceId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, ConvertServiceInfoProfileByRegInfo_001, testing::ext::TestSize.Level1)
-{
-    ServiceRegInfo regInfo;
-    regInfo.serviceInfo.serviceId = 123;
-    regInfo.serviceInfo.serviceType = "1";
-    regInfo.serviceInfo.serviceName = "TestService";
-    regInfo.serviceInfo.serviceDisplayName = "TestDisplayName";
-    ServiceInfoProfile profile;
-    int64_t tokenId = 0;
-    int32_t ret = DeviceManagerService::GetInstance().ConvertServiceInfoProfileByRegInfo(regInfo, profile, tokenId);
-    EXPECT_EQ(ret, DM_OK);
-    EXPECT_EQ(profile.serviceId, 123);
-    EXPECT_EQ(profile.serviceType, std::to_string(1));
-    EXPECT_EQ(profile.serviceName, "TestService");
-    EXPECT_EQ(profile.serviceDisplayName, "TestDisplayName");
-    EXPECT_FALSE(profile.deviceId.empty());
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, ConvertServiceInfoProfileByRegInfo_002, testing::ext::TestSize.Level1)
-{
-    ServiceRegInfo regInfo;
-    ServiceInfoProfile profile;
-    int64_t tokenId = 0;
-    int32_t ret = DeviceManagerService::GetInstance().ConvertServiceInfoProfileByRegInfo(regInfo, profile, tokenId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, GenerateServiceId_002, testing::ext::TestSize.Level1)
-{
-    int64_t generatedServiceId = 123;
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByServiceId(_, _)).Times(AnyNumber())
-        .WillRepeatedly(::testing::Return(ERR_DM_SERVICE_INFO_NOT_EXIST));
-    int32_t result = DeviceManagerService::GetInstance().GenerateServiceId(generatedServiceId);
-    EXPECT_EQ(result, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthInfo_001, testing::ext::TestSize.Level1)

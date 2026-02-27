@@ -26,6 +26,7 @@
 #endif
 
 #include "dm_single_instance.h"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -45,6 +46,7 @@ private:
     DmDialogManager();
     ~DmDialogManager();
     void SendMsgRequest(const sptr<IRemoteObject>& remoteObject);
+    void ConfigLocalInfo(JsonObject& jsonObject);
     class DialogAbilityConnection : public OHOS::AAFwk::AbilityConnectionStub {
     public:
         void OnAbilityConnectDone(
@@ -59,14 +61,15 @@ private:
     std::string appOperationStr_;
     std::string customDescriptionStr_;
     std::string pinCode_;
-    std::string hostPkgLabel_;
     std::string serviceType_;
+    std::string hostPkgLabel_;
     int32_t deviceType_ = -1;
     bool isProxyBind_ = false;
     bool isServiceBind_ = false;
     std::string appUserData_;
     std::string serviceUserData_;
     std::string title_;
+    int32_t userId_ = -1;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::mutex mutex_;
 #else

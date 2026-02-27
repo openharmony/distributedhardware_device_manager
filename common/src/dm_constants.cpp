@@ -159,13 +159,13 @@ const char* PARAM_KEY_SUBJECT_PROXYED_SUBJECTS = "subjectProxyOnes";
 const char* DM_VAL_TRUE = "true";
 const char* DM_VAL_FALSE = "false";
 const char* APP_USER_DATA = "appUserData";
+const char* SERVICE_USER_DATA = "serviceUserData";
 const char* BUNDLE_INFO = "bundleInfo";
 const char* TITLE = "title";
 const char* DM_BUSINESS_ID = "business_id";
 const char* PARAM_KEY_IS_SERVICE_BIND = "isServiceBind";
 const char* BIND_CALLER_IS_SYSTEM_SA = "bindCallerIsSystemSA";
-
-const char* SERVICE_USER_DATA = "serviceUserData";
+const char* PARAM_KEY_PEER_PKG_NAME = "PEER_PKG_NAME";
 const char* PARAM_KEY_LOCAL_USER_ID = "localUserId";
 const char* PARAM_KEY_IS_PROXY_QUERY = "isProxyQuery";
 const char* PARAM_KEY_PKG_NAME = "pkgName";

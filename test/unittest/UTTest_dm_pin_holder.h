@@ -284,6 +284,7 @@ public:
         int32_t reason)
     {
         (void)processInfo;
+        (void)serviceType;
         (void)reason;
     }
 

@@ -95,6 +95,7 @@ bool DeviceProfileConnector::CheckSrcDevIdInAclForDevBind(const std::string &pkg
 
 void DmAuthManagerTest::SetUp()
 {
+    InitDeviceAuthService();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();

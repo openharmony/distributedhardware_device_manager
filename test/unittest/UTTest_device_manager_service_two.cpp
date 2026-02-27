@@ -1923,69 +1923,6 @@ HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_006, testing::ext::TestSize
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnbindServiceTarget_001, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "";
-    int64_t serviceId = 1;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName, serviceId);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceTest, UnbindServiceTarget_002, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "com.ohos.test";
-    int64_t serviceId = 0;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName, serviceId);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceTest, UnbindServiceTarget_003, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "com.ohos.test";
-    int64_t serviceId = 1;
-    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName, serviceId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerServiceTest, UnbindServiceTarget_004, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "com.ohos.test";
-    int64_t serviceId = 1;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(false));
-    int32_t ret = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName, serviceId);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
-HWTEST_F(DeviceManagerServiceTest, UpdateServiceInfo_001, testing::ext::TestSize.Level1)
-{
-    int64_t serviceId = 10020;
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByServiceId(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManagerService::GetInstance().UpdateServiceInfo(serviceId);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DeviceManagerServiceTest, UpdateServiceInfo_002, testing::ext::TestSize.Level1)
-{
-    int64_t serviceId = 10020;
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByServiceId(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceProfileConnectorMock_, PutServiceInfoProfile(_)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManagerService::GetInstance().UpdateServiceInfo(serviceId);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DeviceManagerServiceTest, UpdateServiceInfo_003, testing::ext::TestSize.Level1)
-{
-    int64_t serviceId = 10020;
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByServiceId(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceProfileConnectorMock_, PutServiceInfoProfile(_)).WillOnce(Return(DM_OK));
-    int32_t ret = DeviceManagerService::GetInstance().UpdateServiceInfo(serviceId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_203, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "packName";
