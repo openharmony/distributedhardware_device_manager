@@ -637,18 +637,18 @@ public:
         const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) = 0;
     virtual int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
         std::string &displayName) = 0;
-    virtual int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &info) = 0;
-    virtual int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType) = 0;
-    virtual int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &info) = 0;
-    virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
-        int32_t pinExchangeType, DMLocalServiceInfo &info) = 0;
+    virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
+        std::vector<std::string> &networkIds) = 0;
     virtual int32_t SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName,
         std::shared_ptr<SetLocalDeviceNameCallback> callback) = 0;
     virtual int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
         const std::string &deviceName, std::shared_ptr<SetRemoteDeviceNameCallback> callback) = 0;
     virtual int32_t RestoreLocalDeviceName(const std::string &pkgName) = 0;
-    virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
-        std::vector<std::string> &networkIds) = 0;
+    virtual int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &info) = 0;
+    virtual int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType) = 0;
+    virtual int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &info) = 0;
+    virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
+        int32_t pinExchangeType, DMLocalServiceInfo &info) = 0;
     virtual int32_t UnRegisterPinHolderCallback(const std::string &pkgName) = 0;
     virtual bool CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
     virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
@@ -656,26 +656,15 @@ public:
     virtual bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
     virtual int32_t GetUdidsByDeviceIds(const std::string &pkgName, const std::vector<std::string> deviceIdList,
         std::map<std::string, std::string> &deviceIdToUdidMap) { return 0; }
-//this code line need delete: 659 - 661
     virtual int32_t GetIdentificationByDeviceIds(const std::string &pkgName,
         const std::vector<std::string> deviceIdList,
         std::map<std::string, std::string> &deviceIdentificationMap) { return 0; }
-    virtual int32_t StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam,
-        std::shared_ptr<ServiceDiscoveryCallback> callback) = 0;
-    virtual int32_t StopServiceDiscovery(const std::string &pkgName, int32_t discoveryServiceId) = 0;
     virtual int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
-        std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback) = 0;
-//this code line need delete: 665 - 665
-    virtual int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId) = 0;
+        std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback) { return 0; }
+
     virtual int32_t RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
-        std::shared_ptr<ServiceInfoStateCallback> callback) = 0;
-    virtual int32_t UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId) = 0;
-//this code line need delete: 670 - 674
-    virtual int32_t StartPublishService(const std::string &pkgName, const PublishServiceParam &publishServiceParam,
-        std::shared_ptr<ServicePublishCallback> callback, int64_t &serviceId) = 0;
-    virtual int32_t StopPublishService(int64_t serviceId) = 0;
-    virtual int32_t RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId) = 0;
-    virtual int32_t UnRegisterServiceInfo(int32_t regServiceId) = 0;
+        std::shared_ptr<ServiceInfoStateCallback> callback) { return 0; }
+    virtual int32_t UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId) { return 0; }
     virtual int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId,
         std::shared_ptr<LeaveLNNCallback> callback) { return 0; }
     virtual int32_t GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
@@ -701,7 +690,7 @@ public:
         const std::string &networkId, int64_t serviceId,
         std::shared_ptr<SyncServiceInfoCallback> callback) { return 0; }
     virtual int32_t SyncAllServiceInfo(const std::string &pkgName, int32_t localUserId,
-        const std::string &networkId, std::shared_ptr<SyncServiceInfoCallback> callback) = 0;
+        const std::string &networkId,  std::shared_ptr<SyncServiceInfoCallback> callback) { return 0; }
     virtual int32_t GetLocalServiceInfoByServiceId(int64_t serviceId, DmRegisterServiceInfo &serviceInfo) { return 0; }
     virtual int32_t GetTrustServiceInfo(const std::string &pkgName, const std::map<std::string, std::string> &param,
         std::vector<DmServiceInfo> &serviceInfo) { return 0; }

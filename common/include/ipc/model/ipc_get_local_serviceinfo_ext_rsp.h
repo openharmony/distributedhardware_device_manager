@@ -25,21 +25,11 @@ class IpcGetLocalServiceInfoExtRsp : public IpcRsp {
     DECLARE_IPC_MODEL(IpcGetLocalServiceInfoExtRsp);
 
 public:
-    /**
-     * @tc.name: IpcGetLocalServiceInfoExtRsp::GetServiceInfo
-     * @tc.desc: Get service info
-     * @tc.type: FUNC
-     */
     const DmRegisterServiceInfo &GetServiceInfo() const
     {
         return serviceInfo_;
     }
  
-    /**
-     * @tc.name: IpcGetLocalServiceInfoExtRsp::SetServiceInfo
-     * @tc.desc: Set service info
-     * @tc.type: FUNC
-     */
     void SetServiceInfo(const DmRegisterServiceInfo &serviceInfo)
     {
         serviceInfo_ = serviceInfo;

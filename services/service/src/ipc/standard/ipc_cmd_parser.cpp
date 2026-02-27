@@ -44,9 +44,13 @@
 #include "ipc_notify_service_found_req.h"
 #include "ipc_notify_set_local_device_name_req.h"
 #include "ipc_notify_set_remote_device_name_req.h"
+#include "ipc_notify_service_state_req.h"
 #include "ipc_server_client_proxy.h"
 #include "ipc_server_stub.h"
 #include "ipc_service_publish_result_req.h"
+#include "ipc_notify_service_state_req.h"
+#include "ipc_sync_service_info_req.h"
+#include "ipc_sync_service_info_result_req.h"
 #include "multiple_user_connector.h"
 #include "app_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -56,6 +60,7 @@ namespace OHOS {
 namespace DistributedHardware {
 const unsigned int XCOLLIE_TIMEOUT_S = 5;
 constexpr const char* SCENEBOARD_PROCESS = "com.ohos.sceneboard";
+constexpr int32_t SERVICE_LIST_MAX_SIZE = 1024;
 
 void DecodeDmAccessCaller(MessageParcel &parcel, DmAccessCaller &caller)
 {
@@ -1384,7 +1389,8 @@ ON_IPC_READ_RESPONSE(SERVER_DESTROY_PIN_HOLDER_RESULT, MessageParcel &reply, std
 ON_IPC_CMD(DP_ACL_ADD, MessageParcel &data, MessageParcel &reply)
 {
     std::string udid = data.ReadString();
-    int32_t result = DeviceManagerService::GetInstance().DpAclAdd(udid);
+    int64_t accessControlId = data.ReadInt64();
+    int32_t result = DeviceManagerService::GetInstance().DpAclAdd(udid, accessControlId);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -1840,11 +1846,25 @@ ON_IPC_CMD(UNREG_LOCALSERVICE_INFO, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
+ON_IPC_CMD(UPDATE_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    int64_t serviceId = data.ReadInt64();
+    DmRegisterServiceInfo regServiceInfo;
+    IpcModelCodec::DecodeDmRegServiceInfo(data, regServiceInfo);
+    int32_t result = DeviceManagerService::GetInstance().UpdateServiceInfo(serviceId, regServiceInfo);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(UPDATE_LOCALSERVICE_INFO, MessageParcel &data, MessageParcel &reply)
 {
     DMLocalServiceInfo serviceInfo;
     IpcModelCodec::DecodeLocalServiceInfo(data, serviceInfo);
     int32_t result = DeviceManagerService::GetInstance().UpdateLocalServiceInfo(serviceInfo);
+ 
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -2050,57 +2070,6 @@ ON_IPC_CMD(CHECK_SINK_SAME_ACCOUNT, MessageParcel &data, MessageParcel &reply)
     return OnIpcCmd(CHECK_SINK_SAME_ACCOUNT, data, reply);
 }
 
-ON_IPC_CMD(GET_IDENTIFICATION_BY_DEVICEIDS, MessageParcel &data, MessageParcel &reply)
-{
-    std::string pkgName = data.ReadString();
-    std::vector<std::string> deviceIdList;
-    IpcModelCodec::DecodeStringVector(data, deviceIdList);
-    std::map<std::string, std::string> deviceIdentificationMap;
-    int32_t result = DeviceManagerService::GetInstance().GetIdentificationByDeviceIds(
-        pkgName, deviceIdList, deviceIdentificationMap);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (result == DM_OK && !deviceIdentificationMap.empty()) {
-        std::string outParaStr = ConvertMapToJsonString(deviceIdentificationMap);
-        if (!reply.WriteString(outParaStr)) {
-            LOGE("write returnJsonStr failed");
-            return ERR_DM_IPC_WRITE_FAILED;
-        }
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(START_SERVICE_DISCOVERING, MessageParcel &data, MessageParcel &reply)
-{
-    std::string pkgName = data.ReadString();
-    DiscoveryServiceParam discParam;
-    if (!IpcModelCodec::DecodeSrvDiscParam(data, discParam)) {
-        LOGE("DecodeSrvDiscParam failed");
-        return ERR_DM_FAILED;
-    }
-    int32_t result = DeviceManagerService::GetInstance().StartServiceDiscovery(pkgName, discParam);
-    
-    if (!reply.WriteInt32(result)) {
-        LOGE("Write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(STOP_SERVICE_DISCOVERING, MessageParcel &data, MessageParcel &reply)
-{
-    std::string pkgName = data.ReadString();
-    int32_t discServiceId = data.ReadInt32();
-    int32_t result = DeviceManagerService::GetInstance().StopServiceDiscovery(pkgName, discServiceId);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
 ON_IPC_CMD(BIND_SERVICE_TARGET, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
@@ -2120,16 +2089,17 @@ ON_IPC_CMD(BIND_SERVICE_TARGET, MessageParcel &data, MessageParcel &reply)
 ON_IPC_SET_REQUEST(NOTIFY_SERVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
-    std::shared_ptr<IpcNotifyServiceFoundReq> pReq = std::static_pointer_cast<IpcNotifyServiceFoundReq>(pBaseReq);
-    int32_t discServiceId = pReq->GetDiscServiceId();
-    DiscoveryServiceInfo discServiceInfo = pReq->GetDiscServiceInfo();
-    if (!data.WriteInt32(discServiceId)) {
-        LOGE("write errCode failed");
+    std::shared_ptr<IpcNotifyServiceFoundReq> pReq =
+        std::static_pointer_cast<IpcNotifyServiceFoundReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!IpcModelCodec::EncodeSrvDiscServiceInfo(discServiceInfo, data)) {
-        LOGE("write discServiceInfo failed");
-        return ERR_DM_IPC_WRITE_FAILED;
+    DmServiceInfo dmServiceInfo = pReq->GetDmServiceInfo();
+    if (!IpcModelCodec::EncodeDmServiceInfo(dmServiceInfo, data)) {
+        LOGE("EncodeDmServiceInfo failed");
+        return ERR_DM_FAILED;
     }
     return DM_OK;
 }
@@ -2146,14 +2116,19 @@ ON_IPC_SET_REQUEST(NOTIFY_SERVICE_DISCOVERY_RESULT, std::shared_ptr<IpcReq> pBas
     CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyServiceDiscoverResultReq> pReq =
         std::static_pointer_cast<IpcNotifyServiceDiscoverResultReq>(pBaseReq);
-    int32_t discServiceId = pReq->GetDiscServiceId();
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    std::string serviceType = pReq->GetServiceType();
+    if (!data.WriteString(serviceType)) {
+        LOGE("write serviceType failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
     int32_t result = pReq->GetResult();
     if (!data.WriteInt32(result)) {
         LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteInt32(discServiceId)) {
-        LOGE("write discServiceId failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
@@ -2169,8 +2144,13 @@ ON_IPC_READ_RESPONSE(NOTIFY_SERVICE_DISCOVERY_RESULT, MessageParcel &reply, std:
 ON_IPC_CMD(UNBIND_SERVICE_TARGET, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
+    std::string unbindParamStr = data.ReadString();
+    std::map<std::string, std::string> unbindParam;
+    ParseMapFromJsonString(unbindParamStr, unbindParam);
+    std::string networkId = data.ReadString();
     int64_t serviceId = data.ReadInt64();
-    int32_t result = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName, serviceId);
+    int32_t result = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName,
+        unbindParam, networkId, serviceId);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -2180,15 +2160,15 @@ ON_IPC_CMD(UNBIND_SERVICE_TARGET, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_CMD(REGISTER_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
 {
-    ServiceRegInfo serviceRegInfo;
-    IpcModelCodec::DecodeServiceRegInfo(data, serviceRegInfo);
-    int32_t regServiceId = 0;
-    int32_t result = DeviceManagerService::GetInstance().RegisterServiceInfo(serviceRegInfo, regServiceId);
+    DmRegisterServiceInfo regServiceInfo;
+    IpcModelCodec::DecodeDmRegServiceInfo(data, regServiceInfo);
+    int64_t serviceId = 0;
+    int32_t result = DeviceManagerService::GetInstance().RegisterServiceInfo(regServiceInfo, serviceId);
     if (!reply.WriteInt32(result)) {
         LOGE("Failed to write result to reply.");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!reply.WriteInt32(regServiceId)) {
+    if (!reply.WriteInt64(serviceId)) {
         LOGE("Failed to write regServiceId to reply.");
         return ERR_DM_IPC_WRITE_FAILED;
     }
@@ -2197,8 +2177,8 @@ ON_IPC_CMD(REGISTER_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_CMD(UNREGISTER_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
 {
-    int32_t regServiceId = data.ReadInt32();
-    int32_t result = DeviceManagerService::GetInstance().UnRegisterServiceInfo(regServiceId);
+    int64_t serviceId = data.ReadInt64();
+    int32_t result = DeviceManagerService::GetInstance().UnRegisterServiceInfo(serviceId);
     if (!reply.WriteInt32(result)) {
         LOGE("Failed to write result to reply.");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -2208,17 +2188,13 @@ ON_IPC_CMD(UNREGISTER_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_CMD(START_PUBLISH_SERVICE, MessageParcel &data, MessageParcel &reply)
 {
-    PublishServiceParam publishServiceParam;
-    IpcModelCodec::DecodePublishServiceParam(data, publishServiceParam);
-    int64_t serviceId = 0;
     std::string pkgName = data.ReadString();
-    int32_t result = DeviceManagerService::GetInstance().StartPublishService(pkgName, publishServiceParam, serviceId);
+    int64_t serviceId = data.ReadInt64();
+    DmPublishServiceParam publishServiceParam;
+    IpcModelCodec::DecodeDmPublishServiceParam(data, publishServiceParam);
+    int32_t result = DeviceManagerService::GetInstance().StartPublishService(pkgName, serviceId, publishServiceParam);
     if (!reply.WriteInt32(result)) {
         LOGE("Write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!reply.WriteInt64(serviceId)) {
-        LOGE("Failed to write serviceId to reply.");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
@@ -2226,8 +2202,9 @@ ON_IPC_CMD(START_PUBLISH_SERVICE, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_CMD(STOP_PUBLISH_SERVICE, MessageParcel &data, MessageParcel &reply)
 {
+    std::string pkgName = data.ReadString();
     int64_t serviceId = data.ReadInt64();
-    int32_t result = DeviceManagerService::GetInstance().StopPublishService(serviceId);
+    int32_t result = DeviceManagerService::GetInstance().StopPublishService(pkgName, serviceId);
     if (!reply.WriteInt32(result)) {
         LOGE("Write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -2241,6 +2218,11 @@ ON_IPC_SET_REQUEST(SERVICE_PUBLISH_RESULT, std::shared_ptr<IpcReq> pBaseReq, Mes
     std::shared_ptr<IpcServicePublishResultReq> pReq = std::static_pointer_cast<IpcServicePublishResultReq>(pBaseReq);
     int64_t serviceId = pReq->GetServiceId();
     int32_t result = pReq->GetResult();
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
     if (!data.WriteInt64(serviceId)) {
         LOGE("write serviceId failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -2332,6 +2314,259 @@ ON_IPC_READ_RESPONSE(ON_AUTH_CODE_INVALID, MessageParcel &reply, std::shared_ptr
 {
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_IDENTIFICATION_BY_DEVICEIDS, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::vector<std::string> deviceIdList;
+    IpcModelCodec::DecodeStringVector(data, deviceIdList);
+    std::map<std::string, std::string> deviceIdentificationMap;
+    int32_t result = DeviceManagerService::GetInstance().GetIdentificationByDeviceIds(
+        pkgName, deviceIdList, deviceIdentificationMap);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (result == DM_OK && !deviceIdentificationMap.empty()) {
+        std::string outParaStr = ConvertMapToJsonString(deviceIdentificationMap);
+        if (!reply.WriteString(outParaStr)) {
+            LOGE("write returnJsonStr failed");
+            return ERR_DM_IPC_WRITE_FAILED;
+        }
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(START_SERVICE_DISCOVERING, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    DmDiscoveryServiceParam discParam;
+    if (!IpcModelCodec::DecodeDmSrvDiscParam(data, discParam)) {
+        LOGE("DecodeSrvDiscParam failed");
+        return ERR_DM_FAILED;
+    }
+    int32_t result = DeviceManagerService::GetInstance().StartDiscoveryService(pkgName, discParam);
+    if (!reply.WriteInt32(result)) {
+        LOGE("Write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(STOP_SERVICE_DISCOVERING, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    DmDiscoveryServiceParam discParam;
+    if (!IpcModelCodec::DecodeDmSrvDiscParam(data, discParam)) {
+        LOGE("DecodeSrvDiscParam failed");
+        return ERR_DM_FAILED;
+    }
+    int32_t result = DeviceManagerService::GetInstance().StopDiscoveryService(pkgName, discParam);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(SYNC_SERVICE_CALLBACK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int64_t serviceId = data.ReadInt64();
+    int32_t dmCommonNotifyEvent = data.ReadInt32();
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    int32_t result = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
+    if (dmCommonNotifyEvent == static_cast<int32_t>(DmCommonNotifyEvent::REG_SERVICE_STATE)) {
+        DeviceManagerService::GetInstance().RegServiceStateCallback(pkgName, serviceId);
+    } else if (dmCommonNotifyEvent == static_cast<int32_t>(DmCommonNotifyEvent::UN_REG_SERVICE_STATE)) {
+        DeviceManagerService::GetInstance().UnRegServiceStateCallback(pkgName, serviceId);
+    } else {
+        LOGE("Request out of scope");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(SERVER_SERVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcNotifyServiceStateReq> pReq = std::static_pointer_cast<IpcNotifyServiceStateReq>(pBaseReq);
+    DmRegisterServiceState registerServiceState = pReq->GetDmRegisterServiceState();
+    DmServiceInfo dmServiceInfo = pReq->GetDmServiceInfo();
+    int32_t serviceState = pReq->GetServiceState();
+    if (!IpcModelCodec::EncodeDmRegisterServiceState(registerServiceState, data)) {
+        LOGE("write register service info failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!IpcModelCodec::EncodeDmServiceInfo(dmServiceInfo, data)) {
+        LOGE("write dm service info failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(serviceState)) {
+        LOGE("write state failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SERVER_SERVICE_STATE_NOTIFY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(SYNC_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t localUserId = data.ReadInt32();
+    std::string networkId = data.ReadString();
+    int64_t serviceId = data.ReadInt64();
+    
+    int32_t result = -1;
+    if (serviceId > 0) {
+        result = DeviceManagerService::GetInstance().SyncServiceInfoByServiceId(pkgName, localUserId,
+            networkId, serviceId);
+    } else if (serviceId == 0) {
+        result = DeviceManagerService::GetInstance().SyncAllServiceInfo(pkgName, localUserId, networkId);
+    }
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(SYNC_SERVICE_INFO_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcSyncServiceInfoResultReq> pReq =
+        std::static_pointer_cast<IpcSyncServiceInfoResultReq>(pBaseReq);
+    ServiceSyncInfo serviceSyncInfo = pReq->GetServiceSyncInfo();
+    int32_t result = pReq->GetResult();
+    std::string content = pReq->GetContent();
+    if (!IpcModelCodec::EncodeServiceSyncInfo(serviceSyncInfo, data)) {
+        LOGE("write serviceSyncInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(result)) {
+        LOGE("write result code failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(content)) {
+        LOGE("write content failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SYNC_SERVICE_INFO_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_LOCAL_SERVICEINFO_BY_SERVICEID, MessageParcel &data, MessageParcel &reply)
+{
+    int64_t serviceId = data.ReadInt64();
+    LOGI("GET_LOCAL_SERVICEINFO_BY_SERVICEID, serviceId: %{public}" PRId64, serviceId);
+ 
+    DmRegisterServiceInfo serviceInfo;
+    int32_t result = DeviceManagerService::GetInstance().GetLocalServiceInfoByServiceId(serviceId, serviceInfo);
+ 
+    if (!IpcModelCodec::EncodeDmRegServiceInfo(serviceInfo, reply)) {
+        LOGE("EncodeDmRegServiceInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+ 
+ON_IPC_CMD(GET_TRUST_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string jsonParam = data.ReadString();
+    std::vector<DmServiceInfo> serviceList;
+    std::map<std::string, std::string> paramMap;
+    ParseMapFromJsonString(jsonParam, paramMap);
+    int32_t result = DeviceManagerService::GetInstance().GetTrustServiceInfo(pkgName, paramMap, serviceList);
+    if ((int32_t)serviceList.size() > SERVICE_LIST_MAX_SIZE) {
+        LOGE("service list over max size");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteInt32((int32_t)serviceList.size())) {
+        LOGE("write device list size failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    for (const auto &serviceInfo : serviceList) {
+        if (!IpcModelCodec::EncodeDmServiceInfo(serviceInfo, reply)) {
+            LOGE("write dm device info failed");
+            return ERR_DM_IPC_WRITE_FAILED;
+        }
+    }
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+ 
+ON_IPC_CMD(GET_REGISTER_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    std::string jsonParam = data.ReadString();
+    std::map<std::string, std::string> paramMap;
+    ParseMapFromJsonString(jsonParam, paramMap);
+    std::vector<DmRegisterServiceInfo> regServiceInfos;
+    int32_t result = DeviceManagerService::GetInstance().GetRegisterServiceInfo(paramMap, regServiceInfos);
+    if ((int32_t)regServiceInfos.size() > SERVICE_LIST_MAX_SIZE) {
+        LOGE("service info list over max size");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteInt32((int32_t)regServiceInfos.size())) {
+        LOGE("write regServiceInfos size failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    for (const auto &regServiceInfo : regServiceInfos) {
+        if (!IpcModelCodec::EncodeDmRegServiceInfo(regServiceInfo, reply)) {
+            LOGE("write regServiceInfo failed");
+            return ERR_DM_IPC_WRITE_FAILED;
+        }
+    }
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+ 
+ON_IPC_CMD(GET_PEER_SERVICEINFO_BY_SERVICEID, MessageParcel &data, MessageParcel &reply)
+{
+    std::string networkId = data.ReadString();
+    int64_t serviceId = data.ReadInt64();
+    DmRegisterServiceInfo serviceInfo;
+    int32_t result = DeviceManagerService::GetInstance().GetPeerServiceInfoByServiceId(networkId,
+        serviceId, serviceInfo);
+ 
+    if (!IpcModelCodec::EncodeDmRegServiceInfo(serviceInfo, reply)) {
+        LOGE("EncodeDmRegServiceInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
     return DM_OK;
 }
 } // namespace DistributedHardware

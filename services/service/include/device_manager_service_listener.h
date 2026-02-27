@@ -90,32 +90,33 @@ public:
     void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
         const std::string &deviceName, int32_t code) override;
     void SetExistPkgName(const std::set<std::string> &pkgNameSet) override;
-    //delete start
-    void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
-        int32_t reason) override;
-    void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) override;
     void OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
         const DmDeviceInfo &info, const std::vector<int64_t> &serviceIds) override;
 
     std::string GetLocalDisplayDeviceName() override;
     int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) override;
     int32_t OpenAuthSessionWithPara(int64_t serviceId) override;
-    void OnServicePublishResult(const ProcessInfo &processInfo, int64_t serviceId, int32_t publishResult) override;
     void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
     void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode) override;
-    void OnAuthCodeInvalid(const std::string &pkgName) override;
-    //delete start
+    void OnAuthCodeInvalid(const std::string &pkgName, const std::string &consumerPkgName) override;
     std::set<ProcessInfo> GetAlreadyOnlineProcess() override;
-    //delete end
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
+        int32_t reason) override;
+    void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) override;
+    void OnServicePublishResult(const ProcessInfo &processInfo, int64_t serviceId, int32_t publishResult) override;
     int32_t OnServiceInfoOnline(const DmRegisterServiceState &registerServiceState,
         const DmServiceInfo &serviceInfo) override;
     int32_t OnServiceInfoOffline(const DmRegisterServiceState &registerServiceState,
         const DmServiceInfo &serviceInfo) override;
-    void OnServiceStateCallbackAdd(const ProcessInfo &processInfo,
-        const std::vector<DmServiceInfo> &serviceList) override;
+    int32_t OnServiceInfoChange(const DmRegisterServiceState &registerServiceState,
+        const DmServiceInfo &serviceInfo) override;
     void OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
         int32_t result, const std::string &content) override;
     void OnServiceStateOnlineResult(const ServiceStateBindParameter &bindParam) override;
+    void OnServiceStateOfflineResult(uint64_t tokenId, const std::string &pkgName, int32_t bindType,
+        const std::string &peerUdid, const DistributedDeviceProfile::ServiceInfo &serviceInfo) override;
+#endif
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
         const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
@@ -174,8 +175,6 @@ private:
     static std::unordered_set<std::string> highPriorityPkgNameSet_;
     static std::mutex actUnrelatedPkgNameLock_;
     static std::set<std::string> actUnrelatedPkgName_;
-    static std::mutex alreadyNotifyPkgNameServiceLock_;
-    static std::map<std::string, DmServiceInfo> alreadyOnlinePkgNameService_;
 #endif
 };
 } // namespace DistributedHardware

@@ -16,7 +16,6 @@
 #ifndef OHOS_DM_IPC_GET_REGISTER_SERVICEINFO_RSP_H
 #define OHOS_DM_IPC_GET_REGISTER_SERVICEINFO_RSP_H
 
-
 #include "ipc_rsp.h"
 #include "dm_device_info.h"
 
@@ -26,7 +25,7 @@ class IpcGetRegisterServiceInfoRsp : public IpcRsp {
     DECLARE_IPC_MODEL(IpcGetRegisterServiceInfoRsp);
 
 public:
-    std::vector<DmRegisterServiceInfo> GetRegisterServiceInfos() const
+    const std::vector<DmRegisterServiceInfo>& GetRegisterServiceInfos() const
     {
         return regServiceInfos_;
     }

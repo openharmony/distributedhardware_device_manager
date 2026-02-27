@@ -42,6 +42,7 @@
 #include "dm_log.h"
 #include "multiple_user_connector.h"
 #include "permission_manager.h"
+#include "dm_crypto.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -52,7 +53,7 @@ SERVER_CREATE_PIN_HOLDER, SERVER_DESTROY_PIN_HOLDER, SERVER_CREATE_PIN_HOLDER_RE
 SERVER_ON_PIN_HOLDER_EVENT, UNBIND_TARGET_RESULT, REMOTE_DEVICE_TRUST_CHANGE, SERVER_DEVICE_SCREEN_STATE_NOTIFY,
 SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, SINK_BIND_TARGET_RESULT, GET_DEVICE_PROFILE_INFO_LIST_RESULT,
 GET_DEVICE_ICON_INFO_RESULT, SET_LOCAL_DEVICE_NAME_RESULT, SET_REMOTE_DEVICE_NAME_RESULT, SERVICE_PUBLISH_RESULT,
-ON_AUTH_CODE_INVALID};
+ON_AUTH_CODE_INVALID, SERVER_SERVICE_STATE_NOTIFY};
 constexpr const char* RECLAIM_MEMMGR_FILE_MEM_FOR_DMTASK = "ReclaimMemmgrFileMemForDMTask";
 }
 
@@ -84,6 +85,7 @@ void IpcServerStub::OnStart()
     IPCSkeleton::SetMaxWorkThreadNum(DM_IPC_THREAD_NUM);
 
     LOGI("called:AddAbilityListener begin!");
+    AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
 #ifdef SUPPORT_MEMMGR
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
 #endif // SUPPORT_MEMMGR
@@ -168,6 +170,7 @@ void IpcServerStub::HandleSoftBusServerAdd()
         LOGI("HandleSoftBusServerAdd After 5mins.");
         ReclaimMemmgrFileMemForDM();
     };
+    DeviceManagerService::GetInstance().HandleSoftbusRestart();
     ffrt::submit(task, ffrt::task_attr().name(RECLAIM_MEMMGR_FILE_MEM_FOR_DMTASK).delay(RECLAIM_DELAY_TIME));
     return;
 }
@@ -220,6 +223,8 @@ void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::st
     LOGI("OnRemoveSystemAbility systemAbilityId:%{public}d removed!", systemAbilityId);
     if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
         DeviceManagerService::GetInstance().UninitSoftbusListener();
+        // call notify service offline
+        DeviceManagerService::GetInstance().HandleServiceStatusChange(DmDeviceState::DEVICE_STATE_OFFLINE, deviceId);
     }
 }
 
@@ -229,6 +234,10 @@ bool IpcServerStub::Init()
     LOGI("IpcServerStub::Init ready to init.");
     KVAdapterManager::GetInstance().Init();
     DeviceManagerService::GetInstance().InitDMServiceListener();
+    int32_t ret = DeviceManagerService::GetInstance().HandleProcessRestart();
+    if (ret != DM_OK) {
+        LOGE("HandleProcessRestart failed, ret: %{public}d", ret);
+    }
     std::lock_guard<ffrt::mutex> autoLock(registerLock_);
     if (!registerToService_) {
         bool ret = Publish(this);
@@ -452,6 +461,8 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
     DeviceManagerServiceNotify::GetInstance().ClearDiedProcessCallback(processInfo);
     DeviceManagerService::GetInstance().ClearPublishIdCache(processInfo.pkgName);
     DeviceManagerService::GetInstance().UnRegisterCallerAppId(processInfo.pkgName, processInfo.userId);
+    DeviceManagerService::GetInstance().ClearServiceStateCallback(processInfo.pkgName, processInfo.userId);
+    DeviceManagerService::GetInstance().HandleRemoteDied(processInfo);
 }
 
 void IpcServerStub::AddSystemSA(const std::string &pkgName)

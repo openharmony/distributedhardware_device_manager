@@ -3618,7 +3618,11 @@ void DeviceManagerServiceImpl::StartAuthInfoTimer(const DmAuthInfo &dmAuthInfo, 
     timer_->StartTimer(taskName, BIND_TARGET_PIN_TIMEOUT, [this, dmAuthInfo](std::string name) {
         DeviceManagerServiceImpl::StopAuthInfoTimerAndDeleteDP(dmAuthInfo.pinConsumerPkgName,
             static_cast<int32_t>(dmAuthInfo.pinExchangeType), dmAuthInfo.pinConsumerTokenId);
-            listener_->OnAuthCodeInvalid(dmAuthInfo.pinConsumerPkgName);
+            if (!dmAuthInfo.regPkgName.empty()) {
+                listener_->OnAuthCodeInvalid(dmAuthInfo.regPkgName, dmAuthInfo.pinConsumerPkgName);
+            } else {
+                listener_->OnAuthCodeInvalid(dmAuthInfo.pinConsumerPkgName, dmAuthInfo.pinConsumerPkgName);
+            }
     });
 }
 void DeviceManagerServiceImpl::StopAuthInfoTimerAndDeleteDP(const std::string &pkgName, int32_t pinExchangeType,
