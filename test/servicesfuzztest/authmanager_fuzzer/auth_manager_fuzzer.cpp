@@ -43,12 +43,6 @@ namespace {
     std::shared_ptr<DmAuthContext> context_ = authManager->GetAuthContext();
     std::shared_ptr<AuthManager> authSinkManager = std::make_shared<AuthSinkManager>(softbusConnector, hiChainConnector,
         listener, hiChainAuthConnector);
-    const char* TAG_ACCESSEE_SERVICE_INFO = "accesseeServiceInfo";
-    const char* TAG_REG_SERVICE_ID = "regServiceId";
-    const char* TAG_PUBLISH_STATE = "publishState";
-    const char* TAG_SERVICE_TYPE = "serviceType";
-    const char* TAG_SERVICE_NAME = "serviceName";
-    const char* TAG_SERVICE_DISPLAY_NAME = "serviceDisplayName";
 }
 
 void ConvertSrcVersionFuzzTest(FuzzedDataProvider &fdp)
@@ -403,31 +397,6 @@ void GetBindLevelByBundleNameFuzzTest(FuzzedDataProvider &fdp)
     authManager->GetBindLevelByBundleName(bundleName, requestId, bindLevel);
 }
 
-void ParseSyncServiceInfoFuzzTest(FuzzedDataProvider &fdp)
-{
-    JsonObject jsonObject;
-    std::string serviceInfoStr = fdp.ConsumeRandomLengthString();
-    jsonObject[TAG_ACCESSEE_SERVICE_INFO] = serviceInfoStr;
-
-    JsonObject serviceInfoJson;
-    serviceInfoJson[TAG_REG_SERVICE_ID] = fdp.ConsumeIntegral<int32_t>();
-    serviceInfoJson[TAG_DEVICE_ID] = fdp.ConsumeRandomLengthString();
-    serviceInfoJson[TAG_USER_ID] = fdp.ConsumeIntegral<int32_t>();
-    serviceInfoJson[TAG_TOKEN_ID] = fdp.ConsumeIntegral<int64_t>();
-    serviceInfoJson[TAG_PUBLISH_STATE] = fdp.ConsumeIntegral<int32_t>();
-    serviceInfoJson[TAG_SERVICE_ID] = fdp.ConsumeIntegral<int64_t>();
-    serviceInfoJson[TAG_SERVICE_TYPE] = fdp.ConsumeRandomLengthString();
-    serviceInfoJson[TAG_SERVICE_NAME] = fdp.ConsumeRandomLengthString();
-    serviceInfoJson[TAG_SERVICE_DISPLAY_NAME] = fdp.ConsumeRandomLengthString();
-
-    std::string validServiceInfoStr = serviceInfoJson.Dump();
-    if (fdp.ConsumeBool()) {
-        jsonObject[TAG_ACCESSEE_SERVICE_INFO] = validServiceInfoStr;
-    }
-
-    dmAuthMessageProcessor_->ParseSyncServiceInfo(jsonObject, context_);
-}
-
 void AuthManagerFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -450,7 +419,6 @@ void AuthManagerFuzzTest(const uint8_t* data, size_t size)
     ParseHmlInfoInJsonObjectFuzzTest(fdp);
     CheckAuthParamVaildFuzzTest(fdp);
     ParseJsonObjectFuzzTest(fdp);
-    ParseSyncServiceInfoFuzzTest(fdp);
     GetBindLevelFuzzTest(fdp);
     GetAuthParamFuzzTest(fdp);
     InitAuthStateFuzzTest(fdp);

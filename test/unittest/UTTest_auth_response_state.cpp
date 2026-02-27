@@ -26,6 +26,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void AuthResponseStateTest::SetUp()
 {
+    InitDeviceAuthService();
 }
 void AuthResponseStateTest::TearDown()
 {

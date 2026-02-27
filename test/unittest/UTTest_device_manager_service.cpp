@@ -2110,15 +2110,17 @@ HWTEST_F(DeviceManagerServiceTest, DpAclAdd_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string udid;
-    int32_t ret = DeviceManagerService::GetInstance().DpAclAdd(udid);
+    int64_t accessControlId = 0;
+    int32_t ret = DeviceManagerService::GetInstance().DpAclAdd(udid, accessControlId);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(DeviceManagerServiceTest, DpAclAdd_002, testing::ext::TestSize.Level1)
 {
     std::string udid = "udid";
+    int64_t accessControlId = 0;
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().DpAclAdd(udid);
+    int32_t ret = DeviceManagerService::GetInstance().DpAclAdd(udid, accessControlId);
     EXPECT_EQ(ret, DM_OK);
 }
 

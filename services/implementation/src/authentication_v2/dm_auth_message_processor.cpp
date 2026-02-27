@@ -33,6 +33,7 @@
 #include "dm_auth_context.h"
 #include "dm_auth_state_machine.h"
 #include "dm_crypto.h"
+#include "dm_softbus_cache.h"
 #include "i_dm_service_impl_ext_resident.h"
 
 #ifdef SUPPORT_MSDP
@@ -65,6 +66,9 @@ const char* TAG_CREDENTIAL_OWNER = "credOwner";
 const char* TAG_SYNC = "syncMessage";
 const char* TAG_ACCESS = "dmAccess";
 const char* TAG_PROXY = "proxy";
+const char* TAG_PROXY_SERVICE_ID = "proxyServiceId";
+const char* TAG_SRC_SUBJECT_PKGNAME = "srcSubjectPkgname";
+const char* TAG_SUBJECT_SERVICEID = "subjectServiceId";
 const char* TAG_ACL = "accessControlTable";
 const char* TAG_ACCESSER = "dmAccesser";
 const char* TAG_ACCESSEE = "dmAccessee";
@@ -114,6 +118,7 @@ const char* TAG_SERVICE_NAME = "serviceName";
 const char* TAG_SERVICE_DISPLAY_NAME = "serviceDisplayName";
 const char* TAG_NCM_BIND_TARGET = "ncm_bind_target";
 constexpr const char* TAG_CUSTOM_DESCRIPTION = "CUSTOMDESC";
+
 const char* TAG_SERVICE_INFOS = "serviceInfos";
 const char* SERVICEINFO_USER_ID = "userId";
 const char* SERVICEINFO_SERVICE_ID = "serviceId";
@@ -201,6 +206,10 @@ int32_t ParseInfoToDmAccess(const JsonObject &jsonObject, DmAccess &access)
         return ERR_DM_FAILED;
     }
     access.dmVersion = jsonObject[TAG_DMVERSION].Get<std::string>();
+
+    if (IsInt64(jsonObject, TAG_PROXY_SERVICE_ID)) {
+        access.serviceId = jsonObject[TAG_PROXY_SERVICE_ID].Get<int64_t>();
+    }
 
     // lnn session key is optional
     if (IsString(jsonObject, TAG_LNN_SK_ID)) {
@@ -404,9 +413,13 @@ static DistributedDeviceProfile::AccessControlProfile GetAccessControlProfile(st
 {
     LOGI("GetAccessControlProfile start.");
     DistributedDeviceProfile::AccessControlProfile profile;
+    if (context == nullptr) {
+        LOGE("GetAccessControlProfile context is null.");
+        return profile;
+    }
     std::vector<DistributedDeviceProfile::AccessControlProfile> accessControlProfiles;
-    int32_t ret = DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().GetAllAccessControlProfile(
-        accessControlProfiles);
+    int32_t ret = DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().
+        GetAllAccessControlProfile(accessControlProfiles);
     if (ret != DM_OK) {
         LOGE("GetAllAccessControlProfile failed.");
         return profile;
@@ -416,11 +429,14 @@ static DistributedDeviceProfile::AccessControlProfile GetAccessControlProfile(st
         int64_t acerTokenId = item.GetAccesser().GetAccesserTokenId();
         int32_t acerUserId = item.GetAccesser().GetAccesserUserId();
         std::string aceeDeviceId = item.GetAccessee().GetAccesseeDeviceId();
+        int64_t aceeTokenId = item.GetAccessee().GetAccesseeTokenId();
+        int32_t aceeUserId = item.GetAccessee().GetAccesseeUserId();
         uint32_t bindLevel = item.GetAccesser().GetAccesserBindLevel();
         int32_t status = item.GetStatus();
         if (context->accesser.deviceId == acerDeviceId && context->accesser.userId == acerUserId &&
-            context->accessee.deviceId == aceeDeviceId && context->accesser.tokenId == acerTokenId) {
-            if (bindLevel == static_cast<uint32_t>(USER)) {
+            context->accessee.deviceId == aceeDeviceId && context->accesser.tokenId == acerTokenId &&
+            context->accessee.userId == aceeUserId && context->accessee.tokenId == aceeTokenId) {
+            if (bindLevel == static_cast<int32_t>(USER)) {
                 isNeedLnn = false;
                 continue;
             }
@@ -439,9 +455,13 @@ static DistributedDeviceProfile::AccessControlProfile GetSubjectAccessControlPro
 {
     LOGI("GetSubjectAccessControlProfile start.");
     DistributedDeviceProfile::AccessControlProfile profile;
+    if (context == nullptr) {
+        LOGE("GetAccessControlProfile context is null.");
+        return profile;
+    }
     std::vector<DistributedDeviceProfile::AccessControlProfile> accessControlProfiles;
-    int32_t ret = DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().GetAllAccessControlProfile(
-        accessControlProfiles);
+    int32_t ret = DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().
+        GetAllAccessControlProfile(accessControlProfiles);
     if (ret != DM_OK) {
         LOGE("GetAllAccessControlProfile failed.");
         return profile;
@@ -451,9 +471,12 @@ static DistributedDeviceProfile::AccessControlProfile GetSubjectAccessControlPro
         int64_t acerTokenId = item.GetAccesser().GetAccesserTokenId();
         int32_t acerUserId = item.GetAccesser().GetAccesserUserId();
         std::string aceeDeviceId = item.GetAccessee().GetAccesseeDeviceId();
+        int64_t aceeTokenId = item.GetAccessee().GetAccesseeTokenId();
+        int32_t aceeUserId = item.GetAccessee().GetAccesseeUserId();
         int32_t status = item.GetStatus();
         if (context->accesser.deviceId == acerDeviceId && context->accesser.userId == acerUserId &&
-            context->accessee.deviceId == aceeDeviceId && app.proxyAccesser.tokenId == acerTokenId) {
+            context->accessee.deviceId == aceeDeviceId && app.proxyAccesser.tokenId == acerTokenId &&
+            context->accessee.userId == aceeUserId && context->accessee.tokenId == aceeTokenId) {
             LOGI("GetSubjectAccessControlProfile match success.");
             hasAcl = true;
             profile = item;
@@ -464,27 +487,60 @@ static DistributedDeviceProfile::AccessControlProfile GetSubjectAccessControlPro
     return profile;
 }
 
-static void CollectExistingServiceIds(const std::string &extraData, int64_t excludeServiceId,
-    JsonObject &jsonObjServiceId)
+static void UpdateMatchAccessControlProfile(std::shared_ptr<DmAuthContext> context,
+    DistributedDeviceProfile::AccessControlProfile &profile, bool &hasAcl, int64_t serviceId)
 {
-    JsonObject j(extraData);
-    if (!j.Contains(TAG_SERVICE_ID) || !j[TAG_SERVICE_ID].IsArray()) {
+    LOGI("UpdateMatchAccessControlProfile start.");
+    CHECK_NULL_VOID(context);
+    JsonObject jsonObjServiceId(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    bool isServiceIdExist = false;
+    std::string aceeSeviceId = profile.GetAccessee().GetAccesseeExtraData();
+    JsonObject lastServiceId;
+    if (!lastServiceId.Parse(aceeSeviceId)) {
+        LOGE("Failed to parse JSON string");
         return;
     }
-    auto tmpServiceId = j[TAG_SERVICE_ID];
-    for (auto& id : tmpServiceId.Items()) {
-        int64_t idValue = id.Get<int64_t>();
-        if (idValue != excludeServiceId) {
-            jsonObjServiceId.PushBack(idValue);
+    if (lastServiceId.Contains(TAG_SERVICE_ID) && lastServiceId[TAG_SERVICE_ID].IsArray()) {
+        auto tmpServiceId = lastServiceId[TAG_SERVICE_ID];
+        for (auto& id : tmpServiceId.Items()) {
+            int64_t idValue = id.Get<int64_t>();
+            if (idValue != serviceId) {
+                jsonObjServiceId.PushBack(idValue);
+            } else {
+                isServiceIdExist = true;
+            }
         }
+        if (!isServiceIdExist) {
+            jsonObjServiceId.PushBack(serviceId);
+        }
+        lastServiceId.Insert(TAG_SERVICE_ID, jsonObjServiceId);
+        DistributedDeviceProfile::Accessee accessee = profile.GetAccessee();
+        accessee.SetAccesseeExtraData(lastServiceId.Dump());
+        profile.SetAccessee(accessee);
+        int32_t ret = DM_OK;
+        ret = DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(
+            profile);
+        if (ret != DM_OK) {
+            LOGE("UpdateAccessControlProfile failed.");
+        } else {
+            ServiceStateBindParameter bindParam = {context->accesser.tokenId, context->accesser.pkgName,
+                DM_POINT_TO_POINT, context->accessee.deviceId, context->accessee.userId, serviceId};
+            char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+            Crypto::GetUdidHash(context->accessee.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
+            if (SoftbusCache::GetInstance().CheckIsOnline(std::string(deviceIdHash))) {
+                context->listener->OnServiceStateOnlineResult(bindParam);
+            }
+        }
+    } else {
+        hasAcl = false;
     }
 }
 
 static void SetAccessExtraData(std::shared_ptr<DmAuthContext> context, bool &hasAcl,
-    DistributedDeviceProfile::AccessControlProfile &profile,
-    DistributedDeviceProfile::AccessControlProfile &newProfile)
+    DistributedDeviceProfile::AccessControlProfile &profile)
 {
     LOGI("SetAccessExtraData start.");
+    CHECK_NULL_VOID(context);
     JsonObject jsonObjAccesser;
     JsonObject jsonObjAccessee;
     JsonObject jsonObjServiceId(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
@@ -492,11 +548,7 @@ static void SetAccessExtraData(std::shared_ptr<DmAuthContext> context, bool &has
     jsonObjAccesser[TAG_PKG_NAME] = context->accesser.pkgName;
     jsonObjAccessee[TAG_DMVERSION] = context->accessee.dmVersion;
     if (hasAcl) {
-        std::string aceeSeviceId = profile.GetAccessee().GetAccesseeExtraData();
-        LOGI("SetAccessExtraData hasAcl.");
-        CollectExistingServiceIds(aceeSeviceId, context->accessee.serviceId, jsonObjServiceId);
-        DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(
-            profile.GetAccessControlId());
+        UpdateMatchAccessControlProfile(context, profile, hasAcl, context->accessee.serviceId);
     }
     jsonObjServiceId.PushBack(context->accessee.serviceId);
     jsonObjAccessee.Insert(TAG_SERVICE_ID, jsonObjServiceId);
@@ -504,67 +556,52 @@ static void SetAccessExtraData(std::shared_ptr<DmAuthContext> context, bool &has
     context->accessee.extraInfo = jsonObjAccessee.Dump();
 }
 
-static void SetSubjectAccessExtraData(std::shared_ptr<DmAuthContext> context, DmProxyAuthContext &subject,
-    bool &hasAcl, DistributedDeviceProfile::AccessControlProfile &profile,
-    DistributedDeviceProfile::AccessControlProfile &newProfile)
+static void SetSubjectAccessExtraData(std::shared_ptr<DmAuthContext> context, DmProxyAuthContext &subject, bool &hasAcl,
+    DistributedDeviceProfile::AccessControlProfile &profile)
 {
     LOGI("SetSubjectAccessExtraData start.");
+    CHECK_NULL_VOID(context);
     JsonObject jsonObjAccesser;
     JsonObject jsonObjAccessee;
     JsonObject jsonObjServiceId(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    JsonObject jsonObjAccesserProxy(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    JsonObject jsonObjAccesseeProxy(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    jsonObjAccesserProxy.PushBack(context->accesser.tokenId);
     jsonObjAccesser[TAG_DMVERSION] = context->accesser.dmVersion;
     jsonObjAccesser[TAG_PKG_NAME] = subject.proxyAccesser.pkgName;
+    jsonObjAccesser[TAG_PROXY] = jsonObjAccesserProxy.Dump();
     jsonObjAccessee[TAG_DMVERSION] = context->accessee.dmVersion;
-    jsonObjAccesser[TAG_PROXY] = context->accesser.tokenId;
-    jsonObjAccessee[TAG_PROXY] = context->accessee.tokenId;
+    DistributedDeviceProfile::ServiceInfo dpServiceInfo;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
+        context->accessee.deviceId, subject.proxyAccessee.serviceId, dpServiceInfo);
+    if (ret != DM_OK) {
+        LOGE("GetServiceInfoByUdidAndServiceId failed, ret %{public}d.", ret);
+    }
+    int64_t proxyTokenid = dpServiceInfo.GetServiceRegisterTokenId();
+    jsonObjAccesseeProxy.PushBack(proxyTokenid);
+    jsonObjAccessee[TAG_PROXY] = jsonObjAccesseeProxy.Dump();
     if (hasAcl) {
-        std::string aceeSeviceId = profile.GetAccessee().GetAccesseeExtraData();
-        LOGI("SetSubjectAccessExtraData hasAcl.");
-        CollectExistingServiceIds(aceeSeviceId, subject.proxyAccessee.serviceId, jsonObjServiceId);
-        DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(
-            profile.GetAccessControlId());
+        UpdateMatchAccessControlProfile(context, profile, hasAcl, subject.proxyAccessee.serviceId);
     }
     jsonObjServiceId.PushBack(subject.proxyAccessee.serviceId);
     jsonObjAccessee.Insert(TAG_SERVICE_ID, jsonObjServiceId);
     subject.proxyAccesser.extraInfo = jsonObjAccesser.Dump();
     subject.proxyAccessee.extraInfo = jsonObjAccessee.Dump();
-    LOGI("SetSubjectAccessExtraData accessee.extrainfo:%{public}s, accesser.extrainfo:%{public}s, "
-        "serviceid:%{public}" PRId64".",
-        subject.proxyAccessee.extraInfo.c_str(), subject.proxyAccesser.extraInfo.c_str(),
-        subject.proxyAccessee.serviceId);
-}
-
-static void NotifyServiceBindOnline(std::shared_ptr<DmAuthContext> context)
-{
-    ServiceStateBindParameter bindParam = {
-        context->accesser.tokenId,
-        context->accesser.pkgName,
-        DM_POINT_TO_POINT,
-        context->accessee.deviceId,
-        context->accessee.userId,
-        context->accessee.serviceId
-    };
-    // need implement in the future:context->listener->OnServiceStateOnlineResult(bindParam);
-    LOGI("call BindServiceOnline in PutServiceControlList");
 }
 
 int32_t DmAuthMessageProcessor::PutServiceControlList(std::shared_ptr<DmAuthContext> context,
-    DistributedDeviceProfile::Accesser accesser, DistributedDeviceProfile::Accessee accessee,
-    DistributedDeviceProfile::AccessControlProfile profile, DmAccess &access)
+                                                      DistributedDeviceProfile::Accesser accesser,
+                                                      DistributedDeviceProfile::Accessee accessee,
+                                                      DistributedDeviceProfile::AccessControlProfile profile,
+                                                      DmAccess &access)
 {
     LOGI("Start.");
+    CHECK_NULL_RETURN(context, ERR_DM_INPUT_PARA_INVALID);
     bool hasAcl = false;
     bool isNeedLnn = true;
     JsonObject extraData;
     DistributedDeviceProfile::AccessControlProfile matchProfile = GetAccessControlProfile(context, hasAcl, isNeedLnn);
-    SetAccessExtraData(context, hasAcl, matchProfile, profile);
-    LOGI("PutServiceControlList newprofile:%{public}" PRId64, profile.GetAccessControlId());
-    accesser.SetAccesserExtraData(context->accesser.extraInfo);
-    accessee.SetAccesseeExtraData(context->accessee.extraInfo);
-    profile.SetAccessee(accessee);
-    profile.SetAccesser(accesser);
-    bool isAuthed = (context->direction == DM_AUTH_SOURCE) ? context->accesser.isAuthed : context->accessee.isAuthed;
-    LOGI("PutServiceControlList isPutLnnAcl:%{public}d, bindLevel:%{public}d.", access.isPutLnnAcl, access.bindLevel);
+    SetAccessExtraData(context, hasAcl, matchProfile);
     if (access.isPutLnnAcl && access.bindLevel != static_cast<int32_t>(USER) && isNeedLnn) {
         LOGI("PutServiceControlList lnn inner.");
         profile.SetBindLevel(USER);
@@ -578,43 +615,64 @@ int32_t DmAuthMessageProcessor::PutServiceControlList(std::shared_ptr<DmAuthCont
             LOGE("PutAccessControlProfile failed.");
         }
     }
-    if (!context->IsProxyBind || context->subjectServiceOnes.empty() ||
-        (context->IsCallingProxyAsSubject && !isAuthed)) {
-        LOGI("PutAccessControlProfile subject ones111.");
-        std::string isLnnAclFalse = std::string(ACL_IS_LNN_ACL_VAL_FALSE);
-        extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclFalse;
-        profile.SetExtraData(extraData.Dump());
-        profile.SetBindLevel(access.bindLevel);
-        SetTransmitAccessControlList(context, accesser, accessee);
-        profile.SetBindLevel(access.bindLevel);
-        profile.SetBindType(access.transmitBindType);
-        profile.SetAccessee(accessee);
-        profile.SetAccesser(accesser);
-        int32_t ret =
-            DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile);
-        if (ret != DM_OK) {
-            LOGE("PutAccessControlProfile failed.");
-        } else {
-            NotifyServiceBindOnline(context);
-        }
+    accesser.SetAccesserExtraData(context->accesser.extraInfo);
+    accessee.SetAccesseeExtraData(context->accessee.extraInfo);
+    bool isAuthed = (context->direction == DM_AUTH_SOURCE) ? context->accesser.isAuthed : context->accessee.isAuthed;
+    LOGI("PutAccessControlProfile subject ones111 1:%{public}d, 2:%{public}d, 3:%{public}d, 4:%{public}d.",
+        context->IsProxyBind, context->subjectServiceOnes.empty(), context->IsCallingProxyAsSubject, isAuthed);
+    if ((!context->IsProxyBind || context->subjectServiceOnes.empty() ||
+        (context->IsCallingProxyAsSubject && !isAuthed)) && !hasAcl) {
+        PutNonLnnAclProfile(context, access, profile, accesser, accessee, extraData);
     }
+
     return PutServiceAccessControlList(context, profile, accesser, accessee);
 }
-// this code line need delete:600-646
-int32_t DmAuthMessageProcessor::PutAccessControlList(std::shared_ptr<DmAuthContext> context,
-    DmAccess &access, std::string trustDeviceId)
+
+void DmAuthMessageProcessor::PutNonLnnAclProfile(std::shared_ptr<DmAuthContext> context, DmAccess &access,
+    DistributedDeviceProfile::AccessControlProfile &profile,
+    DistributedDeviceProfile::Accesser &accesser,
+    DistributedDeviceProfile::Accessee &accessee,
+    JsonObject &extraData)
 {
-    LOGI("Start.");
-    DistributedDeviceProfile::Accesser accesser;
-    DistributedDeviceProfile::Accessee accessee;
-    SetLnnAccessControlList(context, accesser, accessee);
-    DistributedDeviceProfile::AccessControlProfile profile;
-    SetAccessControlList(context, profile);
-    profile.SetTrustDeviceId(trustDeviceId);
-    profile.SetDeviceIdHash(access.deviceIdHash);
-    profile.SetBindType(access.lnnBindType);
+    LOGI("PutNonLnnAclProfile.");
+    CHECK_NULL_VOID(context);
+    extraData[ACL_IS_LNN_ACL_KEY] = std::string(ACL_IS_LNN_ACL_VAL_FALSE);
+    profile.SetExtraData(extraData.Dump());
+    profile.SetBindLevel(access.bindLevel);
+
+    SetTransmitAccessControlList(context, accesser, accessee);
+    profile.SetBindLevel(access.bindLevel);
+    profile.SetBindType(access.transmitBindType);
     profile.SetAccessee(accessee);
     profile.SetAccesser(accesser);
+
+    int32_t ret =
+        DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile);
+    if (ret != DM_OK) {
+        LOGE("PutAccessControlProfile failed.");
+        return;
+    }
+
+    ServiceStateBindParameter bindParam = {
+        context->accesser.tokenId,
+        context->accesser.pkgName,
+        DM_POINT_TO_POINT,
+        context->accessee.deviceId,
+        context->accessee.userId,
+        context->accessee.serviceId
+    };
+    char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    Crypto::GetUdidHash(context->accessee.deviceId, reinterpret_cast<uint8_t*>(deviceIdHash));
+    if (SoftbusCache::GetInstance().CheckIsOnline(std::string(deviceIdHash))) {
+        context->listener->OnServiceStateOnlineResult(bindParam);
+    }
+    LOGI("call BindServiceOnline in PutServiceControlList");
+}
+
+int32_t DmAuthMessageProcessor::PutDeviceControlList(std::shared_ptr<DmAuthContext> context,
+    DistributedDeviceProfile::Accesser accesser, DistributedDeviceProfile::Accessee accessee,
+    DistributedDeviceProfile::AccessControlProfile profile, DmAccess &access)
+{
     JsonObject extraData;
     if (access.isPutLnnAcl && access.bindLevel != static_cast<int32_t>(USER)) {
         profile.SetBindLevel(USER);
@@ -629,7 +687,8 @@ int32_t DmAuthMessageProcessor::PutAccessControlList(std::shared_ptr<DmAuthConte
         }
     }
     bool isAuthed = (context->direction == DM_AUTH_SOURCE) ? context->accesser.isAuthed : context->accessee.isAuthed;
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty() || (context->IsCallingProxyAsSubject && !isAuthed)) {
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty() ||
+        (context->IsCallingProxyAsSubject && !isAuthed)) {
         std::string isLnnAclFalse = std::string(ACL_IS_LNN_ACL_VAL_FALSE);
         extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclFalse;
         extraData[TAG_SERVICE_ID] = access.serviceId;
@@ -649,10 +708,11 @@ int32_t DmAuthMessageProcessor::PutAccessControlList(std::shared_ptr<DmAuthConte
     return PutProxyAccessControlList(context, profile, accesser, accessee);
 }
 
-int32_t DmAuthMessageProcessor::PutAccessControlListSrvBind(std::shared_ptr<DmAuthContext> context,
+int32_t DmAuthMessageProcessor::PutAccessControlList(std::shared_ptr<DmAuthContext> context,
     DmAccess &access, std::string trustDeviceId)
 {
     LOGI("Start.");
+    CHECK_NULL_RETURN(context, ERR_DM_INPUT_PARA_INVALID);
     DistributedDeviceProfile::Accesser accesser;
     DistributedDeviceProfile::Accessee accessee;
     SetLnnAccessControlList(context, accesser, accessee);
@@ -665,39 +725,9 @@ int32_t DmAuthMessageProcessor::PutAccessControlListSrvBind(std::shared_ptr<DmAu
     profile.SetAccesser(accesser);
     if (context->isServiceBind) {
         return PutServiceControlList(context, accesser, accessee, profile, access);
+    } else {
+        return PutDeviceControlList(context, accesser, accessee, profile, access);
     }
-    JsonObject extraData;
-    if (access.isPutLnnAcl && access.bindLevel != static_cast<int32_t>(USER)) {
-        profile.SetBindLevel(USER);
-        std::string isLnnAclTrue = std::string(ACL_IS_LNN_ACL_VAL_TRUE);
-        extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclTrue;
-        extraData[TAG_SERVICE_ID] = access.serviceId;
-        profile.SetExtraData(extraData.Dump());
-        int32_t ret =
-            DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile);
-        if (ret != DM_OK) {
-            LOGE("PutAccessControlProfile failed.");
-        }
-    }
-    bool isAuthed = (context->direction == DM_AUTH_SOURCE) ? context->accesser.isAuthed : context->accessee.isAuthed;
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty() || (context->IsCallingProxyAsSubject && !isAuthed)) {
-        std::string isLnnAclFalse = std::string(ACL_IS_LNN_ACL_VAL_FALSE);
-        extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclFalse;
-        extraData[TAG_SERVICE_ID] = access.serviceId;
-        profile.SetExtraData(extraData.Dump());
-        profile.SetBindLevel(access.bindLevel);
-        SetTransmitAccessControlList(context, accesser, accessee);
-        profile.SetBindLevel(access.bindLevel);
-        profile.SetBindType(access.transmitBindType);
-        profile.SetAccessee(accessee);
-        profile.SetAccesser(accesser);
-        int32_t ret =
-            DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile);
-        if (ret != DM_OK) {
-            LOGE("PutAccessControlProfile failed.");
-        }
-    }
-    return PutProxyAccessControlList(context, profile, accesser, accessee);
 }
 
 int32_t DmAuthMessageProcessor::SetProxyAccess(std::shared_ptr<DmAuthContext> context,
@@ -740,13 +770,10 @@ int32_t DmAuthMessageProcessor::PutServiceAccessControlList(std::shared_ptr<DmAu
     DistributedDeviceProfile::Accessee &accessee)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    LOGI("PutServiceAccessControlList start.");
     if (!context->IsProxyBind || context->subjectServiceOnes.empty()) {
-        LOGI("WZF !context->IsProxyBind || context->subjectServiceOnes.empty()");
-        LOGI("WZF isProxyBind %{public}d, subjectServiceOnes%{public}d", context->IsProxyBind,
-            context->subjectServiceOnes.empty());
         return DM_OK;
     }
+
     for (auto &app : context->subjectServiceOnes) {
         if (context->direction == DM_AUTH_SOURCE ? app.proxyAccesser.isAuthed : app.proxyAccessee.isAuthed) {
             LOGI("PutServiceAccessControlList continue.");
@@ -764,22 +791,29 @@ int32_t DmAuthMessageProcessor::PutServiceAccessControlList(std::shared_ptr<DmAu
             app.proxyAccessee.bindLevel);
         profile.SetBindType(context->direction == DM_AUTH_SOURCE ? context->accesser.transmitBindType :
             context->accessee.transmitBindType);
-        SetSubjectAccessExtraData(context, app, hasAcl, matchProfile, profile);
+        SetSubjectAccessExtraData(context, app, hasAcl, matchProfile);
+        if (hasAcl) {
+            LOGE("PutServiceAccessControlList has acl.");
+            continue;
+        }
         accesser.SetAccesserExtraData(app.proxyAccesser.extraInfo);
         accessee.SetAccesseeExtraData(app.proxyAccessee.extraInfo);
         profile.SetAccessee(accessee);
         profile.SetAccesser(accesser);
-        LOGI("PutServiceAccessControlList accessee.extrainfo:%{public}s, accesser.extrainfo:%{public}s.",
-            accessee.GetAccesseeExtraData().c_str(), accesser.GetAccesserExtraData().c_str());
         int32_t ret =
             DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile);
         if (ret != DM_OK) {
-            LOGE("PutAccessControlProfile failed. %{public}d", ret);
+            LOGE("PutServiceAccessControlList failed. %{public}d", ret);
             return ret;
         }
-        NotifyServiceBindOnline(context);
+        ServiceStateBindParameter bindParam = {context->accesser.tokenId, context->accesser.pkgName, DM_POINT_TO_POINT,
+            context->accessee.deviceId, context->accessee.userId, context->accessee.serviceId};
+        char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        Crypto::GetUdidHash(context->accessee.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
+        if (SoftbusCache::GetInstance().CheckIsOnline(std::string(deviceIdHash))) {
+            context->listener->OnServiceStateOnlineResult(bindParam);
+        }
     }
-    SetAclProxyRelate(context);
     return DM_OK;
 }
 
@@ -1150,46 +1184,12 @@ int32_t DmAuthMessageProcessor::ParseMessageRspSKDerive(const JsonObject &jsonOb
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcSKDeriveState>());
     return DM_OK;
 }
-// this code line need delete:1158-1189
 int32_t DmAuthMessageProcessor::ParseProxyCredExchangeToSync(std::shared_ptr<DmAuthContext> &context,
-    JsonObject &jsonObject)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        return DM_OK;
-    }
-    if (!IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
-        LOGE("no subjectProxyOnes");
-        return ERR_DM_FAILED;
-    }
-    std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
-    JsonObject allProxyObj;
-    allProxyObj.Parse(subjectProxyOnesStr);
-    for (auto const &item : allProxyObj.Items()) {
-        if (!IsString(item, TAG_PROXY_CONTEXT_ID)) {
-            continue;
-        }
-        DmProxyAuthContext proxyAuthContext;
-        proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
-        auto it = std::find(context->subjectProxyOnes.begin(), context->subjectProxyOnes.end(), proxyAuthContext);
-        if (it != context->subjectProxyOnes.end()) {
-            if (!IsInt64(item, TAG_TOKEN_ID)) {
-                LOGE("no tokenId");
-                return ERR_DM_FAILED;
-            }
-            DmProxyAccess &access = (context->direction == DM_AUTH_SOURCE) ? it->proxyAccessee : it->proxyAccesser;
-            access.tokenId = item[TAG_TOKEN_ID].Get<int64_t>();
-        }
-    }
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::ParseProxyCredExchangeToSyncSrvBind(std::shared_ptr<DmAuthContext> &context,
     JsonObject &jsonObject)
 {
     LOGI("ParseProxyCredExchangeToSync inner1");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     auto targetKey = context->isServiceBind ? PARAM_KEY_SUBJECT_SERVICE_ONES : PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
     if (!context->IsProxyBind || targetList.empty()) {
         LOGI("ParseProxyCredExchangeToSync inner2");
@@ -1269,47 +1269,7 @@ int32_t DmAuthMessageProcessor::CreateNegotiateOldMessage(std::shared_ptr<DmAuth
 }
 
 // Create 80 message.
-// this code line need delete: 1300-1337
 int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthContext> context,
-    JsonObject &jsonObject)
-{
-    // create old message for compatible in import auth code
-    if (context->authType == DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE) {
-        CreateNegotiateOldMessage(context, jsonObject);
-    }
-    jsonObject[TAG_DMVERSION] = "";
-    jsonObject[TAG_EDITION] = DM_VERSION_5_0_5;
-    jsonObject[TAG_BUNDLE_NAME] = context->accesser.bundleName;
-    jsonObject[TAG_PEER_BUNDLE_NAME] = context->accessee.oldBundleName;
-
-    jsonObject[TAG_PKG_NAME] = context->pkgName;
-
-    jsonObject[TAG_DM_VERSION_V2] = context->accesser.dmVersion;
-    jsonObject[TAG_USER_ID] = context->accesser.userId;
-    jsonObject[TAG_DEVICE_NAME] = context->accesser.deviceName;
-    jsonObject[TAG_DEVICE_ID_HASH] = context->accesser.deviceIdHash;
-    jsonObject[TAG_ACCOUNT_ID_HASH] = context->accesser.accountIdHash;
-    jsonObject[TAG_TOKEN_ID_HASH] = context->accesser.tokenIdHash;
-    jsonObject[TAG_BUNDLE_NAME_V2] = context->accesser.bundleName;
-    jsonObject[TAG_EXTRA_INFO] = context->accesser.extraInfo;
-
-    jsonObject[TAG_PEER_BUNDLE_NAME_V2] = context->accessee.bundleName;
-    jsonObject[TAG_ULTRASONIC_SIDE] = static_cast<int32_t>(context->ultrasonicInfo);
-    jsonObject[TAG_PEER_DISPLAY_ID] = context->accessee.displayId;
-    jsonObject[TAG_PEER_PKG_NAME] = context->accessee.pkgName;
-    jsonObject[TAG_HOST_PKGLABEL] = context->pkgLabel;
-    jsonObject[TAG_SERVICE_ID] = context->accessee.serviceId;
-    jsonObject[PARAM_KEY_IS_SERVICE_BIND] = context->isServiceBind;
-
-    if (!context->businessId.empty()) {
-        jsonObject[DM_BUSINESS_ID] = context->businessId;
-    }
-    jsonObject[TAG_NCM_BIND_TARGET] = context->ncmBindTarget;
-    CreateProxyNegotiateMessage(context, jsonObject);
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::CreateNegotiateMessageSrvBind(std::shared_ptr<DmAuthContext> context,
     JsonObject &jsonObject)
 {
     // create old message for compatible in import auth code
@@ -1418,32 +1378,11 @@ int32_t DmAuthMessageProcessor::CreateRespNegotiateMessage(std::shared_ptr<DmAut
     CreateProxyRespNegotiateMessage(context, jsonObject);
     return DM_OK;
 }
-// this code line need delete: 1424-1442
 int32_t DmAuthMessageProcessor::CreateProxyRespNegotiateMessage(std::shared_ptr<DmAuthContext> context,
     JsonObject &jsonObject)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    jsonObject[PARAM_KEY_IS_PROXY_BIND] = context->IsProxyBind;
-    if (context->IsProxyBind && !context->subjectProxyOnes.empty()) {
-        JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
-        for (const auto &app : context->subjectProxyOnes) {
-            JsonObject object;
-            object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
-            object[TAG_TOKEN_ID_HASH] = app.proxyAccessee.tokenIdHash;
-            object[TAG_ACL_TYPE_LIST] = app.proxyAccessee.aclTypeList;
-            object[TAG_CERT_TYPE_LIST] = app.proxyAccessee.credTypeList;
-            allProxyObj.PushBack(object);
-        }
-        jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
-    }
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::CreateProxyRespNegotiateMessageSrvBind(std::shared_ptr<DmAuthContext> context,
-    JsonObject &jsonObject)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     auto targetKey = context->isServiceBind ? PARAM_KEY_SUBJECT_SERVICE_ONES : PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
     jsonObject[PARAM_KEY_IS_PROXY_BIND] = context->IsProxyBind;
     if (context->IsProxyBind && !targetList.empty()) {
@@ -1454,6 +1393,7 @@ int32_t DmAuthMessageProcessor::CreateProxyRespNegotiateMessageSrvBind(std::shar
             object[TAG_TOKEN_ID_HASH] = app.proxyAccessee.tokenIdHash;
             object[TAG_ACL_TYPE_LIST] = app.proxyAccessee.aclTypeList;
             object[TAG_CERT_TYPE_LIST] = app.proxyAccessee.credTypeList;
+            object[TAG_BUNDLE_NAME] = app.proxyAccessee.bundleName;
             allProxyObj.PushBack(object);
         }
         jsonObject[targetKey] = allProxyObj.Dump();
@@ -1510,31 +1450,11 @@ int32_t DmAuthMessageProcessor::CreateMessageRspCredExchange(std::shared_ptr<DmA
     jsonObject[TAG_DATA] = cipherText;
     return ret;
 }
-// this code line need delete: 1516-1533
 int32_t DmAuthMessageProcessor::CreateProxyCredExchangeMessage(std::shared_ptr<DmAuthContext> &context,
     JsonObject &jsonData)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        return DM_OK;
-    }
-    JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
-    for (const auto &app : context->subjectProxyOnes) {
-        const DmProxyAccess &access = (context->direction == DM_AUTH_SOURCE) ? app.proxyAccesser : app.proxyAccessee;
-        JsonObject object;
-        object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
-        object[TAG_TOKEN_ID] = access.tokenId;
-        allProxyObj.PushBack(object);
-    }
-    jsonData[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::CreateProxyCredExchangeMessageSrvBind(std::shared_ptr<DmAuthContext> &context,
-    JsonObject &jsonData)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     auto targetKey = context->isServiceBind ? PARAM_KEY_SUBJECT_SERVICE_ONES : PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
     if (!context->IsProxyBind || targetList.empty()) {
         return DM_OK;
@@ -1654,7 +1574,8 @@ bool DmAuthMessageProcessor::CheckAccessValidityAndAssign(std::shared_ptr<DmAuth
         Crypto::GetTokenIdHash(std::to_string(accessTmp.tokenId)) == access.tokenIdHash &&
         accessTmp.bundleName == access.bundleName &&
         accessTmp.pkgName == access.pkgName &&
-        accessTmp.bindLevel == selfAccess.bindLevel;
+        accessTmp.bindLevel == selfAccess.bindLevel &&
+        accessTmp.serviceId == context->accessee.serviceId;
     if (isSame) {
         access.transmitSessionKeyId = accessTmp.transmitSessionKeyId;
         access.transmitSkTimeStamp = accessTmp.transmitSkTimeStamp;
@@ -1666,61 +1587,7 @@ bool DmAuthMessageProcessor::CheckAccessValidityAndAssign(std::shared_ptr<DmAuth
     }
     return isSame;
 }
-// this code line need delete: 1672-1723
 int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> &context,
-    DmAccess &access, JsonObject &jsonObject)
-{
-    DmAccess accessTmp;
-    if (ParseInfoToDmAccess(jsonObject, accessTmp) != DM_OK) {
-        LOGE("Parse DataSync prarm err");
-        return ERR_DM_FAILED;
-    }
-
-    if (!IsString(jsonObject, TAG_ACCESS)) {
-        LOGE("ParseSyncMessage TAG_ACCESS error");
-        return ERR_DM_FAILED;
-    }
-    std::string srcAccessStr = jsonObject[TAG_ACCESS].Get<std::string>();
-    // Parse into access
-    ParseDmAccessToSync(srcAccessStr, accessTmp, false);
-    // check access validity
-    if (ParseProxyAccessToSync(context, jsonObject) != DM_OK) {
-        LOGE("ParseProxyAccessToSync error, stop auth.");
-        return ERR_DM_FAILED;
-    }
-    if (!CheckAccessValidityAndAssign(context, access, accessTmp)) {
-        LOGE("ParseSyncMessage CheckAccessValidityAndAssign error, data between two stages different, stop auth.");
-        return ERR_DM_FAILED;
-    }
-    ParseDmAccessToSync(srcAccessStr, access, true);
-    if (!IsString(jsonObject, TAG_ACL_CHECKSUM)) { // Re-parse the acl
-        LOGE("ParseSyncMessage TAG_ACL_CHECKSUM error");
-        return ERR_DM_FAILED;
-    }
-    access.aclStrList = jsonObject[TAG_ACL_CHECKSUM].Get<std::string>();
-    if (context->direction == DmAuthDirection::DM_AUTH_SOURCE) {
-        LOGI("Source parse sink user confirm opt");
-        int32_t userConfirmOpt = static_cast<int32_t>(USER_OPERATION_TYPE_CANCEL_AUTH);
-        if (IsInt32(jsonObject, TAG_USER_CONFIRM_OPT)) {
-            userConfirmOpt = jsonObject[TAG_USER_CONFIRM_OPT].Get<int32_t>();
-        }
-        if (userConfirmOpt == static_cast<int32_t>(USER_OPERATION_TYPE_ALLOW_AUTH) ||
-            userConfirmOpt == static_cast<int32_t>(USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS)) {
-            context->confirmOperation = static_cast<UiAction>(userConfirmOpt);
-        }
-    }
-    if (IsBool(jsonObject, PIN_MATCH_FLAG)) {
-        context->pinCodeFlag = jsonObject[PIN_MATCH_FLAG].Get<bool>();
-    }
-    if (IsBool(jsonObject, TAG_NCM_BIND_TARGET)) {
-        context->ncmBindTarget = jsonObject[TAG_NCM_BIND_TARGET].Get<bool>();
-    }
-    ParseCert(jsonObject, context);
-    ParseSyncServiceInfo(jsonObject, context);
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::ParseSyncMessageSrvBind(std::shared_ptr<DmAuthContext> &context,
     DmAccess &access, JsonObject &jsonObject)
 {
     DmAccess accessTmp;
@@ -1774,61 +1641,20 @@ int32_t DmAuthMessageProcessor::ParseSyncMessageSrvBind(std::shared_ptr<DmAuthCo
     }
     return DM_OK;
 }
-// this code line need delete: 1780-1821
-void DmAuthMessageProcessor::ParseSyncServiceInfo(const JsonObject &jsonObject,
-    std::shared_ptr<DmAuthContext> context)
-{
-    std::string serviceInfoStr = "";
-    if (IsString(jsonObject, TAG_ACCESSEE_SERVICE_INFO)) {
-        serviceInfoStr = jsonObject[TAG_ACCESSEE_SERVICE_INFO].Get<std::string>();
-    }
-    JsonObject json;
-    json.Parse(serviceInfoStr);
-    if (json.IsDiscarded()) {
-        return;
-    }
-    ServiceInfoProfile serviceInfoProfile;
-    if (IsInt32(json, TAG_REG_SERVICE_ID)) {
-        serviceInfoProfile.regServiceId = json[TAG_REG_SERVICE_ID].Get<int32_t>();
-    }
-    if (IsString(json, TAG_DEVICE_ID)) {
-        serviceInfoProfile.deviceId = json[TAG_DEVICE_ID].Get<std::string>();
-    }
-    if (IsInt32(json, TAG_USER_ID)) {
-        serviceInfoProfile.userId = json[TAG_USER_ID].Get<int32_t>();
-    }
-    if (IsInt64(json, TAG_TOKEN_ID)) {
-        serviceInfoProfile.tokenId = json[TAG_TOKEN_ID].Get<int64_t>();
-    }
-    if (IsInt32(json, TAG_PUBLISH_STATE)) {
-        serviceInfoProfile.publishState = json[TAG_PUBLISH_STATE].Get<int32_t>();
-    }
-    if (IsInt64(json, TAG_SERVICE_ID)) {
-        serviceInfoProfile.serviceId = json[TAG_SERVICE_ID].Get<int64_t>();
-    }
-    if (IsString(json, TAG_SERVICE_TYPE)) {
-        serviceInfoProfile.serviceType = json[TAG_SERVICE_TYPE].Get<std::string>();
-    }
-    if (IsString(json, TAG_SERVICE_NAME)) {
-        serviceInfoProfile.serviceName = json[TAG_SERVICE_NAME].Get<std::string>();
-    }
-    if (IsString(json, TAG_SERVICE_DISPLAY_NAME)) {
-        serviceInfoProfile.serviceDisplayName = json[TAG_SERVICE_DISPLAY_NAME].Get<std::string>();
-    }
-    DeviceProfileConnector::GetInstance().PutServiceInfoProfile(serviceInfoProfile);
-}
 
 void DmAuthMessageProcessor::ParseServiceInfo(JsonObject &jsonObject, std::shared_ptr<DmAuthContext> &context)
 {
     LOGI("ParseServiceInfo start");
     if (!IsString(jsonObject, TAG_SERVICE_INFOS)) {
         LOGI("no serviceInfos");
-
         return;
     }
     std::string serviceInfosStr = jsonObject[TAG_SERVICE_INFOS].Get<std::string>();
     JsonObject allServiceInfo;
-    allServiceInfo.Parse(serviceInfosStr);
+    if (!allServiceInfo.Parse(serviceInfosStr)) {
+        LOGE("Failed to parse serviceInfosStr");
+        return;
+    }
     for (auto const &item : allServiceInfo.Items()) {
         LOGI("ParseServiceInfo inner");
         DistributedDeviceProfile::ServiceInfo info;
@@ -1860,18 +1686,54 @@ void DmAuthMessageProcessor::ParseServiceInfo(JsonObject &jsonObject, std::share
         context->serviceId.push_back(idValue);
     }
 }
-// this code line need delete: 1869-1918
-int32_t DmAuthMessageProcessor::ParseProxyAccessToSync(std::shared_ptr<DmAuthContext> &context,
-    JsonObject &jsonObject)
+
+static int32_t ParseServiceProxyAccessToSync(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonObject)
 {
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        return DM_OK;
+    std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_SERVICE_ONES].Get<std::string>();
+    JsonObject allProxyObj;
+    allProxyObj.Parse(subjectProxyOnesStr);
+    for (auto const &item : allProxyObj.Items()) {
+        if (!IsString(item, TAG_PROXY_CONTEXT_ID)) {
+            LOGE("no proxyContextId");
+            return ERR_DM_FAILED;
+        }
+        DmProxyAuthContext proxyAuthContext;
+        proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
+        auto it = std::find(context->subjectServiceOnes.begin(), context->subjectServiceOnes.end(), proxyAuthContext);
+        if (it != context->subjectServiceOnes.end()) {
+            if (!IsInt64(item, TAG_TOKEN_ID) || !IsString(item, TAG_TRANSMIT_SK_ID) ||
+                !IsInt32(item, TAG_BIND_LEVEL) || !IsInt64(item, TAG_TRANSMIT_SK_TIMESTAMP) ||
+                !IsString(item, TAG_TRANSMIT_CREDENTIAL_ID) || !IsString(item, TAG_SRC_SUBJECT_PKGNAME) ||
+                !IsInt64(item, TAG_SUBJECT_SERVICEID)) {
+                LOGE("proxyContext format error");
+                return ERR_DM_FAILED;
+            }
+
+            DmProxyAccess &access = (context->direction == DM_AUTH_SOURCE) ? it->proxyAccessee : it->proxyAccesser;
+            DmProxyAccess &selfAccess = (context->direction == DM_AUTH_SOURCE) ? it->proxyAccesser : it->proxyAccessee;
+            if (Crypto::GetTokenIdHash(std::to_string(item[TAG_TOKEN_ID].Get<int64_t>())) == access.tokenIdHash &&
+                item[TAG_BIND_LEVEL].Get<int32_t>() == selfAccess.bindLevel &&
+                item[TAG_SRC_SUBJECT_PKGNAME].Get<std::string>() == it->proxyAccesser.pkgName &&
+                item[TAG_SUBJECT_SERVICEID].Get<int64_t>() == it->proxyAccessee.serviceId) {
+                access.tokenId  = item[TAG_TOKEN_ID].Get<int64_t>();
+                access.bindLevel = item[TAG_BIND_LEVEL].Get<int32_t>();
+                access.transmitSessionKeyId = std::atoi(item[TAG_TRANSMIT_SK_ID].Get<std::string>().c_str());
+                access.skTimeStamp = item[TAG_TRANSMIT_SK_TIMESTAMP].Get<int64_t>();
+                access.transmitCredentialId  = item[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>();
+            } else {
+                LOGE("tokenId or bindLevel invaild");
+                return ERR_DM_FAILED;
+            }
+        } else {
+            LOGE("proxyContextId not exist");
+            return ERR_DM_FAILED;
+        }
     }
-    if (!IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
-        LOGE("no subjectProxyOnes");
-        return ERR_DM_FAILED;
-    }
+    return DM_OK;
+}
+
+static int32_t ParseDeviceProxyAccessToSync(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonObject)
+{
     std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
     JsonObject allProxyObj;
     allProxyObj.Parse(subjectProxyOnesStr);
@@ -1890,19 +1752,19 @@ int32_t DmAuthMessageProcessor::ParseProxyAccessToSync(std::shared_ptr<DmAuthCon
                 LOGE("proxyContext format error");
                 return ERR_DM_FAILED;
             }
-
             DmProxyAccess &access = (context->direction == DM_AUTH_SOURCE) ? it->proxyAccessee : it->proxyAccesser;
             DmProxyAccess &selfAccess = (context->direction == DM_AUTH_SOURCE) ? it->proxyAccesser : it->proxyAccessee;
-            if (!(Crypto::GetTokenIdHash(std::to_string(item[TAG_TOKEN_ID].Get<int64_t>())) == access.tokenIdHash &&
-                item[TAG_BIND_LEVEL].Get<int32_t>() == selfAccess.bindLevel)) {
+            if (Crypto::GetTokenIdHash(std::to_string(item[TAG_TOKEN_ID].Get<int64_t>())) == access.tokenIdHash &&
+                item[TAG_BIND_LEVEL].Get<int32_t>() == selfAccess.bindLevel) {
+                access.tokenId  = item[TAG_TOKEN_ID].Get<int64_t>();
+                access.bindLevel = item[TAG_BIND_LEVEL].Get<int32_t>();
+                access.transmitSessionKeyId = std::atoi(item[TAG_TRANSMIT_SK_ID].Get<std::string>().c_str());
+                access.skTimeStamp = item[TAG_TRANSMIT_SK_TIMESTAMP].Get<int64_t>();
+                access.transmitCredentialId  = item[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>();
+            } else {
                 LOGE("tokenId or bindLevel invaild");
                 return ERR_DM_FAILED;
             }
-            access.tokenId  = item[TAG_TOKEN_ID].Get<int64_t>();
-            access.bindLevel = item[TAG_BIND_LEVEL].Get<int32_t>();
-            access.transmitSessionKeyId = std::atoi(item[TAG_TRANSMIT_SK_ID].Get<std::string>().c_str());
-            access.skTimeStamp = item[TAG_TRANSMIT_SK_TIMESTAMP].Get<int64_t>();
-            access.transmitCredentialId  = item[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>();
         } else {
             LOGE("proxyContextId not exist");
             return ERR_DM_FAILED;
@@ -1911,11 +1773,11 @@ int32_t DmAuthMessageProcessor::ParseProxyAccessToSync(std::shared_ptr<DmAuthCon
     return DM_OK;
 }
 
-int32_t DmAuthMessageProcessor::ParseProxyAccessToSyncSrvBind(std::shared_ptr<DmAuthContext> &context,
+int32_t DmAuthMessageProcessor::ParseProxyAccessToSync(std::shared_ptr<DmAuthContext> &context,
     JsonObject &jsonObject)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     auto targetKey = context->isServiceBind ? PARAM_KEY_SUBJECT_SERVICE_ONES : PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
     if (!context->IsProxyBind || targetList.empty()) {
         return DM_OK;
@@ -1924,59 +1786,11 @@ int32_t DmAuthMessageProcessor::ParseProxyAccessToSyncSrvBind(std::shared_ptr<Dm
         LOGE("no subjectProxyOnes");
         return ERR_DM_FAILED;
     }
-    std::string subjectProxyOnesStr = jsonObject[targetKey].Get<std::string>();
-    JsonObject allProxyObj;
-    allProxyObj.Parse(subjectProxyOnesStr);
-    for (auto const &item : allProxyObj.Items()) {
-        if (!IsString(item, TAG_PROXY_CONTEXT_ID)) {
-            LOGE("no proxyContextId");
-            return ERR_DM_FAILED;
-        }
-        int32_t ret = ProcessSingleProxyItem(context, item, jsonObject, targetList);
-        if (ret != DM_OK) {
-            return ret;
-        }
+    if (context->isServiceBind) {
+        return ParseServiceProxyAccessToSync(context, jsonObject);
+    } else {
+        return ParseDeviceProxyAccessToSync(context, jsonObject);
     }
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::ProcessSingleProxyItem(std::shared_ptr<DmAuthContext> &context,
-    const JsonItemObject &item, const JsonObject &jsonObject, std::vector<DmProxyAuthContext> &targetList)
-{
-    DmProxyAuthContext proxyAuthContext;
-    proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
-    auto it = std::find(targetList.begin(), targetList.end(), proxyAuthContext);
-    if (it == targetList.end()) {
-        LOGE("proxyContextId not exist");
-        return ERR_DM_FAILED;
-    }
-    if (!IsInt64(item, TAG_TOKEN_ID) || !IsString(item, TAG_TRANSMIT_SK_ID) ||
-        !IsInt32(item, TAG_BIND_LEVEL) || !IsInt64(item, TAG_TRANSMIT_SK_TIMESTAMP) ||
-        !IsString(item, TAG_TRANSMIT_CREDENTIAL_ID)) {
-        LOGE("proxyContext format error");
-        return ERR_DM_FAILED;
-    }
-    DmProxyAccess &access = (context->direction == DM_AUTH_SOURCE) ? it->proxyAccessee : it->proxyAccesser;
-    DmProxyAccess &selfAccess = (context->direction == DM_AUTH_SOURCE) ? it->proxyAccesser : it->proxyAccessee;
-    if (Crypto::GetTokenIdHash(std::to_string(item[TAG_TOKEN_ID].Get<int64_t>())) != access.tokenIdHash ||
-        item[TAG_BIND_LEVEL].Get<int32_t>() != selfAccess.bindLevel) {
-        LOGE("tokenId or bindLevel invaild");
-        return ERR_DM_FAILED;
-    }
-    if (context->direction != DM_AUTH_SOURCE) {
-        LOGI("ParseProxyAccessToSync subjectProxyOnes");
-        std::string serviceInfoStr = "";
-        if (IsString(jsonObject, TAG_ACCESSEE_SERVICE_INFO)) {
-            serviceInfoStr = jsonObject[TAG_ACCESSEE_SERVICE_INFO].Get<std::string>();
-        }
-        access.serviceInfo = serviceInfoStr;
-    }
-    access.tokenId  = item[TAG_TOKEN_ID].Get<int64_t>();
-    access.bindLevel = item[TAG_BIND_LEVEL].Get<int32_t>();
-    access.transmitSessionKeyId = std::atoi(item[TAG_TRANSMIT_SK_ID].Get<std::string>().c_str());
-    access.skTimeStamp = item[TAG_TRANSMIT_SK_TIMESTAMP].Get<int64_t>();
-    access.transmitCredentialId  = item[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>();
-    return DM_OK;
 }
 
 int32_t DmAuthMessageProcessor::DecryptSyncMessage(std::shared_ptr<DmAuthContext> &context,
@@ -2111,7 +1925,6 @@ int32_t DmAuthMessageProcessor::CheckLogicalSessionId(const JsonObject &jsonObje
     }
     return DM_OK;
 }
-// this code line need delete: 2113-2142
 int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
     const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context)
 {
@@ -2136,37 +1949,6 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
     }
     ParseAccesserInfo(jsonObject, context);
     ParseUltrasonicSide(jsonObject, context);
-    ParseProxyNegotiateMessage(jsonObject, context);
-    ParseServiceNego(jsonObject, context);
-    context->authStateMachine->TransitionTo(std::make_shared<AuthSinkNegotiateStateMachine>());
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::ParseNegotiateMessageSrvBind(
-    const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context)
-{
-    if (jsonObject[DM_TAG_LOGICAL_SESSION_ID].IsNumberInteger()) {
-        context->logicalSessionId = jsonObject[DM_TAG_LOGICAL_SESSION_ID].Get<uint64_t>();
-        context->requestId = static_cast<int64_t>(context->logicalSessionId);
-    }
-    if (IsString(jsonObject, TAG_PEER_BUNDLE_NAME_V2)) {
-        context->accessee.bundleName = jsonObject[TAG_PEER_BUNDLE_NAME_V2].Get<std::string>();
-    }
-    if (IsInt32(jsonObject, TAG_PEER_DISPLAY_ID)) {
-        context->accessee.displayId = jsonObject[TAG_PEER_DISPLAY_ID].Get<int32_t>();
-    }
-    if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
-        context->pkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
-    }
-    if (IsString(jsonObject, DM_BUSINESS_ID)) {
-        context->businessId = jsonObject[DM_BUSINESS_ID].Get<std::string>();
-    }
-    if (IsBool(jsonObject, TAG_NCM_BIND_TARGET)) {
-        context->ncmBindTarget = jsonObject[TAG_NCM_BIND_TARGET].Get<bool>();
-    }
-    ParseAccesserInfo(jsonObject, context);
-    ParseUltrasonicSide(jsonObject, context);
-
     ParseServiceNego(jsonObject, context);
     ParseProxyNegotiateMessage(jsonObject, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkNegotiateStateMachine>());
@@ -2265,51 +2047,8 @@ int32_t DmAuthMessageProcessor::ParseServiceNegotiateMessage(
     LOGI("ParseServiceNegotiateMessage inner3");
     return DM_OK;
 }
-// this code line need delete: 2268-2309
+
 int32_t DmAuthMessageProcessor::ParseProxyNegotiateMessage(
-    const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    context->IsProxyBind = false;
-    //accesser dmVersion greater than DM_VERSION_5_1_1
-    if (CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_1) && IsBool(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
-        context->IsProxyBind = jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<bool>();
-    }
-    if (!context->IsProxyBind) {
-        return DM_OK;
-    }
-    if (IsInt32(jsonObject, TAG_AUTH_TYPE)) {
-        context->authType = static_cast<DmAuthType>(jsonObject[TAG_AUTH_TYPE].Get<int32_t>());
-    }
-    if (IsBool(jsonObject, PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT)) {
-        context->IsCallingProxyAsSubject = jsonObject[PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT].Get<bool>();
-    }
-
-    if (!IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
-    JsonObject allProxyObj;
-    allProxyObj.Parse(subjectProxyOnesStr);
-    for (auto const &item : allProxyObj.Items()) {
-        if (!IsString(item, TAG_PROXY_CONTEXT_ID) || !IsString(item, TAG_BUNDLE_NAME) ||
-            !IsString(item, TAG_PEER_BUNDLE_NAME) || !IsString(item, TAG_TOKEN_ID_HASH)) {
-            continue;
-        }
-        DmProxyAuthContext proxyAuthContext;
-        proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
-        proxyAuthContext.proxyAccesser.bundleName = item[TAG_BUNDLE_NAME].Get<std::string>();
-        proxyAuthContext.proxyAccessee.bundleName = item[TAG_PEER_BUNDLE_NAME].Get<std::string>();
-        proxyAuthContext.proxyAccesser.tokenIdHash = item[TAG_TOKEN_ID_HASH].Get<std::string>();
-        if (IsString(item, TAG_HOST_PKGLABEL)) {
-            proxyAuthContext.pkgLabel = item[TAG_HOST_PKGLABEL].Get<std::string>();
-        }
-        context->subjectProxyOnes.push_back(proxyAuthContext);
-    }
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::ParseProxyNegotiateMessageSrvBind(
     const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
@@ -2435,50 +2174,11 @@ int32_t DmAuthMessageProcessor::ParseMessageRespAclNegotiate(const JsonObject &j
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcConfirmState>());
     return DM_OK;
 }
-// this code line need delete: 2438-2474
 int32_t DmAuthMessageProcessor::ParseMessageProxyRespAclNegotiate(const JsonObject &jsonObject,
     std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    //sink not support proxy
-    if (!CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_1)) {
-        context->IsProxyBind = false;
-        LOGE("sink does not support proxy");
-        return DM_OK;
-    } else if (IsBool(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
-        context->IsProxyBind = jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<bool>();
-    }
-    if (!context->IsProxyBind) {
-        return DM_OK;
-    }
-    if (!IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
-    JsonObject allProxyObj;
-    allProxyObj.Parse(subjectProxyOnesStr);
-    for (auto const &item : allProxyObj.Items()) {
-        if (!IsString(item, TAG_PROXY_CONTEXT_ID) || !IsString(item, TAG_TOKEN_ID_HASH) ||
-            !IsString(item, TAG_ACL_TYPE_LIST) || !IsString(item, TAG_CERT_TYPE_LIST)) {
-            continue;
-        }
-        DmProxyAuthContext proxyAuthContext;
-        proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
-        auto it = std::find(context->subjectProxyOnes.begin(), context->subjectProxyOnes.end(), proxyAuthContext);
-        if (it != context->subjectProxyOnes.end()) {
-            it->proxyAccessee.tokenIdHash = item[TAG_TOKEN_ID_HASH].Get<std::string>();
-            it->proxyAccessee.aclTypeList = item[TAG_ACL_TYPE_LIST].Get<std::string>();
-            it->proxyAccessee.credTypeList = item[TAG_CERT_TYPE_LIST].Get<std::string>();
-        }
-    }
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::ParseMessageProxyRespAclNegotiateSrvBind(const JsonObject &jsonObject,
-    std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     auto targetKey = context->isServiceBind ? PARAM_KEY_SUBJECT_SERVICE_ONES : PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
     //sink not support proxy
     if (!CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_1)) {
@@ -2509,6 +2209,7 @@ int32_t DmAuthMessageProcessor::ParseMessageProxyRespAclNegotiateSrvBind(const J
             it->proxyAccessee.tokenIdHash = item[TAG_TOKEN_ID_HASH].Get<std::string>();
             it->proxyAccessee.aclTypeList = item[TAG_ACL_TYPE_LIST].Get<std::string>();
             it->proxyAccessee.credTypeList = item[TAG_CERT_TYPE_LIST].Get<std::string>();
+            it->proxyAccessee.bundleName = item[TAG_BUNDLE_NAME].Get<std::string>();
         }
     }
     return DM_OK;
@@ -2542,7 +2243,6 @@ int32_t DmAuthMessageProcessor::ParseMessageReqUserConfirm(const JsonObject &jso
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkConfirmState>());
     return DM_OK;
 }
-// this code line need delete: 2545-2572
 int32_t DmAuthMessageProcessor::ParseMessageProxyReqUserConfirm(const JsonObject &json,
     std::shared_ptr<DmAuthContext> context)
 {
@@ -2550,36 +2250,7 @@ int32_t DmAuthMessageProcessor::ParseMessageProxyReqUserConfirm(const JsonObject
     if (!context->IsProxyBind) {
         return DM_OK;
     }
-    if (!IsString(json, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    std::string subjectProxyOnesStr = json[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
-    JsonObject allProxyObj;
-    allProxyObj.Parse(subjectProxyOnesStr);
-    for (auto const &item : allProxyObj.Items()) {
-        if (!IsString(item, TAG_PROXY_CONTEXT_ID) || !IsString(item, TAG_ACL_TYPE_LIST) ||
-            !IsString(item, TAG_CERT_TYPE_LIST)) {
-            continue;
-        }
-        DmProxyAuthContext proxyAuthContext;
-        proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
-        auto it = std::find(context->subjectProxyOnes.begin(), context->subjectProxyOnes.end(), proxyAuthContext);
-        if (it != context->subjectProxyOnes.end()) {
-            it->proxyAccesser.aclTypeList = item[TAG_ACL_TYPE_LIST].Get<std::string>();
-            it->proxyAccesser.credTypeList = item[TAG_CERT_TYPE_LIST].Get<std::string>();
-        }
-    }
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::ParseMessageProxyReqUserConfirmSrvBind(const JsonObject &json,
-    std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    if (!context->IsProxyBind) {
-        return DM_OK;
-    }
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     auto targetKey = context->isServiceBind ? PARAM_KEY_SUBJECT_SERVICE_ONES : PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
     if (!IsString(json, targetKey)) {
         return ERR_DM_INPUT_PARA_INVALID;
@@ -2617,7 +2288,6 @@ int32_t DmAuthMessageProcessor::ParseMessageRespUserConfirm(const JsonObject &js
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcPinNegotiateStartState>());
     return DM_OK;
 }
-// this code line need delete: 2620-2655
 int32_t DmAuthMessageProcessor::ParseMessageProxyRespUserConfirm(const JsonObject &json,
     std::shared_ptr<DmAuthContext> context)
 {
@@ -2625,44 +2295,7 @@ int32_t DmAuthMessageProcessor::ParseMessageProxyRespUserConfirm(const JsonObjec
     if (!context->IsProxyBind) {
         return DM_OK;
     }
-    if (!IsString(json, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
-        context->subjectProxyOnes.clear();
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    std::string subjectProxyOnesStr = json[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
-    JsonObject allProxyObj;
-    allProxyObj.Parse(subjectProxyOnesStr);
-    if (allProxyObj.IsDiscarded()) {
-        context->subjectProxyOnes.clear();
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    std::vector<DmProxyAuthContext> sinksubjectProxyOnes;
-    for (auto const &item : allProxyObj.Items()) {
-        if (!IsString(item, TAG_PROXY_CONTEXT_ID)) {
-            continue;
-        }
-        DmProxyAuthContext proxyAuthContext;
-        proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
-        sinksubjectProxyOnes.push_back(proxyAuthContext);
-    }
-    for (auto item = context->subjectProxyOnes.begin(); item != context->subjectProxyOnes.end();) {
-        if (std::find(sinksubjectProxyOnes.begin(), sinksubjectProxyOnes.end(), *item) != sinksubjectProxyOnes.end()) {
-            item++;
-        } else {
-            item = context->subjectProxyOnes.erase(item);
-        }
-    }
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::ParseMessageProxyRespUserConfirmSrvBind(const JsonObject &json,
-    std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    if (!context->IsProxyBind) {
-        return DM_OK;
-    }
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     auto targetKey = context->isServiceBind ? PARAM_KEY_SUBJECT_SERVICE_ONES : PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
     if (!IsString(json, targetKey)) {
         targetList.clear();
@@ -2775,28 +2408,10 @@ int32_t DmAuthMessageProcessor::CreateMessageReqUserConfirm(std::shared_ptr<DmAu
     CreateMessageProxyReqUserConfirm(context, json);
     return DM_OK;
 }
-// this code line need delete: 2778-2793
 int32_t DmAuthMessageProcessor::CreateMessageProxyReqUserConfirm(std::shared_ptr<DmAuthContext> context,
     JsonObject &json)
 {
-    if (context != nullptr && context->IsProxyBind && !context->subjectProxyOnes.empty()) {
-        JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
-        for (const auto &app : context->subjectProxyOnes) {
-            JsonObject object;
-            object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
-            object[TAG_ACL_TYPE_LIST] = app.proxyAccesser.aclTypeList;
-            object[TAG_CERT_TYPE_LIST] = app.proxyAccesser.credTypeList;
-            allProxyObj.PushBack(object);
-        }
-        json[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
-    }
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::CreateMessageProxyReqUserConfirmSrvBind(std::shared_ptr<DmAuthContext> context,
-    JsonObject &json)
-{
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     auto targetKey = context->isServiceBind ? PARAM_KEY_SUBJECT_SERVICE_ONES : PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
     if (context != nullptr && context->IsProxyBind && !targetList.empty()) {
         JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
@@ -2811,29 +2426,10 @@ int32_t DmAuthMessageProcessor::CreateMessageProxyReqUserConfirmSrvBind(std::sha
     }
     return DM_OK;
 }
-// this code line need delete: 2813-2829
 int32_t DmAuthMessageProcessor::CreateMessageRespUserConfirm(std::shared_ptr<DmAuthContext> context, JsonObject &json)
 {
     CHECK_NULL_RETURN(context, ERR_DM_FAILED);
-    json[TAG_AUTH_TYPE_LIST] = vectorAuthTypeToString(context->authTypeList);
-    json[TAG_EXTRA_INFO] = context->accessee.extraInfo;
-    if (context->IsProxyBind && !context->subjectProxyOnes.empty()) {
-        JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
-        for (const auto &app : context->subjectProxyOnes) {
-            JsonObject object;
-            object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
-            allProxyObj.PushBack(object);
-        }
-        json[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
-    }
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::CreateMessageRespUserConfirmSrvBind(std::shared_ptr<DmAuthContext> context,
-    JsonObject &json)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_FAILED);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     auto targetKey = context->isServiceBind ? PARAM_KEY_SUBJECT_SERVICE_ONES : PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
     json[TAG_AUTH_TYPE_LIST] = vectorAuthTypeToString(context->authTypeList);
     json[TAG_EXTRA_INFO] = context->accessee.extraInfo;
@@ -3027,63 +2623,7 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     plainJson[TAG_COMPRESS] = Base64Encode(compressMsg);
     return cryptoMgr_->EncryptMessage(plainJson.Dump(), encSyncMsg);
 }
-// This code line need delete: 3029-3082
-int32_t DmAuthMessageProcessor::SetSyncMsgJson(std::shared_ptr<DmAuthContext> &context, const DmAccess &accessSide,
-    const DmAccessToSync &accessToSync, JsonObject &syncMsgJson)
-{
-    syncMsgJson[TAG_TRANSMIT_SK_ID] = std::to_string(accessSide.transmitSessionKeyId);
-    syncMsgJson[TAG_TRANSMIT_SK_TIMESTAMP] = accessSide.transmitSkTimeStamp;
-    syncMsgJson[TAG_TRANSMIT_CREDENTIAL_ID] = accessSide.transmitCredentialId;
-    // First certification
-    if (accessSide.isGenerateLnnCredential && accessSide.bindLevel != static_cast<int32_t>(USER)) {
-        syncMsgJson[TAG_LNN_SK_ID] = std::to_string(accessSide.lnnSessionKeyId);
-        syncMsgJson[TAG_LNN_SK_TIMESTAMP] = accessSide.lnnSkTimeStamp;
-        syncMsgJson[TAG_LNN_CREDENTIAL_ID] = accessSide.lnnCredentialId;
-    }
-    JsonObject accessJsonObj{};
-    accessJsonObj = accessToSync;
-    syncMsgJson[TAG_DMVERSION] = accessSide.dmVersion;
-    syncMsgJson[TAG_ACCESS] = accessJsonObj.Dump();
-    syncMsgJson[TAG_PROXY] = ""; // Reserved field, leave blank
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string localUdid = static_cast<std::string>(localDeviceId);
-    DmAccess &access = (context->accesser.deviceId == localUdid) ? context->accesser : context->accessee;
-    DmAccess &remoteAccess = (context->accesser.deviceId == localUdid) ? context->accessee : context->accesser;
-    std::string aclHashList;
-    int32_t ret = DeviceProfileConnector::GetInstance().GetAclListHashStr({localUdid, access.userId},
-        {remoteAccess.deviceId, remoteAccess.userId}, aclHashList, DM_ACL_AGING_VERSION);
-    if (ret != DM_OK) {
-        LOGE("DmAuthMessageProcessor::EncryptSyncMessage GetAclListHashStr failed");
-        return ERR_DM_FAILED;
-    }
-
-    syncMsgJson[TAG_ACL_CHECKSUM] = aclHashList;
-    if (context->direction == DmAuthDirection::DM_AUTH_SINK) {
-        LOGI("Sink Send user confirm opt");
-        syncMsgJson[TAG_USER_CONFIRM_OPT] = context->confirmOperation;
-    }
-    syncMsgJson[TAG_IS_COMMON_FLAG] = context->accesser.isCommonFlag;
-    syncMsgJson[TAG_DM_CERT_CHAIN] = context->accesser.cert;
-    if (DmAuthState::IsImportAuthCodeCompatibility(context->authType)) {
-        std::string queryPkgName;
-        if (context->direction == DM_AUTH_SOURCE) {
-            queryPkgName = context->accesser.pkgName;
-        } else {
-            queryPkgName = context->accessee.pkgName;
-        }
-        context->pinCodeFlag = GetPinMatchFlag(queryPkgName, context->authType);
-        syncMsgJson[PIN_MATCH_FLAG] = context->pinCodeFlag;
-        syncMsgJson[TAG_NCM_BIND_TARGET] = context->ncmBindTarget;
-    }
-    if (context->isServiceBind) {
-        std::string serviceInfo = GetAccesseeServiceInfo(context->accessee.serviceId);
-        syncMsgJson[TAG_ACCESSEE_SERVICE_INFO] = serviceInfo;
-    }
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::SetSyncMsgJsonSrvBind(std::shared_ptr<DmAuthContext> &context,
+int32_t DmAuthMessageProcessor::SetSyncMsgJson(std::shared_ptr<DmAuthContext> &context,
     const DmAccess &accessSide, const DmAccessToSync &accessToSync, JsonObject &syncMsgJson)
 {
     syncMsgJson[TAG_TRANSMIT_SK_ID] = std::to_string(accessSide.transmitSessionKeyId);
@@ -3100,6 +2640,7 @@ int32_t DmAuthMessageProcessor::SetSyncMsgJsonSrvBind(std::shared_ptr<DmAuthCont
     syncMsgJson[TAG_DMVERSION] = accessSide.dmVersion;
     syncMsgJson[TAG_ACCESS] = accessJsonObj.Dump();
     syncMsgJson[TAG_PROXY] = ""; // Reserved field, leave blank
+    syncMsgJson[TAG_PROXY_SERVICE_ID] = context->accessee.serviceId;
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
@@ -3138,29 +2679,6 @@ int32_t DmAuthMessageProcessor::SetSyncMsgJsonSrvBind(std::shared_ptr<DmAuthCont
 }
 
 //LCOV_EXCL_START
-// this code line need delete: 3141-3161
-std::string DmAuthMessageProcessor::GetAccesseeServiceInfo(int64_t serviceId)
-{
-    ServiceInfoProfile serviceInfoProfile;
-    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId,
-        serviceInfoProfile);
-    if (ret != DM_OK) {
-        LOGE("GetAccesseeServiceInfo GetServiceInfoProfileByServiceId failed.");
-        return "";
-    }
-    JsonObject json;
-    json[TAG_REG_SERVICE_ID] = serviceInfoProfile.regServiceId;
-    json[TAG_DEVICE_ID] = serviceInfoProfile.deviceId;
-    json[TAG_USER_ID] = serviceInfoProfile.userId;
-    json[TAG_TOKEN_ID] = serviceInfoProfile.tokenId;
-    json[TAG_PUBLISH_STATE] = serviceInfoProfile.publishState;
-    json[TAG_SERVICE_ID] = serviceInfoProfile.serviceId;
-    json[TAG_SERVICE_TYPE] = serviceInfoProfile.serviceType;
-    json[TAG_SERVICE_NAME] = serviceInfoProfile.serviceName;
-    json[TAG_SERVICE_DISPLAY_NAME] = serviceInfoProfile.serviceDisplayName;
-    return json.Dump();
-}
-
 void DmAuthMessageProcessor::GetAccesseeServiceInfo(JsonObject &syncMsgJson,
     std::vector<DistributedDeviceProfile::ServiceInfo> serviceInfos, std::vector<int64_t> serviceId)
 {
@@ -3200,45 +2718,12 @@ void DmAuthMessageProcessor::GetAccesseeServiceInfo(JsonObject &syncMsgJson,
     syncMsgJson[TAG_SERVICE_ID] = allSereviceIdObj.Dump();
     return;
 }
-// this code line need delete: 3206-3237
+
 int32_t DmAuthMessageProcessor::CreateProxyAccessMessage(std::shared_ptr<DmAuthContext> &context,
     JsonObject &syncMsgJson)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        return DM_OK;
-    }
-    JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
-    for (const auto &app : context->subjectProxyOnes) {
-        DmProxyAccess access;
-        if (context->direction == DM_AUTH_SOURCE) {
-            access = app.proxyAccesser;
-        } else {
-            access = app.proxyAccessee;
-        }
-        if (access.isAuthed) {
-            continue;
-        }
-        JsonObject object;
-        object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
-        object[TAG_TOKEN_ID] = access.tokenId;
-        object[TAG_BUNDLE_NAME] = access.bundleName;
-        object[TAG_BIND_LEVEL] = access.bindLevel;
-        object[TAG_PKG_NAME] = access.pkgName;
-        object[TAG_TRANSMIT_SK_ID] = std::to_string(access.transmitSessionKeyId);
-        object[TAG_TRANSMIT_SK_TIMESTAMP] = access.skTimeStamp;
-        object[TAG_TRANSMIT_CREDENTIAL_ID] = access.transmitCredentialId;
-        allProxyObj.PushBack(object);
-    }
-    syncMsgJson[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
-    return DM_OK;
-}
-
-int32_t DmAuthMessageProcessor::CreateProxyAccessMessageSrvBind(std::shared_ptr<DmAuthContext> &context,
-    JsonObject &syncMsgJson)
-{
-    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     auto targetKey = context->isServiceBind ? PARAM_KEY_SUBJECT_SERVICE_ONES : PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
     if (!context->IsProxyBind || targetList.empty()) {
         return DM_OK;
@@ -3257,7 +2742,6 @@ int32_t DmAuthMessageProcessor::CreateProxyAccessMessageSrvBind(std::shared_ptr<
         if (access.isAuthed) {
             continue;
         }
-
         object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
         object[TAG_TOKEN_ID] = access.tokenId;
         if (!context->isServiceBind) {
@@ -3268,12 +2752,13 @@ int32_t DmAuthMessageProcessor::CreateProxyAccessMessageSrvBind(std::shared_ptr<
         object[TAG_TRANSMIT_SK_ID] = std::to_string(access.transmitSessionKeyId);
         object[TAG_TRANSMIT_SK_TIMESTAMP] = access.skTimeStamp;
         object[TAG_TRANSMIT_CREDENTIAL_ID] = access.transmitCredentialId;
+        object[TAG_SRC_SUBJECT_PKGNAME] = app.proxyAccesser.pkgName;
+        object[TAG_SUBJECT_SERVICEID] = app.proxyAccessee.serviceId;
         allProxyObj.PushBack(object);
     }
     syncMsgJson[targetKey] = allProxyObj.Dump();
     return DM_OK;
 }
-
 //LCOV_EXCL_STOP
 
 int32_t DmAuthMessageProcessor::ACLToStr(DistributedDeviceProfile::AccessControlProfile acl, std::string aclStr)
@@ -3349,29 +2834,10 @@ bool DmAuthMessageProcessor::IsExistTheToken(JsonObject &proxyObj, int64_t token
     }
     return false;
 }
-// This code line need delete: 3355-3371
 void DmAuthMessageProcessor::SetAclProxyRelate(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_VOID(context);
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        return;
-    }
-    DmAccess &access = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
-    DmAccess &remoteAccess = (context->direction == DM_AUTH_SOURCE) ? context->accessee : context->accesser;
-    for (auto &app : context->subjectProxyOnes) {
-        DmProxyAccess &proxyAccess = (context->direction == DM_AUTH_SOURCE) ? app.proxyAccesser : app.proxyAccessee;
-        if (!proxyAccess.isAuthed || proxyAccess.aclProfiles.find(DM_POINT_TO_POINT) ==
-            proxyAccess.aclProfiles.end()) {
-            continue;
-        }
-        SetAclProxyRelate(context, proxyAccess.aclProfiles[DM_POINT_TO_POINT]);
-    }
-}
-
-void DmAuthMessageProcessor::SetAclProxyRelateSrvBind(std::shared_ptr<DmAuthContext> context)
-{
-    CHECK_NULL_VOID(context);
-    auto& targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
+    auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     if (!context->IsProxyBind || targetList.empty()) {
         return;
     }

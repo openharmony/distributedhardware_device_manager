@@ -447,17 +447,12 @@ int32_t AuthManagerBase::DmGetUserId(int32_t displayId)
         return userIds[0];
     } else {
         // If userIds.size() > 1, we need to find the main screen user
-#ifdef OS_ACCOUNT_PART_EXISTS
     ret = AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
     if (ret != DM_OK) {
         LOGE("AuthManagerBase::DmGetUserId: get foreground user failed in multi users with error %{public}d", ret);
         return -1;
     }
     return userId;
-#else
-    LOGE("AuthManagerBase::DmGetUserId: get foreground user failed because no OsAcccountManager");
-    return -1;
-#endif
     }
 }
 

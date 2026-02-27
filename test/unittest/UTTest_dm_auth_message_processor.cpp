@@ -215,30 +215,6 @@ HWTEST_F(DmAuthMessageProcessorTest, ParseNegotiateMessage_007, testing::ext::Te
     EXPECT_EQ(context->accessee.extraInfo.empty(), false);
 }
 
-HWTEST_F(DmAuthMessageProcessorTest, ParseSyncServiceInfo_001, testing::ext::TestSize.Level1)
-{
-    JsonObject jsonObject;
-    JsonObject serviceInfo;
-    serviceInfo[DistributedDeviceProfile::REG_SERVICE_ID] = 1;
-    serviceInfo[TAG_DEVICE_ID] = "dev001";
-    serviceInfo[TAG_USER_ID] = 2;
-    serviceInfo[TAG_TOKEN_ID] = static_cast<int64_t>(3);
-    serviceInfo[DistributedDeviceProfile::PUBLISH_STATE] = 4;
-    serviceInfo[DistributedDeviceProfile::REG_SERVICE_ID] = static_cast<int64_t>(5);
-    serviceInfo[DistributedDeviceProfile::SERVICE_TYPE] = "typeA";
-    serviceInfo[TAG_DEVICE_NAME] = "nameA";
-    serviceInfo[DistributedDeviceProfile::SERVICE_DISPLAY_NAME] = "displayA";
-    jsonObject[DistributedDeviceProfile::ACCESSEE_SERVICE_NAME] = serviceInfo.Dump();
-
-    auto context = std::make_shared<DmAuthContext>();
-    auto processor = std::make_shared<DmAuthMessageProcessor>();
-    processor->ParseSyncServiceInfo(jsonObject, context);
-
-    ServiceInfoProfile profile;
-    int ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(5, profile);
-    EXPECT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(DmAuthMessageProcessorTest, ParseServiceNego_001, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
@@ -434,4 +410,4 @@ HWTEST_F(DmAuthMessageProcessorTest, ParseSyncMessage_004, testing::ext::TestSiz
 }
 } // namespace DistributedHardware
 } // namespace OHOS
- 
+

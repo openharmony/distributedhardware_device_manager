@@ -20,18 +20,16 @@
 
 #include "ability_manager_client.h"
 #include "auth_message_processor.h"
+#include "dm_constants.h"
 #include "dm_anonymous.h"
 #include "dm_log.h"
 #include "dm_crypto.h"
-#include "json_object.h"
 #include "parameter.h"
 #include "dm_single_instance.h"
-#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-constexpr int32_t INVALID_USERID = -1;
 constexpr int32_t MESSAGE_PARCEL_KEY_SIZE = 3;
 constexpr int32_t WINDOW_LEVEL_UPPER = 2;
 constexpr int32_t WINDOW_LEVEL_DEFAULT = 1;
@@ -40,10 +38,11 @@ constexpr const char* CONNECT_PIN_DIALOG = "pinDialog";
 constexpr const char* DM_UI_BUNDLE_NAME = "com.ohos.devicemanagerui";
 constexpr const char* CONFIRM_ABILITY_NAME = "com.ohos.devicemanagerui.ConfirmUIExtAbility";
 constexpr const char* PIN_ABILITY_NAME = "com.ohos.devicemanagerui.PincodeUIExtAbility";
+constexpr const char* TAG_SERVICE_TYPE = "serviceType";
 constexpr const char* INPUT_ABILITY_NAME = "com.ohos.devicemanagerui.InputUIExtAbility";
 constexpr uint32_t CLOSE_DIALOG_CMD_CODE = 3;
 constexpr uint32_t SHOW_DIALOG_CMD_CODE = 1;
-constexpr const char* TAG_SERVICE_TYPE = "serviceType";
+constexpr const char* TAG_USER_ID = "userId";
 }
 DM_IMPLEMENT_SINGLE_INSTANCE(DmDialogManager);
 
@@ -57,12 +56,32 @@ DmDialogManager::~DmDialogManager()
     LOGI("DmDialogManager destructor");
 }
 
+void DmDialogManager::ConfigLocalInfo(JsonObject& jsonObject)
+{
+    if (IsBool(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
+        isProxyBind_ = jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<bool>();
+    }
+    if (IsBool(jsonObject, PARAM_KEY_IS_SERVICE_BIND)) {
+        isServiceBind_ = jsonObject[PARAM_KEY_IS_SERVICE_BIND].Get<bool>();
+    }
+    if (IsString(jsonObject, SERVICE_USER_DATA)) {
+        serviceUserData_ = jsonObject[SERVICE_USER_DATA].Get<std::string>();
+    }
+    if (IsString(jsonObject, TITLE)) {
+        title_ = jsonObject[TITLE].Get<std::string>();
+    }
+    if (IsString(jsonObject, TAG_USER_ID)) {
+        userId_ = jsonObject[TAG_USER_ID].Get<std::int32_t>();
+    }
+}
+
 void DmDialogManager::ShowServiceBindConfirmDialog(const std::string param)
 {
     std::string deviceName = "";
     std::string appOperationStr = "";
     std::string customDescriptionStr = "";
     std::string hostPkgLabel = "";
+    int32_t deviceType = -1;
     {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> lock(mutex_);
@@ -81,23 +100,12 @@ void DmDialogManager::ShowServiceBindConfirmDialog(const std::string param)
                 customDescriptionStr = jsonObject[TAG_CUSTOM_DESCRIPTION].Get<std::string>();
             }
             if (IsInt32(jsonObject, TAG_LOCAL_DEVICE_TYPE)) {
-                deviceType_ = jsonObject[TAG_LOCAL_DEVICE_TYPE].Get<std::int32_t>();
+                deviceType = jsonObject[TAG_LOCAL_DEVICE_TYPE].Get<std::int32_t>();
             }
             if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
                 hostPkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
             }
-            if (IsBool(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
-                isProxyBind_ = jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<bool>();
-            }
-            if (IsBool(jsonObject, PARAM_KEY_IS_SERVICE_BIND)) {
-                isServiceBind_ = jsonObject[PARAM_KEY_IS_SERVICE_BIND].Get<bool>();
-            }
-            if (IsString(jsonObject, SERVICE_USER_DATA)) {
-                serviceUserData_ = jsonObject[SERVICE_USER_DATA].Get<std::string>();
-            }
-            if (IsString(jsonObject, TITLE)) {
-                title_ = jsonObject[TITLE].Get<std::string>();
-            }
+            ConfigLocalInfo(jsonObject);
         }
 
         bundleName_ = DM_UI_BUNDLE_NAME;
@@ -105,6 +113,7 @@ void DmDialogManager::ShowServiceBindConfirmDialog(const std::string param)
         deviceName_ = deviceName;
         appOperationStr_ = appOperationStr;
         customDescriptionStr_ = customDescriptionStr;
+        deviceType_ = deviceType;
         hostPkgLabel_ = hostPkgLabel;
     }
     ConnectExtension();
@@ -233,7 +242,7 @@ void DmDialogManager::ConnectExtension()
     isCloseDialog_.store(false);
     if (isConnectSystemUI_.load() && dialogConnectionCallback_ != nullptr && g_remoteObject != nullptr) {
         AppExecFwk::ElementName element;
-        OnAbilityConnectDone(element, g_remoteObject, INVALID_USERID);
+        OnAbilityConnectDone(element, g_remoteObject, userId_);
         LOGI("DmDialogManager::ConnectExtension dialog has been show.");
         return;
     }
@@ -259,13 +268,13 @@ void DmDialogManager::ConnectExtension()
         return;
     }
     LOGI("DmDialogManager::ConnectExtension abilityManager ConnectAbility begin.");
-    auto ret = abilityManager->ConnectAbility(want, dialogConnectionCallback_, INVALID_USERID);
+    auto ret = abilityManager->ConnectAbility(want, dialogConnectionCallback_, userId_);
     if (ret != ERR_OK) {
         LOGE("ConnectExtensionAbility sceneboard failed.");
         bundleName = "com.ohos.systemui";
         abilityName = "com.ohos.systemui.dialog";
         want.SetElementName(bundleName, abilityName);
-        ret = abilityManager->ConnectAbility(want, dialogConnectionCallback_, INVALID_USERID);
+        ret = abilityManager->ConnectAbility(want, dialogConnectionCallback_, userId_);
         if (ret != ERR_OK) {
             LOGE("ConnectExtensionAbility systemui failed again.");
         }

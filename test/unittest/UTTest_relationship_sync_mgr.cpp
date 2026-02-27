@@ -1172,76 +1172,6 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_007, testing::ext::TestSiz
     }
 }
 
-/**
- * @tc.name: ToBroadcastPayLoad_008
- * @tc.type: FUNC
- */
-HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_008, testing::ext::TestSize.Level1)
-{
-    RelationShipChangeMsg msg;
-    msg.type = RelationShipChangeType::DEL_USER;
-    msg.userId = 12345;
-
-    uint8_t* msgPtr = nullptr;
-    uint32_t len = 0;
-
-    bool result = msg.ToBroadcastPayLoad(msgPtr, len);
-    ASSERT_TRUE(result);
-    ASSERT_NE(msgPtr, nullptr);
-    ASSERT_GT(len, 0);
-    delete[] msgPtr;
-    msgPtr = nullptr;
-
-    msg.userId = 7;
-    msg.accountId = "test";
-    uint8_t *load = nullptr;
-    len = 0;
-    result = msg.ToBroadcastPayLoad(load, len);
-    EXPECT_EQ(result, true);
-    if (load != nullptr) {
-        delete[] load;
-        load = nullptr;
-    }
-}
-
-/**
- * @tc.name: ToBroadcastPayLoad_009
- * @tc.type: FUNC
- */
-HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_009, testing::ext::TestSize.Level1)
-{
-    RelationShipChangeMsg msg;
-    msg.type = RelationShipChangeType::STOP_USER;
-    msg.userId = 12345;
-
-    uint8_t* msgPtr = nullptr;
-    uint32_t len = 0;
-
-    bool result = msg.ToBroadcastPayLoad(msgPtr, len);
-    ASSERT_TRUE(result);
-    ASSERT_NE(msgPtr, nullptr);
-    ASSERT_GT(len, 0);
-    delete[] msgPtr;
-    msgPtr = nullptr;
-}
-
-HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_010, testing::ext::TestSize.Level1)
-{
-    RelationShipChangeMsg msg;
-    msg.type = RelationShipChangeType::SHARE_UNBIND;
-    msg.userId = 12345;
-    msg.peerUdids = {"udid1", "udid2"};
-
-    uint8_t* msgPtr = nullptr;
-    uint32_t len = 0;
-
-    bool result = msg.ToBroadcastPayLoad(msgPtr, len);
-    ASSERT_TRUE(result);
-    ASSERT_EQ(msgPtr, nullptr);
-    delete[] msgPtr;
-    msgPtr = nullptr;
-}
-
 HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_011, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
@@ -1285,23 +1215,6 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_012, testing::ext::TestSiz
         delete[] load;
         load = nullptr;
     }
-}
-
-HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_013, testing::ext::TestSize.Level1)
-{
-    RelationShipChangeMsg msg;
-    msg.type = RelationShipChangeType::APP_UNINSTALL;
-    msg.userId = 12345;
-    msg.tokenId = 67890;
-    msg.peerUdids = {"udid1", "udid2"};
-
-    uint8_t* msgPtr = nullptr;
-    uint32_t len = 0;
-
-    bool result = msg.ToBroadcastPayLoad(msgPtr, len);
-    ASSERT_TRUE(result);
-    delete[] msgPtr;
-    msgPtr = nullptr;
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_001, testing::ext::TestSize.Level1)

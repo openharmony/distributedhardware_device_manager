@@ -208,12 +208,17 @@ public:
     int32_t SaveDerivativeSessionKeyToDP(int32_t userId, const std::string &suffix, int32_t &skId);
     int32_t GetSessionKey(int32_t userId, int32_t &skId);
     // Save the current access control list
-    // this code line need delete:212-213
     int32_t PutAccessControlList(std::shared_ptr<DmAuthContext> context,
         DmAccess &access, std::string trustDeviceId);
-    int32_t PutAccessControlListSrvBind(std::shared_ptr<DmAuthContext> context,
-        DmAccess &access, std::string trustDeviceId);
     int32_t PutServiceControlList(std::shared_ptr<DmAuthContext> context, DistributedDeviceProfile::Accesser accesser,
+        DistributedDeviceProfile::Accessee accessee, DistributedDeviceProfile::AccessControlProfile profile,
+        DmAccess &access);
+    void PutNonLnnAclProfile(std::shared_ptr<DmAuthContext> context, DmAccess &access,
+        DistributedDeviceProfile::AccessControlProfile &profile,
+        DistributedDeviceProfile::Accesser &accesser,
+        DistributedDeviceProfile::Accessee &accessee,
+        JsonObject &extraData);
+    int32_t PutDeviceControlList(std::shared_ptr<DmAuthContext> context, DistributedDeviceProfile::Accesser accesser,
         DistributedDeviceProfile::Accessee accessee, DistributedDeviceProfile::AccessControlProfile profile,
         DmAccess &access);
     int32_t SetProxyAccess(std::shared_ptr<DmAuthContext> context, DmProxyAuthContext &proxyAuthContext,
@@ -225,9 +230,7 @@ public:
         DistributedDeviceProfile::AccessControlProfile &profile, DistributedDeviceProfile::Accesser &accesser,
         DistributedDeviceProfile::Accessee &accessee);
     bool IsExistTheToken(JsonObject &proxyObj, int64_t tokenId);
-    // this code line need delete: 229
     void SetAclProxyRelate(std::shared_ptr<DmAuthContext> context);
-    void SetAclProxyRelateSrvBind(std::shared_ptr<DmAuthContext> context);
     void SetAclProxyRelate(std::shared_ptr<DmAuthContext> context,
         DistributedDeviceProfile::AccessControlProfile &profile);
     // Extract the access control list (ACL) for message parsing and bus usage.
@@ -244,36 +247,23 @@ private:
     // Internal implementations for various message types
     // Used to encrypt the synchronization message
     int32_t EncryptSyncMessage(std::shared_ptr<DmAuthContext> &context, DmAccess &accessSide, std::string &encSyncMsg);
-    // this code line need delete: 248
     int32_t CreateProxyAccessMessage(std::shared_ptr<DmAuthContext> &context, JsonObject &syncMsgJson);
-    int32_t CreateProxyAccessMessageSrvBind(std::shared_ptr<DmAuthContext> &context, JsonObject &syncMsgJson);
     // Parse the authentication start message
     int32_t ParseAuthStartMessage(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
 
     // Parse the 80 message
-    // this code line need delete: 255
     int32_t ParseNegotiateMessage(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
-    int32_t ParseNegotiateMessageSrvBind(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
-    // this code line need delete: 258
     int32_t ParseProxyNegotiateMessage(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
-    int32_t ParseProxyNegotiateMessageSrvBind(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     int32_t ParseServiceNegotiateMessage(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     // Parse the 90 message
     int32_t ParseMessageRespAclNegotiate(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
-    // this code line need delete: 264
     int32_t ParseMessageProxyRespAclNegotiate(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
-    int32_t ParseMessageProxyRespAclNegotiateSrvBind(const JsonObject &jsonObject,
-        std::shared_ptr<DmAuthContext> context);
     // Parse the 100 message
     int32_t ParseMessageReqUserConfirm(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
-    // this code line need delete: 270
     int32_t ParseMessageProxyReqUserConfirm(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
-    int32_t ParseMessageProxyReqUserConfirmSrvBind(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
     // Parse the 110 message
     int32_t ParseMessageRespUserConfirm(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
-    // this code line need delete: 275
     int32_t ParseMessageProxyRespUserConfirm(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
-    int32_t ParseMessageProxyRespUserConfirmSrvBind(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
     // Parse the 120 message
     int32_t ParseMessageReqPinAuthStart(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
     // Parse the 130 message
@@ -286,9 +276,7 @@ private:
     int32_t ParseMessageReqCredExchange(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     // Parse the 150 message
     int32_t ParseMessageRspCredExchange(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
-    // this code line need delete:290
     int32_t ParseProxyCredExchangeToSync(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonObject);
-    int32_t ParseProxyCredExchangeToSyncSrvBind(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonObject);
     // Parse the 141 message
     int32_t ParseMessageReqSKDerive(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     // Parse the 151 message
@@ -314,25 +302,17 @@ private:
         std::shared_ptr<DmAuthContext> context);
 
     // Create the 80 message
-    // this code line need delete: 318
     int32_t CreateNegotiateMessage(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
-    int32_t CreateNegotiateMessageSrvBind(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     int32_t CreateProxyNegotiateMessage(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     int32_t CreateServiceNegotiateMessage(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     // Create the 90 message
     int32_t CreateRespNegotiateMessage(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
-    // this code line need delete: 325
     int32_t CreateProxyRespNegotiateMessage(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
-    int32_t CreateProxyRespNegotiateMessageSrvBind(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     // Create the 100 message
     int32_t CreateMessageReqUserConfirm(std::shared_ptr<DmAuthContext> context, JsonObject &json);
-    // this code line need delete: 330
     int32_t CreateMessageProxyReqUserConfirm(std::shared_ptr<DmAuthContext> context, JsonObject &json);
-    int32_t CreateMessageProxyReqUserConfirmSrvBind(std::shared_ptr<DmAuthContext> context, JsonObject &json);
     // Create the 110 message
-    // this code line need delete: 334
     int32_t CreateMessageRespUserConfirm(std::shared_ptr<DmAuthContext> context, JsonObject &json);
-    int32_t CreateMessageRespUserConfirmSrvBind(std::shared_ptr<DmAuthContext> context, JsonObject &json);
     // Create the 120 message
     int32_t CreateMessageReqPinAuthStart(std::shared_ptr<DmAuthContext> context, JsonObject &json);
     // Create the 130 message
@@ -345,9 +325,7 @@ private:
     int32_t CreateMessageReqCredExchange(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     // Create the 150 message
     int32_t CreateMessageRspCredExchange(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
-    // this code line need delete: 349
     int32_t CreateProxyCredExchangeMessage(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonData);
-    int32_t CreateProxyCredExchangeMessageSrvBind(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonData);
     // Create 141 message.
     int32_t CreateMessageReqSKDerive(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     // Create 151 message.
@@ -374,16 +352,9 @@ private:
     int32_t DecryptSyncMessage(std::shared_ptr<DmAuthContext> &context,
         DmAccess &access, std::string &enSyncMsg);
     // Parse the sync message
-    // this code line need delete: 378-379
     int32_t ParseSyncMessage(std::shared_ptr<DmAuthContext> &context,
         DmAccess &access, JsonObject &jsonObject);
-    int32_t ParseSyncMessageSrvBind(std::shared_ptr<DmAuthContext> &context,
-        DmAccess &access, JsonObject &jsonObject);
-    // this code line need delete: 383
     int32_t ParseProxyAccessToSync(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonObject);
-    int32_t ParseProxyAccessToSyncSrvBind(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonObject);
-    int32_t ProcessSingleProxyItem(std::shared_ptr<DmAuthContext> &context, const JsonItemObject &item,
-        const JsonObject &jsonObject, std::vector<DmProxyAuthContext> &targetList);
     int32_t CreateMessageForwardUltrasonicStart(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     int32_t CreateMessageReverseUltrasonicStart(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     int32_t CreateMessageForwardUltrasonicNegotiate(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
@@ -404,23 +375,15 @@ private:
     void ParseCert(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     void ParseAccesserInfo(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     void ParseServiceNego(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
-    // this code line need delete:406
-    void ParseSyncServiceInfo(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
 
-    // this code line need delete: 409-410
     int32_t SetSyncMsgJson(std::shared_ptr<DmAuthContext> &context, const DmAccess &accessSide,
         const DmAccessToSync &accessToSync, JsonObject &syncMsgJson);
-    int32_t SetSyncMsgJsonSrvBind(std::shared_ptr<DmAuthContext> &context, const DmAccess &accessSide,
-        const DmAccessToSync &accessToSync, JsonObject &syncMsgJson);
-    // this code line need delete:414
-    std::string GetAccesseeServiceInfo(int64_t serviceId);
     void GetAccesseeServiceInfo(JsonObject &syncMsgJson,
-        std::vector<DistributedDeviceProfile::ServiceInfo> serviceInfos,
-        std::vector<int64_t> serviceId);
+        std::vector<DistributedDeviceProfile::ServiceInfo> serviceInfos, std::vector<int64_t> serviceId);
     void ParseServiceInfo(JsonObject &jsonObject, std::shared_ptr<DmAuthContext> &context);
-        std::shared_ptr<CryptoMgr> cryptoMgr_ = nullptr;
-        std::unordered_map<DmMessageType, CreateMessageFuncPtr> createMessageFuncMap_;
-        std::unordered_map<DmMessageType, ParaseMessageFuncPtr> paraseMessageFuncMap_;
+    std::shared_ptr<CryptoMgr> cryptoMgr_ = nullptr;
+    std::unordered_map<DmMessageType, CreateMessageFuncPtr> createMessageFuncMap_;
+    std::unordered_map<DmMessageType, ParaseMessageFuncPtr> paraseMessageFuncMap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

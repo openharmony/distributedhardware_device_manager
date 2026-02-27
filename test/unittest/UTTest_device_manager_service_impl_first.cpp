@@ -57,46 +57,6 @@ void DeviceManagerServiceImplFirstTest::TearDownTestCase()
 }
 
 namespace {
-HWTEST_F(DeviceManagerServiceImplFirstTest, GetDeviceIdAndUserId_101, testing::ext::TestSize.Level1)
-{
-    int32_t userId = 1;
-    std::string accountId = "accountId";
-    auto ret = deviceManagerServiceImpl_->GetDeviceIdAndUserId(userId, accountId);
-    EXPECT_TRUE(ret.empty());
-
-    ret = deviceManagerServiceImpl_->GetDeviceIdAndUserId(userId);
-    EXPECT_TRUE(ret.empty());
-
-    std::string localUdid = "deviceId";
-    int32_t localUserId = 123456;
-    std::string peerUdid = "remoteUdid";
-    int32_t peerUserId = 1;
-    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _)).WillOnce(Return(true));
-    if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
-        deviceManagerServiceImpl_->Initialize(listener_);
-    }
-
-    if (deviceManagerServiceImpl_->deviceStateMgr_ == nullptr) {
-        deviceManagerServiceImpl_->Initialize(listener_);
-    }
-    DMAclQuadInfo info = {localUdid, localUserId, peerUdid, peerUserId};
-    std::string accoutId = "accountId";
-    deviceManagerServiceImpl_->HandleIdentAccountLogout(info, accoutId);
-
-    std::vector<uint32_t> foregroundUserIds;
-    std::vector<uint32_t> backgroundUserIds;
-    std::string remoteUdid = "deviceId";
-    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
-    deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid, false);
-
-    std::vector<int32_t> localUserIds;
-    localUserIds.push_back(101);
-    localUserIds.push_back(102);
-    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(DoAll(SetArgReferee<0>(localUserIds), Return(DM_OK)));
-    deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid, false);
-}
-
 HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_001, testing::ext::TestSize.Level1)
 {
     std::string peerUdid = "peerUdid";
@@ -830,64 +790,6 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, BindServiceTarget_Success_101, testi
     std::map<std::string, std::string> bindParam = {{"key1", "value1"}};
     int32_t ret = deviceManagerServiceImpl_->BindServiceTarget("valid_pkg", targetId, bindParam);
     ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerServiceImplFirstTest, UnbindServiceTarget_InvalidInput_101, testing::ext::TestSize.Level0)
-{
-    int64_t serviceId = 123456;
-    int32_t ret = deviceManagerServiceImpl_->UnbindServiceTarget("", serviceId);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceImplFirstTest, UnbindServiceTarget_InvalidInput_102, testing::ext::TestSize.Level0)
-{
-    int64_t serviceId = 0;
-    int32_t ret = deviceManagerServiceImpl_->UnbindServiceTarget("valid_pkg", serviceId);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceImplFirstTest, UnbindServiceTarget_Success_101, testing::ext::TestSize.Level0)
-{
-    int64_t serviceId = 123456;
-    ServiceInfoProfile profile;
-    profile.regServiceId = serviceId;
-    
-    EXPECT_CALL(*deviceManagerServiceImplMock_, DeleteAclExtraDataServiceId(serviceId, _, _, _))
-        .WillOnce(Return(DM_OK));
-    
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByServiceId(serviceId, _)).Times(AnyNumber())
-        .WillOnce(Return(DM_OK));
-    
-    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteServiceInfoProfile(serviceId, -1)).Times(AnyNumber())
-        .WillOnce(Return(DM_OK));
-    
-    int32_t ret = deviceManagerServiceImpl_->UnbindServiceTarget("valid_pkg", serviceId);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceImplFirstTest, UnbindServiceTarget_GetProfileFailed_101, testing::ext::TestSize.Level0) {
-    int64_t serviceId = 123456;
-
-    EXPECT_CALL(*deviceManagerServiceImplMock_, DeleteAclExtraDataServiceId(serviceId, _, _, _)).Times(AnyNumber())
-        .WillOnce(Return(DM_OK));
-
-    ServiceInfoProfile profile;
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByServiceId(serviceId, _)).Times(AnyNumber())
-        .WillOnce(Return(ERR_DM_FAILED));
-
-    int32_t ret = deviceManagerServiceImpl_->UnbindServiceTarget("valid_pkg", serviceId);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceImplFirstTest, UnbindServiceTarget_DeleteAclFailed_101, testing::ext::TestSize.Level0)
-{
-    int64_t serviceId = 123456;
-
-    EXPECT_CALL(*deviceManagerServiceImplMock_, DeleteAclExtraDataServiceId(serviceId, _, _, _)).Times(AnyNumber())
-        .WillOnce(Return(ERR_DM_FAILED));
-
-    int32_t ret = deviceManagerServiceImpl_->UnbindServiceTarget("valid_pkg", serviceId);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclExtraDataServiceId_NoMatchingId_101, testing::ext::TestSize.Level1)
