@@ -23,21 +23,11 @@ namespace DistributedHardware {
 class IpcGetTrustServiceInfoReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcGetTrustServiceInfoReq);
 public:
-    /**
-     * @tc.name: IpcGetTrustServiceInfoReq::GetParamMap
-     * @tc.desc: Get ParamMap of the Ipc get trust service info by request
-     * @tc.type: FUNC
-     */
-    std::map<std::string, std::string> GetParamMap() const
+    const std::map<std::string, std::string>& GetParamMap() const
     {
         return paramMap_;
     }
  
-    /**
-     * @tc.name: IpcGetTrustServiceInfoReq::SetParamMap
-     * @tc.desc: Set ParamMap of the Ipc set trust service info by request
-     * @tc.type: FUNC
-     */
     void SetParamMap(const std::map<std::string, std::string> &paramMap)
     {
         paramMap_ = paramMap;

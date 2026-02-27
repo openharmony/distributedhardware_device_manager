@@ -185,8 +185,6 @@ public:
     virtual ~ServiceDiscoveryCallback()
     {
     }
-//this code line need delete: 189 - 189
-    virtual void OnServiceFound(const DiscoveryServiceInfo &service) = 0;
     virtual void OnServiceFound(const DmServiceInfo &service) = 0;
     virtual void OnServiceDiscoveryResult(int32_t resReason) = 0;
 };
@@ -196,9 +194,6 @@ public:
     virtual ~ServiceInfoStateCallback()
     {
     }
-//this code line need delete: 200 - 201
-    virtual void OnServiceOnline(int64_t serviceId) = 0;
-    virtual void OnServiceOffline(int64_t serviceId) = 0;
     virtual void OnServiceOnline(const DmServiceInfo &serviceInfo) = 0;
     virtual void OnServiceOffline(const DmServiceInfo &serviceInfo) = 0;
     virtual void OnServiceInfoChange(const DmServiceInfo &serviceInfo) = 0;
@@ -227,12 +222,13 @@ public:
     }
     virtual void OnAuthCodeInvalid() = 0;
 };
+
 class SyncServiceInfoCallback {
 public:
     virtual ~SyncServiceInfoCallback()
     {
     }
-    virtual void OnSyncServiceInfoResult(int32_t result, std::string content) = 0;
+    virtual void OnSyncServiceInfoResult(int32_t result, const std::string &content) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

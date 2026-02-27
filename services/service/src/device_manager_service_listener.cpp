@@ -68,8 +68,6 @@ std::mutex DeviceManagerServiceListener::actUnrelatedPkgNameLock_;
 std::set<std::string> DeviceManagerServiceListener::actUnrelatedPkgName_ = {};
 std::unordered_set<std::string> DeviceManagerServiceListener::highPriorityPkgNameSet_ = { "ohos.deviceprofile",
     "ohos.distributeddata.service" };
-std::mutex DeviceManagerServiceListener::alreadyNotifyPkgNameServiceLock_;
-std::map<std::string, DmServiceInfo> DeviceManagerServiceListener::alreadyOnlinePkgNameService_ = {};
 
 void handleExtraData(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
@@ -1202,7 +1200,7 @@ int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(const std::string 
 #endif
 }
 
-//delete start
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DeviceManagerServiceListener::OnServiceDiscoveryResult(const ProcessInfo &processInfo,
     const std::string &serviceType, int32_t reason)
 {
@@ -1214,7 +1212,6 @@ void DeviceManagerServiceListener::OnServiceDiscoveryResult(const ProcessInfo &p
     pReq->SetServiceType(serviceType);
     ipcServerListener_.SendRequest(NOTIFY_SERVICE_DISCOVERY_RESULT, pReq, pRsp);
 }
-//delete end
 
 void DeviceManagerServiceListener::OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service)
 {
@@ -1239,6 +1236,7 @@ void DeviceManagerServiceListener::OnServicePublishResult(const ProcessInfo &pro
     pReq->SetProcessInfo(processInfo);
     ipcServerListener_.SendRequest(SERVICE_PUBLISH_RESULT, pReq, pRsp);
 }
+#endif
 
 void DeviceManagerServiceListener::OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId,
     int32_t retCode)
@@ -1286,9 +1284,10 @@ void DeviceManagerServiceListener::SetNeedNotifyProcessInfos(const ProcessInfo &
     return;
 }
 
-void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName)
+void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName, const std::string &consumerPkgName)
 {
     LOGI("OnAuthCodeInvalid : %{public}s", pkgName.c_str());
+    (void)consumerPkgName;
     if (pkgName.empty()) {
         LOGE("OnAuthCodeInvalid: pkgName is empty, skip IPC request");
         return;
@@ -1311,7 +1310,6 @@ void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName)
     ipcServerListener_.SendRequest(ON_AUTH_CODE_INVALID, pReq, pRsp);
 }
 
-//delete start
 std::set<ProcessInfo> DeviceManagerServiceListener::GetAlreadyOnlineProcess()
 {
     std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
@@ -1328,30 +1326,22 @@ std::set<ProcessInfo> DeviceManagerServiceListener::GetAlreadyOnlineProcess()
     }
     return processInfoSet;
 }
-//delete end
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t DeviceManagerServiceListener::OnServiceInfoOnline(const DmRegisterServiceState &registerServiceState,
     const DmServiceInfo &serviceInfo)
 {
-    LOGI("pkgName %{public}s, serviceId %{public}s.", GetAnonyString(registerServiceState.pkgName).c_str(),
-        std::to_string(registerServiceState.serviceId).c_str());
+    LOGI("OnServiceInfoOnline start.");
     std::shared_ptr<IpcNotifyServiceStateReq> pReq = std::make_shared<IpcNotifyServiceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-
     std::string notifyPkgName = registerServiceState.pkgName;
-    {
-        std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameServiceLock_);
-        if (alreadyOnlinePkgNameService_.find(notifyPkgName) == alreadyOnlinePkgNameService_.end()) {
-            alreadyOnlinePkgNameService_[notifyPkgName] = serviceInfo;
-        }
-    }
     pReq->SetDmRegisterServiceState(registerServiceState);
     pReq->SetDmServiceInfo(serviceInfo);
     pReq->SetServiceState(DmServiceState::SERVICE_STATE_ONLINE);
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
     ProcessInfo processInfoTemp;
     for (const auto &item : processInfos) {
-        if (item.pkgName == registerServiceState.pkgName) {
+        if (item.pkgName == registerServiceState.pkgName && item.userId == registerServiceState.userId) {
             processInfoTemp = item;
             break;
         }
@@ -1362,38 +1352,30 @@ int32_t DeviceManagerServiceListener::OnServiceInfoOnline(const DmRegisterServic
     }
     pReq->SetPkgName(processInfoTemp.pkgName);
     pReq->SetProcessInfo(processInfoTemp);
-    LOGI("START ipcServerListener_.SendRequest(SERVER_SERVICE_STATE_NOTIFY, pReq, pRsp)");
     int32_t ret = ipcServerListener_.SendRequest(SERVER_SERVICE_STATE_NOTIFY, pReq, pRsp);
     if (ret != DM_OK) {
         LOGE("OnServiceInfoOnline failed.");
         return ret;
     }
+    LOGI("OnServiceInfoOnline success.");
     return DM_OK;
 }
 
 int32_t DeviceManagerServiceListener::OnServiceInfoOffline(const DmRegisterServiceState &registerServiceState,
     const DmServiceInfo &serviceInfo)
 {
-    LOGI("pkgName %{public}s, serviceId %{public}s.", GetAnonyString(registerServiceState.pkgName).c_str(),
-        std::to_string(registerServiceState.serviceId).c_str());
+    LOGI("OnServiceInfoOffline start.");
     std::shared_ptr<IpcNotifyServiceStateReq> pReq = std::make_shared<IpcNotifyServiceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
     std::string notifyPkgName = registerServiceState.pkgName;
-    {
-        std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameServiceLock_);
-        if (alreadyOnlinePkgNameService_.find(notifyPkgName) != alreadyOnlinePkgNameService_.end()) {
-            alreadyOnlinePkgNameService_.erase(notifyPkgName);
-        }
-    }
     pReq->SetDmRegisterServiceState(registerServiceState);
     pReq->SetDmServiceInfo(serviceInfo);
     pReq->SetServiceState(DmServiceState::SERVICE_STATE_OFFLINE);
-
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
     ProcessInfo processInfoTemp;
     for (const auto &item : processInfos) {
-        if (item.pkgName == registerServiceState.pkgName) {
+        if (item.pkgName == registerServiceState.pkgName && item.userId == registerServiceState.userId) {
             processInfoTemp = item;
             break;
         }
@@ -1404,10 +1386,42 @@ int32_t DeviceManagerServiceListener::OnServiceInfoOffline(const DmRegisterServi
     }
     pReq->SetPkgName(processInfoTemp.pkgName);
     pReq->SetProcessInfo(processInfoTemp);
-    LOGI("START offline ipcServerListener_.SendRequest(SERVER_SERVICE_STATE_NOTIFY, pReq, pRsp)");
     int32_t ret = ipcServerListener_.SendRequest(SERVER_SERVICE_STATE_NOTIFY, pReq, pRsp);
     if (ret != DM_OK) {
         LOGE("OnServiceInfoOffline failed.");
+        return ret;
+    }
+    LOGI("OnServiceInfoOffline success.");
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceListener::OnServiceInfoChange(const DmRegisterServiceState &registerServiceState,
+    const DmServiceInfo &serviceInfo)
+{
+    LOGI("OnServiceInfoChange start.");
+    std::shared_ptr<IpcNotifyServiceStateReq> pReq = std::make_shared<IpcNotifyServiceStateReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    std::string notifyPkgName = registerServiceState.pkgName;
+    pReq->SetDmRegisterServiceState(registerServiceState);
+    pReq->SetDmServiceInfo(serviceInfo);
+    pReq->SetServiceState(DmServiceState::SERVICE_INFO_CHANGED);
+    std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
+    ProcessInfo processInfoTemp;
+    for (const auto &item : processInfos) {
+        if (item.pkgName == registerServiceState.pkgName && item.userId == registerServiceState.userId) {
+            processInfoTemp = item;
+            break;
+        }
+    }
+    if (processInfoTemp.pkgName.empty()) {
+        LOGI("not register listener");
+        return ERR_DM_FAILED;
+    }
+    pReq->SetPkgName(processInfoTemp.pkgName);
+    pReq->SetProcessInfo(processInfoTemp);
+    int32_t ret = ipcServerListener_.SendRequest(SERVER_SERVICE_STATE_NOTIFY, pReq, pRsp);
+    if (ret != DM_OK) {
+        LOGE("OnServiceInfoChange failed.");
         return ret;
     }
     return DM_OK;
@@ -1435,47 +1449,27 @@ void DeviceManagerServiceListener::OnSyncServiceInfoResult(const ServiceSyncInfo
     }
     pReq->SetPkgName(processInfoTemp.pkgName);
     pReq->SetProcessInfo(processInfoTemp);
-    ipcServerListener_.SendRequest(SYNC_SERVICE_INFO_RESULT, pReq, pRsp);
-}
-
-void DeviceManagerServiceListener::OnServiceStateCallbackAdd(const ProcessInfo &processInfo,
-    const std::vector<DmServiceInfo> &serviceList)
-{
-    for (auto item : serviceList) {
-        std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId) + "#" +
-            std::to_string(item.serviceId);
-        LOGI("Processing service: serviceId=%{public}" PRId64 ", serviceOwnerTokenId=%{public}" PRIu64,
-            item.serviceId, item.serviceOwnerTokenId);
-        {
-            std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameServiceLock_);
-            if (alreadyOnlinePkgNameService_.find(notifyPkgName) != alreadyOnlinePkgNameService_.end()) {
-                continue;
-            }
-            alreadyOnlinePkgNameService_[notifyPkgName] = item;
-        }
-        std::shared_ptr<IpcNotifyServiceStateReq> pReq = std::make_shared<IpcNotifyServiceStateReq>();
-        std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-        DmRegisterServiceState registerServiceState;
-        registerServiceState.userId = processInfo.userId;
-        registerServiceState.tokenId = item.serviceOwnerTokenId;
-        registerServiceState.pkgName = processInfo.pkgName;
-        registerServiceState.serviceId = item.serviceId;
-        pReq->SetDmRegisterServiceState(registerServiceState);
-        pReq->SetDmServiceInfo(item);
-        pReq->SetServiceState(DmServiceState::SERVICE_STATE_ONLINE);
-        ProcessInfo processInfoTemp;
-        processInfoTemp.pkgName = registerServiceState.pkgName;
-        pReq->SetProcessInfo(processInfoTemp);
-        LOGI("Send service online notification: package=%{public}s, user=%{public}d, serviceId=%{public}" PRId64,
-            processInfo.pkgName.c_str(), processInfo.userId, item.serviceId);
-        ipcServerListener_.SendRequest(SERVER_SERVICE_STATE_NOTIFY, pReq, pRsp);
+    int32_t ret = ipcServerListener_.SendRequest(SYNC_SERVICE_INFO_RESULT, pReq, pRsp);
+    if (ret != DM_OK) {
+        LOGE("OnSyncServiceInfoResult failed.");
     }
-    LOGI("OnServiceStateCallbackAdd end");
 }
 
 void DeviceManagerServiceListener::OnServiceStateOnlineResult(const ServiceStateBindParameter &bindParam)
 {
+    LOGI("OnServiceStateOnlineResult start.");
+    DeviceManagerService::GetInstance().BindServiceOnline(bindParam);
     LOGI("OnServiceStateOnlineResult success.");
 }
+
+void DeviceManagerServiceListener::OnServiceStateOfflineResult(uint64_t tokenId,
+    const std::string &pkgName, int32_t bindType,
+    const std::string &peerUdid, const DistributedDeviceProfile::ServiceInfo &serviceInfo)
+{
+    LOGI("OnServiceStateOfflineResult start.");
+    DeviceManagerService::GetInstance().BindServiceOffline(tokenId, pkgName, bindType, peerUdid, serviceInfo);
+    LOGI("OnServiceStateOfflineResult success.");
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS

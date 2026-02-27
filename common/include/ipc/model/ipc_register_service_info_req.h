@@ -16,8 +16,8 @@
 #ifndef OHOS_DM_NEW_IPC_REGISTER_SERVICE_INFO_REQ_H
 #define OHOS_DM_NEW_IPC_REGISTER_SERVICE_INFO_REQ_H
 
-#include "dm_device_info.h"
 #include "ipc_req.h"
+#include "dm_device_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -34,7 +34,6 @@ public:
     {
         regServiceInfo_ = regServiceInfo;
     }
-
 private:
     DmRegisterServiceInfo regServiceInfo_;
 };

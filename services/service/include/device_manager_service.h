@@ -193,9 +193,6 @@ public:
     int32_t UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &unbindParam);
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    int32_t DpAclAdd(const std::string &udid);
-#endif
     int32_t DpAclAdd(const std::string &udid, int64_t accessControlId);
 
     int32_t GetDeviceSecurityLevel(const std::string &pkgName, const std::string &networkId, int32_t &networkType);
@@ -307,16 +304,6 @@ public:
     int32_t UnRegisterAuthCodeInvalidCallback(const std::string &pkgName);
     int32_t HandleProcessRestart();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    // PR1 compatibility wrappers for legacy IPC parser.
-    int32_t StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam);
-    int32_t StopServiceDiscovery(const std::string &pkgName, int32_t discServiceId);
-    int32_t RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId);
-    int32_t UnRegisterServiceInfo(int32_t regServiceId);
-    int32_t StartPublishService(const std::string &pkgName,
-        PublishServiceParam &publishServiceParam, int64_t &serviceId);
-    int32_t StopPublishService(int64_t serviceId);
-    int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
-
     int32_t RegisterServiceInfo(const DmRegisterServiceInfo &regServiceInfo, int64_t &serviceId);
     int32_t UnRegisterServiceInfo(int64_t serviceId);
     int32_t ValidateDmRegisterServiceInfo(const DmRegisterServiceInfo& regServiceInfo);
