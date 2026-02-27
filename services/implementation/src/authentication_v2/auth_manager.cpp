@@ -62,6 +62,8 @@ const char* DM_AUTH_DIALOG_REJECT = "is_auth_dialog_reject";
 const char* DM_TIMESTAMP = "timestamp";
 const char* TAG_NCM_BIND_TARGET = "ncm_bind_target";
 constexpr const char* TAG_NCM_BIND_TARGET_TRUE = "1";
+const char* TAG_PKG_NAME = "pkgName";
+
 int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
 {
     if (!IsNumberString(delaySecondsStr)) {
@@ -254,6 +256,11 @@ void AuthManager::HandleDeviceNotTrust(const std::string &udid)
 
 int32_t AuthManager::RegisterAuthenticationType(int32_t authenticationType)
 {
+    if (authenticationType < static_cast<int32_t>(UiAction::USER_OPERATION_TYPE_ALLOW_AUTH) ||
+        authenticationType > static_cast<int32_t>(UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS)) {
+        LOGE("Invalid authenticationType: %{public}d", authenticationType);
+        return ERR_DM_FAILED;
+    }
     CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
     context_->confirmOperation = static_cast<UiAction>(authenticationType);
     return DM_OK;
@@ -294,6 +301,11 @@ char *AuthSrcManager::AuthDeviceRequest(int64_t requestId, int operationCode, co
 
 void AuthManager::SetAuthType(int32_t authType)
 {
+    if (authType < static_cast<int32_t>(DmAuthType::AUTH_TYPE_CRE) ||
+        authType > static_cast<int32_t>(DmAuthType::AUTH_TYPE_UNKNOW)) {
+        LOGE("Invalid authType: %{public}d", authType);
+        return;
+    }
     CHECK_NULL_VOID(context_);
     context_->authType = (DmAuthType)authType;
 }
@@ -404,17 +416,6 @@ void AuthManager::ParseHmlInfoInJsonObject(const JsonObject &jsonObject)
     }
 
     return;
-}
-
-std::string AuthManager::GetBundleName(const JsonObject &jsonObject)
-{
-    if (!jsonObject.IsDiscarded() && jsonObject[BUNDLE_NAME_KEY].IsString()) {
-        return jsonObject[BUNDLE_NAME_KEY].Get<std::string>();
-    }
-    bool isSystemSA = false;
-    std::string bundleName;
-    AppManager::GetInstance().GetCallerName(isSystemSA, bundleName);
-    return bundleName;
 }
 
 void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
@@ -634,11 +635,12 @@ void AuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
         LOGE("extra string not a json type.");
         return;
     }
+    
     ParseJsonObject(jsonObject);
     if (context_->isServiceBind) {
         if (IsNumberString(deviceId)) {
-            context_->accessee.serviceId = std::stoll(deviceId); // service bind device id is service id
-            context_->accesser.serviceId = std::stoll(deviceId);
+            context_->accessee.serviceId = std::atoll(deviceId.c_str()); // service bind device id is service id
+            context_->accesser.serviceId = std::atoll(deviceId.c_str());
         } else {
             LOGE("OpenAuthSession failed");
             return;
@@ -1338,13 +1340,14 @@ void AuthManager::ParseProxyJsonObject(const JsonObject &jsonObject)
         std::string bundleName = item[TAG_BUNDLE_NAME].Get<std::string>();
         if (context_->accesser.bundleName == bundleName) {
             LOGE("proxy bundleName same as caller bundleName");
-            return;
+            continue;
         }
         std::string peerBundleName = bundleName;
         if (item.Contains(PARAM_KEY_PEER_BUNDLE_NAME) && IsString(item, PARAM_KEY_PEER_BUNDLE_NAME)) {
             peerBundleName = item[PARAM_KEY_PEER_BUNDLE_NAME].Get<std::string>();
         }
         DmProxyAuthContext proxyAuthContext;
+        GetProxyPkgNameFromParam(proxyAuthContext.proxyAccesser.pkgName, proxyAuthContext.proxyAccessee.pkgName, item);
         proxyAuthContext.proxyContextId = Crypto::Sha256(bundleName + peerBundleName);
         if (std::find(context_->subjectProxyOnes.begin(), context_->subjectProxyOnes.end(), proxyAuthContext) ==
             context_->subjectProxyOnes.end()) {
@@ -1368,6 +1371,19 @@ void AuthManager::GetBindLevelByBundleName(std::string &bundleName, int32_t user
         bindLevel = DmRole::DM_ROLE_SA;
     } else {
         LOGE("src not contain the bundlename %{public}s.", bundleName.c_str());
+    }
+}
+
+void AuthManager::GetProxyPkgNameFromParam(std::string &pkgName, std::string &peerPkgName, const JsonItemObject &json)
+{
+    if (IsString(json, TAG_PKG_NAME)) {
+        pkgName = json[TAG_PKG_NAME].Get<std::string>();
+    }
+    if (IsString(json, PARAM_KEY_PEER_PKG_NAME)) {
+        peerPkgName = json[PARAM_KEY_PEER_PKG_NAME].Get<std::string>();
+    }
+    if (peerPkgName.empty()) {
+        peerPkgName = pkgName;
     }
 }
 

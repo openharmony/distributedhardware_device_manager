@@ -177,7 +177,7 @@ public:
     virtual ~CredentialAuthStatusCallback()
     {
     }
-    virtual void OnCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode) = 0;
+    virtual void OnCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId, int32_t errcode) = 0;
 };
 
 class ServiceDiscoveryCallback {

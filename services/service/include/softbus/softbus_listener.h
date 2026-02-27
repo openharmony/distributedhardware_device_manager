@@ -74,9 +74,9 @@ public:
     static void DeviceUserIdCheckSumChange(const std::string &msg);
     static void OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatus *status);
     static void DeviceScreenStatusChange(DmDeviceInfo deviceInfo);
-    static void OnCredentialAuthStatus(const char *deviceList, uint32_t deviceListLen, uint16_t deviceTypeId,
+    static void OnCredentialAuthStatus(const char *proofInfo, uint32_t proofLen, uint16_t deviceTypeId,
                                        int32_t errcode);
-    static void CredentialAuthStatusProcess(std::string deviceList, uint16_t deviceTypeId, int32_t errcode);
+    static void CredentialAuthStatusProcess(std::string proofInfo, uint16_t deviceTypeId, int32_t errcode);
 
     static void CacheDiscoveredDevice(const DeviceInfo *device);
     static void ClearDiscoveredDevice();
@@ -88,7 +88,7 @@ public:
     static std::string ConvertBytesToUpperCaseHexString(const uint8_t arr[], const size_t size);
     static int32_t ConvertScreenStatusToDmDevice(const NodeBasicInfo &nodeInfo, const int32_t devScreenStatus,
         DmDeviceInfo &devInfo);
-    static void UpdateDeviceName(NodeBasicInfo *info);
+    static void UpdateDeviceName(DmDeviceInfo &info);
 
     /**
      * @brief notify the received acl hash info

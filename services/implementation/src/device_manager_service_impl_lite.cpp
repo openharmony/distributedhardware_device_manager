@@ -565,10 +565,10 @@ int32_t DeviceManagerServiceImpl::GetAclListHash(const DevUserInfo &localDevUser
     return 0;
 }
 
-void DeviceManagerServiceImpl::HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
+void DeviceManagerServiceImpl::HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId,
     int32_t errcode)
 {
-    (void)deviceList;
+    (void)proofInfo;
     (void)deviceTypeId;
     (void)errcode;
     return;

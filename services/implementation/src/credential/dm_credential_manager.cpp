@@ -536,11 +536,11 @@ int32_t DmCredentialManager::DeleteRemoteCredential(const std::string &deleteInf
     return DM_OK;
 }
 
-void DmCredentialManager::HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
+void DmCredentialManager::HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId,
     int32_t errcode)
 {
     CHECK_NULL_VOID(listener_);
-    listener_->OnCredentialAuthStatus(processInfo_, deviceList, deviceTypeId, errcode);
+    listener_->OnCredentialAuthStatus(processInfo_, proofInfo, deviceTypeId, errcode);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

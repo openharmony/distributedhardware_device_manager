@@ -142,7 +142,6 @@ private:
     void ParseAccessJsonObject(const JsonObject &jsonObject);
     void GetAuthParam(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
-    std::string GetBundleName(const JsonObject &jsonObject);
     void SetAuthType(int32_t authType);
     bool IsAuthTypeSupported(const int32_t &authType);
     bool IsAuthCodeReady(const std::string &sessionName);
@@ -162,6 +161,7 @@ private:
     int32_t GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmDeviceType deviceType);
     int32_t GetSrcCarUserIdByDisplayId(int32_t displayId);
     void GetDelayCloseConnTime(const JsonObject &jsonObject);
+    void GetProxyPkgNameFromParam(std::string &pkgName, std::string &peerPkgName, const JsonItemObject &json);
 };
 
 class AuthSrcManager : public AuthManager {

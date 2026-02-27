@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,11 @@
  */
 
 #include "native_devicemanager_js.h"
+
+#include <securec.h>
 #include <uv.h>
+#include <mutex>
+
 #include "device_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
@@ -122,14 +126,16 @@ enum class DMBussinessErrorCode : int32_t {
     DM_ERR_PUBLISH_INVALID = 11600105,
 };
 
-const std::string ERR_MESSAGE_NO_PERMISSION = "Permission verify failed.";
-const std::string ERR_MESSAGE_NOT_SYSTEM_APP = "The caller is not a system application.";
-const std::string ERR_MESSAGE_INVALID_PARAMS = "Input parameter error.";
+const std::string ERR_MESSAGE_NO_PERMISSION =
+    "Permission verification failed. The application does not have the permission required to call the API.";
+const std::string ERR_MESSAGE_NOT_SYSTEM_APP =
+    "Permission verification failed. A non-system application calls a system API.";
+const std::string ERR_MESSAGE_INVALID_PARAMS = "Parameter error.";
 const std::string ERR_MESSAGE_FAILED = "Failed to execute the function.";
 const std::string ERR_MESSAGE_OBTAIN_SERVICE = "Failed to obtain the service.";
-const std::string ERR_MESSAGE_AUTHENTICATION_INVALID = "Authentication invalid.";
-const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery invalid.";
-const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
+const std::string ERR_MESSAGE_AUTHENTICATION_INVALID = "Authentication unavailable.";
+const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery unavailable.";
+const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish unavailable.";
 
 napi_value GenerateBusinessError(napi_env env, int32_t err, const std::string &msg)
 {
@@ -940,7 +946,6 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
         } else {
             napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO, &result[0], &callResult);
             napi_delete_reference(env_, authAsyncCallbackInfo_.callback);
-            authAsyncCallbackInfo_.callback = nullptr;
         }
     } else {
         LOGE("handler is nullptr");
@@ -1719,7 +1724,6 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status
     if (handler != nullptr) {
         NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_TWO, &array[0], &callResult));
         NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, deviceInfoListAsyncCallbackInfo->callback));
-        deviceInfoListAsyncCallbackInfo->callback = nullptr;
     } else {
         LOGE("handler is nullptr");
     }
@@ -1747,7 +1751,6 @@ void DeviceManagerNapi::CallRequestCreInfoStatus(napi_env env, napi_status &stat
     if (handler != nullptr) {
         napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_ONE, &result, &callResult);
         napi_delete_reference(env, creAsyncCallbackInfo->callback);
-        creAsyncCallbackInfo->callback = nullptr;
     } else {
         LOGE("handler is nullptr");
     }
@@ -1795,7 +1798,6 @@ void DeviceManagerNapi::CallGetLocalDeviceInfo(napi_env env, napi_status &status
         NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_TWO,
             &result[0], &callResult));
         NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, deviceInfoAsyncCallbackInfo->callback));
-        deviceInfoAsyncCallbackInfo->callback = nullptr;
     } else {
         LOGE("handler is nullptr");
     }
@@ -3146,7 +3148,6 @@ void DeviceManagerNapi::CallGetDeviceInfoCB(napi_env env, napi_status &status,
     if (handler != nullptr) {
         napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_TWO, &result[0], &callResult);
         napi_delete_reference(env, networkIdAsyncCallbackInfo->callback);
-        networkIdAsyncCallbackInfo->callback = nullptr;
     } else {
         LOGE("handler is nullptr");
     }

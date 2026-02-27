@@ -434,7 +434,7 @@ int32_t DmAuthMessageProcessor::SetProxyAccess(std::shared_ptr<DmAuthContext> co
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     accesser.SetAccesserTokenId(proxyAuthContext.proxyAccesser.tokenId);
-    accesser.SetAccesserBundleName(proxyAuthContext.proxyAccesser.bundleName);
+    accesser.SetAccesserBundleName(context->GetAclBundleName(DM_AUTH_SOURCE, proxyAuthContext));
     accesser.SetAccesserCredentialIdStr(proxyAuthContext.proxyAccesser.transmitCredentialId);
     accesser.SetAccesserSessionKeyId(proxyAuthContext.proxyAccesser.transmitSessionKeyId);
     accesser.SetAccesserSKTimeStamp(proxyAuthContext.proxyAccesser.skTimeStamp);
@@ -448,7 +448,7 @@ int32_t DmAuthMessageProcessor::SetProxyAccess(std::shared_ptr<DmAuthContext> co
     accesser.SetAccesserExtraData(accesserExtObj.Dump());
 
     accessee.SetAccesseeTokenId(proxyAuthContext.proxyAccessee.tokenId);
-    accessee.SetAccesseeBundleName(proxyAuthContext.proxyAccessee.bundleName);
+    accessee.SetAccesseeBundleName(context->GetAclBundleName(DM_AUTH_SINK, proxyAuthContext));
     accessee.SetAccesseeCredentialIdStr(proxyAuthContext.proxyAccessee.transmitCredentialId);
     accessee.SetAccesseeSessionKeyId(proxyAuthContext.proxyAccessee.transmitSessionKeyId);
     accessee.SetAccesseeSKTimeStamp(proxyAuthContext.proxyAccessee.skTimeStamp);
@@ -876,8 +876,9 @@ std::string DmAuthMessageProcessor::CreateMessage(DmMessageType msgType, std::sh
         return "";
     }
     int32_t ret = (this->*(itr->second))(context, jsonObj);
-    LOGI("start. message is %{public}s", GetAnonyJsonString(jsonObj.Dump()).c_str());
-    return (ret == DM_OK) ? jsonObj.Dump() : "";
+    std::string strMsg = jsonObj.Dump();
+    LOGI("start. message is %{public}s", GetAnonyJsonString(strMsg).c_str());
+    return (ret == DM_OK) ? strMsg : "";
 }
 
 int32_t DmAuthMessageProcessor::CreateCredentialNegotiateMessage(std::shared_ptr<DmAuthContext> context,
@@ -966,6 +967,8 @@ int32_t DmAuthMessageProcessor::CreateProxyNegotiateMessage(std::shared_ptr<DmAu
             object[TAG_BUNDLE_NAME] = app.proxyAccesser.bundleName;
             object[TAG_PEER_BUNDLE_NAME] = app.proxyAccessee.bundleName;
             object[TAG_TOKEN_ID_HASH] = app.proxyAccesser.tokenIdHash;
+            object[TAG_PKG_NAME] = app.proxyAccesser.pkgName;
+            object[TAG_PEER_PKG_NAME] = app.proxyAccessee.pkgName;
             allProxyObj.PushBack(object);
         }
         jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
@@ -1608,6 +1611,12 @@ int32_t DmAuthMessageProcessor::ParseProxyNegotiateMessage(
         proxyAuthContext.proxyAccesser.tokenIdHash = item[TAG_TOKEN_ID_HASH].Get<std::string>();
         if (IsString(item, TAG_HOST_PKGLABEL)) {
             proxyAuthContext.pkgLabel = item[TAG_HOST_PKGLABEL].Get<std::string>();
+        }
+        if (IsString(item, TAG_PKG_NAME)) {
+            proxyAuthContext.proxyAccesser.pkgName = item[TAG_PKG_NAME].Get<std::string>();
+        }
+        if (IsString(item, TAG_PEER_PKG_NAME)) {
+            proxyAuthContext.proxyAccessee.pkgName = item[TAG_PEER_PKG_NAME].Get<std::string>();
         }
         context->subjectProxyOnes.push_back(proxyAuthContext);
     }

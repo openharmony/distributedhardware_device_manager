@@ -160,8 +160,6 @@ void SoftbusListener::DeviceOnLine(DmDeviceInfo deviceInfo)
 #else
     std::lock_guard<std::mutex> lock(g_lockDeviceOnLine);
 #endif
-    LOGI("received device online deviceId: %{public}s, networkId: %{public}s.",
-        GetAnonyString(deviceInfo.deviceId).c_str(), GetAnonyString(deviceInfo.networkId).c_str());
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_ONLINE, deviceInfo, true);
 }
 
@@ -225,14 +223,14 @@ void SoftbusListener::DeviceScreenStatusChange(DmDeviceInfo deviceInfo)
     DeviceManagerService::GetInstance().HandleDeviceScreenStatusChange(deviceInfo);
 }
 
-void SoftbusListener::CredentialAuthStatusProcess(std::string deviceList, uint16_t deviceTypeId, int32_t errcode)
+void SoftbusListener::CredentialAuthStatusProcess(std::string proofInfo, uint16_t deviceTypeId, int32_t errcode)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> lock(g_credentialAuthStatus);
 #else
     std::lock_guard<std::mutex> lock(g_credentialAuthStatus);
 #endif
-    DeviceManagerService::GetInstance().HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
+    DeviceManagerService::GetInstance().HandleCredentialAuthStatus(proofInfo, deviceTypeId, errcode);
 }
 
 int32_t SoftbusListener::OnSyncLocalAclList(const DevUserInfo &localDevUserInfo,
@@ -248,22 +246,22 @@ int32_t SoftbusListener::OnGetAclListHash(const DevUserInfo &localDevUserInfo,
     return DeviceManagerService::GetInstance().GetAclListHash(localDevUserInfo, remoteDevUserInfo, aclList);
 }
 
-void SoftbusListener::OnCredentialAuthStatus(const char *deviceList, uint32_t deviceListLen,
+void SoftbusListener::OnCredentialAuthStatus(const char *proofInfo, uint32_t proofLen,
                                              uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("received credential auth status callback from softbus.");
-    if (deviceListLen > MAX_SOFTBUS_MSG_LEN) {
-        LOGE("[SOFTBUS]received invaild deviceList value.");
+    if (proofLen > MAX_SOFTBUS_MSG_LEN) {
+        LOGE("[SOFTBUS]received invaild proofInfo value.");
         return;
     }
-    std::string deviceListStr;
-    if (deviceList != nullptr) {
-        deviceListStr = std::string(deviceList, deviceListLen);
+    std::string proofInfoStr;
+    if (proofInfo != nullptr) {
+        proofInfoStr = std::string(proofInfo, proofLen);
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { CredentialAuthStatusProcess(deviceListStr, deviceTypeId, errcode); });
+    ffrt::submit([=]() { CredentialAuthStatusProcess(proofInfoStr, deviceTypeId, errcode); });
 #else
-    std::thread credentialAuthStatus([=]() { CredentialAuthStatusProcess(deviceListStr, deviceTypeId, errcode); });
+    std::thread credentialAuthStatus([=]() { CredentialAuthStatusProcess(proofInfoStr, deviceTypeId, errcode); });
     if (pthread_setname_np(credentialAuthStatus.native_handle(), CREDENTIAL_AUTH_STATUS) != DM_OK) {
         LOGE("credentialAuthStatus setname failed.");
     }
@@ -368,11 +366,12 @@ int32_t SoftbusListener::SoftbusEventQueueAdd(DmSoftbusEvent &dmSoftbusEventInfo
 
 void SoftbusListener::OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatus *status)
 {
+    LOGI("received device screen status change callback from softbus.");
     if (status == nullptr) {
         LOGE("[SOFTBUS]status is nullptr, type = %{public}d", static_cast<int32_t>(type));
         return;
     }
-    LOGI("networkId: %{public}s, screenStatus: %{public}d",
+    LOGI("screenStatusChanged networkId: %{public}s, screenStatus: %{public}d",
         GetAnonyString(status->basicInfo.networkId).c_str(), static_cast<int32_t>(status->reserved[0]));
     if (type != NodeStatusType::TYPE_SCREEN_STATUS) {
         LOGE("type is not matching.");
@@ -404,7 +403,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     SoftbusCache::GetInstance().SaveDeviceInfo(dmSoftbusEventInfo.dmDeviceInfo);
     SoftbusCache::GetInstance().SaveDeviceSecurityLevel(dmSoftbusEventInfo.dmDeviceInfo.networkId);
     SoftbusCache::GetInstance().SaveLocalDeviceInfo();
-    UpdateDeviceName(info);
+    UpdateDeviceName(dmSoftbusEventInfo.dmDeviceInfo);
     {
         std::lock_guard<std::mutex> lock(g_onlineDeviceNumLock);
         g_onlineDeviceNum++;
@@ -492,20 +491,20 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
 }
 
-void SoftbusListener::UpdateDeviceName(NodeBasicInfo *info)
+void SoftbusListener::UpdateDeviceName(DmDeviceInfo &info)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (info == nullptr) {
-        LOGE("NodeBasicInfo is nullptr, not update device name");
+    if (info.networkId[0] == '\0') {
+        LOGE("networkId is empty.");
         return;
     }
     std::string udid = "";
-    if (GetUdidByNetworkId(info->networkId, udid) != DM_OK) {
+    if (GetUdidByNetworkId(info.networkId, udid) != DM_OK) {
         LOGE("GetUdidByNetworkId failed, not update device name");
         return;
     }
-    LOGI("info->deviceName: %{public}s.", GetAnonyString(info->deviceName).c_str());
-    DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, info->deviceName);
+    LOGI("info->deviceName: %{public}s.", GetAnonyString(info.deviceName).c_str());
+    DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, info.deviceName);
 #endif
 }
 
@@ -517,6 +516,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         return;
     }
     if (type == NodeBasicInfoType::TYPE_DEVICE_NAME || type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
+        LOGI("DeviceInfo %{public}d change.", type);
         int32_t networkType = -1;
         if (type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
             if (GetNodeKeyInfo(DM_PKG_NAME, info->networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
@@ -524,10 +524,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
                 LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
                 return;
             }
-            LOGI("NetworkType %{public}d.", networkType);
-        }
-        if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {
-            UpdateDeviceName(info);
+            LOGI("OnSoftbusDeviceInfoChanged NetworkType %{public}d.", networkType);
         }
         DmSoftbusEvent dmSoftbusEventInfo;
         dmSoftbusEventInfo.eventType = EVENT_TYPE_CHANGED;
@@ -535,6 +532,9 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         LOGI("networkId: %{public}s.", GetAnonyString(dmSoftbusEventInfo.dmDeviceInfo.networkId).c_str());
         dmSoftbusEventInfo.dmDeviceInfo.networkType = networkType;
         SoftbusCache::GetInstance().ChangeDeviceInfo(dmSoftbusEventInfo.dmDeviceInfo);
+        if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {
+            UpdateDeviceName(dmSoftbusEventInfo.dmDeviceInfo);
+        }
     #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         SoftbusEventQueueAdd(dmSoftbusEventInfo);
     #else
@@ -549,7 +549,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
 
 void SoftbusListener::OnLocalDevInfoChange()
 {
-    LOGI("start");
+    LOGI("SoftbusListener::OnLocalDevInfoChange");
     SoftbusCache::GetInstance().UpDataLocalDevInfo();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     NodeBasicInfo nodeBasicInfo;
@@ -570,7 +570,7 @@ void SoftbusListener::OnLocalDevInfoChange()
 
 void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *msg, uint32_t msgLen)
 {
-    LOGI("start.");
+    LOGI("OnDeviceTrustedChange.");
     if (msg == nullptr || msgLen > MAX_SOFTBUS_MSG_LEN || strlen(msg) != msgLen) {
         LOGE("OnDeviceTrustedChange msg invalied.");
         return;
@@ -643,10 +643,8 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
             }
         }
     }
-    LOGD("DevId=%{public}s, devName=%{public}s, devType=%{public}d, range=%{public}d,"
-        "isOnline=%{public}d, capability=%{public}u", GetAnonyString(dmDevInfo.deviceId).c_str(),
-        GetAnonyString(dmDevInfo.deviceName).c_str(), dmDevInfo.deviceTypeId, dmDevInfo.range,
-        device->isOnline, device->capabilityBitmap[0]);
+    LOGD("DevId=%{public}s,capability=%{public}u", GetAnonyString(dmDevInfo.deviceId).c_str(),
+        device->capabilityBitmap[0]);
     int32_t actionId = 0;
     int32_t ret = GetAttrFromExtraData(dmDevInfo, actionId);
     if (ret != DM_OK) {
@@ -676,7 +674,7 @@ void SoftbusListener::OnSoftbusDiscoveryResult(int subscribeId, RefreshResult re
 
 void SoftbusListener::OnSoftbusPublishResult(int publishId, PublishResult result)
 {
-    LOGD("publishId: %{public}d, result: %{public}d.", publishId, result);
+    LOGD("OnSoftbusPublishResult, publishId: %{public}d, result: %{public}d.", publishId, result);
 }
 
 SoftbusListener::SoftbusListener()
@@ -747,7 +745,7 @@ int32_t SoftbusListener::InitSoftPublishLNN()
     publishInfo.freq = ExchangeFreq::LOW;
     publishInfo.capability = DM_CAPABILITY_OSD;
     publishInfo.ranging = false;
-    LOGI("begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
+    LOGI("InitSoftPublishLNN begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
         "%{public}s, ranging: %{public}d, freq: %{public}d.", publishInfo.publishId, publishInfo.mode,
         publishInfo.medium, publishInfo.capability, publishInfo.ranging, publishInfo.freq);
 
@@ -762,7 +760,7 @@ int32_t SoftbusListener::InitSoftPublishLNN()
 int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscribeInfo &dmSubInfo,
     const std::string &customData)
 {
-    LOGI("begin, subscribeId: %{public}d.", dmSubInfo.subscribeId);
+    LOGI("RefreshSoftbusLNN begin, subscribeId: %{public}d.", dmSubInfo.subscribeId);
     SubscribeInfo subscribeInfo;
     if (memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo)) != DM_OK) {
         LOGE("RefreshSoftbusLNN memset_s failed.");
@@ -779,7 +777,7 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
     subscribeInfo.capabilityData =
         const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(customData.c_str()));
     subscribeInfo.dataLen = customData.size();
-    LOGI("subscribeId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
+    LOGI("RefreshSoftbusLNN begin, subscribeId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
         "%{public}s, freq: %{public}d.", subscribeInfo.subscribeId, subscribeInfo.mode, subscribeInfo.medium,
         subscribeInfo.capability, subscribeInfo.freq);
     int32_t ret = ::RefreshLNN(pkgName, &subscribeInfo, &softbusRefreshCallback_);
@@ -808,7 +806,7 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
 
 int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
 {
-    LOGI("begin, subscribeId: %{public}d.", (int32_t)subscribeId);
+    LOGI("StopRefreshSoftbusLNN begin, subscribeId: %{public}d.", (int32_t)subscribeId);
     {
         std::lock_guard<std::mutex> lock(g_lockDeviceIdSet);
         deviceIdSet.clear();
@@ -904,7 +902,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
 {
     int32_t ret = SoftbusCache::GetInstance().GetDeviceInfoFromCache(deviceInfoList);
     size_t deviceCount = deviceInfoList.size();
-    LOGI("size is %{public}zu.", deviceCount);
+    LOGI("Success from cache deviceInfoList size is %{public}zu.", deviceCount);
     return ret;
 }
 
@@ -961,10 +959,7 @@ int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp, const std::string &callerId
 int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &nodeInfo, const int32_t devScreenStatus,
     DmDeviceInfo &devInfo)
 {
-    if (memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != DM_OK) {
-        LOGE("ConvertScreenStatusToDmDevice memset failed.");
-        return ERR_DM_FAILED;
-    }
+    (void)memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
                  std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != DM_OK) {
         LOGE("ConvertScreenStatusToDmDevice copy networkId data failed.");
@@ -1128,7 +1123,7 @@ int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_
         return ret;
     }
     networkType = tempNetworkType;
-    LOGI("networkType %{public}d.", tempNetworkType);
+    LOGI("GetNetworkTypeByNetworkId networkType %{public}d.", tempNetworkType);
     return DM_OK;
 }
 
@@ -1239,6 +1234,7 @@ bool SoftbusListener::IsDmRadarHelperReady()
 bool SoftbusListener::CloseDmRadarHelperObj(std::string name)
 {
     (void)name;
+    LOGI("SoftbusListener::CloseDmRadarHelperObj start.");
     std::lock_guard<std::mutex> lock(g_radarLoadLock);
     if (!isRadarSoLoad_ && (dmRadarHelper_ == nullptr) && (radarHandle_ == nullptr)) {
         return true;
@@ -1252,7 +1248,7 @@ bool SoftbusListener::CloseDmRadarHelperObj(std::string name)
     isRadarSoLoad_ = false;
     dmRadarHelper_ = nullptr;
     radarHandle_ = nullptr;
-    LOGI("success.");
+    LOGI("close libdevicemanagerradar so success.");
     return true;
 }
 
@@ -1337,7 +1333,7 @@ std::string SoftbusListener::GetHostPkgName()
 
 void SoftbusListener::SendAclChangedBroadcast(const std::string &msg)
 {
-    LOGI("start");
+    LOGI("SendAclChangedBroadcast");
     if (SyncTrustedRelationShip(DM_PKG_NAME, msg.c_str(), msg.length()) != DM_OK) {
         LOGE("SyncTrustedRelationShip failed.");
     }
@@ -1358,7 +1354,7 @@ int32_t SoftbusListener::GetDeviceScreenStatus(const char *networkId, int32_t &s
         return ret;
     }
     screenStatus = devScreenStatus;
-    LOGI("screenStatus: %{public}d.", devScreenStatus);
+    LOGI("GetDeviceScreenStatus screenStatus: %{public}d.", devScreenStatus);
     return DM_OK;
 }
 
@@ -1368,6 +1364,7 @@ int32_t SoftbusListener::SetForegroundUserIdsToDSoftBus(const std::string &remot
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     NotifyUserIds notifyUserIds(remoteUdid, userIds);
     std::string msg = notifyUserIds.ToString();
+    LOGI("Notify remote userid to dsoftbus, msg: %{public}s", GetAnonyString(msg).c_str());
     return DM_OK;
 #else
     (void)remoteUdid;
@@ -1379,7 +1376,7 @@ int32_t SoftbusListener::SetForegroundUserIdsToDSoftBus(const std::string &remot
 //LCOV_EXCL_START
 void SoftbusListener::DeleteCacheDeviceInfo()
 {
-    LOGI("start.");
+    LOGI("DeleteCacheDeviceInfo start.");
     SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
     std::vector<DmDeviceInfo> onlineDevInfoVec;
     SoftbusCache::GetInstance().GetDeviceInfoFromCache(onlineDevInfoVec);
@@ -1397,7 +1394,7 @@ void SoftbusListener::DeleteCacheDeviceInfo()
 
 int32_t SoftbusListener::SetLocalDisplayName(const std::string &displayName)
 {
-    LOGI("start");
+    LOGI("SoftbusListener Start SetLocalDisplayName!");
     uint32_t len = static_cast<uint32_t>(displayName.size());
     int32_t ret = ::SetDisplayName(DM_PKG_NAME, displayName.c_str(), len);
     if (ret != DM_OK) {
@@ -1466,7 +1463,8 @@ int32_t SoftbusListener::GetAllTrustedDeviceList(const std::string &pkgName, con
     std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
         DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     for (DistributedDeviceProfile::AccessControlProfile profile : allProfile) {
-        if (profile.GetBindType() == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP || ACTIVE != profile.GetStatus()) {
+        if (profile.GetBindType() == static_cast<uint32_t>(GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) ||
+            ACTIVE != profile.GetStatus()) {
             continue;
         }
         DistributedDeviceProfile::Accesser acer = profile.GetAccesser();
@@ -1496,7 +1494,7 @@ int32_t SoftbusListener::GetUdidFromDp(const std::string &udidHash, std::string 
     std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
         DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     for (DistributedDeviceProfile::AccessControlProfile profile : allProfile) {
-        if (profile.GetBindType() == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
+        if (profile.GetBindType() == static_cast<uint32_t>(GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP)) {
             continue;
         }
         char udidHashTemp[DM_MAX_DEVICE_ID_LEN] = {0};

@@ -751,7 +751,6 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
         if (handler != nullptr) {
             napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO, &result[0], &callResult);
             napi_delete_reference(env_, authAsyncCallbackInfo_.callback);
-            authAsyncCallbackInfo_.callback = nullptr;
         } else {
             LOGE("handler is nullptr");
         }
@@ -1248,7 +1247,6 @@ void DeviceManagerNapi::CallGetAvailableDeviceListStatus(napi_env env, napi_stat
             NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_TWO, &array[0],
                 &callResult));
             NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, deviceBasicInfoListAsyncCallbackInfo->callback));
-            deviceBasicInfoListAsyncCallbackInfo->callback = nullptr;
         } else {
             LOGE("handler is nullptr");
         }
@@ -2867,12 +2865,12 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getDeviceProfileInfoList", JsGetDeviceProfileInfoList),
         DECLARE_NAPI_FUNCTION("getDeviceIconInfo", JsGetDeviceIconInfo),
         DECLARE_NAPI_FUNCTION("putDeviceProfileInfoList", JsPutDeviceProfileInfoList),
+        DECLARE_NAPI_FUNCTION("getDeviceNetworkIdList", JsGetDeviceNetworkIdList),
         DECLARE_NAPI_FUNCTION("getLocalDisplayDeviceName", JsGetLocalDisplayDeviceName),
         DECLARE_NAPI_FUNCTION("setLocalDeviceName", JsSetLocalDeviceName),
         DECLARE_NAPI_FUNCTION("setRemoteDeviceName", JsSetRemoteDeviceName),
         DECLARE_NAPI_FUNCTION("restoreLocalDeviceName", JsRestoreLocalDeviceName),
         DECLARE_NAPI_FUNCTION("restoreLocalDeivceName", JsRestoreLocalDeviceName),
-        DECLARE_NAPI_FUNCTION("getDeviceNetworkIdList", JsGetDeviceNetworkIdList),
         DECLARE_NAPI_FUNCTION("getIdentificationByDeviceIds", GetIdentificationByDeviceIds),
         DECLARE_NAPI_FUNCTION("setHeartbeatPolicy", SetHeartbeatPolicy)};
 

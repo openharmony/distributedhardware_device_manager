@@ -33,12 +33,12 @@
 #include "dm_credential_manager.h"
 #include "dm_device_info.h"
 #include "dm_device_state_manager.h"
-#include "dm_single_instance.h"
 #include "dp_inited_callback.h"
 #include "ffrt.h"
 #include "idevice_manager_service_impl.h"
 #include "ipc_skeleton.h"
 #include "mine_hichain_connector.h"
+#include "dm_single_instance.h"
 #include "softbus_connector.h"
 
 namespace OHOS {
@@ -159,7 +159,7 @@ public:
     void HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
-    void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
+    void HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId, int32_t errcode);
     int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately);
     int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
@@ -278,10 +278,10 @@ private:
         std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> &delProfileMap,
         std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std::vector<int32_t> &userIdVec);
 
-    void GetDelACLInfoVec(const int32_t &accessTokenId,
+    void GetDelACLInfoVec(int32_t accessTokenId,
         std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
         std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std::vector<int32_t> &userIdVec,
-        const uint32_t &userId);
+        const DevUserInfo &info);
 
     void DeleteAclByDelProfileMap(
         const std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> &delProfileMap,
@@ -312,7 +312,6 @@ private:
     void GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet, bool &notifyOffline);
     void NotifyDeviceOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid);
     void NotifyDeviceOrAppOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid);
-    void DeleteSessionKey(int32_t userId, const DistributedDeviceProfile::AccessControlProfile &profile);
     void DeleteGroupByBundleName(const std::string &localUdid, int32_t userId, const std::vector<DmAclIdParam> &acls);
     int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller, std::string &udid,
         int32_t &bindLevel);

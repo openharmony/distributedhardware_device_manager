@@ -180,8 +180,6 @@ public:
     static void DeleteAclAndSk(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile);
     void JoinLnn(std::shared_ptr<DmAuthContext> context);
-    void DeleteRedundancyAcl(std::shared_ptr<DmAuthContext> context, JsonObject &aclInfo,
-        const std::set<uint32_t> bindLevelSet, bool isSrc);
     static void UpdatePinErrorCount(const std::string &pkgName, int32_t pinExchangeType);
     bool VerifyFlagXor(std::shared_ptr<DmAuthContext> context);
     void GetPinErrorCountAndTokenId(const std::string &bundleName, int32_t pinExchangeType,
@@ -192,8 +190,6 @@ public:
     void DeleteInvalidCredAndAcl(std::shared_ptr<DmAuthContext> context);
     void DeleteAclSKAndCredId(std::shared_ptr<DmAuthContext> context, const int32_t userId,
         const DistributedDeviceProfile::AccessControlProfile &profile, const std::string &localUdid);
-    void GetRegPkgNameAndPinConsumerPkgName(const std::string &bundleName, int32_t pinExchangeType,
-        std::string &regPkgName, std::string &pinConsumerPkgName);
 protected:
     bool NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context);
     bool NeedAgreeAcl(std::shared_ptr<DmAuthContext> context);

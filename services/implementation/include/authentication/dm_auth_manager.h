@@ -506,7 +506,7 @@ private:
     bool IsServiceInfoAuthBoxTypeValid(int32_t authBoxType);
     bool IsServiceInfoPinExchangeTypeValid(int32_t pinExchangeType);
     bool IsLocalServiceInfoValid(const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo);
-    void GetLocalServiceInfoInDp();
+    bool GetLocalServiceInfoInDp(int32_t pinExchangeType);
     bool CheckNeedShowAuthInfoDialog(int32_t errorCode);
     void UpdateInputPincodeDialog(int32_t errorCode);
     bool CheckHmlParamValid(JsonObject &jsonObject);
@@ -587,13 +587,16 @@ private:
     void SetAuthType(int32_t authType);
     int32_t GetTaskTimeout(const char* taskName, int32_t taskTimeOut);
     void ProcessSessionOpen(int32_t sessionId, int32_t result);
+    void ProcessTerminateMsg(int32_t sessionId, int32_t reply);
     int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr);
     void ConverToFinish();
+    void HandleDeviceOnline();
     int32_t GetBinderInfo();
     void SetProcessInfo();
     bool IsSinkMsgValid();
     bool IsSourceMsgValid();
     void ProcessReqPublicKey();
+    bool CheckBindLevel(const JsonObject &jsonObj, const std::string &key, int32_t &bindLevel);
     void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
     void GetBindCallerInfo();
     void ProcessReqAuthTerminate();

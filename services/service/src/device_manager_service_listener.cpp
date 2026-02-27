@@ -199,6 +199,7 @@ int32_t DeviceManagerServiceListener::FillUdidAndUuidToDeviceInfo(const std::str
 void DeviceManagerServiceListener::ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
     const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo, const bool isOnline)
 {
+    LOGI("In");
     std::vector<ProcessInfo> processInfoVec = GetNotifyProcessInfoByUserId(processInfo.userId,
         DmCommonNotifyEvent::REG_DEVICE_STATE);
     std::vector<ProcessInfo> hpProcessInfoVec;
@@ -235,8 +236,6 @@ void DeviceManagerServiceListener::ProcessAppStateChange(const ProcessInfo &proc
 {
     LOGI("In");
     std::vector<ProcessInfo> processInfoVec = GetWhiteListSAProcessInfo(DmCommonNotifyEvent::REG_DEVICE_STATE);
-
-    std::vector<ProcessInfo> allProcessInfos = ipcServerListener_.GetAllProcessInfo();
     switch (static_cast<int32_t>(state)) {
         case static_cast<int32_t>(DmDeviceState::DEVICE_STATE_ONLINE):
             ProcessAppOnline(processInfoVec, processInfo, state, info, deviceBasicInfo);
@@ -256,6 +255,7 @@ void DeviceManagerServiceListener::ProcessAppStateChange(const ProcessInfo &proc
 void DeviceManagerServiceListener::OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
                                                        const DmDeviceInfo &info, const bool isOnline)
 {
+    LOGI("OnDeviceStateChange, state = %{public}d", state);
     DmDeviceBasicInfo deviceBasicInfo;
     ConvertDeviceInfoToDeviceBasicInfo(processInfo.pkgName, info, deviceBasicInfo);
     if (processInfo.pkgName == std::string(DM_PKG_NAME)) {
@@ -290,7 +290,7 @@ void DeviceManagerServiceListener::OnDeviceFound(const ProcessInfo &processInfo,
 void DeviceManagerServiceListener::OnDiscoveryFailed(const ProcessInfo &processInfo, uint16_t subscribeId,
                                                      int32_t failedReason)
 {
-    LOGI("OnDiscoveryFailed");
+    LOGI("DeviceManagerServiceListener::OnDiscoveryFailed");
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq = std::make_shared<IpcNotifyDiscoverResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -303,7 +303,7 @@ void DeviceManagerServiceListener::OnDiscoveryFailed(const ProcessInfo &processI
 
 void DeviceManagerServiceListener::OnDiscoverySuccess(const ProcessInfo &processInfo, int32_t subscribeId)
 {
-    LOGI("OnDiscoverySuccess");
+    LOGI("DeviceManagerServiceListener::OnDiscoverySuccess");
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq = std::make_shared<IpcNotifyDiscoverResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -316,7 +316,7 @@ void DeviceManagerServiceListener::OnDiscoverySuccess(const ProcessInfo &process
 
 void DeviceManagerServiceListener::OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult)
 {
-    LOGI("OnPublishResult : %{public}d", publishResult);
+    LOGI("DeviceManagerServiceListener::OnPublishResult : %{public}d", publishResult);
     std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::make_shared<IpcNotifyPublishResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -426,7 +426,7 @@ void DeviceManagerServiceListener::OnUnbindResult(const ProcessInfo &processInfo
 void DeviceManagerServiceListener::OnPinHolderCreate(const ProcessInfo &processInfo, const std::string &deviceId,
     DmPinType pinType, const std::string &payload)
 {
-    LOGI("OnPinHolderCreate : %{public}s", processInfo.pkgName.c_str());
+    LOGI("DeviceManagerServiceListener::OnPinHolderCreate : %{public}s", processInfo.pkgName.c_str());
     std::shared_ptr<IpcCreatePinHolderReq> pReq = std::make_shared<IpcCreatePinHolderReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -441,7 +441,7 @@ void DeviceManagerServiceListener::OnPinHolderCreate(const ProcessInfo &processI
 void DeviceManagerServiceListener::OnPinHolderDestroy(const ProcessInfo &processInfo, DmPinType pinType,
     const std::string &payload)
 {
-    LOGI("OnPinHolderDestroy : %{public}s", processInfo.pkgName.c_str());
+    LOGI("DeviceManagerServiceListener::OnPinHolderDestroy : %{public}s", processInfo.pkgName.c_str());
     std::shared_ptr<IpcDestroyPinHolderReq> pReq = std::make_shared<IpcDestroyPinHolderReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -454,7 +454,7 @@ void DeviceManagerServiceListener::OnPinHolderDestroy(const ProcessInfo &process
 
 void DeviceManagerServiceListener::OnCreateResult(const ProcessInfo &processInfo, int32_t result)
 {
-    LOGI("OnCreateResult : %{public}d", result);
+    LOGI("DeviceManagerServiceListener::OnCreateResult : %{public}d", result);
     std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::make_shared<IpcNotifyPublishResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -466,7 +466,7 @@ void DeviceManagerServiceListener::OnCreateResult(const ProcessInfo &processInfo
 
 void DeviceManagerServiceListener::OnDestroyResult(const ProcessInfo &processInfo, int32_t result)
 {
-    LOGI("OnDestroyResult : %{public}d", result);
+    LOGI("DeviceManagerServiceListener::OnDestroyResult : %{public}d", result);
     std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::make_shared<IpcNotifyPublishResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -495,6 +495,7 @@ void DeviceManagerServiceListener::OnPinHolderEvent(const ProcessInfo &processIn
 int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyAndSave(const std::string &pkgName, DmDeviceInfo &deviceInfo,
     const int32_t userId)
 {
+    LOGD("pkgName %{public}s.", pkgName.c_str());
     std::string appId = "";
     if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId, userId) != DM_OK) {
         LOGD("GetAppIdByPkgName failed");
@@ -520,6 +521,7 @@ int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyAndSave(const std::st
 int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyDeviceId(const std::string &pkgName,
     const std::string &udidHash, std::string &anoyDeviceId, const int32_t userId)
 {
+    LOGI("pkgName %{public}s, udidHash %{public}s.", pkgName.c_str(), GetAnonyString(udidHash).c_str());
     std::string appId = "";
     if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId, userId) != DM_OK) {
         LOGD("GetAppIdByPkgName failed");
@@ -537,8 +539,8 @@ int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyDeviceId(const std::s
 void DeviceManagerServiceListener::OnDeviceTrustChange(const std::string &udid, const std::string &uuid,
     DmAuthForm authForm)
 {
-    LOGI("udid %{public}s, authForm %{public}d, uuid %{public}s.", GetAnonyString(udid).c_str(),
-        authForm, GetAnonyString(uuid).c_str());
+    LOGI("udid %{public}s, authForm %{public}d, uuid %{public}s.", GetAnonyString(udid).c_str(), authForm,
+        GetAnonyString(uuid).c_str());
     std::shared_ptr<IpcNotifyDevTrustChangeReq> pReq = std::make_shared<IpcNotifyDevTrustChangeReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     int32_t userId = -1;
@@ -622,7 +624,7 @@ void DeviceManagerServiceListener::RemoveOnlinePkgName(const DmDeviceInfo &info)
 }
 
 void DeviceManagerServiceListener::OnCredentialAuthStatus(const ProcessInfo &processInfo,
-    const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode)
+    const std::string &proofInfo, uint16_t deviceTypeId, int32_t errcode)
 {
     LOGI("In, pkgName = %{public}s", processInfo.pkgName.c_str());
     int32_t userId = -1;
@@ -634,7 +636,7 @@ void DeviceManagerServiceListener::OnCredentialAuthStatus(const ProcessInfo &pro
     for (const auto &item : processInfoVec) {
         std::shared_ptr<IpcNotifyCredentialAuthStatusReq> pReq = std::make_shared<IpcNotifyCredentialAuthStatusReq>();
         std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-        pReq->SetDeviceList(deviceList);
+        pReq->SetProofInfo(proofInfo);
         pReq->SetDeviceTypeId(deviceTypeId);
         pReq->SetErrCode(errcode);
         pReq->SetPkgName(item.pkgName);
@@ -803,7 +805,7 @@ void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<Proces
             continue;
         }
         {
-            std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
+            std::lock_guard<std::mutex> autoLock(actUnrelatedPkgNameLock_);
             if (actUnrelatedPkgName_.find(it.pkgName) != actUnrelatedPkgName_.end()) {
                 continue;
             }
@@ -822,7 +824,7 @@ void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<Proces
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
     }
     {
-        std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
+        std::lock_guard<std::mutex> autoLock(actUnrelatedPkgNameLock_);
         actUnrelatedPkgName_.clear();
     }
 }
@@ -872,7 +874,6 @@ void DeviceManagerServiceListener::ProcessAppOnline(std::vector<ProcessInfo> &pr
                 alreadyOnlinePkgName_[notifyPkgName] = info;
             }
         }
-        LOGI("ProcessAppOnline notifyState = %{public}d", notifyState);
         SetDeviceInfo(pReq, it, notifyState, info, deviceBasicInfo);
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
     }
@@ -909,13 +910,26 @@ void DeviceManagerServiceListener::ProcessAppOffline(std::vector<ProcessInfo> &p
 
 void DeviceManagerServiceListener::OnProcessRemove(const ProcessInfo &processInfo)
 {
-    std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
-    std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId);
-    for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
-        if (it->first.find(notifyPkgName) != std::string::npos) {
-            it = alreadyOnlinePkgName_.erase(it);
-        } else {
-            ++it;
+    {
+        std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
+        std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId);
+        for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
+            if (it->first.find(notifyPkgName) != std::string::npos) {
+                it = alreadyOnlinePkgName_.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(alreadyDbReadyPkgNameLock_);
+        std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId);
+        for (auto it = alreadyDbReadyPkgName_.begin(); it != alreadyDbReadyPkgName_.end();) {
+            if (it->first.find(notifyPkgName) != std::string::npos) {
+                it = alreadyDbReadyPkgName_.erase(it);
+            } else {
+                ++it;
+            }
         }
     }
 }
@@ -945,7 +959,7 @@ void DeviceManagerServiceListener::OnDevStateCallbackAdd(const ProcessInfo &proc
 void DeviceManagerServiceListener::OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo,
     const std::vector<DmDeviceInfo> &deviceList)
 {
-    for (auto item : deviceList) {
+    for (const auto &item : deviceList) {
         std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId) + "#" +
             std::string(item.deviceId);
         {
@@ -1067,6 +1081,14 @@ void DeviceManagerServiceListener::SetExistPkgName(const std::set<std::string> &
     }
 }
 
+void DeviceManagerServiceListener::ClearDbReadyMap(const std::string &notifyPkgName)
+{
+    std::lock_guard<std::mutex> autoLock(alreadyDbReadyPkgNameLock_);
+    if (alreadyDbReadyPkgName_.find(notifyPkgName) != alreadyDbReadyPkgName_.end()) {
+        alreadyDbReadyPkgName_.erase(notifyPkgName);
+    }
+}
+
 void DeviceManagerServiceListener::ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
     const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo, const std::vector<int64_t> &serviceIds)
 {
@@ -1160,14 +1182,6 @@ void DeviceManagerServiceListener::ProcessAppOnline(std::vector<ProcessInfo> &pr
     }
 }
 
-void DeviceManagerServiceListener::ClearDbReadyMap(std::string &notifyPkgName)
-{
-    std::lock_guard<std::mutex> autoLock(alreadyDbReadyPkgNameLock_);
-    if (alreadyDbReadyPkgName_.find(notifyPkgName) != alreadyDbReadyPkgName_.end()) {
-        alreadyDbReadyPkgName_.erase(notifyPkgName);
-    }
-}
-
 std::string DeviceManagerServiceListener::GetLocalDisplayDeviceName()
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -1258,7 +1272,7 @@ void DeviceManagerServiceListener::OnLeaveLNNResult(const std::string &pkgName, 
 }
 
 void DeviceManagerServiceListener::SetNeedNotifyProcessInfos(const ProcessInfo &processInfo,
-    std::vector<ProcessInfo> &procInfoVec)
+    std::vector<ProcessInfo> &processInfoVec)
 {
     ProcessInfo bindProcessInfo = DealBindProcessInfo(processInfo);
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
@@ -1272,19 +1286,18 @@ void DeviceManagerServiceListener::SetNeedNotifyProcessInfos(const ProcessInfo &
         LOGE("state callback not exist, pkg:%{public}s", bindProcessInfo.pkgName.c_str());
         return;
     }
-    if (find(procInfoVec.begin(), procInfoVec.end(), bindProcessInfo) != procInfoVec.end()) {
+    if (find(processInfoVec.begin(), processInfoVec.end(), bindProcessInfo) != processInfoVec.end()) {
         return;
     }
-    procInfoVec.push_back(bindProcessInfo);
+    processInfoVec.push_back(bindProcessInfo);
     return;
 }
 
-void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &regPkgName,
-    const std::string &pinConsumerPkgName)
+void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName, const std::string &consumerPkgName)
 {
-    LOGI("in, regPkgName:%{public}s, pinConsumerPkgName:%{public}s", regPkgName.c_str(), pinConsumerPkgName.c_str());
-    if (regPkgName.empty()) {
-        LOGE("OnAuthCodeInvalid: regPkgName is empty, skip IPC request");
+    LOGI("OnAuthCodeInvalid pkgName:%{public}s, consumerPkgName:%{public}s", pkgName.c_str(), consumerPkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("OnAuthCodeInvalid: pkgName is empty, skip IPC request");
         return;
     }
     std::shared_ptr<IpcReq> pReq = std::make_shared<IpcReq>();
@@ -1292,7 +1305,7 @@ void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &regPkgNa
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
     ProcessInfo processInfoTemp;
     for (const auto &item : processInfos) {
-        if (item.pkgName == regPkgName) {
+        if (item.pkgName == pkgName) {
             processInfoTemp = item;
         }
     }
@@ -1302,7 +1315,7 @@ void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &regPkgNa
     }
     pReq->SetPkgName(processInfoTemp.pkgName);
     pReq->SetProcessInfo(processInfoTemp);
-    pReq->SetPinConsumerPkgName(pinConsumerPkgName);
+    pReq->SetConsumerPkgName(consumerPkgName);
     ipcServerListener_.SendRequest(ON_AUTH_CODE_INVALID, pReq, pRsp);
 }
 

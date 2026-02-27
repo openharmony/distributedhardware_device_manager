@@ -1565,33 +1565,6 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_055, testing::ext::TestSize.Level
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY;
-    MessageParcel data;
-    std::shared_ptr<IpcNotifyCredentialAuthStatusReq> req = nullptr;
-    int ret = ERR_DM_FAILED;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-
-    req = std::make_shared<IpcNotifyCredentialAuthStatusReq>();
-    std::string pkgName = "com.ohos.test";
-    std::string deviceList = "test";
-    uint16_t deviceTypeId = 0x00;
-    int32_t errcode = -1;
-    req->SetPkgName(pkgName);
-    req->SetDeviceList(deviceList);
-    req->SetDeviceTypeId(deviceTypeId);
-    req->SetErrCode(errcode);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_030, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY;

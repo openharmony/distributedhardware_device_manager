@@ -1145,7 +1145,7 @@ void DeviceManagerNotify::UnRegisterCredentialAuthStatusCallback(const std::stri
     credentialAuthStatusCallback_.erase(pkgName);
 }
 
-void DeviceManagerNotify::OnCredentialAuthStatus(const std::string &pkgName, const std::string &deviceList,
+void DeviceManagerNotify::OnCredentialAuthStatus(const std::string &pkgName, const std::string &proofInfo,
                                                  uint16_t deviceTypeId, int32_t errcode)
 {
     if (pkgName.empty()) {
@@ -1166,53 +1166,7 @@ void DeviceManagerNotify::OnCredentialAuthStatus(const std::string &pkgName, con
         LOGE("error, registered credential auth status callback is nullptr.");
         return;
     }
-    tempCbk->OnCredentialAuthStatus(deviceList, deviceTypeId, errcode);
-}
-
-void DeviceManagerNotify::RegisterSinkBindCallback(const std::string &pkgName,
-    std::shared_ptr<BindTargetCallback> callback)
-{
-    if (pkgName.empty() || callback == nullptr) {
-        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
-        return;
-    }
-    std::lock_guard<std::mutex> autoLock(lock_);
-    CHECK_SIZE_VOID(sinkBindTargetCallback_);
-    sinkBindTargetCallback_[pkgName] = callback;
-}
-
-void DeviceManagerNotify::UnRegisterSinkBindCallback(const std::string &pkgName)
-{
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return;
-    }
-    std::lock_guard<std::mutex> autoLock(lock_);
-    sinkBindTargetCallback_.erase(pkgName);
-}
-
-void DeviceManagerNotify::OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId,
-    int32_t result, int32_t status, std::string content)
-{
-    if (pkgName.empty()) {
-        LOGE("Invalid para, pkgName: %{public}s.", pkgName.c_str());
-        return;
-    }
-    LOGI("in, pkgName:%{public}s, result:%{public}d", pkgName.c_str(), result);
-    std::shared_ptr<BindTargetCallback> tempCbk;
-    {
-        std::lock_guard<std::mutex> autoLock(lock_);
-        if (sinkBindTargetCallback_.find(pkgName) == sinkBindTargetCallback_.end()) {
-            LOGE("error, sink bind callback not register.");
-            return;
-        }
-        tempCbk = sinkBindTargetCallback_[pkgName];
-    }
-    if (tempCbk == nullptr) {
-        LOGE("error, registered sink bind callback is nullptr.");
-        return;
-    }
-    tempCbk->OnBindResult(targetId, result, status, content);
+    tempCbk->OnCredentialAuthStatus(proofInfo, deviceTypeId, errcode);
 }
 
 std::shared_ptr<DiscoveryCallback> DeviceManagerNotify::GetDiscoveryCallback(const std::string &pkgName,
@@ -1276,6 +1230,52 @@ void DeviceManagerNotify::GetCallBack(std::map<DmCommonNotifyEvent, std::set<std
     if (authStatusPkgnameSet.size() > 0) {
         callbackMap[DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY] = authStatusPkgnameSet;
     }
+}
+
+void DeviceManagerNotify::RegisterSinkBindCallback(const std::string &pkgName,
+    std::shared_ptr<BindTargetCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    CHECK_SIZE_VOID(sinkBindTargetCallback_);
+    sinkBindTargetCallback_[pkgName] = callback;
+}
+
+void DeviceManagerNotify::UnRegisterSinkBindCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    sinkBindTargetCallback_.erase(pkgName);
+}
+
+void DeviceManagerNotify::OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId,
+    int32_t result, int32_t status, std::string content)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid para, pkgName: %{public}s.", pkgName.c_str());
+        return;
+    }
+    LOGI("DeviceManagerNotify::OnSinkBindResult in, pkgName:%{public}s, result:%{public}d", pkgName.c_str(), result);
+    std::shared_ptr<BindTargetCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (sinkBindTargetCallback_.find(pkgName) == sinkBindTargetCallback_.end()) {
+            LOGE("error, sink bind callback not register.");
+            return;
+        }
+        tempCbk = sinkBindTargetCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("error, registered sink bind callback is nullptr.");
+        return;
+    }
+    tempCbk->OnBindResult(targetId, result, status, content);
 }
 
 int32_t DeviceManagerNotify::RegisterGetDeviceProfileInfoListCallback(const std::string &pkgName,

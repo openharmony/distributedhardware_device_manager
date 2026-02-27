@@ -15,17 +15,16 @@
 #ifndef OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #define OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #include <algorithm>
-#include <map>
 #include <string>
 #include <unordered_set>
 #include "access_control_profile.h"
 #include "dm_device_info.h"
-#include "dm_single_instance.h"
 #include "i_dp_inited_callback.h"
 #include "json_object.h"
 #include "local_service_info.h"
 #include "parameter.h"
 #include "service_info_profile_new.h"
+#include "dm_single_instance.h"
 #include "trusted_device_info.h"
 
 enum AllowAuthType {
@@ -386,6 +385,10 @@ private:
         const int32_t &userId, const std::string &deviceId, const std::string &trustDeviceId, const int32_t &bindType);
     std::unordered_map<std::string, DmAuthForm> GetAuthFormMap(const std::string &pkgName, const std::string &deviceId,
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &profilesFilter, const int32_t &userId);
+    bool GetAuthFormMapByBindType(const uint32_t &highestBindType, const std::string &trustDeviceId,
+        const int32_t &userId, const std::string &deviceId,
+        const DistributedDeviceProfile::AccessControlProfile &profile,
+        std::unordered_map<std::string, DmAuthForm> &deviceIdMap);
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
         const std::string &reqDev);
     bool CheckAuthFormProxyTokenId(const std::string pkgName, const std::string &extraStr);
@@ -477,10 +480,10 @@ private:
     bool CheckSinkP2PAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
-    bool CheckSinkUserP2PAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
+    bool CheckSinkUserAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
-    bool CheckSinkAppOrServiceP2PAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
+    bool CheckSinkAppOrServiceAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
     bool CheckExtWhiteList(const std::string &bundleName);
@@ -492,7 +495,7 @@ private:
         int32_t localUserId, const DistributedDeviceProfile::AccessControlProfile &aclProfile);
 };
 
-extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();
+DM_EXPORT extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();
 using CreateDpConnectorFuncPtr = IDeviceProfileConnector *(*)(void);
 } // namespace DistributedHardware
 } // namespace OHOS

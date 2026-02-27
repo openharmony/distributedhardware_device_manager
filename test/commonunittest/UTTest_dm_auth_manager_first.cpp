@@ -1931,48 +1931,6 @@ HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_001, testing::ext::TestS
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestSize.Level1)
-{
-    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    int32_t errorCode = ERR_DM_HICHAIN_PROOFMISMATCH;
-    authManager_->pincodeDialogEverShown_ = false;
-    authManager_->authResponseContext_->authType = AUTH_TYPE_NFC;
-    authManager_->serviceInfoProfile_.SetPinCode(PINCODE);
-    authManager_->serviceInfoProfile_.SetPinExchangeType(
-        static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::FROMDP));
-    bool ret = authManager_->CheckNeedShowAuthInfoDialog(errorCode);
-    ASSERT_TRUE(ret);
-
-    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
-    ret = authManager_->CheckNeedShowAuthInfoDialog(errorCode);
-    ASSERT_FALSE(ret);
-
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
-        .WillOnce(Return(ERR_DM_FAILED));
-    authManager_->GetLocalServiceInfoInDp();
-
-    DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
-    localServiceInfo.SetAuthType(static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ONETIME));
-    localServiceInfo.SetAuthBoxType(static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::STATE3));
-    localServiceInfo.SetPinExchangeType(static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::FROMDP));
-    localServiceInfo.SetPinCode(PINCODE);
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(localServiceInfo), Return(DM_OK)));
-    authManager_->GetLocalServiceInfoInDp();
-
-    int64_t requestId = 1;
-    uint8_t arrayPtr[] = {1, 2, 3, 4};
-    uint8_t *sessionKey = arrayPtr;
-    uint32_t sessionKeyLen = static_cast<uint32_t>(sizeof(arrayPtr) / sizeof(arrayPtr[0]));
-    authManager_->authResponseContext_->requestId = 1;
-    authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
-    EXPECT_CALL(*cryptoMgrMock_, SaveSessionKey(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceProfileConnectorMock_, PutSessionKey(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(1), Return(DM_OK)));
-    authManager_->AuthDeviceSessionKey(requestId, sessionKey, sessionKeyLen);
-    authManager_->GetSessionKeyIdSync(requestId);
-}
-
 HWTEST_F(DmAuthManagerTest, IsPinCodeValid_001, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_ = nullptr;

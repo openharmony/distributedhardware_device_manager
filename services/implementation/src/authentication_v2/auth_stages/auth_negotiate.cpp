@@ -24,6 +24,8 @@
 #include "app_manager.h"
 #include "business_event.h"
 #include "distributed_device_profile_client.h"
+#include "dm_auth_cert.h"
+#include "dm_auth_attest_common.h"
 #include "dm_crypto.h"
 #include "dm_log.h"
 #include "dm_timer.h"
@@ -297,6 +299,7 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
                 DmAuthState::HandleAuthenticateTimeout(context, name);
         });
     }
+
     // To be compatible with historical versions, use ConvertSrcVersion to get the actual version on the source side.
     std::string preVersion = std::string(DM_VERSION_5_0_OLD_MAX);
     LOGI("AuthSinkNegotiateStateMachine::Action start version compare %{public}s to %{public}s",
@@ -482,7 +485,7 @@ void AuthSinkNegotiateStateMachine::GetSinkAclInfo(std::shared_ptr<DmAuthContext
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
     FilterProfilesByContext(profiles, context);
-    std::set<uint32_t> bindLevelSet = {};
+    uint32_t bindLevel = DM_INVALIED_TYPE;
     for (const auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
         std::string trustDeviceIdHash = Crypto::GetUdidHash(trustDeviceId);
@@ -492,7 +495,7 @@ void AuthSinkNegotiateStateMachine::GetSinkAclInfo(std::shared_ptr<DmAuthContext
                 GetAnonyString(trustDeviceIdHash).c_str(), GetAnonyString(context->accesser.deviceIdHash).c_str());
             continue;
         }
-        bindLevelSet.insert(item.GetBindLevel());
+        bindLevel = item.GetBindLevel();
         switch (item.GetBindType()) {
             case DM_IDENTICAL_ACCOUNT:
                 if (context->accessee.accountIdHash != context->accesser.accountIdHash ||
@@ -520,7 +523,10 @@ void AuthSinkNegotiateStateMachine::GetSinkAclInfo(std::shared_ptr<DmAuthContext
                 break;
         }
     }
-    DeleteRedundancyAcl(context, aclInfo, bindLevelSet, false);
+    if (aclInfo.Contains("pointTopointAcl") && !aclInfo.Contains("lnnAcl") && bindLevel != USER) {
+        aclInfo.Erase("pointTopointAcl");
+        DeleteAcl(context, context->accessee.aclProfiles[DM_POINT_TO_POINT]);
+    }
 }
 
 void AuthSinkNegotiateStateMachine::GetSinkAclInfoForP2P(std::shared_ptr<DmAuthContext> context,
