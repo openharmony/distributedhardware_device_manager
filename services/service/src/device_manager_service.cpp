@@ -3581,11 +3581,11 @@ int32_t DeviceManagerService::GetAclListHash(const DevUserInfo &localDevUserInfo
     return ERR_DM_FAILED;
 }
 
-void DeviceManagerService::HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
+void DeviceManagerService::HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId,
                                                       int32_t errcode)
 {
     if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
+        dmServiceImpl_->HandleCredentialAuthStatus(proofInfo, deviceTypeId, errcode);
     }
 }
 

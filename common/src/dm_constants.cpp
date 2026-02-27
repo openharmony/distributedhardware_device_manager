@@ -145,7 +145,6 @@ const char* PARAM_CLOSE_SESSION_DELAY_SECONDS = "DM_CLOSE_SESSION_DELAY_SECONDS"
 const char* DM_AUTHENTICATION_TYPE = "DM_AUTHENTICATION_TYPE";
 
 const char* PARAM_KEY_CONN_SESSIONTYPE = "connSessionType";
-const char* PARAM_KEY_HML_RELEASETIME = "hmlReleaseTime";
 const char* PARAM_KEY_HML_ENABLE_160M = "hmlEnable160M";
 const char* PARAM_KEY_HML_ACTIONID = "hmlActionId";
 
@@ -164,6 +163,7 @@ const char* TITLE = "title";
 const char* DM_BUSINESS_ID = "business_id";
 const char* PARAM_KEY_IS_SERVICE_BIND = "isServiceBind";
 const char* BIND_CALLER_IS_SYSTEM_SA = "bindCallerIsSystemSA";
+const char* PARAM_KEY_PEER_PKG_NAME = "PEER_PKG_NAME";
 
 // errCode map
 const std::map<int32_t, int32_t> MAP_ERROR_CODE = {

@@ -77,10 +77,10 @@ public:
     void OnCredentialAuthStatus(const ProcessInfo &processInfo, const std::string &deviceList, uint16_t deviceTypeId,
                                 int32_t errcode) override;
     void OnAppUnintall(const std::string &pkgName) override;
-    void OnSinkBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
-        int32_t status, std::string content) override;
     void OnProcessRemove(const ProcessInfo &processInfo) override;
     void OnDevStateCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
+    void OnSinkBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
+        int32_t status, std::string content) override;
     void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) override;
     void OnGetDeviceIconInfoResult(const ProcessInfo &processInfo,
@@ -98,11 +98,11 @@ public:
 
     std::string GetLocalDisplayDeviceName() override;
     int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) override;
+    void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
     int32_t OpenAuthSessionWithPara(int64_t serviceId) override;
     void OnServicePublishResult(const ProcessInfo &processInfo, int64_t serviceId, int32_t publishResult) override;
-    void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
     void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode) override;
-    void OnAuthCodeInvalid(const std::string &regPkgName, const std::string &pinConsumerPkgName) override;
+    void OnAuthCodeInvalid(const std::string &pkgName, const std::string &consumerPkgName) override;
     std::set<ProcessInfo> GetAlreadyOnlineProcess() override;
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
@@ -139,6 +139,7 @@ private:
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo,
         const bool isOnline);
     void RemoveNotExistProcess();
+    void ClearDbReadyMap(const std::string &notifyPkgName);
     void ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
         const DmDeviceBasicInfo &deviceBasicInfo, const std::vector<int64_t> &serviceIds);
     void ProcessAppStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
@@ -150,8 +151,7 @@ private:
     void ProcessAppOnline(std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo,
         const std::vector<int64_t> &serviceIds);
-    void ClearDbReadyMap(std::string &notifyPkgName);
-    void SetNeedNotifyProcessInfos(const ProcessInfo &processInfo, std::vector<ProcessInfo> &procInfoVec);
+    void SetNeedNotifyProcessInfos(const ProcessInfo &processInfo, std::vector<ProcessInfo> &processInfoVec);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;

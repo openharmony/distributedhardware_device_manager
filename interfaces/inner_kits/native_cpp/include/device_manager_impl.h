@@ -422,26 +422,26 @@ public:
         const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) override;
     virtual int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
         std::string &displayName) override;
-    virtual int32_t RestoreLocalDeviceName(const std::string &pkgName) override;
     virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
         std::vector<std::string> &networkIds) override;
+    virtual int32_t SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName,
+        std::shared_ptr<SetLocalDeviceNameCallback> callback) override;
+    virtual int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
+        const std::string &deviceName, std::shared_ptr<SetRemoteDeviceNameCallback> callback) override;
+    virtual int32_t RestoreLocalDeviceName(const std::string &pkgName) override;
     virtual int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &info) override;
     virtual int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType) override;
     virtual int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &info) override;
     virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
         int32_t pinExchangeType, DMLocalServiceInfo &info) override;
-    virtual int32_t SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName,
-        std::shared_ptr<SetLocalDeviceNameCallback> callback) override;
-    virtual int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
-        const std::string &deviceName, std::shared_ptr<SetRemoteDeviceNameCallback> callback) override;
     virtual int32_t UnRegisterPinHolderCallback(const std::string &pkgName) override;
     virtual bool CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual int32_t GetIdentificationByDeviceIds(const std::string &pkgName,
- 	    const std::vector<std::string> deviceIdList,
- 	    std::map<std::string, std::string> &deviceIdentificationMap) override;
+        const std::vector<std::string> deviceIdList,
+        std::map<std::string, std::string> &deviceIdentificationMap) override;
     virtual int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback) override;
     virtual int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId) override;

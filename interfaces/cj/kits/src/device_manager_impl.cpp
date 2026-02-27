@@ -69,7 +69,7 @@ enum ErrorCode {
     // Failed to obtain the service.
     DM_ERR_OBTAIN_SERVICE = 11600102,
     // Authentication invalid.
-    DM_ERR_AUTHENTICATION_INVALID = 11600103,
+    DM_ERR_AUTHENTICALTION_INVALID = 11600103,
     // Discovery invalid.
     DM_ERR_DISCOVERY_INVALID = 11600104,
     // Publish invalid.
@@ -94,7 +94,7 @@ int32_t TransformErrCode(const int32_t errCode)
         case ERR_DM_PUBLISH_REPEATED:
             return DM_ERR_PUBLISH_INVALID;
         case ERR_DM_AUTH_BUSINESS_BUSY:
-            return DM_ERR_AUTHENTICATION_INVALID;
+            return DM_ERR_AUTHENTICALTION_INVALID;
         case ERR_DM_INPUT_PARA_INVALID:
         case ERR_DM_UNSUPPORTED_AUTH_TYPE:
             return ERR_INVALID_PARAMS;

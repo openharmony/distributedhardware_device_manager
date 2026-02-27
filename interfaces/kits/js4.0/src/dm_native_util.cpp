@@ -27,14 +27,16 @@ using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const std::string ERR_MESSAGE_NO_PERMISSION = "Permission verify failed.";
-const std::string ERR_MESSAGE_NOT_SYSTEM_APP = "The caller is not a system application.";
-const std::string ERR_MESSAGE_INVALID_PARAMS = "Input parameter error.";
+const std::string ERR_MESSAGE_NO_PERMISSION =
+    "Permission verification failed. The application does not have the permission required to call the API.";
+const std::string ERR_MESSAGE_NOT_SYSTEM_APP =
+    "Permission verification failed. A non-system application calls a system API.";
+const std::string ERR_MESSAGE_INVALID_PARAMS = "Parameter error.";
 const std::string ERR_MESSAGE_FAILED = "Failed to execute the function.";
 const std::string ERR_MESSAGE_OBTAIN_SERVICE = "Failed to obtain the service.";
-const std::string ERR_MESSAGE_AUTHENTICATION_INVALID = "Authentication invalid.";
-const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery invalid.";
-const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
+const std::string ERR_MESSAGE_AUTHENTICATION_INVALID = "Authentication unavailable.";
+const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery unavailable.";
+const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish unavailable.";
 const std::string ERR_MESSAGE_FROM_CLOUD_FAILED = "Get data from cloud failed.";
 const std::string ERR_MESSAGE_NEED_LOGIN = "A login account is required.";
 const std::string ERR_MESSAGE_SCAS_CHECK_FAILED = "The device name contains non-compliant content.";
@@ -245,7 +247,7 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
             error = CreateErrorForCall(env, DM_ERR_PUBLISH_INVALID, ERR_MESSAGE_PUBLISH_INVALID, isAsync);
             break;
         case ERR_DM_AUTH_BUSINESS_BUSY:
-            error = CreateErrorForCall(env, DM_ERR_AUTHENTICATION_INVALID,
+            error = CreateErrorForCall(env, DM_ERR_AUTHENTICALTION_INVALID,
                 ERR_MESSAGE_AUTHENTICATION_INVALID, isAsync);
             break;
         case ERR_DM_INPUT_PARA_INVALID:
@@ -292,7 +294,7 @@ napi_value CreateBusinessErrorSystem(napi_env env, int32_t errCode, bool isAsync
             error = CreateErrorForCallSystem(env, DM_ERR_PUBLISH_INVALID, ERR_MESSAGE_PUBLISH_INVALID, isAsync);
             break;
         case ERR_DM_AUTH_BUSINESS_BUSY:
-            error = CreateErrorForCallSystem(env, DM_ERR_AUTHENTICATION_INVALID,
+            error = CreateErrorForCallSystem(env, DM_ERR_AUTHENTICALTION_INVALID,
                 ERR_MESSAGE_AUTHENTICATION_INVALID, isAsync);
             break;
         case ERR_DM_INPUT_PARA_INVALID:

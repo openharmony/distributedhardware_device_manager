@@ -24,6 +24,9 @@
 #include <set>
 
 #include "device_manager_callback.h"
+#include "dm_device_info.h"
+#include "dm_device_profile_info.h"
+#include "dm_subscribe_info.h"
 #include "dm_single_instance.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
@@ -146,18 +149,18 @@ public:
     void OnDeviceTrustChange(const std::string &pkgName, const std::string &udid, const std::string &uuid,
         int32_t authForm);
     void OnDeviceScreenStatus(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
-    void OnCredentialAuthStatus(const std::string &pkgName, const std::string &deviceList,
+    void OnCredentialAuthStatus(const std::string &pkgName, const std::string &proofInfo,
                                 uint16_t deviceTypeId, int32_t errcode);
-    void OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, int32_t status,
-        std::string content);
     std::shared_ptr<DiscoveryCallback> GetDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId);
     void GetCallBack(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap);
+    void OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, int32_t status,
+        std::string content);
     void OnServiceFound(int32_t discoveryServiceId, const DiscoveryServiceInfo &service);
     void OnServiceDiscoveryResult(int32_t discoveryServiceId, int32_t resReason);
     void OnServiceOnline(const std::vector<int64_t> &serviceIds);
     void OnServicePublishResult(int64_t serviceId, int32_t publishResult);
     void OnLeaveLNNResult(const std::string &networkId, int32_t retCode);
-    void OnAuthCodeInvalid(const std::string &regPkgName, const std::string &pinConsumerPkgName);
+    void OnAuthCodeInvalid(const std::string &pkgName, const std::string &consumerPkgName);
 
 private:
 #if !defined(__LITEOS_M__)

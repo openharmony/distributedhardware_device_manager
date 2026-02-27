@@ -16,6 +16,7 @@
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 
+#include "app_manager.h"
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
 #include "device_manager_service_notify.h"
@@ -48,7 +49,6 @@
 #include "ipc_server_stub.h"
 #include "ipc_service_publish_result_req.h"
 #include "multiple_user_connector.h"
-#include "app_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
 #endif
@@ -1531,7 +1531,7 @@ ON_IPC_SET_REQUEST(REMOTE_DEVICE_TRUST_CHANGE, std::shared_ptr<IpcReq> pBaseReq,
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteString(uuid)) {
-        LOGE("write uuid code failed");
+        LOGE("write uuid failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
@@ -1622,7 +1622,7 @@ ON_IPC_SET_REQUEST(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, std::shared_ptr<IpcReq
     std::shared_ptr<IpcNotifyCredentialAuthStatusReq> pReq =
         std::static_pointer_cast<IpcNotifyCredentialAuthStatusReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
-    std::string deviceList = pReq->GetDeviceList();
+    std::string proofInfo = pReq->GetProofInfo();
     uint16_t deviceTypeId = pReq->GetDeviceTypeId();
     int32_t errCode = pReq->GetErrCode();
 
@@ -1630,8 +1630,8 @@ ON_IPC_SET_REQUEST(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, std::shared_ptr<IpcReq
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteString(deviceList)) {
-        LOGE("write deviceList failed");
+    if (!data.WriteString(proofInfo)) {
+        LOGE("write proofInfo failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteUint16(deviceTypeId)) {
@@ -1816,54 +1816,18 @@ ON_IPC_CMD(GET_LOCAL_DISPLAY_DEVICE_NAME, MessageParcel &data, MessageParcel &re
     return DM_OK;
 }
 
-ON_IPC_CMD(REG_LOCALSERVICE_INFO, MessageParcel &data, MessageParcel &reply)
+ON_IPC_CMD(GET_DEVICE_NETWORK_ID_LIST, MessageParcel &data, MessageParcel &reply)
 {
-    DMLocalServiceInfo serviceInfo;
-    IpcModelCodec::DecodeLocalServiceInfo(data, serviceInfo);
-    int32_t result = DeviceManagerService::GetInstance().RegisterLocalServiceInfo(serviceInfo);
+    std::string pkgName = data.ReadString();
+    NetworkIdQueryFilter queryFilter;
+    IpcModelCodec::DecodeNetworkIdQueryFilter(data, queryFilter);
+    std::vector<std::string> networkIds;
+    int32_t result = DeviceManagerService::GetInstance().GetDeviceNetworkIdList(pkgName, queryFilter, networkIds);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    return DM_OK;
-}
-
-ON_IPC_CMD(UNREG_LOCALSERVICE_INFO, MessageParcel &data, MessageParcel &reply)
-{
-    std::string bundleName = data.ReadString();
-    int32_t pinExchangeType = data.ReadInt32();
-    int32_t result = DeviceManagerService::GetInstance().UnRegisterLocalServiceInfo(bundleName, pinExchangeType);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(UPDATE_LOCALSERVICE_INFO, MessageParcel &data, MessageParcel &reply)
-{
-    DMLocalServiceInfo serviceInfo;
-    IpcModelCodec::DecodeLocalServiceInfo(data, serviceInfo);
-    int32_t result = DeviceManagerService::GetInstance().UpdateLocalServiceInfo(serviceInfo);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE, MessageParcel &data, MessageParcel &reply)
-{
-    std::string bundleName = data.ReadString();
-    int32_t pinExchangeType = data.ReadInt32();
-    DMLocalServiceInfo serviceInfo;
-    int32_t result = DeviceManagerService::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
-        bundleName, pinExchangeType, serviceInfo);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (result == DM_OK && !IpcModelCodec::EncodeLocalServiceInfo(serviceInfo, reply)) {
+    if (result == DM_OK && !IpcModelCodec::EncodeStringVector(networkIds, reply)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
@@ -1971,18 +1935,54 @@ ON_IPC_CMD(RESTORE_LOCAL_DEVICE_NAME, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
-ON_IPC_CMD(GET_DEVICE_NETWORK_ID_LIST, MessageParcel &data, MessageParcel &reply)
+ON_IPC_CMD(REG_LOCALSERVICE_INFO, MessageParcel &data, MessageParcel &reply)
 {
-    std::string pkgName = data.ReadString();
-    NetworkIdQueryFilter queryFilter;
-    IpcModelCodec::DecodeNetworkIdQueryFilter(data, queryFilter);
-    std::vector<std::string> networkIds;
-    int32_t result = DeviceManagerService::GetInstance().GetDeviceNetworkIdList(pkgName, queryFilter, networkIds);
+    DMLocalServiceInfo serviceInfo;
+    IpcModelCodec::DecodeLocalServiceInfo(data, serviceInfo);
+    int32_t result = DeviceManagerService::GetInstance().RegisterLocalServiceInfo(serviceInfo);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (result == DM_OK && !IpcModelCodec::EncodeStringVector(networkIds, reply)) {
+    return DM_OK;
+}
+
+ON_IPC_CMD(UNREG_LOCALSERVICE_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    std::string bundleName = data.ReadString();
+    int32_t pinExchangeType = data.ReadInt32();
+    int32_t result = DeviceManagerService::GetInstance().UnRegisterLocalServiceInfo(bundleName, pinExchangeType);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(UPDATE_LOCALSERVICE_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    DMLocalServiceInfo serviceInfo;
+    IpcModelCodec::DecodeLocalServiceInfo(data, serviceInfo);
+    int32_t result = DeviceManagerService::GetInstance().UpdateLocalServiceInfo(serviceInfo);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE, MessageParcel &data, MessageParcel &reply)
+{
+    std::string bundleName = data.ReadString();
+    int32_t pinExchangeType = data.ReadInt32();
+    DMLocalServiceInfo serviceInfo;
+    int32_t result = DeviceManagerService::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        bundleName, pinExchangeType, serviceInfo);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (result == DM_OK && !IpcModelCodec::EncodeLocalServiceInfo(serviceInfo, reply)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
@@ -2320,14 +2320,14 @@ ON_IPC_SET_REQUEST(ON_AUTH_CODE_INVALID, std::shared_ptr<IpcReq> pBaseReq, Messa
 {
     CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
-    std::string regPkgName = pReq->GetPkgName();
-    std::string pinConsumerPkgName = pReq->GetPinConsumerPkgName();
-    if (!data.WriteString(regPkgName)) {
-        LOGE("write regPkgName failed");
+    std::string pkgName = pReq->GetPkgName();
+    std::string consumerPkgName = pReq->GetConsumerPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteString(pinConsumerPkgName)) {
-        LOGE("write pinConsumerPkgName failed");
+    if (!data.WriteString(consumerPkgName)) {
+        LOGE("write consumerPkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

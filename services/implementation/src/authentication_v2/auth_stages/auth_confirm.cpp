@@ -46,6 +46,7 @@ constexpr const char* TAG_REQUESTER = "REQUESTER";
 constexpr const char* UNVALID_CREDTID = "invalidCredId";
 constexpr const char* TAG_IS_SUPPORT_ULTRASONIC = "isSupportUltrasonic";
 constexpr const char* PACKAGE_NAME_COLLABORATION_FWK = "hmos.collaborationfwk.deviceDetect";
+constexpr const char* BUNDLE_NAME_WATCH_SYSTEM_SERVICE = "watch_system_service";
 // authType fallback table
 using FallBackKey = std::pair<std::string, DmAuthType>; // accessee.bundleName, authType
 static std::map<FallBackKey, DmAuthType> g_pinAuthTypeFallBackMap = {
@@ -322,7 +323,7 @@ void AuthSrcConfirmState::GetSrcAclInfo(std::shared_ptr<DmAuthContext> context,
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
     FilterProfilesByContext(profiles, context);
-    std::set<uint32_t> bindLevelSet = {};
+    uint32_t bindLevel = DM_INVALIED_TYPE;
     for (const auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
         std::string trustDeviceIdHash = Crypto::GetUdidHash(trustDeviceId);
@@ -332,7 +333,7 @@ void AuthSrcConfirmState::GetSrcAclInfo(std::shared_ptr<DmAuthContext> context,
                 GetAnonyString(trustDeviceIdHash).c_str(), GetAnonyString(context->accesser.deviceIdHash).c_str());
             continue;
         }
-        bindLevelSet.insert(item.GetBindLevel());
+        bindLevel = item.GetBindLevel();
         switch (item.GetBindType()) {
             case DM_IDENTICAL_ACCOUNT:
                 if (context->accessee.accountIdHash != context->accesser.accountIdHash ||
@@ -360,7 +361,10 @@ void AuthSrcConfirmState::GetSrcAclInfo(std::shared_ptr<DmAuthContext> context,
                 break;
         }
     }
-    DeleteRedundancyAcl(context, aclInfo, bindLevelSet, true);
+    if (aclInfo.Contains("pointTopointAcl") && !aclInfo.Contains("lnnAcl") && bindLevel != USER) {
+        aclInfo.Erase("pointTopointAcl");
+        DeleteAcl(context, context->accesser.aclProfiles[DM_POINT_TO_POINT]);
+    }
 }
 
 void AuthSrcConfirmState::GetSrcAclInfoForP2P(std::shared_ptr<DmAuthContext> context,
@@ -650,7 +654,7 @@ void AuthSrcConfirmState::GenerateCertificate(std::shared_ptr<DmAuthContext> con
         return;
     }
     {
-        std::lock_guard lock(context->certMtx_);
+        std::lock_guard<ffrt::mutex> lock(context->certMtx_);
         context->accesser.cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
     }
     context->certCV_.notify_all();
@@ -1045,9 +1049,9 @@ void AuthSinkConfirmState::ReadServiceInfo(std::shared_ptr<DmAuthContext> contex
     if (ret == OHOS::DistributedDeviceProfile::DP_SUCCESS) {
         ProcessImportAuthInfo(context, srvInfo);
     } else if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) &&
-        AuthSinkStatePinAuthComm::IsAuthCodeReady(context) &&
-        context->importPkgName == PACKAGE_NAME_COLLABORATION_FWK &&
-        context->accesser.bundleName == BUNDLE_NAME_COLLABORATION_FWK) {
+               AuthSinkStatePinAuthComm::IsAuthCodeReady(context) &&
+               (context->importPkgName == PACKAGE_NAME_COLLABORATION_FWK &&
+                context->accesser.bundleName == BUNDLE_NAME_COLLABORATION_FWK)) {
         // only special scenarios can import pincode
         context->authBoxType = DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM; // no authorization box
     } else {

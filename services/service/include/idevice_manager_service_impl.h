@@ -239,7 +239,7 @@ public:
     virtual void HandleUserSwitched(const std::vector<std::string> &deviceVec, int32_t currentUserId,
         int32_t beforeUserId) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
-    virtual void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
+    virtual void HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId,
                                             int32_t errcode) = 0;
     virtual int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately) = 0;

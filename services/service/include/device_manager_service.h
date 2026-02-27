@@ -30,8 +30,11 @@
 #include "dm_service_hichain_connector.h"
 #include "idevice_manager_service_impl.h"
 #include "hichain_listener.h"
+#include "i_dm_service_impl_ext.h"
+#include "dm_single_instance.h"
 #include "i_dm_check_api_white_list.h"
 #include "i_dm_service_impl_ext_resident.h"
+#include "dm_timer.h"
 #include "i_dm_device_risk_detect.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_account_common_event.h"
@@ -261,16 +264,16 @@ public:
     int32_t SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName);
     int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId, const std::string &deviceName);
     std::vector<std::string> GetDeviceNamePrefixs();
+    void ClearPublishIdCache(const std::string &pkgName);
     int32_t RestoreLocalDeviceName(const std::string &pkgName);
+    bool IsPC();
+    int32_t GetDeviceNetworkIdList(const std::string &pkgName, const NetworkIdQueryFilter &queryFilter,
+        std::vector<std::string> &networkIds);
     int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &serviceInfo);
     int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType);
     int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &serviceInfo);
     int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName, int32_t pinExchangeType,
         DMLocalServiceInfo &serviceInfo);
-    void ClearPublishIdCache(const std::string &pkgName);
-    bool IsPC();
-    int32_t GetDeviceNetworkIdList(const std::string &pkgName, const NetworkIdQueryFilter &queryFilter,
-        std::vector<std::string> &networkIds);
     void ProcessSyncAccountLogout(const std::string &accountId, const std::string &peerUdid, int32_t userId);
     int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m);
     int32_t UnRegisterPinHolderCallback(const std::string &pkgName);
@@ -286,8 +289,8 @@ public:
     bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t GetIdentificationByDeviceIds(const std::string &pkgName,
- 	    const std::vector<std::string> deviceIdList,
- 	    std::map<std::string, std::string> &deviceIdentificationMap);
+        const std::vector<std::string> deviceIdList,
+        std::map<std::string, std::string> &deviceIdentificationMap);
 #endif
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
     int32_t GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
@@ -364,12 +367,6 @@ private:
     void HandleUserIdsBroadCast(const std::vector<UserIdInfo> &remoteUserIdInfos,
         const std::string &remoteUdid, bool isNeedResponse);
     void HandleShareUnbindBroadCast(const int32_t userId, const std::string &credId);
-    bool InitDPLocalServiceInfo(const DMLocalServiceInfo &serviceInfo,
-        DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceItem);
-    void InitServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceItem,
-        DMLocalServiceInfo &serviceInfo);
-    void InitServiceInfos(const std::vector<DistributedDeviceProfile::LocalServiceInfo> &dpLocalServiceItems,
-        std::vector<DMLocalServiceInfo> &serviceInfos);
 
     void NotifyRemoteUninstallApp(int32_t userId, int32_t tokenId);
     void NotifyRemoteUninstallAppByWifi(int32_t userId, int32_t tokenId,
@@ -395,9 +392,16 @@ private:
     void HandleUserStopBroadCast(int32_t stopUserId, const std::string &remoteUdid);
     void NotifyRemoteLocalUserStopByWifi(const std::string &localUdid,
         const std::map<std::string, std::string> &wifiDevices, int32_t stopUserId);
-
+    bool InitDPLocalServiceInfo(const DMLocalServiceInfo &serviceInfo,
+        DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceItem);
+    void InitServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceItem,
+        DMLocalServiceInfo &serviceInfo);
+    void InitServiceInfos(const std::vector<DistributedDeviceProfile::LocalServiceInfo> &dpLocalServiceItems,
+        std::vector<DMLocalServiceInfo> &serviceInfos);
     void HandleAccountCommonEvent(const std::string commonEventType);
     bool IsUserStatusChanged(std::vector<int32_t> foregroundUserVec, std::vector<int32_t> backgroundUserVec);
+    void PushPeerUdids(const std::map<std::string, int32_t> &curUserDeviceMap,
+        const std::map<std::string, int32_t> &preUserDeviceMap, std::vector<std::string> &peerUdids);
     void NotifyRemoteAccountCommonEvent(const std::string commonEventType, const std::string &localUdid,
         const std::vector<std::string> &peerUdids, const std::vector<int32_t> &foregroundUserIds,
         const std::vector<int32_t> &backgroundUserIds);
@@ -428,7 +432,6 @@ private:
     void QueryDependsSwitchState();
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
     DM_EXPORT void SubscribeDataShareCommonEvent();
-    void ParseAppUnBindRelationShip(const RelationShipChangeMsg &relationShipMsg);
 #endif
     void HandleNetworkConnected(int32_t networkStatus);
     void NotifyRemoteLocalLogout(const std::vector<std::string> &peerUdids,
@@ -450,6 +453,7 @@ private:
         ServiceInfoProfile &serviceInfoProfile, int64_t tokenId);
     int32_t CheckServiceHasRegistered(const ServiceRegInfo &serviceRegInfo, int64_t tokenId, int32_t &regServiceId);
     int32_t GenerateRegServiceId(int32_t &regServiceId);
+    void ParseAppUnBindRelationShip(const RelationShipChangeMsg &relationShipMsg);
 #endif
 
 private:
@@ -486,8 +490,6 @@ private:
     std::shared_ptr<DmAccountCommonEventManager> accountCommonEventManager_;
     std::shared_ptr<DmPackageCommonEventManager> packageCommonEventManager_;
     std::shared_ptr<DmScreenCommonEventManager> screenCommonEventManager_;
-    std::vector<int32_t> foregroundUserVec_;
-    std::vector<int32_t> backgroundUserVec_;
     std::mutex broadCastLock_;
     int64_t SendLastBroadCastTime_ = 0;
     int64_t lastDelayTime_ = 0;

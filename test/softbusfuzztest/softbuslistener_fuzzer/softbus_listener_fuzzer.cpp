@@ -303,10 +303,7 @@ void SoftBusListenerFifthFuzzTest(FuzzedDataProvider &fdp)
     uint32_t deviceListLen = fdp.ConsumeIntegral<uint32_t>();
     softbusListener_->OnCredentialAuthStatus(deviceList.data(), deviceListLen, deviceTypeId, errcode);
 
-    std::shared_ptr<NodeBasicInfo> info = nullptr;
-    softbusListener_->UpdateDeviceName(info.get());
-    info = std::make_shared<NodeBasicInfo>();
-    softbusListener_->UpdateDeviceName(info.get());
+    softbusListener_->UpdateDeviceName(deviceInfo);
     int32_t publishId = fdp.ConsumeIntegral<int32_t>();
     softbusListener_->StopPublishSoftbusLNN(publishId);
     std::string pkgName = fdp.ConsumeRandomLengthString();

@@ -56,7 +56,8 @@ constexpr const static char* ONBINDRESULT_MAPPING_LIST[ONBINDRESULT_MAPPING_NUM]
 constexpr const static char* FLAG_WHITE_LIST[] = {
     "wear_link_service",
 };
-constexpr int32_t FLAG_WHITE_LIST_NUM = std::size(FLAG_WHITE_LIST);
+constexpr size_t FLAG_WHITE_LIST_NUM = std::size(FLAG_WHITE_LIST);
+
 const std::map<DmAuthStateType, DmAuthStatus> NEW_AND_OLD_STATE_MAPPING = {
     { DmAuthStateType::AUTH_SRC_FINISH_STATE, DmAuthStatus::STATUS_DM_AUTH_FINISH },
     { DmAuthStateType::AUTH_SINK_FINISH_STATE, DmAuthStatus::STATUS_DM_SINK_AUTH_FINISH },
@@ -140,7 +141,6 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
         GetOutputReplay(context->accesser.bundleName, context->reason),
         GetOutputState(context->state), GenerateBindResultContent(context));
     context->successFinished = true;
-
     if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED && context->reason != DM_BIND_TRUST_TARGET) {
         BindFail(context);
     }
@@ -614,30 +614,6 @@ void DmAuthState::DeleteAcl(std::shared_ptr<DmAuthContext> context,
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(profile.GetAccessControlId());
 }
 
-void DmAuthState::DeleteRedundancyAcl(std::shared_ptr<DmAuthContext> context, JsonObject &aclInfo,
-    const std::set<uint32_t> bindLevelSet, bool isSrc)
-{
-    CHECK_NULL_VOID(context);
-    DmAccess access = isSrc ? context->accesser : context->accessee;
-    if (bindLevelSet.empty()) {
-        LOGE("DeleteRedundancyAcl empty set");
-        return;
-    }
-    if (aclInfo.Contains("pointTopointAcl") && !aclInfo.Contains("lnnAcl") &&
-        bindLevelSet.find(USER) == bindLevelSet.end()) {
-        aclInfo.Erase("pointTopointAcl");
-        if (access.aclProfiles.find(DM_POINT_TO_POINT) != access.aclProfiles.end()) {
-            DeleteAcl(context, access.aclProfiles[DM_POINT_TO_POINT]);
-        }
-    }
-    if (!aclInfo.Contains("pointTopointAcl") && aclInfo.Contains("lnnAcl")) {
-        aclInfo.Erase("lnnAcl");
-        if (access.aclProfiles.find(DM_LNN) != access.aclProfiles.end()) {
-            DeleteAcl(context, access.aclProfiles[DM_LNN]);
-        }
-    }
-}
-
 void DmAuthState::SetProcessInfo(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_VOID(context);
@@ -657,11 +633,10 @@ void DmAuthState::SetProcessInfo(std::shared_ptr<DmAuthContext> context)
     }
     processInfoVec.push_back(processInfo);
     if (context->IsProxyBind && !context->subjectProxyOnes.empty()) {
-        for (const auto &app : context->subjectProxyOnes) {
+        for (auto &app : context->subjectProxyOnes) {
             ProcessInfo processInfo;
             processInfo.userId = localAccess.userId;
-            processInfo.pkgName = context->direction == DmAuthDirection::DM_AUTH_SOURCE ? app.proxyAccesser.bundleName :
-                app.proxyAccessee.bundleName;
+            processInfo.pkgName = context->GetAclBundleName(context->direction, app);
             processInfoVec.push_back(processInfo);
         }
     }
@@ -693,6 +668,18 @@ void DmAuthState::FilterProfilesByContext(
     }
     profiles.clear();
     profiles.assign(aclProfilesVec.begin(), aclProfilesVec.end());
+}
+
+void DmAuthState::GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId)
+{
+    CHECK_NULL_VOID(context);
+    peerDeviceId = context->accesser.aclProfiles[DM_IDENTICAL_ACCOUNT].GetAccessee().GetAccesseeDeviceId();
+    if (peerDeviceId.empty()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccessee().GetAccesseeDeviceId();
+    }
+    if (peerDeviceId.empty()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
+    }
 }
 
 bool DmAuthState::GetSessionKey(std::shared_ptr<DmAuthContext> context)
@@ -868,51 +855,19 @@ void DmAuthState::DeleteAclAndSk(std::shared_ptr<DmAuthContext> context,
     int32_t sessionKeyId = access.deviceId == profile.GetAccesser().GetAccesserDeviceId() ?
         profile.GetAccesser().GetAccesserSessionKeyId() : profile.GetAccessee().GetAccesseeSessionKeyId();
     context->authMessageProcessor->DeleteSessionKeyToDP(userId, sessionKeyId);
+    int32_t accessUserId;
+    std::string accessCredId;
+    if (context->direction == DmAuthDirection::DM_AUTH_SOURCE) {
+        accessUserId = profile.GetAccesser().GetAccesserUserId();
+        accessCredId = profile.GetAccesser().GetAccesserCredentialIdStr();
+    } else {
+        accessUserId = profile.GetAccessee().GetAccesseeUserId();
+        accessCredId = profile.GetAccessee().GetAccesseeCredentialIdStr();
+    }
+    LOGI("Deleted credential for userId %{public}s, credId %{public}s", GetAnonyInt32(accessUserId).c_str(),
+        GetAnonyString(accessCredId).c_str());
+    context->hiChainAuthConnector->DeleteCredential(accessUserId, accessCredId);
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(profile.GetAccessControlId());
-}
-
-void DmAuthState::GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId)
-{
-    CHECK_NULL_VOID(context);
-    if (context->accesser.aclProfiles.find(DM_IDENTICAL_ACCOUNT) != context->accesser.aclProfiles.end()) {
-        peerDeviceId = context->accesser.aclProfiles[DM_IDENTICAL_ACCOUNT].GetAccessee().GetAccesseeDeviceId();
-        if (!peerDeviceId.empty()) {
-            return;
-        }
-    }
-    if (context->accesser.aclProfiles.find(DM_SHARE) != context->accesser.aclProfiles.end()) {
-        peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccessee().GetAccesseeDeviceId();
-        if (peerDeviceId == context->accesser.deviceId) {
-            peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccesser().GetAccesserDeviceId();
-        }
-        if (!peerDeviceId.empty()) {
-            return;
-        }
-    }
-    if (context->accesser.aclProfiles.find(DM_POINT_TO_POINT) != context->accesser.aclProfiles.end()) {
-        peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
-        if (peerDeviceId == context->accesser.deviceId) {
-            peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserDeviceId();
-        }
-        if (!peerDeviceId.empty()) {
-            return;
-        }
-    }
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        return;
-    }
-    for (auto &app : context->subjectProxyOnes) {
-        if (app.proxyAccesser.aclProfiles.find(DM_POINT_TO_POINT) != app.proxyAccesser.aclProfiles.end()) {
-            peerDeviceId = app.proxyAccesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
-            if (peerDeviceId == context->accesser.deviceId) {
-                peerDeviceId = app.proxyAccesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserDeviceId();
-            }
-            if (!peerDeviceId.empty()) {
-                return;
-            }
-        }
-    }
-    LOGE("failed");
 }
 
 bool DmAuthState::IsMatchCredentialAndP2pACL(JsonObject &credInfo, std::string &credId,
@@ -1112,36 +1067,12 @@ void DmAuthState::HandlePinResultAndCallback(std::shared_ptr<DmAuthContext> cont
     DmAuthState::UpdatePinErrorCount(pkgName, context->authType);
     ++count;
     if (count >= PIN_CODE_COUNT_MAX_NUM) {
-        std::string regPkgName = "";
-        std::string pinConsumerPkgName = "";
-        GetRegPkgNameAndPinConsumerPkgName(pkgName, context->authType, regPkgName, pinConsumerPkgName);
         if (context->stopTimerAndDelDpCallback) {
             context->stopTimerAndDelDpCallback(pkgName, context->authType, tokenId);
         }
         if (context->listener != nullptr) {
-            context->listener->OnAuthCodeInvalid(regPkgName, pinConsumerPkgName);
+            context->listener->OnAuthCodeInvalid(context->accessee.pkgName, context->accessee.pkgName);
         }
-    }
-}
-
-void DmAuthState::GetRegPkgNameAndPinConsumerPkgName(const std::string &bundleName, int32_t pinExchangeType,
-    std::string &regPkgName, std::string &pinConsumerPkgName)
-{
-    DistributedDeviceProfile::LocalServiceInfo srvInfo;
-    JsonObject extraInfoObj;
-    if (!GetServiceExtraInfo(bundleName, pinExchangeType, srvInfo, extraInfoObj)) {
-        LOGE("load extra info failed, use default values");
-        regPkgName = bundleName;
-        pinConsumerPkgName = bundleName;
-        return;
-    }
-    pinConsumerPkgName = srvInfo.GetBundleName();
-    if (IsString(extraInfoObj, REG_PKGNAME)) {
-        regPkgName = extraInfoObj[REG_PKGNAME].Get<std::string>();
-    }
-    if (regPkgName.empty()) {
-        LOGI("regPkgName is empty");
-        regPkgName = pinConsumerPkgName;
     }
 }
 
@@ -1227,7 +1158,7 @@ bool DmAuthState::IsInFlagWhiteList(const std::string &bundleName)
         LOGE("bundleName is empty");
         return false;
     }
-    uint16_t index = 0;
+    size_t index = 0;
     for (; index < FLAG_WHITE_LIST_NUM; ++index) {
         std::string tmp = FLAG_WHITE_LIST[index];
         if (bundleName == tmp) {

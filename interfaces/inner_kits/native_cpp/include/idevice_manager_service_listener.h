@@ -160,11 +160,11 @@ public:
     virtual void OnCredentialAuthStatus(const ProcessInfo &processInfo, const std::string &deviceList,
                                         uint16_t deviceTypeId, int32_t errcode) = 0;
     virtual void OnAppUnintall(const std::string &pkgName) = 0;
-    virtual void OnSinkBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
-        int32_t status, std::string content) = 0;
     virtual void OnProcessRemove(const ProcessInfo &processInfo) = 0;
     virtual void OnDevStateCallbackAdd(const ProcessInfo &processInfo,
         const std::vector<DmDeviceInfo> &deviceList) = 0;
+    virtual void OnSinkBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
+        int32_t status, std::string content) = 0;
     virtual void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) = 0;
     virtual void OnGetDeviceIconInfoResult(const ProcessInfo &processInfo,
@@ -180,15 +180,15 @@ public:
 
     virtual std::string GetLocalDisplayDeviceName() = 0;
     virtual int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) = 0;
+    virtual void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo,
+        const std::vector<DmDeviceInfo> &deviceList) = 0;
     virtual int32_t OpenAuthSessionWithPara(int64_t serviceId) = 0;
     virtual void OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
         const DmDeviceInfo &info, const std::vector<int64_t> &serviceIds) = 0;
     virtual void OnServicePublishResult(const ProcessInfo &processInfo, int64_t serviceId, int32_t publishResult) = 0;
-    virtual void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo,
-        const std::vector<DmDeviceInfo> &deviceList) = 0;
     virtual void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId,
         int32_t retCode) {}
-    virtual void OnAuthCodeInvalid(const std::string &regPkgName, const std::string &pinConsumerPkgName) {}
+    virtual void OnAuthCodeInvalid(const std::string &pkgName, const std::string &consumerPkgName) {}
     virtual std::set<ProcessInfo> GetAlreadyOnlineProcess() = 0;
 };
 } // namespace DistributedHardware
