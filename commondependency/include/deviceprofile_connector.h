@@ -20,6 +20,7 @@
 #include <unordered_set>
 #include "access_control_profile.h"
 #include "dm_device_info.h"
+#include "dm_single_instance.h"
 #include "i_dp_inited_callback.h"
 #include "json_object.h"
 #include "local_service_info.h"
@@ -197,7 +198,7 @@ public:
 };
 
 class DeviceProfileConnector : public IDeviceProfileConnector {
-    DECLARE_SINGLE_INSTANCE(DeviceProfileConnector);
+    DM_DECLARE_SINGLE_INSTANCE(DeviceProfileConnector);
 public:
     DM_EXPORT DmOfflineParam FilterNeedDeleteACL(const std::string &localDeviceId, uint32_t localTokenId,
         const std::string &remoteDeviceId, const std::string &extra);
