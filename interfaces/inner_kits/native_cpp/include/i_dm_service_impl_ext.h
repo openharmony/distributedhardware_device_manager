@@ -17,6 +17,7 @@
 #define OHOS_I_DM_SERVICE_IMPL_EXT_H
 
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 #include "idevice_manager_service_listener.h"
 #include "i_dm_bind_manager_ext_resident.h"
 
@@ -99,10 +100,10 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t AccountUserSwitched(int32_t userId, const std::string &accountId) = 0;
+
     virtual int32_t InitResident(std::shared_ptr<IDMBindManagerExtResident> residentCallback,
         const std::shared_ptr<IDeviceManagerServiceListener> &listener) = 0;
     virtual void OnResidentBytesReceived(const int32_t sessionId, const std::string &message) = 0;
-
     virtual void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result) = 0;
     virtual void OnSessionClosed(const int32_t sessionId) = 0;
     virtual void OnBytesReceived(const int32_t sessionId, const std::string message) = 0;

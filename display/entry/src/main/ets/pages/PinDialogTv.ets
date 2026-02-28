@@ -36,7 +36,7 @@ struct PinCustomDialog {
   @State pinCodeArr: Array<string> = [];
   @State btnColor: ResourceColor = Color.Transparent;
   @State isPC: boolean = false;
-  @State mLocalWidth: number = 0;
+  @State mLocalWidth: number = 1;
   controller?: CustomDialogController
 
   cancel() {
@@ -58,7 +58,7 @@ struct PinCustomDialog {
       this.mLocalWidth = display.getDefaultDisplaySync().width;
     } catch (err) {
       console.error('Failed to get display width:', err);
-      this.mLocalWidth = 0;
+      this.mLocalWidth = 1;
     }
     if (AppStorage.get('metaType') != null) {
       metaType = AppStorage.get('metaType') as number;
