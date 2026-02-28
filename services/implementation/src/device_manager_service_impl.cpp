@@ -552,10 +552,6 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     if (credentialMgr_ == nullptr) {
         credentialMgr_ = std::make_shared<DmCredentialManager>(hiChainConnector_, listener);
     }
-    if (dpInitedCallback_ == nullptr) {
-        dpInitedCallback_ = sptr<DpInitedCallback>(new DpInitedCallback());
-        DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback_);
-    }
     listener_ = listener;
     CreateGlobalClassicalAuthMgr();
     if (authMgr_ != nullptr) {
@@ -628,8 +624,6 @@ void DeviceManagerServiceImpl::Release()
     softbusConnector_ = nullptr;
     abilityMgr_ = nullptr;
     hiChainConnector_ = nullptr;
-    DeviceProfileConnector::GetInstance().UnSubscribeDeviceProfileInited();
-    dpInitedCallback_ = nullptr;
 }
 
 int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &udid,

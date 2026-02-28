@@ -34,7 +34,6 @@
 #include "dm_device_info.h"
 #include "dm_device_state_manager.h"
 #include "dm_single_instance.h"
-#include "dp_inited_callback.h"
 #include "ffrt.h"
 #include "idevice_manager_service_impl.h"
 #include "ipc_skeleton.h"
@@ -350,7 +349,6 @@ private:
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::atomic<bool> isCredentialType_ = false;
     ffrt::mutex logoutMutex_;
-    sptr<DpInitedCallback> dpInitedCallback_ = nullptr;
 
     // The session ID corresponding to the device ID, used only on the src side
     std::map<std::string, int> deviceId2SessionIdMap_;

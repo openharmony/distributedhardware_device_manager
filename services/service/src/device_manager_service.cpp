@@ -445,6 +445,10 @@ int32_t DeviceManagerService::InitDMServiceListener()
             LOGE("SubscribeAllServiceInfo failed, ret: %{public}d", ret);
         }
     }
+    if (dpInitedCallback_ == nullptr) {
+        dpInitedCallback_ = sptr<DpInitedCallback>(new DpInitedCallback());
+        DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback_);
+    }
 #endif
     LOGI("Init success.");
     return DM_OK;
@@ -458,6 +462,8 @@ DM_EXPORT void DeviceManagerService::UninitDMServiceListener()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DeviceNameManager::GetInstance().UnInit();
     KVAdapterManager::GetInstance().UnInit();
+    dpInitedCallback_ = nullptr;
+    DeviceProfileConnector::GetInstance().UnSubscribeDeviceProfileInited();
 #endif
     LOGI("Uninit.");
 }
@@ -2856,7 +2862,7 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
         dmServiceImplExtResident_->AccountIdLogout(userId, accountId, dualPeerUdids);
     }
     HandleRegularPeerLogout(userId, accountId, accountName, peerUdids);
-    ProcessDeviceMapForLogout(deviceMap, localUdid, accountId);
+    ProcessDeviceMapForLogout(userId, deviceMap, localUdid, accountId);
 }
 
 void DeviceManagerService::HandleRegularPeerLogout(int32_t userId, const std::string &accountId,
@@ -2873,19 +2879,18 @@ void DeviceManagerService::HandleRegularPeerLogout(int32_t userId, const std::st
     }
 }
 
-void DeviceManagerService::ProcessDeviceMapForLogout(const std::multimap<std::string, int32_t> &deviceMap,
-    const std::string &localUdid, const std::string &accountId)
+void DeviceManagerService::ProcessDeviceMapForLogout(int32_t userId,
+    const std::multimap<std::string, int32_t> &deviceMap, const std::string &localUdid,
+    const std::string &accountId)
 {
     for (const auto &item : deviceMap) {
-        DMAclQuadInfo info = {localUdid, item.second, item.first, item.second};
+        DMAclQuadInfo info = {localUdid, userId, item.first, item.second};
         std::vector<DmUserRemovedServiceInfo> serviceInfos;
         dmServiceImpl_->HandleIdentAccountLogout(info, accountId, serviceInfos);
-        
         if (!IsDMServiceAdapterResidentLoad()) {
             LOGE("IsDMServiceAdapterResidentLoad failed.");
             return;
         }
-        
         LogoutProcessServiceInfos(serviceInfos, localUdid);
     }
 }
@@ -5575,7 +5580,7 @@ int32_t DeviceManagerService::GetLocalServiceInfoByServiceId(int64_t serviceId, 
     LOGI("GetLocalServiceInfoByServiceId success");
     return DM_OK;
 }
- 
+
 int32_t DeviceManagerService::GetTrustServiceInfo(const std::string &pkgName,
     const std::map<std::string, std::string> &paramMap, std::vector<DmServiceInfo> &serviceList)
 {
@@ -5604,7 +5609,7 @@ int32_t DeviceManagerService::GetTrustServiceInfo(const std::string &pkgName,
     LOGI("GetTrustServiceInfo success");
     return DM_OK;
 }
- 
+
 int32_t DeviceManagerService::GetRegisterServiceInfo(const std::map<std::string, std::string> &param,
     std::vector<DmRegisterServiceInfo> &regServiceInfos)
 {
@@ -5647,7 +5652,7 @@ int32_t DeviceManagerService::UpdateServiceInfo(int64_t serviceId, const DmRegis
     }
     return ERR_DM_FAILED;
 }
- 
+
 int32_t DeviceManagerService::GetPeerServiceInfoByServiceId(const std::string &networkId, int64_t serviceId,
     DmRegisterServiceInfo &serviceInfo)
 {
@@ -5793,7 +5798,7 @@ void DeviceManagerService::HandleServiceUnRegEvent(const std::string &peerUdid, 
         LOGE("failed, adapter instance not init or init failed.");
         return;
     }
-    
+
     ffrt::submit([dmServiceImplExtResident = dmServiceImplExtResident_, peerUdid, serviceId]() {
         dmServiceImplExtResident->HandleServiceUnRegEvent(peerUdid, serviceId);
     },
@@ -5832,7 +5837,7 @@ int32_t DeviceManagerService::HandleRemoteDied(const ProcessInfo &processInfo)
     LOGI("HandleRemoteDied result: %{public}d", result);
     return result;
 }
- 
+
 int32_t DeviceManagerService::HandleSoftbusRestart()
 {
     LOGI("HandleSoftbusRestart start");

@@ -1,6 +1,7 @@
 {
   "src": [
     "pages/ConfirmDialog",
+    "pages/ConfirmDialogServe",
     "pages/PinDialog",
     "pages/InputPinDialog",
     "pages/BluetoothDialog",

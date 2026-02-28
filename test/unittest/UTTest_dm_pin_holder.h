@@ -364,16 +364,6 @@ public:
         (void)bindParam;
     }
 
-    virtual void OnServiceStateOfflineResult(uint64_t tokenId, const std::string &pkgName, int32_t bindType,
-        const std::string &peerUdid, const DistributedDeviceProfile::ServiceInfo &serviceInfo) override
-    {
-        (void)tokenId;
-        (void)pkgName;
-        (void)bindType;
-        (void)peerUdid;
-        (void)serviceInfo;
-    }
-
     virtual void OnAuthCodeInvalid(const std::string &pkgName, const std::string &consumerPkgName) override
     {
         (void)pkgName;

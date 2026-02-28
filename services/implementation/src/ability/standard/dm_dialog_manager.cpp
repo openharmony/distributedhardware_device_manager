@@ -70,7 +70,7 @@ void DmDialogManager::ConfigLocalInfo(JsonObject& jsonObject)
     if (IsString(jsonObject, TITLE)) {
         title_ = jsonObject[TITLE].Get<std::string>();
     }
-    if (IsString(jsonObject, TAG_USER_ID)) {
+    if (IsInt32(jsonObject, TAG_USER_ID)) {
         userId_ = jsonObject[TAG_USER_ID].Get<std::int32_t>();
     }
 }

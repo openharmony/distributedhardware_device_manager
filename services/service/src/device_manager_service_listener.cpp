@@ -1461,15 +1461,6 @@ void DeviceManagerServiceListener::OnServiceStateOnlineResult(const ServiceState
     DeviceManagerService::GetInstance().BindServiceOnline(bindParam);
     LOGI("OnServiceStateOnlineResult success.");
 }
-
-void DeviceManagerServiceListener::OnServiceStateOfflineResult(uint64_t tokenId,
-    const std::string &pkgName, int32_t bindType,
-    const std::string &peerUdid, const DistributedDeviceProfile::ServiceInfo &serviceInfo)
-{
-    LOGI("OnServiceStateOfflineResult start.");
-    DeviceManagerService::GetInstance().BindServiceOffline(tokenId, pkgName, bindType, peerUdid, serviceInfo);
-    LOGI("OnServiceStateOfflineResult success.");
-}
 #endif
 } // namespace DistributedHardware
 } // namespace OHOS

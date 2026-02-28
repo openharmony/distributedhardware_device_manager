@@ -34,6 +34,7 @@
 #include "i_dm_service_impl_ext_resident.h"
 #include "i_dm_device_risk_detect.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "dp_inited_callback.h"
 #include "dm_account_common_event.h"
 #include "dm_datashare_common_event.h"
 #include "dm_package_common_event.h"
@@ -395,8 +396,8 @@ private:
     void HandleAccountLogout(int32_t userId, const std::string &accountId, const std::string &accountName);
     void HandleRegularPeerLogout(int32_t userId, const std::string &accountId, const std::string &accountName,
         const std::vector<std::string>& peerUdids);
-    void ProcessDeviceMapForLogout(const std::multimap<std::string, int32_t> &deviceMap, const std::string &localUdid,
-        const std::string &accountId);
+    void ProcessDeviceMapForLogout(int32_t userId, const std::multimap<std::string, int32_t> &deviceMap,
+        const std::string &localUdid, const std::string &accountId);
     void LogoutProcessServiceInfos(const std::vector<DmUserRemovedServiceInfo> &serviceInfos,
         const std::string &localUdid);
     void HandleUserRemoved(int32_t removedUserId);
@@ -536,6 +537,7 @@ private:
     std::string localDeviceId_;
     std::shared_ptr<PinHolder> pinHolder_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    sptr<DpInitedCallback> dpInitedCallback_ = nullptr;
     std::shared_ptr<DmAccountCommonEventManager> accountCommonEventManager_;
     std::shared_ptr<DmPackageCommonEventManager> packageCommonEventManager_;
     std::shared_ptr<DmScreenCommonEventManager> screenCommonEventManager_;
