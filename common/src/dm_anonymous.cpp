@@ -495,13 +495,13 @@ std::string GetAnonyJsonString(const std::string &value)
     }
     const std::set<std::string> sensitiveKey = { "LOCALDEVICEID", "localAccountId", "networkId", "lnnPublicKey",
         "transmitPublicKey", "DEVICEID", "deviceId", "keyValue", "deviceName", "REMOTE_DEVICE_NAME", "data" };
-
-    for (auto &element : paramJson.Items()) {
+    std::vector<JsonItemObject> paramJsonVec = paramJson.Items();
+    for (auto &element : paramJsonVec) {
         if (element.IsString() && sensitiveKey.find(element.Key()) != sensitiveKey.end()) {
             paramJson[element.Key()] = GetAnonyString(element.Get<std::string>());
         }
     }
-    return paramJson.Dump();
+    return paramJson.DumpFormated();
 }
 
 int64_t GetCurrentTimestamp()

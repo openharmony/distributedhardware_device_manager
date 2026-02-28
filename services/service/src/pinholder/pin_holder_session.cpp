@@ -44,6 +44,7 @@ int32_t PinHolderSession::RegisterSessionCallback(std::shared_ptr<IPinholderSess
 {
     std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
     pinholderSessionCallback_ = callback;
+    LOGI("end.");
     return DM_OK;
 }
 
@@ -51,6 +52,7 @@ int32_t PinHolderSession::UnRegisterSessionCallback()
 {
     std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
     pinholderSessionCallback_ = nullptr;
+    LOGI("end.");
     return DM_OK;
 }
 
@@ -68,7 +70,7 @@ int32_t PinHolderSession::OpenSessionServer(const PeerTargetId &targetId)
         LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId);
         return sessionId;
     }
-    LOGI("success. sessionId: %{public}d.", sessionId);
+    LOGI("OpenAuthSession success. sessionId: %{public}d.", sessionId);
     return sessionId;
 }
 
@@ -86,7 +88,7 @@ int PinHolderSession::OnSessionOpened(int sessionId, int result)
         std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
         tempCbk = pinholderSessionCallback_;
     }
-    LOGI("[SOFTBUS]OnSessionOpened sessionId: %{public}d", sessionId);
+    LOGI("[SOFTBUS]OnBytesReceived sessionId: %{public}d", sessionId);
     if (tempCbk == nullptr) {
         LOGE("OnSessionOpened error, pinholderSessionCallback_ is nullptr.");
         return ERR_DM_FAILED;
