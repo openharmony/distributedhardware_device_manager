@@ -157,7 +157,7 @@ class SyncServiceInfoCallbackTest : public SyncServiceInfoCallback {
 public:
     explicit SyncServiceInfoCallbackTest(int *count) : count_(count) {}
     virtual ~SyncServiceInfoCallbackTest() {}
-    void OnSyncServiceInfoResult(int32_t result, std::string content) override {}
+    void OnSyncServiceInfoResult(int32_t result, const std::string content) override {}
 private:
     int *count_ = nullptr;
 };
