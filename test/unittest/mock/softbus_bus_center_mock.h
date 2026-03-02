@@ -18,11 +18,15 @@
 
 #include <cstdint>
 
+#include "softbus_bus_center.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 void ResetSoftbusBusCenterMock();
 void SetPublishLnnMockRet(int32_t ret);
 void SetStopPublishLnnMockRet(int32_t ret);
+void SetLocalNodeDeviceInfoMockRet(int32_t ret);
+void SetLocalNodeDeviceInfoMock(const NodeBasicInfo &info);
 int32_t GetPublishLnnMockCallCount();
 int32_t GetStopPublishLnnMockCallCount();
 int32_t GetPublishLnnMockLastPublishId();
