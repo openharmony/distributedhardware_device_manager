@@ -2666,22 +2666,22 @@ ohos_unittest("UTTest_dm_language_manager") {
 
 ## UnitTest UTTest_dm_language_manager }}}
 ## UnitTest UTTest_ipc_model_codec_test {{{
-	 
- ohos_unittest("UTTest_ipc_model_codec_test") {
-	  module_out_path = module_out_path
- 	  include_dirs = [
- 	    "${devicemanager_path}/common/include/ipc/standard",
- 	    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
- 	    "${devicemanager_path}/test/unittest",
- 	    "${devicemanager_path}/services/ipc/include",
- 	  ]
- 	  sources = [ "UTTest_ipc_model_codec_test.cpp" ]
- 	  deps = [ ":device_manager_test_common" ]
- 	  external_deps = [
- 	    "googletest:gmock",
- 	    "googletest:gmock_main",
- 	    "hilog:libhilog",
- 	  ]
+
+ohos_unittest("UTTest_ipc_model_codec_test") {
+  module_out_path = module_out_path
+  include_dirs = [
+    "${devicemanager_path}/common/include/ipc/standard",
+    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
+    "${devicemanager_path}/test/unittest",
+    "${devicemanager_path}/services/ipc/include",
+  ]
+  sources = [ "UTTest_ipc_model_codec_test.cpp" ]
+  deps = [ ":device_manager_test_common" ]
+  external_deps = [
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
 }
- 	 
+
 ## UnitTest UTTest_ipc_model_codec_test }}}

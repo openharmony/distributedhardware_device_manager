@@ -1796,7 +1796,7 @@ HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_015, testing::ext::Tes
     int64_t serviceId = 123;
     req->SetPkgName(networkId);
     req->SetBindParam(unbindParam);
-    req->SetNetWorkId(networkId);
+    req->SetNetworkId(networkId);
     req->SetServiceId(serviceId);
     int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
