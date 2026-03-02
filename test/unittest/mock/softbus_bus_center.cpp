@@ -15,12 +15,60 @@
 
 #include "softbus_connector.h"
 
+#include "softbus_bus_center_mock.h"
+
+namespace {
 int32_t g_mockPublishLnnRet = 0;
 int32_t g_mockStopPublishLnnRet = 0;
 int32_t g_mockPublishLnnCallCount = 0;
 int32_t g_mockStopPublishLnnCallCount = 0;
 int32_t g_mockPublishLnnLastPublishId = -1;
 int32_t g_mockStopPublishLnnLastPublishId = -1;
+}
+
+namespace OHOS {
+namespace DistributedHardware {
+void ResetSoftbusBusCenterMock()
+{
+    g_mockPublishLnnRet = 0;
+    g_mockStopPublishLnnRet = 0;
+    g_mockPublishLnnCallCount = 0;
+    g_mockStopPublishLnnCallCount = 0;
+    g_mockPublishLnnLastPublishId = -1;
+    g_mockStopPublishLnnLastPublishId = -1;
+}
+
+void SetPublishLnnMockRet(int32_t ret)
+{
+    g_mockPublishLnnRet = ret;
+}
+
+void SetStopPublishLnnMockRet(int32_t ret)
+{
+    g_mockStopPublishLnnRet = ret;
+}
+
+int32_t GetPublishLnnMockCallCount()
+{
+    return g_mockPublishLnnCallCount;
+}
+
+int32_t GetStopPublishLnnMockCallCount()
+{
+    return g_mockStopPublishLnnCallCount;
+}
+
+int32_t GetPublishLnnMockLastPublishId()
+{
+    return g_mockPublishLnnLastPublishId;
+}
+
+int32_t GetStopPublishLnnMockLastPublishId()
+{
+    return g_mockStopPublishLnnLastPublishId;
+}
+} // namespace DistributedHardware
+} // namespace OHOS
 
 int32_t GetNodeKeyInfo(const char *pkgName, const char *networkId, NodeDeviceInfoKey key, uint8_t *info,
                        int32_t infoLen)
