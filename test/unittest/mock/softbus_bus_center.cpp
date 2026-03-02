@@ -24,6 +24,8 @@ int32_t g_mockPublishLnnCallCount = 0;
 int32_t g_mockStopPublishLnnCallCount = 0;
 int32_t g_mockPublishLnnLastPublishId = -1;
 int32_t g_mockStopPublishLnnLastPublishId = -1;
+int32_t g_mockGetLocalNodeDeviceInfoRet = 0;
+NodeBasicInfo g_mockLocalNodeInfo = {};
 }
 
 namespace OHOS {
@@ -36,6 +38,8 @@ void ResetSoftbusBusCenterMock()
     g_mockStopPublishLnnCallCount = 0;
     g_mockPublishLnnLastPublishId = -1;
     g_mockStopPublishLnnLastPublishId = -1;
+    g_mockGetLocalNodeDeviceInfoRet = 0;
+    g_mockLocalNodeInfo = {};
 }
 
 void SetPublishLnnMockRet(int32_t ret)
@@ -46,6 +50,16 @@ void SetPublishLnnMockRet(int32_t ret)
 void SetStopPublishLnnMockRet(int32_t ret)
 {
     g_mockStopPublishLnnRet = ret;
+}
+
+void SetLocalNodeDeviceInfoMockRet(int32_t ret)
+{
+    g_mockGetLocalNodeDeviceInfoRet = ret;
+}
+
+void SetLocalNodeDeviceInfoMock(const NodeBasicInfo &info)
+{
+    g_mockLocalNodeInfo = info;
 }
 
 int32_t GetPublishLnnMockCallCount()
@@ -94,6 +108,18 @@ int32_t GetAllNodeDeviceInfo(const char *pkgName, NodeBasicInfo **info, int32_t 
     (void)info;
     (void)infoNum;
     return 0;
+}
+
+int32_t GetLocalNodeDeviceInfo(const char *pkgName, NodeBasicInfo *info)
+{
+    (void)pkgName;
+    if (g_mockGetLocalNodeDeviceInfoRet != 0) {
+        return g_mockGetLocalNodeDeviceInfoRet;
+    }
+    if (info != nullptr) {
+        *info = g_mockLocalNodeInfo;
+    }
+    return g_mockGetLocalNodeDeviceInfoRet;
 }
 
 int32_t PublishLNN(const char *pkgName, const PublishInfo *info, const IPublishCb *cb)
