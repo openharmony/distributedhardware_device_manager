@@ -211,7 +211,7 @@ static void NegotiateProxyP2PAclAccesserInner(std::vector<DmProxyAuthContext>::i
         }
     }
 }
- 	 
+
 static void NegotiateProxyP2PAclAccesser(std::vector<DmProxyAuthContext>::iterator item, JsonObject &aclNegoResult)
 {
     if (item->proxyAccesser.aclProfiles.count(DM_POINT_TO_POINT) != 0) {
@@ -1482,7 +1482,8 @@ bool AuthSinkConfirmState::ProcessServerAuthorize(std::shared_ptr<DmAuthContext>
     if (context == nullptr) {
         return false;
     }
-    if (!context->IsProxyBind || context->authType != DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE) {
+    if (!context->IsProxyBind || context->authType != DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE ||
+        context->isServiceBind) {
         return true;
     }
     OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;

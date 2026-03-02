@@ -448,7 +448,8 @@ private:
         const DMAclQuadInfo &info, const std::string &accountId, DmOfflineParam &offlineParam,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos, bool &notifyOffline);
     void ProcessRemoteAccessLocal(const DistributedDeviceProfile::AccessControlProfile &item,
-        const DMAclQuadInfo &info, const std::string &accountId, DmOfflineParam &offlineParam, bool &notifyOffline);
+        const DMAclQuadInfo &info, const std::string &accountId, DmOfflineParam &offlineParam,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos, bool &notifyOffline);
     void SetProcessInfoPkgName(const DistributedDeviceProfile::AccessControlProfile &acl,
         std::vector<OHOS::DistributedHardware::ProcessInfo> &processInfoVec, bool isAccer);
     bool CheckAclStatusNotMatch(const DistributedDeviceProfile::AccessControlProfile &profile,
@@ -458,7 +459,8 @@ private:
         const DMAclQuadInfo &info, const std::string &accountIdHash, DmOfflineParam &offlineParam, bool &notifyOffline,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     void ProcessPeerToLocal(const DistributedDeviceProfile::AccessControlProfile &profile, const DMAclQuadInfo &info,
-        const std::string &accountIdHash, DmOfflineParam &offlineParam, bool &notifyOffline);
+        const std::string &accountIdHash, DmOfflineParam &offlineParam, bool &notifyOffline,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
 
     void FilterNeedDeleteACLInfos(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
         const std::string &localUdid, const std::string &peerUdid, DmOfflineParam &offlineParam);
@@ -529,6 +531,10 @@ private:
         int32_t localUserId, const DistributedDeviceProfile::AccessControlProfile &aclProfile);
     bool HasServiceId(const DistributedDeviceProfile::AccessControlProfile &profile, int64_t serviceId);
     void HandleSyncBackgroundUserIdEventInner(DistributedDeviceProfile::AccessControlProfile &item,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    int32_t FillDmUserRemovedServiceInfoRemote(const DistributedDeviceProfile::AccessControlProfile &item,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    void FillDmUserRemovedServiceInfoLocal(const DistributedDeviceProfile::AccessControlProfile &item,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
 };
 

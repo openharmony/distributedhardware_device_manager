@@ -234,10 +234,6 @@ bool IpcServerStub::Init()
     LOGI("IpcServerStub::Init ready to init.");
     KVAdapterManager::GetInstance().Init();
     DeviceManagerService::GetInstance().InitDMServiceListener();
-    int32_t ret = DeviceManagerService::GetInstance().HandleProcessRestart();
-    if (ret != DM_OK) {
-        LOGE("HandleProcessRestart failed, ret: %{public}d", ret);
-    }
     std::lock_guard<ffrt::mutex> autoLock(registerLock_);
     if (!registerToService_) {
         bool ret = Publish(this);

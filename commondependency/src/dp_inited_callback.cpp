@@ -31,6 +31,7 @@
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
+#include "device_manager_service.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -63,8 +64,12 @@ int32_t DpInitedCallback::OnDpInited()
 void DpInitedCallback::PutAllTrustedDevices()
 {
     LOGE("In.");
+    int32_t ret = DeviceManagerService::GetInstance().HandleProcessRestart();
+    if (ret != DM_OK) {
+        LOGE("HandleProcessRestart failed, ret: %{public}d", ret);
+    }
     std::vector<DmDeviceInfo> dmDeviceInfos;
-    int32_t ret = SoftbusCache::GetInstance().GetDeviceInfoFromCache(dmDeviceInfos);
+    ret = SoftbusCache::GetInstance().GetDeviceInfoFromCache(dmDeviceInfos);
     if (ret != DM_OK) {
         LOGE("GetDeviceInfoFromCache fail:%{public}d", ret);
         return;

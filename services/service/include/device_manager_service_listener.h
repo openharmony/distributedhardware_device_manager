@@ -114,8 +114,6 @@ public:
     void OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
         int32_t result, const std::string &content) override;
     void OnServiceStateOnlineResult(const ServiceStateBindParameter &bindParam) override;
-    void OnServiceStateOfflineResult(uint64_t tokenId, const std::string &pkgName, int32_t bindType,
-        const std::string &peerUdid, const DistributedDeviceProfile::ServiceInfo &serviceInfo) override;
 #endif
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
