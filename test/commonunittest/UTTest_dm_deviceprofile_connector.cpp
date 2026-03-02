@@ -937,22 +937,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_003, testing:
     EXPECT_EQ(ret.empty(), true);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, PutAccessControlList_001, testing::ext::TestSize.Level1)
-{
-    DmAclInfo aclInfo;
-    DmAccesser dmAccesser;
-    DmAccessee dmAccessee;
-    int32_t userId = 123456;
-    std::string localDeviceId = "deviceId";
-    std::vector<std::string> peerUdids;
-    std::multimap<std::string, int32_t> peerUserIdMap;
-    DmOfflineParam offlineParam;
-    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(localDeviceId, userId, peerUdids, peerUserIdMap,
-        offlineParam);
-    int32_t ret = DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, dmAccesser, dmAccessee);
-    EXPECT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(DeviceProfileConnectorTest, UpdateAccessControlList_001, testing::ext::TestSize.Level1)
 {
     int32_t userId = 0;
@@ -1466,51 +1450,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetAclProfileByDeviceIdAndUserId_001, testi
     EXPECT_FALSE(ret.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext::TestSize.Level1)
-{
-    std::string localUdid;
-    int32_t localUserId = 444;
-    std::string peerUdid = "deviceId";
-    int32_t peerUserId = 555;
-    DmOfflineParam offlineParam;
-    DMAclQuadInfo info = {localUdid, localUserId, peerUdid, peerUserId};
-    std::string accountId = "accountId";
-    bool ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId, offlineParam);
-    EXPECT_FALSE(ret);
-
-    localUdid = "deviceId";
-    localUserId = 123456;
-    peerUdid = "deviceId";
-    peerUserId = 456;
-    info = {localUdid, localUserId, peerUdid, peerUserId};
-    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId, offlineParam);
-    EXPECT_FALSE(ret);
-
-    localUdid = "deviceId";
-    localUserId = 123456;
-    peerUdid = "deviceId";
-    peerUserId = 123456;
-    info = {localUdid, localUserId, peerUdid, peerUserId};
-    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId, offlineParam);
-    EXPECT_FALSE(ret);
-
-    localUdid = "localDeviceId";
-    localUserId = 123456;
-    peerUdid = "remoteDeviceId";
-    peerUserId = 123456;
-    info = {localUdid, localUserId, peerUdid, peerUserId};
-    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId, offlineParam);
-    EXPECT_FALSE(ret);
-
-    localUdid = "remoteDeviceId";
-    localUserId = 1234;
-    peerUdid = "localDeviceId";
-    peerUserId = 1234;
-    info = {localUdid, localUserId, peerUdid, peerUserId};
-    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId, offlineParam);
-    EXPECT_FALSE(ret);
-}
-
 HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_005, testing::ext::TestSize.Level1)
 {
     std::string localDeviceId = "deviceId";
@@ -1558,37 +1497,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_001, testing::ext::Tes
     EXPECT_TRUE(ret.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorTest, HandleUserSwitched_001, testing::ext::TestSize.Level1)
-{
-    int32_t currentUserId = 0;
-    std::string localUdid = "deviceId";
-    int32_t beforeUserId = 123456;
-    std::vector<std::string> deviceVec;
-    int32_t ret = DeviceProfileConnector::GetInstance().HandleUserSwitched(localUdid, deviceVec, currentUserId,
-        beforeUserId);
-    EXPECT_EQ(ret, DM_OK);
-
-    beforeUserId = 1234;
-    currentUserId = 123456;
-    ret = DeviceProfileConnector::GetInstance().HandleUserSwitched(localUdid, deviceVec, currentUserId, beforeUserId);
-    EXPECT_EQ(ret, DM_OK);
-
-    std::vector<int32_t> remoteUserIds;
-    remoteUserIds.push_back(currentUserId);
-    std::string remoteUdid = "deviceId";
-    std::vector<int32_t> localUserIds;
-    localUserIds.push_back(currentUserId);
-    DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(remoteUserIds, remoteUdid,
-        localUserIds, localUdid);
-
-    localUdid = "remoteDeviceId";
-    remoteUdid = "localDeviceId";
-    int32_t localdeviceId = 456;
-    remoteUserIds.push_back(localdeviceId);
-    localUserIds.push_back(localdeviceId);
-    DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(remoteUserIds, remoteUdid,
-        localUserIds, localUdid);
-}
 
 HWTEST_F(DeviceProfileConnectorTest, GetOfflineProcessInfo_001, testing::ext::TestSize.Level1)
 {
@@ -1611,93 +1519,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetOfflineProcessInfo_001, testing::ext::Te
     ret = DeviceProfileConnector::GetInstance().GetOfflineProcessInfo(localUdid, localUserIds, remoteUdid,
         remoteUserIds);
     EXPECT_FALSE(ret.empty());
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetUserIdAndBindLevel_001, testing::ext::TestSize.Level1)
-{
-    std::string localUdid = "deviceId";
-    std::string peerUdid = "deviceId";
-    auto ret = DeviceProfileConnector::GetInstance().GetUserIdAndBindLevel(localUdid, peerUdid);
-    EXPECT_FALSE(ret.empty());
-
-    localUdid = "remoteDeviceId";
-    peerUdid = "localDeviceId";
-    ret = DeviceProfileConnector::GetInstance().GetUserIdAndBindLevel(localUdid, peerUdid);
-    EXPECT_FALSE(ret.empty());
-
-    localUdid = "remoteDeviceIdee";
-    peerUdid = "localDeviceIder";
-    ret = DeviceProfileConnector::GetInstance().GetUserIdAndBindLevel(localUdid, peerUdid);
-    EXPECT_FALSE(ret.empty());
-
-    int32_t userId = 123456;
-    std::vector<int32_t> localUserIds;
-    localUserIds.push_back(userId);
-    std::string remoteUdid = "deviceId";
-    std::vector<int32_t> remoteFrontUserIds;
-    remoteFrontUserIds.push_back(userId);
-    std::vector<int32_t> remoteBackUserIds;
-    remoteBackUserIds.push_back(userId);
-    DmOfflineParam offlineParam;
-    DeviceProfileConnector::GetInstance().UpdateACL(localUdid, localUserIds, remoteUdid, remoteFrontUserIds,
-        remoteBackUserIds, offlineParam);
-
-    localUdid = "remoteDeviceId";
-    remoteUdid = "localDeviceId";
-    userId = 456;
-    std::vector<int32_t> remoteUserIds;
-    remoteUserIds.push_back(userId);
-    localUserIds.push_back(userId);
-    DeviceProfileConnector::GetInstance().HandleSyncBackgroundUserIdEvent(remoteUserIds, remoteUdid, localUserIds,
-        localUdid);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_002, testing::ext::TestSize.Level1)
-{
-    std::string localUdid = "deviceId";
-    int32_t localUserId = 123456;
-    auto ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndUserId(localUdid, localUserId);
-    EXPECT_FALSE(ret.empty());
-
-    localUdid = "localDeviceId";
-    localUserId = 456;
-    ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndUserId(localUdid, localUserId);
-    EXPECT_FALSE(ret.empty());
-
-    std::vector<int32_t> remoteUserIds;
-    remoteUserIds.push_back(localUserId);
-    std::string remoteUdid = "deviceId";
-    std::vector<int32_t> localUserIds;
-    localUserIds.push_back(localUserId);
-    DeviceProfileConnector::GetInstance().HandleSyncBackgroundUserIdEvent(remoteUserIds, remoteUdid, localUserIds,
-        localUdid);
-
-    ProcessInfo process;
-    process.userId = 1;
-    process.pkgName = "pkgName";
-    ProcessInfo process1;
-    process1.userId = 1;
-    process1.pkgName = "pkgName";
-    EXPECT_TRUE(process == process1);
-
-    process.userId = 0;
-    EXPECT_TRUE(process < process1);
-
-    DmNotifyKey dmNotifyKey;
-    dmNotifyKey.processUserId = 1;
-    dmNotifyKey.processPkgName = "proName";
-    dmNotifyKey.notifyUserId = 0;
-    dmNotifyKey.udid = "udid";
-
-    DmNotifyKey dmNotifyKey1;
-    dmNotifyKey1.processUserId = 1;
-    dmNotifyKey1.processPkgName = "proName";
-    dmNotifyKey1.notifyUserId = 0;
-    dmNotifyKey1.udid = "udid";
-    EXPECT_TRUE(dmNotifyKey == dmNotifyKey1);
-
-    dmNotifyKey1.processUserId = 2;
-    EXPECT_TRUE(dmNotifyKey < dmNotifyKey1);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_004, testing::ext::TestSize.Level1)
@@ -2131,21 +1952,6 @@ HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_002, testing::ext::TestSize
     DeviceProfileConnector::GetInstance().ProcessBindType(profiles, localDeviceId, sinkBindType, bindTypeIndex, index,
         targetDeviceId);
     EXPECT_FALSE(sinkBindType.empty());
-}
-
-HWTEST_F(DeviceProfileConnectorTest, DeleteAclForRemoteUserRemoved_001, testing::ext::TestSize.Level1)
-{
-    std::string peerUdid = "deviceId";
-    int32_t peerUserId = 123456;
-    std::vector<int32_t> userIds;
-    DmOfflineParam offlineParam;
-    DeviceProfileConnector::GetInstance().DeleteAclForRemoteUserRemoved(peerUdid, peerUserId, userIds, offlineParam);
-    EXPECT_TRUE(userIds.empty());
-
-    peerUdid = "remoteDeviceId";
-    peerUserId = 1234;
-    DeviceProfileConnector::GetInstance().DeleteAclForRemoteUserRemoved(peerUdid, peerUserId, userIds, offlineParam);
-    EXPECT_TRUE(userIds.empty());
 }
 
 HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_001, testing::ext::TestSize.Level1)

@@ -422,18 +422,18 @@ public:
         const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) override;
     virtual int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
         std::string &displayName) override;
-    virtual int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &info) override;
-    virtual int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType) override;
-    virtual int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &info) override;
-    virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
-        int32_t pinExchangeType, DMLocalServiceInfo &info) override;
+    virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
+        std::vector<std::string> &networkIds) override;
     virtual int32_t SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName,
         std::shared_ptr<SetLocalDeviceNameCallback> callback) override;
     virtual int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
         const std::string &deviceName, std::shared_ptr<SetRemoteDeviceNameCallback> callback) override;
     virtual int32_t RestoreLocalDeviceName(const std::string &pkgName) override;
-    virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
-        std::vector<std::string> &networkIds) override;
+    virtual int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &info) override;
+    virtual int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType) override;
+    virtual int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &info) override;
+    virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
+        int32_t pinExchangeType, DMLocalServiceInfo &info) override;
     virtual int32_t UnRegisterPinHolderCallback(const std::string &pkgName) override;
     virtual bool CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
@@ -444,20 +444,10 @@ public:
         std::map<std::string, std::string> &deviceIdentificationMap) override;
     virtual int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback) override;
-//this code line need delete: 447 - 450
-    virtual int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId) override;
-    virtual int32_t StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam,
-        std::shared_ptr<ServiceDiscoveryCallback> callback) override;
-    virtual int32_t StopServiceDiscovery(const std::string &pkgName, int32_t discoveryServiceId) override;
+
     virtual int32_t RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
         std::shared_ptr<ServiceInfoStateCallback> callback) override;
     virtual int32_t UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId) override;
-//this code line need delete: 447 - 459
-    virtual int32_t StartPublishService(const std::string &pkgName, const PublishServiceParam &publishServiceParam,
-        std::shared_ptr<ServicePublishCallback> callback, int64_t &serviceId) override;
-    virtual int32_t StopPublishService(int64_t serviceId) override;
-    virtual int32_t RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId) override;
-    virtual int32_t UnRegisterServiceInfo(int32_t regServiceId) override;
     virtual int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId,
         std::shared_ptr<LeaveLNNCallback> callback) override;
     virtual int32_t GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
@@ -480,7 +470,7 @@ public:
     virtual int32_t SyncServiceInfoByServiceId(const std::string &pkgName, int32_t localUserId,
         const std::string &networkId, int64_t serviceId, std::shared_ptr<SyncServiceInfoCallback> callback) override;
     virtual int32_t SyncAllServiceInfo(const std::string &pkgName, int32_t localUserId,
-        const std::string &networkId, std::shared_ptr<SyncServiceInfoCallback> callback) override;
+        const std::string &networkId,  std::shared_ptr<SyncServiceInfoCallback> callback) override;
     virtual int32_t GetLocalServiceInfoByServiceId(int64_t serviceId, DmRegisterServiceInfo &serviceInfo) override;
     virtual int32_t GetTrustServiceInfo(const std::string &pkgName, const std::map<std::string, std::string> &param,
         std::vector<DmServiceInfo> &serviceInfo) override;

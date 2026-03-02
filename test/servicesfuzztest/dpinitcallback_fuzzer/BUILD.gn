@@ -40,7 +40,7 @@ ohos_fuzztest("DpInitCallbackFuzzTest") {
     "${servicesimpl_path}/include/adapter",
     "${servicesimpl_path}/include/ipc/standard",
     "${servicesimpl_path}/include/publish",
-    "${servicesimpl_path}/include/dependency/deviceprofile",
+    "${devicemanager_path}/commondependency/include",
     "${servicesimpl_path}/include/dependency/hichain",
     "${servicesimpl_path}/include/devicestate",
     "${devicemanager_path}/interfaces/kits/js/include",
@@ -60,7 +60,7 @@ ohos_fuzztest("DpInitCallbackFuzzTest") {
   sources = [ "dp_init_callback_fuzzer.cpp" ]
 
   deps = [
-    "${devicemanager_path}/services/implementation:devicemanagerserviceimpl",
+    "${devicemanager_path}/services/service:devicemanagerservicetest",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${json_path}:devicemanagerjson",
     "${utils_path}:devicemanagerutilstest",

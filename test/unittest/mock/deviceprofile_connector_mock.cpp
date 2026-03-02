@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DM_IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
+IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
 std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfileConnector::GetAllAccessControlProfile()
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->GetAllAccessControlProfile();
@@ -51,10 +51,10 @@ std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLevel(const s
 }
 
 bool DeviceProfileConnector::DeleteAclForAccountLogOut(const DMAclQuadInfo &info, const std::string &accountId,
-    DmOfflineParam &offlineParam)
+    DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAclForAccountLogOut(info, accountId,
-        offlineParam);
+        offlineParam, serviceInfos);
 }
 
 DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
@@ -93,11 +93,11 @@ DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(const std::string
         remoteDeviceId, bindLevel, extra);
 }
 
-void DeviceProfileConnector::DeleteAclForRemoteUserRemoved(std::string peerUdid, int32_t peerUserId,
-    std::vector<int32_t> &userIds, DmOfflineParam &offlineParam)
+void DeviceProfileConnector::DeleteAclForRemoteUserRemoved(DmRemoteUserRemovedInfo &userRemovedInfo,
+    DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
 {
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAclForRemoteUserRemoved(peerUdid, peerUserId,
-        userIds, offlineParam);
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAclForRemoteUserRemoved(userRemovedInfo,
+        offlineParam, serviceInfos);
 }
 
 DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
@@ -201,33 +201,6 @@ bool DeviceProfileConnector::IsLnnAcl(const DistributedDeviceProfile::AccessCont
     return DmDeviceProfileConnector::dmDeviceProfileConnector->IsLnnAcl(profile);
 }
 
-int32_t DeviceProfileConnector::GetServiceInfoProfileByServiceId(int64_t serviceId,
-    ServiceInfoProfile &profile)
-{
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfoProfileByServiceId(serviceId, profile);
-}
-
-int32_t DeviceProfileConnector::PutServiceInfoProfile(const ServiceInfoProfile &profile)
-{
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->PutServiceInfoProfile(profile);
-}
-
-int32_t DeviceProfileConnector::DeleteServiceInfoProfile(int32_t regServiceId, int32_t userId)
-{
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteServiceInfoProfile(regServiceId, userId);
-}
-
-int32_t DeviceProfileConnector::GetServiceInfoProfileByTokenId(int64_t tokenId,
-    std::vector<ServiceInfoProfile> &serInfos)
-{
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfoProfileByTokenId(tokenId, serInfos);
-}
-
-int32_t DeviceProfileConnector::GetServiceInfoProfileByRegServiceId(int32_t regSerId, ServiceInfoProfile &serInfo)
-{
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfoProfileByRegServiceId(regSerId, serInfo);
-}
-
 int32_t DeviceProfileConnector::GetAclListHashStr(const DevUserInfo &localDevUserInfo,
     const DevUserInfo &remoteDevUserInfo, std::string &aclListHash, std::string dmVersion)
 {
@@ -278,6 +251,43 @@ std::unordered_set<int32_t> DeviceProfileConnector::GetActiveAuthOncePeerUserId(
 bool DeviceProfileConnector::CheckAccessControlProfileByTokenId(int32_t tokenId)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->CheckAccessControlProfileByTokenId(tokenId);
+}
+
+int32_t DeviceProfileConnector::GetServiceInfosByUdid(const std::string &udid,
+    std::vector<DistributedDeviceProfile::ServiceInfo> &serviceInfos)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfosByUdid(udid, serviceInfos);
+}
+
+int32_t DeviceProfileConnector::GetServiceInfosByUdidAndUserId(const std::string &udid, int32_t userId,
+    std::vector<DistributedDeviceProfile::ServiceInfo> &serviceInfos)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfosByUdidAndUserId(udid,
+        userId, serviceInfos);
+}
+
+int32_t DeviceProfileConnector::GetServiceInfoByUdidAndServiceId(const std::string &udid, int64_t serviceId,
+    DistributedDeviceProfile::ServiceInfo &serviceInfo)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfoByUdidAndServiceId(udid, serviceId,
+        serviceInfo);
+}
+
+int32_t DeviceProfileConnector::PutServiceInfo(const DistributedDeviceProfile::ServiceInfo &serviceInfo)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->PutServiceInfo(serviceInfo);
+}
+
+int32_t DeviceProfileConnector::DeleteServiceInfo(const DistributedDeviceProfile::ServiceInfo &serviceInfo)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteServiceInfo(serviceInfo);
+}
+
+void DeviceProfileConnector::GetPeerTokenIdForServiceProxyUnbind(int32_t userId, uint64_t localTokenId,
+    const std::string &peerUdid, int64_t serviceId, std::vector<uint64_t> &peerTokenId)
+{
+    DmDeviceProfileConnector::dmDeviceProfileConnector->GetPeerTokenIdForServiceProxyUnbind(userId, localTokenId,
+        peerUdid, serviceId, peerTokenId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -36,31 +36,6 @@ public:
 
 private:
     DmServiceInfo dmServiceInfo_;
-//this code line need delete: 40- 63
-public:
-    int32_t GetDiscServiceId() const
-    {
-        return discServiceId_;
-    }
-
-    void SetDiscServiceId(int32_t discServiceId)
-    {
-        discServiceId_ = discServiceId;
-    }
-
-    const DiscoveryServiceInfo &GetDiscServiceInfo() const
-    {
-        return discServiceInfo_;
-    }
-
-    void SetDiscServiceInfo(const DiscoveryServiceInfo &discServiceInfo)
-    {
-        discServiceInfo_ = discServiceInfo;
-    }
-
-private:
-    int32_t discServiceId_ { 0 };
-    DiscoveryServiceInfo discServiceInfo_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

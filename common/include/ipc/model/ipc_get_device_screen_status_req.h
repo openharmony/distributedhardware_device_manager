@@ -24,22 +24,12 @@ class IpcGetDeviceScreenStatusReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcGetDeviceScreenStatusReq);
 
 public:
-    /**
-     * @tc.name: IpcGetDeviceScreenStatusReq::GetNetWorkId
-     * @tc.desc: Ipc Get Device Screen Status request Get NetWorkId
-     * @tc.type: FUNC
-     */
     const std::string GetNetWorkId() const
     {
         return netWorkId_;
     }
 
-    /**
-     * @tc.name: IpcGetDeviceScreenStatusReq::SetNetWorkId
-     * @tc.desc: Ipc Get Device Screen Status request Set NetWorkId
-     * @tc.type: FUNC
-     */
-    void SetNetWorkId(const std::string &netWorkId)
+    void SetNetworkId(const std::string &netWorkId)
     {
         netWorkId_ = netWorkId;
     }

@@ -487,12 +487,10 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
     IpcModelCodec::DecodeServiceIds(serviceIds, data);
     switch (deviceState) {
         case DEVICE_STATE_ONLINE:
-            LOGI("Online pkgName:%{public}s", pkgName.c_str());
             DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, dmDeviceInfo);
             DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, dmDeviceBasicInfo);
             break;
         case DEVICE_STATE_OFFLINE:
-            LOGI("Offline pkgName:%{public}s", pkgName.c_str());
             DeviceManagerNotify::GetInstance().OnDeviceOffline(pkgName, dmDeviceInfo);
             DeviceManagerNotify::GetInstance().OnDeviceOffline(pkgName, dmDeviceBasicInfo);
             break;
@@ -1715,7 +1713,7 @@ ON_IPC_READ_RESPONSE(GET_NETWORKID_BY_UDID, MessageParcel &reply, std::shared_pt
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     std::shared_ptr<IpcGetInfoByNetWorkRsp> pRsp = std::static_pointer_cast<IpcGetInfoByNetWorkRsp>(pBaseRsp);
     pRsp->SetErrCode(reply.ReadInt32());
-    pRsp->SetNetWorkId(reply.ReadString());
+    pRsp->SetNetworkId(reply.ReadString());
     return DM_OK;
 }
 
@@ -1950,7 +1948,7 @@ ON_IPC_SET_REQUEST(REG_LOCALSERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, Mess
         LOGE("pBaseReq is null");
         return ERR_DM_FAILED;
     }
-    std::shared_ptr<IpcRegServiceInfoReq> pReq = std::static_pointer_cast<IpcRegServiceInfoReq>(pBaseReq);
+    std::shared_ptr<IpcRegAuthInfoReq> pReq = std::static_pointer_cast<IpcRegAuthInfoReq>(pBaseReq);
     const DMLocalServiceInfo& info = pReq->GetLocalServiceInfo();
     if (!IpcModelCodec::EncodeLocalServiceInfo(info, data)) {
         LOGE("EncodeLocalServiceInfo failed");
@@ -1997,7 +1995,7 @@ ON_IPC_READ_RESPONSE(UNREG_LOCALSERVICE_INFO, MessageParcel &reply, std::shared_
     return DM_OK;
 }
 
-ON_IPC_SET_REQUEST(UPDATE_LOCALSERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+ON_IPC_SET_REQUEST(UPDATE_SERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
         LOGE("pBaseReq is null");
@@ -2016,6 +2014,31 @@ ON_IPC_SET_REQUEST(UPDATE_LOCALSERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, M
     return DM_OK;
 }
 
+ON_IPC_READ_RESPONSE(UPDATE_SERVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(UPDATE_LOCALSERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcRegAuthInfoReq> pReq = std::static_pointer_cast<IpcRegAuthInfoReq>(pBaseReq);
+    const DMLocalServiceInfo& info = pReq->GetLocalServiceInfo();
+    if (!IpcModelCodec::EncodeLocalServiceInfo(info, data)) {
+        LOGE("EncodeLocalServiceInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+ 
 ON_IPC_READ_RESPONSE(UPDATE_LOCALSERVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     if (pBaseRsp == nullptr) {
@@ -2306,37 +2329,6 @@ ON_IPC_READ_RESPONSE(CHECK_SINK_SAME_ACCOUNT, MessageParcel &reply, std::shared_
     return ReadResponse(CHECK_SINK_SAME_ACCOUNT, reply, pBaseRsp);
 }
 
-ON_IPC_SET_REQUEST(GET_IDENTIFICATION_BY_DEVICEIDS, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
-    std::shared_ptr<IpcGetIdentificationByDeviceIdsReq> pReq =
-        std::static_pointer_cast<IpcGetIdentificationByDeviceIdsReq>(pBaseReq);
-    if (!data.WriteString(pReq->GetPkgName())) {
-        LOGE("write pkgName failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    std::vector<std::string> deviceIdList = pReq->GetDeviceIdList();
-    if (!IpcModelCodec::EncodeStringVector(deviceIdList, data)) {
-        LOGE("write deviceIdList failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(GET_IDENTIFICATION_BY_DEVICEIDS, MessageParcel &reply,
-    std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
-    std::shared_ptr<IpcGetIdentificationByDeviceIdsRsp> pRsp =
-        std::static_pointer_cast<IpcGetIdentificationByDeviceIdsRsp>(pBaseRsp);
-    pRsp->SetErrCode(reply.ReadInt32());
-    std::string outParaStr = reply.ReadString();
-    std::map<std::string, std::string> outputResult;
-    ParseMapFromJsonString(outParaStr, outputResult);
-    pRsp->SetDeviceIdentificationMap(outputResult);
-    return DM_OK;
-}
-
 ON_IPC_CMD(NOTIFY_SERVICE_DISCOVERY_RESULT, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
@@ -2419,6 +2411,7 @@ ON_IPC_CMD(LEAVE_LNN_RESULT, MessageParcel &data, MessageParcel &reply)
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 ON_IPC_SET_REQUEST(GET_AUTHTYPE_BY_UDIDHASH, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
@@ -2428,7 +2421,6 @@ ON_IPC_SET_REQUEST(GET_AUTHTYPE_BY_UDIDHASH, std::shared_ptr<IpcReq> pBaseReq, M
     std::string pkgName = pReq->GetPkgName();
     std::string udidHash = pReq->GetUdidHash();
     if (!data.WriteString(pkgName)) {
-        LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteString(udidHash)) {
@@ -2451,7 +2443,7 @@ ON_IPC_READ_RESPONSE(GET_AUTHTYPE_BY_UDIDHASH, MessageParcel &reply, std::shared
 ON_IPC_CMD(ON_AUTH_CODE_INVALID, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(pkgName);
+    DeviceManagerNotify::GetInstance().OnAuthCodeInvalid(pkgName, "");
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }
@@ -2493,7 +2485,10 @@ ON_IPC_SET_REQUEST(UNREGISTER_SERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, Me
 ON_IPC_READ_RESPONSE(UNREGISTER_SERVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
-    pBaseRsp->SetErrCode(reply.ReadInt32());
+    std::shared_ptr<IpcGetAuthTypeByUdidHashRsp> pRsp =
+        std::static_pointer_cast<IpcGetAuthTypeByUdidHashRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    pRsp->SetAuthType(reply.ReadInt32());
     return DM_OK;
 }
 
@@ -2549,6 +2544,37 @@ ON_IPC_READ_RESPONSE(STOP_PUBLISH_SERVICE, MessageParcel &reply, std::shared_ptr
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     std::shared_ptr<IpcRsp> pRsp = std::static_pointer_cast<IpcRsp>(pBaseRsp);
     pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_IDENTIFICATION_BY_DEVICEIDS, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcGetIdentificationByDeviceIdsReq> pReq =
+        std::static_pointer_cast<IpcGetIdentificationByDeviceIdsReq>(pBaseReq);
+    if (!data.WriteString(pReq->GetPkgName())) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    std::vector<std::string> deviceIdList = pReq->GetDeviceIdList();
+    if (!IpcModelCodec::EncodeStringVector(deviceIdList, data)) {
+        LOGE("write deviceIdList failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+ 
+ON_IPC_READ_RESPONSE(GET_IDENTIFICATION_BY_DEVICEIDS, MessageParcel &reply,
+    std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    std::shared_ptr<IpcGetIdentificationByDeviceIdsRsp> pRsp =
+        std::static_pointer_cast<IpcGetIdentificationByDeviceIdsRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    std::string outParaStr = reply.ReadString();
+    std::map<std::string, std::string> outputResult;
+    ParseMapFromJsonString(outParaStr, outputResult);
+    pRsp->SetDeviceIdentificationMap(outputResult);
     return DM_OK;
 }
 
@@ -2614,7 +2640,7 @@ ON_IPC_CMD(NOTIFY_SERVICE_FOUND, MessageParcel &data, MessageParcel &reply)
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }
-// zl online&offline
+
 ON_IPC_SET_REQUEST(SYNC_SERVICE_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
@@ -2636,18 +2662,16 @@ ON_IPC_SET_REQUEST(SYNC_SERVICE_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, Mess
     }
     return DM_OK;
 }
-// zl online&offline
+
 ON_IPC_READ_RESPONSE(SYNC_SERVICE_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
-// zl online&offline
+
 ON_IPC_CMD(SERVER_SERVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply)
 {
-    LOGI("SERVER_SERVICE_STATE_NOTIFY ON_IPC_CMD start");
-
     DmRegisterServiceState registerServiceState;
     IpcModelCodec::DecodeDmRegisterServiceState(data, registerServiceState);
     DmServiceInfo dmServiceInfo;
@@ -2656,24 +2680,22 @@ ON_IPC_CMD(SERVER_SERVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &repl
  
     switch (deviceState) {
         case SERVICE_STATE_ONLINE:
-            LOGI("SERVER_SERVICE_STATE_NOTIFY ON_IPC_CMD OnServiceOnline");
             DeviceManagerNotify::GetInstance().OnServiceOnline(registerServiceState, dmServiceInfo);
             break;
         case SERVICE_STATE_OFFLINE:
             DeviceManagerNotify::GetInstance().OnServiceOffline(registerServiceState, dmServiceInfo);
             break;
-        case DEVICE_INFO_CHANGED:
+        case SERVICE_INFO_CHANGED:
+            DeviceManagerNotify::GetInstance().OnServiceChange(registerServiceState, dmServiceInfo);
             break;
         default:
             LOGE("unknown service state:%{public}d", deviceState);
             break;
     }
     reply.WriteInt32(DM_OK);
-    LOGI("SERVER_SERVICE_STATE_NOTIFY ON_IPC_CMD sucessed.");
-
     return DM_OK;
 }
-//add by zqz
+
 ON_IPC_SET_REQUEST(SYNC_SERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
@@ -2696,14 +2718,14 @@ ON_IPC_SET_REQUEST(SYNC_SERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageP
     }
     return DM_OK;
 }
-//add by zqz
+
 ON_IPC_READ_RESPONSE(SYNC_SERVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
-//add by zqz
+
 ON_IPC_CMD(SYNC_SERVICE_INFO_RESULT, MessageParcel &data, MessageParcel &reply)
 {
     ServiceSyncInfo serviceSyncInfo;

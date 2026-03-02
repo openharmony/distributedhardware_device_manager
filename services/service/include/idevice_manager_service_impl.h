@@ -226,15 +226,17 @@ public:
     virtual std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId,
         const std::string &accountId) = 0;
     virtual void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
-        const std::string &remoteUdid) = 0;
+        const std::string &remoteUdid, std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
     virtual void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId) = 0;
     virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId) = 0;
     virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, int32_t peerTokenId) = 0;
     virtual int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
         const std::string &udid, uint64_t &tokenId) = 0;
-    virtual void HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId) = 0;
-    virtual void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId) = 0;
+    virtual void HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
+    virtual void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
     virtual void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo) = 0;
     virtual void HandleUserSwitched(const std::vector<std::string> &deviceVec, int32_t currentUserId,
         int32_t beforeUserId) = 0;
@@ -251,8 +253,10 @@ public:
         const std::string &udid) = 0;
 
     virtual void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
-        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus) = 0;
-    virtual void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid) = 0;
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
+    virtual void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
     virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId) = 0;
     virtual std::vector<std::string> GetDeviceIdByUserIdAndTokenId(int32_t userId, int32_t tokenId) = 0;
     virtual std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId) = 0;
@@ -268,7 +272,8 @@ public:
     virtual void HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
         int32_t remoteTokenId) = 0;
     virtual void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
-        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid) = 0;
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
     virtual bool CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
@@ -287,23 +292,6 @@ public:
     virtual int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId) = 0;
     virtual int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength) = 0;
     virtual int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo) = 0;
-
-    //this code line mock start
-    virtual void HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
-    virtual void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
-    virtual void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
-        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
-    virtual void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
-    virtual void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
-        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus,
-        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
-    virtual void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
-        const std::string &remoteUdid, std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
-    //this code line mock end
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
