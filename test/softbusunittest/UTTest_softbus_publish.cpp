@@ -22,15 +22,9 @@
 #include "dm_softbus_cache.h"
 #include "json_object.h"
 #include "softbus_connector.h"
+#include "softbus_bus_center_mock.h"
 #include "softbus_error_code.h"
 #include "system_ability_definition.h"
-
-extern int32_t g_mockPublishLnnRet;
-extern int32_t g_mockStopPublishLnnRet;
-extern int32_t g_mockPublishLnnCallCount;
-extern int32_t g_mockStopPublishLnnCallCount;
-extern int32_t g_mockPublishLnnLastPublishId;
-extern int32_t g_mockStopPublishLnnLastPublishId;
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -39,12 +33,9 @@ extern DmDeviceInfo localDeviceInfo_;
 
 void SoftbusPublishTest::SetUp()
 {
-    g_mockPublishLnnRet = DM_OK;
-    g_mockStopPublishLnnRet = DM_OK;
-    g_mockPublishLnnCallCount = 0;
-    g_mockStopPublishLnnCallCount = 0;
-    g_mockPublishLnnLastPublishId = -1;
-    g_mockStopPublishLnnLastPublishId = -1;
+    ResetSoftbusBusCenterMock();
+    SetPublishLnnMockRet(DM_OK);
+    SetStopPublishLnnMockRet(DM_OK);
     g_getLocalDevInfo = true;
     localDeviceInfo_ = {};
     localDeviceInfo_.deviceTypeId = DmDeviceType::DEVICE_TYPE_PHONE;
@@ -62,63 +53,63 @@ void SoftbusPublishTest::TearDownTestCase()
 namespace {
 HWTEST_F(SoftbusPublishTest, PublishSoftbusLNN_001, testing::ext::TestSize.Level1)
 {
-    g_mockPublishLnnRet = SOFTBUS_ERR;
+    SetPublishLnnMockRet(SOFTBUS_ERR);
     SoftbusPublish spftbusPublish;
     int32_t ret = spftbusPublish.PublishSoftbusLNN();
     int publishId = 1;
     SoftbusPublish::OnSoftbusPublishResult(publishId, PUBLISH_LNN_SUCCESS);
     EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
-    EXPECT_EQ(g_mockPublishLnnCallCount, 1);
-    EXPECT_EQ(g_mockPublishLnnLastPublishId, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    EXPECT_EQ(GetPublishLnnMockCallCount(), 1);
+    EXPECT_EQ(GetPublishLnnMockLastPublishId(), DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
 }
 
 HWTEST_F(SoftbusPublishTest, PublishSoftbusLNN_002, testing::ext::TestSize.Level1)
 {
-    g_mockPublishLnnRet = DM_OK;
+    SetPublishLnnMockRet(DM_OK);
     SoftbusPublish spftbusPublish;
     int32_t ret = spftbusPublish.PublishSoftbusLNN();
     EXPECT_EQ(ret, DM_OK);
-    EXPECT_EQ(g_mockPublishLnnCallCount, 1);
-    EXPECT_EQ(g_mockPublishLnnLastPublishId, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    EXPECT_EQ(GetPublishLnnMockCallCount(), 1);
+    EXPECT_EQ(GetPublishLnnMockLastPublishId(), DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
 }
 
 HWTEST_F(SoftbusPublishTest, StopPublishSoftbusLNN_001, testing::ext::TestSize.Level1)
 {
-    g_mockStopPublishLnnRet = SOFTBUS_ERR;
+    SetStopPublishLnnMockRet(SOFTBUS_ERR);
     SoftbusPublish spftbusPublish;
     int publishId = 2;
     int32_t ret = spftbusPublish.StopPublishSoftbusLNN(publishId);
     EXPECT_EQ(ret, ERR_DM_STOP_PUBLISH_LNN_FAILED);
-    EXPECT_EQ(g_mockStopPublishLnnCallCount, 1);
-    EXPECT_EQ(g_mockStopPublishLnnLastPublishId, publishId);
+    EXPECT_EQ(GetStopPublishLnnMockCallCount(), 1);
+    EXPECT_EQ(GetStopPublishLnnMockLastPublishId(), publishId);
 }
 
 HWTEST_F(SoftbusPublishTest, StopPublishSoftbusLNN_002, testing::ext::TestSize.Level1)
 {
-    g_mockStopPublishLnnRet = DM_OK;
+    SetStopPublishLnnMockRet(DM_OK);
     SoftbusPublish spftbusPublish;
     int publishId = 2;
     int32_t ret = spftbusPublish.StopPublishSoftbusLNN(publishId);
     EXPECT_EQ(ret, DM_OK);
-    EXPECT_EQ(g_mockStopPublishLnnCallCount, 1);
-    EXPECT_EQ(g_mockStopPublishLnnLastPublishId, publishId);
+    EXPECT_EQ(GetStopPublishLnnMockCallCount(), 1);
+    EXPECT_EQ(GetStopPublishLnnMockLastPublishId(), publishId);
 }
 
 HWTEST_F(SoftbusPublishTest, PublishCommonEventCallback_001, testing::ext::TestSize.Level1)
 {
     localDeviceInfo_.deviceTypeId = DmDeviceType::DEVICE_TYPE_WATCH;
     PublishCommonEventCallback(0, 0, DM_SCREEN_ON);
-    EXPECT_EQ(g_mockPublishLnnCallCount, 0);
-    EXPECT_EQ(g_mockStopPublishLnnCallCount, 0);
+    EXPECT_EQ(GetPublishLnnMockCallCount(), 0);
+    EXPECT_EQ(GetStopPublishLnnMockCallCount(), 0);
 }
 
 HWTEST_F(SoftbusPublishTest, PublishCommonEventCallback_002, testing::ext::TestSize.Level1)
 {
     localDeviceInfo_.deviceTypeId = DmDeviceType::DEVICE_TYPE_PHONE;
     PublishCommonEventCallback(0, 0, DM_SCREEN_OFF);
-    EXPECT_EQ(g_mockPublishLnnCallCount, 0);
-    EXPECT_EQ(g_mockStopPublishLnnCallCount, 1);
-    EXPECT_EQ(g_mockStopPublishLnnLastPublishId, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    EXPECT_EQ(GetPublishLnnMockCallCount(), 0);
+    EXPECT_EQ(GetStopPublishLnnMockCallCount(), 1);
+    EXPECT_EQ(GetStopPublishLnnMockLastPublishId(), DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
 }
 } // namespace
 } // namespace DistributedHardware
