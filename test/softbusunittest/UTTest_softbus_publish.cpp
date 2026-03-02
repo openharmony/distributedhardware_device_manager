@@ -14,8 +14,6 @@
  */
 #include "UTTest_softbus_publish.h"
 
-#include <atomic>
-
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
@@ -28,17 +26,32 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-extern std::atomic<bool> g_getLocalDevInfo;
-extern DmDeviceInfo localDeviceInfo_;
+namespace {
+NodeBasicInfo BuildLocalNodeInfo(uint16_t deviceTypeId)
+{
+    NodeBasicInfo localNodeInfo = {};
+    localNodeInfo.deviceTypeId = deviceTypeId;
+    localNodeInfo.networkId[0] = '1';
+    localNodeInfo.networkId[1] = '\0';
+    localNodeInfo.deviceName[0] = 'd';
+    localNodeInfo.deviceName[1] = '\0';
+    return localNodeInfo;
+}
+
+void PrepareLocalDeviceInfoMock(uint16_t deviceTypeId)
+{
+    SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
+    SetLocalNodeDeviceInfoMockRet(DM_OK);
+    SetLocalNodeDeviceInfoMock(BuildLocalNodeInfo(deviceTypeId));
+}
+} // namespace
 
 void SoftbusPublishTest::SetUp()
 {
     ResetSoftbusBusCenterMock();
     SetPublishLnnMockRet(DM_OK);
     SetStopPublishLnnMockRet(DM_OK);
-    g_getLocalDevInfo = true;
-    localDeviceInfo_ = {};
-    localDeviceInfo_.deviceTypeId = DmDeviceType::DEVICE_TYPE_PHONE;
+    PrepareLocalDeviceInfoMock(static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_PHONE));
 }
 void SoftbusPublishTest::TearDown()
 {
@@ -50,7 +63,6 @@ void SoftbusPublishTest::TearDownTestCase()
 {
 }
 
-namespace {
 HWTEST_F(SoftbusPublishTest, PublishSoftbusLNN_001, testing::ext::TestSize.Level1)
 {
     SetPublishLnnMockRet(SOFTBUS_ERR);
@@ -97,7 +109,7 @@ HWTEST_F(SoftbusPublishTest, StopPublishSoftbusLNN_002, testing::ext::TestSize.L
 
 HWTEST_F(SoftbusPublishTest, PublishCommonEventCallback_001, testing::ext::TestSize.Level1)
 {
-    localDeviceInfo_.deviceTypeId = DmDeviceType::DEVICE_TYPE_WATCH;
+    PrepareLocalDeviceInfoMock(static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_WATCH));
     PublishCommonEventCallback(0, 0, DM_SCREEN_ON);
     EXPECT_EQ(GetPublishLnnMockCallCount(), 0);
     EXPECT_EQ(GetStopPublishLnnMockCallCount(), 0);
@@ -105,12 +117,11 @@ HWTEST_F(SoftbusPublishTest, PublishCommonEventCallback_001, testing::ext::TestS
 
 HWTEST_F(SoftbusPublishTest, PublishCommonEventCallback_002, testing::ext::TestSize.Level1)
 {
-    localDeviceInfo_.deviceTypeId = DmDeviceType::DEVICE_TYPE_PHONE;
+    PrepareLocalDeviceInfoMock(static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_PHONE));
     PublishCommonEventCallback(0, 0, DM_SCREEN_OFF);
     EXPECT_EQ(GetPublishLnnMockCallCount(), 0);
     EXPECT_EQ(GetStopPublishLnnMockCallCount(), 1);
     EXPECT_EQ(GetStopPublishLnnMockLastPublishId(), DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
 }
-} // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
