@@ -174,10 +174,6 @@ int32_t DMCommTool::RspAppUninstall(const std::string &rmtNetworkId, int32_t soc
     CommMsg commMsg(DM_COMM_RSP_APP_UNINSTALL, msgStr);
     std::string payload = GetCommMsgString(commMsg);
 
-    if (dmTransportPtr_ == nullptr) {
-        LOGE("dmTransportPtr_ is null");
-        return ERR_DM_FAILED;
-    }
     int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload, socketId);
     if (ret != DM_OK) {
         LOGE("RspAppUninstall failed, ret: %{public}d", ret);
@@ -264,7 +260,7 @@ int32_t DMCommTool::SendUnBindAppObj(int32_t userId, int32_t tokenId, const std:
 
 int32_t DMCommTool::SendUnBindServiceProxyObj(const UnbindServiceProxyParam &param)
 {
-    LOGI("DMCommTool::SendUnBindAppObj, userId: %{public}d, peerTokenId: %{public}zu, serviceId: %{public}s",
+    LOGI("DMCommTool::SendUnBindServiceProxyObj, userId: %{public}d, peerTokenId: %{public}zu, serviceId: %{public}s",
         param.userId, param.peerTokenId.size(), std::to_string(param.serviceId).c_str());
     if (!IsIdLengthValid(param.peerNetworkId)) {
         LOGE("param invalid, networkId: %{public}s", GetAnonyString(param.peerNetworkId).c_str());

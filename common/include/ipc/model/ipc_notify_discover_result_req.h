@@ -63,23 +63,9 @@ public:
     {
         result_ = result;
     }
-    //delete start
-    std::string GetServiceType() const
-    {
-        return serviceType_;
-    }
-
-    void SetServiceType(const std::string &serviceType)
-    {
-        serviceType_ = serviceType;
-    }
-    //delete end
 private:
     uint16_t subscribeId_ { 0 };
     int32_t result_ { 0 };
-    //delete start
-    std::string serviceType_ = "";
-    //delete end
 };
 } // namespace DistributedHardware
 } // namespace OHOS

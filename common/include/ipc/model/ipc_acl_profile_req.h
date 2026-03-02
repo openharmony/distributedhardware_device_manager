@@ -49,10 +49,12 @@ public:
     {
         return accessControlId_;
     }
+
     void SetAccessControlId(int64_t accessControlId)
     {
         accessControlId_ = accessControlId;
     }
+
 private:
     std::string str_;
     int64_t accessControlId_;

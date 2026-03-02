@@ -34,7 +34,6 @@
 #include "dm_device_info.h"
 #include "dm_device_state_manager.h"
 #include "dm_single_instance.h"
-#include "dp_inited_callback.h"
 #include "ffrt.h"
 #include "idevice_manager_service_impl.h"
 #include "ipc_skeleton.h"
@@ -156,13 +155,11 @@ public:
     void HandleDeviceNotTrust(const std::string &udid);
     int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
         const std::string &udid, uint64_t &tokenId);
-    // this code line need delete:162
-    void HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId);
     void HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
-    void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
+    void HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId, int32_t errcode);
     int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately);
     int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
@@ -170,9 +167,6 @@ public:
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);
     int32_t ProcessAppUninstall(int32_t userId, int32_t accessTokenId);
     void ProcessUnBindApp(int32_t userId, int32_t accessTokenId, const std::string &extra, const std::string &udid);
-    // this code line need delete:176-177
-    void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
-        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus);
     void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
@@ -198,9 +192,6 @@ public:
     int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
     int32_t InitAndRegisterAuthMgr(bool isSrcSide, uint64_t tokenId, std::shared_ptr<Session> session,
         uint64_t logicalSessionId, const std::string &pkgName);
-    // this code line need delete:204-205
-    void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
-        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
@@ -217,9 +208,7 @@ public:
         const std::vector<int32_t> &backGroundUserIds);
     int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam);
-    // this code line need delete:223
     int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
-    int32_t UnbindServiceTargetSrvBind(const std::string &pkgName, int64_t serviceId);
     void InitTaskOfDelTimeOutAcl(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId);
     void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList);
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
@@ -239,18 +228,12 @@ private:
     bool CheckSharePeerSrc(const std::string &peerUdid, const std::string &localUdid);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId, const std::string &accountId);
-    // this code line need delete:244-245
-    void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
-        const std::string &remoteUdid);
     void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, int32_t peerTokenId);
-    // this code line need delete:253-254
-    void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId);
-    void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid);
     void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid,
@@ -366,7 +349,6 @@ private:
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::atomic<bool> isCredentialType_ = false;
     ffrt::mutex logoutMutex_;
-    sptr<DpInitedCallback> dpInitedCallback_ = nullptr;
 
     // The session ID corresponding to the device ID, used only on the src side
     std::map<std::string, int> deviceId2SessionIdMap_;

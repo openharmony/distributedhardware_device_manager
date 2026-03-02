@@ -179,12 +179,9 @@ DM_DECLARE_SINGLE_INSTANCE_BASE(NegotiateProcess);
 public:
     NegotiateProcess();
     ~NegotiateProcess();
-    // this code line need delete: 183
     int32_t HandleNegotiateResult(std::shared_ptr<DmAuthContext> context);
-    int32_t HandleNegotiateResultSrvBind(std::shared_ptr<DmAuthContext> context);
-    // this code line need delete: 186
     int32_t HandleProxyNegotiateResult(std::shared_ptr<DmAuthContext> context, int32_t result);
-    int32_t HandleProxyNegotiateResultSrvBind(std::shared_ptr<DmAuthContext> context, int32_t result);
+    int32_t HandleServiceNegotiateResult(std::shared_ptr<DmAuthContext> context, int32_t result);
     bool IsNeedSetProxyRelationShip(std::shared_ptr<DmAuthContext> context, DmProxyAuthContext &proxyContext);
     bool IsExistTheTokenId(const std::string extraData, const std::string tokenIdHash);
 private:

@@ -84,19 +84,19 @@ std::string GetBundleLabel(const std::string &bundleName)
         LOGE("Get ability manager failed");
         return bundleName;
     }
-
+ 
     sptr<IRemoteObject> object = samgr->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
     if (object == nullptr) {
         LOGE("object is NULL.");
         return bundleName;
     }
-
+ 
     sptr<OHOS::AppExecFwk::IBundleMgr> bms = iface_cast<OHOS::AppExecFwk::IBundleMgr>(object);
     if (bms == nullptr) {
         LOGE("bundle manager service is NULL.");
         return bundleName;
     }
-
+ 
     auto bundleResourceProxy = bms->GetBundleResourceProxy();
     if (bundleResourceProxy == nullptr) {
         LOGE("GetBundleResourceProxy fail");
@@ -112,7 +112,7 @@ std::string GetBundleLabel(const std::string &bundleName)
     LOGI("bundle resource label is %{public}s ", (resourceInfo.label).c_str());
     return resourceInfo.label;
 }
-
+ 
 std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindParam)
 {
     auto iter = bindParam.find(PARAM_KEY_BIND_EXTRA_DATA);
@@ -452,44 +452,7 @@ std::string AuthManager::GetBundleName(const JsonObject &jsonObject)
     AppManager::GetInstance().GetCallerName(isSystemSA, bundleName);
     return bundleName;
 }
-// this line need delete: ParseJsonObject 455-490
 void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
-{
-    CHECK_NULL_VOID(context_);
-    if (IsString(jsonObject, DM_BUSINESS_ID)) {
-        context_->businessId = jsonObject[DM_BUSINESS_ID].Get<std::string>();
-    }
-    if (!MultipleUserConnector::CheckMDMControl()) {
-        if (jsonObject[APP_OPERATION_KEY].IsString()) {
-            context_->appOperation = jsonObject[APP_OPERATION_KEY].Get<std::string>();
-        }
-        if (jsonObject[CUSTOM_DESCRIPTION_KEY].IsString()) {
-            context_->customData = jsonObject[CUSTOM_DESCRIPTION_KEY].Get<std::string>();
-        }
-        if (jsonObject[TAG_APP_THUMBNAIL2].IsString()) {
-            context_->appThumbnail = jsonObject[TAG_APP_THUMBNAIL2].Get<std::string>();
-        }
-    }
-    ParseAccessJsonObject(jsonObject);
-    if (jsonObject[TAG_IS_NEED_AUTHENTICATE].IsString()) {
-        context_->isNeedAuthenticate = std::atoi(jsonObject[TAG_IS_NEED_AUTHENTICATE].Get<std::string>().c_str());
-        LOGI("isNeedAuthenticate: %{public}d.", context_->isNeedAuthenticate);
-    }
-    if (context_->authType == AUTH_TYPE_PIN_ULTRASONIC) {
-        ParseUltrasonicSide(jsonObject);
-    }
-    if (context_->accesser.bundleName == BUNDLE_NAME_COLLABORATION_FWK &&
-        IsString(jsonObject, TAG_NCM_BIND_TARGET)) {
-        std::string ncmStr = jsonObject[TAG_NCM_BIND_TARGET].Get<std::string>();
-        context_->ncmBindTarget = ncmStr == TAG_NCM_BIND_TARGET_TRUE ? true : false;
-    }
-    ParseHmlInfoInJsonObject(jsonObject);
-    ParseProxyJsonObject(jsonObject);
-    ParseServiceInfo(jsonObject);
-    return;
-}
-
-void AuthManager::ParseJsonObjectSrvBind(const JsonObject &jsonObject)
 {
     CHECK_NULL_VOID(context_);
     if (IsString(jsonObject, DM_BUSINESS_ID)) {
@@ -525,7 +488,6 @@ void AuthManager::ParseJsonObjectSrvBind(const JsonObject &jsonObject)
         return;
     }
     ParseProxyJsonObject(jsonObject);
-
     return;
 }
 
@@ -598,15 +560,6 @@ int32_t AuthManager::GetSrcCarUserIdByDisplayId(int32_t displayId)
         return INVALID_USERID;
     }
     return mainScreenUserId;
-}
-// this line need delete: ParseServiceInfo 603-610
-void AuthManager::ParseServiceInfo(const JsonObject &jsonObject)
-{
-    if (context_ == nullptr || jsonObject.IsDiscarded() || !IsString(jsonObject, PARAM_KEY_IS_SERVICE_BIND) ||
-        jsonObject[PARAM_KEY_IS_SERVICE_BIND].Get<std::string>() != DM_VAL_TRUE) {
-        return;
-    }
-    context_->isServiceBind = true;
 }
 
 void AuthManager::ParseServiceInfo(const std::string &extra)
@@ -723,8 +676,8 @@ void AuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     ParseJsonObject(jsonObject);
     if (context_->isServiceBind) {
         if (IsNumberString(deviceId)) {
-            context_->accessee.serviceId = std::stoll(deviceId); // service bind device id is service id
-            context_->accesser.serviceId = std::stoll(deviceId);
+            context_->accessee.serviceId = std::atoll(deviceId.c_str()); // service bind device id is service id
+            context_->accesser.serviceId = context_->accessee.serviceId;
         } else {
             LOGE("OpenAuthSession failed");
             return;
@@ -763,64 +716,24 @@ void AuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     LOGI("AuthManager::AuthenticateDevice complete");
     return;
 }
-// this line need delete: AuthenticateDevice 767-810
 int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
     LOGI("AuthManager::AuthenticateDevice start auth type %{public}d.", authType);
     SetAuthType(authType);
-    CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
-    context_->processInfo.pkgName = pkgName;
-    GetBindCallerInfo();
-    int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
-    if (ret != DM_OK) {
-        LOGE("AuthManager::AuthenticateDevice failed, param is invaild.");
-        return ret;
-    }
-    ret = CheckProxyAuthParamVaild(extra);
-    if (ret != DM_OK) {
-        LOGE("CheckProxyAuthParamVaild failed.");
-        return ret;
-    }
-    context_->isAuthenticateDevice = true;
-    if (authType == AUTH_TYPE_CRE) {
-        GetConnDelayCloseTime(extra);
-        LOGI("AuthManager::AuthenticateDevice for credential type, joinLNN directly.");
-        CHECK_NULL_RETURN(context_->softbusConnector, ERR_DM_POINT_NULL);
-        context_->softbusConnector->JoinLnn(deviceId, true);
-        CHECK_NULL_RETURN(context_->listener, ERR_DM_POINT_NULL);
-        context_->listener->OnAuthResult(context_->processInfo, context_->peerTargetId.deviceId,
-            "", STATUS_DM_AUTH_DEFAULT, DM_OK);
-        context_->listener->OnBindResult(context_->processInfo, context_->peerTargetId,
-            DM_OK, STATUS_DM_AUTH_DEFAULT, "");
-        context_->reason = DM_OK;
-        CHECK_NULL_RETURN(context_->authStateMachine, ERR_DM_POINT_NULL);
-        context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
-        return DM_OK;
-    }
-    InitAuthState(pkgName, authType, deviceId, extra);
-    if (context_->accesser.userId < 0) {
-        LOGE("accesser.userId is invalid.");
-        return ERR_DM_GET_LOCAL_USERID_FAILED;
-    }
-    if (context_->ultrasonicInfo == DmUltrasonicInfo::DM_Ultrasonic_Invalid) {
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    return DM_OK;
-}
-
-int32_t AuthManager::AuthenticateDeviceSrvBind(const std::string &pkgName, int32_t authType,
-    const std::string &deviceId, const std::string &extra)
-{
-    LOGI("AuthManager::AuthenticateDevice start auth type %{public}d.", authType);
-    SetAuthType(authType);
     ParseServiceInfo(extra);
+    int32_t ret = DM_OK;
+    if (context_->isServiceBind) {
+        ret = CheckSrcNegotiateSrvParam(pkgName, targetId_.serviceId, bindParam_);
+        if (ret != DM_OK) {
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+    }
     CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
     context_->processInfo.pkgName = pkgName;
     GetBindCallerInfo();
-    int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
+    ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
     if (ret != DM_OK) {
-        LOGE("AuthManager::AuthenticateDevice failed, param is invaild.");
         return ret;
     }
     ret = CheckProxyAuthParamVaild(extra);
@@ -886,7 +799,7 @@ int32_t AuthManager::CheckSrcNegotiateSrvParam(const std::string &pkgName, int64
     }
     return DM_OK;
 }
-// this line need delete: BindTarget 890-937
+
 int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam, int sessionId, uint64_t logicalSessionId)
 {
@@ -923,61 +836,6 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
     } else {
         LOGE("AuthManager::BindTarget failed, targetId is error.");
         return ERR_DM_INPUT_PARA_INVALID;
-    }
-
-    context_->sessionId = sessionId;
-    context_->logicalSessionId = logicalSessionId;
-    context_->requestId = static_cast<int64_t>(logicalSessionId);
-    CHECK_NULL_RETURN(context_->authStateMachine, ERR_DM_POINT_NULL);
-    context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcNegotiateStateMachine>());
-    info = { .funcName = "BindTarget" };
-    info.channelId = sessionId;
-    DmRadarHelper::GetInstance().ReportAuthSendRequest(info);
-    return ret;
-}
-
-int32_t AuthManager::BindTargetSrvBind(const std::string &pkgName, const PeerTargetId &targetId,
-    const std::map<std::string, std::string> &bindParam, int sessionId, uint64_t logicalSessionId)
-{
-    int ret = DM_OK;
-    LOGI("AuthManager::BindTarget start. pkgName: %{public}s", pkgName.c_str());
-
-    struct RadarInfo info = {
-        .funcName = "AuthenticateDevice",
-        .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
-        .bizState = static_cast<int32_t>(BizState::BIZ_STATE_END),
-    };
-    if (!DmRadarHelper::GetInstance().ReportDiscoverUserRes(info)) {
-        LOGE("ReportDiscoverUserRes failed");
-    }
-    GetIsNeedJoinLnnParam(bindParam);
-    if (pkgName.empty()) {
-        LOGE("AuthManager::BindTarget failed, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    int32_t authType = -1;
-    if (ParseAuthType(bindParam, authType) != DM_OK) {
-        LOGE("AuthManager::BindTarget failed, key: %{public}s error.", PARAM_KEY_AUTH_TYPE);
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
-    context_->peerTargetId = targetId_;
-    {
-        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
-        bindParam_ = bindParam;
-    }
-    if (!targetId.deviceId.empty()) {
-        ret = AuthenticateDevice(pkgName, authType, targetId.deviceId, ParseExtraFromMap(bindParam));
-        if (ret != DM_OK) { return ret; }
-    } else {
-        LOGE("AuthManager::BindTarget failed, targetId is error.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (context_->isServiceBind) {
-        ret = CheckSrcNegotiateSrvParam(pkgName, targetId.serviceId, bindParam);
-        if (ret != DM_OK) {
-            return ERR_DM_INPUT_PARA_INVALID;
-        }
     }
 
     context_->sessionId = sessionId;
@@ -1495,6 +1353,11 @@ int32_t AuthManager::CheckProxyAuthParamVaild(const std::string &extra)
         LOGE("no proxy permission");
         return ERR_DM_NO_PERMISSION;
     }
+
+    if (context_->isServiceBind) {
+        LOGI("CheckServiceAuthParamVaild enter");
+        return CheckServiceAuthParamVaild(jsonObject);
+    }
     if (!jsonObject.Contains(PARAM_KEY_SUBJECT_PROXYED_SUBJECTS) ||
         !IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
         LOGE("no subject proxyed apps");
@@ -1532,11 +1395,11 @@ int32_t AuthManager::CheckServiceAuthParamVaild(const JsonObject &jsonObject)
             LOGE("pkgName invalid");
             return ERR_DM_INPUT_PARA_INVALID;
         }
-        if (!item.Contains(PARAM_KEY_LOCAL_TOKENID) || !IsInt64(item, PARAM_KEY_LOCAL_TOKENID)) {
+        if (!item.Contains(PARAM_KEY_LOCAL_TOKENID) || !IsString(item, PARAM_KEY_LOCAL_TOKENID)) {
             LOGE("tokenId invalid");
             return ERR_DM_INPUT_PARA_INVALID;
         }
-        if (!item.Contains(PARAM_KEY_PEER_SERVICEID) || !IsInt64(item, PARAM_KEY_PEER_SERVICEID)) {
+        if (!item.Contains(PARAM_KEY_PEER_SERVICEID) || !IsString(item, PARAM_KEY_PEER_SERVICEID)) {
             LOGE("serviceId invalid");
             return ERR_DM_INPUT_PARA_INVALID;
         }
@@ -1621,11 +1484,11 @@ void AuthManager::ParseServiceJsonObject(const JsonObject &jsonObject)
             LOGE("local pkgName invalid");
             return;
         }
-        if (!IsInt64(item, PARAM_KEY_LOCAL_TOKENID)) {
+        if (!IsString(item, PARAM_KEY_LOCAL_TOKENID)) {
             LOGE("local tokenId invalid");
             return;
         }
-        if (!IsInt64(item, PARAM_KEY_PEER_SERVICEID)) {
+        if (!IsString(item, PARAM_KEY_PEER_SERVICEID)) {
             LOGE("peer serviceId invalid");
             return;
         }
@@ -1633,10 +1496,10 @@ void AuthManager::ParseServiceJsonObject(const JsonObject &jsonObject)
         if (std::find(context_->subjectServiceOnes.begin(), context_->subjectServiceOnes.end(), proxyAuthContext) ==
             context_->subjectServiceOnes.end()) {
             proxyAuthContext.proxyAccesser.pkgName = item[PARAM_KEY_LOCAL_PKGNAME].Get<std::string>();
-            proxyAuthContext.proxyAccesser.tokenId = item[PARAM_KEY_LOCAL_TOKENID].Get<int64_t>();
+            proxyAuthContext.proxyAccesser.tokenId = std::stoll(item[PARAM_KEY_LOCAL_TOKENID].Get<std::string>());
             proxyAuthContext.proxyAccesser.tokenIdHash =
                 Crypto::GetTokenIdHash(std::to_string(proxyAuthContext.proxyAccesser.tokenId));
-            proxyAuthContext.proxyAccessee.serviceId = item[PARAM_KEY_PEER_SERVICEID].Get<int64_t>();
+            proxyAuthContext.proxyAccessee.serviceId = std::stoll(item[PARAM_KEY_PEER_SERVICEID].Get<std::string>());
             proxyAuthContext.proxyContextId = Crypto::Sha256(proxyAuthContext.proxyAccesser.tokenIdHash +
                 std::to_string(proxyAuthContext.proxyAccesser.serviceId));
             proxyAuthContext.proxyAccesser.bindLevel = context_->accesser.bindLevel;

@@ -62,7 +62,7 @@ int32_t DmDeviceStateManager::RegisterSoftbusStateCallback()
 
 void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
 {
-    LOGI("begin, deviceId = %{public}s", GetAnonyString(std::string(info.deviceId)).c_str());
+    LOGI("SaveOnlineDeviceInfo begin, deviceId = %{public}s", GetAnonyString(std::string(info.deviceId)).c_str());
     std::string udid;
     if (SoftbusConnector::GetUdidByNetworkId(info.networkId, udid) == DM_OK) {
         std::string uuid;
@@ -149,7 +149,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
 
 void DmDeviceStateManager::OnDeviceOffline(std::string deviceId, const bool isOnline)
 {
-    LOGI("OnDeviceOffline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
+    LOGI("DmDeviceStateManager::OnDeviceOffline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo devInfo;
     {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -167,43 +167,7 @@ void DmDeviceStateManager::OnDeviceOffline(std::string deviceId, const bool isOn
     ProcessDeviceStateChange(DEVICE_STATE_OFFLINE, devInfo, processInfoVec, isOnline);
     softbusConnector_->ClearProcessInfo();
 }
-// this code line need delete: 172-205
 void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
-    std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid, const bool isOnline)
-{
-    LOGI("Handle device status change: devState=%{public}d, deviceId=%{public}s.", devState,
-        GetAnonyString(devInfo.deviceId).c_str());
-    switch (devState) {
-        case DEVICE_STATE_ONLINE:
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-            RegisterOffLineTimer(devInfo);
-#endif
-            SaveOnlineDeviceInfo(devInfo);
-            ProcessDeviceStateChange(devState, devInfo, processInfoVec, isOnline);
-            break;
-        case DEVICE_STATE_OFFLINE:
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-            StartOffLineTimer(peerUdid);
-#endif
-            DeleteOfflineDeviceInfo(devInfo);
-            if (softbusConnector_ != nullptr) {
-                std::string udid;
-                softbusConnector_->GetUdidByNetworkId(devInfo.networkId, udid);
-                softbusConnector_->EraseUdidFromMap(udid);
-            }
-            ProcessDeviceStateChange(devState, devInfo, processInfoVec, isOnline);
-            break;
-        case DEVICE_INFO_CHANGED:
-            ChangeDeviceInfo(devInfo);
-            ProcessDeviceStateChange(devState, devInfo, processInfoVec, isOnline);
-            break;
-        default:
-            LOGE("HandleDeviceStatusChange error, unknown device state = %{public}d", devState);
-            break;
-    }
-}
-
-void DmDeviceStateManager::HandleDeviceStatusChangeSrvBind(DmDeviceState devState, DmDeviceInfo &devInfo,
     std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid, const bool isOnline)
 {
     LOGI("Handle device status change: devState=%{public}d, deviceId=%{public}s.", devState,
@@ -241,46 +205,7 @@ void DmDeviceStateManager::HandleDeviceStatusChangeSrvBind(DmDeviceState devStat
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-// this code line need delete: 246-282
 void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
-    std::vector<ProcessInfo> &processInfoVec, const bool isOnline)
-{
-    LOGI("begin, devState = %{public}d networkId: %{public}s.", devState, GetAnonyString(devInfo.networkId).c_str());
-    std::unordered_set<int64_t> remoteTokenIds;
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string localUdid(localDeviceId);
-    CHECK_NULL_VOID(softbusConnector_);
-    std::string udid = softbusConnector_->GetDeviceUdidByUdidHash(devInfo.deviceId);
-    DeviceProfileConnector::GetInstance().GetRemoteTokenIds(localUdid, udid, remoteTokenIds);
-    std::unordered_set<int64_t> remoteServiceIds;
-    for (const auto &item : remoteTokenIds) {
-        std::vector<ServiceInfoProfile> serviceInfos;
-        if (DeviceProfileConnector::GetInstance().GetServiceInfoProfileByTokenId(item, serviceInfos) != DM_OK) {
-            LOGE("GetServiceInfoProfileByTokenId failed.");
-            continue;
-        }
-        for (const auto &serviceInfo : serviceInfos) {
-            remoteServiceIds.insert(serviceInfo.serviceId);
-        }
-    }
-    LOGI("ProcessDeviceStateChange, remoteServiceIds size: %{public}zu", remoteServiceIds.size());
-
-    CHECK_NULL_VOID(listener_);
-    for (const auto &item : processInfoVec) {
-        if (!item.pkgName.empty()) {
-            LOGI("ProcessDeviceStateChange, pkgName = %{public}s", item.pkgName.c_str());
-            if (!remoteServiceIds.empty() && devState == DEVICE_STATE_ONLINE) {
-                std::vector<int64_t> remoteServiceIdVec(remoteServiceIds.begin(), remoteServiceIds.end());
-                listener_->OnDeviceStateChange(item, devState, devInfo, remoteServiceIdVec);
-            } else {
-                listener_->OnDeviceStateChange(item, devState, devInfo, isOnline);
-            }
-        }
-    }
-}
-
-void DmDeviceStateManager::ProcessDeviceStateChangeSrvBind(const DmDeviceState devState, const DmDeviceInfo &devInfo,
     std::vector<ProcessInfo> &processInfoVec, const bool isOnline)
 {
     LOGI("begin, devState = %{public}d networkId: %{public}s.", devState, GetAnonyString(devInfo.networkId).c_str());
@@ -582,19 +507,19 @@ void DmDeviceStateManager::StartEventThread()
 
 void DmDeviceStateManager::StopEventThread()
 {
-    LOGD("StopEventThread begin");
+    LOGI("StopEventThread begin");
     eventTask_.threadRunning_ = false;
     eventTask_.queueCond_.notify_all();
     eventTask_.queueFullCond_.notify_all();
     if (eventTask_.queueThread_.joinable()) {
         eventTask_.queueThread_.join();
     }
-    LOGD("StopEventThread complete");
+    LOGI("StopEventThread complete");
 }
 
 int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
 {
-    LOGD("AddTask begin, eventId: %{public}d", task->GetEventId());
+    LOGI("AddTask begin, eventId: %{public}d", task->GetEventId());
     {
         std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
         while (eventTask_.queue_.size() >= DM_EVENT_QUEUE_CAPACITY) {
@@ -603,13 +528,13 @@ int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
         eventTask_.queue_.push(task);
     }
     eventTask_.queueCond_.notify_one();
-    LOGD("AddTask complete");
+    LOGI("AddTask complete");
     return DM_OK;
 }
 
 void DmDeviceStateManager::ThreadLoop()
 {
-    LOGD("ThreadLoop begin");
+    LOGI("ThreadLoop begin");
     int32_t ret = pthread_setname_np(pthread_self(), THREAD_LOOP);
     if (ret != DM_OK) {
         LOGE("ThreadLoop setname failed.");
@@ -631,16 +556,16 @@ void DmDeviceStateManager::ThreadLoop()
             RunTask(task);
         }
     }
-    LOGD("ThreadLoop end");
+    LOGI("ThreadLoop end");
 }
 
 void DmDeviceStateManager::RunTask(const std::shared_ptr<NotifyEvent> &task)
 {
-    LOGD("RunTask begin, eventId: %{public}d", task->GetEventId());
+    LOGI("RunTask begin, eventId: %{public}d", task->GetEventId());
     if (task->GetEventId() == DM_NOTIFY_EVENT_ONDEVICEREADY) {
         OnDbReady(std::string(DM_PKG_NAME), task->GetDeviceId());
     }
-    LOGD("RunTask complete");
+    LOGI("RunTask complete");
 }
 
 DmAuthForm DmDeviceStateManager::GetAuthForm(const std::string &networkId)
@@ -695,7 +620,7 @@ void DmDeviceStateManager::GetNotifyEventInfos(std::vector<DmDeviceInfo> &device
 
 int32_t DmDeviceStateManager::ProcNotifyEvent(const int32_t eventId, const std::string &deviceId)
 {
-    LOGD("ProcNotifyEvent in, eventId: %{public}d", eventId);
+    LOGI("ProcNotifyEvent in, eventId: %{public}d", eventId);
     return AddTask(std::make_shared<NotifyEvent>(eventId, deviceId));
 }
 

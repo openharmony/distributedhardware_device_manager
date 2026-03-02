@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DeviceNameManager);
+DM_IMPLEMENT_SINGLE_INSTANCE(DeviceNameManager);
 
 void DeviceNameManager::DataShareReady()
 {

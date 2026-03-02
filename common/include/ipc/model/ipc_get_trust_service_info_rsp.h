@@ -24,22 +24,12 @@ namespace DistributedHardware {
 class IpcGetTrustServiceInfoRsp : public IpcRsp {
     DECLARE_IPC_MODEL(IpcGetTrustServiceInfoRsp);
 public:
-    /**
-     * @tc.name: IpcGetTrustDeviceRsp::GetServiceInfoVec
-     * @tc.desc: Get ServiceInfoVec of the Ipc Get Trust Service Info Response
-     * @tc.type: FUNC
-     */
     std::vector<DmServiceInfo> GetServiceInfoVec() const
     {
         return serviceInfoVec_;
     }
  
-    /**
-     * @tc.name: IpcGetTrustDeviceRsp::SetServiceInfoVec
-     * @tc.desc: Set ServiceInfoVec of the Ipc Get Trust Service Info Response
-     * @tc.type: FUNC
-     */
-    void SetServiceInfoVec(std::vector<DmServiceInfo> &serviceInfoVec)
+    void SetServiceInfoVec(const std::vector<DmServiceInfo> &serviceInfoVec)
     {
         serviceInfoVec_ = serviceInfoVec;
     }

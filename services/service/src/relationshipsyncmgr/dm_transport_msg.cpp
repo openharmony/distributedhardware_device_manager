@@ -31,9 +31,10 @@ const char* const DSOFTBUS_NOTIFY_USERIDS_USERIDKEY = "foregroundUserIds";
 const char* const DSOFTBUS_NOTIFY_ACCOUNTID_KEY = "accountId";
 const char* const DSOFTBUS_NOTIFY_USERID_KEY = "userId";
 const char* const DSOFTBUS_NOTIFY_TOKENID_KEY = "tokenId";
+const char* const DSOFTBUS_NOTIFY_SUBJECTID_KEY = "subjectTokenId";
 const char* const DSOFTBUS_NOTIFY_EXTRA_KEY = "extra";
 const char* const DSOFTBUS_NOTIFY_UDID_KEY = "udid";
-const char* const DSOFTBUS_NOTIFY_PEER_TOKENID_KEY = "peerTokenId";
+const char* const DSOFTBUS_NOTIFY_ISPROXYBIND_KEY = "isProxyBind";
 const char* const DSOFTBUS_NOTIFY_SERVICEID_KEY = "serviceId";
 }
 void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg)
@@ -360,25 +361,11 @@ void ToJson(cJSON *jsonObject, const UnbindServiceProxyParam &unBindServiceMsg)
 
     cJSON_AddNumberToObject(jsonObject, DSOFTBUS_NOTIFY_USERID_KEY, unBindServiceMsg.userId);
     cJSON_AddNumberToObject(jsonObject, DSOFTBUS_NOTIFY_TOKENID_KEY, unBindServiceMsg.localTokenId);
-    cJSON_AddNumberToObject(jsonObject, DSOFTBUS_NOTIFY_SERVICEID_KEY, unBindServiceMsg.serviceId);
+    cJSON_AddNumberToObject(jsonObject, DSOFTBUS_NOTIFY_SUBJECTID_KEY, unBindServiceMsg.subjectTokenId);
+    cJSON_AddStringToObject(jsonObject, DSOFTBUS_NOTIFY_SERVICEID_KEY,
+        std::to_string(unBindServiceMsg.serviceId).c_str());
     cJSON_AddStringToObject(jsonObject, DSOFTBUS_NOTIFY_UDID_KEY, unBindServiceMsg.localUdid.c_str());
-    cJSON *tokenIdArr = cJSON_CreateArray();
-    if (tokenIdArr == nullptr) {
-        return;
-    }
-    cJSON *tokenIdNumberObj = nullptr;
-    for (auto const &tokenId : unBindServiceMsg.peerTokenId) {
-        tokenIdNumberObj = cJSON_CreateNumber(tokenId);
-        if (tokenIdNumberObj == nullptr || !cJSON_AddItemToArray(tokenIdArr, tokenIdNumberObj)) {
-            cJSON_Delete(tokenIdNumberObj);
-            cJSON_Delete(tokenIdArr);
-            return;
-        }
-    }
-    if (!cJSON_AddItemToObject(jsonObject, DSOFTBUS_NOTIFY_PEER_TOKENID_KEY, tokenIdArr)) {
-        cJSON_Delete(tokenIdArr);
-        return;
-    }
+    cJSON_AddNumberToObject(jsonObject, DSOFTBUS_NOTIFY_ISPROXYBIND_KEY, unBindServiceMsg.isProxyUnbind);
 }
 
 void FromJson(const cJSON *jsonObject, UnbindServiceProxyParam &unBindServiceMsg)
@@ -390,11 +377,14 @@ void FromJson(const cJSON *jsonObject, UnbindServiceProxyParam &unBindServiceMsg
 
     cJSON *userIdObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_USERID_KEY);
     cJSON *tokenIdObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_TOKENID_KEY);
+    cJSON *subjectTokenIdObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_SUBJECTID_KEY);
     cJSON *serviceIdObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_SERVICEID_KEY);
     cJSON *udidObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_UDID_KEY);
+    cJSON *isProxyUnbindObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_ISPROXYBIND_KEY);
     if (userIdObj == nullptr || tokenIdObj == nullptr ||
-        serviceIdObj == nullptr || udidObj == nullptr) {
-        LOGE("userIdObj or tokenIdObj or peerTokenIdObj or serviceIdObj or udidObj is nullptr");
+        serviceIdObj == nullptr || udidObj == nullptr ||
+        subjectTokenIdObj == nullptr || isProxyUnbindObj == nullptr) {
+        LOGE("userIdObj or tokenIdObj or serviceIdObj or udidObj or subjectTokenIdObj or isProxyUnbindObj is nullptr");
         return;
     }
     if (cJSON_IsNumber(userIdObj)) {
@@ -403,26 +393,18 @@ void FromJson(const cJSON *jsonObject, UnbindServiceProxyParam &unBindServiceMsg
     if (cJSON_IsNumber(tokenIdObj)) {
         unBindServiceMsg.localTokenId = tokenIdObj->valueint;
     }
-    if (cJSON_IsNumber(serviceIdObj)) {
-        unBindServiceMsg.serviceId = serviceIdObj->valueint;
+    if (cJSON_IsNumber(subjectTokenIdObj)) {
+        unBindServiceMsg.subjectTokenId = subjectTokenIdObj->valueint;
+    }
+    if (cJSON_IsString(serviceIdObj)) {
+        unBindServiceMsg.serviceId = std::stoll(serviceIdObj->valuestring);
+        LOGI("FromJson serviceId:%{public}" PRId64, unBindServiceMsg.serviceId);
     }
     if (cJSON_IsString(udidObj)) {
         unBindServiceMsg.localUdid = udidObj->valuestring;
     }
-    cJSON *tokenIdsArr = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_PEER_TOKENID_KEY);
-    if (tokenIdsArr == nullptr) {
-        LOGE("tokenIdsArr is nullptr.");
-        return;
-    }
-    if (cJSON_IsArray(tokenIdsArr)) {
-        int32_t arrSize = cJSON_GetArraySize(tokenIdsArr);
-        for (int32_t i = 0; i < arrSize; i++) {
-            cJSON *tokenIdItem = cJSON_GetArrayItem(tokenIdsArr, i);
-            if (tokenIdItem != nullptr && cJSON_IsNumber(tokenIdItem)) {
-                uint32_t tokenId = static_cast<uint32_t>(tokenIdItem->valueint);
-                unBindServiceMsg.peerTokenId.push_back(tokenId);
-            }
-        }
+    if (cJSON_IsNumber(isProxyUnbindObj)) {
+        unBindServiceMsg.isProxyUnbind = isProxyUnbindObj->valueint;
     }
 }
 } // DistributedHardware

@@ -117,11 +117,11 @@ public:
     }
 
     /**
-     * @tc.name: IpcGetInfoByNetWorkRsp::SetNetWorkId
+     * @tc.name: IpcGetInfoByNetWorkRsp::SetNetworkId
      * @tc.desc: Ipc Get Info By NetWork request Set NetWorkId
      * @tc.type: FUNC
      */
-    void SetNetWorkId(const std::string &netWorkId)
+    void SetNetworkId(const std::string &netWorkId)
     {
         netWorkId_ = netWorkId;
     }

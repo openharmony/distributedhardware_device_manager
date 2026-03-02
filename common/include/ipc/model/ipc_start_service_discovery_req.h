@@ -24,17 +24,6 @@ class IpcStartServiceDiscoveryReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcStartServiceDiscoveryReq);
 
 public:
-//this code line need delete: 28 - 36
-    DiscoveryServiceParam GetDiscParam() const
-    {
-        return discParam_;
-    }
-
-    void SetDiscParam(const DiscoveryServiceParam &discParam)
-    {
-        discParam_ = discParam;
-    }
-    
     DmDiscoveryServiceParam GetDmDiscParam() const
     {
         return discDmParam_;
@@ -47,8 +36,6 @@ public:
 
 private:
     DmDiscoveryServiceParam discDmParam_;
-//this code line need delete: 51 - 51
-    DiscoveryServiceParam discParam_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -16,7 +16,9 @@
 #include "hichain_listener.h"
 
 #include "device_manager_service.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_log.h"
 #include "dm_random.h"
 #include "multiple_user_connector.h"
 
@@ -108,7 +110,7 @@ HichainListener::~HichainListener()
 //LCOV_EXCL_START
 void HichainListener::RegisterDataChangeCb()
 {
-    LOGI("start");
+    LOGI("HichainListener::RegisterDataChangeCb start");
     if (deviceGroupManager_ == nullptr) {
         LOGE("deviceGroupManager_ is null!");
         return;
@@ -118,12 +120,12 @@ void HichainListener::RegisterDataChangeCb()
         LOGE("[HICHAIN]regDataChangeListener failed with ret: %{public}d.", ret);
         return;
     }
-    LOGI("success!");
+    LOGI("RegisterDataChangeCb success!");
 }
 
 void HichainListener::RegisterCredentialCb()
 {
-    LOGI("start");
+    LOGI("HichainListener::RegisterCredentialCb start");
     if (credManager_ == nullptr) {
         LOGE("credManager_ is null!");
         return;
@@ -133,13 +135,13 @@ void HichainListener::RegisterCredentialCb()
         LOGE("[HICHAIN]registerChangeListener failed with ret: %{public}d.", ret);
         return;
     }
-    LOGI("success!");
+    LOGI("RegisterCredentialCb success!");
 }
 //LCOV_EXCL_STOP
 
 void HichainListener::OnHichainDeviceUnBound(const char *peerUdid, const char *groupInfo)
 {
-    LOGI("start");
+    LOGI("HichainListener::onDeviceUnBound start");
     if (peerUdid == nullptr || groupInfo == nullptr) {
         LOGE("peerUdid or groupInfo is null!");
         return;
@@ -178,7 +180,7 @@ void HichainListener::OnCredentialDeleted(const char *credId, const char *credIn
         LOGE("credId or credInfo is invalid");
         return;
     }
-    LOGI("start, credId: %{public}s.", GetAnonyString(credId).c_str());
+    LOGI("HichainListener::OnCredentialDeleted start, credId: %{public}s.", GetAnonyString(credId).c_str());
     JsonObject jsonObject;
     jsonObject.Parse(std::string(credInfo));
     if (jsonObject.IsDiscarded()) {
@@ -191,7 +193,7 @@ void HichainListener::OnCredentialDeleted(const char *credId, const char *credIn
         credType = static_cast<uint32_t>(jsonObject[credTypeTag].Get<int32_t>());
     }
     if (credType != ACCOUNT_SHARED) {
-        LOGE("credType %{public}d is invalid.", credType);
+        LOGE("credType: %{public}d is invalid.", credType);
         return;
     }
     DeviceManagerService::GetInstance().HandleCredentialDeleted(credId, credInfo);
@@ -200,7 +202,7 @@ void HichainListener::OnCredentialDeleted(const char *credId, const char *credIn
 
 void HichainListener::DeleteAllGroup(const std::string &localUdid, const std::vector<int32_t> &backgroundUserIds)
 {
-    LOGI("start");
+    LOGI("OnStart HichainListener::DeleteAllGroup");
     for (auto &userId : backgroundUserIds) {
         std::vector<GroupsInfo> groupList;
         GetRelatedGroups(userId, localUdid, groupList);
@@ -240,11 +242,11 @@ int32_t HichainListener::GetRelatedGroupsExt(int32_t userId, const std::string &
 int32_t HichainListener::GetRelatedGroupsCommon(int32_t userId, const std::string &deviceId, const char* pkgName,
     std::vector<GroupsInfo> &groupList)
 {
+    LOGI("Start to get related groups.");
     if (userId < 0) {
         LOGE("user id failed");
         return ERR_DM_FAILED;
     }
-    LOGI("Start.");
     uint32_t groupNum = 0;
     char *returnGroups = nullptr;
     int32_t ret =

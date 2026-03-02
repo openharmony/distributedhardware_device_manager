@@ -71,7 +71,7 @@ const std::string LOCAL_ZH_HANS_CN = "zh-Hans-CN";
 constexpr int32_t DEFAULT_USER_ID = -1;
 }
 
-IMPLEMENT_SINGLE_INSTANCE(DeviceNameManager);
+DM_IMPLEMENT_SINGLE_INSTANCE(DeviceNameManager);
 
 void DeviceNameManager::DataShareReady()
 {

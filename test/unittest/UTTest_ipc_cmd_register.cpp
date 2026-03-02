@@ -255,7 +255,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_09, testing::ext::TestSize.Level0)
     std::string pkgName = "ohos.test";
     std::string netWorkId = "123";
     req->SetPkgName(pkgName);
-    req->SetNetWorkId(netWorkId);
+    req->SetNetworkId(netWorkId);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -273,7 +273,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_010, testing::ext::TestSize.Level0)
     std::string pkgName = "ohos.test";
     std::string netWorkId = "1234";
     req->SetPkgName(pkgName);
-    req->SetNetWorkId(netWorkId);
+    req->SetNetworkId(netWorkId);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
     ASSERT_EQ(ret, DM_OK);
 }
