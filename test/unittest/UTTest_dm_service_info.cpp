@@ -333,7 +333,6 @@ HWTEST_F(DmServiceInfoTest, FieldAssignment_001, testing::ext::TestSize.Level1)
     info.serviceId = 1000;
     info.displayId = 2000;
     info.publishState = 1;
-    info.authform = DM_AUTH_FORM_IDENTICAL_ACCOUNT;
     info.serviceOwnerTokenId = 3000;
     info.serviceRegisterTokenId = 4000;
     info.dataLen = 5000;
@@ -343,7 +342,6 @@ HWTEST_F(DmServiceInfoTest, FieldAssignment_001, testing::ext::TestSize.Level1)
     EXPECT_EQ(info.serviceId, 1000);
     EXPECT_EQ(info.displayId, 2000);
     EXPECT_EQ(info.publishState, 1);
-    EXPECT_EQ(info.authform, DM_AUTH_FORM_IDENTICAL_ACCOUNT);
     EXPECT_EQ(info.serviceOwnerTokenId, 3000);
     EXPECT_EQ(info.serviceRegisterTokenId, 4000);
     EXPECT_EQ(info.dataLen, 5000);
@@ -405,24 +403,6 @@ HWTEST_F(DmServiceInfoTest, CopyAssignment_001, testing::ext::TestSize.Level1)
     EXPECT_EQ(info2.userId, 100);
     EXPECT_EQ(info2.serviceId, 1000);
     EXPECT_EQ(info2.serviceName, "TestService");
-}
-
-/**
- * @tc.name: AuthFormEnum_001
- * @tc.desc: Test DmAuthForm enum values can be assigned
- *           Step 1: Create DmServiceInfo with different DmAuthForm values
- *           Step 2: Assign various enum values
- *           Step 3: Verify enum values are stored correctly
- * @tc.type: FUNC
- */
-HWTEST_F(DmServiceInfoTest, AuthFormEnum_001, testing::ext::TestSize.Level1)
-{
-    DmServiceInfo info;
-    info.authform = DM_AUTH_FORM_IDENTICAL_ACCOUNT;
-    EXPECT_EQ(info.authform, DM_AUTH_FORM_IDENTICAL_ACCOUNT);
-
-    info.authform = DM_AUTH_FORM_ACROSS_ACCOUNT;
-    EXPECT_EQ(info.authform, DM_AUTH_FORM_ACROSS_ACCOUNT);
 }
 
 } // namespace DistributedHardware
