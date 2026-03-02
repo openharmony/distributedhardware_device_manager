@@ -15,6 +15,13 @@
 
 #include "softbus_connector.h"
 
+int32_t g_mockPublishLnnRet = 0;
+int32_t g_mockStopPublishLnnRet = 0;
+int32_t g_mockPublishLnnCallCount = 0;
+int32_t g_mockStopPublishLnnCallCount = 0;
+int32_t g_mockPublishLnnLastPublishId = -1;
+int32_t g_mockStopPublishLnnLastPublishId = -1;
+
 int32_t GetNodeKeyInfo(const char *pkgName, const char *networkId, NodeDeviceInfoKey key, uint8_t *info,
                        int32_t infoLen)
 {
@@ -44,16 +51,18 @@ int32_t GetAllNodeDeviceInfo(const char *pkgName, NodeBasicInfo **info, int32_t 
 int32_t PublishLNN(const char *pkgName, const PublishInfo *info, const IPublishCb *cb)
 {
     (void)pkgName;
-    (void)info;
     (void)cb;
-    return 0;
+    g_mockPublishLnnCallCount++;
+    g_mockPublishLnnLastPublishId = (info == nullptr) ? -1 : info->publishId;
+    return g_mockPublishLnnRet;
 }
 
 int32_t StopPublishLNN(const char *pkgName, int32_t publishId)
 {
     (void)pkgName;
-    (void)publishId;
-    return 0;
+    g_mockStopPublishLnnCallCount++;
+    g_mockStopPublishLnnLastPublishId = publishId;
+    return g_mockStopPublishLnnRet;
 }
 
 int CreateSessionServer(const char *pkgName, const char *sessionName, const ISessionListener *listener)
