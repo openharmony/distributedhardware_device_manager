@@ -44,6 +44,7 @@ group("unittest") {
     ":UTTest_discovery_filter",
     ":UTTest_discovery_manager",
     ":UTTest_dm_account_common_event",
+    ":UTTest_dm_ability_manager",
     ":UTTest_dm_auth_attest_common",
     ":UTTest_dm_auth_cert",
     ":UTTest_dm_anonymous",
@@ -2794,3 +2795,29 @@ ohos_unittest("UTTest_dm_language_manager") {
 }
 
 ## UnitTest UTTest_dm_language_manager }}}
+
+## UnitTest UTTest_dm_ability_manager {{{
+ohos_unittest("UTTest_dm_ability_manager") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/services/implementation/include",
+    "${devicemanager_path}/services/implementation/include/ability",
+  ]
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_dm_ability_manager.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "bundle_framework:appexecfwk_base",
+    "cJSON:cjson_static",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_dm_ability_manager }}}
