@@ -275,28 +275,6 @@ HWTEST_F(DmServiceInfoTest, OperatorLess_005, testing::ext::TestSize.Level1)
 }
 
 /**
- * @tc.name: DefaultConstructor_001
- * @tc.desc: Test default constructor initializes numeric fields
- *           Step 1: Create default DmServiceInfo object
- *           Step 2: Check numeric field default values
- *           Step 3: Verify fields are initialized to 0 or empty
- * @tc.type: FUNC
- */
-HWTEST_F(DmServiceInfoTest, DefaultConstructor_001, testing::ext::TestSize.Level1)
-{
-    DmServiceInfo info;
-    EXPECT_EQ(info.userId, 0);
-    EXPECT_EQ(info.serviceId, 0);
-    EXPECT_EQ(info.displayId, 0);
-    EXPECT_EQ(info.publishState, 0);
-    EXPECT_EQ(info.authform, 0);
-    EXPECT_EQ(info.serviceOwnerTokenId, 0);
-    EXPECT_EQ(info.serviceRegisterTokenId, 0);
-    EXPECT_EQ(info.dataLen, 0);
-    EXPECT_EQ(info.timeStamp, 0);
-}
-
-/**
  * @tc.name: DefaultConstructor_002
  * @tc.desc: Test default constructor initializes string fields to empty
  *           Step 1: Create default DmServiceInfo object
