@@ -68,6 +68,10 @@ group("unittest") {
     ":UTTest_dm_radar_helper_test",
     ":UTTest_dm_screen_common_event",
     ":UTTest_dm_service_hichain_connector",
+    ":UTTest_dm_service_info",
+    ":UTTest_dm_discovery_service_param",
+    ":UTTest_dm_register_service_state",
+    ":UTTest_process_info",
     ":UTTest_dm_service_load",
     ":UTTest_dm_softbus_cache",
     ":UTTest_dm_timer",
@@ -1017,6 +1021,90 @@ ohos_unittest("UTTest_dm_service_load") {
 }
 
 ## UnitTest UTTest_dm_service_load }}}
+
+## UnitTest UTTest_dm_service_info {{{
+ohos_unittest("UTTest_dm_service_info") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
+  ]
+
+  sources = [ "UTTest_dm_service_info.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_dm_service_info }}}
+
+## UnitTest UTTest_dm_discovery_service_param {{{
+ohos_unittest("UTTest_dm_discovery_service_param") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
+  ]
+
+  sources = [ "UTTest_dm_discovery_service_param.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_dm_discovery_service_param }}}
+
+## UnitTest UTTest_dm_register_service_state {{{
+ohos_unittest("UTTest_dm_register_service_state") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
+  ]
+
+  sources = [ "UTTest_dm_register_service_state.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_dm_register_service_state }}}
+
+## UnitTest UTTest_process_info {{{
+ohos_unittest("UTTest_process_info") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
+  ]
+
+  sources = [ "UTTest_process_info.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_process_info }}}
 
 ## UnitTest UTTest_ipc_client_manager {{{
 ohos_unittest("UTTest_ipc_client_manager") {
