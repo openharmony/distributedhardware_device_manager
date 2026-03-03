@@ -59,5 +59,11 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const DevUserInfo &localDevUse
     return DmSoftbusConnector::dmSoftbusConnector->SyncLocalAclListProcess(localDevUserInfo, remoteDevUserInfo,
                                                                            remoteAclList, isDelImmediately);
 }
+
+int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId,
+    std::shared_ptr<DeviceInfo> deviceInfo)
+{
+    return DmSoftbusConnector::dmSoftbusConnector->AddMemberToDiscoverMap(deviceId, deviceInfo);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

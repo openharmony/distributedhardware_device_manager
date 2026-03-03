@@ -1734,6 +1734,10 @@ HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_006, testing::ext::TestSize.L
     EXPECT_CALL(*dmDeviceStateManagerMock_, ProcNotifyEvent(_, _)).WillOnce(Return(ERR_DM_INPUT_PARA_INVALID));
     int ret = deviceManagerServiceImpl_->NotifyEvent(pkgName, eventId, event);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    EXPECT_CALL(*dmDeviceStateManagerMock_, ProcNotifyEvent(_, _)).WillOnce(Return(DM_OK));
+    ret = deviceManagerServiceImpl_->NotifyEvent(pkgName, eventId, event);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, GetGroupType_004, testing::ext::TestSize.Level1)
@@ -1924,6 +1928,11 @@ HWTEST_F(DeviceManagerServiceImplTest, GetLogicalIdAndTokenIdBySessionId_001, te
     deviceManagerServiceImpl_->logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
     ret = deviceManagerServiceImpl_->GetLogicalIdAndTokenIdBySessionId(logicalSessionId, tokenId, sessionId);
     EXPECT_EQ(ret, ERR_DM_AUTH_FAILED);
+
+    deviceManagerServiceImpl_->logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+    deviceManagerServiceImpl_->logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
+    ret = deviceManagerServiceImpl_->GetLogicalIdAndTokenIdBySessionId(logicalSessionId, tokenId, logicalSessionId);
+    EXPECT_EQ(ret, ERR_DM_AUTH_FAILED);
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, InitNewProtocolAuthMgr_001, testing::ext::TestSize.Level1)
@@ -2011,6 +2020,20 @@ HWTEST_F(DeviceManagerServiceImplTest, AddAuthMgr_001, testing::ext::TestSize.Le
     deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, authMgr);
     EXPECT_FALSE(deviceManagerServiceImpl_->authMgrMap_.empty());
     deviceManagerServiceImpl_->sessionEnableMap_.clear();
+    deviceManagerServiceImpl_->authMgrMap_.clear();
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, AddAuthMgr_002, testing::ext::TestSize.Level1)
+{
+    uint64_t tokenId = 0;
+    int sessionId = 1;
+
+    std::shared_ptr<AuthManagerBase> authMgr = std::make_shared<AuthSrcManager>(
+        deviceManagerServiceImpl_->softbusConnector_, deviceManagerServiceImpl_->hiChainConnector_,
+        deviceManagerServiceImpl_->listener_, deviceManagerServiceImpl_->hiChainAuthConnector_);
+    deviceManagerServiceImpl_->authMgrMap_[tokenId] = authMgr;
+    auto ret = deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, authMgr);
+    EXPECT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
     deviceManagerServiceImpl_->authMgrMap_.clear();
 }
 

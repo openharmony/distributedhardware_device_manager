@@ -35,6 +35,8 @@ public:
     virtual void SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec) = 0;
     virtual int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo, const DevUserInfo &remoteDevUserInfo,
                                             std::string remoteAclList, bool isDelImmediately) = 0;
+    virtual int32_t AddMemberToDiscoverMap(const std::string &deviceId,
+        std::shared_ptr<DeviceInfo> deviceInfo) = 0;
 
 public:
     static inline std::shared_ptr<DmSoftbusConnector> dmSoftbusConnector = nullptr;
@@ -50,6 +52,7 @@ public:
     MOCK_METHOD(void, SetProcessInfo, (ProcessInfo processInfo));
     MOCK_METHOD(void, SetProcessInfoVec, (std::vector<ProcessInfo> processInfoVec));
     MOCK_METHOD(int32_t, SyncLocalAclListProcess, (const DevUserInfo &, const DevUserInfo &, std::string, bool));
+    MOCK_METHOD(int32_t, AddMemberToDiscoverMap, (const std::string &, std::shared_ptr<DeviceInfo>));
 };
 }
 }

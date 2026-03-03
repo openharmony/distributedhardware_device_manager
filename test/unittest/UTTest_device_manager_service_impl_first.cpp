@@ -24,6 +24,7 @@ using namespace testing::ext;
 using namespace OHOS::DistributedDeviceProfile;
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* BIND_CALLER_USERID = "bindCallerUserId";
 void DeviceManagerServiceImplFirstTest::SetUp()
 {
     if (deviceManagerServiceImpl_ == nullptr) {
@@ -1063,6 +1064,275 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, InitDpServiceInfo_002, testing::ext:
     dmAuthInfo.extraInfo = R"({"key": "value"})";
     deviceManagerServiceImpl_->InitDpServiceInfo(dmAuthInfo, dpServiceInfo, pinMatchFlag, tokenId, errortCount);
     EXPECT_FALSE(dpServiceInfo.GetExtraInfo().empty());
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ImportConfig_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthManagerBase> authMgr = std::make_shared<AuthSrcManager>(
+        deviceManagerServiceImpl_->softbusConnector_, deviceManagerServiceImpl_->hiChainConnector_,
+        deviceManagerServiceImpl_->listener_, deviceManagerServiceImpl_->hiChainAuthConnector_);
+    uint64_t tokenId  = 123;
+    std::string pkgName = "ImportConfig";
+    deviceManagerServiceImpl_->configsMap_[tokenId] = std::make_shared<Config>();
+    deviceManagerServiceImpl_->ImportConfig(authMgr, tokenId, pkgName);
+    EXPECT_TRUE(deviceManagerServiceImpl_->configsMap_.find(tokenId) == deviceManagerServiceImpl_->configsMap_.end());
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, InitAndRegisterAuthMgr_001, testing::ext::TestSize.Level1)
+{
+    uint64_t tokenId  = 123;
+    auto ret = deviceManagerServiceImpl_->InitAndRegisterAuthMgr(true, tokenId, nullptr, 0, "com.test");
+    EXPECT_EQ(ret, ERR_DM_AUTH_OPEN_SESSION_FAILED);
+
+    auto session = std::make_shared<Session>(0, "");
+    session->flag_ = true;
+    ret = deviceManagerServiceImpl_->InitAndRegisterAuthMgr(true, tokenId, session, 0, "com.test");
+    EXPECT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, Release_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector = deviceManagerServiceImpl_->hiChainConnector_;
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = deviceManagerServiceImpl_->hiChainAuthConnector_;
+    std::shared_ptr<SoftbusConnector> softbusConnector = deviceManagerServiceImpl_->softbusConnector_;
+    
+    deviceManagerServiceImpl_->softbusConnector_ = nullptr;
+    deviceManagerServiceImpl_->hiChainAuthConnector_ = nullptr;
+    deviceManagerServiceImpl_->hiChainConnector_ = nullptr;
+    deviceManagerServiceImpl_->Release();
+    EXPECT_EQ(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
+
+    deviceManagerServiceImpl_->softbusConnector_ = softbusConnector;
+    deviceManagerServiceImpl_->Release();
+    EXPECT_EQ(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
+
+    deviceManagerServiceImpl_->softbusConnector_ = softbusConnector;
+    deviceManagerServiceImpl_->hiChainConnector_ = hiChainConnector;
+    deviceManagerServiceImpl_->Release();
+    EXPECT_EQ(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
+
+    deviceManagerServiceImpl_->softbusConnector_ = softbusConnector;
+    deviceManagerServiceImpl_->hiChainConnector_ = hiChainConnector;
+    deviceManagerServiceImpl_->hiChainAuthConnector_ = hiChainAuthConnector;
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, UnBindDevice_01, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "UnBindDevice";
+    std::string udid = "123";
+    int32_t bindLevel = 0;
+    std::string extra = "extra";
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel, extra);
+    deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, UnBindDevice_02, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "UnBindDevice";
+    std::string udid = "123";
+    int32_t bindLevel = 0;
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel);
+    deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, HandleOffline_001, testing::ext::TestSize.Level1)
+{
+    std::string testID("111111");
+    DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
+    DmDeviceInfo devInfo;
+    strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, testID.c_str());
+    devInfo.networkId[sizeof(devInfo.networkId) - 1] = '\0';
+
+    std::map<int32_t, int32_t> userIdAndBindLevel;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return("123456"));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetUserIdAndBindLevel(_, _)).WillOnce(Return(userIdAndBindLevel));
+    EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(SHARE_TYPE));
+    deviceManagerServiceImpl_->HandleOffline(devState, devInfo, true);
+    EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, HandleOffline_002, testing::ext::TestSize.Level1)
+{
+    std::string testID("111111");
+    DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
+    DmDeviceInfo devInfo;
+    strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, testID.c_str());
+    devInfo.networkId[sizeof(devInfo.networkId) - 1] = '\0';
+
+    std::map<int32_t, int32_t> userIdAndBindLevel;
+    userIdAndBindLevel[1] = INVALIED_TYPE;
+    userIdAndBindLevel[2] = USER;
+    userIdAndBindLevel[3] = SERVICE;
+    userIdAndBindLevel[4] = APP;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return("123456"));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetUserIdAndBindLevel(_, _)).WillOnce(Return(userIdAndBindLevel));
+    EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(APP));
+    deviceManagerServiceImpl_->HandleOffline(devState, devInfo, true);
+    EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_006, testing::ext::TestSize.Level1)
+{
+    std::string peerUdid = "peerUdid";
+    std::string localUdid = "localUdid";
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_SHARE);
+    profile.SetTrustDeviceId(peerUdid);
+    Accesser accesser;
+    accesser.SetAccesserDeviceId(peerUdid);
+    profile.SetAccesser(accesser);
+    Accessee accessee;
+    accessee.SetAccesseeDeviceId(localUdid);
+    profile.SetAccessee(accessee);
+    profiles.push_back(profile);
+    
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    
+    bool result = deviceManagerServiceImpl_->CheckSharePeerSrc(peerUdid, localUdid);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetLogicalIdAndTokenIdBySessionId_001, testing::ext::TestSize.Level1)
+{
+    int32_t sessionId = 10001;
+    uint64_t tokenId = 1000023;
+    uint64_t logicalSessionId = 45678910;
+
+    deviceManagerServiceImpl_->logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+    auto ret = deviceManagerServiceImpl_->GetLogicalIdAndTokenIdBySessionId(logicalSessionId,
+        tokenId, logicalSessionId);
+    EXPECT_EQ(ret, DM_OK);
+    deviceManagerServiceImpl_->logicalSessionId2SessionIdMap_.clear();
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, TransferSinkOldAuthMgr_001, testing::ext::TestSize.Level1)
+{
+    JsonObject jsonObject;
+    std::shared_ptr<Session> curSession = std::make_shared<Session>(1, "deviceId");
+    int32_t ret = deviceManagerServiceImpl_->TransferSinkOldAuthMgr(jsonObject, curSession);
+    EXPECT_EQ(ret, ERR_DM_AUTH_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, TransferSinkOldAuthMgr_002, testing::ext::TestSize.Level1)
+{
+    JsonObject jsonObject;
+    jsonObject[TAG_BUNDLE_NAME] = "com.test.bundle";
+    std::shared_ptr<Session> curSession = std::make_shared<Session>(1, "deviceId");
+    std::shared_ptr<SoftbusConnector> softbusConnector = deviceManagerServiceImpl_->softbusConnector_;
+    deviceManagerServiceImpl_->softbusConnector_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->TransferSinkOldAuthMgr(jsonObject, curSession);
+    EXPECT_EQ(ret, ERR_DM_AUTH_FAILED);
+    deviceManagerServiceImpl_->softbusConnector_ = softbusConnector;
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, RegisterCredentialCallback_001, testing::ext::TestSize.Level1)
+{
+    const std::string pkgName = "pkgNametest";
+    int32_t ret = deviceManagerServiceImpl_->RegisterCredentialCallback(pkgName);
+    EXPECT_EQ(ret, DM_OK);
+    deviceManagerServiceImpl_->UnRegisterCredentialCallback(pkgName);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, UnRegisterCredentialCallback_001, testing::ext::TestSize.Level1)
+{
+    const std::string pkgName = "pkgNametest";
+    int32_t ret = deviceManagerServiceImpl_->UnRegisterCredentialCallback(pkgName);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetConfigByTokenId_001, testing::ext::TestSize.Level1)
+{
+    deviceManagerServiceImpl_->configsMap_.clear();
+    auto config = deviceManagerServiceImpl_->GetConfigByTokenId();
+    EXPECT_NE(config, nullptr);
+    EXPECT_FALSE(deviceManagerServiceImpl_->configsMap_.empty());
+    deviceManagerServiceImpl_->configsMap_.clear();
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetConfigByTokenId_002, testing::ext::TestSize.Level1)
+{
+    deviceManagerServiceImpl_->configsMap_.clear();
+    uint64_t tokenId = IPCSkeleton::GetCallingTokenID();
+    auto config1 = deviceManagerServiceImpl_->GetConfigByTokenId();
+    config1->pkgName = "test.bundle";
+    config1->authCode = "test_auth_code";
+    
+    auto config2 = deviceManagerServiceImpl_->GetConfigByTokenId();
+    EXPECT_EQ(config2->pkgName, "test.bundle");
+    EXPECT_EQ(config2->authCode, "test_auth_code");
+    EXPECT_EQ(deviceManagerServiceImpl_->configsMap_.size(), 1);
+    deviceManagerServiceImpl_->configsMap_.clear();
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, OpenAuthSession_001, testing::ext::TestSize.Level1)
+{
+    std::string deviceId = "123456";
+    std::map<std::string, std::string> bindParam;
+    bindParam[PARAM_KEY_IS_SERVICE_BIND] = DM_VAL_TRUE;
+    int32_t ret = deviceManagerServiceImpl_->OpenAuthSession(deviceId, bindParam);
+    EXPECT_NE(ret, 0);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, OpenAuthSession_002, testing::ext::TestSize.Level1)
+{
+    std::string deviceId = "not_a_number";
+    std::map<std::string, std::string> bindParam;
+    bindParam[PARAM_KEY_IS_SERVICE_BIND] = DM_VAL_TRUE;
+    int32_t ret = deviceManagerServiceImpl_->OpenAuthSession(deviceId, bindParam);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, OpenAuthSession_003, testing::ext::TestSize.Level1)
+{
+    std::string deviceId = "123456";
+    std::map<std::string, std::string> bindParam;
+    bindParam[PARAM_KEY_IS_SERVICE_BIND] = DM_VAL_TRUE;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = deviceManagerServiceImpl_->listener_;
+    deviceManagerServiceImpl_->listener_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->OpenAuthSession(deviceId, bindParam);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+    deviceManagerServiceImpl_->listener_ = listener;
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, OpenAuthSession_004, testing::ext::TestSize.Level1)
+{
+    std::string deviceId = "deviceId";
+    std::map<std::string, std::string> bindParam;
+    bindParam[PARAM_KEY_BIND_EXTRA_DATA] = "invalid_json";
+    int32_t ret = deviceManagerServiceImpl_->OpenAuthSession(deviceId, bindParam);
+    EXPECT_EQ(ret, -1);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, OpenAuthSession_005, testing::ext::TestSize.Level1)
+{
+    std::string deviceId = "deviceId";
+    std::map<std::string, std::string> bindParam;
+    std::shared_ptr<SoftbusConnector> softbusConnector = deviceManagerServiceImpl_->softbusConnector_;
+    deviceManagerServiceImpl_->softbusConnector_ = nullptr;
+    int32_t ret = deviceManagerServiceImpl_->OpenAuthSession(deviceId, bindParam);
+    EXPECT_EQ(ret, -1);
+    deviceManagerServiceImpl_->softbusConnector_ = softbusConnector;
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, OpenAuthSession_007, testing::ext::TestSize.Level1)
+{
+    std::string deviceId = "deviceId";
+    std::map<std::string, std::string> bindParam;
+    std::string extra = R"({"connSessionType": "normal"})";
+    bindParam[PARAM_KEY_BIND_EXTRA_DATA] = extra;
+    std::shared_ptr<SoftbusSessionMock> softbusSessionMock = std::make_shared<SoftbusSessionMock>();
+    EXPECT_CALL(*softbusSessionMock, OpenAuthSession(testing::_)).WillOnce(Return(100));
+    DmSoftbusSession::dmSoftbusSession = softbusSessionMock;
+    int32_t ret = deviceManagerServiceImpl_->OpenAuthSession(deviceId, bindParam);
+    EXPECT_EQ(ret, 100);
+    DmSoftbusSession::dmSoftbusSession = nullptr;
 }
 } // namespace
 } // namespace DistributedHardware
