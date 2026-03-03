@@ -16,7 +16,23 @@
 #ifndef OHOS_DM_TEST_SERVICE_INFO_H
 #define OHOS_DM_TEST_SERVICE_INFO_H
 
-// UT compatibility shim: service related structs are provided by dm_device_info.h.
+// Prefer the real header when it exists in later include paths.
+#if defined(__has_include_next)
+#if __has_include_next("service_info.h")
+#include_next "service_info.h"
+#define OHOS_DM_TEST_SERVICE_INFO_HAS_REAL 1
+#endif
+#endif
+
+#ifndef OHOS_DM_TEST_SERVICE_INFO_HAS_REAL
+// Fallback shim for environments where distributed profile headers are absent.
 #include "dm_device_info.h"
+
+namespace OHOS {
+namespace DistributedDeviceProfile {
+using ServiceInfo = OHOS::DistributedHardware::ServiceInfo;
+} // namespace DistributedDeviceProfile
+} // namespace OHOS
+#endif
 
 #endif // OHOS_DM_TEST_SERVICE_INFO_H
