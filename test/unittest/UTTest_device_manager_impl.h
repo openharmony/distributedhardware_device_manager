@@ -160,7 +160,7 @@ class ServiceDiscoveryCallbackTest : public ServiceDiscoveryCallback {
 public:
     ServiceDiscoveryCallbackTest() = default;
     virtual ~ServiceDiscoveryCallbackTest() = default;
-    void OnServiceFound(const DmDeviceInfo &service) override {}
+    void OnServiceFound(const DmServiceInfo &service) override {}
     void OnServiceDiscoveryResult(int32_t resReason) override {}
 };
 
@@ -173,7 +173,7 @@ public:
 
 class SyncServiceInfoCallbackTest : public SyncServiceInfoCallback {
 public:
-    void OnSyncServiceInfoResult(int32_t result, std::string content) override
+    void OnSyncServiceInfoResult(int32_t result, const std::string &content) override
     {
         if (count_ != nullptr) {
             *count_ = *count_ + 1;
