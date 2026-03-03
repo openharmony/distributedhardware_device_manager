@@ -19,7 +19,7 @@
 // Prefer the real header when it exists in later include paths.
 #if defined(__has_include_next)
 #if __has_include_next("service_info.h")
-#include_next "service_info.h"
+# include_next "service_info.h"
 #define OHOS_DM_TEST_SERVICE_INFO_HAS_REAL 1
 #endif
 #endif
