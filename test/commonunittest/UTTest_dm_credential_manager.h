@@ -23,6 +23,7 @@
 #include "device_manager_service_listener.h"
 #include "dm_timer.h"
 #include "hichain_connector.h"
+#include "hichain_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -33,6 +34,7 @@ public:
     void SetUp();
     void TearDown();
 
+    std::shared_ptr<testing::NiceMock<HiChainConnectorMock>> hiChainConnectorMock_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<DmCredentialManager> dmCreMgr_;
@@ -43,6 +45,17 @@ public:
     MockDeviceManagerServiceListener() = default;
     ~MockDeviceManagerServiceListener() = default;
     void OnCredentialResult(const ProcessInfo &processInfo, int32_t action, const std::string &resultInfo) override {}
+};
+
+class MockCredentialServiceListener : public DeviceManagerServiceListener {
+public:
+    MockCredentialServiceListener() = default;
+    ~MockCredentialServiceListener() = default;
+    MOCK_METHOD(void, OnCredentialResult,
+        (const ProcessInfo &processInfo, int32_t action, const std::string &resultInfo), (override));
+    MOCK_METHOD(void, OnCredentialAuthStatus,
+        (const ProcessInfo &processInfo, const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode),
+        (override));
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -468,7 +468,11 @@ ohos_unittest("UTTest_dm_credential_manager") {
     "${servicesimpl_path}/src/credential",
   ]
 
-  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_credential_manager.cpp" ]
+   sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_dm_credential_manager.cpp",
+    "${devicemanager_path}/test/unittest/mock/hichain_connector_mock.cpp",
+  ]
+
 
   deps = [ ":device_manager_test_common" ]
 
@@ -848,6 +852,7 @@ ohos_unittest("UTTest_softbus_publish") {
   sources = [
     "${devicemanager_path}/test/softbusunittest/UTTest_softbus_publish.cpp",
     "${devicemanager_path}/test/unittest/mock/parameter.cpp",
+    "${devicemanager_path}/test/unittest/mock/softbus_bus_center.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
