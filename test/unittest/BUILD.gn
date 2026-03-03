@@ -69,7 +69,7 @@ group("unittest") {
     ":UTTest_dm_screen_common_event",
     ":UTTest_dm_service_hichain_connector",
     ":UTTest_dm_service_load",
-    ":UTTest_dm_service_info",
+    ":UTTest_dm_service_sync_info",
     ":UTTest_dm_notify_key",
     ":UTTest_dm_softbus_cache",
     ":UTTest_dm_timer",
@@ -1011,11 +1011,11 @@ ohos_unittest("UTTest_dm_service_load") {
 
 ## UnitTest UTTest_dm_service_load }}}
 
-## UnitTest UTTest_dm_service_info {{{
-ohos_unittest("UTTest_dm_service_info") {
+## UnitTest UTTest_dm_service_sync_info {{{
+ohos_unittest("UTTest_dm_service_sync_info") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_dm_service_info.cpp" ]
+  sources = [ "UTTest_dm_service_sync_info.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -1026,7 +1026,7 @@ ohos_unittest("UTTest_dm_service_info") {
   ]
 }
 
-## UnitTest UTTest_dm_service_info }}}
+## UnitTest UTTest_dm_service_sync_info }}}
 
 ## UnitTest UTTest_dm_notify_key {{{
 ohos_unittest("UTTest_dm_notify_key") {

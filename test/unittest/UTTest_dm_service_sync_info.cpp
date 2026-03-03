@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "UTTest_dm_service_info.h"
+#include "UTTest_dm_service_sync_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {

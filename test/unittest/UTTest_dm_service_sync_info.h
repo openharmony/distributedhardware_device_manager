@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_SERVICE_INFO_TEST_H
-#define OHOS_DM_SERVICE_INFO_TEST_H
+#ifndef OHOS_DM_SERVICE_SYNC_INFO_TEST_H
+#define OHOS_DM_SERVICE_SYNC_INFO_TEST_H
 
 #include <gtest/gtest.h>
 #include "dm_device_info.h"
