@@ -68,6 +68,10 @@ group("unittest") {
     ":UTTest_dm_radar_helper_test",
     ":UTTest_dm_screen_common_event",
     ":UTTest_dm_service_hichain_connector",
+    ":UTTest_dm_service_info",
+    ":UTTest_dm_discovery_service_param",
+    ":UTTest_dm_register_service_state",
+    ":UTTest_process_info",
     ":UTTest_dm_service_load",
     ":UTTest_dm_service_sync_info",
     ":UTTest_dm_notify_key",
@@ -388,6 +392,8 @@ ohos_unittest("UTTest_dm_pin_holder") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "googletest:gmock",
@@ -468,7 +474,11 @@ ohos_unittest("UTTest_dm_credential_manager") {
     "${servicesimpl_path}/src/credential",
   ]
 
-  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_credential_manager.cpp" ]
+   sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_dm_credential_manager.cpp",
+    "${devicemanager_path}/test/unittest/mock/hichain_connector_mock.cpp",
+  ]
+
 
   deps = [ ":device_manager_test_common" ]
 
@@ -478,6 +488,8 @@ ohos_unittest("UTTest_dm_credential_manager") {
     "access_token:libtoken_setproc",
     "cJSON:cjson_static",
     "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "googletest:gmock",
@@ -846,6 +858,7 @@ ohos_unittest("UTTest_softbus_publish") {
   sources = [
     "${devicemanager_path}/test/softbusunittest/UTTest_softbus_publish.cpp",
     "${devicemanager_path}/test/unittest/mock/parameter.cpp",
+    "${devicemanager_path}/test/unittest/mock/softbus_bus_center.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -1025,8 +1038,27 @@ ohos_unittest("UTTest_dm_service_sync_info") {
     "hilog:libhilog",
   ]
 }
-
 ## UnitTest UTTest_dm_service_sync_info }}}
+
+## UnitTest UTTest_dm_service_info {{{
+ohos_unittest("UTTest_dm_service_info") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
+  ]
+
+  sources = [ "UTTest_dm_service_info.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+## UnitTest UTTest_dm_service_info }}}
 
 ## UnitTest UTTest_dm_notify_key {{{
 ohos_unittest("UTTest_dm_notify_key") {
@@ -1042,8 +1074,69 @@ ohos_unittest("UTTest_dm_notify_key") {
     "hilog:libhilog",
   ]
 }
-
 ## UnitTest UTTest_dm_notify_key }}}
+
+## UnitTest UTTest_dm_discovery_service_param {{{
+ohos_unittest("UTTest_dm_discovery_service_param") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
+  ]
+
+  sources = [ "UTTest_dm_discovery_service_param.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+## UnitTest UTTest_dm_discovery_service_param }}}
+
+## UnitTest UTTest_dm_register_service_state {{{
+ohos_unittest("UTTest_dm_register_service_state") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
+  ]
+
+  sources = [ "UTTest_dm_register_service_state.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_dm_register_service_state }}}
+
+## UnitTest UTTest_process_info {{{
+ohos_unittest("UTTest_process_info") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
+  ]
+
+  sources = [ "UTTest_process_info.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_process_info }}}
 
 ## UnitTest UTTest_ipc_client_manager {{{
 ohos_unittest("UTTest_ipc_client_manager") {

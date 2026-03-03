@@ -65,7 +65,7 @@ public:
         bindParam_ = bindParam;
     }
 
-    void SetNetWorkId(const std::string &netWorkId)
+    void SetNetworkId(const std::string &netWorkId)
     {
         netWorkId_ = netWorkId;
     }

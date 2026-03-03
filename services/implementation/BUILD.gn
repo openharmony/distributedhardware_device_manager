@@ -196,7 +196,6 @@ if (defined(ohos_lite)) {
       "src/credential/dm_credential_manager.cpp",
       "src/cryptomgr/crypto_mgr.cpp",
       "src/dependency/commonevent/dm_common_event_manager.cpp",
-      "src/dependency/deviceprofile/dp_inited_callback.cpp",
       "src/dependency/hichain/hichain_auth_connector.cpp",
       "src/dependency/hichain/hichain_connector.cpp",
       "src/dependency/hichain/mine_hichain_connector.cpp",

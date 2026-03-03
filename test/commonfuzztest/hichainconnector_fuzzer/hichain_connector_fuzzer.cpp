@@ -399,6 +399,7 @@ void HichainConnectorFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
+    InitDeviceAuthService();
     FuzzedDataProvider fdp(data, size);
     HiChainConnectorFuzzTest(fdp);
     HiChainConnectorSecondFuzzTest(fdp);

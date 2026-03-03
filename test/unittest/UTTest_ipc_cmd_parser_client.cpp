@@ -412,7 +412,7 @@ HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_002, testing::ext::TestSize.L
     std::string pkgName = "ohos.dm.test";
     std::string netWorkId = "xxx";
     req->SetPkgName(pkgName);
-    req->SetNetWorkId(netWorkId);
+    req->SetNetworkId(netWorkId);
     int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
@@ -446,7 +446,7 @@ HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_004, testing::ext::TestSize.L
     std::string pkgName = "ohos.dm.test";
     std::string netWorkId = "xxx";
     req->SetPkgName(pkgName);
-    req->SetNetWorkId(netWorkId);
+    req->SetNetworkId(netWorkId);
     int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
@@ -620,7 +620,7 @@ HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_014, testing::ext::TestSize.L
     std::string networkId = "XXX";
     std::string pkgName = "ohos.dm.test";
     req->SetPkgName(pkgName);
-    req->SetNetWorkId(networkId);
+    req->SetNetworkId(networkId);
     int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
     SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
     if (ptr) {
@@ -651,7 +651,7 @@ HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_031, testing::ext::TestSize.L
     int32_t cmdCode = REG_LOCALSERVICE_INFO;
     DMLocalServiceInfo serviceInfo;
     MessageParcel data;
-    std::shared_ptr<IpcRegServiceInfoReq> req = std::make_shared<IpcRegServiceInfoReq>();
+    std::shared_ptr<IpcRegAuthInfoReq> req = std::make_shared<IpcRegAuthInfoReq>();
     req->SetLocalServiceInfo(serviceInfo);
 
     int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -684,7 +684,7 @@ HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_033, testing::ext::TestSize.L
     int32_t cmdCode = UPDATE_LOCALSERVICE_INFO;
     DMLocalServiceInfo serviceInfo;
     MessageParcel data;
-    std::shared_ptr<IpcRegServiceInfoReq> req = std::make_shared<IpcRegServiceInfoReq>();
+    std::shared_ptr<IpcRegAuthInfoReq> req = std::make_shared<IpcRegAuthInfoReq>();
     req->SetLocalServiceInfo(serviceInfo);
 
     int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
@@ -1010,7 +1010,7 @@ HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_020, testing::ext::TestSize.L
     std::string pkgName = "ohos.dm.test";
     std::string netWorkId = "3a80******fd94";
     req->SetPkgName(pkgName);
-    req->SetNetWorkId(netWorkId);
+    req->SetNetworkId(netWorkId);
     auto ret = ptr(req, data);
     ASSERT_EQ(DM_OK, ret);
 }

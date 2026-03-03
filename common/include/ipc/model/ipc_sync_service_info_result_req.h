@@ -24,82 +24,42 @@ namespace DistributedHardware {
 class IpcSyncServiceInfoResultReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcSyncServiceInfoResultReq);
 public:
-    /**
-     * @tc.name: IpcSyncServiceInfoResultReq::SetServiceSyncInfo
-     * @tc.desc: Ipc Set ServiceSyncInfo Request Set ServiceSyncInfo
-     * @tc.type: FUNC
-     */
     void SetServiceSyncInfo(const ServiceSyncInfo &serviceSyncInfo)
     {
         serviceSyncInfo_ = serviceSyncInfo;
     }
 
-    /**
-     * @tc.name: IpcSyncServiceInfoResultReq::SetServiceSyncInfo
-     * @tc.desc: Ipc Get ServiceSyncInfo Request Get ServiceSyncInfo
-     * @tc.type: FUNC
-     */
     const ServiceSyncInfo &GetServiceSyncInfo() const
     {
         return serviceSyncInfo_;
     }
 
-    /**
-     * @tc.name: IpcSyncServiceInfoResultReq::SetResult
-     * @tc.desc: Ipc Set Result Request Set Result
-     * @tc.type: FUNC
-     */
     void SetResult(int32_t result)
     {
         result_ = result;
     }
 
-    /**
-     * @tc.name: IpcSyncServiceInfoResultReq::GetResult
-     * @tc.desc: Ipc Get Result Request Get Result
-     * @tc.type: FUNC
-     */
-    int32_t &GetResult()
+    int32_t GetResult()
     {
         return result_;
     }
 
-    /**
-     * @tc.name: IpcSyncServiceInfoResultReq::SetContent
-     * @tc.desc: Ipc Set Content Request Set Content
-     * @tc.type: FUNC
-     */
     void SetContent(const std::string &content)
     {
         content_ = content;
     }
 
-    /**
-     * @tc.name: IpcSyncServiceInfoResultReq::GetContent
-     * @tc.desc: Ipc Get Content Request Get Content
-     * @tc.type: FUNC
-     */
     const std::string &GetContent() const
     {
         return content_;
     }
 
-    /**
-     * @tc.name: IpcSyncServiceInfoResultReq::SetServiceId
-     * @tc.desc: Ipc Set ServiceId Request Set ServiceId
-     * @tc.type: FUNC
-     */
     void SetServiceId(int64_t serviceId)
     {
         serviceId_ = serviceId;
     }
 
-    /**
-     * @tc.name: IpcSyncServiceInfoResultReq::GetServiceId
-     * @tc.desc: Ipc Get ServiceId Request Get ServiceId
-     * @tc.type: FUNC
-     */
-    int32_t GetServiceId()
+    int64_t GetServiceId()
     {
         return serviceId_;
     }
@@ -112,4 +72,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_SYNC_SERVICE_INFO_REQ_H
+#endif // OHOS_DM_IPC_SYNC_SERVICE_INFO_RESULT_REQ_H

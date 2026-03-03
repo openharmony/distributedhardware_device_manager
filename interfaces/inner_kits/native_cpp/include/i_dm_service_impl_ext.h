@@ -17,6 +17,7 @@
 #define OHOS_I_DM_SERVICE_IMPL_EXT_H
 
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 #include "idevice_manager_service_listener.h"
 #include "i_dm_bind_manager_ext_resident.h"
 
@@ -24,6 +25,15 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+class AdapterExtCallback {
+public:
+    virtual ~AdapterExtCallback()
+    {
+    }
+    virtual void OnServiceOfflineExt(uint64_t tokenId, const std::string &pkgName, int32_t bindType,
+        const std::string &peerUdid, const DistributedDeviceProfile::ServiceInfo &serviceInfo) = 0;
+};
+
 class IDMServiceImplExt {
 public:
     virtual ~IDMServiceImplExt() {}
@@ -99,24 +109,18 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t AccountUserSwitched(int32_t userId, const std::string &accountId) = 0;
+
     virtual int32_t InitResident(std::shared_ptr<IDMBindManagerExtResident> residentCallback,
         const std::shared_ptr<IDeviceManagerServiceListener> &listener) = 0;
     virtual void OnResidentBytesReceived(const int32_t sessionId, const std::string &message) = 0;
-
     virtual void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result) = 0;
     virtual void OnSessionClosed(const int32_t sessionId) = 0;
     virtual void OnBytesReceived(const int32_t sessionId, const std::string message) = 0;
     virtual int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) = 0;
-//this code line need delete: 111 - 112
-    virtual int32_t StartServiceDiscovery(const ProcessInfo &processInfo, const DiscoveryServiceParam &discParam) = 0;
-    virtual int32_t StopServiceDiscovery(int32_t discServiceId) = 0;
     virtual int32_t OpenAuthSessionWithPara(int64_t serviceId) = 0;
-//this code line need delete: 115 - 117
-    virtual int32_t StartPublishService(const ProcessInfo &processInfo,
-        const PublishServiceParam &publishServiceParam) = 0;
-    virtual int32_t StopPublishService(int64_t serviceId) = 0;
     virtual void OnDynamicSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result) = 0;
     virtual void OnDynamicSessionClosed(const int32_t sessionId) = 0;
+    virtual void RegisterAdapterExtCallback(const std::shared_ptr<AdapterExtCallback> &cb) = 0;
 };
 
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);

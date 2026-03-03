@@ -31,10 +31,6 @@ public:
     virtual bool IsDMServiceAdapterSoLoaded() = 0;
     virtual bool IsDMServiceAdapterResidentLoad() = 0;
     virtual int32_t OpenAuthSessionWithPara(int64_t serviceId) = 0;
-    virtual int32_t GenerateServiceId(int64_t &serviceId) = 0;
-    virtual int32_t CheckServiceHasRegistered(const ServiceRegInfo &serviceRegInfo, int64_t tokenId,
-        int32_t &regServiceId) = 0;
-    virtual int32_t GenerateRegServiceId(int32_t &regServiceId) = 0;
     virtual bool IsImportAuthInfoValid(const DmAuthInfo &dmAuthInfo) = 0;
     virtual bool IsExportAuthInfoValid(const DmAuthInfo &dmAuthInfo) = 0;
 public:
@@ -48,9 +44,6 @@ public:
     MOCK_METHOD(bool, IsDMServiceAdapterSoLoaded, ());
     MOCK_METHOD(bool, IsDMServiceAdapterResidentLoad, ());
     MOCK_METHOD(int32_t, OpenAuthSessionWithPara, (int64_t));
-    MOCK_METHOD(int32_t, GenerateServiceId, (int64_t &));
-    MOCK_METHOD(int32_t, CheckServiceHasRegistered, (const ServiceRegInfo &, int64_t, int32_t &));
-    MOCK_METHOD(int32_t, GenerateRegServiceId, (int32_t &));
     MOCK_METHOD(bool, IsImportAuthInfoValid, (const DmAuthInfo &));
     MOCK_METHOD(bool, IsExportAuthInfoValid, (const DmAuthInfo &));
 };

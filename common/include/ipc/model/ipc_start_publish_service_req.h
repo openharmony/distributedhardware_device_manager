@@ -26,11 +26,11 @@ class IpcStartPublishServiceReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcStartPublishServiceReq);
 
 public:
-    DmPublishServiceParam GetDmPublishServiceParam()
+    const DmPublishServiceParam& GetDmPublishServiceParam()
     {
         return publishDmServiceParam_;
     }
-
+    
     void SetDmPublishServiceParam(const DmPublishServiceParam &publishDmServiceParam)
     {
         publishDmServiceParam_ = publishDmServiceParam;
@@ -45,20 +45,8 @@ public:
     {
         serviceId_ = serviceId;
     }
-//this code line need delete: 49 -57
-    PublishServiceParam GetPublishServiceParam()
-    {
-        return publishServiceParam_;
-    }
-    
-    void SetPublishServiceParam(const PublishServiceParam &publishServiceParam)
-    {
-        publishServiceParam_ = publishServiceParam;
-    }
 
 private:
-//this code line need delete: 61 - 61
-    PublishServiceParam publishServiceParam_;
     DmPublishServiceParam publishDmServiceParam_;
     int64_t serviceId_ = 0;
 };

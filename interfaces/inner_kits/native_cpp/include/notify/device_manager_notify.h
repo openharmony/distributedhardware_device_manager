@@ -88,17 +88,13 @@ public:
         std::shared_ptr<SetRemoteDeviceNameCallback> callback);
     void OnSetRemoteDeviceNameResult(const std::string &pkgName, const std::string &deviceId, int32_t code);
     void UnRegisterPinHolderCallback(const std::string &pkgName);
-//this code line need delete: 92 - 93
     void RegisterServiceDiscoveryCallback(int32_t discoveryServiceId,
         std::shared_ptr<ServiceDiscoveryCallback> callback);
     void UnRegisterServiceDiscoveryCallback(int32_t discoveryServiceId);
-    //delete start
-    int32_t RegisterServiceStateCallback(const std::string &key, std::shared_ptr<ServiceInfoStateCallback> callback);
-    int32_t UnRegisterServiceStateCallback(const std::string &key);
-    //delete end
     int32_t RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
         std::shared_ptr<ServiceInfoStateCallback> callback);
     int32_t UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId);
+
     void RegisterServicePublishCallback(int64_t serviceId, std::shared_ptr<ServicePublishCallback> callback);
     void UnRegisterServicePublishCallback(int64_t serviceId);
     void RegisterServicePublishCallback(const std::string &pkgName,
@@ -107,13 +103,13 @@ public:
     void RegisterServiceDiscoveryCallback(const std::string &pkgName, const std::string &serviceType,
     std::shared_ptr<ServiceDiscoveryCallback> callback);
     void UnRegisterServiceDiscoveryCallback(const std::string &pkgName, const std::string &serviceType);
+    void RegisterLeaveLnnCallback(const std::string &networkId, std::shared_ptr<LeaveLNNCallback> callback);
+    void RegisterAuthCodeInvalidCallback(const std::string &pkgName, std::shared_ptr<AuthCodeInvalidCallback> cb);
+    void UnRegisterAuthCodeInvalidCallback(const std::string &pkgName);
     void RegisterSyncServiceInfoCallback(const std::string &pkgName, int32_t localUserId,
         const std::string &networkId, std::shared_ptr<SyncServiceInfoCallback> callback, int64_t serviceId = 0);
     void UnRegisterSyncServiceInfoCallback(const std::string &pkgName, int32_t localUserId,
         const std::string &networkId, int64_t serviceId = 0);
-    void RegisterLeaveLnnCallback(const std::string &networkId, std::shared_ptr<LeaveLNNCallback> callback);
-    void RegisterAuthCodeInvalidCallback(const std::string &pkgName, std::shared_ptr<AuthCodeInvalidCallback> cb);
-    void UnRegisterAuthCodeInvalidCallback(const std::string &pkgName);
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
     static void DeviceInfoOffline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -129,12 +125,12 @@ public:
         std::shared_ptr<DeviceStatusCallback> tempCbk);
     static void DeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm,
         std::shared_ptr<DevTrustChangeCallback> tempCbk);
-    static void ServiceInfoOnline(
-        std::vector<std::pair<std::shared_ptr<ServiceInfoStateCallback>, int64_t>> callbackInfo);
     static void AuthCodeInvalid(std::shared_ptr<AuthCodeInvalidCallback> tempCbk);
     static void ServiceInfoOnline(const std::shared_ptr<ServiceInfoStateCallback> &callback,
         const DmServiceInfo &dmServiceInfo);
     static void ServiceInfoOffline(const std::shared_ptr<ServiceInfoStateCallback> &callback,
+        const DmServiceInfo &dmServiceInfo);
+    static void ServiceInfoChange(const std::shared_ptr<ServiceInfoStateCallback> &callback,
         const DmServiceInfo &dmServiceInfo);
 public:
     void OnRemoteDied();
@@ -168,29 +164,23 @@ public:
     void OnDeviceScreenStatus(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
     void OnCredentialAuthStatus(const std::string &pkgName, const std::string &deviceList,
                                 uint16_t deviceTypeId, int32_t errcode);
-    void OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, int32_t status,
-        std::string content);
     std::shared_ptr<DiscoveryCallback> GetDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId);
     void GetCallBack(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap);
-    //delete start
-    void OnServiceFound(int32_t discoveryServiceId, const DiscoveryServiceInfo &service);
-    void OnServiceDiscoveryResult(int32_t discoveryServiceId, int32_t resReason);
-    //delete end
+    void OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, int32_t status,
+        std::string content);
     void OnServiceDiscoveryResult(const std::string &pkgName, const std::string &serviceType, int32_t resReason);
-    void OnServiceOnline(const std::vector<int64_t> &serviceIds);
-    //delete start
-    void OnServicePublishResult(int64_t serviceId, int32_t publishResult);
-    //delete end
     void OnServicePublishResult(const std::string &pkgName, int64_t serviceId, int32_t publishResult);
     void OnLeaveLNNResult(const std::string &networkId, int32_t retCode);
-    void OnAuthCodeInvalid(const std::string &pkgName);
+    void OnAuthCodeInvalid(const std::string &pkgName, const std::string &consumerPkgName);
     void OnServiceFound(const std::string &pkgName, const DmServiceInfo &dmServiceInfo);
     void OnServiceOnline(const DmRegisterServiceState &registerServiceState, const DmServiceInfo &serviceInfo);
     void OnServiceOffline(const DmRegisterServiceState &registerServiceState, const DmServiceInfo &serviceInfo);
+    void OnServiceChange(const DmRegisterServiceState &registerServiceState, const DmServiceInfo &serviceInfo);
     void OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
         int32_t result, const std::string &content);
     void GetServiceCallBack(
         std::map<DmCommonNotifyEvent, std::set<std::pair<std::string, int64_t>>> &serviceCallbackMap);
+
 private:
 #if !defined(__LITEOS_M__)
     std::mutex lock_;
@@ -217,16 +207,12 @@ private:
     std::map<std::string, std::shared_ptr<SetLocalDeviceNameCallback>> setLocalDeviceNameCallback_;
     std::map<std::string,
         std::map<std::string, std::shared_ptr<SetRemoteDeviceNameCallback>>> setRemoteDeviceNameCallback_;
-    //this code line need delete: 211 - 213
-    std::map<int32_t, std::shared_ptr<ServiceDiscoveryCallback>> serviceDiscoveryCallbacks_;
-    std::map<int64_t, std::shared_ptr<ServicePublishCallback>> servicePublishCallback_;
     std::map<std::pair<std::string, int64_t>, std::shared_ptr<ServiceInfoStateCallback>> serviceStateCallback_;
+    std::map<std::string, std::shared_ptr<LeaveLNNCallback>> leaveLnnCallback_;
+    std::map<std::string, std::shared_ptr<AuthCodeInvalidCallback>> authCodeInvalidCallback_;
     std::map<std::pair<std::string, int64_t>, std::shared_ptr<ServicePublishCallback>> servicePublishCallbacks_;
     std::map<std::pair<std::string, std::string>, std::shared_ptr<ServiceDiscoveryCallback>> discoveryServiceCallbacks_;
     std::map<std::string, std::map<ServiceSyncInfo, std::shared_ptr<SyncServiceInfoCallback>>> syncServiceInfoCallback_;
-
-    std::map<std::string, std::shared_ptr<LeaveLNNCallback>> leaveLnnCallback_;
-    std::map<std::string, std::shared_ptr<AuthCodeInvalidCallback>> authCodeInvalidCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

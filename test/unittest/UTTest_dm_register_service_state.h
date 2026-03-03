@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,32 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//this code line need delete: 1 - 100
-//delete this file
-#ifndef OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
-#define OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
 
+#ifndef OHOS_DM_REGISTER_SERVICE_STATE_TEST_H
+#define OHOS_DM_REGISTER_SERVICE_STATE_TEST_H
+
+#include <gtest/gtest.h>
 #include "dm_device_info.h"
-#include "ipc_req.h"
+
 namespace OHOS {
 namespace DistributedHardware {
-class IpcRegisterServiceInfoNewReq : public IpcReq {
-    DECLARE_IPC_MODEL(IpcRegisterServiceInfoNewReq);
-
+class DmRegisterServiceStateTest : public testing::Test {
 public:
-    ServiceRegInfo GetServiceRegInfo() const
-    {
-        return serviceRegInfo_;
-    }
-
-    void SetServiceRegInfo(const ServiceRegInfo& serviceRegInfo)
-    {
-        serviceRegInfo_ = serviceRegInfo;
-    }
-
-private:
-    ServiceRegInfo serviceRegInfo_;
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    void SetUp();
+    void TearDown();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_REGISTER_SERVICE_INFO_NEW_REQ_H
+
+#endif // OHOS_DM_REGISTER_SERVICE_STATE_TEST_H

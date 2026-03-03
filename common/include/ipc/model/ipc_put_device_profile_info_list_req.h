@@ -32,7 +32,7 @@ public:
     }
 
     void SetDeviceProfileInfoList(
-            const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList)
+        const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList)
     {
         deviceProfileInfoList_ = deviceProfileInfoList;
     }

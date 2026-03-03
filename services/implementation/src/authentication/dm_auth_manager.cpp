@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,6 +63,7 @@ const int32_t SESSION_CLOSE_TIMEOUT = 2;
 const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
 constexpr const char* NEED_JOIN_LNN = "0";
 constexpr const char* NO_NEED_JOIN_LNN = "1";
+constexpr const char* PUT_SESSION_KEY_ASYNC_TASK = "PutSessionKeyAsyncTask";
 
 // clone task timeout map
 const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
@@ -2710,7 +2711,7 @@ void DmAuthManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessi
     auto asyncTaskFunc = [sharePtrThis, requestId, hashVector]() {
         sharePtrThis->PutSessionKeyAsync(requestId, hashVector);
     };
-    ffrt::submit(asyncTaskFunc, ffrt::task_attr().delay(0));
+    ffrt::submit(asyncTaskFunc, ffrt::task_attr().name(PUT_SESSION_KEY_ASYNC_TASK).delay(0));
 }
 
 void DmAuthManager::PutSessionKeyAsync(int64_t requestId, std::vector<unsigned char> hash)

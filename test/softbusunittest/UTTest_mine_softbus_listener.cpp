@@ -1046,6 +1046,18 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceAliasMatch_002, testing::ext::TestS
     EXPECT_EQ(ret, false);
 }
 
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceAliasMatch_003, testing::ext::TestSize.Level1)
+{
+    DevicePolicyInfo devicePolicyInfo = {};
+    char data[DISC_MAX_CUST_DATA_LEN] = {0};
+    devicePolicyInfo.aliasHashValid = true;
+    (void)memset_s(devicePolicyInfo.aliasHash, DM_HASH_DATA_LEN, 0x11, DM_HASH_DATA_LEN);
+    (void)memset_s(data, DISC_MAX_CUST_DATA_LEN, 0x11, DM_HASH_DATA_LEN);
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    auto ret = mineListener->CheckDeviceAliasMatch(devicePolicyInfo, data);
+    EXPECT_EQ(ret, true);
+}
+
 HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_001, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
@@ -1118,6 +1130,52 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_006, testing::ext::Test
     EXPECT_EQ(ret, false);
 }
 
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_007, testing::ext::TestSize.Level1)
+{
+    DevicePolicyInfo devicePolicyInfo = {};
+    devicePolicyInfo.numberValid = true;
+    int32_t startNumber = -1;
+    int32_t endNumber = 20;
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    auto ret = mineListener->CheckDeviceNumberMatch(devicePolicyInfo, startNumber, endNumber);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_008, testing::ext::TestSize.Level1)
+{
+    DevicePolicyInfo devicePolicyInfo = {};
+    devicePolicyInfo.numberValid = true;
+    (void)strcpy_s(devicePolicyInfo.number, DM_DEVICE_NUMBER_LEN, "10");
+    int32_t startNumber = 2;
+    int32_t endNumber = 20;
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    auto ret = mineListener->CheckDeviceNumberMatch(devicePolicyInfo, startNumber, endNumber);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_009, testing::ext::TestSize.Level1)
+{
+    DevicePolicyInfo devicePolicyInfo = {};
+    devicePolicyInfo.numberValid = true;
+    (void)strcpy_s(devicePolicyInfo.number, DM_DEVICE_NUMBER_LEN, "1");
+    int32_t startNumber = 2;
+    int32_t endNumber = 20;
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    auto ret = mineListener->CheckDeviceNumberMatch(devicePolicyInfo, startNumber, endNumber);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_010, testing::ext::TestSize.Level1)
+{
+    DevicePolicyInfo devicePolicyInfo = {};
+    devicePolicyInfo.numberValid = true;
+    int32_t startNumber = 2;
+    int32_t endNumber = -1;
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    auto ret = mineListener->CheckDeviceNumberMatch(devicePolicyInfo, startNumber, endNumber);
+    EXPECT_EQ(ret, true);
+}
+
 HWTEST_F(MineSoftbusListenerTest, CheckDeviceSnMatch_001, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
@@ -1136,6 +1194,18 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceSnMatch_002, testing::ext::TestSize
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     auto ret = mineListener->CheckDeviceSnMatch(devicePolicyInfo, output);
     EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceSnMatch_003, testing::ext::TestSize.Level1)
+{
+    DevicePolicyInfo devicePolicyInfo = {};
+    char output[DISC_MAX_CUST_DATA_LEN] = {0};
+    devicePolicyInfo.snHashValid = true;
+    (void)memset_s(devicePolicyInfo.snHash, DM_HASH_DATA_LEN, 0x11, DM_HASH_DATA_LEN);
+    (void)memset_s(output, DISC_MAX_CUST_DATA_LEN, 0x11, DM_HASH_DATA_LEN);
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    auto ret = mineListener->CheckDeviceSnMatch(devicePolicyInfo, output);
+    EXPECT_EQ(ret, true);
 }
 
 HWTEST_F(MineSoftbusListenerTest, CheckDeviceTypeMatch_001, testing::ext::TestSize.Level1)
@@ -1158,6 +1228,18 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceTypeMatch_002, testing::ext::TestSi
     EXPECT_EQ(ret, false);
 }
 
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceTypeMatch_003, testing::ext::TestSize.Level1)
+{
+    DevicePolicyInfo devicePolicyInfo = {};
+    char output[DISC_MAX_CUST_DATA_LEN] = {0};
+    devicePolicyInfo.typeHashValid = true;
+    (void)memset_s(devicePolicyInfo.typeHash, DM_HASH_DATA_LEN, 0x11, DM_HASH_DATA_LEN);
+    (void)memset_s(output, DISC_MAX_CUST_DATA_LEN, 0x11, DM_HASH_DATA_LEN);
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    auto ret = mineListener->CheckDeviceTypeMatch(devicePolicyInfo, output);
+    EXPECT_EQ(ret, true);
+}
+
 HWTEST_F(MineSoftbusListenerTest, CheckDeviceUdidMatch_001, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
@@ -1178,6 +1260,18 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceUdidMatch_002, testing::ext::TestSi
     EXPECT_EQ(ret, false);
 }
 
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceUdidMatch_003, testing::ext::TestSize.Level1)
+{
+    DevicePolicyInfo devicePolicyInfo = {};
+    char output[DISC_MAX_CUST_DATA_LEN] = {0};
+    devicePolicyInfo.udidHashValid = true;
+    (void)memset_s(devicePolicyInfo.udidHash, DM_HASH_DATA_LEN, 0x11, DM_HASH_DATA_LEN);
+    (void)memset_s(output, DISC_MAX_CUST_DATA_LEN, 0x11, DM_HASH_DATA_LEN);
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    auto ret = mineListener->CheckDeviceUdidMatch(devicePolicyInfo, output);
+    EXPECT_EQ(ret, true);
+}
+
 HWTEST_F(MineSoftbusListenerTest, GetMatchResult_001, testing::ext::TestSize.Level1)
 {
     std::vector<int> matchItemNum;
@@ -1196,6 +1290,19 @@ HWTEST_F(MineSoftbusListenerTest, GetMatchResult_002, testing::ext::TestSize.Lev
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     auto ret = mineListener->GetMatchResult(matchItemNum, matchItemResult);
     EXPECT_EQ(ret, BUSINESS_PARTIAL_MATCH);
+}
+
+HWTEST_F(MineSoftbusListenerTest, GetMatchResult_003, testing::ext::TestSize.Level1)
+{
+    std::vector<int> matchItemNum;
+    matchItemNum.push_back(1);
+    matchItemNum.push_back(2);
+    std::vector<int> matchItemResult;
+    matchItemResult.push_back(1);
+    matchItemResult.push_back(2);
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    auto ret = mineListener->GetMatchResult(matchItemNum, matchItemResult);
+    EXPECT_EQ(ret, BUSINESS_EXACT_MATCH);
 }
 } // namespace
 } // namespace DistributedHardware

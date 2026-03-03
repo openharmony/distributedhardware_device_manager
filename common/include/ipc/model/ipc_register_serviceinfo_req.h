@@ -21,8 +21,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcRegServiceInfoReq : public IpcReq {
-    DECLARE_IPC_MODEL(IpcRegServiceInfoReq);
+class IpcRegAuthInfoReq : public IpcReq {
+    DECLARE_IPC_MODEL(IpcRegAuthInfoReq);
 
 public:
     const DMLocalServiceInfo &GetLocalServiceInfo() const

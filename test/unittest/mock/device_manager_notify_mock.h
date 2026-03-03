@@ -30,6 +30,9 @@ public:
         std::shared_ptr<GetDeviceIconInfoCallback> callback) = 0;
     virtual int32_t RegisterGetDeviceProfileInfoListCallback(const std::string &pkgName,
         std::shared_ptr<GetDeviceProfileInfoListCallback> callback) = 0;
+    virtual int32_t RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
+        std::shared_ptr<ServiceInfoStateCallback> callback) = 0;
+    virtual int32_t UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerNotify> dmDeviceManagerNotify = nullptr;
 };
@@ -40,6 +43,9 @@ public:
         std::shared_ptr<GetDeviceIconInfoCallback>));
     MOCK_METHOD(int32_t, RegisterGetDeviceProfileInfoListCallback, (const std::string &,
         std::shared_ptr<GetDeviceProfileInfoListCallback>));
+    MOCK_METHOD(int32_t, RegisterServiceStateCallback, (const std::string &, int64_t,
+        std::shared_ptr<ServiceInfoStateCallback>));
+    MOCK_METHOD(int32_t, UnRegisterServiceStateCallback, (const std::string &, int64_t));
 };
 }
 }
