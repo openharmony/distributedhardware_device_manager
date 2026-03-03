@@ -16,7 +16,28 @@
 #ifndef OHOS_DM_TEST_SERVICE_INFO_H
 #define OHOS_DM_TEST_SERVICE_INFO_H
 
-// UT compatibility shim: provide ServiceInfo for DistributedDeviceProfile namespace.
+// Prefer real service_info.h through explicit paths to avoid self-include.
+#if defined(__has_include)
+#if __has_include("i_distributed_device_profile.h")
+#include "i_distributed_device_profile.h"
+#define OHOS_DM_TEST_HAS_REAL_SERVICE_INFO
+#elif __has_include("distributed_device_profile_client.h")
+#include "distributed_device_profile_client.h"
+#define OHOS_DM_TEST_HAS_REAL_SERVICE_INFO
+#elif __has_include("common/include/interfaces/service_info.h")
+#include "common/include/interfaces/service_info.h"
+#define OHOS_DM_TEST_HAS_REAL_SERVICE_INFO
+#elif __has_include("deviceprofile/device_info_manager/common/include/interfaces/service_info.h")
+#include "deviceprofile/device_info_manager/common/include/interfaces/service_info.h"
+#define OHOS_DM_TEST_HAS_REAL_SERVICE_INFO
+#elif __has_include("interfaces/service_info.h")
+#include "interfaces/service_info.h"
+#define OHOS_DM_TEST_HAS_REAL_SERVICE_INFO
+#endif
+#endif
+
+#ifndef OHOS_DM_TEST_HAS_REAL_SERVICE_INFO
+// Fallback shim when real DistributedDeviceProfile service_info.h is unavailable.
 #include "dm_device_info.h"
 
 namespace OHOS {
@@ -24,5 +45,6 @@ namespace DistributedDeviceProfile {
 using ServiceInfo = OHOS::DistributedHardware::ServiceInfo;
 } // namespace DistributedDeviceProfile
 } // namespace OHOS
+#endif
 
 #endif // OHOS_DM_TEST_SERVICE_INFO_H
