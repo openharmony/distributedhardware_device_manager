@@ -18,36 +18,50 @@
 #include <unistd.h>
 
 #include "device_manager_ipc_interface_code.h"
+#include "dm_anonymous.h"
+#include "dm_constants.h"
+#include "dm_device_info.h"
+#include "device_manager_notify.h"
 #include "ipc_acl_profile_req.h"
-#include "ipc_bind_device_req.h"
 #include "ipc_auth_info_req.h"
+#include "ipc_authenticate_device_req.h"
+#include "ipc_bind_device_req.h"
+#include "ipc_bind_target_req.h"
 #include "ipc_client_manager.h"
 #include "ipc_cmd_register.h"
 #include "ipc_common_param_req.h"
 #include "ipc_create_pin_holder_req.h"
-#include "ipc_register_listener_req.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_localserviceinfo_rsp.h"
+#include "ipc_get_local_serviceinfo_ext_rsp.h"
+#include "ipc_get_register_serviceinfo_rsp.h"
+#include "ipc_get_peerserviceinfo_by_serviceid_req.h"
+#include "ipc_get_trust_service_info_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_model_codec.h"
+#include "ipc_notify_dmfa_result_req.h"
+#include "ipc_notify_event_req.h"
 #include "ipc_publish_req.h"
-#include "ipc_unpublish_req.h"
-#include "ipc_unauthenticate_device_req.h"
-#include "ipc_unbind_device_req.h"
-#include "ipc_authenticate_device_req.h"
+#include "ipc_register_listener_req.h"
+#include "ipc_register_service_info_req.h"
 #include "ipc_register_serviceinfo_req.h"
+#include "ipc_req.h"
 #include "ipc_set_credential_req.h"
 #include "ipc_set_credential_rsp.h"
-#include "ipc_notify_event_req.h"
-#include "device_manager_notify.h"
-#include "ipc_req.h"
-#include "dm_anonymous.h"
-#include "dm_device_info.h"
-#include "dm_constants.h"
+#include "ipc_start_publish_service_req.h"
+#include "ipc_start_service_discovery_req.h"
+#include "ipc_stop_publish_service_req.h"
+#include "ipc_sync_service_callback_req.h"
+#include "ipc_sync_service_info_req.h"
+#include "ipc_unauthenticate_device_req.h"
+#include "ipc_unbind_device_req.h"
+#include "ipc_unregister_service_info_req.h"
+#include "ipc_unpublish_req.h"
+#include "ipc_update_service_info_req.h"
 #include "nlohmann/json.hpp"
 
 #define NUM_200 200
@@ -373,6 +387,200 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_088, testing::ext::TestSize.Le
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_089, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UPDATE_LOCALSERVICE_INFO;
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_001, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = REGISTER_SERVICE_INFO;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_002, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = REGISTER_SERVICE_INFO;
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_003, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = UNREGISTER_SERVICE_INFO;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_004, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = UNREGISTER_SERVICE_INFO;
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_005, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = START_PUBLISH_SERVICE;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_006, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = START_PUBLISH_SERVICE;
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_007, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = STOP_PUBLISH_SERVICE;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_008, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = STOP_PUBLISH_SERVICE;
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_009, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = START_SERVICE_DISCOVERING;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_010, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = START_SERVICE_DISCOVERING;
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_011, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = STOP_SERVICE_DISCOVERING;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_012, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = STOP_SERVICE_DISCOVERING;
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_013, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SYNC_SERVICE_CALLBACK;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_014, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SYNC_SERVICE_CALLBACK;
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_015, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SYNC_SERVICE_INFO;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_016, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SYNC_SERVICE_INFO;
+    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_017, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_LOCAL_SERVICEINFO_BY_SERVICEID;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_018, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_LOCAL_SERVICEINFO_BY_SERVICEID;
+    MessageParcel reply;
+    std::shared_ptr<IpcGetLocalServiceInfoExtRsp> rsp = std::make_shared<IpcGetLocalServiceInfoExtRsp>();
+    DmRegisterServiceInfo serviceInfo;
+    IpcModelCodec::EncodeDmRegServiceInfo(serviceInfo, reply);
+    reply.WriteInt32(DM_OK);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    ReadResponseFunc ptr = GetResponseFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(reply, rsp);
+    }
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_019, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_TRUST_SERVICE_INFO;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_020, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_TRUST_SERVICE_INFO;
+    MessageParcel reply;
+    std::shared_ptr<IpcGetTrustServiceInfoRsp> rsp = std::make_shared<IpcGetTrustServiceInfoRsp>();
+    int32_t serviceInfoSize = 1;
+    reply.WriteInt32(serviceInfoSize);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    ReadResponseFunc ptr = GetResponseFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(reply, rsp);
+    }
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_021, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_REGISTER_SERVICE_INFO;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_022, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_REGISTER_SERVICE_INFO;
+    MessageParcel reply;
+    std::shared_ptr<IpcGetRegisterServiceInfoRsp> rsp = std::make_shared<IpcGetRegisterServiceInfoRsp>();
+    int32_t regServiceInfoSize  = 1;
+    reply.WriteInt32(regServiceInfoSize);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    ReadResponseFunc ptr = GetResponseFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(reply, rsp);
+    }
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_023, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_PEER_SERVICEINFO_BY_SERVICEID;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_024, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_PEER_SERVICEINFO_BY_SERVICEID;
+    MessageParcel reply;
+    std::shared_ptr<IpcGetLocalServiceInfoExtRsp> rsp = std::make_shared<IpcGetLocalServiceInfoExtRsp>();
+    DmRegisterServiceInfo serviceInfo;
+    IpcModelCodec::EncodeDmRegServiceInfo(serviceInfo, reply);
+    reply.WriteInt32(DM_OK);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    ReadResponseFunc ptr = GetResponseFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(reply, rsp);
+    }
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_025, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = UNBIND_SERVICE_TARGET;
+    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_026, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = UNBIND_SERVICE_TARGET;
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
@@ -1338,6 +1546,266 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_050, testing::ext::TestSize.Le
     EXPECT_TRUE(result);
 }
 
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_001, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = DP_ACL_ADD;
+    MessageParcel data;
+    std::shared_ptr<IpcAclProfileReq> req = std::make_shared<IpcAclProfileReq>();
+    std::string udid = "XXX";
+    int64_t accessControlId = 123;
+    req->SetStr(udid);
+    req->SetAccessControlId(accessControlId);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_002, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = UPDATE_LOCALSERVICE_INFO;
+    int64_t serviceId = 123;
+    DmRegisterServiceInfo serviceInfo;
+    MessageParcel data;
+    std::shared_ptr<IpcUpdateServiceInfoReq> req = std::make_shared<IpcUpdateServiceInfoReq>();
+    req->SetServiceId(serviceId);
+    req->SetRegisterServiceInfo(serviceInfo);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_003, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = REGISTER_SERVICE_INFO;
+    DmRegisterServiceInfo serviceInfo;
+    MessageParcel data;
+    std::shared_ptr<IpcRegisterServiceInfoReq> req = std::make_shared<IpcRegisterServiceInfoReq>();
+    req->SetRegisterServiceInfo(serviceInfo);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_004, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = UNREGISTER_SERVICE_INFO;
+    DmRegisterServiceInfo serviceInfo;
+    MessageParcel data;
+    int64_t serviceId = 123;
+    std::shared_ptr<IpcUnRegisterServiceInfoReq> req = std::make_shared<IpcUnRegisterServiceInfoReq>();
+    req->SetServiceId(serviceId);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_005, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = START_PUBLISH_SERVICE;
+    MessageParcel data;
+    std::shared_ptr<IpcStartPublishServiceReq> req = std::make_shared<IpcStartPublishServiceReq>();
+    std::string pkgName = "XXX";
+    int64_t serviceId = 123;
+    DmPublishServiceParam param;
+    req->SetPkgName(pkgName);
+    req->SetServiceId(serviceId);
+    req->SetDmPublishServiceParam(param);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_006, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = STOP_PUBLISH_SERVICE;
+    MessageParcel data;
+    std::shared_ptr<IpcStopPublishServiceReq> req = std::make_shared<IpcStopPublishServiceReq>();
+    std::string pkgName = "XXX";
+    int64_t serviceId = 123;
+    req->SetPkgName(pkgName);
+    req->SetServiceId(serviceId);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_007, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = START_SERVICE_DISCOVERING;
+    MessageParcel data;
+    std::shared_ptr<IpcStartServiceDiscoveryReq> req = std::make_shared<IpcStartServiceDiscoveryReq>();
+    std::string pkgName = "XXX";
+    DmDiscoveryServiceParam param;
+    req->SetPkgName(pkgName);
+    req->SetDmDiscParam(param);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_008, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = STOP_SERVICE_DISCOVERING;
+    MessageParcel data;
+    std::shared_ptr<IpcStartServiceDiscoveryReq> req = std::make_shared<IpcStartServiceDiscoveryReq>();
+    std::string pkgName = "XXX";
+    DmDiscoveryServiceParam param;
+    req->SetPkgName(pkgName);
+    req->SetDmDiscParam(param);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_009, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SYNC_SERVICE_CALLBACK;
+    MessageParcel data;
+    std::shared_ptr<IpcSyncServiceCallbackReq> req = std::make_shared<IpcSyncServiceCallbackReq>();
+    std::string pkgName = "XXX";
+    int64_t serviceId = 123;
+    int32_t notifyEvent = 112;
+    req->SetPkgName(pkgName);
+    req->SetServiceId(serviceId);
+    req->SetDmCommonNotifyEvent(notifyEvent);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_010, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = SYNC_SERVICE_INFO;
+    MessageParcel data;
+    std::shared_ptr<IpcSyncServiceInfoReq> req = std::make_shared<IpcSyncServiceInfoReq>();
+    std::string pkgName = "XXX";
+    int32_t localUserId = 112;
+    std::string networkId = "XXX";
+    int64_t serviceId = 123;
+    req->SetPkgName(pkgName);
+    req->SetLocalUserId(localUserId);
+    req->SetNetworkId(networkId);
+    req->SetServiceId(serviceId);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_011, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_LOCAL_SERVICEINFO_BY_SERVICEID;
+    MessageParcel data;
+    std::shared_ptr<IpcStopPublishServiceReq> req = std::make_shared<IpcStopPublishServiceReq>();
+    int64_t serviceId = 123;
+    req->SetServiceId(serviceId);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_012, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_TRUST_SERVICE_INFO;
+    MessageParcel data;
+    std::shared_ptr<IpcNotifyDMFAResultReq> req = std::make_shared<IpcNotifyDMFAResultReq>();
+    std::string pkgName = "xxx";
+    std::string jsonParam = "aaa";
+    req->SetPkgName(pkgName);
+    req->SetJsonParam(jsonParam);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_013, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_REGISTER_SERVICE_INFO;
+    MessageParcel data;
+    std::shared_ptr<IpcNotifyDMFAResultReq> req = std::make_shared<IpcNotifyDMFAResultReq>();
+    std::string jsonParam = "aaa";
+    req->SetJsonParam(jsonParam);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_014, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_PEER_SERVICEINFO_BY_SERVICEID;
+    MessageParcel data;
+    std::shared_ptr<IpcGetPeerServiceInfoByServiceIdReq> req = std::make_shared<IpcGetPeerServiceInfoByServiceIdReq>();
+    std::string networkId  = "xxx";
+    int64_t serviceId = 123;
+    req->SetNetworkId(networkId);
+    req->SetServiceId(serviceId);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_015, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = UNBIND_SERVICE_TARGET;
+    MessageParcel data;
+    std::shared_ptr<IpcBindTargetReq> req = std::make_shared<IpcBindTargetReq>();
+    std::string pkgName = "aaa";
+    std::string unbindParam = "bbb";
+    std::string networkId = "ccc";
+    int64_t serviceId = 123;
+    req->SetPkgName(networkId);
+    req->SetBindParam(unbindParam);
+    req->SetNetworkId(networkId);
+    req->SetServiceId(serviceId);
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+}
+
 HWTEST_F(IpcCmdParserClientTest, TEST_IPC_REQUEST_NULL_001, testing::ext::TestSize.Level2)
 {
     EXPECT_EQ(TestIpcRequestNull(REGISTER_DEVICE_MANAGER_LISTENER), ERR_DM_FAILED);
@@ -1402,6 +1870,19 @@ HWTEST_F(IpcCmdParserClientTest, TEST_IPC_REQUEST_NULL_003, testing::ext::TestSi
     EXPECT_EQ(TestIpcRequestNull(UPDATE_LOCALSERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestIpcRequestNull(GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE), ERR_DM_FAILED);
     EXPECT_EQ(TestIpcRequestNull(IMPORT_AUTH_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(REGISTER_SERVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(UNREGISTER_SERVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(START_PUBLISH_SERVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(STOP_PUBLISH_SERVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(START_SERVICE_DISCOVERING), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(STOP_SERVICE_DISCOVERING), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(SYNC_SERVICE_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(SYNC_SERVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_LOCAL_SERVICEINFO_BY_SERVICEID), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_TRUST_SERVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_REGISTER_SERVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_PEER_SERVICEINFO_BY_SERVICEID), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(UNBIND_SERVICE_TARGET), ERR_DM_FAILED);
 }
 
 HWTEST_F(IpcCmdParserClientTest, TEST_READ_RESPONSE_NULL_001, testing::ext::TestSize.Level2)
@@ -1455,6 +1936,19 @@ HWTEST_F(IpcCmdParserClientTest, TEST_READ_RESPONSE_NULL_002, testing::ext::Test
     EXPECT_EQ(TestReadResponseRspNull(UPDATE_LOCALSERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestReadResponseRspNull(GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE), ERR_DM_FAILED);
     EXPECT_EQ(TestReadResponseRspNull(IMPORT_AUTH_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(REGISTER_SERVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(UNREGISTER_SERVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(START_PUBLISH_SERVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(STOP_PUBLISH_SERVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(START_SERVICE_DISCOVERING), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(STOP_SERVICE_DISCOVERING), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(SYNC_SERVICE_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(SYNC_SERVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_LOCAL_SERVICEINFO_BY_SERVICEID), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_TRUST_SERVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_REGISTER_SERVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_PEER_SERVICEINFO_BY_SERVICEID), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(UNBIND_SERVICE_TARGET), ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware
