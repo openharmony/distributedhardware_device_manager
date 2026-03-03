@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,7 +45,8 @@ void DmAbilityManagerTest::TearDown()
 HWTEST_F(DmAbilityManagerTest, StartAbility_001, testing::ext::TestSize.Level1)
 {
     DmAbilityManager abilityManager;
-    std::string params = R"({"requester": "deviceName", "appOperation": "operation", "customDescription": "desc", "localDeviceType": 1})";
+    std::string params = R"({"requester": "deviceName", "appOperation": "operation",
+        "customDescription": "desc", "localDeviceType": 1})";
 
     AbilityStatus status = abilityManager.StartAbility(params);
 
@@ -225,7 +226,8 @@ HWTEST_F(DmAbilityManagerTest, StartAbility_012, testing::ext::TestSize.Level1)
 HWTEST_F(DmAbilityManagerTest, StartAbility_013, testing::ext::TestSize.Level1)
 {
     DmAbilityManager abilityManager;
-    std::string params = R"({"requester": "VeryLongDeviceNameThatExceedsNormalLengthForTesting", "localDeviceType": 1})";
+    std::string params = R"({"requester": "VeryLongDeviceNameThatExceedsNormalLengthForTesting",
+        "localDeviceType": 1})";
 
     AbilityStatus status = abilityManager.StartAbility(params);
 
@@ -270,7 +272,8 @@ HWTEST_F(DmAbilityManagerTest, StartAbility_015, testing::ext::TestSize.Level1)
 HWTEST_F(DmAbilityManagerTest, StartAbility_016, testing::ext::TestSize.Level1)
 {
     DmAbilityManager abilityManager;
-    std::string params = R"({"requester": "deviceName", "customDescription": "Custom Description", "localDeviceType": 1})";
+    std::string params = R"({"requester": "deviceName", "customDescription": "Custom Description",
+        "localDeviceType": 1})";
 
     AbilityStatus status = abilityManager.StartAbility(params);
 
@@ -285,7 +288,8 @@ HWTEST_F(DmAbilityManagerTest, StartAbility_016, testing::ext::TestSize.Level1)
 HWTEST_F(DmAbilityManagerTest, StartAbility_017, testing::ext::TestSize.Level1)
 {
     DmAbilityManager abilityManager;
-    std::string params = R"({"requester": "deviceName", "appOperation": "operation", "customDescription": "desc", "localDeviceType": 1})";
+    std::string params = R"({"requester": "deviceName", "appOperation": "operation",
+        "customDescription": "desc", "localDeviceType": 1})";
 
     AbilityStatus status = abilityManager.StartAbility(params);
 
