@@ -2036,7 +2036,7 @@ HWTEST_F(DeviceProfileConnectorTest, SingleUserProcess_002, testing::ext::TestSi
     profile.SetAccessee(accessee);
     int32_t ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
     EXPECT_EQ(ret, true);
-    
+
 
     profile.SetBindType(DM_ACROSS_ACCOUNT);
     profile.SetBindLevel(APP);
@@ -2243,40 +2243,52 @@ HWTEST_F(DeviceProfileConnectorTest, FindTargetAclIncludeLnn_001, testing::ext::
     EXPECT_EQ(false, ret);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, FindTargetAclIncludeLnnOld_001, testing::ext::TestSize.Level1)
+HWTEST_F(DeviceProfileConnectorTest, CacheAcerAclId_001, testing::ext::TestSize.Level1)
 {
-    DistributedDeviceProfile::AccessControlProfile acl1;
-    DistributedDeviceProfile::Accesser accesser;
-    DistributedDeviceProfile::Accessee accessee;
-    DmOfflineParam offlineParam;
-    std::string localUdid = "localUdid";
-    std::string remoteUdid = "remoteUdid";
-    accesser.SetAccesserDeviceId(remoteUdid);
-    accessee.SetAccesseeDeviceId(localUdid);
-    acl1.SetAccesser(accesser);
-    acl1.SetAccessee(accessee);
-    bool ret = DeviceProfileConnector::GetInstance().FindTargetAclIncludeLnnOld(
-        acl1, localUdid, remoteUdid, offlineParam);
-    EXPECT_EQ(true, ret);
+    DistributedDeviceProfile::AccessControlProfile profile;
+    AddAccessControlProfileFirst(profile);
+    std::vector<DmAclIdParam> aclInfos;
+    DeviceProfileConnector::GetInstance().CacheAcerAclId(profile, aclInfos);
+    EXPECT_EQ(aclInfos.size(), 1);
+}
 
-    DistributedDeviceProfile::AccessControlProfile acl2;
-    accesser.SetAccesserDeviceId(localUdid);
-    accessee.SetAccesseeDeviceId(remoteUdid);
-    acl2.SetAccesser(accesser);
-    acl2.SetAccessee(accessee);
-    ret = DeviceProfileConnector::GetInstance().FindTargetAclIncludeLnnOld(
-        acl2, localUdid, remoteUdid, offlineParam);
-    EXPECT_EQ(true, ret);
+HWTEST_F(DeviceProfileConnectorTest, CacheAceeAclId_001, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    AddAccessControlProfileFirst(profile);
+    std::vector<DmAclIdParam> aclInfos;
+    DeviceProfileConnector::GetInstance().CacheAceeAclId(profile, aclInfos);
+    EXPECT_EQ(aclInfos.size(), 1);
+}
 
-    std::string extra = "extra";
-    DistributedDeviceProfile::AccessControlProfile acl3;
-    accesser.SetAccesserDeviceId(localUdid);
-    accessee.SetAccesseeDeviceId(remoteUdid);
-    acl3.SetAccesser(accesser);
-    acl3.SetAccessee(accessee);
-    ret = DeviceProfileConnector::GetInstance().FindTargetAclIncludeLnnOld(
-        acl3, extra, remoteUdid, offlineParam);
-    EXPECT_EQ(false, ret);
+HWTEST_F(DeviceProfileConnectorTest, HandleUserSwitched_003, testing::ext::TestSize.Level1)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> activeProfiles;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> inActiveProfiles;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    AddAccessControlProfileFirst(profile);
+    profile.SetStatus(ACTIVE);
+    activeProfiles.push_back(profile);
+    profile.SetStatus(INACTIVE);
+    inActiveProfiles.push_back(profile);
+    DeviceProfileConnector::GetInstance().HandleUserSwitched(activeProfiles, inActiveProfiles);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: SubscribeDeviceProfileInited_001
+ * @tc.desc: SubscribeDeviceProfileInited subscribes to device profile init event
+ *           Step 1: Prepare callback
+ *           Step 2: Call SubscribeDeviceProfileInited
+ *           Step 3: Verify return value
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, SubscribeDeviceProfileInited_001, testing::ext::TestSize.Level1)
+{
+    sptr<MockDpInitedCallback> callback = new MockDpInitedCallback();
+
+    int32_t ret = DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(callback);
+    EXPECT_NE(ret, DM_OK);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

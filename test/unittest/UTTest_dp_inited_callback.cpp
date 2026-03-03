@@ -335,5 +335,88 @@ HWTEST_F(DpInitedCallbackTest, PutAllTrustedDevices_009, testing::ext::TestSize.
     // @tc.expect: authFormMap find udid failed.
     dpInitedCallback.PutAllTrustedDevices();
 }
+
+
+/**
+ * @tc.name: ConvertToTrustedDeviceInfo_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(DpInitedCallbackTest, ConvertToTrustedDeviceInfo_001, testing::ext::TestSize.Level1)
+{
+    DmDeviceInfo deviceInfo;
+    char networkId[] = "255.255.255.1";
+    JsonObject jsonObject;
+    jsonObject[PARAM_KEY_OS_VERSION] = "5.0.3";
+    jsonObject[PARAM_KEY_OS_TYPE] = 1;
+    std::string extraData = jsonObject.Dump();
+    auto ret = CreateDmDeviceInfo(networkId, extraData, deviceInfo);
+    ASSERT_TRUE(ret);
+    deviceInfo.deviceTypeId = 1001;
+
+    std::string udid = "mate-60";
+    std::string uuid = "uuid-mate-60";
+    std::unordered_map<std::string, DmAuthForm> authFormMap = { {udid, PEER_TO_PEER} };
+    DistributedDeviceProfile::TrustedDeviceInfo trustedDeviceInfo;
+
+    DpInitedCallback dpInitedCallback;
+    auto softbusCacheMock = std::static_pointer_cast<SoftbusCacheMock>(DmSoftbusCache::dmSoftbusCache);
+    ASSERT_TRUE(softbusCacheMock != nullptr);
+    EXPECT_CALL(*softbusCacheMock, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(udid), Return(DM_OK)));
+    EXPECT_CALL(*softbusCacheMock, GetUuidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(uuid), Return(DM_OK)));
+
+    bool convertRet = dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
+    EXPECT_TRUE(convertRet);
+}
+
+/**
+ * @tc.name: ConvertToTrustedDeviceInfo_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(DpInitedCallbackTest, ConvertToTrustedDeviceInfo_002, testing::ext::TestSize.Level1)
+{
+    DmDeviceInfo deviceInfo;
+    char networkId[] = "255.255.255.2";
+    std::string extraData;
+    auto ret = CreateDmDeviceInfo(networkId, extraData, deviceInfo);
+    ASSERT_TRUE(ret);
+
+    std::unordered_map<std::string, DmAuthForm> authFormMap;
+    DistributedDeviceProfile::TrustedDeviceInfo trustedDeviceInfo;
+    DpInitedCallback dpInitedCallback;
+
+    bool convertRet = dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
+    EXPECT_FALSE(convertRet);
+}
+
+
+/**
+ * @tc.name: ConvertToTrustedDeviceInfo_003
+ * @tc.type: FUNC
+ */
+HWTEST_F(DpInitedCallbackTest, ConvertToTrustedDeviceInfo_003, testing::ext::TestSize.Level1)
+{
+    DmDeviceInfo deviceInfo;
+    char networkId[] = "255.255.255.3";
+    JsonObject jsonObject;
+    jsonObject[PARAM_KEY_OS_VERSION] = "5.0.3";
+    jsonObject[PARAM_KEY_OS_TYPE] = 1;
+    std::string extraData = jsonObject.Dump();
+    auto ret = CreateDmDeviceInfo(networkId, extraData, deviceInfo);
+    ASSERT_TRUE(ret);
+
+    std::string udid = "mate-60";
+    std::string uuid = "uuid-mate-60";
+    std::unordered_map<std::string, DmAuthForm> authFormMap;
+    DistributedDeviceProfile::TrustedDeviceInfo trustedDeviceInfo;
+
+    DpInitedCallback dpInitedCallback;
+    auto softbusCacheMock = std::static_pointer_cast<SoftbusCacheMock>(DmSoftbusCache::dmSoftbusCache);
+    ASSERT_TRUE(softbusCacheMock != nullptr);
+    EXPECT_CALL(*softbusCacheMock, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(udid), Return(DM_OK)));
+    EXPECT_CALL(*softbusCacheMock, GetUuidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(uuid), Return(DM_OK)));
+
+    bool convertRet = dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
+    EXPECT_FALSE(convertRet);
+}
 } // DistributedHardware
 } // OHOS

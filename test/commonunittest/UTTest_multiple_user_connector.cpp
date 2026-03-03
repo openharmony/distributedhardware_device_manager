@@ -117,6 +117,54 @@ HWTEST_F(MultipleUserConnectorTest, GetAccountInfoByUserId_001, testing::ext::Te
 
     MultipleUserConnector::DeleteAccountInfoByUserId(userId);
 }
+
+HWTEST_F(MultipleUserConnectorTest, GetAccountInfoByUserId_002, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 98765;
+    MultipleUserConnector::DeleteAccountInfoByUserId(userId);
+    auto ret = MultipleUserConnector::GetAccountInfoByUserId(userId);
+    EXPECT_TRUE(ret.accountId.empty());
+    EXPECT_TRUE(ret.accountName.empty());
+}
+
+HWTEST_F(MultipleUserConnectorTest, GetCurrentDMAccountInfo_001, testing::ext::TestSize.Level1)
+{
+    DMAccountInfo info = MultipleUserConnector::GetCurrentDMAccountInfo();
+    EXPECT_EQ(info.accountId, MultipleUserConnector::GetOhosAccountId());
+    EXPECT_EQ(info.accountName, MultipleUserConnector::GetOhosAccountName());
+}
+
+HWTEST_F(MultipleUserConnectorTest, ClearLockedUser_001, testing::ext::TestSize.Level1)
+{
+    std::vector<int32_t> foregroundUserVec;
+    MultipleUserConnector::ClearLockedUser(foregroundUserVec);
+    EXPECT_TRUE(foregroundUserVec.empty());
+}
+
+HWTEST_F(MultipleUserConnectorTest, ClearLockedUser_002, testing::ext::TestSize.Level1)
+{
+    std::vector<int32_t> foregroundUserVec;
+    std::vector<int32_t> backgroundUserVec;
+    MultipleUserConnector::ClearLockedUser(foregroundUserVec, backgroundUserVec);
+    EXPECT_TRUE(foregroundUserVec.empty());
+    EXPECT_TRUE(backgroundUserVec.empty());
+}
+
+HWTEST_F(MultipleUserConnectorTest, GetTokenIdAndForegroundUserId_001, testing::ext::TestSize.Level1)
+{
+    uint32_t tokenId = 0;
+    int32_t userId = -2;
+    MultipleUserConnector::GetTokenIdAndForegroundUserId(tokenId, userId);
+    EXPECT_NE(userId, -2);
+}
+
+HWTEST_F(MultipleUserConnectorTest, GetUserIdByDisplayId_001, testing::ext::TestSize.Level1)
+{
+    int32_t userId = MultipleUserConnector::GetUserIdByDisplayId(-1);
+    int32_t expected = MultipleUserConnector::GetFirstForegroundUserId();
+    EXPECT_EQ(userId, expected);
+}
+
 }
 } // namespace DistributedHardware
 } // namespace OHOS
