@@ -125,12 +125,41 @@ public:
     void OnBindResult(const PeerTargetId &targetId, int32_t result, int32_t status, std::string content) override {}
 };
 
+class ServiceDiscoveryCallbackTest : public ServiceDiscoveryCallback {
+public:
+    void OnServiceFound(const DmServiceInfo &service) override {}
+    void OnServiceDiscoveryResult(int32_t resReason) override {}
+};
+
+class ServiceInfoStateCallbackTest : public ServiceInfoStateCallback {
+public:
+    void OnServiceOnline(const DmServiceInfo &serviceInfo) override {}
+    void OnServiceOffline(const DmServiceInfo &serviceInfo) override {}
+    void OnServiceInfoChange(const DmServiceInfo &serviceInfo) override {}
+};
+
+class ServicePublishCallbackTest : public ServicePublishCallback {
+public:
+    ServicePublishCallbackTest() = default;
+    virtual ~ServicePublishCallbackTest() = default;
+    void OnServicePublishResult(int64_t serviceId, int32_t reason) override {}
+};
+
 class AuthCodeInvalidCallbackTest : public AuthCodeInvalidCallback {
 public:
     virtual ~AuthCodeInvalidCallbackTest()
     {
     }
     void OnAuthCodeInvalid() override {};
+};
+
+class SyncServiceInfoCallbackTest : public SyncServiceInfoCallback {
+public:
+    explicit SyncServiceInfoCallbackTest(int *count) : count_(count) {}
+    virtual ~SyncServiceInfoCallbackTest() {}
+    void OnSyncServiceInfoResult(int32_t result, const std::string &content) override {}
+private:
+    int *count_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

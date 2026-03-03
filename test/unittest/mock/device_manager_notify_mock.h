@@ -33,6 +33,16 @@ public:
     virtual int32_t RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
         std::shared_ptr<ServiceInfoStateCallback> callback) = 0;
     virtual int32_t UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId) = 0;
+    virtual void RegisterServicePublishCallback(const std::string &pkgName, int64_t serviceId,
+        std::shared_ptr<ServicePublishCallback> callback) = 0;
+    virtual void UnRegisterServicePublishCallback(const std::string &pkgName, int64_t serviceId) = 0;
+    virtual void RegisterServiceDiscoveryCallback(const std::string &pkgName, const std::string &serviceType,
+        std::shared_ptr<ServiceDiscoveryCallback> callback) = 0;
+    virtual void UnRegisterServiceDiscoveryCallback(const std::string &pkgName, const std::string &serviceType) = 0;
+    virtual void RegisterSyncServiceInfoCallback(const std::string &pkgName, int32_t localUserId,
+        const std::string &networkId, std::shared_ptr<SyncServiceInfoCallback> callback, int64_t serviceId = 0) = 0;
+    virtual void UnRegisterSyncServiceInfoCallback(const std::string &pkgName, int32_t localUserId,
+        const std::string &networkId, int64_t serviceId = 0) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerNotify> dmDeviceManagerNotify = nullptr;
 };
@@ -46,6 +56,16 @@ public:
     MOCK_METHOD(int32_t, RegisterServiceStateCallback, (const std::string &, int64_t,
         std::shared_ptr<ServiceInfoStateCallback>));
     MOCK_METHOD(int32_t, UnRegisterServiceStateCallback, (const std::string &, int64_t));
+    MOCK_METHOD(void, RegisterServicePublishCallback, (const std::string &, int64_t,
+        std::shared_ptr<ServicePublishCallback>));
+    MOCK_METHOD(void, UnRegisterServicePublishCallback, (const std::string &, int64_t));
+    MOCK_METHOD(void, RegisterServiceDiscoveryCallback, (const std::string &, const std::string &,
+        std::shared_ptr<ServiceDiscoveryCallback>));
+    MOCK_METHOD(void, UnRegisterServiceDiscoveryCallback, (const std::string &, const std::string &));
+    MOCK_METHOD(void, RegisterSyncServiceInfoCallback, (const std::string &, int32_t,
+        const std::string &, std::shared_ptr<SyncServiceInfoCallback>, int64_t));
+    MOCK_METHOD(void, UnRegisterSyncServiceInfoCallback, (const std::string &, int32_t,
+        const std::string &, int64_t));
 };
 }
 }

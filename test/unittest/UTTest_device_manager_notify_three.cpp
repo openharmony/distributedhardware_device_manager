@@ -1098,6 +1098,421 @@ HWTEST_F(DeviceManagerNotifyTest, OnAuthCodeInvalid_004, testing::ext::TestSize.
     ASSERT_NE(it, DeviceManagerNotify::GetInstance().authCodeInvalidCallback_.end());
     ASSERT_EQ(it->second, nullptr);
 }
+
+HWTEST_F(DeviceManagerNotifyTest, RegisterServicePublishCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int64_t serviceId = 1001;
+    std::shared_ptr<ServicePublishCallback> callback = std::make_shared<ServicePublishCallbackTest>();
+    DeviceManagerNotify::GetInstance().servicePublishCallbacks_.clear();
+
+    size_t initialSize = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.size();
+    DeviceManagerNotify::GetInstance().RegisterServicePublishCallback(pkgName, serviceId, callback);
+    size_t finalSize = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.size();
+    ASSERT_EQ(initialSize + 1, finalSize);
+    auto key = std::make_pair(pkgName, serviceId);
+    auto it = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.find(key);
+    ASSERT_NE(it, DeviceManagerNotify::GetInstance().servicePublishCallbacks_.end());
+    ASSERT_EQ(it->second, callback);
+}
+
+HWTEST_F(DeviceManagerNotifyTest, RegisterServicePublishCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int64_t serviceId = 1002;
+    std::shared_ptr<ServicePublishCallback> callback = nullptr;
+    DeviceManagerNotify::GetInstance().servicePublishCallbacks_.clear();
+
+    size_t initialSize = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.size();
+    DeviceManagerNotify::GetInstance().RegisterServicePublishCallback(pkgName, serviceId, callback);
+    size_t finalSize = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.size();
+
+    ASSERT_EQ(initialSize, finalSize);
+}
+
+HWTEST_F(DeviceManagerNotifyTest, RegisterServicePublishCallback_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    int64_t serviceId = 1003;
+    std::shared_ptr<ServicePublishCallback> callback = std::make_shared<ServicePublishCallbackTest>();
+    DeviceManagerNotify::GetInstance().servicePublishCallbacks_.clear();
+
+    size_t initialSize = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.size();
+    DeviceManagerNotify::GetInstance().RegisterServicePublishCallback(pkgName, serviceId, callback);
+    size_t finalSize = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.size();
+
+    ASSERT_EQ(initialSize + 1, finalSize);
+}
+
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterServicePublishCallback_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int64_t serviceId = 2001;
+    std::shared_ptr<ServicePublishCallback> callback = std::make_shared<ServicePublishCallbackTest>();
+    DeviceManagerNotify::GetInstance().RegisterServicePublishCallback(pkgName, serviceId, callback);
+
+    size_t sizeAfterRegister = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.size();
+    auto key = std::make_pair(pkgName, serviceId);
+    auto it = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.find(key);
+    ASSERT_NE(it, DeviceManagerNotify::GetInstance().servicePublishCallbacks_.end());
+
+    DeviceManagerNotify::GetInstance().UnRegisterServicePublishCallback(pkgName, serviceId);
+    size_t finalSize = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.size();
+    ASSERT_EQ(sizeAfterRegister - 1, finalSize);
+
+    it = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.find(key);
+    ASSERT_EQ(it, DeviceManagerNotify::GetInstance().servicePublishCallbacks_.end());
+}
+
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterServicePublishCallback_006, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int64_t serviceId = 2002;
+    DeviceManagerNotify::GetInstance().servicePublishCallbacks_.clear();
+
+    size_t initialSize = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.size();
+    DeviceManagerNotify::GetInstance().UnRegisterServicePublishCallback(pkgName, serviceId);
+    size_t finalSize = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.size();
+
+    ASSERT_EQ(initialSize, finalSize);
+}
+
+HWTEST_F(DeviceManagerNotifyTest, OnServicePublishResult_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int64_t serviceId = 3001;
+    int32_t publishResult = 0; // DM_OK
+    int count = 0;
+
+    class TestServicePublishCallback : public ServicePublishCallback {
+    public:
+        explicit TestServicePublishCallback(int &count) : count_(count) {}
+        void OnServicePublishResult(int64_t serviceId, int32_t reason) override {
+            count_++;
+        }
+    private:
+        int &count_;
+    };
+
+    std::shared_ptr<TestServicePublishCallback> callback =
+        std::make_shared<TestServicePublishCallback>(count);
+    DeviceManagerNotify::GetInstance().RegisterServicePublishCallback(pkgName, serviceId, callback);
+
+    ASSERT_NO_FATAL_FAILURE(
+        DeviceManagerNotify::GetInstance().OnServicePublishResult(pkgName, serviceId, publishResult));
+}
+
+HWTEST_F(DeviceManagerNotifyTest, OnServicePublishResult_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int64_t serviceId = 3002;
+    int32_t publishResult = 0;
+
+    ASSERT_NO_FATAL_FAILURE(
+        DeviceManagerNotify::GetInstance().OnServicePublishResult(pkgName, serviceId, publishResult));
+}
+
+HWTEST_F(DeviceManagerNotifyTest, OnServicePublishResult_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int64_t serviceId = 3003;
+    int32_t publishResult = -1; // Failed
+
+    std::shared_ptr<ServicePublishCallback> callback = std::make_shared<ServicePublishCallbackTest>();
+    DeviceManagerNotify::GetInstance().RegisterServicePublishCallback(pkgName, serviceId, callback);
+
+    auto key = std::make_pair(pkgName, serviceId);
+    auto it = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.find(key);
+    ASSERT_NE(it, DeviceManagerNotify::GetInstance().servicePublishCallbacks_.end());
+
+    ASSERT_NO_FATAL_FAILURE(
+        DeviceManagerNotify::GetInstance().OnServicePublishResult(pkgName, serviceId, publishResult));
+
+    it = DeviceManagerNotify::GetInstance().servicePublishCallbacks_.find(key);
+    ASSERT_EQ(it, DeviceManagerNotify::GetInstance().servicePublishCallbacks_.end());
+}
+
+HWTEST_F(DeviceManagerNotifyTest, RegisterServiceDiscoveryCallback_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string serviceType = "testService";
+    std::shared_ptr<ServiceDiscoveryCallback> callback = std::make_shared<ServiceDiscoveryCallbackTest>();
+    DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.clear();
+
+    size_t initialSize = DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.size();
+    DeviceManagerNotify::GetInstance().RegisterServiceDiscoveryCallback(pkgName, serviceType, callback);
+    size_t finalSize = DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.size();
+
+    ASSERT_EQ(initialSize + 1, finalSize);
+    auto key = std::make_pair(pkgName, serviceType);
+    auto it = DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.find(key);
+    ASSERT_NE(it, DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.end());
+    ASSERT_EQ(it->second, callback);
+}
+
+HWTEST_F(DeviceManagerNotifyTest, RegisterServiceDiscoveryCallback_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string serviceType = "testService";
+    std::shared_ptr<ServiceDiscoveryCallback> callback = nullptr;
+    DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.clear();
+
+    size_t initialSize = DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.size();
+    DeviceManagerNotify::GetInstance().RegisterServiceDiscoveryCallback(pkgName, serviceType, callback);
+    size_t finalSize = DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.size();
+
+    ASSERT_EQ(initialSize, finalSize);
+}
+
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterServiceDiscoveryCallback_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string serviceType = "testService";
+    std::shared_ptr<ServiceDiscoveryCallback> callback = std::make_shared<ServiceDiscoveryCallbackTest>();
+    DeviceManagerNotify::GetInstance().RegisterServiceDiscoveryCallback(pkgName, serviceType, callback);
+
+    size_t sizeAfterRegister = DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.size();
+    auto key = std::make_pair(pkgName, serviceType);
+    auto it = DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.find(key);
+    ASSERT_NE(it, DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.end());
+
+    DeviceManagerNotify::GetInstance().UnRegisterServiceDiscoveryCallback(pkgName, serviceType);
+    size_t finalSize = DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.size();
+    ASSERT_EQ(sizeAfterRegister - 1, finalSize);
+
+    it = DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.find(key);
+    ASSERT_EQ(it, DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.end());
+}
+
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterServiceDiscoveryCallback_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string serviceType = "testService";
+    DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.clear();
+
+    size_t initialSize = DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.size();
+    DeviceManagerNotify::GetInstance().UnRegisterServiceDiscoveryCallback(pkgName, serviceType);
+    size_t finalSize = DeviceManagerNotify::GetInstance().discoveryServiceCallbacks_.size();
+
+    ASSERT_EQ(initialSize, finalSize);
+}
+
+HWTEST_F(DeviceManagerNotifyTest, OnServiceDiscoveryResult_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string serviceType = "testService";
+    int32_t resReason = 0;
+    std::shared_ptr<ServiceDiscoveryCallback> callback = std::make_shared<ServiceDiscoveryCallbackTest>();
+
+    DeviceManagerNotify::GetInstance().RegisterServiceDiscoveryCallback(pkgName, serviceType, callback);
+
+    ASSERT_NO_FATAL_FAILURE(
+        DeviceManagerNotify::GetInstance().OnServiceDiscoveryResult(pkgName, serviceType, resReason));
+}
+
+HWTEST_F(DeviceManagerNotifyTest, OnServiceDiscoveryResult_006, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string serviceType = "testService";
+    int32_t resReason = 0;
+
+    ASSERT_NO_FATAL_FAILURE(
+        DeviceManagerNotify::GetInstance().OnServiceDiscoveryResult(pkgName, serviceType, resReason));
+}
+
+HWTEST_F(DeviceManagerNotifyTest, OnServiceFound_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string serviceType = "testService";
+    std::shared_ptr<ServiceDiscoveryCallback> callback = std::make_shared<ServiceDiscoveryCallbackTest>();
+
+    DeviceManagerNotify::GetInstance().RegisterServiceDiscoveryCallback(pkgName, serviceType, callback);
+
+    DmServiceInfo dmServiceInfo;
+    dmServiceInfo.serviceType = serviceType;
+    dmServiceInfo.serviceId = 1001;
+    dmServiceInfo.userId = 100;
+
+    ASSERT_NO_FATAL_FAILURE(
+        DeviceManagerNotify::GetInstance().OnServiceFound(pkgName, dmServiceInfo));
+}
+
+HWTEST_F(DeviceManagerNotifyTest, OnServiceFound_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    DmServiceInfo dmServiceInfo;
+    dmServiceInfo.serviceType = "testService";
+    dmServiceInfo.serviceId = 1002;
+    dmServiceInfo.userId = 100;
+
+    ASSERT_NO_FATAL_FAILURE(
+        DeviceManagerNotify::GetInstance().OnServiceFound(pkgName, dmServiceInfo));
+}
+
+HWTEST_F(DeviceManagerNotifyTest, RegisterSyncServiceInfoCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t localUserId = 100;
+    std::string networkId = "network123";
+    int64_t serviceId = 4001;
+    int count = 0;
+
+    std::shared_ptr<SyncServiceInfoCallback> callback =
+        std::make_shared<SyncServiceInfoCallbackTest>(&count);
+    DeviceManagerNotify::GetInstance().syncServiceInfoCallback_.clear();
+
+    DeviceManagerNotify::GetInstance().RegisterSyncServiceInfoCallback(
+        pkgName, localUserId, networkId, callback, serviceId);
+
+    ASSERT_GT(DeviceManagerNotify::GetInstance().syncServiceInfoCallback_.size(), 0u);
+    ASSERT_GE(DeviceManagerNotify::GetInstance().syncServiceInfoCallback_[pkgName].size(), 1u);
+}
+
+HWTEST_F(DeviceManagerNotifyTest, RegisterSyncServiceInfoCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    int32_t localUserId = 100;
+    std::string networkId = "network123";
+    int64_t serviceId = 4002;
+    int count = 0;
+
+    std::shared_ptr<SyncServiceInfoCallback> callback =
+        std::make_shared<SyncServiceInfoCallbackTest>(&count);
+    DeviceManagerNotify::GetInstance().syncServiceInfoCallback_.clear();
+
+    size_t initialSize = DeviceManagerNotify::GetInstance().syncServiceInfoCallback_.size();
+    DeviceManagerNotify::GetInstance().RegisterSyncServiceInfoCallback(
+        pkgName, localUserId, networkId, callback, serviceId);
+    size_t finalSize = DeviceManagerNotify::GetInstance().syncServiceInfoCallback_.size();
+
+    ASSERT_EQ(initialSize, finalSize);
+}
+
+HWTEST_F(DeviceManagerNotifyTest, RegisterSyncServiceInfoCallback_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t localUserId = -1;
+    std::string networkId = "network123";
+    int64_t serviceId = 4003;
+    int count = 0;
+
+    std::shared_ptr<SyncServiceInfoCallback> callback =
+        std::make_shared<SyncServiceInfoCallbackTest>(&count);
+    DeviceManagerNotify::GetInstance().syncServiceInfoCallback_.clear();
+
+    size_t initialSize = DeviceManagerNotify::GetInstance().syncServiceInfoCallback_.size();
+    DeviceManagerNotify::GetInstance().RegisterSyncServiceInfoCallback(
+        pkgName, localUserId, networkId, callback, serviceId);
+    size_t finalSize = DeviceManagerNotify::GetInstance().syncServiceInfoCallback_.size();
+
+    ASSERT_EQ(initialSize, finalSize);
+}
+
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterSyncServiceInfoCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t localUserId = 100;
+    std::string networkId = "network123";
+    int64_t serviceId = 5001;
+    int count = 0;
+
+    std::shared_ptr<SyncServiceInfoCallback> callback =
+        std::make_shared<SyncServiceInfoCallbackTest>(&count);
+    DeviceManagerNotify::GetInstance().RegisterSyncServiceInfoCallback(
+        pkgName, localUserId, networkId, callback, serviceId);
+
+    ASSERT_GT(DeviceManagerNotify::GetInstance().syncServiceInfoCallback_[pkgName].size(), 0u);
+
+    DeviceManagerNotify::GetInstance().UnRegisterSyncServiceInfoCallback(
+        pkgName, localUserId, networkId, serviceId);
+
+    ASSERT_EQ(DeviceManagerNotify::GetInstance().syncServiceInfoCallback_[pkgName].size(), 0u);
+}
+
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterSyncServiceInfoCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t localUserId = 100;
+    std::string networkId = "network123";
+    int64_t serviceId = 5002;
+
+    DeviceManagerNotify::GetInstance().syncServiceInfoCallback_.clear();
+
+    ASSERT_NO_FATAL_FAILURE(
+        DeviceManagerNotify::GetInstance().UnRegisterSyncServiceInfoCallback(
+            pkgName, localUserId, networkId, serviceId));
+}
+
+HWTEST_F(DeviceManagerNotifyTest, OnSyncServiceInfoResult_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int32_t localUserId = 100;
+    std::string networkId = "network123";
+    int64_t serviceId = 6001;
+    int32_t result = 0;
+    std::string content = "test content";
+    int count = 0;
+
+    std::shared_ptr<SyncServiceInfoCallback> callback =
+        std::make_shared<SyncServiceInfoCallbackTest>(&count);
+    DeviceManagerNotify::GetInstance().RegisterSyncServiceInfoCallback(
+        pkgName, localUserId, networkId, callback, serviceId);
+
+    ASSERT_GT(DeviceManagerNotify::GetInstance().syncServiceInfoCallback_[pkgName].size(), 0u);
+
+    ServiceSyncInfo serviceSyncInfo;
+    serviceSyncInfo.pkgName = pkgName;
+    serviceSyncInfo.localUserId = localUserId;
+    serviceSyncInfo.networkId = networkId;
+    serviceSyncInfo.serviceId = serviceId;
+
+    ASSERT_NO_FATAL_FAILURE(
+        DeviceManagerNotify::GetInstance().OnSyncServiceInfoResult(serviceSyncInfo, result, content));
+
+    ASSERT_EQ(DeviceManagerNotify::GetInstance().syncServiceInfoCallback_[pkgName].size(), 0u);
+}
+
+HWTEST_F(DeviceManagerNotifyTest, OnSyncServiceInfoResult_002, testing::ext::TestSize.Level0)
+{
+    ServiceSyncInfo serviceSyncInfo;
+    serviceSyncInfo.pkgName = "com.ohos.test";
+    serviceSyncInfo.localUserId = 100;
+    serviceSyncInfo.networkId = "network123";
+    serviceSyncInfo.serviceId = 6002;
+    int32_t result = 0;
+    std::string content = "test content";
+
+    ASSERT_NO_FATAL_FAILURE(
+        DeviceManagerNotify::GetInstance().OnSyncServiceInfoResult(serviceSyncInfo, result, content));
+}
+
+HWTEST_F(DeviceManagerNotifyTest, GetServiceCallBack_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    int64_t serviceId = 7001;
+    std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallbackTest>();
+
+    DeviceManagerNotify::GetInstance().RegisterServiceStateCallback(pkgName, serviceId, callback);
+
+    std::map<DmCommonNotifyEvent, std::set<std::pair<std::string, int64_t>>> serviceCallbackMap;
+    DeviceManagerNotify::GetInstance().GetServiceCallBack(serviceCallbackMap);
+
+    ASSERT_GT(serviceCallbackMap.size(), 0u);
+    ASSERT_GT(serviceCallbackMap[DmCommonNotifyEvent::REG_SERVICE_STATE].size(), 0u);
+
+    auto it = serviceCallbackMap[DmCommonNotifyEvent::REG_SERVICE_STATE].find(std::make_pair(pkgName, serviceId));
+    ASSERT_NE(it, serviceCallbackMap[DmCommonNotifyEvent::REG_SERVICE_STATE].end());
+}
+
+HWTEST_F(DeviceManagerNotifyTest, GetServiceCallBack_002, testing::ext::TestSize.Level0)
+{
+    DeviceManagerNotify::GetInstance().serviceStateCallback_.clear();
+
+    std::map<DmCommonNotifyEvent, std::set<std::pair<std::string, int64_t>>> serviceCallbackMap;
+    DeviceManagerNotify::GetInstance().GetServiceCallBack(serviceCallbackMap);
+
+    ASSERT_EQ(serviceCallbackMap.size(), 0u);
+}
 } // namespace
 
 DmInitCallbackTest::DmInitCallbackTest(int &count) : DmInitCallback()

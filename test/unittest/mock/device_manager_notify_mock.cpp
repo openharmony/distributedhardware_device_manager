@@ -41,5 +41,41 @@ int32_t DeviceManagerNotify::UnRegisterServiceStateCallback(const std::string &p
 {
     return DmDeviceManagerNotify::dmDeviceManagerNotify->UnRegisterServiceStateCallback(pkgName, serviceId);
 }
+
+void DeviceManagerNotify::RegisterServicePublishCallback(const std::string &pkgName, int64_t serviceId,
+    std::shared_ptr<ServicePublishCallback> callback)
+{
+    DmDeviceManagerNotify::dmDeviceManagerNotify->RegisterServicePublishCallback(pkgName, serviceId, callback);
+}
+
+void DeviceManagerNotify::UnRegisterServicePublishCallback(const std::string &pkgName, int64_t serviceId)
+{
+    DmDeviceManagerNotify::dmDeviceManagerNotify->UnRegisterServicePublishCallback(pkgName, serviceId);
+}
+
+void DeviceManagerNotify::RegisterServiceDiscoveryCallback(const std::string &pkgName, const std::string &serviceType,
+    std::shared_ptr<ServiceDiscoveryCallback> callback)
+{
+    DmDeviceManagerNotify::dmDeviceManagerNotify->RegisterServiceDiscoveryCallback(pkgName, serviceType, callback);
+}
+
+void DeviceManagerNotify::UnRegisterServiceDiscoveryCallback(const std::string &pkgName, const std::string &serviceType)
+{
+    DmDeviceManagerNotify::dmDeviceManagerNotify->UnRegisterServiceDiscoveryCallback(pkgName, serviceType);
+}
+
+void DeviceManagerNotify::RegisterSyncServiceInfoCallback(const std::string &pkgName, int32_t localUserId,
+    const std::string &networkId, std::shared_ptr<SyncServiceInfoCallback> callback, int64_t serviceId)
+{
+    DmDeviceManagerNotify::dmDeviceManagerNotify->RegisterSyncServiceInfoCallback(pkgName, localUserId,
+        networkId, callback, serviceId);
+}
+
+void DeviceManagerNotify::UnRegisterSyncServiceInfoCallback(const std::string &pkgName, int32_t localUserId,
+    const std::string &networkId, int64_t serviceId)
+{
+    DmDeviceManagerNotify::dmDeviceManagerNotify->UnRegisterSyncServiceInfoCallback(pkgName, localUserId,
+        networkId, serviceId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
