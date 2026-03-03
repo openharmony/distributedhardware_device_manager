@@ -15,14 +15,57 @@
 
 #include "UTTest_dm_credential_manager_service.h"
 
+#include "dm_anonymous.h"
 #include "dm_constants.h"
-#include "dm_credential_manager.cpp"
 
 using ::testing::_;
 using ::testing::Return;
 
 namespace OHOS {
 namespace DistributedHardware {
+
+constexpr int32_t NONSYMMETRY_CREDENTIAL_TYPE = 2;
+constexpr int32_t SYMMETRY_CREDENTIAL_TYPE = 1;
+constexpr int32_t UNKNOWN_CREDENTIAL_TYPE = 0;
+
+constexpr const char *FIELD_SERVER_PK = "serverPk";
+constexpr const char *FIELD_CREDENTIAL_ID = "credentialId";
+
+struct CredentialDataInfo {
+    int32_t credentialType;
+    std::string credentialId;
+    std::string serverPk;
+    std::string pkInfoSignature;
+    std::string pkInfo;
+    std::string authCode;
+    std::string peerDeviceId;
+    std::string userId;
+    CredentialDataInfo() : credentialType(UNKNOWN_CREDENTIAL_TYPE)
+    {
+    }
+};
+
+struct PeerCredentialInfo {
+    std::string peerDeviceId;
+    std::string peerCredentialId;
+};
+
+void FromJson(const JsonItemObject &jsonObject, CredentialData &credentialData);
+void FromJson(const JsonItemObject &jsonObject, CredentialDataInfo &credentialDataInfo);
+void ToJson(JsonItemObject &jsonObject, const CredentialDataInfo &credentialDataInfo);
+void FromJson(const JsonItemObject &jsonObject, PeerCredentialInfo &peerCredentialInfo);
+void ToJson(JsonItemObject &jsonObject, const PeerCredentialInfo &peerCredentialInfo);
+int32_t GetDeleteDeviceList(const JsonObject &jsonObject, JsonObject &deviceList);
+
+constexpr int32_t TEST_CALLER_USER_ID = 100;
+constexpr int64_t TEST_MISMATCH_REQUEST_ID = 100;
+constexpr int64_t TEST_DEFAULT_REQUEST_ID = 0;
+constexpr int32_t TEST_GROUP_ACTION_IGNORE = 1;
+constexpr int32_t TEST_GROUP_ACTION_NOTIFY = 7;
+constexpr int32_t TEST_UNSUPPORTED_CREDENTIAL_TYPE = 99;
+constexpr int32_t TEST_INVALID_CREDENTIAL_TYPE = -1;
+constexpr int32_t TEST_CREDENTIAL_ID_202 = 202;
+constexpr int32_t TEST_CREDENTIAL_ID_203 = 203;
 
 class CaptureCredentialServiceListenerForCred final : public DeviceManagerServiceListener {
 public:
@@ -56,9 +99,9 @@ void DmCredentialManagerServiceTest::TearDown()
 void DmCredentialManagerServiceTest::SetUpTestCase()
 {
     DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
-    ON_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillByDefault(Return(100));
+    ON_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillByDefault(Return(TEST_CALLER_USER_ID));
     ON_CALL(*multipleUserConnectorMock_, GetCallerUserId(_))
-        .WillByDefault([](int32_t &userId) { userId = 100; });
+        .WillByDefault([](int32_t &userId) { userId = TEST_CALLER_USER_ID; });
 }
 
 void DmCredentialManagerServiceTest::TearDownTestCase()
@@ -618,9 +661,8 @@ HWTEST_F(DmCredentialManagerServiceTest, OnGroupResult_001, testing::ext::TestSi
 {
     auto listener = std::make_shared<CaptureCredentialServiceListenerForCred>();
     auto dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener);
-    dmCreMgr->requestId_ = 200;
 
-    dmCreMgr->OnGroupResult(100, 1, "ignore");
+    dmCreMgr->OnGroupResult(TEST_MISMATCH_REQUEST_ID, TEST_GROUP_ACTION_IGNORE, "ignore");
     EXPECT_EQ(listener->credentialResultCallCount_, 0);
 }
 
@@ -633,11 +675,10 @@ HWTEST_F(DmCredentialManagerServiceTest, OnGroupResult_002, testing::ext::TestSi
 {
     auto listener = std::make_shared<CaptureCredentialServiceListenerForCred>();
     auto dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener);
-    dmCreMgr->requestId_ = 300;
 
-    dmCreMgr->OnGroupResult(300, 7, "ok");
+    dmCreMgr->OnGroupResult(TEST_DEFAULT_REQUEST_ID, TEST_GROUP_ACTION_NOTIFY, "ok");
     EXPECT_EQ(listener->credentialResultCallCount_, 1);
-    EXPECT_EQ(listener->lastAction_, 7);
+    EXPECT_EQ(listener->lastAction_, TEST_GROUP_ACTION_NOTIFY);
     EXPECT_EQ(listener->lastResultInfo_, "ok");
 }
 
@@ -648,10 +689,8 @@ HWTEST_F(DmCredentialManagerServiceTest, OnGroupResult_002, testing::ext::TestSi
  */
 HWTEST_F(DmCredentialManagerServiceTest, OnGroupResult_003, testing::ext::TestSize.Level1)
 {
-    auto dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    dmCreMgr->requestId_ = 300;
-    dmCreMgr->listener_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(dmCreMgr->OnGroupResult(300, 7, "ok"));
+    auto dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, nullptr);
+    EXPECT_NO_FATAL_FAILURE(dmCreMgr->OnGroupResult(TEST_DEFAULT_REQUEST_ID, TEST_GROUP_ACTION_NOTIFY, "ok"));
 }
 
 /**
@@ -677,8 +716,7 @@ HWTEST_F(DmCredentialManagerServiceTest, OnGroupResultExt_001, testing::ext::Tes
  */
 HWTEST_F(DmCredentialManagerServiceTest, OnGroupResultExt_002, testing::ext::TestSize.Level1)
 {
-    auto dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    dmCreMgr->listener_ = nullptr;
+    auto dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, nullptr);
     EXPECT_NO_FATAL_FAILURE(dmCreMgr->OnGroupResultExt(ERR_DM_FAILED, "failed"));
 }
 
@@ -690,7 +728,7 @@ HWTEST_F(DmCredentialManagerServiceTest, OnGroupResultExt_002, testing::ext::Tes
 HWTEST_F(DmCredentialManagerServiceTest, GetCredentialData_001, testing::ext::TestSize.Level1)
 {
     CredentialData creData {};
-    creData.credentialType = 99;
+    creData.credentialType = TEST_UNSUPPORTED_CREDENTIAL_TYPE;
     JsonObject jsonOutObj;
     int32_t ret = dmCreMgr_->GetCredentialData("{}", creData, jsonOutObj);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -704,7 +742,7 @@ HWTEST_F(DmCredentialManagerServiceTest, GetCredentialData_001, testing::ext::Te
 HWTEST_F(DmCredentialManagerServiceTest, GetCredentialData_002, testing::ext::TestSize.Level1)
 {
     CredentialData creData {};
-    creData.credentialType = 1;
+    creData.credentialType = SYMMETRY_CREDENTIAL_TYPE;
     creData.authCode = "authCode";
     JsonObject jsonOutObj;
     int32_t ret = dmCreMgr_->GetCredentialData("{}", creData, jsonOutObj);
@@ -721,7 +759,7 @@ HWTEST_F(DmCredentialManagerServiceTest, GetCredentialData_002, testing::ext::Te
 HWTEST_F(DmCredentialManagerServiceTest, GetCredentialData_003, testing::ext::TestSize.Level1)
 {
     CredentialData creData {};
-    creData.credentialType = 2;
+    creData.credentialType = NONSYMMETRY_CREDENTIAL_TYPE;
     JsonObject jsonOutObj;
     std::string credentialInfo = R"({"userId":"userA","version":"1.0"})";
     int32_t ret = dmCreMgr_->GetCredentialData(credentialInfo, creData, jsonOutObj);
@@ -736,7 +774,7 @@ HWTEST_F(DmCredentialManagerServiceTest, GetCredentialData_003, testing::ext::Te
 HWTEST_F(DmCredentialManagerServiceTest, GetCredentialData_004, testing::ext::TestSize.Level1)
 {
     CredentialData creData {};
-    creData.credentialType = 2;
+    creData.credentialType = NONSYMMETRY_CREDENTIAL_TYPE;
     creData.serverPk = "serverPk";
     creData.pkInfoSignature = "pkSig";
     JsonObject jsonOutObj;
@@ -761,7 +799,7 @@ HWTEST_F(DmCredentialManagerServiceTest, GetCredentialData_004, testing::ext::Te
 HWTEST_F(DmCredentialManagerServiceTest, GetCredentialData_005, testing::ext::TestSize.Level1)
 {
     CredentialData creData {};
-    creData.credentialType = 2;
+    creData.credentialType = NONSYMMETRY_CREDENTIAL_TYPE;
     JsonObject jsonOutObj;
     int32_t ret = dmCreMgr_->GetCredentialData("invalid json", creData, jsonOutObj);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -855,7 +893,7 @@ HWTEST_F(DmCredentialManagerServiceTest, CredentialDataJson_001, testing::ext::T
     })");
     CredentialData credentialData {};
     FromJson(jsonObject, credentialData);
-    EXPECT_EQ(credentialData.credentialType, 1);
+    EXPECT_EQ(credentialData.credentialType, SYMMETRY_CREDENTIAL_TYPE);
     EXPECT_EQ(credentialData.credentialId, "200");
     EXPECT_EQ(credentialData.authCode, "authCode");
     EXPECT_EQ(credentialData.peerDeviceId, "peerDevice");
@@ -870,9 +908,9 @@ HWTEST_F(DmCredentialManagerServiceTest, CredentialDataJson_002, testing::ext::T
 {
     JsonObject jsonObject(R"({"credentialType":1})");
     CredentialData credentialData {};
-    credentialData.credentialType = -1;
+    credentialData.credentialType = TEST_INVALID_CREDENTIAL_TYPE;
     FromJson(jsonObject, credentialData);
-    EXPECT_EQ(credentialData.credentialType, -1);
+    EXPECT_EQ(credentialData.credentialType, TEST_INVALID_CREDENTIAL_TYPE);
 }
 
 /**
@@ -891,7 +929,7 @@ HWTEST_F(DmCredentialManagerServiceTest, CredentialDataInfoJson_001, testing::ex
     })");
     CredentialDataInfo credentialDataInfo;
     FromJson(jsonObject, credentialDataInfo);
-    EXPECT_EQ(credentialDataInfo.credentialType, 1);
+    EXPECT_EQ(credentialDataInfo.credentialType, SYMMETRY_CREDENTIAL_TYPE);
     EXPECT_EQ(credentialDataInfo.credentialId, "201");
     EXPECT_EQ(credentialDataInfo.authCode, "authCode");
     EXPECT_EQ(credentialDataInfo.peerDeviceId, "peerDevice");
@@ -905,7 +943,7 @@ HWTEST_F(DmCredentialManagerServiceTest, CredentialDataInfoJson_001, testing::ex
 HWTEST_F(DmCredentialManagerServiceTest, CredentialDataInfoJson_002, testing::ext::TestSize.Level1)
 {
     CredentialDataInfo credentialDataInfo;
-    credentialDataInfo.credentialType = 2;
+    credentialDataInfo.credentialType = NONSYMMETRY_CREDENTIAL_TYPE;
     credentialDataInfo.credentialId = "202";
     credentialDataInfo.serverPk = "serverPk";
     credentialDataInfo.pkInfoSignature = "pkSig";
@@ -918,7 +956,7 @@ HWTEST_F(DmCredentialManagerServiceTest, CredentialDataInfoJson_002, testing::ex
     EXPECT_TRUE(IsString(jsonObject, FIELD_SERVER_PK));
     EXPECT_EQ(jsonObject[FIELD_SERVER_PK].Get<std::string>(), "serverPk");
     EXPECT_TRUE(IsInt32(jsonObject, FIELD_CREDENTIAL_ID));
-    EXPECT_EQ(jsonObject[FIELD_CREDENTIAL_ID].Get<int32_t>(), 202);
+    EXPECT_EQ(jsonObject[FIELD_CREDENTIAL_ID].Get<int32_t>(), TEST_CREDENTIAL_ID_202);
 }
 
 /**
@@ -929,7 +967,7 @@ HWTEST_F(DmCredentialManagerServiceTest, CredentialDataInfoJson_002, testing::ex
 HWTEST_F(DmCredentialManagerServiceTest, CredentialDataInfoJson_003, testing::ext::TestSize.Level1)
 {
     CredentialDataInfo credentialDataInfo;
-    credentialDataInfo.credentialType = 1;
+    credentialDataInfo.credentialType = SYMMETRY_CREDENTIAL_TYPE;
     credentialDataInfo.credentialId = "203";
     credentialDataInfo.authCode = "authCode203";
     credentialDataInfo.peerDeviceId = "peerDevice203";
@@ -940,7 +978,7 @@ HWTEST_F(DmCredentialManagerServiceTest, CredentialDataInfoJson_003, testing::ex
     EXPECT_TRUE(IsString(jsonObject, FIELD_AUTH_CODE));
     EXPECT_EQ(jsonObject[FIELD_AUTH_CODE].Get<std::string>(), "authCode203");
     EXPECT_TRUE(IsInt32(jsonObject, FIELD_CREDENTIAL_ID));
-    EXPECT_EQ(jsonObject[FIELD_CREDENTIAL_ID].Get<int32_t>(), 203);
+    EXPECT_EQ(jsonObject[FIELD_CREDENTIAL_ID].Get<int32_t>(), TEST_CREDENTIAL_ID_203);
 }
 
 /**
