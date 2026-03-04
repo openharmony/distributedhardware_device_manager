@@ -439,12 +439,12 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
 
     DmDeviceInfo info;
     memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    strncpy(info.deviceId, "test_device_id", sizeof(info.deviceId) - 1);
-    info.deviceId[sizeof(info.deviceId) - 1] = '\0';
-    strncpy(info.deviceName, "TestDevice", sizeof(info.deviceName) - 1);
-    info.deviceName[sizeof(info.deviceName) - 1] = '\0';
-    strncpy(info.networkId, "test_network_id", sizeof(info.networkId) - 1);
-    info.networkId[sizeof(info.networkId) - 1] = '\0';
+    std::string testDeviceId = "test_device_id";
+    std::string testDeviceName = "TestDevice";
+    std::string testNetworkId = "test_network_id";
+    memcpy_s(info.deviceId, sizeof(info.deviceId), testDeviceId.c_str(), testDeviceId.length());
+    memcpy_s(info.deviceName, sizeof(info.deviceName), testDeviceName.c_str(), testDeviceName.length());
+    memcpy_s(info.networkId, sizeof(info.networkId), testNetworkId.c_str(), testNetworkId.length());
     info.deviceTypeId = static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_PAD);
     info.extraData = extraData;
 
@@ -475,12 +475,12 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
 
     DmDeviceInfo info;
     memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    strncpy(info.deviceId, "test_device_id", sizeof(info.deviceId) - 1);
-    info.deviceId[sizeof(info.deviceId) - 1] = '\0';
-    strncpy(info.deviceName, "TestDevice", sizeof(info.deviceName) - 1);
-    info.deviceName[sizeof(info.deviceName) - 1] = '\0';
-    strncpy(info.networkId, "test_network_id", sizeof(info.networkId) - 1);
-    info.networkId[sizeof(info.networkId) - 1] = '\0';
+    std::string testDeviceId = "test_device_id";
+    std::string testDeviceName = "TestDevice";
+    std::string testNetworkId = "test_network_id";
+    memcpy_s(info.deviceId, sizeof(info.deviceId), testDeviceId.c_str(), testDeviceId.length());
+    memcpy_s(info.deviceName, sizeof(info.deviceName), testDeviceName.c_str(), testDeviceName.length());
+    memcpy_s(info.networkId, sizeof(info.networkId), testNetworkId.c_str(), testNetworkId.length());
     info.deviceTypeId = static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_WATCH);
     info.extraData = invalidJsonExtraData;
 
@@ -510,12 +510,12 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
 
     DmDeviceInfo info;
     memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    strncpy(info.deviceId, "test_device_id", sizeof(info.deviceId) - 1);
-    info.deviceId[sizeof(info.deviceId) - 1] = '\0';
-    strncpy(info.deviceName, "TestDevice", sizeof(info.deviceName) - 1);
-    info.deviceName[sizeof(info.deviceName) - 1] = '\0';
-    strncpy(info.networkId, "test_network_id", sizeof(info.networkId) - 1);
-    info.networkId[sizeof(info.networkId) - 1] = '\0';
+    std::string testDeviceId = "test_device_id";
+    std::string testDeviceName = "TestDevice";
+    std::string testNetworkId = "test_network_id";
+    memcpy_s(info.deviceId, sizeof(info.deviceId), testDeviceId.c_str(), testDeviceId.length());
+    memcpy_s(info.deviceName, sizeof(info.deviceName), testDeviceName.c_str(), testDeviceName.length());
+    memcpy_s(info.networkId, sizeof(info.networkId), testNetworkId.c_str(), testNetworkId.length());
     info.deviceTypeId = static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_TV);
     info.extraData = extraDataWithoutCustomData;
 
@@ -579,12 +579,12 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
     for (auto deviceType : deviceTypes) {
         DmDeviceInfo info;
         memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-        strncpy(info.deviceId, "test_device_id", sizeof(info.deviceId) - 1);
-        info.deviceId[sizeof(info.deviceId) - 1] = '\0';
-        strncpy(info.deviceName, "TestDevice", sizeof(info.deviceName) - 1);
-        info.deviceName[sizeof(info.deviceName) - 1] = '\0';
-        strncpy(info.networkId, "test_network_id", sizeof(info.networkId) - 1);
-        info.networkId[sizeof(info.networkId) - 1] = '\0';
+        std::string testDeviceId = "test_device_id";
+        std::string testDeviceName = "TestDevice";
+        std::string testNetworkId = "test_network_id";
+        memcpy_s(info.deviceId, sizeof(info.deviceId), testDeviceId.c_str(), testDeviceId.length());
+        memcpy_s(info.deviceName, sizeof(info.deviceName), testDeviceName.c_str(), testDeviceName.length());
+        memcpy_s(info.networkId, sizeof(info.networkId), testNetworkId.c_str(), testNetworkId.length());
         info.deviceTypeId = static_cast<uint16_t>(deviceType);
 
         DmDeviceBasicInfo deviceBasicInfo;
@@ -611,12 +611,12 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
 
     DmDeviceInfo info;
     memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    strncpy(info.deviceId, "test_device_id", sizeof(info.deviceId) - 1);
-    info.deviceId[sizeof(info.deviceId) - 1] = '\0';
-    strncpy(info.deviceName, "TestDevice", sizeof(info.deviceName) - 1);
-    info.deviceName[sizeof(info.deviceName) - 1] = '\0';
-    strncpy(info.networkId, "test_network_id", sizeof(info.networkId) - 1);
-    info.networkId[sizeof(info.networkId) - 1] = '\0';
+    std::string testDeviceId = "test_device_id";
+    std::string testDeviceName = "TestDevice";
+    std::string testNetworkId = "test_network_id";
+    memcpy_s(info.deviceId, sizeof(info.deviceId), testDeviceId.c_str(), testDeviceId.length());
+    memcpy_s(info.deviceName, sizeof(info.deviceName), testDeviceName.c_str(), testDeviceName.length());
+    memcpy_s(info.networkId, sizeof(info.networkId), testNetworkId.c_str(), testNetworkId.length());
     info.deviceTypeId = static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_PC);
     info.extraData = extraDataWithEmptyCustomData;
 
@@ -658,7 +658,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::Test
     DmDeviceBasicInfo deviceBasicInfo;
     memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
     std::string testNetworkId = "test_network_id";
-    memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str(), testNetworkId.length());
+    memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str(),
+        testNetworkId.length());
 
     std::string appId = "test_app_id";
 
@@ -704,7 +705,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_002, testing::ext::Test
     DmDeviceBasicInfo deviceBasicInfo;
     memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
     std::string testNetworkId = "test_network_id_789";
-    memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str(), testNetworkId.length());
+    memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str()
+        testNetworkId.length());
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(processInfo.pkgName, _, processInfo.userId))
         .WillOnce(testing::Return(ERR_DM_FAILED));
@@ -909,7 +911,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_007, testing::ext::Test
     DmDeviceBasicInfo deviceBasicInfo;
     memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
     std::string testNetworkId = "test_network_id";
-    memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str(), testNetworkId.length());
+    memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str()
+        testNetworkId.length());
 
     std::string appId = "test_app_id_success";
 
