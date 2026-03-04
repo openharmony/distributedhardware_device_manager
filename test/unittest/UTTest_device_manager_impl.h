@@ -23,6 +23,7 @@
 #include <cstdint>
 #include "mock/mock_ipc_client_proxy.h"
 #include "device_manager.h"
+#include "device_manager_callback.h"
 #include "dm_single_instance.h"
 #include "device_manager_impl.h"
 #include "softbus_error_code.h"
@@ -39,6 +40,9 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+
+    static inline std::shared_ptr<DeviceManagerNotifyMock> deviceManagerNotifyMock_ =
+        std::make_shared<DeviceManagerNotifyMock>();
     static inline std::shared_ptr<MockIpcClientProxy> ipcClientProxyMock_ = std::make_shared<MockIpcClientProxy>();
 };
 
@@ -155,6 +159,44 @@ public:
     void OnBindResult(const PeerTargetId &targetId, int32_t result, int32_t status, std::string content) override {}
 };
 
+class ServiceDiscoveryCallbackTest : public ServiceDiscoveryCallback {
+public:
+    ServiceDiscoveryCallbackTest() = default;
+    virtual ~ServiceDiscoveryCallbackTest() = default;
+    void OnServiceFound(const DmServiceInfo &service) override {}
+    void OnServiceDiscoveryResult(int32_t resReason) override {}
+};
+
+class ServiceInfoStateCallbackTest : public ServiceInfoStateCallback {
+public:
+    void OnServiceOnline(const DmServiceInfo &serviceInfo) override {}
+    void OnServiceOffline(const DmServiceInfo &serviceInfo) override {}
+    void OnServiceInfoChange(const DmServiceInfo &serviceInfo) override {}
+};
+
+class SyncServiceInfoCallbackTest : public SyncServiceInfoCallback {
+public:
+    void OnSyncServiceInfoResult(int32_t result, const std::string &content) override
+    {
+        if (count_ != nullptr) {
+            *count_ = *count_ + 1;
+        }
+    }
+private:
+    int *count_ = nullptr;
+};
+
+class MockServicePublishCallback : public ServicePublishCallback {
+public:
+    void OnPublishResult(int32_t result, const std::string &publishId) {}
+};
+
+class ServicePublishCallbackTest : public ServicePublishCallback {
+public:
+    ServicePublishCallbackTest() = default;
+    virtual ~ServicePublishCallbackTest() = default;
+    void OnServicePublishResult(int64_t serviceId, int32_t reason) override {}
+};
 class LeaveLNNCallbackTest : public LeaveLNNCallback {
 public:
     virtual ~LeaveLNNCallbackTest()
