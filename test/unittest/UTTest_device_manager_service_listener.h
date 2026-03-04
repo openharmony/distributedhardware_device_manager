@@ -28,6 +28,10 @@
 #include "kv_adapter_manager_mock.h"
 #include "app_manager_mock.h"
 #include "device_manager_service_mock.h"
+#include "dm_crypto_mock.h"
+#include "app_manager_mock.h"
+#include "dm_softbus_cache_mock.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerServiceListenerTest : public testing::Test {
@@ -46,6 +50,12 @@ public:
     static inline  std::shared_ptr<AppManagerMock> appManagerMock_ = std::make_shared<AppManagerMock>();
     static inline  std::shared_ptr<DeviceManagerServiceMock> deviceManagerServiceMock_ =
         std::make_shared<DeviceManagerServiceMock>();
+    static inline std::shared_ptr<AppManagerMock> appManagerMock_ =
+        std::make_shared<AppManagerMock>();
+    static inline std::shared_ptr<SoftbusCacheMock> softbusCacheMock_ =
+        std::make_shared<SoftbusCacheMock>();
+    static inline std::shared_ptr<CryptoMock> cryptoMock_ =
+        std::make_shared<CryptoMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

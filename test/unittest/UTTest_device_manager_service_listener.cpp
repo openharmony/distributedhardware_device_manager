@@ -439,9 +439,12 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
 
     DmDeviceInfo info;
     memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    info.deviceId = "test_device_id";
-    info.deviceName = "TestDevice";
-    info.networkId = "test_network_id";
+    strncpy(info.deviceId, "test_device_id", sizeof(info.deviceId) - 1);
+    info.deviceId[sizeof(info.deviceId) - 1] = '\0';
+    strncpy(info.deviceName, "TestDevice", sizeof(info.deviceName) - 1);
+    info.deviceName[sizeof(info.deviceName) - 1] = '\0';
+    strncpy(info.networkId, "test_network_id", sizeof(info.networkId) - 1);
+    info.networkId[sizeof(info.networkId) - 1] = '\0';
     info.deviceTypeId = static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_PAD);
     info.extraData = extraData;
 
@@ -472,9 +475,12 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
 
     DmDeviceInfo info;
     memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    info.deviceId = "test_device_id";
-    info.deviceName = "TestDevice";
-    info.networkId = "test_network_id";
+    strncpy(info.deviceId, "test_device_id", sizeof(info.deviceId) - 1);
+    info.deviceId[sizeof(info.deviceId) - 1] = '\0';
+    strncpy(info.deviceName, "TestDevice", sizeof(info.deviceName) - 1);
+    info.deviceName[sizeof(info.deviceName) - 1] = '\0';
+    strncpy(info.networkId, "test_network_id", sizeof(info.networkId) - 1);
+    info.networkId[sizeof(info.networkId) - 1] = '\0';
     info.deviceTypeId = static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_WATCH);
     info.extraData = invalidJsonExtraData;
 
@@ -504,9 +510,12 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
 
     DmDeviceInfo info;
     memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    info.deviceId = "test_device_id";
-    info.deviceName = "TestDevice";
-    info.networkId = "test_network_id";
+    strncpy(info.deviceId, "test_device_id", sizeof(info.deviceId) - 1);
+    info.deviceId[sizeof(info.deviceId) - 1] = '\0';
+    strncpy(info.deviceName, "TestDevice", sizeof(info.deviceName) - 1);
+    info.deviceName[sizeof(info.deviceName) - 1] = '\0';
+    strncpy(info.networkId, "test_network_id", sizeof(info.networkId) - 1);
+    info.networkId[sizeof(info.networkId) - 1] = '\0';
     info.deviceTypeId = static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_TV);
     info.extraData = extraDataWithoutCustomData;
 
@@ -570,9 +579,12 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
     for (auto deviceType : deviceTypes) {
         DmDeviceInfo info;
         memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-        info.deviceId = "test_device_id";
-        info.deviceName = "TestDevice";
-        info.networkId = "test_network_id";
+        strncpy(info.deviceId, "test_device_id", sizeof(info.deviceId) - 1);
+        info.deviceId[sizeof(info.deviceId) - 1] = '\0';
+        strncpy(info.deviceName, "TestDevice", sizeof(info.deviceName) - 1);
+        info.deviceName[sizeof(info.deviceName) - 1] = '\0';
+        strncpy(info.networkId, "test_network_id", sizeof(info.networkId) - 1);
+        info.networkId[sizeof(info.networkId) - 1] = '\0';
         info.deviceTypeId = static_cast<uint16_t>(deviceType);
 
         DmDeviceBasicInfo deviceBasicInfo;
@@ -599,9 +611,12 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
 
     DmDeviceInfo info;
     memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    info.deviceId = "test_device_id";
-    info.deviceName = "TestDevice";
-    info.networkId = "test_network_id";
+    strncpy(info.deviceId, "test_device_id", sizeof(info.deviceId) - 1);
+    info.deviceId[sizeof(info.deviceId) - 1] = '\0';
+    strncpy(info.deviceName, "TestDevice", sizeof(info.deviceName) - 1);
+    info.deviceName[sizeof(info.deviceName) - 1] = '\0';
+    strncpy(info.networkId, "test_network_id", sizeof(info.networkId) - 1);
+    info.networkId[sizeof(info.networkId) - 1] = '\0';
     info.deviceTypeId = static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_PC);
     info.extraData = extraDataWithEmptyCustomData;
 
@@ -648,8 +663,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::Test
     std::string appId = "test_app_id";
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(processInfo.pkgName, _, processInfo.userId))
-        .WillOnce(DoAll(SetArgReferee<1>(appId), Return(DM_OK)));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
+        .WillOnce(DoAll(testing::SetArgReferee<1>(appId), testing::Return(DM_OK)));
+    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(testing::Return(DM_OK));
 
     // Act
     listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
@@ -692,7 +707,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_002, testing::ext::Test
     memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str(), testNetworkId.length());
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(processInfo.pkgName, _, processInfo.userId))
-        .WillOnce(Return(ERR_DM_FAILED));
+        .WillOnce(testing::Return(ERR_DM_FAILED));
 
     // Act
     listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
@@ -737,7 +752,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_003, testing::ext::Test
         DmDeviceBasicInfo deviceBasicInfo;
         memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
 
-        EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+        EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(testing::Return(ERR_DM_FAILED));
 
         // Act
         listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
@@ -779,7 +794,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_004, testing::ext::Test
         DmDeviceBasicInfo deviceBasicInfo;
         memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
 
-        EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(pkgName, _, _)).WillOnce(Return(ERR_DM_FAILED));
+        EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(pkgName, _, _)).WillOnce(testing::Return(ERR_DM_FAILED));
 
         // Act
         listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
@@ -821,7 +836,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_005, testing::ext::Test
         DmDeviceBasicInfo deviceBasicInfo;
         memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
 
-        EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+        EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(testing::Return(ERR_DM_FAILED));
 
         // Act
         listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
@@ -856,7 +871,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_006, testing::ext::Test
     DmDeviceBasicInfo deviceBasicInfo;
     memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
 
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(testing::Return(ERR_DM_FAILED));
 
     // Act
     listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
@@ -899,8 +914,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_007, testing::ext::Test
     std::string appId = "test_app_id_success";
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(processInfo.pkgName, _, processInfo.userId))
-        .WillOnce(DoAll(SetArgReferee<1>(appId), Return(DM_OK)));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
+        .WillOnce(DoAll(testing::SetArgReferee<1>(appId), testing::Return(DM_OK)));
+    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(testing::Return(DM_OK));
 
     // Act
     listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
@@ -940,7 +955,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_008, testing::ext::Test
         DmDeviceBasicInfo deviceBasicInfo;
         memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
 
-        EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, userId)).WillOnce(Return(ERR_DM_FAILED));
+        EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, userId)).WillOnce(testing::Return(ERR_DM_FAILED));
 
         // Act
         listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
@@ -991,7 +1006,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_002, test
     memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), networkId.c_str(), networkId.length());
     dmDeviceInfo.extraData = "{\"key\":\"value\"}";
 
-    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(testing::Return(ERR_DM_FAILED));
 
     // Act
     int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
@@ -1019,8 +1034,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_003, test
 
     std::string udid = "test_udid";
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(udid), Return(DM_OK)));
-    EXPECT_CALL(*softbusCacheMock_, GetUuidFromCache(_, _)).WillOnce(Return(ERR_DM_FAILED));
+        .WillOnce(DoAll(testing::SetArgReferee<1>(udid), testing::Return(DM_OK)));
+    EXPECT_CALL(*softbusCacheMock_, GetUuidFromCache(_, _)).WillOnce(testing::Return(ERR_DM_FAILED));
 
     // Act
     int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
@@ -1049,9 +1064,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_004, test
     std::string udid = "test_udid";
     std::string uuid = "test_uuid";
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(udid), Return(DM_OK)));
+        .WillOnce(DoAll(testing::SetArgReferee<1>(udid), testing::Return(DM_OK)));
     EXPECT_CALL(*softbusCacheMock_, GetUuidFromCache(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(uuid), Return(DM_OK)));
+        .WillOnce(DoAll(testing::SetArgReferee<1>(uuid), testing::Return(DM_OK)));
 
     // Act
     int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
@@ -1080,9 +1095,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_005, test
     std::string udid = "test_udid";
     std::string uuid = "test_uuid";
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(udid), Return(DM_OK)));
+        .WillOnce(DoAll(testing::SetArgReferee<1>(udid), testing::Return(DM_OK)));
     EXPECT_CALL(*softbusCacheMock_, GetUuidFromCache(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(uuid), Return(DM_OK)));
+        .WillOnce(DoAll(testing::SetArgReferee<1>(uuid), testing::Return(DM_OK)));
 
     // Act
     int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
@@ -1111,9 +1126,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_006, test
     std::string udid = "test_udid_12345";
     std::string uuid = "test_uuid_67890";
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(udid), Return(DM_OK)));
+        .WillOnce(DoAll(testing::SetArgReferee<1>(udid), testing::Return(DM_OK)));
     EXPECT_CALL(*softbusCacheMock_, GetUuidFromCache(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(uuid), Return(DM_OK)));
+        .WillOnce(DoAll(testing::SetArgReferee<1>(uuid), testing::Return(DM_OK)));
 
     // Act
     int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
@@ -1153,9 +1168,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_007, test
         std::string udid = "udid_" + pkgName;
         std::string uuid = "uuid_" + pkgName;
         EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
-            .WillOnce(DoAll(SetArgReferee<1>(udid), Return(DM_OK)));
+            .WillOnce(DoAll(testing::SetArgReferee<1>(udid), testing::Return(DM_OK)));
         EXPECT_CALL(*softbusCacheMock_, GetUuidFromCache(_, _))
-            .WillOnce(DoAll(SetArgReferee<1>(uuid), Return(DM_OK)));
+            .WillOnce(DoAll(testing::SetArgReferee<1>(uuid), testing::Return(DM_OK)));
 
         // Act
         int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
@@ -1211,9 +1226,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_009, test
     std::string udid = "test_udid_with_special_chars";
     std::string uuid = "test_uuid_with_special_chars";
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(udid), Return(DM_OK)));
+        .WillOnce(DoAll(testing::SetArgReferee<1>(udid), testing::Return(DM_OK)));
     EXPECT_CALL(*softbusCacheMock_, GetUuidFromCache(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(uuid), Return(DM_OK)));
+        .WillOnce(DoAll(testing::SetArgReferee<1>(uuid), testing::Return(DM_OK)));
 
     // Act
     int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
@@ -1262,9 +1277,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_001, testing
     processInfoVec.push_back(pro2);
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
 
     // Act
     listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
@@ -1352,9 +1367,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_003, testing
     processInfoVec.push_back(pro);
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
 
     // Act
     listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
@@ -1397,9 +1412,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_004, testing
     processInfoVec.push_back(pro);
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
 
     // Act
     listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
@@ -1526,9 +1541,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_007, testing
     processInfoVec.push_back(pro3);
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
 
     // Act
     listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
@@ -1575,9 +1590,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_008, testing
     processInfoVec.push_back(pro2);
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
 
     // Act
     listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
@@ -1624,9 +1639,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_009, testing
     processInfoVec.push_back(pro2);
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
 
     // Act
     listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
@@ -1717,9 +1732,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_011, testing
         processInfoVec.push_back(pro);
 
         EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, userId))
-            .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+            .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
         EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
-            .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+            .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
 
         // Act
         listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
