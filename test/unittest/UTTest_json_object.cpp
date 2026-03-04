@@ -361,6 +361,27 @@ HWTEST_F(JsonObjectTest, Parse_004, testing::ext::TestSize.Level1)
     EXPECT_FALSE(object1.Parse(strJson1));
 }
 
+HWTEST_F(JsonObjectTest, IsNumber_001, testing::ext::TestSize.Level1)
+{
+    JsonObject object;
+    JsonItemObject invalidItem = object.At("NOT_EXIST_KEY");
+    EXPECT_FALSE(invalidItem.IsNumber());
+}
+
+HWTEST_F(JsonObjectTest, IsNumber_002, testing::ext::TestSize.Level1)
+{
+    std::string strJson = R"({"OBJ":{"K":1},"ARR":[1,2],"NULLVAL":null,"NUM":-7})";
+    JsonObject object(strJson);
+    bool ret = object.IsDiscarded();
+    EXPECT_FALSE(ret);
+    if (!ret) {
+        EXPECT_FALSE(object["OBJ"].IsNumber());
+        EXPECT_FALSE(object["ARR"].IsNumber());
+        EXPECT_FALSE(object["NULLVAL"].IsNumber());
+        EXPECT_TRUE(object["NUM"].IsNumber());
+    }
+}
+
 HWTEST_F(JsonObjectTest, Get_001, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"TEST1":"value1","TEST2":15,"TEST3":true, "TEST4":0.03})";
