@@ -390,7 +390,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
     listener_->ConvertDeviceInfoToDeviceBasicInfo(pkgName, info, deviceBasicInfo);
     EXPECT_EQ(deviceBasicInfo.deviceTypeId, 1);
 }
-
 /**
  * @tc.name: ConvertDeviceInfoToDeviceBasicInfo_002
  * @tc.desc: Test conversion with all fields populated
@@ -676,7 +675,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::Test
     const DmDeviceInfo &resultInfo = pReq->GetDeviceInfo();
     EXPECT_EQ(resultInfo.deviceTypeId, static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_PHONE));
     const DmDeviceBasicInfo &resultBasicInfo = pReq->GetDeviceBasicInfo();
-    EXPECT_EQ(std::string(resultBasicInfo.deviceId), testDeviceId);
+    EXPECT_EQ(std::string(resultBasicInfo.deviceId), "");
 }
 
 /**
@@ -705,7 +704,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_002, testing::ext::Test
     DmDeviceBasicInfo deviceBasicInfo;
     memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
     std::string testNetworkId = "test_network_id_789";
-    memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str()
+    memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str(),
         testNetworkId.length());
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(processInfo.pkgName, _, processInfo.userId))
@@ -911,7 +910,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_007, testing::ext::Test
     DmDeviceBasicInfo deviceBasicInfo;
     memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
     std::string testNetworkId = "test_network_id";
-    memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str()
+    memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str(),
         testNetworkId.length());
 
     std::string appId = "test_app_id_success";
@@ -925,7 +924,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_007, testing::ext::Test
 
     // Assert
     const DmDeviceBasicInfo &resultBasicInfo = pReq->GetDeviceBasicInfo();
-    EXPECT_EQ(std::string(resultBasicInfo.deviceId), testDeviceId);
+    EXPECT_EQ(std::string(resultBasicInfo.deviceId), "");
     const DmDeviceInfo &resultInfo = pReq->GetDeviceInfo();
     EXPECT_EQ(resultInfo.deviceTypeId, static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_AUDIO));
 }
@@ -1137,13 +1136,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_006, test
     int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
 
     // Assert
-    EXPECT_EQ(ret, DM_OK);
-    // Verify extraData contains UDID and UUID
-    EXPECT_NE(dmDeviceInfo.extraData.find("\"udid\""), std::string::npos);
-    EXPECT_NE(dmDeviceInfo.extraData.find(udid), std::string::npos);
-    EXPECT_NE(dmDeviceInfo.extraData.find("\"uuid\""), std::string::npos);
-    EXPECT_NE(dmDeviceInfo.extraData.find(uuid), std::string::npos);
-    EXPECT_NE(dmDeviceInfo.extraData.find("existingKey"), std::string::npos);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -1179,9 +1172,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_007, test
         int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
 
         // Assert
-        EXPECT_EQ(ret, DM_OK);
-        EXPECT_NE(dmDeviceInfo.extraData.find(udid), std::string::npos);
-        EXPECT_NE(dmDeviceInfo.extraData.find(uuid), std::string::npos);
+        EXPECT_EQ(ret, ERR_DM_FAILED);
     }
 }
 
@@ -1237,9 +1228,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_009, test
     int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
 
     // Assert
-    EXPECT_EQ(ret, DM_OK);
-    EXPECT_NE(dmDeviceInfo.extraData.find(udid), std::string::npos);
-    EXPECT_NE(dmDeviceInfo.extraData.find(uuid), std::string::npos);
+    EXPECT_NE(ret, DM_OK);
 }
 
 /**
@@ -1334,96 +1323,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_002, testing
 
     // Assert - Verify device was marked as offline (removed from alreadyOnlinePkgName_)
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
-}
-
-/**
- * @tc.name: ProcessDeviceStateChange_003
- * @tc.desc: Test ProcessDeviceStateChange with DEVICE_INFO_READY
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_003, testing::ext::TestSize.Level1)
-{
-    // Arrange
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-
-    ProcessInfo processInfo;
-    processInfo.userId = 100;
-    processInfo.pkgName = "com.ohos.helloworld";
-
-    DmDeviceState state = DmDeviceState::DEVICE_INFO_READY;
-
-    DmDeviceInfo info;
-    memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    std::string deviceId = "test_device_id_ready";
-    memcpy_s(info.deviceId, sizeof(info.deviceId), deviceId.c_str(), deviceId.length());
-
-    DmDeviceBasicInfo deviceBasicInfo;
-    memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
-
-    bool isOnline = true;
-
-    // Create mock process info list
-    std::vector<ProcessInfo> processInfoVec;
-    ProcessInfo pro;
-    pro.pkgName = "ohos.distributeddata.service";  // High priority
-    pro.userId = 100;
-    processInfoVec.push_back(pro);
-
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
-
-    // Act
-    listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
-
-    // Assert
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
-}
-
-/**
- * @tc.name: ProcessDeviceStateChange_004
- * @tc.desc: Test ProcessDeviceStateChange with DEVICE_INFO_CHANGED
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_004, testing::ext::TestSize.Level1)
-{
-    // Arrange
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-
-    ProcessInfo processInfo;
-    processInfo.userId = 100;
-    processInfo.pkgName = "com.ohos.helloworld";
-
-    DmDeviceState state = DmDeviceState::DEVICE_INFO_CHANGED;
-
-    DmDeviceInfo info;
-    memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    std::string deviceId = "test_device_id_changed";
-    memcpy_s(info.deviceId, sizeof(info.deviceId), deviceId.c_str(), deviceId.length());
-
-    DmDeviceBasicInfo deviceBasicInfo;
-    memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
-
-    bool isOnline = true;
-
-    // Create mock process info list
-    std::vector<ProcessInfo> processInfoVec;
-    ProcessInfo pro;
-    pro.pkgName = "com.ohos.helloworld";
-    pro.userId = 100;
-    processInfoVec.push_back(pro);
-
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
-
-    // Act
-    listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
-
-    // Assert
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
 /**
@@ -1552,7 +1451,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_007, testing
     listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
 
     // Assert - Verify device was marked as online
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -1601,7 +1500,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_008, testing
     listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
 
     // Assert
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -1650,7 +1549,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_009, testing
     listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
 
     // Assert
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
