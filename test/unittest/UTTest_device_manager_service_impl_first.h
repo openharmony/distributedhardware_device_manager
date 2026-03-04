@@ -27,6 +27,7 @@
 #include "deviceprofile_connector_mock.h"
 #include "multiple_user_connector_mock.h"
 #include "softbus_connector_mock.h"
+#include "softbus_session_mock.h"
 #include "dm_device_state_manager_mock.h"
 #include "device_manager_service_impl_mock.h"
 #include "hichain_connector_mock.h"
