@@ -41,7 +41,7 @@ public:
     void SetUp();
     void TearDown();
 
-    static inline std::shared_ptr<DeviceManagerNotifyMock> deviceManagerNotityMock_ =
+    static inline std::shared_ptr<DeviceManagerNotifyMock> deviceManagerNotifyMock_ =
         std::make_shared<DeviceManagerNotifyMock>();
     static inline std::shared_ptr<MockIpcClientProxy> ipcClientProxyMock_ = std::make_shared<MockIpcClientProxy>();
 };
