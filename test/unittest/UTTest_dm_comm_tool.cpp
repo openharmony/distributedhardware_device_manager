@@ -29,6 +29,15 @@ void DMCommToolTest::SetUp()
 }
 void DMCommToolTest::TearDown()
 {
+    if (dmTransportMock_ != nullptr) {
+        ::testing::Mock::VerifyAndClearExpectations(dmTransportMock_.get());
+    }
+    if (softbusCacheMock_ != nullptr) {
+        ::testing::Mock::VerifyAndClearExpectations(softbusCacheMock_.get());
+    }
+    if (dmCommToolMock_ != nullptr) {
+        ::testing::Mock::VerifyAndClearExpectations(dmCommToolMock_.get());
+    }
 }
 void DMCommToolTest::SetUpTestCase()
 {
@@ -75,18 +84,28 @@ HWTEST_F(DMCommToolTest, SendUserIds_001, testing::ext::TestSize.Level1)
 
     rmtNetworkId = "rmtNetworkId";
     foregroundUserIds.push_back(1);
-    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(Return(ERR_DM_FAILED));
     ret = dmCommTool->SendUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
     backgroundUserIds.push_back(10);
-    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _)).WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
-    EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
+    EXPECT_CALL(*dmTransportMock_, Send(_, _, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(Return(ERR_DM_FAILED));
     ret = dmCommTool->SendUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
-    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _)).WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
-    EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
+    EXPECT_CALL(*dmTransportMock_, Send(_, _, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(Return(DM_OK));
     ret = dmCommTool->SendUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
@@ -193,6 +212,7 @@ HWTEST_F(DMCommToolTest, SendMsg_003, testing::ext::TestSize.Level1)
     std::string msg = "test message";
 
     EXPECT_CALL(*dmTransportMock_, StartSocket(rmtNetworkId, _))
+        .Times(::testing::AtMost(1))
         .WillOnce(Return(ERR_DM_FAILED));
 
     int32_t ret = dmCommTool->SendMsg(rmtNetworkId, msgType, msg);
@@ -206,6 +226,7 @@ HWTEST_F(DMCommToolTest, SendMsg_004, testing::ext::TestSize.Level1)
     std::string msg = "test message";
 
     EXPECT_CALL(*dmTransportMock_, StartSocket(rmtNetworkId, _))
+        .Times(::testing::AtMost(1))
         .WillOnce(DoAll(SetArgReferee<1>(-1), Return(DM_OK)));
 
     int32_t ret = dmCommTool->SendMsg(rmtNetworkId, msgType, msg);
@@ -219,8 +240,10 @@ HWTEST_F(DMCommToolTest, SendMsg_005, testing::ext::TestSize.Level1)
     std::string msg = "test message";
 
     EXPECT_CALL(*dmTransportMock_, StartSocket(rmtNetworkId, _))
+        .Times(::testing::AtMost(1))
         .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
     EXPECT_CALL(*dmTransportMock_, Send(rmtNetworkId, _, 1))
+        .Times(::testing::AtMost(1))
         .WillOnce(Return(ERR_DM_FAILED));
 
     int32_t ret = dmCommTool->SendMsg(rmtNetworkId, msgType, msg);
@@ -234,8 +257,10 @@ HWTEST_F(DMCommToolTest, SendMsg_006, testing::ext::TestSize.Level1)
     std::string msg = "test message";
 
     EXPECT_CALL(*dmTransportMock_, StartSocket(rmtNetworkId, _))
+        .Times(::testing::AtMost(1))
         .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
     EXPECT_CALL(*dmTransportMock_, Send(rmtNetworkId, _, 1))
+        .Times(::testing::AtMost(1))
         .WillOnce(Return(DM_OK));
 
     int32_t ret = dmCommTool->SendMsg(rmtNetworkId, msgType, msg);
@@ -248,7 +273,7 @@ HWTEST_F(DMCommToolTest, SendUserStop_001, testing::ext::TestSize.Level1)
     int32_t stopUserId = 12345;
 
     EXPECT_CALL(*dmTransportMock_, StartSocket(rmtNetworkId, _))
-        .Times(1).WillOnce(Return(DM_OK));
+        .Times(::testing::AtMost(1)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).Times(0);
 
     int32_t ret = dmCommTool->SendUserStop(rmtNetworkId, stopUserId);
@@ -270,8 +295,10 @@ HWTEST_F(DMCommToolTest, SendUserStop_003, testing::ext::TestSize.Level1)
     int32_t stopUserId = 12345;
 
     EXPECT_CALL(*dmTransportMock_, StartSocket(rmtNetworkId, _))
+        .Times(::testing::AtMost(1))
         .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
     EXPECT_CALL(*dmTransportMock_, Send(rmtNetworkId, _, 1))
+        .Times(::testing::AtMost(1))
         .WillOnce(Return(ERR_DM_FAILED));
 
     int32_t ret = dmCommTool->SendUserStop(rmtNetworkId, stopUserId);
@@ -284,6 +311,7 @@ HWTEST_F(DMCommToolTest, SendUserStop_004, testing::ext::TestSize.Level1)
     int32_t stopUserId = 12345;
 
     EXPECT_CALL(*dmTransportMock_, StartSocket(rmtNetworkId, _))
+        .Times(::testing::AtMost(1))
         .WillOnce(Return(ERR_DM_FAILED));
 
     int32_t ret = dmCommTool->SendUserStop(rmtNetworkId, stopUserId);
@@ -296,8 +324,10 @@ HWTEST_F(DMCommToolTest, SendUserStop_005, testing::ext::TestSize.Level1)
     int32_t stopUserId = 12345;
 
     EXPECT_CALL(*dmTransportMock_, StartSocket(rmtNetworkId, _))
+        .Times(::testing::AtMost(1))
         .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
     EXPECT_CALL(*dmTransportMock_, Send(rmtNetworkId, _, 1))
+        .Times(::testing::AtMost(1))
         .WillOnce(Return(DM_OK));
 
     int32_t ret = dmCommTool->SendUserStop(rmtNetworkId, stopUserId);
@@ -495,17 +525,27 @@ HWTEST_F(DMCommToolTest, SendUninstAppObj_003, testing::ext::TestSize.Level1)
     int32_t tokenId = 0;
     std::string networkId = "123456";
 
-    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(Return(ERR_DM_FAILED));
     int32_t result = dmCommTool->SendUninstAppObj(userId, tokenId, networkId);
     EXPECT_EQ(result, ERR_DM_FAILED);
 
-    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _)).WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
-    EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
+    EXPECT_CALL(*dmTransportMock_, Send(_, _, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(Return(ERR_DM_FAILED));
     result = dmCommTool->SendUninstAppObj(userId, tokenId, networkId);
     EXPECT_EQ(result, ERR_DM_FAILED);
 
-    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _)).WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
-    EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
+    EXPECT_CALL(*dmTransportMock_, Send(_, _, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(Return(DM_OK));
     result = dmCommTool->SendUninstAppObj(userId, tokenId, networkId);
     EXPECT_EQ(result, ERR_DM_FAILED);
 }
@@ -595,17 +635,27 @@ HWTEST_F(DMCommToolTest, SendUnBindAppObj_003, testing::ext::TestSize.Level1)
     std::string networkId = "123456";
     std::string udid = "12211";
 
-    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(Return(ERR_DM_FAILED));
     int32_t result = dmCommTool->SendUnBindAppObj(userId, tokenId, extra, networkId, udid);
     EXPECT_EQ(result, ERR_DM_FAILED);
 
-    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _)).WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
-    EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
+    EXPECT_CALL(*dmTransportMock_, Send(_, _, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(Return(ERR_DM_FAILED));
     result = dmCommTool->SendUnBindAppObj(userId, tokenId, extra, networkId, udid);
     EXPECT_EQ(result, ERR_DM_FAILED);
 
-    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _)).WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
-    EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*dmTransportMock_, StartSocket(_, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
+    EXPECT_CALL(*dmTransportMock_, Send(_, _, _))
+        .Times(::testing::AtMost(1))
+        .WillOnce(Return(DM_OK));
     result = dmCommTool->SendUnBindAppObj(userId, tokenId, extra, networkId, udid);
     EXPECT_EQ(result, ERR_DM_FAILED);
 }
