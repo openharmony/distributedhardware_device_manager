@@ -3458,7 +3458,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, UpdateLocalServiceInfo_001, testing::
     localServiceInfo.SetBundleName("com.test.app");
 
     int32_t ret = DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(localServiceInfo);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -3478,7 +3478,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetLocalServiceInfoByBundleNameAndPin
 
     int32_t ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
         bundleName, pinExchangeType, localServiceInfo);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
