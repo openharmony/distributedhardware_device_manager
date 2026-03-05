@@ -28,6 +28,10 @@
 #include "kv_adapter_manager_mock.h"
 #include "app_manager_mock.h"
 #include "device_manager_service_mock.h"
+#include "dm_crypto_mock.h"
+#include "app_manager_mock.h"
+#include "dm_softbus_cache_mock.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerServiceListenerTest : public testing::Test {
