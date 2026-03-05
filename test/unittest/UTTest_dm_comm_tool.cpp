@@ -108,13 +108,23 @@ HWTEST_F(DMCommToolTest, SendUserIds_001, testing::ext::TestSize.Level1)
         .WillOnce(Return(DM_OK));
     ret = dmCommTool->SendUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds);
     EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DMCommToolTest, SendUserIds_002, testing::ext::TestSize.Level1)
+{
+    std::string rmtNetworkId = "rmtNetworkId";
+    std::vector<uint32_t> foregroundUserIds = {1};
+    std::vector<uint32_t> backgroundUserIds = {10};
 
     int32_t socketId = 1;
     EXPECT_CALL(*dmTransportMock_, Send(_, _, _))
         .Times(::testing::AtLeast(2))
         .WillRepeatedly(Return(ERR_DM_FAILED));
     dmCommTool->RspLocalFrontOrBackUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds, socketId);
+}
 
+HWTEST_F(DMCommToolTest, SendUserIds_003, testing::ext::TestSize.Level1)
+{
     std::string remoteNetworkId = "network******12";
     std::string strMsg = R"({
         "MsgType": "0",
@@ -126,8 +136,9 @@ HWTEST_F(DMCommToolTest, SendUserIds_001, testing::ext::TestSize.Level1)
         ]
     })";
     std::shared_ptr<CommMsg> commMsg_ = std::make_shared<CommMsg>(1, strMsg);
-    socketId = 0;
-    std::shared_ptr<InnerCommMsg> InnerCommMsg_ = std::make_shared<InnerCommMsg>(remoteNetworkId, commMsg_, socketId);
+    int32_t socketId = 0;
+    std::shared_ptr<InnerCommMsg> InnerCommMsg_ =
+        std::make_shared<InnerCommMsg>(remoteNetworkId, commMsg_, socketId);
     std::string rmtUdid = "";
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(rmtUdid), Return(ERR_DM_FAILED)));
