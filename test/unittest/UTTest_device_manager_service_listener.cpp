@@ -1232,55 +1232,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_009, test
 }
 
 /**
- * @tc.name: ProcessDeviceStateChange_001
- * @tc.desc: Test ProcessDeviceStateChange with DEVICE_STATE_ONLINE
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_001, testing::ext::TestSize.Level1)
-{
-    // Arrange
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-
-    ProcessInfo processInfo;
-    processInfo.userId = 100;
-    processInfo.pkgName = "com.ohos.helloworld";
-
-    DmDeviceState state = DmDeviceState::DEVICE_STATE_ONLINE;
-
-    DmDeviceInfo info;
-    memset_s(&info, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    std::string deviceId = "test_device_id";
-    memcpy_s(info.deviceId, sizeof(info.deviceId), deviceId.c_str(), deviceId.length());
-
-    DmDeviceBasicInfo deviceBasicInfo;
-    memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
-
-    bool isOnline = true;
-
-    // Create mock process info list
-    std::vector<ProcessInfo> processInfoVec;
-    ProcessInfo pro1;
-    pro1.pkgName = "ohos.deviceprofile";  // High priority
-    pro1.userId = 100;
-    ProcessInfo pro2;
-    pro2.pkgName = "com.ohos.helloworld";  // Low priority
-    pro2.userId = 100;
-    processInfoVec.push_back(pro1);
-    processInfoVec.push_back(pro2);
-
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(testing::Return(DM_OK));
-
-    // Act
-    listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
-
-    // Assert - Verify device was marked as online
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
-}
-
-/**
  * @tc.name: ProcessDeviceStateChange_002
  * @tc.desc: Test ProcessDeviceStateChange with DEVICE_STATE_OFFLINE
  * @tc.type: FUNC

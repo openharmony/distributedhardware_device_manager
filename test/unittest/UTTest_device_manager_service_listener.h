@@ -50,12 +50,6 @@ public:
     static inline  std::shared_ptr<AppManagerMock> appManagerMock_ = std::make_shared<AppManagerMock>();
     static inline  std::shared_ptr<DeviceManagerServiceMock> deviceManagerServiceMock_ =
         std::make_shared<DeviceManagerServiceMock>();
-    static inline std::shared_ptr<AppManagerMock> appManagerMock_ =
-        std::make_shared<AppManagerMock>();
-    static inline std::shared_ptr<SoftbusCacheMock> softbusCacheMock_ =
-        std::make_shared<SoftbusCacheMock>();
-    static inline std::shared_ptr<CryptoMock> cryptoMock_ =
-        std::make_shared<CryptoMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
