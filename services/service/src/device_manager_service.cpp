@@ -5092,7 +5092,8 @@ int32_t DeviceManagerService::GetIdentificationByDeviceIds(const std::string &pk
         return ERR_DM_NOT_SYSTEM_APP;
     }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission() ||
-        !PermissionManager::GetInstance().CheckDataSyncPermission()) {
+        !PermissionManager::GetInstance().CheckDataSyncPermission() ||
+        !PermissionManager::GetInstance().CheckAccessUdidPermission()) {
         LOGE("The caller does not have permission to call GetIdentificationByDeviceIds.");
         return ERR_DM_NO_PERMISSION;
     }
