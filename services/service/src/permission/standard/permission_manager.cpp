@@ -32,7 +32,7 @@ namespace {
 constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
 constexpr const char* DM_DISTRIBUTED_DATASYNC_PERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";
 constexpr const char* DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION = "ohos.permission.MONITOR_DEVICE_NETWORK_STATE";
-constexpr const char* DISTRIBUTED_SOFTBUS_CENTER = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
+constexpr const char* ACCESS_UDID = "ohos.permission.sec.ACCESS_UDID";
 constexpr const static char* AUTH_CODE_WHITE_LIST[] = {
     "CollaborationFwk",
     "wear_link_service",
@@ -121,9 +121,9 @@ bool PermissionManager::CheckDataSyncPermission(void)
     return VerifyAccessTokenByPermissionName(DM_DISTRIBUTED_DATASYNC_PERMISSION);
 }
 
-bool PermissionManager::CheckSoftbusCenterPermission(void)
+bool PermissionManager::CheckAccessUdidPermission(void)
 {
-    return VerifyAccessTokenByPermissionName(DISTRIBUTED_SOFTBUS_CENTER);
+    return VerifyAccessTokenByPermissionName(ACCESS_UDID);
 }
 
 bool PermissionManager::CheckMonitorPermission(void)

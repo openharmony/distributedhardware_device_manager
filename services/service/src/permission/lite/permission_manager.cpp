@@ -31,7 +31,7 @@ bool PermissionManager::CheckDataSyncPermission(void)
     return true;
 }
 
-bool PermissionManager::CheckSoftbusCenterPermission(void)
+bool PermissionManager::CheckAccessUdidPermission(void)
 {
     return true;
 }
