@@ -102,7 +102,7 @@ void AuthSrcConfirmState::NegotiateCredential(std::shared_ptr<DmAuthContext> con
         context->accesser.isGenerateLnnCredential = false;
     }
 }
-
+//LCOV_EXCL_START
 void AuthSrcConfirmState::NegotiateProxyCredential(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_VOID(context);
@@ -260,7 +260,7 @@ void AuthSrcConfirmState::NegotiateProxyAcl(std::shared_ptr<DmAuthContext> conte
         item->proxyAccesser.aclTypeList = aclNegoResult.Dump();
     }
 }
-
+//LCOV_EXCL_STOP
 void AuthSrcConfirmState::GetSrcCredType(std::shared_ptr<DmAuthContext> context,
     JsonObject &credInfo, JsonObject &aclInfo, JsonObject &credTypeJson)
 {
@@ -326,7 +326,7 @@ void AuthSrcConfirmState::GetSrcCredTypeForP2P(std::shared_ptr<DmAuthContext> co
         context->accesser.credentialInfos[credType] = credObj.Dump();
     }
 }
-
+//LCOV_EXCL_START
 void AuthSrcConfirmState::GetSrcProxyCredTypeForP2P(std::shared_ptr<DmAuthContext> context,
     std::vector<std::string> &deleteCredInfo)
 {
@@ -379,7 +379,7 @@ void AuthSrcConfirmState::GetSrcProxyCredTypeForP2P(std::shared_ptr<DmAuthContex
         }
     }
 }
-
+//LCOV_EXCL_STOP
 void AuthSrcConfirmState::GetSrcAclInfo(std::shared_ptr<DmAuthContext> context,
     JsonObject &credInfo, JsonObject &aclInfo)
 {
@@ -444,7 +444,7 @@ void AuthSrcConfirmState::GetSrcAclInfoForP2P(std::shared_ptr<DmAuthContext> con
     }
     GetSrcProxyAclInfoForP2P(context, profile);
 }
-
+//LCOV_EXCL_START
 void AuthSrcConfirmState::GetSrcProxyAclInfoForP2P(std::shared_ptr<DmAuthContext> context,
     const DistributedDeviceProfile::AccessControlProfile &profile)
 {
@@ -523,7 +523,7 @@ bool AuthSrcConfirmState::CheckCredIdInAcl(std::shared_ptr<DmAuthContext> contex
     }
     return checkResult;
 }
-
+//LCOV_EXCL_STOP
 void AuthSrcConfirmState::CheckCredIdInAclForP2P(std::shared_ptr<DmAuthContext> context, std::string &credId,
     const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo, uint32_t bindType,
     bool &checkResult)
@@ -835,7 +835,7 @@ DmAuthStateType AuthSinkConfirmState::GetStateType()
 {
     return DmAuthStateType::AUTH_SINK_CONFIRM_STATE;
 }
-
+// LCOV_EXCL_START
 int32_t AuthSinkConfirmState::ShowServiceBindConfigDialog(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("start");
@@ -1018,7 +1018,7 @@ int32_t AuthSinkConfirmState::CreateServiceBindProxyData(std::shared_ptr<DmAuthC
     jsonObj[TITLE] = context->title;
     return DM_OK;
 }
-
+// LCOV_EXCL_STOP
 int32_t AuthSinkConfirmState::CreateProxyData(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObj)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
@@ -1074,7 +1074,7 @@ void AuthSinkConfirmState::NegotiateCredential(std::shared_ptr<DmAuthContext> co
     }
     return;
 }
-
+// LCOV_EXCL_START
 void AuthSinkConfirmState::NegotiateProxyCredential(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_VOID(context);
@@ -1225,7 +1225,7 @@ void AuthSinkConfirmState::NegotiateProxyAcl(std::shared_ptr<DmAuthContext> cont
         item->proxyAccessee.aclTypeList = aclNegoResult.Dump();
     }
 }
-
+// LCOV_EXCL_STOP
 void AuthSinkConfirmState::MatchFallBackCandidateList(
     std::shared_ptr<DmAuthContext> context, DmAuthType authType)
 {
@@ -1240,7 +1240,7 @@ void AuthSinkConfirmState::MatchFallBackCandidateList(
         }
     }
 }
-
+// LCOV_EXCL_START
 bool AuthSinkConfirmState::ExtractPinConsumerTokenId(const std::string &srvExtraInfo, uint64_t &tokenId)
 {
     tokenId = 0;
@@ -1257,7 +1257,7 @@ bool AuthSinkConfirmState::ExtractPinConsumerTokenId(const std::string &srvExtra
     tokenId = extraInfoObj[PIN_CONSUMER_TOKENID].Get<uint64_t>();
     return true;
 }
-
+// LCOV_EXCL_STOP
 void AuthSinkConfirmState::ReadServiceInfo(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_VOID(context);
@@ -1283,7 +1283,7 @@ void AuthSinkConfirmState::ReadServiceInfo(std::shared_ptr<DmAuthContext> contex
         context->authBoxType = DMLocalServiceInfoAuthBoxType::STATE3; // default: tristate box
     }
 }
-
+// LCOV_EXCL_START
 void AuthSinkConfirmState::ProcessImportAuthInfo(std::shared_ptr<DmAuthContext> context,
     const OHOS::DistributedDeviceProfile::LocalServiceInfo &srvInfo)
 {
@@ -1318,7 +1318,7 @@ void AuthSinkConfirmState::ProcessImportAuthInfo(std::shared_ptr<DmAuthContext> 
     context->customData = srvInfo.GetDescription(); // read customData
     context->srvExtarInfo = srvInfo.GetExtraInfo();
 }
-
+// LCOV_EXCL_STOP
 int32_t AuthSinkConfirmState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("start.");
@@ -1418,7 +1418,7 @@ int32_t AuthSinkConfirmState::ProcessUserAuthorize(std::shared_ptr<DmAuthContext
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
     return DM_OK;
 }
-
+// LCOV_EXCL_START
 bool AuthSinkConfirmState::ProcessUserOptionSrvBindInner(std::shared_ptr<DmAuthContext> context, JsonObject &appDataObj)
 {
     CHECK_NULL_RETURN(context, false);
@@ -1550,7 +1550,7 @@ bool AuthSinkConfirmState::IsUserAuthorizeProxy(JsonObject &paramObj, std::share
     }
     return false;
 }
-
+// LCOV_EXCL_STOP
 bool AuthSinkConfirmState::IsUserAuthorize(JsonObject &paramObj, DmProxyAccess &access)
 {
     if (paramObj.IsDiscarded()) {

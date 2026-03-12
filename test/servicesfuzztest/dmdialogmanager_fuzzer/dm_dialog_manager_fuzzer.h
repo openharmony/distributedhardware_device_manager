@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_PROFILE_CONNECTOR_FUZZER_H
-#define DEVICE_PROFILE_CONNECTOR_FUZZER_H
+#ifndef DM_DIALOG_MANAGER_FUZZER_H
+#define DM_DIALOG_MANAGER_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "deviceprofileconnector_fuzzer"
+#define FUZZ_PROJECT_NAME "dmdialogmanager_fuzzer"
 
-#endif // DEVICE_PROFILE_CONNECTOR_FUZZER_H
+#endif // DM_DIALOG_MANAGER_FUZZER_H
