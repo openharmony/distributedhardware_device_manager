@@ -229,7 +229,8 @@ void GetTrustServiceInfoFuzzTest(FuzzedDataProvider &fdp)
     std::map<std::string, std::string> param;
     size_t paramMapCount = fdp.ConsumeIntegralInRange<size_t>(0, 5);
     for (size_t i = 0; i < paramMapCount; ++i) {
-        param.insert({fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH), fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH)});
+        param.insert({fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH),
+                fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH)});
     }
 
     std::vector<DmServiceInfo> serviceInfoList;
@@ -242,7 +243,8 @@ void GetRegisterServiceInfoFuzzTest(FuzzedDataProvider &fdp)
     std::map<std::string, std::string> param;
     size_t paramMapCount = fdp.ConsumeIntegralInRange<size_t>(0, 5);
     for (size_t i = 0; i < paramMapCount; ++i) {
-        param.insert({fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH), fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH)});
+        param.insert({fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH),
+                fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH)});
     }
 
     std::vector<DmRegisterServiceInfo> regServiceInfos;
@@ -286,7 +288,8 @@ void UnbindServiceTargetFuzzTest(FuzzedDataProvider &fdp)
     std::map<std::string, std::string> unbindParam;
     size_t mapCount = fdp.ConsumeIntegralInRange<size_t>(0, 5);
     for (size_t i = 0; i < mapCount; ++i) {
-        unbindParam.insert({fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH), fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH)});
+        unbindParam.insert({fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH),
+            fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH)});
     }
 
     std::string netWorkId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);

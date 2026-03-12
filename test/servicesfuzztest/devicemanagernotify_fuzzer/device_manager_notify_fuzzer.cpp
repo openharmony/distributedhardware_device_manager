@@ -157,7 +157,8 @@ void RegisterSyncServiceInfoCallbackFuzzTest(FuzzedDataProvider &fdp)
     int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
     std::shared_ptr<SyncServiceInfoCallbackTest> callback = std::make_shared<SyncServiceInfoCallbackTest>();
 
-    DeviceManagerNotify::GetInstance().RegisterSyncServiceInfoCallback(pkgName, localUserId, networkId, callback, serviceId);
+    DeviceManagerNotify::GetInstance().RegisterSyncServiceInfoCallback(pkgName,
+            localUserId, networkId, callback, serviceId);
 }
 
 void UnRegisterSyncServiceInfoCallbackFuzzTest(FuzzedDataProvider &fdp)
