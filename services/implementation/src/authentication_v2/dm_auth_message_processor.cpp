@@ -229,11 +229,11 @@ int32_t ParseInfoToDmAccess(const JsonObject &jsonObject, DmAccess &access)
 bool IsMessageValid(const JsonItemObject &jsonObject)
 {
     if (jsonObject.IsDiscarded()) {
-        LOGE("DmAuthMessageProcessor::ParseMessage failed, decodeRequestAuth jsonStr error");
+        LOGE("decodeRequestAuth jsonStr error");
         return false;
     }
     if (!jsonObject[TAG_MSG_TYPE].IsNumberInteger()) {
-        LOGE("DmAuthMessageProcessor::ParseMessage failed, message type error.");
+        LOGE("message type error.");
         return false;
     }
     return true;
@@ -272,7 +272,7 @@ bool GetPinMatchFlag(const std::string &pkgName, DmAuthType authType)
 int32_t DmAuthMessageProcessor::SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen)
 {
     if (cryptoMgr_ == nullptr) {
-        LOGE("DmAuthMessageProcessor::SaveSessionKey failed, cryptoMgr_ is nullptr.");
+        LOGE("cryptoMgr_ is nullptr.");
         return ERR_DM_FAILED;
     }
     return cryptoMgr_->ProcessSessionKey(sessionKey, keyLen);
@@ -281,7 +281,7 @@ int32_t DmAuthMessageProcessor::SaveSessionKey(const uint8_t *sessionKey, const 
 int32_t DmAuthMessageProcessor::SaveSessionKeyToDP(int32_t userId, int32_t &skId)
 {
     if (cryptoMgr_ == nullptr) {
-        LOGE("DmAuthMessageProcessor::SaveSessionKeyToDP failed, cryptoMgr_ is nullptr.");
+        LOGE("cryptoMgr_ is nullptr.");
         return ERR_DM_FAILED;
     }
     return DeviceProfileConnector::GetInstance().PutSessionKey(userId, cryptoMgr_->GetSessionKey(), skId);
@@ -290,7 +290,7 @@ int32_t DmAuthMessageProcessor::SaveSessionKeyToDP(int32_t userId, int32_t &skId
 int32_t DmAuthMessageProcessor::SaveDerivativeSessionKeyToDP(int32_t userId, const std::string &suffix, int32_t &skId)
 {
     if (cryptoMgr_ == nullptr) {
-        LOGE("DmAuthMessageProcessor::SaveSessionKeyToDP failed, cryptoMgr_ is nullptr.");
+        LOGE("cryptoMgr_ is nullptr.");
         return ERR_DM_FAILED;
     }
     std::vector<unsigned char> sessionKey = cryptoMgr_->GetSessionKey();
@@ -411,10 +411,10 @@ void DmAuthMessageProcessor::SetLnnAccessControlList(std::shared_ptr<DmAuthConte
 static DistributedDeviceProfile::AccessControlProfile GetAccessControlProfile(std::shared_ptr<DmAuthContext> context,
     bool &hasAcl, bool &isNeedLnn)
 {
-    LOGI("GetAccessControlProfile start.");
+    LOGI("start.");
     DistributedDeviceProfile::AccessControlProfile profile;
     if (context == nullptr) {
-        LOGE("GetAccessControlProfile context is null.");
+        LOGE("context is null.");
         return profile;
     }
     std::vector<DistributedDeviceProfile::AccessControlProfile> accessControlProfiles;
@@ -440,7 +440,7 @@ static DistributedDeviceProfile::AccessControlProfile GetAccessControlProfile(st
                 isNeedLnn = false;
                 continue;
             }
-            LOGI("GetAccessControlProfile match success.");
+            LOGI("match success.");
             hasAcl = true;
             profile = item;
             break;
@@ -453,7 +453,7 @@ static DistributedDeviceProfile::AccessControlProfile GetAccessControlProfile(st
 static DistributedDeviceProfile::AccessControlProfile GetSubjectAccessControlProfile(
     std::shared_ptr<DmAuthContext> context, DmProxyAuthContext app, bool &hasAcl)
 {
-    LOGI("GetSubjectAccessControlProfile start.");
+    LOGI("start.");
     DistributedDeviceProfile::AccessControlProfile profile;
     if (context == nullptr) {
         LOGE("GetAccessControlProfile context is null.");
@@ -477,7 +477,7 @@ static DistributedDeviceProfile::AccessControlProfile GetSubjectAccessControlPro
         if (context->accesser.deviceId == acerDeviceId && context->accesser.userId == acerUserId &&
             context->accessee.deviceId == aceeDeviceId && app.proxyAccesser.tokenId == acerTokenId &&
             context->accessee.userId == aceeUserId && context->accessee.tokenId == aceeTokenId) {
-            LOGI("GetSubjectAccessControlProfile match success.");
+            LOGI("match success.");
             hasAcl = true;
             profile = item;
             break;
@@ -490,7 +490,7 @@ static DistributedDeviceProfile::AccessControlProfile GetSubjectAccessControlPro
 static void UpdateMatchAccessControlProfile(std::shared_ptr<DmAuthContext> context,
     DistributedDeviceProfile::AccessControlProfile &profile, bool &hasAcl, int64_t serviceId)
 {
-    LOGI("UpdateMatchAccessControlProfile start.");
+    LOGI("start.");
     CHECK_NULL_VOID(context);
     JsonObject jsonObjServiceId(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     bool isServiceIdExist = false;
@@ -539,7 +539,7 @@ static void UpdateMatchAccessControlProfile(std::shared_ptr<DmAuthContext> conte
 static void SetAccessExtraData(std::shared_ptr<DmAuthContext> context, bool &hasAcl,
     DistributedDeviceProfile::AccessControlProfile &profile)
 {
-    LOGI("SetAccessExtraData start.");
+    LOGI("start.");
     CHECK_NULL_VOID(context);
     JsonObject jsonObjAccesser;
     JsonObject jsonObjAccessee;
@@ -559,7 +559,7 @@ static void SetAccessExtraData(std::shared_ptr<DmAuthContext> context, bool &has
 static void SetSubjectAccessExtraData(std::shared_ptr<DmAuthContext> context, DmProxyAuthContext &subject, bool &hasAcl,
     DistributedDeviceProfile::AccessControlProfile &profile)
 {
-    LOGI("SetSubjectAccessExtraData start.");
+    LOGI("start.");
     CHECK_NULL_VOID(context);
     JsonObject jsonObjAccesser;
     JsonObject jsonObjAccessee;
@@ -603,7 +603,7 @@ int32_t DmAuthMessageProcessor::PutServiceControlList(std::shared_ptr<DmAuthCont
     DistributedDeviceProfile::AccessControlProfile matchProfile = GetAccessControlProfile(context, hasAcl, isNeedLnn);
     SetAccessExtraData(context, hasAcl, matchProfile);
     if (access.isPutLnnAcl && access.bindLevel != static_cast<int32_t>(USER) && isNeedLnn) {
-        LOGI("PutServiceControlList lnn inner.");
+        LOGI("lnn inner.");
         profile.SetBindLevel(USER);
         std::string isLnnAclTrue = std::string(ACL_IS_LNN_ACL_VAL_TRUE);
         extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclTrue;
@@ -776,7 +776,7 @@ int32_t DmAuthMessageProcessor::PutServiceAccessControlList(std::shared_ptr<DmAu
 
     for (auto &app : context->subjectServiceOnes) {
         if (context->direction == DM_AUTH_SOURCE ? app.proxyAccesser.isAuthed : app.proxyAccessee.isAuthed) {
-            LOGI("PutServiceAccessControlList continue.");
+            LOGI("continue.");
             continue;
         }
         bool hasAcl = false;
@@ -793,7 +793,7 @@ int32_t DmAuthMessageProcessor::PutServiceAccessControlList(std::shared_ptr<DmAu
             context->accessee.transmitBindType);
         SetSubjectAccessExtraData(context, app, hasAcl, matchProfile);
         if (hasAcl) {
-            LOGE("PutServiceAccessControlList has acl.");
+            LOGE("has acl.");
             continue;
         }
         accesser.SetAccesserExtraData(app.proxyAccesser.extraInfo);
@@ -803,7 +803,7 @@ int32_t DmAuthMessageProcessor::PutServiceAccessControlList(std::shared_ptr<DmAu
         int32_t ret =
             DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile);
         if (ret != DM_OK) {
-            LOGE("PutServiceAccessControlList failed. %{public}d", ret);
+            LOGE("failed. %{public}d", ret);
             return ret;
         }
         ServiceStateBindParameter bindParam = {context->accesser.tokenId, context->accesser.pkgName, DM_POINT_TO_POINT,
@@ -910,7 +910,7 @@ void DmAuthMessageProcessor::ConstructParseMessageFuncMap()
 
 DmAuthMessageProcessor::DmAuthMessageProcessor()
 {
-    LOGI("DmAuthMessageProcessor constructor");
+    LOGI("constructor");
     cryptoMgr_ = std::make_shared<CryptoMgr>();
     ConstructCreateMessageFuncMap();
     ConstructParseMessageFuncMap();
@@ -933,14 +933,14 @@ int32_t DmAuthMessageProcessor::ParseMessage(std::shared_ptr<DmAuthContext> cont
     }
     DmMessageType msgType = static_cast<DmMessageType>(jsonObject[TAG_MSG_TYPE].Get<int32_t>());
     context->msgType = msgType;
-    LOGI("DmAuthMessageProcessor::ParseMessage message type %{public}d", context->msgType);
+    LOGI("message type %{public}d", context->msgType);
     if (CheckLogicalSessionId(jsonObject, context) != DM_OK) {
         LOGE("CheckLogicalSessionId failed.");
         return ERR_DM_FAILED;
     }
     auto itr = paraseMessageFuncMap_.find(msgType);
     if (itr == paraseMessageFuncMap_.end()) {
-        LOGI("DmAuthMessageProcessor::ParseMessage message type error %{public}d", context->msgType);
+        LOGI("message type error %{public}d", context->msgType);
         return ERR_DM_FAILED;
     }
     return (this->*(itr->second))(jsonObject, context);
@@ -948,7 +948,7 @@ int32_t DmAuthMessageProcessor::ParseMessage(std::shared_ptr<DmAuthContext> cont
 
 void DmAuthMessageProcessor::DmAuthUltrasonicMessageProcessor()
 {
-    LOGI("DmAuthUltrasonicMessageProcessor enter.");
+    LOGI("enter.");
     createMessageFuncMap_[DmMessageType::MSG_TYPE_REVERSE_ULTRASONIC_START] =
         &DmAuthMessageProcessor::CreateMessageReverseUltrasonicStart;
     createMessageFuncMap_[DmMessageType::MSG_TYPE_REVERSE_ULTRASONIC_DONE] =
@@ -966,7 +966,7 @@ void DmAuthMessageProcessor::DmAuthUltrasonicMessageProcessor()
         &DmAuthMessageProcessor::ParseMessageForwardUltrasonicStart;
     paraseMessageFuncMap_[DmMessageType::MSG_TYPE_FORWARD_ULTRASONIC_NEGOTIATE] =
         &DmAuthMessageProcessor::ParseMessageForwardUltrasonicNegotiate;
-    LOGI("DmAuthUltrasonicMessageProcessor leave.");
+    LOGI("leave.");
     return;
 }
 
@@ -997,7 +997,7 @@ int32_t DmAuthMessageProcessor::ParseMessageNegotiateTransmit(const JsonObject &
     std::shared_ptr<DmAuthContext> context)
 {
     if (jsonObject.IsDiscarded() || !jsonObject.Contains(TAG_DATA) || !jsonObject[TAG_DATA].IsString()) {
-        LOGE("DmAuthMessageProcessor::ParseMessageNegotiateTransmit Unlegal json string failed");
+        LOGE("Unlegal json string failed");
         return ERR_DM_FAILED;
     }
 
@@ -1024,7 +1024,7 @@ int32_t DmAuthMessageProcessor::ParseMessageRespPinAuthNegotiate(const JsonObjec
     std::shared_ptr<DmAuthContext> context)
 {
     if (jsonObject.IsDiscarded() || !jsonObject[TAG_DATA].IsString()) {
-        LOGE("DmAuthMessageProcessor::ParseMessageRespPinAuthNegotiate failed, decodeRequestAuth jsonStr error");
+        LOGE("decodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
     }
 
@@ -1043,7 +1043,7 @@ int32_t DmAuthMessageProcessor::ParseMessageReqCredExchange(const JsonObject &js
 
     std::string plainText;
     if (cryptoMgr_->DecryptMessage(jsonObject[TAG_DATA].Get<std::string>(), plainText) != DM_OK) {
-        LOGE("DmAuthMessageProcessor::ParseMessageReqCredExchange() error, decrypt data failed.");
+        LOGE("decrypt data failed.");
         return ERR_DM_FAILED;
     }
     JsonObject jsonData(plainText);
@@ -1051,7 +1051,7 @@ int32_t DmAuthMessageProcessor::ParseMessageReqCredExchange(const JsonObject &js
     // First authentication, parse lnn public key
     if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != static_cast<int32_t>(USER)) {
         if (!jsonData[TAG_LNN_PUBLIC_KEY].IsString()) {
-            LOGE("DmAuthMessageProcessor::ParseMessageReqCredExchange() error, first auth, no lnnPublicKey.");
+            LOGE("first auth, no lnnPublicKey.");
             return ERR_DM_FAILED;
         }
         context->accesser.lnnPublicKey = jsonData[TAG_LNN_PUBLIC_KEY].Get<std::string>();
@@ -1061,7 +1061,7 @@ int32_t DmAuthMessageProcessor::ParseMessageReqCredExchange(const JsonObject &js
         !jsonData[TAG_DEVICE_ID].IsString() ||
         !jsonData[TAG_PEER_USER_SPACE_ID].IsNumberInteger() ||
         !jsonData[TAG_TOKEN_ID].IsNumberInteger()) {
-        LOGE("DmAuthMessageProcessor::ParseMessageReqCredExchange, MSG_TYPE_REQ_CREDENTIAL_EXCHANGE message error.");
+        LOGE("MSG_TYPE_REQ_CREDENTIAL_EXCHANGE message error.");
         return ERR_DM_FAILED;
     }
     context->accesser.transmitPublicKey = jsonData[TAG_TRANSMIT_PUBLIC_KEY].Get<std::string>();
@@ -1077,15 +1077,15 @@ int32_t DmAuthMessageProcessor::ParseMessageReqCredExchange(const JsonObject &js
 int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &jsonObject,
     std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("DmAuthMessageProcessor::ParseMessageRspCredExchange start.");
+    LOGI("start.");
     if (jsonObject.IsDiscarded() || !jsonObject[TAG_DATA].IsString()) {
-        LOGE("DmAuthMessageProcessor::ParseMessageRspCredExchange, DecodeRequestAuth jsonStr error");
+        LOGE("DecodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
     }
 
     std::string plainText;
     if (cryptoMgr_->DecryptMessage(jsonObject[TAG_DATA].Get<std::string>(), plainText) != DM_OK) {
-        LOGE("DmAuthMessageProcessor::ParseMessageRspCredExchange error, decrypt data failed.");
+        LOGE("decrypt data failed.");
         return ERR_DM_FAILED;
     }
 
@@ -1095,7 +1095,7 @@ int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &js
     std::string tmpString = "";
     if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != static_cast<int32_t>(USER)) {
         if (!jsonData[TAG_LNN_PUBLIC_KEY].IsString()) {
-            LOGE("DmAuthMessageProcessor::ParseMessageRspCredExchange failed, first auth but no lnnPublicKey.");
+            LOGE("first auth but no lnnPublicKey.");
             return ERR_DM_FAILED;
         }
         context->accessee.lnnPublicKey = jsonData[TAG_LNN_PUBLIC_KEY].Get<std::string>();
@@ -1106,7 +1106,7 @@ int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &js
         !jsonData[TAG_DEVICE_ID].IsString() ||
         !jsonData[TAG_PEER_USER_SPACE_ID].IsNumberInteger() ||
         !jsonData[TAG_TOKEN_ID].IsNumberInteger()) {
-        LOGE("DmAuthMessageProcessor::ParseMessageRspCredExchange failed, decode MSG_TYPE_RESP_CREDENTIAL_EXCHANGE "
+        LOGE("decode MSG_TYPE_RESP_CREDENTIAL_EXCHANGE"
             "message error.");
         return ERR_DM_FAILED;
     }
@@ -1131,20 +1131,20 @@ int32_t DmAuthMessageProcessor::ParseMessageReqSKDerive(const JsonObject &jsonOb
     }
     std::string plainText;
     if (cryptoMgr_->DecryptMessage(jsonObject[TAG_DATA].Get<std::string>(), plainText) != DM_OK) {
-        LOGE("DmAuthMessageProcessor::ParseMessageReqSKDerive() error, decrypt data failed.");
+        LOGE("decrypt data failed.");
         return ERR_DM_FAILED;
     }
     JsonObject jsonData(plainText);
     // First authentication, parse lnn public key
     if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != static_cast<int32_t>(USER)) {
         if (!jsonData[TAG_LNN_CREDENTIAL_ID].IsString()) {
-            LOGE("DmAuthMessageProcessor::ParseMessageReqSKDerive() error, first auth, no lnnPublicKey.");
+            LOGE("first auth, no lnnPublicKey.");
             return ERR_DM_FAILED;
         }
         context->accesser.lnnCredentialId = jsonData[TAG_LNN_CREDENTIAL_ID].Get<std::string>();
     }
     if (!jsonData[TAG_TRANSMIT_CREDENTIAL_ID].IsString()) {
-        LOGE("DmAuthMessageProcessor::ParseMessageReqSKDerive, MSG_TYPE_REQ_SK_DERIVE message error.");
+        LOGE("MSG_TYPE_REQ_SK_DERIVE message error.");
         return ERR_DM_FAILED;
     }
     context->accesser.transmitCredentialId = jsonData[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>();
@@ -1164,20 +1164,20 @@ int32_t DmAuthMessageProcessor::ParseMessageRspSKDerive(const JsonObject &jsonOb
     }
     std::string plainText;
     if (cryptoMgr_->DecryptMessage(jsonObject[TAG_DATA].Get<std::string>(), plainText) != DM_OK) {
-        LOGE("DmAuthMessageProcessor::ParseMessageRspSKDerive() error, decrypt data failed.");
+        LOGE("decrypt data failed.");
         return ERR_DM_FAILED;
     }
     JsonObject jsonData(plainText);
     // First authentication, parse lnn public key
     if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != static_cast<int32_t>(USER)) {
         if (!jsonData[TAG_LNN_CREDENTIAL_ID].IsString()) {
-            LOGE("DmAuthMessageProcessor::ParseMessageRspSKDerive() error, first auth, no lnnPublicKey.");
+            LOGE("first auth, no lnnPublicKey.");
             return ERR_DM_FAILED;
         }
         context->accessee.lnnCredentialId = jsonData[TAG_LNN_CREDENTIAL_ID].Get<std::string>();
     }
     if (!jsonData[TAG_TRANSMIT_CREDENTIAL_ID].IsString()) {
-        LOGE("DmAuthMessageProcessor::ParseMessageRspSKDerive, MSG_TYPE_RESP_SK_DERIVE message error.");
+        LOGE("MSG_TYPE_RESP_SK_DERIVE message error.");
         return ERR_DM_FAILED;
     }
     context->accessee.transmitCredentialId = jsonData[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>();
@@ -1187,12 +1187,12 @@ int32_t DmAuthMessageProcessor::ParseMessageRspSKDerive(const JsonObject &jsonOb
 int32_t DmAuthMessageProcessor::ParseProxyCredExchangeToSync(std::shared_ptr<DmAuthContext> &context,
     JsonObject &jsonObject)
 {
-    LOGI("ParseProxyCredExchangeToSync inner1");
+    LOGI("inner1");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     auto targetKey = context->isServiceBind ? PARAM_KEY_SUBJECT_SERVICE_ONES : PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
     if (!context->IsProxyBind || targetList.empty()) {
-        LOGI("ParseProxyCredExchangeToSync inner2");
+        LOGI("inner2");
         return DM_OK;
     }
     if (!IsString(jsonObject, targetKey)) {
@@ -1223,13 +1223,13 @@ int32_t DmAuthMessageProcessor::ParseProxyCredExchangeToSync(std::shared_ptr<DmA
 
 std::string DmAuthMessageProcessor::CreateMessage(DmMessageType msgType, std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("DmAuthMessageProcessor::CreateMessage start. msgType is %{public}d", msgType);
+    LOGI("start. msgType is %{public}d", msgType);
     JsonObject jsonObj;
     jsonObj[TAG_MSG_TYPE] = msgType;
     jsonObj[DM_TAG_LOGICAL_SESSION_ID] = context->logicalSessionId;
     auto itr = createMessageFuncMap_.find(msgType);
     if (itr == createMessageFuncMap_.end()) {
-        LOGE("DmAuthMessageProcessor::CreateMessage msgType %{public}d error.", msgType);
+        LOGE("msgType %{public}d error.", msgType);
         return "";
     }
     int32_t ret = (this->*(itr->second))(context, jsonObj);
@@ -1311,7 +1311,7 @@ int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthCon
 int32_t DmAuthMessageProcessor::CreateServiceNegotiateMessage(std::shared_ptr<DmAuthContext> context,
     JsonObject &jsonObject)
 {
-    LOGI("CreateServiceNegotiateMessage inner1");
+    LOGI("inner1");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     jsonObject[PARAM_KEY_IS_PROXY_BIND] = context->IsProxyBind;
     jsonObject[PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT] = context->IsCallingProxyAsSubject;
@@ -1418,7 +1418,7 @@ int32_t DmAuthMessageProcessor::CreateMessageReqCredExchange(std::shared_ptr<DmA
     std::string cipherText;
     int32_t ret = cryptoMgr_->EncryptMessage(plainText, cipherText);
     if (ret != DM_OK) {
-        LOGI("DmAuthMessageProcessor::CreateMessageReqCredExchange encryptMessage failed.");
+        LOGI("encryptMessage failed.");
         return ret;
     }
     jsonObject[TAG_DATA] = cipherText;
@@ -1429,7 +1429,7 @@ int32_t DmAuthMessageProcessor::CreateMessageReqCredExchange(std::shared_ptr<DmA
 int32_t DmAuthMessageProcessor::CreateMessageRspCredExchange(std::shared_ptr<DmAuthContext> context,
     JsonObject &jsonObject)
 {
-    LOGI("DmAuthMessageProcessor::CreateMessageRspCredExchange start.");
+    LOGI("start.");
     JsonObject jsonData;
     if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != static_cast<int32_t>(USER)) {
         jsonData[TAG_LNN_PUBLIC_KEY] = context->accessee.lnnPublicKey;
@@ -1444,7 +1444,7 @@ int32_t DmAuthMessageProcessor::CreateMessageRspCredExchange(std::shared_ptr<DmA
     LOGI("plainText=%{public}s", GetAnonyJsonString(plainText).c_str());
     int32_t ret = cryptoMgr_->EncryptMessage(plainText, cipherText);
     if (ret != DM_OK) {
-        LOGI("DmAuthMessageProcessor::CreateMessageRspCredExchange encryptMessage failed.");
+        LOGI("encryptMessage failed.");
         return ret;
     }
     jsonObject[TAG_DATA] = cipherText;
@@ -1488,7 +1488,7 @@ int32_t DmAuthMessageProcessor::CreateMessageReqSKDerive(std::shared_ptr<DmAuthC
     std::string cipherText;
     int32_t ret = cryptoMgr_->EncryptMessage(plainText, cipherText);
     if (ret != DM_OK) {
-        LOGE("DmAuthMessageProcessor::CreateMessageReqSKDerive encryptMessage failed.");
+        LOGE("encryptMessage failed.");
         return ret;
     }
     jsonObject[TAG_DATA] = cipherText;
@@ -1511,7 +1511,7 @@ int32_t DmAuthMessageProcessor::CreateMessageRspSKDerive(std::shared_ptr<DmAuthC
     std::string cipherText;
     int32_t ret = cryptoMgr_->EncryptMessage(plainText, cipherText);
     if (ret != DM_OK) {
-        LOGE("DmAuthMessageProcessor::CreateMessageRspSKDerive encryptMessage failed.");
+        LOGE("encryptMessage failed.");
         return ret;
     }
     jsonObject[TAG_DATA] = cipherText;
@@ -1544,7 +1544,7 @@ int32_t DmAuthMessageProcessor::CreateMessageSyncResp(std::shared_ptr<DmAuthCont
     std::string encSyncMsg;
     int32_t ret = EncryptSyncMessage(context, access, encSyncMsg);
     if (ret != DM_OK) {
-        LOGE("DmAuthMessageProcessor::CreateMessageSyncResp encrypt failed");
+        LOGE("encrypt failed");
         return ret;
     }
     jsonObject[TAG_SYNC] = encSyncMsg;
@@ -1597,7 +1597,7 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
     }
 
     if (!IsString(jsonObject, TAG_ACCESS)) {
-        LOGE("ParseSyncMessage TAG_ACCESS error");
+        LOGE("TAG_ACCESS error");
         return ERR_DM_FAILED;
     }
     std::string srcAccessStr = jsonObject[TAG_ACCESS].Get<std::string>();
@@ -1609,12 +1609,12 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
         return ERR_DM_FAILED;
     }
     if (!CheckAccessValidityAndAssign(context, access, accessTmp)) {
-        LOGE("ParseSyncMessage CheckAccessValidityAndAssign error, data between two stages different, stop auth.");
+        LOGE("CheckAccessValidityAndAssign error, data between two stages different, stop auth.");
         return ERR_DM_FAILED;
     }
     ParseDmAccessToSync(srcAccessStr, access, true);
     if (!IsString(jsonObject, TAG_ACL_CHECKSUM)) { // Re-parse the acl
-        LOGE("ParseSyncMessage TAG_ACL_CHECKSUM error");
+        LOGE("TAG_ACL_CHECKSUM error");
         return ERR_DM_FAILED;
     }
     access.aclStrList = jsonObject[TAG_ACL_CHECKSUM].Get<std::string>();
@@ -1644,7 +1644,7 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
 
 void DmAuthMessageProcessor::ParseServiceInfo(JsonObject &jsonObject, std::shared_ptr<DmAuthContext> &context)
 {
-    LOGI("ParseServiceInfo start");
+    LOGI("start");
     if (!IsString(jsonObject, TAG_SERVICE_INFOS)) {
         LOGI("no serviceInfos");
         return;
@@ -1656,7 +1656,7 @@ void DmAuthMessageProcessor::ParseServiceInfo(JsonObject &jsonObject, std::share
         return;
     }
     for (auto const &item : allServiceInfo.Items()) {
-        LOGI("ParseServiceInfo inner");
+        LOGI("inner");
         DistributedDeviceProfile::ServiceInfo info;
         info.SetUserId(item[SERVICEINFO_USER_ID].Get<int32_t>());
         info.SetDisplayId(item[SERVICEINFO_DISPLAY_ID].Get<int64_t>());
@@ -1838,7 +1838,7 @@ int32_t DmAuthMessageProcessor::ParseMessageSyncReq(const JsonObject &jsonObject
     std::shared_ptr<DmAuthContext> context)
 {
     if (!jsonObject[TAG_SYNC].IsString()) {
-        LOGE("ParseMessageSyncReq json error");
+        LOGE("json error");
         return ERR_DM_FAILED;
     }
     std::string enSyncMsg = jsonObject[TAG_SYNC].Get<std::string>();
@@ -1857,7 +1857,7 @@ int32_t DmAuthMessageProcessor::ParseMessageSyncResp(const JsonObject &jsonObjec
     std::shared_ptr<DmAuthContext> context)
 {
     if (!jsonObject[TAG_SYNC].IsString()) {
-        LOGE("ParseMessageSyncResp json error");
+        LOGE("json error");
         return ERR_DM_FAILED;
     }
     std::string enSyncMsg = jsonObject[TAG_SYNC].Get<std::string>();
@@ -2018,9 +2018,9 @@ void DmAuthMessageProcessor::ParseCert(const JsonObject &jsonObject,
 int32_t DmAuthMessageProcessor::ParseServiceNegotiateMessage(
     const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("ParseServiceNegotiateMessage inner1");
+    LOGI("inner1");
     if (!IsString(jsonObject, PARAM_KEY_SUBJECT_SERVICE_ONES)) {
-        LOGI("ParseServiceNegotiateMessage inner2");
+        LOGI("inner2");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_SERVICE_ONES].Get<std::string>();
@@ -2044,7 +2044,7 @@ int32_t DmAuthMessageProcessor::ParseServiceNegotiateMessage(
         }
         context->subjectServiceOnes.push_back(proxyAuthContext);
     }
-    LOGI("ParseServiceNegotiateMessage inner3");
+    LOGI("inner3");
     return DM_OK;
 }
 
@@ -2517,7 +2517,7 @@ std::string DmAuthMessageProcessor::CompressSyncMsg(std::string &inputStr)
     uint32_t srcLen = inputStr.size();
     uint32_t boundSize = compressBound(srcLen);  // Maximum compression length
     if (boundSize == 0) {
-        LOGE("DmAuthMessageProcessor::CompressSyncMsg zlib compressBound failed");
+        LOGE("zlib compressBound failed");
         return "";
     }
     std::string compressed(boundSize, '\0');
@@ -2527,7 +2527,7 @@ std::string DmAuthMessageProcessor::CompressSyncMsg(std::string &inputStr)
     int32_t ret = compress(reinterpret_cast<Bytef *>(&compressed[0]), &destSize,
                            reinterpret_cast<const Bytef *>(inputStr.data()), srcLen);
     if (ret != Z_OK) {
-        LOGE("DmAuthMessageProcessor::CompressSyncMsg zlib compress failed");
+        LOGE("zlib compress failed");
         return "";
     }
     compressed.resize(destSize); // Actual usage length
@@ -2537,7 +2537,7 @@ std::string DmAuthMessageProcessor::CompressSyncMsg(std::string &inputStr)
 std::string DmAuthMessageProcessor::DecompressSyncMsg(std::string& compressed, uint32_t oriLen)
 {
     if (oriLen <= 0) {
-        LOGE("DmAuthMessageProcessor::DecompressSyncMsg decompress oriLen param error");
+        LOGE("decompress oriLen param error");
         return "";
     }
     std::string decompressed;
@@ -2547,7 +2547,7 @@ std::string DmAuthMessageProcessor::DecompressSyncMsg(std::string& compressed, u
                              reinterpret_cast<const Bytef *>(compressed.data()),  // Skip header when decompressing
                              compressed.size());
     if (ret != Z_OK || destLen != oriLen) {
-        LOGE("DmAuthMessageProcessor::DecompressSyncMsg decompress failed");
+        LOGE("decompress failed");
         return "";
     }
     return decompressed;
@@ -2570,7 +2570,7 @@ std::string DmAuthMessageProcessor::Base64Encode(std::string &inputStr)
     size_t encodedLen = 0;
     int32_t ret = mbedtls_base64_encode(buffer.data(), buffer.size(), &encodedLen, src, srcLen);
     if (ret != 0) {
-        LOGE("DmAuthMessageProcessor::Base64Encode mbedtls_base64_encode failed");
+        LOGE("mbedtls_base64_encode failed");
         return "";
     }
     return std::string(reinterpret_cast<const char*>(buffer.data()), encodedLen); // No terminator needed
@@ -2593,7 +2593,7 @@ std::string DmAuthMessageProcessor::Base64Decode(std::string &inputStr)
     size_t decodedLen = 0;
     int32_t ret = mbedtls_base64_decode(buffer.data(), buffer.size(), &decodedLen, src, srcLen);
     if (ret != 0) {
-        LOGE("DmAuthMessageProcessor::Base64Decode mbedtls_base64_decode failed");
+        LOGE("mbedtls_base64_decode failed");
         return "";
     }
     return std::string(reinterpret_cast<const char*>(buffer.data()), decodedLen); // 无需终止符
@@ -2607,7 +2607,7 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     SaveToDmAccessSync(accessToSync, context, accessSide);
 
     if (SetSyncMsgJson(context, accessSide, accessToSync, syncMsgJson) != DM_OK) {
-        LOGE("DmAuthMessageProcessor::SetSyncMsgJson failed");
+        LOGE("SetSyncMsgJson failed");
         return ERR_DM_FAILED;
     }
 
@@ -2615,7 +2615,7 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     std::string syncMsg = syncMsgJson.Dump();
     std::string compressMsg = CompressSyncMsg(syncMsg);
     if (compressMsg.empty()) {
-        LOGE("DmAuthMessageProcessor::EncryptSyncMessage compress failed");
+        LOGE("compress failed");
         return ERR_DM_FAILED;
     }
     JsonObject plainJson;
@@ -2650,7 +2650,7 @@ int32_t DmAuthMessageProcessor::SetSyncMsgJson(std::shared_ptr<DmAuthContext> &c
     int32_t ret = DeviceProfileConnector::GetInstance().GetAclListHashStr({localUdid, access.userId},
         {remoteAccess.deviceId, remoteAccess.userId}, aclHashList, DM_ACL_AGING_VERSION);
     if (ret != DM_OK) {
-        LOGE("DmAuthMessageProcessor::EncryptSyncMessage GetAclListHashStr failed");
+        LOGE("GetAclListHashStr failed");
         return ERR_DM_FAILED;
     }
 
@@ -2688,7 +2688,7 @@ void DmAuthMessageProcessor::GetAccesseeServiceInfo(JsonObject &syncMsgJson,
     }
     JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     for (const auto &info : serviceInfos) {
-        LOGI("GetAccesseeServiceInfo inner");
+        LOGI("inner");
         JsonObject object;
         object[SERVICEINFO_USER_ID] = info.GetUserId();
         object[SERVICEINFO_SERVICE_ID] = info.GetServiceId();
@@ -2781,7 +2781,7 @@ int32_t DmAuthMessageProcessor::ACLToStr(DistributedDeviceProfile::AccessControl
     aclJsonObj = dmAcl;
     aclStr = aclJsonObj.Dump();
     if (aclStr.empty()) {
-        LOGE("DmAuthMessageProcessor::ACLToStr normalized acl failed");
+        LOGE("normalized acl failed");
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -2798,7 +2798,7 @@ int32_t DmAuthMessageProcessor::CreateSyncMessage(std::shared_ptr<DmAuthContext>
     std::string encSyncMsg;
     int32_t ret = EncryptSyncMessage(context, accessSide, encSyncMsg);
     if (ret != DM_OK) {
-        LOGE("DmAuthMessageProcessor::CreateSyncMessage encrypt failed");
+        LOGE("encrypt failed");
         return ret;
     }
     jsonObject[TAG_SYNC] = encSyncMsg;
@@ -2810,7 +2810,7 @@ int32_t DmAuthMessageProcessor::ParseAuthStartMessage(const JsonObject &jsonObje
 {
     if (jsonObject.IsDiscarded() || !jsonObject.Contains(TAG_DATA) ||
         !jsonObject[TAG_DATA].IsString()) {
-        LOGE("DmAuthMessageProcessor::ParseAuthStartMessage Unlegal json string failed");
+        LOGE("Unlegal json string failed");
         return ERR_DM_FAILED;
     }
     context->transmitData = jsonObject[TAG_DATA].Get<std::string>();

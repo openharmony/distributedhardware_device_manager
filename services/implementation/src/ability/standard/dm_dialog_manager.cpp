@@ -48,12 +48,12 @@ DM_IMPLEMENT_SINGLE_INSTANCE(DmDialogManager);
 
 DmDialogManager::DmDialogManager()
 {
-    LOGI("DmDialogManager constructor");
+    LOGI("constructor");
 }
 
 DmDialogManager::~DmDialogManager()
 {
-    LOGI("DmDialogManager destructor");
+    LOGI("destructor");
 }
 
 void DmDialogManager::ConfigLocalInfo(JsonObject& jsonObject)
@@ -238,12 +238,12 @@ void DmDialogManager::CloseDialog()
 //LCOV_EXCL_START
 void DmDialogManager::ConnectExtension()
 {
-    LOGI("DmDialogManager::ConnectExtension start.");
+    LOGI("start.");
     isCloseDialog_.store(false);
     if (isConnectSystemUI_.load() && dialogConnectionCallback_ != nullptr && g_remoteObject != nullptr) {
         AppExecFwk::ElementName element;
         OnAbilityConnectDone(element, g_remoteObject, userId_);
-        LOGI("DmDialogManager::ConnectExtension dialog has been show.");
+        LOGI("dialog has been show.");
         return;
     }
     AAFwk::Want want;
@@ -267,7 +267,7 @@ void DmDialogManager::ConnectExtension()
         LOGE("create dialogConnectionCallback_ failed.");
         return;
     }
-    LOGI("DmDialogManager::ConnectExtension abilityManager ConnectAbility begin.");
+    LOGI("abilityManager ConnectAbility begin.");
     auto ret = abilityManager->ConnectAbility(want, dialogConnectionCallback_, userId_);
     if (ret != ERR_OK) {
         LOGE("ConnectExtensionAbility sceneboard failed.");
@@ -285,7 +285,7 @@ void DmDialogManager::ConnectExtension()
 void DmDialogManager::OnAbilityConnectDone(
     const AppExecFwk::ElementName& element, const sptr<IRemoteObject>& remoteObject, int resultCode)
 {
-    LOGI("OnAbilityConnectDone");
+    LOGI("start");
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> lock(mutex_);
 #else
@@ -354,7 +354,7 @@ void DmDialogManager::SendMsgRequest(const sptr<IRemoteObject>& remoteObject)
 
 void DmDialogManager::OnAbilityDisconnectDone(const AppExecFwk::ElementName& element, int resultCode)
 {
-    LOGI("OnAbilityDisconnectDone");
+    LOGI("start");
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> lock(mutex_);
 #else

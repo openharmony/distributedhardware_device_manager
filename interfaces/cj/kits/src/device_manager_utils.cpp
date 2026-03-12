@@ -33,16 +33,16 @@ void DmFfiInitCallback::OnRemoteDied()
 {
     DeviceManagerFfiImpl *deviceManagerFfi = DeviceManagerFfiImpl::GetDeviceManagerFfi(bundleName_);
     if (deviceManagerFfi == nullptr) {
-        LOGE("OnRemoteDied, deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
+        LOGE("deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
     }
-    LOGI("OnRemoteDied, deviceManagerFfi bundleName %{public}s", bundleName_.c_str());
+    LOGI("deviceManagerFfi bundleName %{public}s", bundleName_.c_str());
 }
 
 void DmFfiDeviceStatusCallback::OnDeviceOnline(const DmDeviceBasicInfo &deviceBasicInfo)
 {
     DeviceManagerFfiImpl *deviceManagerFfi = DeviceManagerFfiImpl::GetDeviceManagerFfi(bundleName_);
     if (deviceManagerFfi == nullptr) {
-        LOGE("OnDeviceOnline, deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
+        LOGE("deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
     } else {
         deviceManagerFfi->OnDeviceStatusChange(DmFfiDevStatusChange::UNKNOWN, deviceBasicInfo);
     }
@@ -52,7 +52,7 @@ void DmFfiDeviceStatusCallback::OnDeviceReady(const DmDeviceBasicInfo &deviceBas
 {
     DeviceManagerFfiImpl *deviceManagerFfi = DeviceManagerFfiImpl::GetDeviceManagerFfi(bundleName_);
     if (deviceManagerFfi == nullptr) {
-        LOGE("OnDeviceReady, deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
+        LOGE("deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
     } else {
         deviceManagerFfi->OnDeviceStatusChange(DmFfiDevStatusChange::AVAILABLE, deviceBasicInfo);
     }
@@ -62,7 +62,7 @@ void DmFfiDeviceStatusCallback::OnDeviceOffline(const DmDeviceBasicInfo &deviceB
 {
     DeviceManagerFfiImpl *deviceManagerFfi = DeviceManagerFfiImpl::GetDeviceManagerFfi(bundleName_);
     if (deviceManagerFfi == nullptr) {
-        LOGE("OnDeviceOffline, deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
+        LOGE("deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
     } else {
         deviceManagerFfi->OnDeviceStatusChange(DmFfiDevStatusChange::UNAVAILABLE, deviceBasicInfo);
     }
@@ -72,7 +72,7 @@ void DmFfiDeviceStatusCallback::OnDeviceChanged(const DmDeviceBasicInfo &deviceB
 {
     DeviceManagerFfiImpl *deviceManagerFfi = DeviceManagerFfiImpl::GetDeviceManagerFfi(bundleName_);
     if (deviceManagerFfi == nullptr) {
-        LOGE("OnDeviceChanged, deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
+        LOGE("deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
     } else {
         deviceManagerFfi->OnDeviceNameChange(deviceBasicInfo.deviceName);
     }
@@ -80,10 +80,10 @@ void DmFfiDeviceStatusCallback::OnDeviceChanged(const DmDeviceBasicInfo &deviceB
 
 void DmFfiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("OnDeviceFound for %{public}s, subscribeId %{public}d", bundleName_.c_str(), (int32_t)subscribeId);
+    LOGI("OnDeviceFound %{public}s, subscribeId %{public}d", bundleName_.c_str(), (int32_t)subscribeId);
     DeviceManagerFfiImpl *deviceManagerFfi = DeviceManagerFfiImpl::GetDeviceManagerFfi(bundleName_);
     if (deviceManagerFfi == nullptr) {
-        LOGE("OnDeviceFound, deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
+        LOGE("deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
     } else {
         deviceManagerFfi->OnDeviceFound(subscribeId, deviceBasicInfo);
     }
@@ -91,10 +91,10 @@ void DmFfiDiscoveryCallback::OnDeviceFound(uint16_t subscribeId, const DmDeviceB
 
 void DmFfiDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason)
 {
-    LOGI("OnDiscoveryFailed for %{public}s, subscribeId %{public}d", bundleName_.c_str(), (int32_t)subscribeId);
+    LOGI("OnDiscoveryFailed %{public}s, subscribeId %{public}d", bundleName_.c_str(), (int32_t)subscribeId);
     DeviceManagerFfiImpl *deviceManagerFfi = DeviceManagerFfiImpl::GetDeviceManagerFfi(bundleName_);
     if (deviceManagerFfi == nullptr) {
-        LOGE("OnDiscoveryFailed, deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
+        LOGE("deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
     } else {
         deviceManagerFfi->OnDiscoveryFailed(subscribeId, failedReason);
     }
@@ -104,10 +104,10 @@ void DmFfiDiscoveryCallback::OnDiscoverySuccess(uint16_t subscribeId)
 {
     DeviceManagerFfiImpl *deviceManagerFfi = DeviceManagerFfiImpl::GetDeviceManagerFfi(bundleName_);
     if (deviceManagerFfi == nullptr) {
-        LOGE("OnDiscoverySuccess, deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
+        LOGE("deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
         return;
     }
-    LOGI("DiscoverySuccess for %{public}s, subscribeId %{public}d", bundleName_.c_str(), (int32_t)subscribeId);
+    LOGI("OnDiscoverySuccess %{public}s, subscribeId %{public}d", bundleName_.c_str(), (int32_t)subscribeId);
 }
 
 void DmFfiDiscoveryCallback::IncreaseRefCount()
@@ -127,11 +127,11 @@ int32_t DmFfiDiscoveryCallback::GetRefCount()
 
 void DmFfiPublishCallback::OnPublishResult(int32_t publishId, int32_t publishResult)
 {
-    LOGI("OnPublishResult for %{public}s, publishId %{public}d, publishResult %{public}d", bundleName_.c_str(),
+    LOGI("OnPublishResult %{public}s, publishId %{public}d, publishResult %{public}d", bundleName_.c_str(),
         publishId, publishResult);
     DeviceManagerFfiImpl *deviceManagerFfi = DeviceManagerFfiImpl::GetDeviceManagerFfi(bundleName_);
     if (deviceManagerFfi == nullptr) {
-        LOGE("OnPublishResult, deviceManagerFfi failed for bundleName %{public}s", bundleName_.c_str());
+        LOGE("deviceManagerFfi failed for bundleName %{public}s", bundleName_.c_str());
     } else {
         deviceManagerFfi->OnPublishResult(publishId, publishResult);
     }
@@ -157,7 +157,7 @@ void DmFfiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const 
 {
     DeviceManagerFfiImpl *deviceManagerFfi = DeviceManagerFfiImpl::GetDeviceManagerFfi(bundleName_);
     if (deviceManagerFfi == nullptr) {
-        LOGE("OnAuthResult, deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
+        LOGE("deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
     } else {
         deviceManagerFfi->OnAuthResult(deviceId, token, status, reason);
     }
@@ -167,7 +167,7 @@ void DmFfiDeviceManagerUiCallback::OnCall(const std::string &paramJson)
 {
     DeviceManagerFfiImpl *deviceManagerFfi = DeviceManagerFfiImpl::GetDeviceManagerFfi(bundleName_);
     if (deviceManagerFfi == nullptr) {
-        LOGE("OnCall, deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
+        LOGE("deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
     } else {
         deviceManagerFfi->OnDmUiCall(paramJson);
     }
@@ -179,7 +179,7 @@ void DmFfiBindTargetCallback::OnBindResult(const PeerTargetId &targetId, int32_t
     (void)targetId;
     DeviceManagerFfiImpl *deviceManagerFfi = DeviceManagerFfiImpl::GetDeviceManagerFfi(bundleName_);
     if (deviceManagerFfi == nullptr) {
-        LOGE("OnBindResult, deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
+        LOGE("deviceManagerFfi not find for bundleName %{public}s", bundleName_.c_str());
     } else {
         deviceManagerFfi->OnAuthResult(content, "", status, result);
     }

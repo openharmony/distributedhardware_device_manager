@@ -24,7 +24,7 @@ namespace DistributedHardware {
 
 void AuthPinAuthStateTest::SetUpTestCase()
 {
-    LOGI("AuthPinAuthStateTest::SetUpTestCase start.");
+    LOGI("start.");
     DmHiChainAuthConnector::dmHiChainAuthConnector = hiChainAuthConnectorMock;
     DmAuthStateMachineMock::dmAuthStateMachineMock = std::make_shared<DmAuthStateMachineMock>();
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient =
@@ -33,7 +33,7 @@ void AuthPinAuthStateTest::SetUpTestCase()
 
 void AuthPinAuthStateTest::TearDownTestCase()
 {
-    LOGI("AuthPinAuthStateTest::TearDownTestCase start.");
+    LOGI("start.");
     DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
     DmAuthStateMachineMock::dmAuthStateMachineMock = nullptr;
     hiChainAuthConnectorMock = nullptr;
@@ -43,7 +43,7 @@ void AuthPinAuthStateTest::TearDownTestCase()
 
 void AuthPinAuthStateTest::SetUp()
 {
-    LOGI("AuthPinAuthStateTest::SetUp start.");
+    LOGI("start.");
     softbusConnector = std::make_shared<SoftbusConnector>();
     listener = std::make_shared<DeviceManagerServiceListener>();
     hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
@@ -58,7 +58,7 @@ void AuthPinAuthStateTest::SetUp()
 
 void AuthPinAuthStateTest::TearDown()
 {
-    LOGI("AuthPinAuthStateTest::TearDown start.");
+    LOGI("start.");
     softbusConnector = nullptr;
     listener = nullptr;
     hiChainAuthConnector = nullptr;

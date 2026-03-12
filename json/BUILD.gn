@@ -40,7 +40,7 @@ if (defined(ohos_lite)) {
 
       defines = [
         "HI_LOG_ENABLE",
-        "DH_LOG_TAG=\"devicemanagerjson\"",
+        "DH_LOG_TAG=\"dmjson\"",
         "LOG_DOMAIN=0xD004110",
       ]
 
@@ -96,7 +96,7 @@ if (defined(ohos_lite)) {
 
     defines = [
       "HI_LOG_ENABLE",
-      "DH_LOG_TAG=\"devicemanagerjson\"",
+      "DH_LOG_TAG=\"dmjson\"",
       "LOG_DOMAIN=0xD004110",
     ]
 

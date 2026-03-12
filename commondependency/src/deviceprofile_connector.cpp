@@ -115,11 +115,11 @@ DM_EXPORT int32_t DeviceProfileConnector::GetVersionByExtra(std::string &extraIn
 {
     JsonObject extraInfoJson(extraInfo);
     if (extraInfoJson.IsDiscarded()) {
-        LOGE("GetVersionByExtra extraInfoJson error");
+        LOGE("extraInfoJson error");
         return ERR_DM_FAILED;
     }
     if (!extraInfoJson[TAG_DMVERSION].IsString()) {
-        LOGE("GetVersionByExtra PARAM_KEY_OS_VERSION error");
+        LOGE("PARAM_KEY_OS_VERSION error");
         return ERR_DM_FAILED;
     }
     dmVersion = extraInfoJson[TAG_DMVERSION].Get<std::string>();
@@ -201,7 +201,7 @@ DM_EXPORT int32_t DeviceProfileConnector::GetAclListHashStr(const DevUserInfo &l
         }
     }
     if (aclMap.empty()) {
-        LOGI("DeviceProfileConnector:: acl list is empty");
+        LOGI("acl list is empty");
     }
     std::vector<AclHashItem> aclStrVec;
     for (auto &item : aclMap) {
@@ -329,7 +329,7 @@ DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProf
         }
     }
     if (aclList.empty()) {
-        LOGI("DeviceProfileConnector::GetAclList acl is empty");
+        LOGI("acl is empty");
     }
     return aclList;
 }
@@ -726,7 +726,7 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAuthFormM
         }
         if (deviceIdMap.find(trustDeviceId) == deviceIdMap.end()) {
             if (CheckSinkShareType(item, userId, deviceId, trustDeviceId, bindType)) {
-                LOGI("GetAuthFormMap CheckSinkShareType true.");
+                LOGI("CheckSinkShareType true.");
                 continue;
             }
             deviceIdMap[trustDeviceId] = static_cast<DmAuthForm>(bindType);
@@ -755,7 +755,7 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAuthFormM
             deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
             continue;
         } else {
-            LOGE("GetAuthFormMap highestBindType match failed.");
+            LOGE("highestBindType match failed.");
             continue;
         }
     }
@@ -1093,7 +1093,7 @@ DM_EXPORT std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(
     std::vector<int32_t> bindType;
     std::vector<int32_t> bindTypeIndex =
         CompareBindType(profiles, pkgName, sinkBindType, localDeviceId, targetDeviceId);
-    LOGI("SyncAclByBindType sinkBindType size is %{public}zu", sinkBindType.size());
+    LOGI("sinkBindType size is %{public}zu", sinkBindType.size());
     for (uint32_t sinkIndex = 0; sinkIndex < sinkBindType.size(); sinkIndex++) {
         bool deleteAclFlag = true;
         for (uint32_t srcIndex = 0; srcIndex < bindTypeVec.size(); srcIndex++) {
@@ -1105,7 +1105,7 @@ DM_EXPORT std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(
         if (deleteAclFlag) {
             int32_t deleteIndex = profiles[bindTypeIndex[sinkIndex]].GetAccessControlId();
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(deleteIndex);
-            LOGI("SyncAclByBindType deleteAcl index is %{public}d", deleteIndex);
+            LOGI("deleteAcl index is %{public}d", deleteIndex);
         }
     }
     return bindType;
@@ -1322,7 +1322,7 @@ DM_EXPORT bool DeviceProfileConnector::DeleteAclByActhash(
 void DeviceProfileConnector::CacheOfflineParam(const DmCacheOfflineInputParam &inputParam,
     DmOfflineParam &offlineParam, bool &notifyOffline, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
 {
-    LOGI("CacheOfflineParam start.");
+    LOGI("start.");
     DistributedDeviceProfile::AccessControlProfile profile = inputParam.profile;
     DMAclQuadInfo info = inputParam.info;
     std::string accountIdHash = inputParam.accountIdHash;
@@ -1470,7 +1470,7 @@ DM_EXPORT void DeviceProfileConnector::DeleteAccessControlList(const std::string
 {
     LOGI("Udid: %{public}s.", GetAnonyString(udid).c_str());
     if (udid.empty()) {
-        LOGE("DeleteAccessControlList udid is empty.");
+        LOGE("udid is empty.");
         return;
     }
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
@@ -1506,11 +1506,11 @@ bool DeviceProfileConnector::IsAuthNewVersion(const DistributedDeviceProfile::Ac
     std::string extraInfo = GetAclVersionInfo(localUdid, remoteUdid, acl);
     JsonObject extraInfoJson(extraInfo);
     if (extraInfoJson.IsDiscarded()) {
-        LOGE("IsAuthNewVersion extraInfoJson error");
+        LOGE("extraInfoJson error");
         return false;
     }
     if (!extraInfoJson[TAG_DMVERSION].IsString()) {
-        LOGE("IsAuthNewVersion PARAM_KEY_OS_VERSION error");
+        LOGE("PARAM_KEY_OS_VERSION error");
         return false;
     }
     std::string dmVersion = extraInfoJson[TAG_DMVERSION].Get<std::string>();
@@ -1720,7 +1720,7 @@ void DeviceProfileConnector::DeleteAppBindLevel(DmOfflineParam &offlineParam, co
     uint64_t peerTokenId = 0;
     std::string peerBundleName;
     JsonStrHandle::GetInstance().GetPeerAppInfoParseExtra(extra, peerTokenId, peerBundleName);
-    LOGI("DeviceProfileConnector::DeleteAppBindLevel peerBundleName %{public}s", peerBundleName.c_str());
+    LOGI("peerBundleName %{public}s", peerBundleName.c_str());
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() != remoteUdid || item.GetBindType() == DM_IDENTICAL_ACCOUNT ||
             item.GetBindLevel() != APP) {
@@ -3188,7 +3188,7 @@ bool DeviceProfileConnector::CheckAclStatusAndForegroundNotMatch(const std::stri
     const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds)
 {
     std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
-    LOGI("CheckAclStatusAndForegroundNotMatch profiles size is %{public}zu", profiles.size());
+    LOGI("profiles size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
         if (CheckAclStatusNotMatch(item, localUdid, foregroundUserIds, backgroundUserIds)) {
             return true;
@@ -3315,7 +3315,7 @@ DM_EXPORT int32_t DeviceProfileConnector::UpdateAclDeviceName(const std::string 
 DM_EXPORT int32_t DeviceProfileConnector::CheckDeviceInfoPermission(const std::string &localUdid,
     const std::string &peerDeviceId)
 {
-    LOGI("CheckDeviceInfoPermission Start.");
+    LOGI("Start.");
     int32_t localUserId = 0;
     uint32_t tempLocalTokenId = 0;
     MultipleUserConnector::GetTokenIdAndForegroundUserId(tempLocalTokenId, localUserId);
@@ -3524,7 +3524,7 @@ DM_EXPORT int32_t DeviceProfileConnector::HandleAccountCommonEvent(const std::st
     const std::vector<std::string> &deviceVec, const std::vector<int32_t> &foregroundUserIds,
     const std::vector<int32_t> &backgroundUserIds, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
 {
-    LOGI("HandleAccountCommonEvent start, foregroundUserIds: %{public}s, backgroundUserIds:  %{public}s",
+    LOGI("start, foregroundUserIds: %{public}s, backgroundUserIds:  %{public}s",
         GetIntegerList(foregroundUserIds).c_str(), GetIntegerList(backgroundUserIds).c_str());
     if (deviceVec.empty()) {
         LOGI("no remote device.");
@@ -3960,7 +3960,7 @@ DM_EXPORT void DeviceProfileConnector::GetRemoteTokenIds(const std::string &loca
     const std::string &udid, std::unordered_set<int64_t> &remoteTokenIds)
 {
     if (udid.empty() || localUdid.empty() || localUdid == udid) {
-        LOGE("GetRemoteTokenIds udid error.");
+        LOGE("udid error.");
         return;
     }
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
@@ -4185,7 +4185,7 @@ DM_EXPORT int32_t DeviceProfileConnector::GetServiceInfosByUdidAndUserId(const s
     int32_t ret = DistributedDeviceProfileClient::GetInstance().GetServiceInfosByUserInfo(
         userInfo, serviceInfos);
     if (ret != DM_OK) {
-        LOGE("GetServiceInfosByUdidAndUserId failed, ret: %{public}d", ret);
+        LOGE("ret: %{public}d", ret);
         if (ret == DP_NOT_FIND_DATA) {
             ret = ERR_DM_SERVICE_INFO_NOT_EXIST;
         }
@@ -4196,29 +4196,29 @@ DM_EXPORT int32_t DeviceProfileConnector::GetServiceInfosByUdidAndUserId(const s
 
 DM_EXPORT int32_t DeviceProfileConnector::PutServiceInfo(const DistributedDeviceProfile::ServiceInfo &serviceInfo)
 {
-    LOGI("PutServiceInfo start");
+    LOGI("start");
     int32_t ret = DistributedDeviceProfileClient::GetInstance().PutServiceInfo(serviceInfo);
     if (ret != DM_OK) {
-        LOGE("PutServiceInfo failed, result: %{public}d", ret);
+        LOGE("result: %{public}d", ret);
         return ret;
     }
-    LOGI("PutServiceInfo success");
+    LOGI("success");
     return DM_OK;
 }
 
 DM_EXPORT int32_t DeviceProfileConnector::DeleteServiceInfo(const DistributedDeviceProfile::ServiceInfo &serviceInfo)
 {
-    LOGI("DeleteServiceInfo start");
+    LOGI("start");
     DistributedDeviceProfile::UserInfo userInfo;
     userInfo.udid = serviceInfo.GetUdid();
     userInfo.userId = serviceInfo.GetUserId();
     userInfo.serviceId = serviceInfo.GetServiceId();
     int32_t ret = DistributedDeviceProfileClient::GetInstance().DeleteServiceInfo(userInfo);
     if (ret != DM_OK) {
-        LOGE("DeleteServiceInfo failed, result: %{public}d", ret);
+        LOGE("result: %{public}d", ret);
         return ret;
     }
-    LOGI("DeleteServiceInfo success");
+    LOGI("success");
     return DM_OK;
 }
 
@@ -4230,10 +4230,10 @@ DM_EXPORT int32_t DeviceProfileConnector::GetServiceInfosByUdid(const std::strin
     int32_t ret = DistributedDeviceProfileClient::GetInstance().GetServiceInfosByUserInfo(
         userInfo, serviceInfos);
     if (ret != DM_OK) {
-        LOGE("GetServiceInfosByUdid failed, result: %{public}d", ret);
+        LOGE("result: %{public}d", ret);
         return ret;
     }
-    LOGI("GetServiceInfosByUdid success");
+    LOGI("success");
     return DM_OK;
 }
 
@@ -4266,7 +4266,7 @@ DM_EXPORT void DeviceProfileConnector::GetPeerTokenIdForServiceProxyUnbind(int32
 bool DeviceProfileConnector::HasServiceId(const DistributedDeviceProfile::AccessControlProfile &profile,
     int64_t serviceId)
 {
-    LOGI("HasServiceId start.");
+    LOGI("start.");
     std::string aceeExtraData = profile.GetAccessee().GetAccesseeExtraData();
     if (aceeExtraData.empty()) {
         LOGE("CheckAclByUdidAndTokenIdAndServiceId aceeExtraData is empty.");
@@ -4292,7 +4292,7 @@ int32_t DeviceProfileConnector::FillDmUserRemovedServiceInfoRemote(
     const DistributedDeviceProfile::AccessControlProfile &item,
     std::vector<DmUserRemovedServiceInfo> &serviceInfos)
 {
-    LOGI("FillDmUserRemovedServiceInfoRemote start.");
+    LOGI("start.");
     DmUserRemovedServiceInfo serviceInfo;
     serviceInfo.localTokenId = item.GetAccesser().GetAccesserTokenId();
     serviceInfo.localPkgName = item.GetAccesser().GetAccesserBundleName();
@@ -4302,7 +4302,7 @@ int32_t DeviceProfileConnector::FillDmUserRemovedServiceInfoRemote(
     if (item.GetBindType() == DM_POINT_TO_POINT) {
         std::string aceeExtraData = item.GetAccessee().GetAccesseeExtraData();
         if (aceeExtraData.empty()) {
-            LOGE("FillDmUserRemovedServiceInfoRemote aceeExtraData is empty.");
+            LOGE("aceeExtraData is empty.");
             return ERR_DM_FAILED;
         }
         JsonObject aceeExtJson(aceeExtraData);

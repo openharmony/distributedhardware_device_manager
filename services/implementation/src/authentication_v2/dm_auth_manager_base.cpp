@@ -124,276 +124,276 @@ constexpr uint32_t PROCESS_NAME_PROXY_ADAPTATION_LIST_NUM = std::size(PROCESS_NA
 int32_t AuthManagerBase::AuthenticateDevice(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGE("AuthenticateDevice is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::UnAuthenticateDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel)
 {
-    LOGE("UnAuthenticateDevice is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::UnBindDevice(const std::string &pkgName, const std::string &udid,
     int32_t bindLevel, const std::string &extra)
 {
-    LOGE("UnBindDevice is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 void AuthManagerBase::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
-    LOGE("OnSessionOpened is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 void AuthManagerBase::OnSessionClosed(const int32_t sessionId)
 {
-    LOGE("OnSessionClosed is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 void AuthManagerBase::OnSessionDisable()
 {
-    LOGE("OnSessionDisable is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 void AuthManagerBase::OnDataReceived(const int32_t sessionId, const std::string message)
 {
-    LOGE("OnDataReceived is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 void AuthManagerBase::OnSoftbusJoinLNNResult(const int32_t sessionId, const char *networkId, int32_t result)
 {
-    LOGE("OnSoftbusJoinLNNResult is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 void AuthManagerBase::OnGroupCreated(int64_t requestId, const std::string &groupId)
 {
-    LOGE("OnGroupCreated is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 void AuthManagerBase::OnMemberJoin(int64_t requestId, int32_t status, int32_t operationCode)
 {
-    LOGE("OnMemberJoin is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 int32_t AuthManagerBase::EstablishAuthChannel(const std::string &deviceId)
 {
-    LOGE("EstablishAuthChannel is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 void AuthManagerBase::StartNegotiate(const int32_t &sessionId)
 {
-    LOGE("StartNegotiate is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 void AuthManagerBase::RespNegotiate(const int32_t &sessionId)
 {
-    LOGE("RespNegotiate is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 void AuthManagerBase::SendAuthRequest(const int32_t &sessionId)
 {
-    LOGE("SendAuthRequest is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 int32_t AuthManagerBase::StartAuthProcess(const int32_t &action)
 {
-    LOGE("StartAuthProcess is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 void AuthManagerBase::StartRespAuthProcess()
 {
-    LOGE("StartRespAuthProcess is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 int32_t AuthManagerBase::CreateGroup()
 {
-    LOGE("CreateGroup is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::ProcessPincode(const std::string &pinCode)
 {
-    LOGE("ProcessPincode is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 std::string AuthManagerBase::GetConnectAddr(std::string deviceId)
 {
-    LOGE("GetConnectAddr is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return "";
 }
 
 int32_t AuthManagerBase::JoinNetwork()
 {
-    LOGE("JoinNetwork is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 void AuthManagerBase::AuthenticateFinish()
 {
-    LOGE("AuthenticateFinish is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 bool AuthManagerBase::GetIsCryptoSupport()
 {
-    LOGE("GetIsCryptoSupport is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return false;
 }
 
 int32_t AuthManagerBase::SetAuthRequestState(std::shared_ptr<AuthRequestState> authRequestState)
 {
-    LOGE("SetAuthRequestState is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::SetAuthResponseState(std::shared_ptr<AuthResponseState> authResponseState)
 {
-    LOGE("SetAuthResponseState is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::GetPinCode(std::string &code)
 {
-    LOGE("GetPinCode is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 std::string AuthManagerBase::GenerateGroupName()
 {
-    LOGE("GenerateGroupName is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return "";
 }
 
 void AuthManagerBase::HandleAuthenticateTimeout(std::string name)
 {
-    LOGE("HandleAuthenticateTimeout is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 std::string AuthManagerBase::GeneratePincode()
 {
-    LOGE("GeneratePincode is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return "";
 }
 
 void AuthManagerBase::ShowConfigDialog()
 {
-    LOGE("ShowConfigDialog is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 void AuthManagerBase::ShowAuthInfoDialog(bool authDeviceError)
 {
-    LOGE("ShowAuthInfoDialog is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 void AuthManagerBase::ShowStartAuthDialog()
 {
-    LOGE("ShowStartAuthDialog is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 int32_t AuthManagerBase::OnUserOperation(int32_t action, const std::string &params)
 {
-    LOGE("OnUserOperation is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::SetPageId(int32_t pageId)
 {
-    LOGE("SetPageId is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::SetReasonAndFinish(int32_t reason, int32_t state)
 {
-    LOGE("SetReasonAndFinish is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 bool AuthManagerBase::IsIdenticalAccount()
 {
-    LOGE("IsIdenticalAccount is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return false;
 }
 
 int32_t AuthManagerBase::RegisterUiStateCallback(const std::string pkgName)
 {
-    LOGE("RegisterUiStateCallback is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::UnRegisterUiStateCallback(const std::string pkgName)
 {
-    LOGE("UnRegisterUiStateCallback is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
 {
-    LOGE("ImportAuthCode is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam, int sessionId, uint64_t logicalSessionId)
 {
-    LOGE("BindTarget is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::RegisterAuthenticationType(int32_t authenticationType)
 {
-    LOGE("RegisterAuthenticationType is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::StopAuthenticateDevice(const std::string &pkgName)
 {
-    LOGE("StopAuthenticateDevice is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::DeleteGroup(const std::string &pkgName, const std::string &deviceId)
 {
-    LOGE("DeleteGroup is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManagerBase::GetReason()
 {
-    LOGE("GetReason is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return ERR_DM_FAILED;
 }
 
 void AuthManagerBase::GetBindTargetParams(std::string &pkgName, PeerTargetId &targetId,
     std::map<std::string, std::string> &bindParam)
 {
-    LOGE("GetBindTargetParams is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return;
 }
 
 void AuthManagerBase::GetAuthCodeAndPkgName(std::string &pkgName, std::string &authCode)
 {
-    LOGE("GetAuthCodeAndPkgName is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return;
 }
 
 void AuthManagerBase::SetBindTargetParams(const PeerTargetId &targetId)
 {
-    LOGE("SetBindTargetParams is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return;
 }
 
 void AuthManagerBase::RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback)
 {
-    LOGE("RegisterCleanNotifyCallback is not implemented in the current version");
+    LOGE("is not implemented in the current version");
     return;
 }
 
 void AuthManagerBase::RegisterStopTimerAndDelDpCallback(StopTimerAndDelDpCallback stopTimerAndDelDpCallback)
 {
-    LOGE("RegisterStopTimerAndDelDpCallback is not implemented in the current version");
+    LOGE("is not implemented in the current version");
 }
 
 std::string AuthManagerBase::ConvertSrcVersion(const std::string &version, const std::string &edition)
@@ -406,7 +406,7 @@ std::string AuthManagerBase::ConvertSrcVersion(const std::string &version, const
     } else if (version != "" && edition == "") {
         srcVersion = version;
     }
-    LOGI("ConvertSrcVersion version %{public}s, edition %{public}s, srcVersion is %{public}s.",
+    LOGI("version %{public}s, edition %{public}s, srcVersion is %{public}s.",
         version.c_str(), edition.c_str(), srcVersion.c_str());
     return srcVersion;
 }
@@ -449,7 +449,7 @@ int32_t AuthManagerBase::DmGetUserId(int32_t displayId)
         // If userIds.size() > 1, we need to find the main screen user
     ret = AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
     if (ret != DM_OK) {
-        LOGE("AuthManagerBase::DmGetUserId: get foreground user failed in multi users with error %{public}d", ret);
+        LOGE("get foreground user failed in multi users with error %{public}d", ret);
         return -1;
     }
     return userId;
@@ -491,20 +491,20 @@ int32_t AuthManagerBase::ParseAuthType(const std::map<std::string, std::string> 
 {
     auto iter = bindParam.find(PARAM_KEY_AUTH_TYPE);
     if (iter == bindParam.end()) {
-        LOGE("AuthManagerBase::ParseAuthType bind param key: %{public}s not exist.", PARAM_KEY_AUTH_TYPE);
+        LOGE("bind param key: %{public}s not exist.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string authTypeStr = iter->second;
     if (authTypeStr.empty()) {
-        LOGE("AuthManagerBase::ParseAuthType bind param %{public}s is empty.", PARAM_KEY_AUTH_TYPE);
+        LOGE("bind param %{public}s is empty.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (authTypeStr.length() > 1) {
-        LOGE("AuthManagerBase::ParseAuthType bind param %{public}s length is unsupported.", PARAM_KEY_AUTH_TYPE);
+        LOGE("bind param %{public}s length is unsupported.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!isdigit(authTypeStr[0])) {
-        LOGE("AuthManagerBase::ParseAuthType bind param %{public}s fromat is unsupported.", PARAM_KEY_AUTH_TYPE);
+        LOGE("bind param %{public}s fromat is unsupported.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     authType = std::atoi(authTypeStr.c_str());
@@ -542,7 +542,7 @@ int32_t AuthManagerBase::EndDream()
 
 bool AuthManagerBase::CheckProcessNameInWhiteList(const std::string &processName)
 {
-    LOGI("AuthManagerBase::CheckProcessNameInWhiteList start");
+    LOGI("start");
     if (processName.empty()) {
         LOGE("processName is empty");
         return false;

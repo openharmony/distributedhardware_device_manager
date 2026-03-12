@@ -142,13 +142,13 @@ bool AppManager::GetBundleManagerProxy(sptr<AppExecFwk::IBundleMgr> &bundleManag
     sptr<ISystemAbilityManager> systemAbilityManager =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityManager == nullptr) {
-        LOGE("GetBundleManagerProxy Failed to get system ability mgr.");
+        LOGE("Failed to get system ability mgr.");
         return false;
     }
     sptr<IRemoteObject> remoteObject =
         systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
     if (remoteObject == nullptr) {
-        LOGE("GetBundleManagerProxy Failed to get bundle manager service.");
+        LOGE("Failed to get bundle manager service.");
         return false;
     }
     bundleManager = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
@@ -163,7 +163,7 @@ bool AppManager::IsSystemSA()
 {
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
-        LOGE("IsSystemSA GetCallingTokenID error.");
+        LOGE("GetCallingTokenID error.");
         return false;
     }
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
@@ -205,7 +205,7 @@ DM_EXPORT int32_t AppManager::GetCallerName(bool isSystemSA, std::string &caller
         }
         callerName = std::move(tokenInfo.processName);
     } else {
-        LOGE("failed, unsupported process.");
+        LOGE("unsupported process.");
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -214,7 +214,7 @@ DM_EXPORT int32_t AppManager::GetCallerName(bool isSystemSA, std::string &caller
 DM_EXPORT int32_t AppManager::GetBundleNameByTokenId(int64_t tokenId, std::string &bundleName)
 {
     if (tokenId < 0) {
-        LOGE("GetBundleNameByTokenId error.");
+        LOGE("error.");
         return ERR_DM_FAILED;
     }
     AccessTokenID tokenIdTemp = static_cast<AccessTokenID>(tokenId);
@@ -234,7 +234,7 @@ DM_EXPORT int32_t AppManager::GetBundleNameByTokenId(int64_t tokenId, std::strin
         }
         bundleName = std::move(tokenInfo.processName);
     } else {
-        LOGE("failed, unsupported process.");
+        LOGE("unsupported process.");
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -272,7 +272,7 @@ DM_EXPORT int32_t AppManager::GetCallerProcessName(std::string &processName)
 {
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
-        LOGE("GetCallerProcessName GetCallingTokenID error.");
+        LOGE("GetCallingTokenID error.");
         return ERR_DM_FAILED;
     }
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
@@ -285,7 +285,7 @@ DM_EXPORT int32_t AppManager::GetCallerProcessName(std::string &processName)
         processName = std::move(tokenInfo.bundleName);
         uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
         if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId)) {
-            LOGE("GetCallerProcessName %{public}s not system hap.", processName.c_str());
+            LOGE("%{public}s not system hap.", processName.c_str());
             return ERR_DM_FAILED;
         }
     } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
@@ -296,7 +296,7 @@ DM_EXPORT int32_t AppManager::GetCallerProcessName(std::string &processName)
         }
         processName = std::move(tokenInfo.processName);
     } else {
-        LOGE("GetCallerProcessName failed, unsupported process.");
+        LOGE("unsupported process.");
         return ERR_DM_FAILED;
     }
 
@@ -332,7 +332,7 @@ int32_t AppManager::GetBundleNameForSelf(std::string &bundleName)
     int32_t flags = static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION);
     int32_t ret = static_cast<int32_t>(bundleManager->GetBundleInfoForSelf(flags, bundleInfo));
     if (ret != ERR_OK) {
-        LOGE("failed, ret=%{public}d.", ret);
+        LOGE("ret=%{public}d.", ret);
         return ERR_DM_GET_BUNDLE_NAME_FAILED;
     }
     bundleName = bundleInfo.name;

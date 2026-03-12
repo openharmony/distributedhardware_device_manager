@@ -87,7 +87,7 @@ bool g_groupIsRedundance = false;
 
 DmServiceHiChainConnector::DmServiceHiChainConnector()
 {
-    LOGI("DmServiceHiChainConnector::constructor");
+    LOGI("constructor");
     InitDeviceAuthService();
     deviceAuthCallback_ = {.onTransmit = nullptr,
                            .onSessionKeyReturned = nullptr,
@@ -104,19 +104,19 @@ DmServiceHiChainConnector::DmServiceHiChainConnector()
         LOGE("[HICHAIN]fail to register callback to hachain with ret:%{public}d.", ret);
         return;
     }
-    LOGI("DmServiceHiChainConnector::constructor success.");
+    LOGI("success.");
 }
 
 DmServiceHiChainConnector::~DmServiceHiChainConnector()
 {
     DestroyDeviceAuthService();
-    LOGI("DmServiceHiChainConnector::destructor.");
+    LOGI("start");
 }
 
 void DmServiceHiChainConnector::onFinish(int64_t requestId, int operationCode, const char *returnData)
 {
     std::string data = (returnData != nullptr) ? std::string(returnData) : "";
-    LOGI("DmServiceHiChainConnector::onFinish reqId:%{public}" PRId64 ", operation:%{public}d",
+    LOGI("reqId:%{public}" PRId64 ", operation:%{public}d",
         requestId, operationCode);
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGI("Create group success");
@@ -149,7 +149,7 @@ void DmServiceHiChainConnector::onFinish(int64_t requestId, int operationCode, c
 void DmServiceHiChainConnector::onError(int64_t requestId, int operationCode, int errorCode, const char *errorReturn)
 {
     std::string data = (errorReturn != nullptr) ? std::string(errorReturn) : "";
-    LOGI("HichainAuthenCallBack::onError reqId:%{public}" PRId64 ", operation:%{public}d, errorCode:%{public}d.",
+    LOGI("reqId:%{public}" PRId64 ", operation:%{public}d, errorCode:%{public}d.",
         requestId, operationCode, errorCode);
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
         LOGE("Create group failed");
@@ -221,7 +221,7 @@ bool DmServiceHiChainConnector::GetGroupInfoCommon(const int32_t userId, const s
         deviceGroupManager_->destroyInfo(&groupVec);
         return false;
     }
-    LOGI("DmServiceHiChainConnector::GetGroupInfo groupNum(%{public}u)", num);
+    LOGI("groupNum(%{public}u)", num);
     std::string relatedGroups = std::string(groupVec);
     deviceGroupManager_->destroyInfo(&groupVec);
     JsonObject jsonObject(relatedGroups);
@@ -236,7 +236,7 @@ bool DmServiceHiChainConnector::GetGroupInfoCommon(const int32_t userId, const s
     std::vector<DmGroupInfo> groupInfos;
     jsonObject.Get(groupInfos);
     if (groupInfos.empty()) {
-        LOGE("DmServiceHiChainConnector::GetGroupInfo group failed, groupInfos is empty.");
+        LOGE("group failed, groupInfos is empty.");
         return false;
     }
     groupList = groupInfos;
@@ -285,7 +285,7 @@ int32_t DmServiceHiChainConnector::GetGroupIdExt(const std::string &userId, cons
 int32_t DmServiceHiChainConnector::ParseRemoteCredentialExt(const std::string &credentialInfo, std::string &params,
     std::string &groupOwner)
 {
-    LOGI("ParseRemoteCredentialExt start.");
+    LOGI("start.");
     JsonObject jsonObject(credentialInfo);
     if (jsonObject.IsDiscarded()) {
         LOGE("CredentialInfo string not a json type.");
@@ -328,7 +328,7 @@ int32_t DmServiceHiChainConnector::ParseRemoteCredentialExt(const std::string &c
 int32_t DmServiceHiChainConnector::addMultiMembersExt(const std::string &credentialInfo)
 {
     if (deviceGroupManager_ == nullptr) {
-        LOGE("DmServiceHiChainConnector::deviceGroupManager_ is nullptr.");
+        LOGE("deviceGroupManager_ is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string addParams = "";
@@ -412,7 +412,7 @@ void DmServiceHiChainConnector::DealRedundanceGroup(const std::string &userId, i
     g_groupIsRedundance = false;
     std::vector<DmGroupInfo> groupList;
     if (IsRedundanceGroup(userId, authType, groupList)) {
-        LOGI("DmServiceHiChainConnector::CreateGroup IsRedundanceGroup");
+        LOGI("IsRedundanceGroup");
         g_groupIsRedundance = true;
         for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
             if (iter->userId != userId) {
@@ -426,14 +426,14 @@ void DmServiceHiChainConnector::DealRedundanceGroup(const std::string &userId, i
 int32_t DmServiceHiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const std::string &userId,
     JsonObject &jsonOutObj)
 {
-    LOGI("DmServiceHiChainConnector::CreateGroup start.");
+    LOGI("start.");
     if (deviceGroupManager_ == nullptr) {
-        LOGE("DmServiceHiChainConnector::CreateGroup group manager is null, requestId %{public}" PRId64, requestId);
+        LOGE("group manager is null, requestId %{public}" PRId64, requestId);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     DealRedundanceGroup(userId, authType);
     networkStyle_ = CREDENTIAL_NETWORK;
-    LOGI("DmServiceHiChainConnector::CreateGroup requestId %{public}" PRId64, requestId);
+    LOGI("requestId %{public}" PRId64, requestId);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string sLocalDeviceId = localDeviceId;
@@ -479,7 +479,7 @@ int32_t DmServiceHiChainConnector::DeleteGroup(int64_t requestId_, const std::st
         LOGE("failed to get device join groups");
         return ERR_DM_FAILED;
     }
-    LOGI("DmServiceHiChainConnector::DeleteGroup groupList count = %{public}zu", groupList.size());
+    LOGI("groupList count = %{public}zu", groupList.size());
     bool userIsExist = false;
     std::string groupId = "";
     for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
@@ -585,13 +585,13 @@ int32_t DmServiceHiChainConnector::addMultiMembers(const int32_t groupType, cons
     const JsonObject &jsonDeviceList)
 {
     if (deviceGroupManager_ == nullptr) {
-        LOGE("DmServiceHiChainConnector::deviceGroupManager_ is nullptr.");
+        LOGE("deviceGroupManager_ is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string addParams;
     int32_t osAccountUserId = 0;
     if (ParseRemoteCredential(groupType, userId, jsonDeviceList, addParams, osAccountUserId) != DM_OK) {
-        LOGE("addMultiMembers ParseRemoteCredential failed!");
+        LOGE("ParseRemoteCredential failed!");
         return ERR_DM_FAILED;
     }
 
@@ -607,14 +607,14 @@ int32_t DmServiceHiChainConnector::deleteMultiMembers(const int32_t groupType, c
     const JsonObject &jsonDeviceList)
 {
     if (deviceGroupManager_ == nullptr) {
-        LOGE("DmServiceHiChainConnector::deviceGroupManager_ is nullptr.");
+        LOGE("deviceGroupManager_ is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
     std::string deleteParams;
     int32_t osAccountUserId = 0;
     if (ParseRemoteCredential(groupType, userId, jsonDeviceList, deleteParams, osAccountUserId) != DM_OK) {
-        LOGE("deleteMultiMembers ParseRemoteCredential failed!");
+        LOGE("ParseRemoteCredential failed!");
         return ERR_DM_FAILED;
     }
 

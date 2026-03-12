@@ -87,12 +87,12 @@ DmCredentialManager::DmCredentialManager(std::shared_ptr<DmServiceHiChainConnect
     : hiChainConnector_(hiChainConnector), listener_(listener)
 {
     processInfo_.userId = 0;
-    LOGI("DmCredentialManager constructor");
+    LOGI("constructor");
 }
 
 DmCredentialManager::~DmCredentialManager()
 {
-    LOGI("DmCredentialManager destructor");
+    LOGI("destructor");
 }
 
 int32_t DmCredentialManager::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
@@ -168,7 +168,7 @@ int32_t DmCredentialManager::ImportLocalCredential(const std::string &credential
     std::vector<CredentialData> vecCredentialData;
     jsonObject[FIELD_CREDENTIAL_DATA].Get(vecCredentialData);
     if (vecCredentialData.size() != 1) {
-        LOGI("ImportLocalCredential credentialData err");
+        LOGI("credentialData err");
         return ERR_DM_FAILED;
     }
     LOGI("get credentialData success!");
@@ -205,7 +205,7 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
     }
     if (!IsInt32(jsonObject, FIELD_PROCESS_TYPE) || !IsInt32(jsonObject, FIELD_AUTH_TYPE) ||
         !IsString(jsonObject, FIELD_USER_ID)) {
-        LOGE("DmCredentialManager::DeleteCredential err json string!");
+        LOGE("err json string!");
         return ERR_DM_FAILED;
     }
     int32_t processType = jsonObject[FIELD_PROCESS_TYPE].Get<int32_t>();
@@ -238,7 +238,7 @@ void DmCredentialManager::OnGroupResultExt(int32_t action, const std::string &re
 void DmCredentialManager::OnGroupResult(int64_t requestId, int32_t action,
     const std::string &resultInfo)
 {
-    LOGI("OnGroupResult");
+    LOGI("start");
     if (requestId_ != requestId) {
         return;
     }
@@ -249,7 +249,7 @@ void DmCredentialManager::OnGroupResult(int64_t requestId, int32_t action,
 int32_t DmCredentialManager::RegisterCredentialCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("DmCredentialManager::RegisterCredentialCallback input param is empty");
+        LOGE("input param is empty");
         return ERR_DM_FAILED;
     }
     int32_t userId = -1;
@@ -270,7 +270,7 @@ int32_t DmCredentialManager::RegisterCredentialCallback(const std::string &pkgNa
 int32_t DmCredentialManager::UnRegisterCredentialCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("DmCredentialManager::UnRegisterCredentialStateCallback input param is empty");
+        LOGE("input param is empty");
         return ERR_DM_FAILED;
     }
     LOGI("pkgName = %{public}s",
@@ -299,7 +299,7 @@ int32_t DmCredentialManager::GetCredentialData(const std::string &credentialInfo
         }
         if (!IsString(jsonObject, FIELD_USER_ID) || !IsString(jsonObject, FIELD_CREDENTIAL_VERSION) ||
             !IsString(jsonObject, FIELD_DEVICE_ID) || !IsString(jsonObject, FIELD_DEVICE_PK)) {
-            LOGE("DmCredentialManager::GetCredentialData err json string!");
+            LOGE("err json string!");
             return ERR_DM_FAILED;
         }
         std::string userId = jsonObject[FIELD_USER_ID].Get<std::string>();

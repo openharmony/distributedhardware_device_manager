@@ -50,13 +50,13 @@ DeviceAuthCallback g_deviceAuthCallback = {
 MineHiChainConnector::MineHiChainConnector()
 {
     Init();
-    LOGI("HiChainConnector::constructor success.");
+    LOGI("success.");
 }
 
 MineHiChainConnector::~MineHiChainConnector()
 {
     UnInit();
-    LOGI("HiChainConnector::destructor.");
+    LOGI("start");
 }
 
 void MineHiChainConnector::onFinish(int64_t requestId, int operationCode, const char *returnData)
@@ -194,7 +194,7 @@ int32_t MineHiChainConnector::CreateGroup(const std::string &reqJsonStr)
 int MineHiChainConnector::RequestCredential(std::string &returnJsonStr)
 {
     if (g_deviceGroupManager == nullptr) {
-        LOGE("HiChainConnector::g_deviceGroupManager is nullptr.");
+        LOGE("g_deviceGroupManager is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
@@ -216,7 +216,7 @@ int MineHiChainConnector::RequestCredential(std::string &returnJsonStr)
 int MineHiChainConnector::CheckCredential(std::string reqJsonStr, std::string &returnJsonStr)
 {
     if (reqJsonStr.empty() || g_deviceGroupManager == nullptr) {
-        LOGE("HiChainConnector::g_deviceGroupManager is nullptr.");
+        LOGE("reqJsonStr is empty or g_deviceGroupManager is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("start to check device credential.");

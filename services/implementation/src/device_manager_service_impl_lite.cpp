@@ -27,12 +27,12 @@ namespace DistributedHardware {
 constexpr uint32_t DEVICE_BIUND_LEVEL = 1;
 DeviceManagerServiceImpl::DeviceManagerServiceImpl()
 {
-    LOGI("DeviceManagerServiceImpl constructor");
+    LOGI("constructor");
 }
 
 DeviceManagerServiceImpl::~DeviceManagerServiceImpl()
 {
-    LOGI("DeviceManagerServiceImpl destructor");
+    LOGI("destructor");
 }
 
 int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManagerServiceListener> &listener)
@@ -204,7 +204,7 @@ int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonSt
 int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
 {
     if (pkgName.empty() || credentialInfo.empty()) {
-        LOGE("DeviceManagerServiceImpl::ImportCredential failed, pkgName is %{public}s, credentialInfo is %{public}s",
+        LOGE("pkgName is %{public}s, credentialInfo is %{public}s",
             pkgName.c_str(), GetAnonyString(credentialInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -218,7 +218,7 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
 int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
 {
     if (pkgName.empty() || deleteInfo.empty()) {
-        LOGE("DeviceManagerServiceImpl::DeleteCredential failed, pkgName is %{public}s, deleteInfo is %{public}s",
+        LOGE("pkgName is %{public}s, deleteInfo is %{public}s",
             pkgName.c_str(), GetAnonyString(deleteInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }

@@ -62,7 +62,7 @@ constexpr size_t MAX_FALLBACK_LOOPKUP_TIMES = 2;
 
 AuthSrcConfirmState::~AuthSrcConfirmState()
 {
-    LOGI("AuthSrcConfirmState destructor.");
+    LOGI("destructor.");
 }
 
 DmAuthStateType AuthSrcConfirmState::GetStateType()
@@ -838,7 +838,7 @@ DmAuthStateType AuthSinkConfirmState::GetStateType()
 
 int32_t AuthSinkConfirmState::ShowServiceBindConfigDialog(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSinkConfirmState::ShowServiceBindConfigDialog start");
+    LOGI("start");
 
     CHECK_NULL_RETURN(context, ERR_DM_INPUT_PARA_INVALID);
     int64_t serviceId = context->accessee.serviceId;
@@ -862,13 +862,13 @@ int32_t AuthSinkConfirmState::ShowServiceBindConfigDialog(std::shared_ptr<DmAuth
     jsonObj[TAG_HOST_PKGLABEL] = context->pkgLabel;
     jsonObj[PARAM_KEY_IS_SERVICE_BIND] = context->isServiceBind;
     if (!context->IsProxyBind) {
-        LOGI("ShowServiceBindConfigDialog no proxy bind.");
+        LOGI("no proxy bind.");
         JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
         JsonObject object;
         object[TAG_SERVICE_DISPLAY_NAME] = dpServiceInfo.GetServiceDisplayName();
         object[TAG_SERVICE_ID] = dpServiceInfo.GetServiceId();
         object[TAG_DESCRIPTION] = dpServiceInfo.GetDescription();
-        LOGI("ShowServiceBindConfigDialog serviceDisplayName:%{public}s, serviceId:%{public}" PRId64,
+        LOGI("serviceDisplayName:%{public}s, serviceId:%{public}" PRId64,
             dpServiceInfo.GetServiceDisplayName().c_str(), dpServiceInfo.GetServiceId());
         allProxyObj.PushBack(object);
         jsonObj[SERVICE_USER_DATA] = allProxyObj.Dump();
@@ -878,7 +878,7 @@ int32_t AuthSinkConfirmState::ShowServiceBindConfigDialog(std::shared_ptr<DmAuth
     const std::string params = jsonObj.Dump();
     DmDialogManager::GetInstance().ShowServiceBindConfirmDialog(params);
 
-    LOGI("AuthSinkConfirmState::ShowServiceBindConfigDialog end");
+    LOGI("end");
     return DM_OK;
 }
 
@@ -895,18 +895,18 @@ int32_t AuthSinkConfirmState::ShowDeviceBindConfigDialog(std::shared_ptr<DmAuthC
     const std::string params = jsonObj.Dump();
     DmDialogManager::GetInstance().ShowConfirmDialog(params);
 
-    LOGI("AuthSinkConfirmState::ShowConfigDialog end");
+    LOGI("end");
     return DM_OK;
 }
 
 int32_t AuthSinkConfirmState::ShowConfigDialog(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSinkConfirmState::ShowConfigDialog start");
+    LOGI("start");
 
     CHECK_NULL_RETURN(context, STOP_BIND);
     if (context->authType == AUTH_TYPE_PIN_ULTRASONIC &&
         context->ultrasonicInfo == DmUltrasonicInfo::DM_Ultrasonic_Invalid) {
-        LOGE("AuthSinkConfirmState::ShowConfigDialog ultrasonicInfo invalid.");
+        LOGE("ultrasonicInfo invalid.");
         return STOP_BIND;
     }
 
@@ -924,7 +924,7 @@ int32_t AuthSinkConfirmState::ShowConfigDialog(std::shared_ptr<DmAuthContext> co
             return STOP_BIND;
         }
     } else if (IsScreenLocked()) {
-        LOGE("AuthSinkConfirmState::ShowStartAuthDialog screen is locked.");
+        LOGE("screen is locked.");
         context->reason = ERR_DM_BIND_USER_CANCEL;
         CHECK_NULL_RETURN(context->authStateMachine, STOP_BIND);
         context->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
@@ -985,10 +985,10 @@ void AuthSinkConfirmState::GetBundleLabel(std::shared_ptr<DmAuthContext> context
 
 int32_t AuthSinkConfirmState::CreateServiceBindProxyData(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObj)
 {
-    LOGI("CreateServiceBindProxyData inner1");
+    LOGI("inner1");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     if (!context->IsProxyBind || context->subjectServiceOnes.empty()) {
-        LOGI("CreateServiceBindProxyData inner2");
+        LOGI("inner2");
         jsonObj[PARAM_KEY_IS_PROXY_BIND] = false;
         return DM_OK;
     }
@@ -996,7 +996,7 @@ int32_t AuthSinkConfirmState::CreateServiceBindProxyData(std::shared_ptr<DmAuthC
     JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     for (const auto &app : context->subjectServiceOnes) {
         if (!app.needBind && !app.IsNeedSetProxyRelationShip) {
-            LOGI("CreateServiceBindProxyData no need bind, serviceId:%{public}" PRId64, app.proxyAccessee.serviceId);
+            LOGI("no need bind, serviceId:%{public}" PRId64, app.proxyAccessee.serviceId);
             continue;
         }
         DistributedDeviceProfile::ServiceInfo dpServiceInfo;
@@ -1010,7 +1010,7 @@ int32_t AuthSinkConfirmState::CreateServiceBindProxyData(std::shared_ptr<DmAuthC
         object[TAG_SERVICE_DISPLAY_NAME] = dpServiceInfo.GetServiceDisplayName();
         object[TAG_SERVICE_ID] = dpServiceInfo.GetServiceId();
         object[TAG_DESCRIPTION] = dpServiceInfo.GetDescription();
-        LOGI("CreateServiceBindProxyData serviceDisplayName:%{public}s, serviceId:%{public}" PRId64,
+        LOGI("serviceDisplayName:%{public}s, serviceId:%{public}" PRId64,
             dpServiceInfo.GetServiceDisplayName().c_str(), dpServiceInfo.GetServiceId());
         allProxyObj.PushBack(object);
     }
@@ -1288,7 +1288,7 @@ void AuthSinkConfirmState::ProcessImportAuthInfo(std::shared_ptr<DmAuthContext> 
     const OHOS::DistributedDeviceProfile::LocalServiceInfo &srvInfo)
 {
     CHECK_NULL_VOID(context);
-    LOGI("AuthSinkConfirmState::ReadServiceInfo found");
+    LOGI("found");
     // ServiceInfo found
     context->serviceInfoFound = true;
     // read authBoxType
@@ -1399,11 +1399,11 @@ int32_t AuthSinkConfirmState::ProcessUserAuthorize(std::shared_ptr<DmAuthContext
     CHECK_NULL_RETURN(context->authStateMachine, ERR_DM_POINT_NULL);
     if (DmEventType::ON_USER_OPERATION !=
         context->authStateMachine->WaitExpectEvent(DmEventType::ON_USER_OPERATION)) {
-        LOGE("AuthSinkConfirmState::Action ON_USER_OPERATION err");
+        LOGE("ON_USER_OPERATION err");
         return ERR_DM_FAILED;
     }
     if (context->confirmOperation == USER_OPERATION_TYPE_CANCEL_AUTH) {
-        LOGE("AuthSinkConfirmState::Action USER_OPERATION_TYPE_CANCEL_AUTH");
+        LOGE("USER_OPERATION_TYPE_CANCEL_AUTH");
         context->reason = ERR_DM_AUTH_PEER_REJECT;
         return ERR_DM_FAILED;
     }

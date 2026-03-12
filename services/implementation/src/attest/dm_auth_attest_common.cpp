@@ -25,12 +25,12 @@ constexpr int32_t HEX_TO_UINT8 = 2;
 
 AuthAttestCommon::AuthAttestCommon()
 {
-    LOGD("AuthAttestCommon constructor");
+    LOGD("constructor");
 }
 
 AuthAttestCommon::~AuthAttestCommon()
 {
-    LOGD("AuthAttestCommon destructor");
+    LOGD("destructor");
 }
 
 std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain *chain)

@@ -49,7 +49,7 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGE("DeviceManager::InitDeviceManager completed, pkgName: %{public}s, ret = %{public}d", pkgName.c_str(),
+        LOGE("completed, pkgName: %{public}s, ret = %{public}d", pkgName.c_str(),
             ret);
         return ret;
     }
@@ -74,7 +74,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGE("DeviceManager::UnInitDeviceManager completed, pkgName: %{public}s, ret = %{public}d", pkgName.c_str(),
+        LOGE("completed, pkgName: %{public}s, ret = %{public}d", pkgName.c_str(),
             ret);
         return ret;
     }

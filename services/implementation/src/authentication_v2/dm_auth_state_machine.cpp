@@ -246,7 +246,7 @@ int32_t DmAuthStateMachine::TransitionTo(std::shared_ptr<DmAuthState> state)
         // The states after the finish status are illegal states.
         if (preState_ == DmAuthStateType::AUTH_SRC_FINISH_STATE ||
             preState_ == DmAuthStateType::AUTH_SINK_FINISH_STATE) {
-            LOGE("DmAuthStateMachine::TransitionTo next state is invalid.");
+            LOGE("next state is invalid.");
             return ERR_DM_NEXT_STATE_INVALID;
         }
         if (this->CheckStateTransitValid(nextState)) {
@@ -350,7 +350,7 @@ void DmAuthStateMachine::Run(std::shared_ptr<DmAuthContext> context)
         DmAuthStateType stateType = state.value()->GetStateType();
         int32_t ret = state.value()->Action(context);
         if (ret != DM_OK) {
-            LOGE("DmAuthStateMachine::Run err:%{public}d", ret);
+            LOGE("err:%{public}d", ret);
             if (context->reason == DM_OK) {
                 // If the context reason is not set, set action ret.
                 context->reason = ret;
@@ -362,10 +362,10 @@ void DmAuthStateMachine::Run(std::shared_ptr<DmAuthContext> context)
                 this->TransitionTo(std::make_shared<AuthSinkFinishState>());
             }
         } else {
-            LOGI("DmAuthStateMachine::Run ok state:%{public}d", stateType);
+            LOGI("ok state:%{public}d", stateType);
         }
     }
-    LOGI("DmAuthStateMachine::Run end");
+    LOGI("end");
 }
 
 std::optional<std::shared_ptr<DmAuthState>> DmAuthStateMachine::FetchAndSetCurState()
@@ -413,7 +413,7 @@ bool DmAuthStateMachine::IsWaitEvent()
 
 void DmAuthStateMachine::SetCurState(DmAuthStateType state)
 {
-    LOGI("DmAuthStateMachine::SetCurState state: %{public}d", state);
+    LOGI("state: %{public}d", state);
     curState_ = state;
 }
 

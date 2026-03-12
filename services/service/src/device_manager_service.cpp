@@ -136,7 +136,7 @@ namespace {
 //LCOV_EXCL_START
 DeviceManagerService::~DeviceManagerService()
 {
-    LOGI("DeviceManagerService destructor");
+    LOGI("destructor");
     UnloadDMServiceImplSo();
     UnloadDMServiceAdapterResident();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
@@ -148,7 +148,7 @@ int32_t DeviceManagerService::Init()
 {
     InitSoftbusListener();
     InitDMServiceListener();
-    LOGI("Init success, dm service single instance initialized.");
+    LOGI("success, dm service single instance initialized.");
 
     int32_t ret = HandleProcessRestart();
     if (ret != DM_OK) {
@@ -212,7 +212,7 @@ int32_t DeviceManagerService::InitSoftbusListener()
 
 void DeviceManagerService::InitHichainListener()
 {
-    LOGI("DeviceManagerService::InitHichainListener Start.");
+    LOGI("Start.");
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> lock(hichainListenerLock_);
 #else
@@ -293,7 +293,7 @@ void DeviceManagerService::DelAllRelateShip()
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 void DeviceManagerService::SubscribePublishCommonEvent()
 {
-    LOGI("DeviceManagerServiceImpl::SubscribeCommonEvent");
+    LOGI("start");
     PublishEventCallback callback = [=](const auto &arg1, const auto &arg2, const auto &arg3) {
         OHOS::DistributedHardware::PublishCommonEventCallback(arg1, arg2, arg3);
     };
@@ -319,7 +319,7 @@ void DeviceManagerService::SubscribePublishCommonEvent()
 #endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
 DM_EXPORT void DeviceManagerService::SubscribeDataShareCommonEvent()
 {
-    LOGI("DeviceManagerServiceImpl::SubscribeDataShareCommonEvent");
+    LOGI("start");
     if (dataShareCommonEventManager_ == nullptr) {
         dataShareCommonEventManager_ = std::make_shared<DmDataShareCommonEventManager>();
     }
@@ -568,7 +568,7 @@ int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std
         CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
         int32_t ret = softbusListener_->ShiftLNNGear(isWakeUp, callerId);
         if (ret != DM_OK) {
-            LOGE("ShiftLNNGear error, failed ret: %{public}d", ret);
+            LOGE("failed ret: %{public}d", ret);
             return ret;
         }
     }
@@ -592,7 +592,7 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
     SoftbusListener::GetUdidByNetworkId(networkId.c_str(), peerDeviceId);
     int32_t ret = DM_OK;
     if (!IsDMServiceImplReady()) {
-        LOGE("GetDeviceInfo failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
@@ -661,7 +661,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
     std::string udidHashTemp = "";
     if (ConvertUdidHashToAnoyDeviceId(localDeviceId_, udidHashTemp) == DM_OK) {
         if (memset_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN) != DM_OK) {
-            LOGE("GetLocalDeviceInfo memset_s failed.");
+            LOGE("memset_s failed.");
             return ERR_DM_FAILED;
         }
         if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, udidHashTemp.c_str(), udidHashTemp.length()) != 0) {
@@ -835,11 +835,11 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
         return ERR_DM_NO_PERMISSION;
     }
     if (pkgName.empty() || deviceId.empty() || pkgName == std::string(DM_PKG_NAME)) {
-        LOGE("DeviceManagerService::AuthenticateDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("AuthenticateDevice failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     std::string queryDeviceId = deviceId;
@@ -853,7 +853,7 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
     ConnectionAddrType addrType;
     int32_t ret = SoftbusListener::GetTargetInfoFromCache(queryDeviceId, targetId, addrType);
     if (ret != DM_OK) {
-        LOGE("AuthenticateDevice failed, cannot get target info from cached discovered device map.");
+        LOGE("cannot get target info from cached discovered device map.");
         return ERR_DM_BIND_INPUT_PARA_INVALID;
     }
     std::map<std::string, std::string> bindParam;
@@ -872,26 +872,26 @@ int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, c
     LOGI("Begin for pkgName = %{public}s, networkId = %{public}s",
         pkgName.c_str(), GetAnonyString(networkId).c_str());
     if (pkgName.empty() || networkId.empty()) {
-        LOGE("DeviceManagerService::UnAuthenticateDevice error: Invalid parameter, pkgName: %{public}s",
+        LOGE("Invalid parameter, pkgName: %{public}s",
             pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string udid = "";
     if (SoftbusListener::GetUdidByNetworkId(networkId.c_str(), udid) != DM_OK) {
-        LOGE("UnAuthenticateDevice GetUdidByNetworkId error: udid: %{public}s", GetAnonyString(udid).c_str());
+        LOGE("GetUdidByNetworkId error: udid: %{public}s", GetAnonyString(udid).c_str());
         return ERR_DM_FAILED;
     }
     char localUdid[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
     if (!IsDMServiceImplReady()) {
-        LOGE("UnAuthenticateDevice failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     uint64_t tokenId = 0;
     int32_t bindLevel = dmServiceImpl_->GetBindLevel(pkgName, std::string(localUdid), udid, tokenId);
-    LOGI("UnAuthenticateDevice get bindlevel %{public}d.", bindLevel);
+    LOGI("get bindlevel %{public}d.", bindLevel);
     if (bindLevel == INVALIED_BIND_LEVEL) {
-        LOGE("UnAuthenticateDevice failed, Acl not contain the bindLevel %{public}d.", bindLevel);
+        LOGE("Acl not contain the bindLevel %{public}d.", bindLevel);
         return ERR_DM_FAILED;
     }
     if (dmServiceImpl_->UnAuthenticateDevice(pkgName, udid, bindLevel) != DM_OK) {
@@ -913,13 +913,13 @@ int32_t DeviceManagerService::StopAuthenticateDevice(const std::string &pkgName)
         return ERR_DM_NO_PERMISSION;
     }
     if (pkgName.empty()) {
-        LOGE("DeviceManagerService::StopAuthenticateDevice error: Invalid parameter, pkgName: %{public}s",
+        LOGE("Invalid parameter, pkgName: %{public}s",
             pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Begin for pkgName = %{public}s", pkgName.c_str());
     if (!IsDMServiceImplReady()) {
-        LOGE("StopAuthenticateDevice failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     if (dmServiceImpl_->StopAuthenticateDevice(pkgName) != DM_OK) {
@@ -937,11 +937,11 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
         return ERR_DM_NO_PERMISSION;
     }
     if (pkgName.empty() || deviceId.empty() || pkgName == std::string(DM_PKG_NAME)) {
-        LOGE("DeviceManagerService::BindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("BindDevice failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     std::string queryDeviceId = deviceId;
@@ -963,7 +963,7 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
         ConnectionAddrType addrType;
         int32_t ret = SoftbusListener::GetTargetInfoFromCache(queryDeviceId, targetId, addrType);
         if (ret != DM_OK) {
-            LOGE("BindDevice failed, cannot get target info from cached discovered device map.");
+            LOGE("cannot get target info from cached discovered device map.");
             return ERR_DM_BIND_INPUT_PARA_INVALID;
         }
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_CONN_ADDR_TYPE, std::to_string(addrType)));
@@ -1175,14 +1175,14 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
 
 int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash)
 {
-    LOGI("DeviceManagerService::ValidateUnBindDeviceParams pkgName: %{public}s, udidHash: %{public}s",
+    LOGI("pkgName: %{public}s, udidHash: %{public}s",
         GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str());
     if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call UnBindDevice.");
         return ERR_DM_NO_PERMISSION;
     }
     if (pkgName.empty() || udidHash.empty() || pkgName == std::string(DM_PKG_NAME)) {
-        LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
@@ -1195,7 +1195,7 @@ int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgN
 int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash,
     const std::string &extra)
 {
-    LOGI("DeviceManagerService::ValidateUnBindDeviceParams pkgName: %{public}s, udidHash: %{public}s, "
+    LOGI("pkgName: %{public}s, udidHash: %{public}s,"
         "extra: %{public}s", GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str(),
         GetAnonyString(extra).c_str());
     if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
@@ -1203,7 +1203,7 @@ int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgN
         return ERR_DM_NO_PERMISSION;
     }
     if (pkgName.empty() || udidHash.empty() || pkgName == std::string(DM_PKG_NAME)) {
-        LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
@@ -1220,7 +1220,7 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
         return ERR_DM_NO_PERMISSION;
     }
     if (pkgName.empty() || params.empty()) {
-        LOGE("DeviceManagerService::SetUserOperation error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     JsonObject paramJson;
@@ -1233,7 +1233,7 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
     int32_t ret = ERR_DM_FAILED;
     if (metaType != PROXY_DEFAULT) {
         if (IsDMServiceAdapterSoLoaded()) {
-            LOGI("SetUserOperation metaType: %{public}d", metaType);
+            LOGI("metaType: %{public}d", metaType);
             ret = dmServiceImplExtResident_->ReplyUiAction(pkgName, action, params);
         }
     } else {
@@ -1253,7 +1253,7 @@ static std::string GetLocalDeviceUdid()
 
 void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline)
 {
-    LOGI("HandleDeviceStatusChange start.");
+    LOGI("start.");
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceStatusChange(devState, devInfo, isOnline);
     }
@@ -1279,7 +1279,7 @@ void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDe
 int DeviceManagerService::OnSessionOpened(int sessionId, int result)
 {
     if (!IsDMServiceImplReady()) {
-        LOGE("OnSessionOpened failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->OnSessionOpened(sessionId, result);
@@ -1288,7 +1288,7 @@ int DeviceManagerService::OnSessionOpened(int sessionId, int result)
 void DeviceManagerService::OnSessionClosed(int sessionId)
 {
     if (!IsDMServiceImplReady()) {
-        LOGE("OnSessionClosed failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return;
     }
     dmServiceImpl_->OnSessionClosed(sessionId);
@@ -1297,7 +1297,7 @@ void DeviceManagerService::OnSessionClosed(int sessionId)
 void DeviceManagerService::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
     if (!IsDMServiceImplReady()) {
-        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return;
     }
     dmServiceImpl_->OnBytesReceived(sessionId, data, dataLen);
@@ -1326,7 +1326,7 @@ int32_t DeviceManagerService::RequestCredential(const std::string &reqJsonStr, s
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("RequestCredential failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->RequestCredential(reqJsonStr, returnJsonStr);
@@ -1354,7 +1354,7 @@ int32_t DeviceManagerService::CheckCredential(const std::string &pkgName, const 
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("CheckCredential failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->CheckCredential(pkgName, reqJsonStr, returnJsonStr);
@@ -1369,7 +1369,7 @@ int32_t DeviceManagerService::ImportCredential(const std::string &pkgName, const
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("ImportCredential failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->ImportCredential(pkgName, reqJsonStr, returnJsonStr);
@@ -1384,7 +1384,7 @@ int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("DeleteCredential failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->DeleteCredential(pkgName, reqJsonStr, returnJsonStr);
@@ -1393,7 +1393,7 @@ int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const
 int32_t DeviceManagerService::RegisterUiStateCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("DeviceManagerService::RegisterUiStateCallback error: Invalid parameter, pkgName: %{public}s",
+        LOGE("Invalid parameter, pkgName: %{public}s",
             pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1407,7 +1407,7 @@ int32_t DeviceManagerService::RegisterUiStateCallback(const std::string &pkgName
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("RegisterUiStateCallback failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->RegisterUiStateCallback(pkgName);
@@ -1416,7 +1416,7 @@ int32_t DeviceManagerService::RegisterUiStateCallback(const std::string &pkgName
 int32_t DeviceManagerService::UnRegisterUiStateCallback(const std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("DeviceManagerService::UnRegisterUiStateCallback error: Invalid parameter, pkgName: %{public}s",
+        LOGE("Invalid parameter, pkgName: %{public}s",
             pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1430,7 +1430,7 @@ int32_t DeviceManagerService::UnRegisterUiStateCallback(const std::string &pkgNa
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("UnRegisterUiStateCallback failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->UnRegisterUiStateCallback(pkgName);
@@ -1520,7 +1520,7 @@ int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, s
 
             for (unsigned int j = 0; j < deviceList.size(); j++) {
                 HiDumpHelper::GetInstance().SetNodeInfo(deviceList[j]);
-                LOGI("DeviceManagerService::DmHiDumper SetNodeInfo.");
+                LOGI("SetNodeInfo.");
             }
         }
     }
@@ -1535,11 +1535,11 @@ int32_t DeviceManagerService::NotifyEvent(const std::string &pkgName, const int3
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("NotifyEvent failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     if (eventId == DM_NOTIFY_EVENT_ON_PINHOLDER_EVENT) {
-        LOGI("NotifyEvent on pin holder event start.");
+        LOGI("on pin holder event start.");
         CHECK_NULL_RETURN(pinHolder_, ERR_DM_POINT_NULL);
         return pinHolder_->NotifyPinHolderEvent(pkgName, event);
     }
@@ -1645,7 +1645,7 @@ int32_t DeviceManagerService::ImportAuthCode(const std::string &pkgName, const s
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("ImportAuthCode failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->ImportAuthCode(pkgName, authCode);
@@ -1667,7 +1667,7 @@ int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("ExportAuthCode failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->ExportAuthCode(authCode);
@@ -1752,7 +1752,7 @@ int32_t DeviceManagerService::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsImportAuthInfoValid(dmAuthInfo)) {
-        LOGE("error: Invalid para");
+        LOGE("Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
@@ -1761,11 +1761,11 @@ int32_t DeviceManagerService::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
     }
     int32_t ret = dmServiceImpl_->ImportAuthInfo(dmAuthInfo);
     if (ret != DM_OK) {
-        LOGE("ImportAuthInfo failed: %{public}d.", ret);
+        LOGE("failed: %{public}d.", ret);
         return ret;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->ImportAuthInfo(dmAuthInfo);
@@ -1787,7 +1787,7 @@ int32_t DeviceManagerService::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pi
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsExportAuthInfoValid(dmAuthInfo)) {
-        LOGE("error: Invalid para");
+        LOGE("Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (pinLength < DM_MIN_PINCODE_SIZE || pinLength > DM_MAX_PINCODE_SIZE) {
@@ -1795,16 +1795,16 @@ int32_t DeviceManagerService::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pi
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     int32_t ret = dmServiceImpl_->ExportAuthInfo(dmAuthInfo, pinLength);
     if (ret != DM_OK) {
-        LOGE("ExportAuthInfo failed: %{public}d.", ret);
+        LOGE("failed: %{public}d.", ret);
         return ret;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->ExportAuthInfo(dmAuthInfo);
@@ -1954,7 +1954,7 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
-        LOGI("StartDiscovering input MetaType = %{public}s", (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
+        LOGI("input MetaType = %{public}s", (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
     CHECK_NULL_RETURN(discoveryMgr_, ERR_DM_POINT_NULL);
     return discoveryMgr_->StartDiscovering(pkgName, discoverParam, filterOptions);
@@ -1977,7 +1977,7 @@ int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
         subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
     }
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
-        LOGI("StopDiscovering input MetaType = %{public}s", (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
+        LOGI("input MetaType = %{public}s", (discoverParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
     CHECK_NULL_RETURN(discoveryMgr_, ERR_DM_POINT_NULL);
     return discoveryMgr_->StopDiscovering(pkgName, subscribeId);
@@ -2041,7 +2041,7 @@ int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (advertiseParam.find(PARAM_KEY_META_TYPE) != advertiseParam.end()) {
-        LOGI("StopAdvertising input MetaType=%{public}s", (advertiseParam.find(PARAM_KEY_META_TYPE)->second).c_str());
+        LOGI("input MetaType=%{public}s", (advertiseParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
     int32_t publishId = -1;
     if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) != advertiseParam.end()) {
@@ -2054,7 +2054,7 @@ int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
 int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam)
 {
-    LOGI("DeviceManagerService::BindTarget");
+    LOGI("start");
     if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
@@ -2066,10 +2066,10 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
     }
     if (bindParam.find(PARAM_KEY_META_TYPE) == bindParam.end()) {
         if (!IsDMServiceImplReady()) {
-            LOGE("BindTarget failed, DMServiceImpl instance not init or init failed.");
+            LOGE("DMServiceImpl instance not init or init failed.");
             return ERR_DM_NOT_INIT;
         }
-        LOGI("BindTarget stardard begin.");
+        LOGI("stardard begin.");
         if (targetId.wifiIp.empty() || targetId.wifiIp.length() > IP_STR_MAX_LEN) {
             return dmServiceImpl_->BindTarget(pkgName, targetId, bindParam);
         }
@@ -2089,10 +2089,10 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("BindTarget failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    LOGI("BindTarget unstardard begin.");
+    LOGI("unstardard begin.");
     return dmServiceImplExtResident_->BindTargetExt(pkgName, targetId, bindParam);
 }
 
@@ -2109,7 +2109,7 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("UnbindTarget failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     if (unbindParam.find(PARAM_KEY_META_TYPE) == unbindParam.end()) {
@@ -2269,7 +2269,7 @@ int32_t DeviceManagerService::RegisterPinHolderCallback(const std::string &pkgNa
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DeviceManagerService::RegisterPinHolderCallback begin.");
+    LOGI("begin.");
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -2335,7 +2335,7 @@ int32_t DeviceManagerService::DpAclAdd(const std::string &udid, int64_t accessCo
     }
     LOGI("Start.");
     if (!IsDMServiceImplReady()) {
-        LOGE("DpAclAdd failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     dmServiceImpl_->DpAclAdd(udid);
@@ -2363,7 +2363,7 @@ int32_t DeviceManagerService::DpAclAdd(const std::string &udid, int64_t accessCo
             break;
         }
     }
-    LOGI("DeviceManagerService::DpAclAdd completed");
+    LOGI("completed");
     return DM_OK;
 }
 #endif
@@ -2385,7 +2385,7 @@ int32_t DeviceManagerService::GetDeviceSecurityLevel(const std::string &pkgName,
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetDeviceSecurityLevel(networkId.c_str(), securityLevel);
     if (ret != DM_OK) {
-        LOGE("GetDeviceSecurityLevel failed, ret = %{public}d", ret);
+        LOGE("ret = %{public}d", ret);
         return ret;
     }
     return DM_OK;
@@ -2399,11 +2399,11 @@ int32_t DeviceManagerService::IsSameAccount(const std::string &networkId)
     }
     std::string udid = "";
     if (SoftbusListener::GetUdidByNetworkId(networkId.c_str(), udid) != DM_OK) {
-        LOGE("DeviceManagerService::IsSameAccount error: udid: %{public}s", GetAnonyString(udid).c_str());
+        LOGE("udid: %{public}s", GetAnonyString(udid).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("IsSameAccount failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->IsSameAccount(udid);
@@ -3182,7 +3182,7 @@ void DeviceManagerService::ProcessSyncUserIds(const std::vector<uint32_t> &foreg
 
 void DeviceManagerService::ProcessUninstApp(int32_t userId, int32_t tokenId)
 {
-    LOGI("DeviceManagerService::ProcessUninstApp userId: %{public}s, tokenId: %{public}s",
+    LOGI("userId: %{public}s, tokenId: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->ProcessAppUninstall(userId, tokenId);
@@ -3192,7 +3192,7 @@ void DeviceManagerService::ProcessUninstApp(int32_t userId, int32_t tokenId)
 void DeviceManagerService::ProcessUnBindApp(int32_t userId, int32_t tokenId, const std::string &extra,
     const std::string &udid)
 {
-    LOGI("DeviceManagerService::ProcessUnBindApp userId: %{public}s, tokenId: %{public}s, udid: %{public}s",
+    LOGI("userId: %{public}s, tokenId: %{public}s, udid: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(udid).c_str());
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->ProcessUnBindApp(userId, tokenId, extra, udid);
@@ -3384,10 +3384,10 @@ void DeviceManagerService::ScreenCommonEventCallback(std::string commonEventType
         bool isLock = commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED;
         dmServiceImplExtResident_->HandleScreenLockEvent(isLock);
     } else {
-        LOGE("ScreenCommonEventCallback failed, dmServiceImplExtResident not init or init failed.");
+        LOGE("dmServiceImplExtResident not init or init failed.");
     }
     if (!IsDMImplSoLoaded()) {
-        LOGE("ScreenCommonEventCallback failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return;
     }
     dmServiceImpl_->ScreenCommonEventCallback(commonEventType);
@@ -3398,16 +3398,16 @@ void DeviceManagerService::HandleDeviceNotTrust(const std::string &msg)
 {
     LOGI("Start.");
     if (msg.empty()) {
-        LOGE("DeviceManagerService::HandleDeviceNotTrust msg is empty.");
+        LOGE("msg is empty.");
         return;
     }
     JsonObject msgJsonObj(msg);
     if (msgJsonObj.IsDiscarded()) {
-        LOGE("HandleDeviceNotTrust msg prase error.");
+        LOGE("msg prase error.");
         return;
     }
     if (!IsString(msgJsonObj, NETWORKID)) {
-        LOGE("HandleDeviceNotTrust msg not contain networkId.");
+        LOGE("msg not contain networkId.");
         return;
     }
     std::string networkId = msgJsonObj[NETWORKID].Get<std::string>();
@@ -3465,7 +3465,7 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
     int32_t timeOut = std::atoi(timeOutIter->second.c_str());
     LOGD("strategy: %{public}d, timeOut: %{public}d", policyStrategy, timeOut);
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("SetDnPolicy failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->SetDnPolicy(policyStrategy, timeOut);
@@ -3478,7 +3478,7 @@ DM_EXPORT void DeviceManagerService::ConvertUdidHashToAnoyDeviceId(
     std::string udidHashTemp = "";
     if (ConvertUdidHashToAnoyDeviceId(deviceInfo.deviceId, udidHashTemp) == DM_OK) {
         if (memset_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN) != DM_OK) {
-            LOGE("ConvertUdidHashToAnoyDeviceId memset_s failed.");
+            LOGE("memset_s failed.");
             return;
         }
         if (memcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udidHashTemp.c_str(), udidHashTemp.length()) != 0) {
@@ -3608,7 +3608,7 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
 {
     int32_t delayTime = CalculateBroadCastDelayTime();
     std::function<void()> task = [=]() {
-        LOGI("SendAppUnBindBroadCast Start.");
+        LOGI("Start.");
         RelationShipChangeMsg msg;
         msg.type = RelationShipChangeType::APP_UNBIND;
         msg.userId = static_cast<uint32_t>(userId);
@@ -3631,7 +3631,7 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
 {
     int32_t delayTime = CalculateBroadCastDelayTime();
     std::function<void()> task = [=]() {
-        LOGI("SendAppUnBindBroadCast Start.");
+        LOGI("Start.");
         RelationShipChangeMsg msg;
         msg.type = RelationShipChangeType::APP_UNBIND;
         msg.userId = static_cast<uint32_t>(userId);
@@ -3655,7 +3655,7 @@ void DeviceManagerService::SendAppUnInstallBroadCast(const std::vector<std::stri
 {
     int32_t delayTime = CalculateBroadCastDelayTime();
     std::function<void()> task = [=]() {
-        LOGI("SendAppUnInstallBroadCast Start.");
+        LOGI("Start.");
         RelationShipChangeMsg msg;
         msg.type = RelationShipChangeType::APP_UNINSTALL;
         msg.userId = static_cast<uint32_t>(userId);
@@ -3690,23 +3690,23 @@ void DeviceManagerService::HandleCredentialDeleted(const char *credId, const cha
 {
     LOGI("start.");
     if (credId == nullptr || credInfo == nullptr) {
-        LOGE("HandleCredentialDeleted credId or credInfo is nullptr.");
+        LOGE("credId or credInfo is nullptr.");
         return;
     }
     std::string localUdid = GetLocalDeviceUdid();
     if (!IsDMServiceImplReady()) {
-        LOGE("HandleCredentialDeleted failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return;
     }
     std::string remoteUdid = "";
     bool isSendBroadCast = false;
     dmServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid, isSendBroadCast);
     if (remoteUdid.empty()) {
-        LOGE("HandleCredentialDeleted failed, remoteUdid is empty.");
+        LOGE("remoteUdid is empty.");
         return;
     }
     if (!isSendBroadCast) {
-        LOGI("HandleCredentialDeleted not need to send broadcast.");
+        LOGI("not need to send broadcast.");
         return;
     }
     std::vector<std::string> peerUdids;
@@ -3884,7 +3884,7 @@ void DeviceManagerService::HandleShareUnbindBroadCast(const int32_t userId, cons
 {
     LOGI("start.");
     if (credId == "") {
-        LOGE("HandleShareUnbindBroadCast credId is null.");
+        LOGE("credId is null.");
         return;
     }
     std::string localUdid = GetLocalDeviceUdid();
@@ -4036,7 +4036,7 @@ int32_t DeviceManagerService::GetDeviceScreenStatus(const std::string &pkgName, 
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetDeviceScreenStatus(networkId.c_str(), screenStatus);
     if (ret != DM_OK) {
-        LOGE("GetDeviceScreenStatus failed, ret = %{public}d", ret);
+        LOGE("ret = %{public}d", ret);
         return ret;
     }
     return DM_OK;
@@ -4159,7 +4159,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
     if (ret != DM_OK) {
-        LOGE("failed");
+        LOGE("GetTrustedDeviceList failed");
         return ret;
     }
     if (!onlineDeviceList.empty() && IsDMServiceImplReady()) {
@@ -4184,7 +4184,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
 
 void DeviceManagerService::HandleDeviceUnBind(const char *peerUdid, const GroupInformation &groupInfo)
 {
-    LOGI("DeviceManagerService::HandleDeviceUnBind start.");
+    LOGI("start.");
     std::string localUdid = GetLocalDeviceUdid();
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceUnBind(groupInfo.groupType, std::string(peerUdid),
@@ -4213,7 +4213,7 @@ int32_t DeviceManagerService::GetAnonyLocalUdid(const std::string &pkgName, std:
 
 void DeviceManagerService::NotifyRemoteUninstallApp(int32_t userId, int32_t tokenId)
 {
-    LOGI("DeviceManagerService::NotifyRemoteUninstallApp userId: %{public}s, tokenId: %{public}s",
+    LOGI("userId: %{public}s, tokenId: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
     std::vector<std::string> peerUdids;
     int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
@@ -4264,7 +4264,7 @@ void DeviceManagerService::NotifyRemoteUninstallApp(int32_t userId, int32_t toke
 void DeviceManagerService::NotifyRemoteUninstallAppByWifi(int32_t userId, int32_t tokenId,
     const std::map<std::string, std::string> &wifiDevices)
 {
-    LOGI("DeviceManagerService::NotifyRemoteUninstallAppByWifi userId: %{public}s, tokenId: %{public}s",
+    LOGI("userId: %{public}s, tokenId: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
     for (const auto &it : wifiDevices) {
         int32_t result = SendUninstAppByWifi(userId, tokenId, it.second);
@@ -4288,7 +4288,7 @@ void DeviceManagerService::NotifyRemoteUninstallAppByWifi(int32_t userId, int32_
 void DeviceManagerService::NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
     const std::map<std::string, std::string> &wifiDevices)
 {
-    LOGI("DeviceManagerService::NotifyRemoteUnBindAppByWifi userId: %{public}s, tokenId: %{public}s, extra: %{public}s",
+    LOGI("userId: %{public}s, tokenId: %{public}s, extra: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(extra).c_str());
     for (const auto &it : wifiDevices) {
         std::string localUdid = GetLocalDeviceUdid();
@@ -4312,7 +4312,7 @@ void DeviceManagerService::NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t t
 
 void DeviceManagerService::ProcessReceiveRspAppUninstall(const std::string &remoteUdid)
 {
-    LOGI("ProcessReceiveRspAppUninstall remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
+    LOGI("remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
     std::lock_guard<std::mutex> autoLock(timerLocks_);
     if (timer_ != nullptr && remoteUdid != "") {
         timer_->DeleteTimer(std::string(APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
@@ -4321,7 +4321,7 @@ void DeviceManagerService::ProcessReceiveRspAppUninstall(const std::string &remo
 
 void DeviceManagerService::ProcessReceiveRspAppUnbind(const std::string &remoteUdid)
 {
-    LOGI("ProcessReceiveRspAppUnbind remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
+    LOGI("remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
     std::lock_guard<std::mutex> autoLock(timerLocks_);
     if (timer_ != nullptr && remoteUdid != "") {
         timer_->DeleteTimer(std::string(APP_UNBIND_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
@@ -4330,7 +4330,7 @@ void DeviceManagerService::ProcessReceiveRspAppUnbind(const std::string &remoteU
 
 void DeviceManagerService::ProcessReceiveRspSvcUnbindProxy(const std::string &remoteUdid)
 {
-    LOGI("ProcessReceiveRspSvcUnbindProxy remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
+    LOGI("remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
     std::lock_guard<std::mutex> autoLock(timerLocks_);
     if (timer_ != nullptr && remoteUdid != "") {
         timer_->DeleteTimer(std::string(SERVICE_UNBIND_PROXY_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
@@ -4339,7 +4339,7 @@ void DeviceManagerService::ProcessReceiveRspSvcUnbindProxy(const std::string &re
 
 void DeviceManagerService::ProcessUnBindServiceProxy(const UnbindServiceProxyParam &param)
 {
-    LOGI("DeviceManagerService::ProcessUnBindServiceProxy start");
+    LOGI("start");
     UnbindServiceProxyParam reverseParam;
     reverseParam.userId = param.userId;
     reverseParam.localTokenId = param.localTokenId;
@@ -4354,7 +4354,7 @@ void DeviceManagerService::ProcessUnBindServiceProxy(const UnbindServiceProxyPar
 
 int32_t DeviceManagerService::SendUninstAppByWifi(int32_t userId, int32_t tokenId, const std::string &networkId)
 {
-    LOGE("DeviceManagerService::SendUninstAppByWifi userId: %{public}s, tokenId: %{public}s",
+    LOGE("userId: %{public}s, tokenId: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
     CHECK_NULL_RETURN(DMCommTool::GetInstance(), ERR_DM_POINT_NULL);
     return DMCommTool::GetInstance()->SendUninstAppObj(userId, tokenId, networkId);
@@ -4363,7 +4363,7 @@ int32_t DeviceManagerService::SendUninstAppByWifi(int32_t userId, int32_t tokenI
 int32_t DeviceManagerService::SendUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
     const std::string &networkId, const std::string &udid)
 {
-    LOGE("DeviceManagerService::SendUnBindAppByWifi");
+    LOGE("start");
     CHECK_NULL_RETURN(DMCommTool::GetInstance(), ERR_DM_POINT_NULL);
     return DMCommTool::GetInstance()->SendUnBindAppObj(userId, tokenId, extra, networkId, udid);
 }
@@ -4608,7 +4608,7 @@ int32_t DeviceManagerService::RegisterAuthenticationType(const std::string &pkgN
     int32_t authenticationType = std::atoi(authTypeIter->second.c_str());
 
     if (!IsDMServiceImplReady()) {
-        LOGE("RegisterAuthenticationType failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_INIT_FAILED;
     }
     return dmServiceImpl_->RegisterAuthenticationType(authenticationType);
@@ -4623,7 +4623,7 @@ int32_t DeviceManagerService::GetDeviceProfileInfoList(const std::string &pkgNam
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("GetDeviceProfileInfoList failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->GetDeviceProfileInfoList(pkgName, filterOptions);
@@ -4638,7 +4638,7 @@ int32_t DeviceManagerService::GetDeviceIconInfo(const std::string &pkgName,
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("GetDeviceIconInfo failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->GetDeviceIconInfo(pkgName, filterOptions);
@@ -4714,7 +4714,7 @@ int32_t DeviceManagerService::SetLocalDeviceName(const std::string &pkgName, con
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
 #if !defined(DEVICE_MANAGER_COMMON_FLAG)
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("SetLocalDeviceName failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->SetLocalDeviceName(pkgName, deviceName);
@@ -4756,7 +4756,7 @@ int32_t DeviceManagerService::SetRemoteDeviceName(const std::string &pkgName,
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("SetRemoteDeviceName failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->SetRemoteDeviceName(pkgName, deviceId, deviceName);
@@ -4766,7 +4766,7 @@ std::vector<std::string> DeviceManagerService::GetDeviceNamePrefixs()
 {
     LOGI("In");
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("GetDeviceNamePrefixs failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return {};
     }
     return dmServiceImplExtResident_->GetDeviceNamePrefixs();
@@ -4776,7 +4776,7 @@ void DeviceManagerService::HandleNetworkConnected(int32_t networkStatus)
 {
     LOGI("In");
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("HandleNetworkConnected failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return;
     }
     dmServiceImplExtResident_->HandleNetworkConnected(networkStatus);
@@ -4823,7 +4823,7 @@ int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
     if (IsDMServiceAdapterResidentLoad()) {
         dmServiceImplExtResident_->RestoreLocalDeviceName();
     } else {
-        LOGW("RestoreLocalDeviceName fail, adapter instance not init or init failed.");
+        LOGW("fail, adapter instance not init or init failed.");
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DeviceNameManager::GetInstance().RestoreLocalDeviceName();
@@ -4955,7 +4955,7 @@ void DeviceManagerService::ProcessSyncAccountLogout(const std::string &accountId
 int32_t DeviceManagerService::OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m)
 {
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->OpenAuthSessionWithPara(deviceId, actionId, isEnable160m);
@@ -5009,7 +5009,7 @@ bool DeviceManagerService::GetAccessUdidByNetworkId(const std::string &srcNetWor
         return false;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("GetAccessUdidByNetworkId failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return false;
     }
     SoftbusListener::GetUdidByNetworkId(srcNetWorkId.c_str(), srcUdid);
@@ -5086,7 +5086,7 @@ int32_t DeviceManagerService::GetIdentificationByDeviceIds(const std::string &pk
         LOGE("Invalid parameter, pkgName is empty or deviceIdList is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("GetIdentificationByDeviceIds pkgName = %{public}s.", pkgName.c_str());
+    LOGI("pkgName = %{public}s.", pkgName.c_str());
     if (!AppManager::GetInstance().IsSystemApp()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NOT_SYSTEM_APP;
@@ -5098,7 +5098,7 @@ int32_t DeviceManagerService::GetIdentificationByDeviceIds(const std::string &pk
         return ERR_DM_NO_PERMISSION;
     }
     for (auto deviceId : deviceIdList) {
-        LOGI("GetIdentificationByDeviceIds deviceId = %{public}s.", GetAnonyString(deviceId).c_str());
+        LOGI("deviceId = %{public}s.", GetAnonyString(deviceId).c_str());
         if (deviceIdentificationMap.find(deviceId) == deviceIdentificationMap.end()) {
             std::string udidHash = "";
             std::string udid = "";
@@ -5242,7 +5242,7 @@ int32_t DeviceManagerService::BindServiceTarget(const std::string &pkgName, cons
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("BindServiceTarget failed, DMServiceImpl instance not init or init failed.");
+        LOGE("DMServiceImpl instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->BindServiceTarget(pkgName, targetId, bindParam);
@@ -5259,7 +5259,7 @@ int32_t DeviceManagerService::LeaveLNN(const std::string &pkgName, const std::st
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
-        LOGE("Failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->LeaveLNN(pkgName, networkId);
@@ -5268,7 +5268,7 @@ int32_t DeviceManagerService::LeaveLNN(const std::string &pkgName, const std::st
 int32_t DeviceManagerService::OpenAuthSessionWithPara(int64_t serviceId)
 {
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->OpenAuthSessionWithPara(serviceId);
@@ -5340,7 +5340,7 @@ int32_t DeviceManagerService::UnRegisterServiceInfo(int64_t serviceId)
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("UnRegisterServiceInfo failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
 
@@ -5364,7 +5364,7 @@ int32_t DeviceManagerService::UnRegisterServiceInfo(int64_t serviceId)
 
     int32_t ret = dmServiceImplExtResident_->UnRegisterServiceInfo(serviceId);
     if (ret != DM_OK) {
-        LOGE("UnRegisterServiceInfo failed, ret: %{public}d", ret);
+        LOGE("ret: %{public}d", ret);
         return ret;
     }
     return DM_OK;
@@ -5373,7 +5373,7 @@ int32_t DeviceManagerService::UnRegisterServiceInfo(int64_t serviceId)
 int32_t DeviceManagerService::StartPublishService(const std::string &pkgName, int64_t serviceId,
     const DmPublishServiceParam &publishServiceParam)
 {
-    LOGI("StartPublishService start, pkgName: %{public}s", pkgName.c_str());
+    LOGI("start, pkgName: %{public}s", pkgName.c_str());
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call StantPublishService.");
         return ERR_DM_NO_PERMISSION;
@@ -5383,7 +5383,7 @@ int32_t DeviceManagerService::StartPublishService(const std::string &pkgName, in
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("StartPublishService failed, instance not init or init failed.");
+        LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImplExtResident_->StartPublishService(pkgName, serviceId, publishServiceParam);
@@ -5391,7 +5391,7 @@ int32_t DeviceManagerService::StartPublishService(const std::string &pkgName, in
 
 int32_t DeviceManagerService::StopPublishService(const std::string &pkgName, int64_t serviceId)
 {
-    LOGI("StopPublishService start, pkgName: %{public}s, serviceId: %{public}" PRId64,
+    LOGI("start, pkgName: %{public}s, serviceId: %{public}" PRId64,
         pkgName.c_str(), serviceId);
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call StantPublishService.");
@@ -5401,7 +5401,7 @@ int32_t DeviceManagerService::StopPublishService(const std::string &pkgName, int
     processInfo.pkgName = pkgName;
     MultipleUserConnector::GetCallerUserId(processInfo.userId);
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("StopPublishService failed, adapter instance not init or init failed");
+        LOGE("adapter instance not init or init failed");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->StopPublishService(processInfo, serviceId);
@@ -5430,7 +5430,7 @@ int32_t DeviceManagerService::StartDiscoveryService(const std::string &pkgName, 
 int32_t DeviceManagerService::StopDiscoveryService(const std::string &pkgName,
     const DmDiscoveryServiceParam &discParam)
 {
-    LOGI("StopDiscoveryService start, pkgName: %{public}s", pkgName.c_str());
+    LOGI("start, pkgName: %{public}s", pkgName.c_str());
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call StantPublishService.");
         return ERR_DM_NO_PERMISSION;
@@ -5440,7 +5440,7 @@ int32_t DeviceManagerService::StopDiscoveryService(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("StopDiscoveryService failed, adapter instance not init or init failed");
+        LOGE("adapter instance not init or init failed");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     ProcessInfo processInfo;
@@ -5451,7 +5451,7 @@ int32_t DeviceManagerService::StopDiscoveryService(const std::string &pkgName,
 
 int32_t DeviceManagerService::RegServiceStateCallback(const std::string &pkgName, int64_t serviceId)
 {
-    LOGI("RegServiceStateCallback called.");
+    LOGI("called.");
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call GetDeviceInfo.");
         return ERR_DM_NO_PERMISSION;
@@ -5465,7 +5465,7 @@ int32_t DeviceManagerService::RegServiceStateCallback(const std::string &pkgName
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("RegServiceStateCallback failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     int32_t result = dmServiceImplExtResident_->RegisterServiceStateCallback(pkgName, serviceId);
@@ -5475,19 +5475,19 @@ int32_t DeviceManagerService::RegServiceStateCallback(const std::string &pkgName
 
 int32_t DeviceManagerService::ClearServiceStateCallback(const std::string &pkgName, int32_t userId)
 {
-    LOGI("ClearServiceStateCallback called.");
+    LOGI("called.");
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("ClearServiceStateCallback failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     int32_t result = dmServiceImplExtResident_->ClearServiceStateCallback(pkgName, userId);
-    LOGI("ClearServiceStateCallback result: %{public}d", result);
+    LOGI("result: %{public}d", result);
     return result;
 }
 
 int32_t DeviceManagerService::UnRegServiceStateCallback(const std::string &pkgName, int64_t serviceId)
 {
-    LOGI("UnRegServiceStateCallback called.");
+    LOGI("called.");
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call GetDeviceInfo.");
         return ERR_DM_NO_PERMISSION;
@@ -5501,7 +5501,7 @@ int32_t DeviceManagerService::UnRegServiceStateCallback(const std::string &pkgNa
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("UnRegServiceStateCallback failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     int32_t result = dmServiceImplExtResident_->UnRegisterServiceStateCallback(pkgName, serviceId);
@@ -5525,7 +5525,7 @@ int32_t DeviceManagerService::SyncServiceInfoByServiceId(const std::string &pkgN
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->SyncServiceInfoByServiceId(pkgName, localUserId, networkId, serviceId);
@@ -5547,7 +5547,7 @@ int32_t DeviceManagerService::SyncAllServiceInfo(const std::string &pkgName, int
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->SyncAllServiceInfo(pkgName, localUserId, networkId);
@@ -5555,7 +5555,7 @@ int32_t DeviceManagerService::SyncAllServiceInfo(const std::string &pkgName, int
 
 int32_t DeviceManagerService::GetLocalServiceInfoByServiceId(int64_t serviceId, DmRegisterServiceInfo &serviceInfo)
 {
-    LOGI("GetLocalServiceInfoByServiceId, serviceId: %{public}" PRId64, serviceId);
+    LOGI("serviceId: %{public}" PRId64, serviceId);
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
@@ -5570,22 +5570,22 @@ int32_t DeviceManagerService::GetLocalServiceInfoByServiceId(int64_t serviceId, 
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGW("GetLocalServiceInfoByServiceId fail, adapter instance not init or init failed.");
+        LOGW("fail, adapter instance not init or init failed.");
         return ERR_DM_FAILED;
     }
     int32_t ret = dmServiceImplExtResident_->GetLocalServiceInfoByServiceId(serviceId, serviceInfo);
     if (ret != DM_OK) {
-        LOGE("GetLocalServiceInfoByServiceId from resident failed, ret: %{public}d", ret);
+        LOGE("from resident failed, ret: %{public}d", ret);
         return ret;
     }
-    LOGI("GetLocalServiceInfoByServiceId success");
+    LOGI("success");
     return DM_OK;
 }
 
 int32_t DeviceManagerService::GetTrustServiceInfo(const std::string &pkgName,
     const std::map<std::string, std::string> &paramMap, std::vector<DmServiceInfo> &serviceList)
 {
-    LOGI("GetTrustServiceInfo Start");
+    LOGI("Start");
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
@@ -5599,22 +5599,22 @@ int32_t DeviceManagerService::GetTrustServiceInfo(const std::string &pkgName,
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGW("GetTrustServiceInfo fail, adapter instance not init or init failed.");
+        LOGW("fail, adapter instance not init or init failed.");
         return ERR_DM_FAILED;
     }
     int32_t ret = dmServiceImplExtResident_->GetTrustServiceInfo(pkgName, paramMap, serviceList);
     if (ret != DM_OK) {
-        LOGE("GetTrustServiceInfo from resident failed, ret: %{public}d", ret);
+        LOGE("from resident failed, ret: %{public}d", ret);
         return ret;
     }
-    LOGI("GetTrustServiceInfo success");
+    LOGI("success");
     return DM_OK;
 }
 
 int32_t DeviceManagerService::GetRegisterServiceInfo(const std::map<std::string, std::string> &param,
     std::vector<DmRegisterServiceInfo> &regServiceInfos)
 {
-    LOGI("GetRegisterServiceInfo Start");
+    LOGI("Start");
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
@@ -5625,21 +5625,21 @@ int32_t DeviceManagerService::GetRegisterServiceInfo(const std::map<std::string,
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGW("GetRegisterServiceInfo fail, adapter instance not init or init failed.");
+        LOGW("fail, adapter instance not init or init failed.");
         return ERR_DM_FAILED;
     }
     int32_t ret = dmServiceImplExtResident_->GetRegisterServiceInfo(param, regServiceInfos);
     if (ret != DM_OK) {
-        LOGE("GetRegisterServiceInfo from resident failed, ret: %{public}d", ret);
+        LOGE("from resident failed, ret: %{public}d", ret);
         return ret;
     }
-    LOGI("GetRegisterServiceInfo success");
+    LOGI("success");
     return DM_OK;
 }
 
 int32_t DeviceManagerService::UpdateServiceInfo(int64_t serviceId, const DmRegisterServiceInfo &regServiceInfo)
 {
-    LOGI("UpdateServiceInfo start.");
+    LOGI("start.");
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
@@ -5657,7 +5657,7 @@ int32_t DeviceManagerService::UpdateServiceInfo(int64_t serviceId, const DmRegis
 int32_t DeviceManagerService::GetPeerServiceInfoByServiceId(const std::string &networkId, int64_t serviceId,
     DmRegisterServiceInfo &serviceInfo)
 {
-    LOGI("GetPeerServiceInfoByServiceId, serviceId: %{public}" PRId64, serviceId);
+    LOGI("serviceId: %{public}" PRId64, serviceId);
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
@@ -5672,15 +5672,15 @@ int32_t DeviceManagerService::GetPeerServiceInfoByServiceId(const std::string &n
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGW("GetPeerServiceInfoByServiceId fail, adapter instance not init or init failed.");
+        LOGW("fail, adapter instance not init or init failed.");
         return ERR_DM_FAILED;
     }
     int32_t ret = dmServiceImplExtResident_->GetPeerServiceInfoByServiceId(networkId, serviceId, serviceInfo);
     if (ret != DM_OK) {
-        LOGE("GetPeerServiceInfoByServiceId from resident failed, ret: %{public}d", ret);
+        LOGE("from resident failed, ret: %{public}d", ret);
         return ret;
     }
-    LOGI("GetPeerServiceInfoByServiceId success");
+    LOGI("success");
     return DM_OK;
 }
 
@@ -5712,7 +5712,7 @@ void DeviceManagerService::NotifyRemoteUnbindService(const std::map<std::string,
 void DeviceManagerService::NotifyRemoteUnBindServiceByWifi(int32_t userId, uint64_t localTokenId,
     uint64_t subjectTokenId, int64_t serviceId, const std::string &netWorkId, bool isProxyUnbind)
 {
-    LOGI("NotifyRemoteUnBindServiceByWifi start.");
+    LOGI("start.");
     std::string localUdid = GetLocalDeviceUdid();
     UnbindServiceProxyParam param;
     param.userId = userId;
@@ -5725,7 +5725,7 @@ void DeviceManagerService::NotifyRemoteUnBindServiceByWifi(int32_t userId, uint6
     CHECK_NULL_VOID(DMCommTool::GetInstance());
     int32_t res = DMCommTool::GetInstance()->SendUnBindServiceProxyObj(param);
     if (res != DM_OK) {
-        LOGE("NotifyRemoteUnBindServiceByWifi failed: %{public}s", netWorkId.c_str());
+        LOGE("failed: %{public}s", netWorkId.c_str());
         return;
     }
     std::lock_guard<std::mutex> autoLock(timerLocks_);
@@ -5744,13 +5744,13 @@ int32_t DeviceManagerService::UnbindServiceTarget(const std::string &pkgName,
     const std::map<std::string, std::string> &unbindParam, const std::string &netWorkId,
     int64_t serviceId)
 {
-    LOGI("DeviceManagerService::UnbindServiceTarget start");
+    LOGI("start");
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     NotifyRemoteUnbindService(unbindParam, netWorkId, serviceId);
@@ -5758,7 +5758,7 @@ int32_t DeviceManagerService::UnbindServiceTarget(const std::string &pkgName,
         netWorkId, serviceId);
     LOGI("UnAuthenticateDevice 11 get ret %{public}d.", ret);
     if (ret != DM_OK) {
-        LOGE("UnbindServiceTarget failed, %{public}d.", ret);
+        LOGE("failed, %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -5767,7 +5767,7 @@ int32_t DeviceManagerService::UnbindServiceTarget(const std::string &pkgName,
 int32_t DeviceManagerService::GetSubjectTokenId(const std::map<std::string, std::string> &unbindParam,
     uint64_t &subjectTokenId)
 {
-    LOGI("GetSubjectTokenId start");
+    LOGI("start");
     auto it = unbindParam.find(PARAM_KEY_SUBJECT_SERVICE_ONES);
     if (it == unbindParam.end()) {
         LOGE("input unbind parameter not contains isProxyUnbind");
@@ -5796,7 +5796,7 @@ void DeviceManagerService::HandleServiceUnRegEvent(const std::string &peerUdid, 
     int64_t serviceId)
 {
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return;
     }
 
@@ -5810,7 +5810,7 @@ void DeviceManagerService::HandleServiceUnRegEvent(const std::string &peerUdid, 
 int32_t DeviceManagerService::BindServiceOnline(const ServiceStateBindParameter &bindParam)
 {
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->BindServiceOnline(bindParam);
@@ -5820,7 +5820,7 @@ int32_t DeviceManagerService::BindServiceOffline(uint64_t tokenId, const std::st
     const std::string &peerUdid, const DistributedDeviceProfile::ServiceInfo &serviceInfo)
 {
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->BindServiceOffline(tokenId, pkgName, bindType, peerUdid, serviceInfo);
@@ -5828,38 +5828,38 @@ int32_t DeviceManagerService::BindServiceOffline(uint64_t tokenId, const std::st
 
 int32_t DeviceManagerService::HandleRemoteDied(const ProcessInfo &processInfo)
 {
-    LOGI("HandleRemoteDied called, pkgName: %{public}s, userId: %{public}d",
+    LOGI("called, pkgName: %{public}s, userId: %{public}d",
         processInfo.pkgName.c_str(), processInfo.userId);
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("HandleRemoteDied failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     int32_t result = dmServiceImplExtResident_->HandleRemoteDied(processInfo);
-    LOGI("HandleRemoteDied result: %{public}d", result);
+    LOGI("result: %{public}d", result);
     return result;
 }
 
 int32_t DeviceManagerService::HandleSoftbusRestart()
 {
-    LOGI("HandleSoftbusRestart start");
+    LOGI("start");
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("HandleSoftbusRestart failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     int32_t result = dmServiceImplExtResident_->HandleSoftbusRestart();
-    LOGI("HandleSoftbusRestart result: %{public}d", result);
+    LOGI("result: %{public}d", result);
     return result;
 }
 
 int32_t DeviceManagerService::HandleServiceStatusChange(DmDeviceState devState, const std::string &peerUdid)
 {
-    LOGI("HandleServiceStatusChange start");
+    LOGI("start");
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("HandleServiceStatusChange failed, adapter instance not init or init failed.");
+        LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     int32_t result = dmServiceImplExtResident_->HandleServiceStatusChange(devState, peerUdid);
-    LOGI("HandleServiceStatusChange result: %{public}d", result);
+    LOGI("result: %{public}d", result);
     return result;
 }
 #endif

@@ -42,12 +42,12 @@ DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> sof
 {
     decisionSoName_ = "libdevicemanagerext_decision.z.so";
     StartEventThread();
-    LOGI("DmDeviceStateManager constructor");
+    LOGI("constructor");
 }
 
 DmDeviceStateManager::~DmDeviceStateManager()
 {
-    LOGI("DmDeviceStateManager destructor");
+    LOGI("destructor");
     softbusConnector_->UnRegisterSoftbusStateCallback();
     StopEventThread();
 }
@@ -62,7 +62,7 @@ int32_t DmDeviceStateManager::RegisterSoftbusStateCallback()
 
 void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
 {
-    LOGI("SaveOnlineDeviceInfo begin, deviceId = %{public}s", GetAnonyString(std::string(info.deviceId)).c_str());
+    LOGI("begin, deviceId = %{public}s", GetAnonyString(std::string(info.deviceId)).c_str());
     std::string udid;
     if (SoftbusConnector::GetUdidByNetworkId(info.networkId, udid) == DM_OK) {
         std::string uuid;
@@ -77,7 +77,7 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
             remoteDeviceInfos_[uuid] = saveInfo;
             stateDeviceInfos_[udid] = saveInfo;
         }
-        LOGI("SaveOnlineDeviceInfo complete, networkId = %{public}s, udid = %{public}s, uuid = %{public}s",
+        LOGI("complete, networkId = %{public}s, udid = %{public}s, uuid = %{public}s",
              GetAnonyString(std::string(info.networkId)).c_str(),
              GetAnonyString(udid).c_str(), GetAnonyString(uuid).c_str());
     }
@@ -149,7 +149,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
 
 void DmDeviceStateManager::OnDeviceOffline(std::string deviceId, const bool isOnline)
 {
-    LOGI("DmDeviceStateManager::OnDeviceOffline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
+    LOGI("deviceId = %{public}s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo devInfo;
     {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -158,7 +158,7 @@ void DmDeviceStateManager::OnDeviceOffline(std::string deviceId, const bool isOn
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
 #endif
         if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
-            LOGE("DmDeviceStateManager::OnDeviceOffline not find deviceId");
+            LOGE("not find deviceId");
             return;
         }
         devInfo = stateDeviceInfos_[deviceId];
@@ -199,7 +199,7 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
             ProcessDeviceStateChange(devState, devInfo, processInfoVec, isOnline);
             break;
         default:
-            LOGE("HandleDeviceStatusChange error, unknown device state = %{public}d", devState);
+            LOGE("unknown device state = %{public}d", devState);
             break;
     }
 }
@@ -219,12 +219,12 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
     std::unordered_set<int64_t> remoteServiceIds;
     for (const auto &item : remoteTokenIds) {
     }
-    LOGI("ProcessDeviceStateChange, remoteServiceIds size: %{public}zu", remoteServiceIds.size());
+    LOGI("remoteServiceIds size: %{public}zu", remoteServiceIds.size());
 
     CHECK_NULL_VOID(listener_);
     for (const auto &item : processInfoVec) {
         if (!item.pkgName.empty()) {
-            LOGI("ProcessDeviceStateChange, pkgName = %{public}s", item.pkgName.c_str());
+            LOGI("pkgName = %{public}s", item.pkgName.c_str());
             if (!remoteServiceIds.empty() && devState == DEVICE_STATE_ONLINE) {
                 std::vector<int64_t> remoteServiceIdVec(remoteServiceIds.begin(), remoteServiceIds.end());
                 listener_->OnDeviceStateChange(item, devState, devInfo, remoteServiceIdVec);
@@ -251,13 +251,13 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
 
 void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &uuid)
 {
-    LOGI("OnDbReady function is called with pkgName: %{public}s and uuid = %{public}s",
+    LOGI("function is called with pkgName: %{public}s and uuid = %{public}s",
          pkgName.c_str(), GetAnonyString(uuid).c_str());
     if (pkgName.empty() || uuid.empty()) {
         LOGE("On db ready pkgName is empty or uuid is empty");
         return;
     }
-    LOGI("OnDbReady function is called with pkgName: %{public}s and uuid = %{public}s", pkgName.c_str(),
+    LOGI("function is called with pkgName: %{public}s and uuid = %{public}s", pkgName.c_str(),
          GetAnonyString(uuid).c_str());
     DmDeviceInfo saveInfo;
     {
@@ -268,7 +268,7 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
 #endif
         auto iter = remoteDeviceInfos_.find(uuid);
         if (iter == remoteDeviceInfos_.end()) {
-            LOGE("OnDbReady complete not find uuid: %{public}s", GetAnonyString(uuid).c_str());
+            LOGE("complete not find uuid: %{public}s", GetAnonyString(uuid).c_str());
             return;
         }
         saveInfo = iter->second;
@@ -364,7 +364,7 @@ void DmDeviceStateManager::DeleteTimeOutGroup(const std::string &timerName)
     LOGI("start timerName:%{public}s", timerName.c_str());
     std::lock_guard<ffrt::mutex> mutexLock(timerMapMutex_);
     if (hiChainConnector_ == nullptr || softbusConnector_ == nullptr) {
-        LOGW("DmDeviceStateManager::DeleteTimeOutGroup hiChainConnector_ or softbusConnector_ is nullptr");
+        LOGW("hiChainConnector_ or softbusConnector_ is nullptr");
         return;
     }
     auto iter = stateTimerInfoMap_.begin();
@@ -374,7 +374,7 @@ void DmDeviceStateManager::DeleteTimeOutGroup(const std::string &timerName)
         }
     }
     if (iter == stateTimerInfoMap_.end()) {
-        LOGW("DmDeviceStateManager::DeleteTimeOutGroup not found by timerName:%{public}s", timerName.c_str());
+        LOGW("not found by timerName:%{public}s", timerName.c_str());
         return;
     }
     auto timerInfo = iter->second;
@@ -412,7 +412,7 @@ void DmDeviceStateManager::DeleteCredential(const DmOfflineParam &offlineParam, 
 
 int32_t DmDeviceStateManager::DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls)
 {
-    LOGI("DmDeviceStateManager::DeleteSkCredAndAcl start.");
+    LOGI("start.");
     int32_t ret = DM_OK;
     if (acls.empty()) {
         return ret;
@@ -432,12 +432,12 @@ int32_t DmDeviceStateManager::DeleteSkCredAndAcl(const std::vector<DmAclIdParam>
 
 void DmDeviceStateManager::DeleteCredential(const DmAclIdParam &acl)
 {
-    LOGI("DmDeviceStateManager::DeleteCredential by acl start.");
+    LOGI("by acl start.");
     CHECK_NULL_VOID(hiChainAuthConnector_);
     JsonObject credJson;
     int32_t ret = hiChainAuthConnector_->QueryCredInfoByCredId(acl.userId, acl.credId, credJson);
     if (ret != DM_OK || !credJson.Contains(acl.credId)) {
-        LOGE("DeleteCredential err, ret:%{public}d", ret);
+        LOGE("err, ret:%{public}d", ret);
         return;
     }
     if (!credJson[acl.credId].Contains(FILED_AUTHORIZED_APP_LIST)) {
@@ -499,27 +499,27 @@ void DmDeviceStateManager::DeleteOffLineTimer(const std::string &peerUdid)
 
 void DmDeviceStateManager::StartEventThread()
 {
-    LOGD("StartEventThread begin");
+    LOGD("begin");
     eventTask_.threadRunning_ = true;
     eventTask_.queueThread_ = std::thread([this]() { this->ThreadLoop(); });
-    LOGD("StartEventThread complete");
+    LOGD("complete");
 }
 
 void DmDeviceStateManager::StopEventThread()
 {
-    LOGI("StopEventThread begin");
+    LOGI("begin");
     eventTask_.threadRunning_ = false;
     eventTask_.queueCond_.notify_all();
     eventTask_.queueFullCond_.notify_all();
     if (eventTask_.queueThread_.joinable()) {
         eventTask_.queueThread_.join();
     }
-    LOGI("StopEventThread complete");
+    LOGI("complete");
 }
 
 int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
 {
-    LOGI("AddTask begin, eventId: %{public}d", task->GetEventId());
+    LOGI("begin, eventId: %{public}d", task->GetEventId());
     {
         std::unique_lock<std::mutex> lock(eventTask_.queueMtx_);
         while (eventTask_.queue_.size() >= DM_EVENT_QUEUE_CAPACITY) {
@@ -528,16 +528,16 @@ int32_t DmDeviceStateManager::AddTask(const std::shared_ptr<NotifyEvent> &task)
         eventTask_.queue_.push(task);
     }
     eventTask_.queueCond_.notify_one();
-    LOGI("AddTask complete");
+    LOGI("complete");
     return DM_OK;
 }
 
 void DmDeviceStateManager::ThreadLoop()
 {
-    LOGI("ThreadLoop begin");
+    LOGI("begin");
     int32_t ret = pthread_setname_np(pthread_self(), THREAD_LOOP);
     if (ret != DM_OK) {
-        LOGE("ThreadLoop setname failed.");
+        LOGE("setname failed.");
     }
     while (eventTask_.threadRunning_) {
         std::shared_ptr<NotifyEvent> task = nullptr;
@@ -556,21 +556,21 @@ void DmDeviceStateManager::ThreadLoop()
             RunTask(task);
         }
     }
-    LOGI("ThreadLoop end");
+    LOGI("end");
 }
 
 void DmDeviceStateManager::RunTask(const std::shared_ptr<NotifyEvent> &task)
 {
-    LOGI("RunTask begin, eventId: %{public}d", task->GetEventId());
+    LOGI("begin, eventId: %{public}d", task->GetEventId());
     if (task->GetEventId() == DM_NOTIFY_EVENT_ONDEVICEREADY) {
         OnDbReady(std::string(DM_PKG_NAME), task->GetDeviceId());
     }
-    LOGI("RunTask complete");
+    LOGI("complete");
 }
 
 DmAuthForm DmDeviceStateManager::GetAuthForm(const std::string &networkId)
 {
-    LOGI("GetAuthForm start");
+    LOGI("start");
     if (hiChainConnector_ == nullptr) {
         LOGE("hiChainConnector_ is nullptr");
         return DmAuthForm::INVALID_TYPE;
@@ -591,7 +591,7 @@ DmAuthForm DmDeviceStateManager::GetAuthForm(const std::string &networkId)
 
 void DmDeviceStateManager::SaveNotifyEventInfos(const int32_t eventId, const std::string &deviceId)
 {
-    LOGI("SaveNotifyEventInfos in, eventId: %{public}d", eventId);
+    LOGI("in, eventId: %{public}d", eventId);
     DmDeviceInfo saveInfo;
     {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -601,7 +601,7 @@ void DmDeviceStateManager::SaveNotifyEventInfos(const int32_t eventId, const std
 #endif
         auto iter = remoteDeviceInfos_.find(deviceId);
         if (iter == remoteDeviceInfos_.end()) {
-            LOGE("SaveNotifyEventInfos complete not find deviceId: %{public}s", GetAnonyString(deviceId).c_str());
+            LOGE("complete not find deviceId: %{public}s", GetAnonyString(deviceId).c_str());
             return;
         }
         saveInfo = iter->second;
@@ -620,7 +620,7 @@ void DmDeviceStateManager::GetNotifyEventInfos(std::vector<DmDeviceInfo> &device
 
 int32_t DmDeviceStateManager::ProcNotifyEvent(const int32_t eventId, const std::string &deviceId)
 {
-    LOGI("ProcNotifyEvent in, eventId: %{public}d", eventId);
+    LOGI("in, eventId: %{public}d", eventId);
     return AddTask(std::make_shared<NotifyEvent>(eventId, deviceId));
 }
 
@@ -635,12 +635,12 @@ void DmDeviceStateManager::ChangeDeviceInfo(const DmDeviceInfo &info)
         if (std::string(iter.second.deviceId) == std::string(info.deviceId)) {
             if (memcpy_s(iter.second.deviceName, sizeof(iter.second.deviceName), info.deviceName,
                          sizeof(info.deviceName)) != DM_OK) {
-                    LOGE("ChangeDeviceInfo remoteDeviceInfos copy deviceName failed");
+                    LOGE("remoteDeviceInfos copy deviceName failed");
                     return;
             }
             if (memcpy_s(iter.second.networkId, sizeof(iter.second.networkId), info.networkId,
                          sizeof(info.networkId)) != DM_OK) {
-                    LOGE("ChangeDeviceInfo remoteDeviceInfos copy networkId failed");
+                    LOGE("remoteDeviceInfos copy networkId failed");
                     return;
             }
             iter.second.deviceTypeId = info.deviceTypeId;
@@ -652,12 +652,12 @@ void DmDeviceStateManager::ChangeDeviceInfo(const DmDeviceInfo &info)
         if (std::string(iter.second.deviceId) == std::string(info.deviceId)) {
             if (memcpy_s(iter.second.deviceName, sizeof(iter.second.deviceName), info.deviceName,
                          sizeof(info.deviceName)) != DM_OK) {
-                    LOGE("ChangeDeviceInfo stateDeviceInfos copy deviceName failed");
+                    LOGE("stateDeviceInfos copy deviceName failed");
                     return;
             }
             if (memcpy_s(iter.second.networkId, sizeof(iter.second.networkId), info.networkId,
                          sizeof(info.networkId)) != DM_OK) {
-                    LOGE("ChangeDeviceInfo stateDeviceInfos copy networkId failed");
+                    LOGE("stateDeviceInfos copy networkId failed");
                     return;
             }
             iter.second.deviceTypeId = info.deviceTypeId;
@@ -691,7 +691,7 @@ int32_t DmDeviceStateManager::DeleteGroupByDP(const std::string &peerUdid, int32
 {
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAccessControlProfileByUserId(localUserId);
-    LOGI("DeleteGroupByDP, AccessControlProfile size is %{public}zu", profiles.size());
+    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     std::vector<std::string> delPkgNameVec;
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() != peerUdid || item.GetAuthenticationType() != ALLOW_AUTH_ONCE) {
@@ -722,7 +722,7 @@ int32_t DmDeviceStateManager::DeleteGroupByDP(const std::string &peerUdid, int32
         for (auto &pkgName : delPkgNameVec) {
             if (iter.groupName.find(pkgName) != std::string::npos) {
                 int32_t ret = hiChainConnector_->DeleteGroupExt(localUserId, iter.groupId);
-                LOGI("DeleteGroupByDP delete groupId %{public}s ,result %{public}d.",
+                LOGI("delete groupId %{public}s ,result %{public}d.",
                     GetAnonyString(iter.groupId).c_str(), ret);
             }
         }
@@ -760,7 +760,7 @@ void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo,
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DmDeviceStateManager::StartDelTimerByDP(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId)
 {
-    LOGI("StartDelTimerByDP for peerUdid:%{public}s, peerUserId:%{public}d, localUserId:%{public}d",
+    LOGI("peerUdid:%{public}s, peerUserId:%{public}d, localUserId:%{public}d",
         GetAnonyString(peerUdid).c_str(), peerUserId, localUserId);
     std::lock_guard<ffrt::mutex> mutexLock(timerMapMutex_);
     std::string key = peerUdid + "_" + std::to_string(peerUserId) + "_" +  std::to_string(localUserId);

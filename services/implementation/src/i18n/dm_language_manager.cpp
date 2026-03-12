@@ -49,7 +49,7 @@ std::string DmLanguageManager::GetSystemParam(const std::string &key)
     char value[MAX_LEN] = {0};
     int32_t ret = GetParameter(key.c_str(), "", value, MAX_LEN);
     if (ret <= 0) {
-        LOGE("GetSystemParam %{public}s failed", key.c_str());
+        LOGE("%{public}s failed", key.c_str());
         return "";
     }
     return std::string(value);

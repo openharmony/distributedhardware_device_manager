@@ -36,7 +36,7 @@ DeviceManagerImplMini &DeviceManagerImplMini::GetInstance()
 int32_t DeviceManagerImplMini::InitDeviceManager(const std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("InitDeviceManager error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
+        LOGE("Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
@@ -50,12 +50,12 @@ int32_t DeviceManagerImplMini::InitDeviceManager(const std::string &pkgName)
         usleep(USLEEP_TIME_US_100000);
         retryNum++;
         if (retryNum == SERVICE_INIT_MAX_NUM) {
-            LOGE("InitDeviceManager error, wait for device manager service starting timeout.");
+            LOGE("wait for device manager service starting timeout.");
             return ERR_DM_NOT_INIT;
         }
     }
     if (ret != DM_OK) {
-        LOGE("InitDeviceManager error, proxy init failed ret: %{public}d", ret);
+        LOGE("proxy init failed ret: %{public}d", ret);
         return ERR_DM_INIT_FAILED;
     }
     LOGI("Success");
@@ -65,13 +65,13 @@ int32_t DeviceManagerImplMini::InitDeviceManager(const std::string &pkgName)
 int32_t DeviceManagerImplMini::UnInitDeviceManager(const std::string &pkgName)
 {
     if (pkgName.empty()) {
-        LOGE("UnInitDeviceManager Invalid parameter, pkgName is empty.");
+        LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
     int32_t ret = ipcClientProxy_->UnInit(pkgName);
     if (ret != DM_OK) {
-        LOGE("UnInitDeviceManager error, proxy unInit failed ret: %{public}d", ret);
+        LOGE("proxy unInit failed ret: %{public}d", ret);
         return ERR_DM_FAILED;
     }
     LOGI("Success");
@@ -83,7 +83,7 @@ int32_t DeviceManagerImplMini::OnDmServiceDied()
     LOGI("Start");
     int32_t ret = ipcClientProxy_->OnDmServiceDied();
     if (ret != DM_OK) {
-        LOGE("OnDmServiceDied failed, ret: %{public}d", ret);
+        LOGE("ret: %{public}d", ret);
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -99,12 +99,12 @@ int32_t DeviceManagerImplMini::GetLocalDisplayDeviceName(const std::string &pkgN
     req->SetMaxNameLength(maxNameLength);
     int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DISPLAY_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
-        LOGE("error: Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGE("error: Failed with ret %{public}d", ret);
+        LOGE("Failed with ret %{public}d", ret);
         return ret;
     }
     displayName = rsp->GetDisplayName();

@@ -77,7 +77,7 @@ int32_t DeviceFilterOption::ParseFilterOptionJson(const std::string &str)
 {
     JsonObject object(str);
     if (object.IsDiscarded()) {
-        LOGE("ParseFilterOptionJson parse error.");
+        LOGE("parse error.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     filterOp_ = FILTERS_TYPE_AND;
@@ -113,7 +113,7 @@ int32_t DeviceFilterOption::ParseFilterOptionJson(const std::string &str)
 int32_t DeviceFilterOption::TransformToFilter(const std::string &filterOptions)
 {
     if (filterOptions.empty()) {
-        LOGI("DeviceFilterOption::filterOptions empty");
+        LOGI("empty");
         filterOp_ = FILTERS_TYPE_OR;
         DeviceFilters deviceFilters;
         deviceFilters.type = "credible";
@@ -127,7 +127,7 @@ int32_t DeviceFilterOption::TransformToFilter(const std::string &filterOptions)
 int32_t DeviceFilterOption::TransformFilterOption(const std::string &filterOptions)
 {
     if (filterOptions.empty()) {
-        LOGI("DeviceFilterOption::filterOptions empty");
+        LOGI("empty");
         filterOp_ = FILTERS_TYPE_OR;
         DeviceFilters deviceFilters;
         deviceFilters.type = "credible";

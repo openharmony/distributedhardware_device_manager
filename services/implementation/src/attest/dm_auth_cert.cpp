@@ -25,12 +25,12 @@ constexpr const char* LIB_DM_AUTH_CERT = "libdm_auth_cert.z.so";
 
 AuthCert::AuthCert()
 {
-    LOGD("AuthCert AuthCert");
+    LOGD("constructor");
 }
 
 AuthCert::~AuthCert()
 {
-    LOGD("AuthCert destructor");
+    LOGD("destructor");
     if (authCertSoHandle_ != nullptr) {
         LOGI("dm auth cert authCertSoHandle_ is not nullptr.");
         dlclose(authCertSoHandle_);

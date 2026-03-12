@@ -49,7 +49,7 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
     std::vector<int> ids;
     ErrCode ret = OsAccountManager::QueryActiveOsAccountIds(ids);
     if (ret != 0 || ids.empty()) {
-        LOGE("GetCurrentAccountUserID error ret: %{public}d", ret);
+        LOGE("error ret: %{public}d", ret);
         return -1;
     }
     return ids[0];
@@ -82,7 +82,7 @@ DM_EXPORT std::string MultipleUserConnector::GetOhosAccountId(void)
     OhosAccountInfo accountInfo;
     ErrCode ret = OhosAccountKits::GetInstance().GetOhosAccountInfo(accountInfo);
     if (ret != 0 || accountInfo.uid_ == "") {
-        LOGE("GetOhosAccountId error ret: %{public}d", ret);
+        LOGE("error ret: %{public}d", ret);
         return "";
     }
     return accountInfo.uid_;
@@ -376,7 +376,7 @@ bool MultipleUserConnector::IsUserUnlocked(int32_t userId)
     bool isUserUnlocked = false;
     ErrCode ret = OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
     if (ret != 0) {
-        LOGE("IsUserUnlocked error ret: %{public}d", ret);
+        LOGE("error ret: %{public}d", ret);
         return false;
     }
     return isUserUnlocked;

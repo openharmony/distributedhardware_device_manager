@@ -209,7 +209,7 @@ bool CheckArgsType(napi_env env, bool assertion, const std::string &paramName, c
 
 napi_value CreateErrorForCall(napi_env env, int32_t code, const std::string &errMsg, bool isAsync)
 {
-    LOGI("CreateErrorForCall code:%{public}d, message:%{public}s", code, errMsg.c_str());
+    LOGI("code:%{public}d, message:%{public}s", code, errMsg.c_str());
     napi_value error = nullptr;
     if (isAsync) {
         napi_throw_error(env, std::to_string(code).c_str(), errMsg.c_str());
@@ -506,7 +506,7 @@ void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::st
         jsonObj["deviceType"] = deviceType;
     }
     extra = jsonObj.Dump();
-    LOGI("JsToDmDiscoveryExtra, extra :%{public}s", extra.c_str());
+    LOGI("extra :%{public}s", extra.c_str());
 }
 
 void JsToDiscoveryParam(const napi_env &env, const napi_value &object,
@@ -699,7 +699,7 @@ void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServ
         SetValueUtf8String(env, "data", jsonObj.Dump(), item);
         napi_status status = napi_set_element(env, arrayResult, i, item);
         if (status != napi_ok) {
-            LOGE("DmServiceProfileInfoToJsArray To JsArray set element error: %{public}d", status);
+            LOGE("To JsArray set element error: %{public}d", status);
         }
     }
 }

@@ -28,7 +28,7 @@ constexpr const char* TIMER_TASK = "TimerTask";
 
 DmTimer::DmTimer()
 {
-    LOGI("DmTimer constructor");
+    LOGI("constructor");
     if (queue_ != nullptr) {
         LOGI("Timer is already init.");
         return;
@@ -38,7 +38,7 @@ DmTimer::DmTimer()
 
 DmTimer::~DmTimer()
 {
-    LOGI("DmTimer destructor");
+    LOGI("destructor");
     DeleteAll();
 }
 

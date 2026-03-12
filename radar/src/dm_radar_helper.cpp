@@ -97,7 +97,7 @@ bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
             DM_DISCOVER_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     }
     if (res != DM_OK) {
-        LOGE("ReportDiscoverRegCallback error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -170,7 +170,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
             DM_DISCOVER_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     }
     if (res != DM_OK) {
-        LOGE("ReportDiscoverResCallback error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -260,7 +260,7 @@ bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo info)
         res = ReportDiscoverUserResStageOther(info);
     }
     if (res != DM_OK) {
-        LOGE("ReportDiscoverUserRes error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -295,7 +295,7 @@ bool DmRadarHelper::ReportAuthStart(const std::string &peerUdid, const std::stri
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
         DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     if (res != DM_OK) {
-        LOGE("ReportAuthStart error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -366,7 +366,7 @@ bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo &info)
             DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthOpenSession error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -393,7 +393,7 @@ bool DmRadarHelper::ReportAuthSessionOpenCb(struct RadarInfo &info)
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
         DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     if (res != DM_OK) {
-        LOGE("ReportAuthSessionOpenCb error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -445,7 +445,7 @@ bool DmRadarHelper::ReportAuthPullAuthBox(struct RadarInfo &info)
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
         DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     if (res != DM_OK) {
-        LOGE("ReportAuthPullAuthBox error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -487,7 +487,7 @@ bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo &info)
             DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthConfirmBox error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -542,7 +542,7 @@ bool DmRadarHelper::ReportAuthCreateGroup(struct RadarInfo &info)
             DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthCreateGroup error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -589,7 +589,7 @@ bool DmRadarHelper::ReportAuthCreateGroupCb(std::string funcName, int32_t stageR
             DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthCreateGroupCb error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -611,7 +611,7 @@ bool DmRadarHelper::ReportAuthPullPinBox(struct RadarInfo &info)
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
         DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     if (res != DM_OK) {
-        LOGE("ReportAuthPullPinBox error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -653,7 +653,7 @@ bool DmRadarHelper::ReportAuthInputPinBox(struct RadarInfo &info)
             DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthInputPinBox error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -714,7 +714,7 @@ bool DmRadarHelper::ReportAuthAddGroup(struct RadarInfo &info)
             DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthAddGroup error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -763,7 +763,7 @@ bool DmRadarHelper::ReportAuthAddGroupCb(std::string funcName, int32_t stageRes)
             DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     }
     if (res != DM_OK) {
-        LOGE("ReportAuthAddGroupCb error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -793,7 +793,7 @@ bool DmRadarHelper::ReportNetworkOnline(struct RadarInfo &info)
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
         DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     if (res != DM_OK) {
-        LOGE("ReportNetworkOnline error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -822,7 +822,7 @@ bool DmRadarHelper::ReportNetworkOffline(struct RadarInfo &info)
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
         DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     if (res != DM_OK) {
-        LOGE("ReportNetworkOffline error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -857,7 +857,7 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
         DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     if (res != DM_OK) {
-        LOGE("ReportDeleteTrustRelation error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return false;
     }
     return true;
@@ -1067,13 +1067,13 @@ void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string f
             OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
             DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
         if (res != DM_OK) {
-            LOGE("ReportSendOrReceiveHolderMsg error, res:%{public}d", res);
+            LOGE("res:%{public}d", res);
             return;
         }
     } else {
         res = ReportSendOrReceiveHolderMsgStageOther(bizStage, funcName, peerUdid);
         if (res != DM_OK) {
-            LOGE("ReportSendOrReceiveHolderMsg error, res:%{public}d", res);
+            LOGE("res:%{public}d", res);
             return;
         }
     }
@@ -1155,7 +1155,7 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
             deviceInfoList, errCode, localUdid, discoverDevList);
     }
     if (res != DM_OK) {
-        LOGE("ReportGetTrustDeviceList error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return;
     }
 }
@@ -1219,7 +1219,7 @@ void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName,
             DM_AUTHCATION_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
     }
     if (res != DM_OK) {
-        LOGE("ReportDmBehavior error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return;
     }
 }
@@ -1297,7 +1297,7 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
         }
     }
     if (res != DM_OK) {
-        LOGE("ReportGetLocalDevInfo error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return;
     }
 }
@@ -1376,7 +1376,7 @@ void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
         }
     }
     if (res != DM_OK) {
-        LOGE("ReportGetDeviceInfo error, res:%{public}d", res);
+        LOGE("res:%{public}d", res);
         return;
     }
 }
@@ -1449,7 +1449,7 @@ int32_t DmRadarHelper::GetApiType()
 {
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
-        LOGE("GetApiType GetCallingTokenID error.");
+        LOGE("GetCallingTokenID error.");
         return static_cast<int32_t>(ApiType::API_UNKNOW);
     }
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);

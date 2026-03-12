@@ -27,11 +27,11 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
                                    size_t buffLen)
 {
     if (pBaseReq == nullptr) {
-        LOGE("IpcCmdRegister::SetRequest pBaseReq is nullptr!");
+        LOGE("pBaseReq is nullptr!");
         return ERR_DM_POINT_NULL;
     }
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
+        LOGE("cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     auto setRequestMapIter = setIpcRequestFuncMap_.find(cmdCode);
@@ -55,7 +55,7 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, IpcIo &reply, std::shared_
 int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, IpcIo &reply)
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcCmdRegister::OnIpcCmd cmdCode param invalid!");
+        LOGE("cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     auto onIpcCmdMapIter = onIpcCmdFuncMap_.find(cmdCode);

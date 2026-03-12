@@ -48,7 +48,7 @@ namespace {
 
 int32_t KVAdapter::Init()
 {
-    LOGI("Init local DB, dataType: %{public}d", static_cast<int32_t>(dataType_));
+    LOGI("local DB, dataType: %{public}d", static_cast<int32_t>(dataType_));
     if (isInited_.load()) {
         LOGI("Local DB already inited.");
         return DM_OK;
@@ -60,7 +60,7 @@ int32_t KVAdapter::Init()
     while (tryTimes > 0) {
         DistributedKv::Status status = GetLocalKvStorePtr();
         if (status == DistributedKv::Status::SUCCESS && kvStorePtr_) {
-            LOGI("Init KvStorePtr Success");
+            LOGI("KvStorePtr Success");
             isInited_.store(true);
             return DM_OK;
         }
@@ -113,7 +113,7 @@ int32_t KVAdapter::Put(const std::string &key, const std::string &value)
         status = kvStorePtr_->Put(kvKey, kvValue);
     }
     if (status != DistributedKv::Status::SUCCESS) {
-        LOGE("Put kv to db failed, ret: %{public}d", status);
+        LOGE("kv to db failed, ret: %{public}d", status);
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -121,7 +121,7 @@ int32_t KVAdapter::Put(const std::string &key, const std::string &value)
 
 int32_t KVAdapter::Get(const std::string &key, std::string &value)
 {
-    LOGI("Get data by key: %{public}s", GetAnonyString(key).c_str());
+    LOGI("data by key: %{public}s", GetAnonyString(key).c_str());
     DistributedKv::Key kvKey(key);
     DistributedKv::Value kvValue;
     DistributedKv::Status status;
@@ -131,7 +131,7 @@ int32_t KVAdapter::Get(const std::string &key, std::string &value)
         status = kvStorePtr_->Get(kvKey, kvValue);
     }
     if (status != DistributedKv::Status::SUCCESS) {
-        LOGE("Get data from kv failed, key: %{public}s", GetAnonyString(key).c_str());
+        LOGE("data from kv failed, key: %{public}s", GetAnonyString(key).c_str());
         return ERR_DM_FAILED;
     }
     value = kvValue.ToString();
@@ -219,7 +219,7 @@ int32_t KVAdapter::DeleteBatch(const std::vector<std::string> &keys)
         for (auto delKeys : delKeyBatches) {
             DistributedKv::Status status = kvStorePtr_->DeleteBatch(delKeys);
             if (status != DistributedKv::Status::SUCCESS) {
-                LOGE("DeleteBatch failed!");
+                LOGE("failed!");
                 return ERR_DM_FAILED;
             }
         }
@@ -240,7 +240,7 @@ int32_t KVAdapter::Delete(const std::string& key)
         status = kvStorePtr_->Delete(kvKey);
     }
     if (status != DistributedKv::Status::SUCCESS) {
-        LOGE("Delete kv by key failed!");
+        LOGE("kv by key failed!");
         return ERR_DM_FAILED;
     }
     return DM_OK;

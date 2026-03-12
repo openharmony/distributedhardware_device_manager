@@ -130,7 +130,7 @@ bool PermissionManager::CheckMonitorPermission(void)
 {
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
-        LOGE("CheckMonitorPermission GetCallingTokenID error.");
+        LOGE("GetCallingTokenID error.");
         return false;
     }
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
@@ -154,7 +154,7 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
 {
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
-        LOGE("GetCallerProcessName GetCallingTokenID error.");
+        LOGE("GetCallingTokenID error.");
         return ERR_DM_FAILED;
     }
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
@@ -167,7 +167,7 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
         processName = std::move(tokenInfo.bundleName);
         uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
         if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId)) {
-            LOGE("GetCallerProcessName %{public}s not system hap.", processName.c_str());
+            LOGE("%{public}s not system hap.", processName.c_str());
             return ERR_DM_FAILED;
         }
     } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
@@ -178,7 +178,7 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
         }
         processName = std::move(tokenInfo.processName);
     } else {
-        LOGE("GetCallerProcessName failed, unsupported process.");
+        LOGE("unsupported process.");
         return ERR_DM_FAILED;
     }
 
@@ -386,7 +386,7 @@ bool PermissionManager::CheckReadLocalDeviceName(void)
 {
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
-        LOGE("CheckReadLocalDeviceName GetCallingTokenID error.");
+        LOGE("GetCallingTokenID error.");
         return false;
     }
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);

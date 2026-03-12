@@ -43,7 +43,7 @@ constexpr uint32_t KEY_BITS_UNIT = 8;
 constexpr uint32_t HEX_TO_UINT8 = 2;
 CryptoMgr::CryptoMgr()
 {
-    LOGI("CryptoMgr ctor");
+    LOGI("ctor");
 }
 
 CryptoMgr::~CryptoMgr()

@@ -112,7 +112,7 @@ if (defined(ohos_lite)) {
       defines = [
         "LITE_DEVICE",
         "HI_LOG_ENABLE",
-        "DH_LOG_TAG=\"devicemanagerkit\"",
+        "DH_LOG_TAG=\"dmkit\"",
         "LOG_DOMAIN=0xD004111",
       ]
 
@@ -196,7 +196,7 @@ if (defined(ohos_lite)) {
 
     defines = [
       "HI_LOG_ENABLE",
-      "DH_LOG_TAG=\"devicemanagerkit\"",
+      "DH_LOG_TAG=\"dmkit\"",
       "LOG_DOMAIN=0xD004111",
     ]
 

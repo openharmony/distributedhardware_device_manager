@@ -34,7 +34,7 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
     }
 
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
+        LOGE("cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     SetIpcRequestFunc ptr = nullptr;
@@ -47,7 +47,7 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
         }
         ptr = setRequestMapIter->second;
         if (ptr == nullptr) {
-            LOGE("IpcCmdRegister::SetRequest setRequestMapIter->second is null");
+            LOGE("setRequestMapIter->second is null");
             return ERR_DM_POINT_NULL;
         }
     }
@@ -57,7 +57,7 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
 int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcCmdRegister::ReadResponse cmdCode param invalid!");
+        LOGE("cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     ReadResponseFunc ptr = nullptr;
@@ -70,7 +70,7 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std:
         }
         ptr = readResponseMapIter->second;
         if (ptr == nullptr) {
-            LOGE("IpcCmdRegister::ReadResponse readResponseMapIter->second is null");
+            LOGE("readResponseMapIter->second is null");
             return ERR_DM_POINT_NULL;
         }
     }
@@ -80,7 +80,7 @@ int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std:
 int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessageParcel &reply)
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcCmdRegister::OnIpcCmd cmdCode param invalid!");
+        LOGE("cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     OnIpcCmdFunc ptr = nullptr;
@@ -93,7 +93,7 @@ int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessagePa
         }
         ptr = onIpcCmdMapIter->second;
         if (ptr == nullptr) {
-            LOGE("IpcCmdRegister::OnIpcCmd onIpcCmdMapIter->second is null");
+            LOGE("onIpcCmdMapIter->second is null");
             return ERR_DM_POINT_NULL;
         }
     }

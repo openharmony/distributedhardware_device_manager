@@ -91,7 +91,7 @@ void AuthConfirmTest::TearDownTestCase()
 
 void AuthConfirmTest::SetUp()
 {
-    LOGI("AuthConfirmTest::SetUp start.");
+    LOGI("start.");
     softbusConnector = std::make_shared<SoftbusConnector>();
     listener = std::make_shared<DeviceManagerServiceListener>();
     hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
@@ -100,7 +100,7 @@ void AuthConfirmTest::SetUp()
 
 void AuthConfirmTest::TearDown()
 {
-    LOGI("AuthConfirmTest::TearDown start.");
+    LOGI("start.");
     softbusConnector = nullptr;
     listener = nullptr;
     hiChainAuthConnector = nullptr;

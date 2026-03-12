@@ -174,7 +174,7 @@ int32_t DeviceManagerFfiImpl::ReleaseDeviceManager()
     int ret = DeviceManager::GetInstance().UnInitDeviceManager(bundleName_);
     if (ret != 0) {
         ret = TransformErrCode(ret);
-        LOGE("ReleaseDeviceManager for bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
+        LOGE("bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
         return ret;
     }
     ClearBundleCallbacks();
@@ -251,10 +251,10 @@ int32_t DeviceManagerFfiImpl::GetLocalDeviceNetworkId(const char *&networkId)
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceNetWorkId(bundleName_, result);
     if (ret != 0) {
         ret = TransformErrCode(ret);
-        LOGE("GetLocalDeviceNetworkId for failed, ret %{public}d", ret);
+        LOGE("ret %{public}d", ret);
         return ret;
     }
-    LOGI("DeviceManager::GetLocalDeviceNetworkId networkId:%{public}s", GetAnonyString(result).c_str());
+    LOGI("networkId:%{public}s", GetAnonyString(result).c_str());
 
     networkId = MallocCStr(result.c_str());
     if (networkId == nullptr) {
@@ -273,10 +273,10 @@ int32_t DeviceManagerFfiImpl::GetLocalDeviceName(const char *&deviceName)
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceName(bundleName_, result);
     if (ret != 0) {
         ret = TransformErrCode(ret);
-        LOGE("GetLocalDeviceName for failed, ret %{public}d", ret);
+        LOGE("ret %{public}d", ret);
         return ret;
     }
-    LOGI("DeviceManager::GetLocalDeviceName deviceName:%{public}s", GetAnonyString(result).c_str());
+    LOGI("deviceName:%{public}s", GetAnonyString(result).c_str());
 
     deviceName = MallocCStr(result.c_str());
     if (deviceName == nullptr) {
@@ -294,10 +294,10 @@ int32_t DeviceManagerFfiImpl::GetLocalDeviceType(int32_t &deviceType)
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceType(bundleName_, deviceType);
     if (ret != 0) {
         ret = TransformErrCode(ret);
-        LOGE("GetLocalDeviceType for failed, ret %{public}d", ret);
+        LOGE("ret %{public}d", ret);
         return ret;
     }
-    LOGI("DeviceManager::GetLocalDeviceType deviceType:%{public}d", deviceType);
+    LOGI("deviceType:%{public}d", deviceType);
     return ERR_OK;
 }
 
@@ -311,10 +311,10 @@ int32_t DeviceManagerFfiImpl::GetLocalDeviceId(const char *&deviceId)
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceId(bundleName_, result);
     if (ret != 0) {
         ret = TransformErrCode(ret);
-        LOGE("GetLocalDeviceId for failed, ret %{public}d", ret);
+        LOGE("ret %{public}d", ret);
         return ret;
     }
-    LOGI("DeviceManager::GetLocalDeviceId deviceId:%{public}s", GetAnonyString(result).c_str());
+    LOGI("deviceId:%{public}s", GetAnonyString(result).c_str());
 
     deviceId = MallocCStr(result.c_str());
     if (deviceId == nullptr) {
@@ -331,13 +331,13 @@ int32_t DeviceManagerFfiImpl::GetDeviceName(const std::string &networkId, const 
     }
     std::string result;
     ret = DeviceManager::GetInstance().GetDeviceName(bundleName_, networkId, result);
-    LOGI("DeviceManager::GetDeviceName getinstance return.");
+    LOGI("getinstance return.");
     if (ret != 0) {
         ret = TransformErrCode(ret);
-        LOGE("GetDeviceName for failed, ret %{public}d", ret);
+        LOGE("ret %{public}d", ret);
         return ret;
     }
-    LOGI("DeviceManager::GetDeviceName deviceName:%{public}s", GetAnonyString(result).c_str());
+    LOGI("deviceName:%{public}s", GetAnonyString(result).c_str());
 
     deviceName = MallocCStr(result.c_str());
     if (deviceName == nullptr) {
@@ -355,10 +355,10 @@ int32_t DeviceManagerFfiImpl::GetDeviceType(const std::string &networkId, int32_
     ret = DeviceManager::GetInstance().GetDeviceType(bundleName_, networkId, deviceType);
     if (ret != 0) {
         ret = TransformErrCode(ret);
-        LOGE("GetDeviceType for failed, ret %{public}d", ret);
+        LOGE("ret %{public}d", ret);
         return ret;
     }
-    LOGI("DeviceManager::GetDeviceType deviceType:%{public}d", deviceType);
+    LOGI("deviceType:%{public}d", deviceType);
     return ERR_OK;
 }
 
@@ -424,7 +424,7 @@ int32_t DeviceManagerFfiImpl::BindDevice(const std::string &deviceId, const std:
         bindParam, bindDeviceCallback);
     if (ret != 0) {
         ret = TransformErrCode(ret);
-        LOGE("BindDevice for bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
+        LOGE("bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
         return ret;
     }
     return WaitForCallbackCv();
@@ -458,7 +458,7 @@ int32_t DeviceManagerFfiImpl::BindTarget(const std::string &deviceId,
         int32_t ret = BindTargetWarpper(deviceId, bindParam, bindTargetCallback);
         if (ret != 0) {
             ret = TransformErrCode(ret);
-            LOGE("BindTarget for bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
+            LOGE("bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
             return ret;
         }
         return WaitForCallbackCv();
@@ -471,7 +471,7 @@ int32_t DeviceManagerFfiImpl::WaitForCallbackCv()
 {
     std::unique_lock<std::mutex> autoLock(callbackFinishedMutex);
     callbackFinishedCv.wait(autoLock, [this] { return this->callbackFinished; });
-    LOGI("WaitForCallbackCv got notified, errCode is %{public}d", errCode_.load());
+    LOGI("got notified, errCode is %{public}d", errCode_.load());
     return errCode_.load();
 }
 
@@ -501,7 +501,7 @@ int32_t DeviceManagerFfiImpl::EventOn(const std::string &type, void *callback)
         return TransformErrCode(ret);
     }
 
-    LOGI("EventOn for bundleName %{public}s, eventType %{public}s ", bundleName_.c_str(), type.c_str());
+    LOGI("bundleName %{public}s, eventType %{public}s", bundleName_.c_str(), type.c_str());
     RegisterCallbackByType(type, callback);
 
     if (type == DM_FFI_EVENT_DEVICE_STATE_CHANGE || type == DM_FFI_EVENT_DEVICE_NAME_CHANGE) {
@@ -520,7 +520,7 @@ int32_t DeviceManagerFfiImpl::EventOff(const std::string &type)
         return ret;
     }
 
-    LOGI("EventOff for bundleName %{public}s, eventType %{public}s ", bundleName_.c_str(), type.c_str());
+    LOGI("bundleName %{public}s, eventType %{public}s", bundleName_.c_str(), type.c_str());
     Off(type);
     if (type == DM_FFI_EVENT_DEVICE_STATE_CHANGE || type == DM_FFI_EVENT_DEVICE_NAME_CHANGE) {
         if (!deviceStateChangedCallback && !deviceNameChangedCallback) {
@@ -540,12 +540,12 @@ void DeviceManagerFfiImpl::OnDeviceStatusChange(int32_t action, const DmDeviceBa
     if (deviceStateChangedCallback) {
         auto ptr = static_cast<FfiDeviceBasicInfo *>(malloc(sizeof(FfiDeviceBasicInfo)));
         if (ptr == nullptr) {
-            LOGE("OnDeviceStatusChange malloc FfiDeviceBasicInfo failed.");
+            LOGE("malloc FfiDeviceBasicInfo failed.");
             return;
         }
         int32_t ret = Transform2FfiDeviceBasicInfo(deviceBasicInfo, *ptr);
         if (ret != 0) {
-            LOGE("OnDeviceStatusChange failed to transform DmDeviceBasicInfo.");
+            LOGE("failed to transform DmDeviceBasicInfo.");
             free(ptr);
             ptr = nullptr;
             return;
@@ -563,7 +563,7 @@ void DeviceManagerFfiImpl::OnDeviceNameChange(const std::string &deviceName)
     if (deviceNameChangedCallback) {
         char *cDeviceName = MallocCStr(deviceName.c_str());
         if (cDeviceName == nullptr) {
-            LOGE("OnDeviceNameChange malloc deviname failed.");
+            LOGE("malloc deviname failed.");
             return;
         }
         deviceNameChangedCallback(cDeviceName);
@@ -598,7 +598,7 @@ void DeviceManagerFfiImpl::OnDeviceFound(uint16_t subscribeId, const DmDeviceBas
 void DeviceManagerFfiImpl::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason)
 {
     std::lock_guard<std::mutex> autoLock(callbackLock);
-    LOGI("OnDiscoveryFailed for subscribeId %{public}d", (int32_t)subscribeId);
+    LOGI("subscribeId %{public}d", (int32_t)subscribeId);
     if (deviceDiscoverFailedCallback) {
         deviceDiscoverFailedCallback(failedReason);
     }
@@ -606,23 +606,23 @@ void DeviceManagerFfiImpl::OnDiscoveryFailed(uint16_t subscribeId, int32_t faile
 
 void DeviceManagerFfiImpl::OnPublishResult(int32_t publishId, int32_t publishResult)
 {
-    LOGI("OnPublishResult for publishId %{public}d, publishResult %{public}d", publishId, publishResult);
+    LOGI("publishId %{public}d, publishResult %{public}d", publishId, publishResult);
 }
 
 void DeviceManagerFfiImpl::OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
     int32_t reason)
 {
-    LOGI("OnAuthResult for status: %{public}d, reason: %{public}d", status, reason);
+    LOGI("status: %{public}d, reason: %{public}d", status, reason);
     if (reason == DM_OK && (status <= STATUS_DM_CLOSE_PIN_INPUT_UI && status >= STATUS_DM_SHOW_AUTHORIZE_UI)) {
         LOGI("update ui change, status: %{public}d, reason: %{public}d", status, reason);
         return;
     }
 
     if (status == DM_AUTH_REQUEST_SUCCESS_STATUS && reason == 0) {
-        LOGI("OnAuthResult success");
+        LOGI("success");
         errCode_ = ERR_OK;
     } else {
-        LOGI("OnAuthResult failed");
+        LOGI("authentication failed");
         errCode_ = reason;
     }
 
@@ -649,7 +649,7 @@ DeviceManagerFfiImpl *DeviceManagerFfiImpl::GetDeviceManagerFfi(std::string &bun
 
 void DeviceManagerFfiImpl::ClearBundleCallbacks()
 {
-    LOGI("ClearBundleCallbacks start for bundleName %{public}s", bundleName_.c_str());
+    LOGI("start for bundleName %{public}s", bundleName_.c_str());
     {
         std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
         g_deviceManagerMap.erase(bundleName_);
@@ -714,7 +714,7 @@ int32_t DeviceManagerFfiImpl::BindTargetWarpper(const std::string &deviceId,
 
 int32_t DeviceManagerFfiImpl::RegisterDevStatusCallback()
 {
-    LOGI("RegisterDevStatusCallback start for bundleName %{public}s", bundleName_.c_str());
+    LOGI("start for bundleName %{public}s", bundleName_.c_str());
     {
         std::lock_guard<std::mutex> autoLock(g_deviceStatusCallbackMapMutex);
         if (g_deviceStatusCallbackMap.find(bundleName_) != g_deviceStatusCallbackMap.end()) {
@@ -726,7 +726,7 @@ int32_t DeviceManagerFfiImpl::RegisterDevStatusCallback()
     int32_t ret = DeviceManager::GetInstance().RegisterDevStatusCallback(bundleName_, "", callback);
     if (ret != 0) {
         ret = TransformErrCode(ret);
-        LOGE("RegisterDevStatusCallback failed for bundleName %{public}s", bundleName_.c_str());
+        LOGE("failed for bundleName %{public}s", bundleName_.c_str());
         return ret;
     }
     {
@@ -803,7 +803,7 @@ int32_t DeviceManagerFfiImpl::ReleaseDevStatusCallback()
 
 int32_t DeviceManagerFfiImpl::ReleaseDiscoveryCallback()
 {
-    LOGI("ReleaseDiscoveryCallback for bundleName %{public}s", bundleName_.c_str());
+    LOGI("bundleName %{public}s", bundleName_.c_str());
     std::shared_ptr<DmFfiDiscoveryCallback> DiscoveryCallback = nullptr;
     {
         std::lock_guard<std::mutex> autoLock(g_discoveryCallbackMapMutex);
@@ -824,7 +824,7 @@ int32_t DeviceManagerFfiImpl::ReleaseDiscoveryCallback()
 
 int32_t DeviceManagerFfiImpl::ReleasePublishCallback()
 {
-    LOGI("ReleasePublishCallback for bundleName %{public}s", bundleName_.c_str());
+    LOGI("bundleName %{public}s", bundleName_.c_str());
     std::shared_ptr<DmFfiPublishCallback> publishCallback = nullptr;
     {
         std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
@@ -880,7 +880,7 @@ void DeviceManagerFfiImpl::RegisterCallbackByType(const std::string &type, void 
     } else if (type == DM_FFI_EVENT_DEVICE_DISCOVER_FAIL) {
         deviceDiscoverFailedCallback = CJLambda::Create(reinterpret_cast<void (*)(int32_t)>(callback));
     } else {
-        LOGE("RegisterCallbackByType call with wrong type.");
+        LOGE("call with wrong type.");
     }
 }
 
@@ -896,7 +896,7 @@ void DeviceManagerFfiImpl::Off(const std::string &type)
     } else if (type == DM_FFI_EVENT_DEVICE_DISCOVER_FAIL) {
         deviceDiscoverFailedCallback = nullptr;
     } else {
-        LOGE("Off call with wrong type.");
+        LOGE("call with wrong type.");
     }
 }
 } // namespace OHOS::DistributedHardware

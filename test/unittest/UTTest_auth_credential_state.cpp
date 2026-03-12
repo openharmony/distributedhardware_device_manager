@@ -27,7 +27,7 @@ constexpr const char *TEST_NONE_EMPTY_STRING = "test";
 
 void AuthCredentialStateTest::SetUpTestCase()
 {
-    LOGI("AuthCredentialStateTest::SetUpTestCase start.");
+    LOGI("start.");
     DmHiChainAuthConnector::dmHiChainAuthConnector = dmHiChainAuthConnectorMock;
     DmSoftbusSession::dmSoftbusSession = dmSoftbusSessionMock;
     DmAuthStateMachineMock::dmAuthStateMachineMock = dmAuthStateMachineMock;
@@ -36,7 +36,7 @@ void AuthCredentialStateTest::SetUpTestCase()
 
 void AuthCredentialStateTest::TearDownTestCase()
 {
-    LOGI("AuthCredentialStateTest::TearDownTestCase start.");
+    LOGI("start.");
     DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
     dmHiChainAuthConnectorMock = nullptr;
     DmSoftbusSession::dmSoftbusSession = nullptr;
@@ -48,7 +48,7 @@ void AuthCredentialStateTest::TearDownTestCase()
 
 void AuthCredentialStateTest::SetUp()
 {
-    LOGI("AuthCredentialStateTest::SetUp start.");
+    LOGI("start.");
     softbusConnector = std::make_shared<SoftbusConnector>();
     listener = std::make_shared<DeviceManagerServiceListener>();
     hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
@@ -57,7 +57,7 @@ void AuthCredentialStateTest::SetUp()
 
 void AuthCredentialStateTest::TearDown()
 {
-    LOGI("AuthCredentialStateTest::TearDown start.");
+    LOGI("start.");
     softbusConnector = nullptr;
     listener = nullptr;
     hiChainAuthConnector = nullptr;

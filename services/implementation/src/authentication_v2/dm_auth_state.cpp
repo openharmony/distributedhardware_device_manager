@@ -87,7 +87,7 @@ const std::map<int32_t, int32_t> NEW_AND_OLD_REPLAY_MAPPING = {
 
 int32_t DmAuthState::GetTaskTimeout(std::shared_ptr<DmAuthContext> context, const char* taskName, int32_t taskTimeOut)
 {
-    LOGI("GetTaskTimeout, taskName: %{public}s, authType_: %{public}d", taskName, context->authType);
+    LOGI("taskName: %{public}s, authType_: %{public}d", taskName, context->authType);
     if (AUTH_TYPE_IMPORT_AUTH_CODE == context->authType) {
         auto timeout = TASK_TIME_OUT_MAP.find(std::string(taskName));
         if (timeout != TASK_TIME_OUT_MAP.end()) {
@@ -99,11 +99,11 @@ int32_t DmAuthState::GetTaskTimeout(std::shared_ptr<DmAuthContext> context, cons
 
 void DmAuthState::HandleAuthenticateTimeout(std::shared_ptr<DmAuthContext> context, std::string name)
 {
-    LOGI("DmAuthContext::HandleAuthenticateTimeout start timer name %{public}s", name.c_str());
+    LOGI("start timer name %{public}s", name.c_str());
     context->timer->DeleteTimer(name);
     context->reason = ERR_DM_TIME_OUT;
     context->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
-    LOGI("DmAuthContext::HandleAuthenticateTimeout complete");
+    LOGI("complete");
 }
 
 bool DmAuthState::IsScreenLocked()
@@ -113,7 +113,7 @@ bool DmAuthState::IsScreenLocked()
     CHECK_NULL_RETURN(OHOS::ScreenLock::ScreenLockManager::GetInstance(), isLocked);
     isLocked = OHOS::ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked();
 #endif
-    LOGI("IsScreenLocked isLocked: %{public}d.", isLocked);
+    LOGI("isLocked: %{public}d.", isLocked);
     return isLocked;
 }
 
@@ -130,7 +130,7 @@ DmAuthScope DmAuthState::GetAuthorizedScope(int32_t bindLevel)
 
 void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("SourceFinish reason:%{public}d, state:%{public}d", context->reason, context->state);
+    LOGI("reason:%{public}d, state:%{public}d", context->reason, context->state);
     if (DmAuthState::IsImportAuthCodeCompatibility(context->authType)) {
         HandlePinResultAndCallback(context, context->accesser.pkgName);
     }
@@ -144,7 +144,7 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
     if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED && context->reason != DM_BIND_TRUST_TARGET) {
         BindFail(context);
     }
-    LOGI("SourceFinish notify online");
+    LOGI("notify online");
     char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
     Crypto::GetUdidHash(context->accessee.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
     if (SoftbusCache::GetInstance().CheckIsOnline(std::string(deviceIdHash))) {
@@ -160,7 +160,7 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
 
 void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("SinkFinish reason:%{public}d, state:%{public}d", context->reason, context->state);
+    LOGI("reason:%{public}d, state:%{public}d", context->reason, context->state);
     if (DmAuthState::IsImportAuthCodeCompatibility(context->authType)) {
         DistributedDeviceProfile::LocalServiceInfo srvInfo;
         JsonObject extraInfoObj;
@@ -189,7 +189,7 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
     if (context->reason != DM_OK) {
         BindFail(context);
     } else {
-        LOGI("SinkFinish notify online");
+        LOGI("notify online");
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
         Crypto::GetUdidHash(context->accesser.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
         if (SoftbusCache::GetInstance().CheckIsOnline(std::string(deviceIdHash))) {
@@ -411,11 +411,11 @@ int32_t DmAuthState::GetAclBindType(std::shared_ptr<DmAuthContext> context, std:
     JsonObject result;
     int32_t ret = context->hiChainAuthConnector->QueryCredInfoByCredId(access.userId, credId, result);
     if (ret != DM_OK) {
-        LOGE("GetAclBindType QueryCredInfoByCredId failed, ret: %{public}d.", ret);
+        LOGE("QueryCredInfoByCredId failed, ret: %{public}d.", ret);
         return DM_UNKNOWN_TYPE;
     }
     if (!result.Contains(credId)) {
-        LOGE("GetAclBindType result not contains credId.");
+        LOGE("result not contains credId.");
         return DM_UNKNOWN_TYPE;
     }
     if (!result[credId].Contains(FILED_CRED_TYPE) ||
@@ -536,7 +536,7 @@ bool DmAuthState::HaveSameTokenId(std::shared_ptr<DmAuthContext> context,
 {
     // Store the token of src and sink. The size must be greater than or equal to 2.
     if (tokenIdHashList.size() < 2) {
-        LOGE("HaveSameTokenId invalid tokenList size.");
+        LOGE("invalid tokenList size.");
         return false;
     }
     return std::find(tokenIdHashList.begin(), tokenIdHashList.end(),
@@ -584,7 +584,7 @@ uint64_t DmAuthState::GetSysTimeMs()
     while (retryNum < GET_SYSTEMTIME_MAX_NUM) {
         if (gettimeofday(&time, nullptr) != 0) {
             retryNum++;
-            LOGE("GetSysTimeMs failed. retryNum: %{public}d", retryNum);
+            LOGE("failed. retryNum: %{public}d", retryNum);
             continue;
         }
         return (uint64_t) time.tv_sec * MS_PER_SECOND + (uint64_t)time.tv_usec / US_PER_MSECOND;
@@ -620,7 +620,7 @@ void DmAuthState::DeleteRedundancyAcl(std::shared_ptr<DmAuthContext> context, Js
     CHECK_NULL_VOID(context);
     DmAccess access = isSrc ? context->accesser : context->accessee;
     if (bindLevelSet.empty()) {
-        LOGE("DeleteRedundancyAcl empty set");
+        LOGE("empty set");
         return;
     }
     if (aclInfo.Contains("pointTopointAcl") && !aclInfo.Contains("lnnAcl") &&
@@ -913,13 +913,13 @@ void DmAuthState::GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::s
             }
         }
     }
-    LOGE("failed");
+    LOGE("peerDeviceId is empty.");
 }
 
 bool DmAuthState::IsMatchCredentialAndP2pACL(JsonObject &credInfo, std::string &credId,
     const DistributedDeviceProfile::AccessControlProfile &profile)
 {
-    LOGI("IsMatchCredentialAndP2pACL 1:%{public}d, 2:%{public}d, 3:%{public}d",
+    LOGI("1:%{public}d, 2:%{public}d, 3:%{public}d",
         credInfo.Contains(credId),
         credInfo[credId].Contains(FILED_AUTHORIZED_SCOPE),
         credInfo[credId][FILED_AUTHORIZED_SCOPE].IsNumberInteger());
@@ -929,7 +929,7 @@ bool DmAuthState::IsMatchCredentialAndP2pACL(JsonObject &credInfo, std::string &
         return false;
     }
     int32_t authorizedScope = credInfo[credId][FILED_AUTHORIZED_SCOPE].Get<int32_t>();
-    LOGI("IsMatchCredentialAndP2pACL authorizedScope:%{public}d, DM_AUTH_SCOPE_USER:%{public}d, "
+    LOGI("authorizedScope:%{public}d, DM_AUTH_SCOPE_USER:%{public}d,"
         "GetBindLevel:%{public}d",
         authorizedScope,
         static_cast<int32_t>(DM_AUTH_SCOPE_USER), profile.GetBindLevel());
@@ -1085,13 +1085,13 @@ void DmAuthState::UpdatePinErrorCount(const std::string &pkgName, int32_t pinExc
     }
     std::string extra = srvInfo.GetExtraInfo();
     if (extra.empty()) {
-        LOGE("UpdatePinErrorCount extra is empty");
+        LOGE("extra is empty");
         return;
     }
     JsonObject extraInfoObj;
     extraInfoObj.Parse(extra);
     if (extraInfoObj.IsDiscarded()) {
-        LOGE("UpdatePinErrorCount parse extra discarded, skip update to protect original data");
+        LOGE("parse extra discarded, skip update to protect original data");
         return;
     }
     int32_t count = 0;
@@ -1103,7 +1103,7 @@ void DmAuthState::UpdatePinErrorCount(const std::string &pkgName, int32_t pinExc
     srvInfo.SetExtraInfo(extraInfoObj.Dump());
     int32_t updateRet = DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(srvInfo);
     if (updateRet != DM_OK) {
-        LOGE("UpdatePinErrorCount UpdateLocalServiceInfo failed ret=%{public}d", updateRet);
+        LOGE("UpdateLocalServiceInfo failed ret=%{public}d", updateRet);
     }
 }
 
@@ -1137,7 +1137,7 @@ void DmAuthState::GetPinErrorCountAndTokenId(const std::string &bundleName, int3
     DistributedDeviceProfile::LocalServiceInfo srvInfo;
     JsonObject extraInfoObj;
     if (!GetServiceExtraInfo(bundleName, pinExchangeType, srvInfo, extraInfoObj)) {
-        LOGE("GetPinErrorCountAndTokenId: load extra info failed, use default values");
+        LOGE("load extra info failed, use default values");
         return;
     }
     if (IsInt32(extraInfoObj, PIN_ERROR_COUNT)) {
@@ -1174,7 +1174,7 @@ bool DmAuthState::VerifyFlagXor(std::shared_ptr<DmAuthContext> context)
         }
     }
     if (!GetServiceExtraInfo(pkgName, context->authType, srvInfo, extraInfoObj)) {
-        LOGE("VerifyFlagXor load extra failed");
+        LOGE("load extra failed");
         return false;
     }
     bool localFlag = false;
@@ -1201,7 +1201,7 @@ bool DmAuthState::GetServiceExtraInfo(const std::string &pkgName, int32_t pinExc
     }
     extraInfoObj.Parse(extra);
     if (extraInfoObj.IsDiscarded()) {
-        LOGE("GetServiceExtraInfo parse extra discarded");
+        LOGE("parse extra discarded");
         return false;
     }
     return true;

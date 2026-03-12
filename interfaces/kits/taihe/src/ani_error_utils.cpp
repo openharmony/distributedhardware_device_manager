@@ -83,7 +83,7 @@ ani_object ToBusinessError(ani_env *env, int32_t code, const std::string &messag
 
 ani_object CreateErrorForCall(ani_env* env, int32_t code, const std::string &errMsg, bool isAsync)
 {
-    LOGI("CreateErrorForCall code:%{public}d, message:%{public}s", code, errMsg.c_str());
+    LOGI("code:%{public}d, message:%{public}s", code, errMsg.c_str());
     ani_object error = nullptr;
     if (isAsync) {
         ThrowError(code, errMsg.c_str());

@@ -32,12 +32,12 @@ std::shared_ptr<IPinholderSessionCallback> PinHolderSession::pinholderSessionCal
 std::mutex PinHolderSession::pinHolderSessionLock_;
 PinHolderSession::PinHolderSession()
 {
-    LOGD("PinHolderSession constructor.");
+    LOGD("constructor.");
 }
 
 PinHolderSession::~PinHolderSession()
 {
-    LOGD("PinHolderSession destructor.");
+    LOGD("destructor.");
 }
 
 int32_t PinHolderSession::RegisterSessionCallback(std::shared_ptr<IPinholderSessionCallback> callback)
@@ -90,12 +90,12 @@ int PinHolderSession::OnSessionOpened(int sessionId, int result)
     }
     LOGI("[SOFTBUS]OnBytesReceived sessionId: %{public}d", sessionId);
     if (tempCbk == nullptr) {
-        LOGE("OnSessionOpened error, pinholderSessionCallback_ is nullptr.");
+        LOGE("pinholderSessionCallback_ is nullptr.");
         return ERR_DM_FAILED;
     }
     int32_t sessionSide = GetSessionSide(sessionId);
     tempCbk->OnSessionOpened(sessionId, sessionSide, result);
-    LOGI("OnSessionOpened, success, sessionId: %{public}d.", sessionId);
+    LOGI("success, sessionId: %{public}d.", sessionId);
     return DM_OK;
 }
 
@@ -108,11 +108,11 @@ void PinHolderSession::OnSessionClosed(int sessionId)
     }
     LOGI("[SOFTBUS]OnSessionClosed sessionId: %{public}d", sessionId);
     if (tempCbk == nullptr) {
-        LOGE("OnSessionClosed error, pinholderSessionCallback_ is nullptr.");
+        LOGE("pinholderSessionCallback_ is nullptr.");
         return;
     }
     tempCbk->OnSessionClosed(sessionId);
-    LOGI("OnSessionClosed, success, sessionId: %{public}d.", sessionId);
+    LOGI("success, sessionId: %{public}d.", sessionId);
     return;
 }
 
@@ -129,13 +129,13 @@ void PinHolderSession::OnBytesReceived(int sessionId, const void *data, unsigned
         tempCbk = pinholderSessionCallback_;
     }
     if (tempCbk == nullptr) {
-        LOGE("OnBytesReceived error, pinholderSessionCallback_ is nullptr.");
+        LOGE("pinholderSessionCallback_ is nullptr.");
         return;
     }
     LOGI("start, sessionId: %{public}d, dataLen: %{public}d.", sessionId, dataLen);
     std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
     tempCbk->OnDataReceived(sessionId, message);
-    LOGI("OnBytesReceived, success, sessionId: %{public}d.", sessionId);
+    LOGI("success, sessionId: %{public}d.", sessionId);
     return;
 }
 
@@ -147,7 +147,7 @@ int32_t PinHolderSession::SendData(int32_t sessionId, const std::string &message
         return ERR_DM_FAILED;
     }
     if (!IsInt32(jsonObject, TAG_MSG_TYPE)) {
-        LOGE("SoftbusSession::SendData err json string.");
+        LOGE("err json string.");
         return ERR_DM_FAILED;
     }
     int32_t msgType = jsonObject[TAG_MSG_TYPE].Get<int32_t>();

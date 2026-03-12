@@ -28,7 +28,7 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcServerListener::SendRequest cmdCode param invalid!");
+        LOGE("cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     ProcessInfo processInfo = req->GetProcessInfo();

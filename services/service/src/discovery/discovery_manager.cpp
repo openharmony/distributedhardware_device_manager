@@ -45,7 +45,7 @@ void* DiscoveryManager::dpConnectorHandle_ = nullptr;
 DiscoveryManager::DiscoveryManager(std::shared_ptr<SoftbusListener> softbusListener,
     std::shared_ptr<IDeviceManagerServiceListener> listener) : softbusListener_(softbusListener), listener_(listener)
 {
-    LOGI("DiscoveryManager constructor.");
+    LOGI("constructor.");
 }
 
 DiscoveryManager::~DiscoveryManager()
@@ -53,7 +53,7 @@ DiscoveryManager::~DiscoveryManager()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     CloseCommonDependencyObj();
 #endif
-    LOGI("DiscoveryManager destructor.");
+    LOGI("destructor.");
 }
 
 int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
@@ -89,7 +89,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     if (discoverParam.find(PARAM_KEY_DISC_CAPABILITY) != discoverParam.end()) {
         std::string capability = discoverParam.find(PARAM_KEY_DISC_CAPABILITY)->second;
         if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, capability.c_str()) != EOK) {
-            LOGE("failed, capability copy err.");
+            LOGE("capability copy err.");
             return ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED;
         }
     }
@@ -101,7 +101,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     UpdateInfoMedium(discoverParam, dmSubInfo);
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
     if (ret != DM_OK) {
-        LOGE("failed, softbus refresh lnn ret: %{public}d.", ret);
+        LOGE("softbus refresh lnn ret: %{public}d.", ret);
         return ret;
     }
     softbusListener_->RegisterSoftbusLnnOpsCbk(pkgNameTemp, shared_from_this());
@@ -118,7 +118,7 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
     LOGI("begin for pkgName = %{public}s.", pkgName.c_str());
     std::string pkgNameTemp = RemoveMultiUserIdentify(pkgName);
     if (extraParam.find(PARAM_KEY_META_TYPE) != extraParam.end()) {
-        LOGI("DisableDiscoveryListener, input MetaType = %{public}s",
+        LOGI("input MetaType = %{public}s",
             (extraParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
     uint16_t innerSubId = DM_INVALID_FLAG_ID;
@@ -178,7 +178,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     int32_t ret = isStandardMetaNode ? StartDiscoveringNoMetaType(pkgNameTemp, dmSubInfo, discoverParam) :
             StartDiscovering4MetaType(pkgNameTemp, dmSubInfo, discoverParam);
     if (ret != DM_OK) {
-        LOGE("StartDiscovering for meta node process failed, ret = %{public}d", ret);
+        LOGE("meta node process failed, ret = %{public}d", ret);
         return ret;
     }
     return ret;
@@ -188,7 +188,7 @@ void DiscoveryManager::ConfigDiscParam(const std::map<std::string, std::string> 
     DmSubscribeInfo *dmSubInfo)
 {
     if (dmSubInfo == nullptr) {
-        LOGE("ConfigDiscParam failed, dmSubInfo is nullptr.");
+        LOGE("dmSubInfo is nullptr.");
         return;
     }
     dmSubInfo->subscribeId = DM_INVALID_FLAG_ID;
@@ -264,7 +264,7 @@ int32_t DiscoveryManager::StartDiscoveringNoMetaType(const std::string &pkgName,
     }
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, customData);
     if (ret != DM_OK) {
-        LOGE("StartDiscoveringNoMetaType failed, softbus refresh lnn ret: %{public}d.", ret);
+        LOGE("softbus refresh lnn ret: %{public}d.", ret);
     }
     return ret;
 }
@@ -314,7 +314,7 @@ int32_t DiscoveryManager::StartDiscovering4MetaType(const std::string &pkgName, 
 
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, customData);
     if (ret != DM_OK) {
-        LOGE("StartDiscovering4MetaType failed, softbus refresh lnn ret: %{public}d.", ret);
+        LOGE("softbus refresh lnn ret: %{public}d.", ret);
     }
     return ret;
 }
@@ -374,7 +374,7 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
 {
     JsonObject jsonObject(info.extraData);
     if (jsonObject.IsDiscarded()) {
-        LOGE("OnDeviceFound jsonStr error");
+        LOGE("jsonStr error");
         return;
     }
     if (!IsUint32(jsonObject, PARAM_KEY_DISC_CAPABILITY)) {
@@ -434,7 +434,7 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const uint32_t 
     DiscoveryFilter filter;
     if (!isIndiscoveryContextMap ||
         filter.IsValidDevice(discoveryContext.filterOp, discoveryContext.filters, filterPara)) {
-        LOGD("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
+        LOGD("pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
         listener_->OnDeviceFound(processInfo, externalSubId, info);
     }
 }
@@ -460,7 +460,7 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
     processInfo.userId = userId;
     processInfo.pkgName = callerPkgName;
     if (pkgName.empty() || (listener_ == nullptr)) {
-        LOGE("DiscoveryManager::OnDiscoveringResult failed, IDeviceManagerServiceListener is null.");
+        LOGE("IDeviceManagerServiceListener is null.");
         return;
     }
     uint16_t externalSubId = DM_INVALID_FLAG_ID;
@@ -535,7 +535,7 @@ int32_t DiscoveryManager::HandleDiscoveryQueue(const std::string &pkgName, uint1
             discoveryContextMap_.emplace(pkgName, context);
             return DM_OK;
         } else {
-            LOGE("DiscoveryManager::HandleDiscoveryQueue repeated, pkgName : %{public}s.", pkgName.c_str());
+            LOGE("repeated, pkgName : %{public}s.", pkgName.c_str());
             return ERR_DM_DISCOVERY_REPEATED;
         }
     }
@@ -548,12 +548,12 @@ void DiscoveryManager::HandleDiscoveryTimeout(const std::string &pkgName)
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         if (pkgNameSet_.find(pkgName) == pkgNameSet_.end()) {
-            LOGE("HandleDiscoveryTimeout: pkgName: %{public}s is not exist.", pkgName.c_str());
+            LOGE("pkgName: %{public}s is not exist.", pkgName.c_str());
             return;
         }
         auto iter = discoveryContextMap_.find(pkgName);
         if (iter == discoveryContextMap_.end()) {
-            LOGE("HandleDiscoveryTimeout: subscribeId not found by pkgName %{public}s.",
+            LOGE("subscribeId not found by pkgName %{public}s.",
                 GetAnonyString(pkgName).c_str());
             return;
         }

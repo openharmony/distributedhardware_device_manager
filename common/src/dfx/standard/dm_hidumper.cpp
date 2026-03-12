@@ -70,7 +70,7 @@ int32_t HiDumpHelper::HiDump(const std::vector<std::string>& args, std::string &
 
 void HiDumpHelper::SetNodeInfo(const DmDeviceInfo& deviceInfo)
 {
-    LOGI("HiDumpHelper::SetNodeInfo");
+    LOGI("start");
     std::lock_guard<std::mutex> autoLock(nodeInfosLock_);
     CHECK_SIZE_VOID(nodeInfos_);
     nodeInfos_.push_back(deviceInfo);
@@ -144,7 +144,7 @@ int32_t HiDumpHelper::ShowHelp(std::string &result)
 
 int32_t HiDumpHelper::ShowIllealInfomation(std::string &result)
 {
-    LOGI("ShowIllealInfomation Dump");
+    LOGI("Dump");
     result.clear();
     result.append("unrecognized option, -help for help.");
     return DM_OK;
@@ -152,7 +152,7 @@ int32_t HiDumpHelper::ShowIllealInfomation(std::string &result)
 
 int32_t HiDumpHelper::GetArgsType(const std::vector<std::string>& args, std::vector<HidumperFlag> &Flag)
 {
-    LOGI("HiDumpHelper::GetArgsType");
+    LOGI("start");
     int32_t ret = ERR_DM_FAILED;
     if (args.empty()) {
         Flag.push_back(HidumperFlag::HIDUMPER_GET_HELP);

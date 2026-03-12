@@ -298,7 +298,7 @@ bool SoftbusListener::SaveDeviceIdHash(DmDeviceInfo &deviceInfo)
     }
     if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), udidHash,
                  std::min(sizeof(deviceInfo.deviceId), sizeof(udidHash))) != DM_OK) {
-        LOGE("SaveDeviceInfo copy deviceId failed.");
+        LOGE("copy deviceId failed.");
         return false;
     }
     return true;
@@ -582,7 +582,7 @@ void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *ms
 {
     LOGI("start.");
     if (msg == nullptr || msgLen > MAX_SOFTBUS_MSG_LEN || strlen(msg) != msgLen) {
-        LOGE("OnDeviceTrustedChange msg invalied.");
+        LOGE("msg invalied.");
         return;
     }
     std::string softbusMsg = std::string(msg, msgLen);
@@ -701,7 +701,7 @@ SoftbusListener::SoftbusListener()
         .OnMessageReceived = nullptr,
         .OnStreamReceived = nullptr
     };
-    LOGD("SoftbusListener constructor.");
+    LOGD("constructor.");
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t ret = CreateSessionServer(DM_PKG_NAME, DM_SESSION_NAME, &sessionListener);
     if (ret != DM_OK) {
@@ -729,7 +729,7 @@ SoftbusListener::~SoftbusListener()
     RemoveSessionServer(DM_PKG_NAME, DM_SESSION_NAME);
     RemoveSessionServer(DM_PKG_NAME, DM_PIN_HOLDER_SESSION_NAME);
 #endif
-    LOGD("SoftbusListener destructor.");
+    LOGD("destructor.");
 }
 
 int32_t SoftbusListener::InitSoftbusListener()
@@ -778,7 +778,7 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
     LOGI("begin, subscribeId: %{public}d.", dmSubInfo.subscribeId);
     SubscribeInfo subscribeInfo;
     if (memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo)) != DM_OK) {
-        LOGE("RefreshSoftbusLNN memset_s failed.");
+        LOGE("memset_s failed.");
         return ERR_DM_FAILED;
     }
 
@@ -975,18 +975,18 @@ int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &node
     DmDeviceInfo &devInfo)
 {
     if (memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != DM_OK) {
-        LOGE("ConvertScreenStatusToDmDevice memset failed.");
+        LOGE("memset failed.");
         return ERR_DM_FAILED;
     }
     if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
                  std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != DM_OK) {
-        LOGE("ConvertScreenStatusToDmDevice copy networkId data failed.");
+        LOGE("copy networkId data failed.");
         return ERR_DM_FAILED;
     }
 
     if (memcpy_s(devInfo.deviceName, sizeof(devInfo.deviceName), nodeInfo.deviceName,
                  std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != DM_OK) {
-        LOGE("ConvertScreenStatusToDmDevice copy deviceName data failed.");
+        LOGE("copy deviceName data failed.");
         return ERR_DM_FAILED;
     }
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
@@ -1002,18 +1002,18 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
 {
     LOGI("Begin, osType : %{public}d", nodeInfo.osType);
     if (memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed.");
+        LOGE("memset_s failed.");
         return ERR_DM_FAILED;
     }
     if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
                  std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != EOK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+        LOGE("copy networkId data failed.");
         return ERR_DM_FAILED;
     }
 
     if (memcpy_s(devInfo.deviceName, sizeof(devInfo.deviceName), nodeInfo.deviceName,
                  std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != EOK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
+        LOGE("copy deviceName data failed.");
         return ERR_DM_FAILED;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -1046,19 +1046,19 @@ std::string SoftbusListener::ConvertBytesToUpperCaseHexString(const uint8_t arr[
 int32_t SoftbusListener::FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice)
 {
     if (memset_s(&dmDevice, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != DM_OK) {
-        LOGE("FillDeviceInfo memset_s failed.");
+        LOGE("memset_s failed.");
         return ERR_DM_FAILED;
     }
 
     if (memcpy_s(dmDevice.deviceId, sizeof(dmDevice.deviceId), device.devId,
                  std::min(sizeof(dmDevice.deviceId), sizeof(device.devId))) != DM_OK) {
-        LOGE("FillDeviceInfo: copy device id failed.");
+        LOGE("copy device id failed.");
         return ERR_DM_FAILED;
     }
 
     if (memcpy_s(dmDevice.deviceName, sizeof(dmDevice.deviceName), device.devName,
                  std::min(sizeof(dmDevice.deviceName), sizeof(device.devName))) != DM_OK) {
-        LOGE("FillDeviceInfo: copy device name failed.");
+        LOGE("copy device name failed.");
         return ERR_DM_FAILED;
     }
 
@@ -1081,7 +1081,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
 
     const ConnectionAddr *addrInfo = &(device.addr)[0];
     if (addrInfo == nullptr) {
-        LOGE("ConvertDeviceInfoToDmDevice: addrInfo is nullptr.");
+        LOGE("addrInfo is nullptr.");
         dmDevice.extraData = jsonObj.Dump();
         return;
     }
@@ -1154,7 +1154,7 @@ void SoftbusListener::CacheDiscoveredDevice(const DeviceInfo *device)
 {
     std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
     if (memcpy_s(infoPtr.get(), sizeof(DeviceInfo), device, sizeof(DeviceInfo)) != DM_OK) {
-        LOGE("CacheDiscoveredDevice error, copy device info failed.");
+        LOGE("copy device info failed.");
         return;
     }
 
@@ -1171,17 +1171,17 @@ int32_t SoftbusListener::GetTargetInfoFromCache(const std::string &deviceId, Pee
     std::lock_guard<std::mutex> lock(g_deviceMapMutex);
     auto iter = discoveredDeviceMap.find(deviceId);
     if (iter == discoveredDeviceMap.end()) {
-        LOGE("GetTargetInfoFromCache failed, cannot found device in cached discovered map.");
+        LOGE("cannot found device in cached discovered map.");
         return ERR_DM_BIND_INPUT_PARA_INVALID;
     }
     auto deviceVectorIter = iter->second;
     if (deviceVectorIter.size() == 0) {
-        LOGE("GetTargetInfoFromCache failed, cannot found deviceVectorIter in cached discovered map.");
+        LOGE("cannot found deviceVectorIter in cached discovered map.");
         return ERR_DM_BIND_INPUT_PARA_INVALID;
     }
     const ConnectionAddr *addrInfo = &((--deviceVectorIter.end())->second->addr)[0];
     if (addrInfo == nullptr) {
-        LOGE("GetTargetInfoFromCache failed, connection address of discovered device is nullptr.");
+        LOGE("connection address of discovered device is nullptr.");
         return ERR_DM_BIND_COMMON_FAILED;
     }
 
@@ -1224,7 +1224,7 @@ bool SoftbusListener::IsDmRadarHelperReady()
 {
     std::lock_guard<std::mutex> lock(g_radarLoadLock);
     if (isRadarSoLoad_ && (dmRadarHelper_ != nullptr) && (radarHandle_ != nullptr)) {
-        LOGD("IsDmRadarHelperReady alReady.");
+        LOGD("alReady.");
         return true;
     }
     radarHandle_ = dlopen(LIB_RADAR_NAME, RTLD_NOW | RTLD_NOLOAD);
@@ -1242,7 +1242,7 @@ bool SoftbusListener::IsDmRadarHelperReady()
         LOGE("Create object function is not exist.");
         return false;
     }
-    LOGI("IsDmRadarHelperReady ready success.");
+    LOGI("ready success.");
     isRadarSoLoad_ = true;
     dmRadarHelper_ = func();
     return true;
@@ -1275,13 +1275,13 @@ void SoftbusListener::CacheDeviceInfo(const std::string deviceId, std::shared_pt
         return;
     }
     if (infoPtr->addrNum <= 0) {
-        LOGE("CacheDeviceInfo failed, infoPtr->addr is empty.");
+        LOGE("infoPtr->addr is empty.");
         return;
     }
     ConnectionAddrType addrType;
     const ConnectionAddr *addrInfo = &(infoPtr->addr)[0];
     if (addrInfo == nullptr) {
-        LOGE("CacheDeviceInfo failed, connection address of discovered device is nullptr.");
+        LOGE("connection address of discovered device is nullptr.");
         return;
     }
     addrType = addrInfo->type;
@@ -1310,7 +1310,7 @@ int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, con
     std::lock_guard<std::mutex> lock(g_deviceMapMutex);
     auto iter = discoveredDeviceMap.find(deviceId);
     if (iter == discoveredDeviceMap.end()) {
-        LOGE("GetIPAddrTypeFromCache failed, cannot found device in cached discovered map.");
+        LOGE("cannot found device in cached discovered map.");
         return ERR_DM_BIND_INPUT_PARA_INVALID;
     }
     auto deviceVectorIter = iter->second;
@@ -1433,7 +1433,7 @@ void SoftbusListener::ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessCon
 
     if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), udidHash,
                  std::min(sizeof(deviceInfo.deviceId), sizeof(udidHash))) != DM_OK) {
-        LOGE("GetAllTrustedDeviceList copy deviceId failed.");
+        LOGE("copy deviceId failed.");
         return;
     }
 
@@ -1441,7 +1441,7 @@ void SoftbusListener::ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessCon
     if (GetNetworkIdByUdid(profile.GetTrustDeviceId(), networkId) == DM_OK) {
         if (memcpy_s(deviceInfo.networkId, sizeof(deviceInfo.networkId), networkId.c_str(),
                      std::min(sizeof(deviceInfo.networkId), networkId.size())) != DM_OK) {
-            LOGE("GetAllTrustedDeviceList copy networkId data failed.");
+            LOGE("copy networkId data failed.");
             return;
         }
     }
@@ -1450,7 +1450,7 @@ void SoftbusListener::ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessCon
     if (GetDeviceNameByUdid(profile.GetTrustDeviceId(), deviceName) == DM_OK) {
         if (memcpy_s(deviceInfo.deviceName, sizeof(deviceInfo.deviceName), deviceName.c_str(),
                      std::min(sizeof(deviceInfo.deviceName), deviceName.size())) != DM_OK) {
-            LOGE("GetAllTrustedDeviceList copy deviceName data failed.");
+            LOGE("copy deviceName data failed.");
             return;
         }
     } else {
@@ -1461,7 +1461,7 @@ void SoftbusListener::ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessCon
         }
         if (memcpy_s(deviceInfo.deviceName, sizeof(deviceInfo.deviceName), deviceName.c_str(),
                      std::min(sizeof(deviceInfo.deviceName), deviceName.size())) != DM_OK) {
-            LOGE("GetAllTrustedDeviceList copy deviceName data from dp failed.");
+            LOGE("copy deviceName data from dp failed.");
         }
     }
 }

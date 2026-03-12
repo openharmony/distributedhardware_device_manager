@@ -46,15 +46,15 @@ int32_t AuthRequestState::TransitionTo(std::shared_ptr<AuthRequestState> state)
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     if (state == nullptr) {
-        LOGE("AuthRequestState::state null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     if (context_ == nullptr) {
-        LOGE("AuthRequestState::Enter context_ is null");
+        LOGE("context_ is null");
         return ERR_DM_FAILED;
     }
     state->SetAuthManager(stateAuthManager);
@@ -74,11 +74,11 @@ int32_t AuthRequestInitState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestInitState::Enter authManager_ is null");
+        LOGE("authManager_ is null");
         return ERR_DM_FAILED;
     }
     if (context_ == nullptr) {
-        LOGE("AuthRequestInitState::Enter context_ is null");
+        LOGE("context_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->EstablishAuthChannel(context_->deviceId);
@@ -94,11 +94,11 @@ int32_t AuthRequestNegotiateState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestNegotiateState::Enter authManager_ is null");
+        LOGE("authManager_ is null");
         return ERR_DM_FAILED;
     }
     if (context_ == nullptr) {
-        LOGE("AuthRequestNegotiateState::Enter context_ is null");
+        LOGE("context_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->StartNegotiate(context_->sessionId);
@@ -114,11 +114,11 @@ int32_t AuthRequestNegotiateDoneState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestNegotiateDoneState::Enter authManager_ is null");
+        LOGE("authManager_ is null");
         return ERR_DM_FAILED;
     }
     if (context_ == nullptr) {
-        LOGE("AuthRequestNegotiateDoneState::Enter context_ is null");
+        LOGE("context_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->SendAuthRequest(context_->sessionId);
@@ -134,7 +134,7 @@ int32_t AuthRequestReplyState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestReplyState::Enter authManager_ is null");
+        LOGE("authManager_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->StartRespAuthProcess();
@@ -148,14 +148,14 @@ int32_t AuthRequestJoinState::GetStateType()
 
 int32_t AuthRequestJoinState::Enter()
 {
-    LOGI("DmAuthManager::AuthRequestJoinState");
+    LOGI("start");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestJoinState::Enter authManager_  is null");
+        LOGE("authManager_  is null");
         return ERR_DM_FAILED;
     }
     if (context_ == nullptr) {
-        LOGE("AuthRequestJoinState::Enter context_ is null");
+        LOGE("context_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->AddMember(context_->deviceId);
@@ -171,7 +171,7 @@ int32_t AuthRequestNetworkState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestNetworkState::Enter authManager_ is null");
+        LOGE("authManager_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->JoinNetwork();
@@ -187,7 +187,7 @@ int32_t AuthRequestFinishState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestFinishState::Enter authManager_ is null");
+        LOGE("authManager_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->AuthenticateFinish();

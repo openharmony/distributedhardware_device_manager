@@ -45,10 +45,10 @@ std::shared_ptr<DmAuthRequestContext> AuthRequestState::GetAuthContext()
 
 int32_t AuthRequestState::TransitionTo(std::shared_ptr<AuthRequestState> state)
 {
-    LOGI("AuthRequestState::TransitionTo");
+    LOGI("start");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     std::shared_ptr<DmAuthRequestContext> contextTemp = GetAuthContext();
@@ -70,7 +70,7 @@ int32_t AuthRequestInitState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     CHECK_NULL_RETURN(context_, ERR_DM_FAILED);
@@ -87,7 +87,7 @@ int32_t AuthRequestNegotiateState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     CHECK_NULL_RETURN(context_, ERR_DM_FAILED);
@@ -104,7 +104,7 @@ int32_t AuthRequestNegotiateDoneState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     CHECK_NULL_RETURN(context_, ERR_DM_FAILED);
@@ -121,7 +121,7 @@ int32_t AuthRequestReplyState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->StartRespAuthProcess();
@@ -135,10 +135,10 @@ int32_t AuthRequestJoinState::GetStateType()
 
 int32_t AuthRequestJoinState::Enter()
 {
-    LOGI("DmAuthManager::AuthRequestJoinState");
+    LOGI("start");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->ShowStartAuthDialog();
@@ -154,7 +154,7 @@ int32_t AuthRequestNetworkState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->JoinNetwork();
@@ -170,7 +170,7 @@ int32_t AuthRequestFinishState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->AuthenticateFinish();
@@ -187,7 +187,7 @@ int32_t AuthRequestCredential::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->RequestCredential();
@@ -203,7 +203,7 @@ int32_t AuthRequestCredentialDone::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->RequestCredentialDone();
@@ -229,7 +229,7 @@ int32_t AuthRequestReCheckMsg::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->RequestReCheckMsg();
@@ -245,7 +245,7 @@ int32_t AuthRequestReCheckMsgDone::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->RequestReCheckMsgDone();

@@ -278,7 +278,7 @@ DM_EXPORT int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId,
     }
     int32_t ret = ConvertUdidHashToAnoyGenerate(appId, udidHash, kvValue);
     if (ret != DM_OK) {
-        LOGE("failed");
+        LOGE("ConvertUdidHashToAnoyGenerate failed");
         return ERR_DM_FAILED;
     }
     KVAdapterManager::GetInstance().PutByAnoyDeviceId(kvValue.anoyDeviceId, kvValue);

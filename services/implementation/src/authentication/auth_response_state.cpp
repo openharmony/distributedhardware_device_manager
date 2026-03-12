@@ -45,10 +45,10 @@ int32_t AuthResponseState::SetAuthManager(std::shared_ptr<DmAuthManager> authMan
 
 int32_t AuthResponseState::TransitionTo(std::shared_ptr<AuthResponseState> state) __attribute__((no_sanitize("cfi")))
 {
-    LOGI("AuthResponseState::TransitionTo");
+    LOGI("start");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthResponseState::authManager_ null");
+        LOGE("authManager_ null");
         return ERR_DM_FAILED;
     }
     std::shared_ptr<DmAuthResponseContext> contextTemp = GetAuthContext();
@@ -69,7 +69,7 @@ int32_t AuthResponseInitState::GetStateType()
 
 int32_t AuthResponseInitState::Enter()
 {
-    LOGI("AuthResponse::AuthResponseInitState Enter");
+    LOGI("start");
     return DM_OK;
 }
 
@@ -97,7 +97,7 @@ int32_t AuthResponseConfirmState::GetStateType()
 
 int32_t AuthResponseConfirmState::Enter()
 {
-    LOGI("AuthResponse::AuthResponseConfirmState Enter");
+    LOGI("start");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthResponseConfirmState authManager_ is null");
@@ -114,7 +114,7 @@ int32_t AuthResponseGroupState::GetStateType()
 
 int32_t AuthResponseGroupState::Enter()
 {
-    LOGI("AuthResponse::AuthResponseGroupState Enter");
+    LOGI("start");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthResponseGroupState authManager_ is null");
