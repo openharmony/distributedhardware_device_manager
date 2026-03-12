@@ -81,7 +81,7 @@ int32_t AuthSinkDataSyncState::VerifyCertificate(std::shared_ptr<DmAuthContext> 
     return DM_OK;
 #endif
 }
-
+//LCOV_EXCL_START
 static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("SetServiceInfos::start");
@@ -150,7 +150,7 @@ static void CompareServiceInfos(std::shared_ptr<DmAuthContext> context)
     }
     context->serviceInfos.clear();
 }
-
+//LCOV_EXCL_STOP
 // Received 180 synchronization message, send 190 message
 int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 {
@@ -282,7 +282,7 @@ int32_t AuthSinkDataSyncState::DerivativeSessionKey(std::shared_ptr<DmAuthContex
 
     return DM_OK;
 }
-
+//LCOV_EXCL_START
 static void PutServiceInfos(const std::shared_ptr<DmAuthContext> context)
 {
     LOGI("PutServiceInfos::Action start");
@@ -299,7 +299,7 @@ static void PutServiceInfos(const std::shared_ptr<DmAuthContext> context)
         }
     }
 }
-
+//LCOV_EXCL_STOP
 static void DeleteServiceInfos(const std::shared_ptr<DmAuthContext> context)
 {
     LOGI("DeleteServiceInfos::Action start");

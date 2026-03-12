@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_PROFILE_CONNECTOR_FUZZER_H
-#define DEVICE_PROFILE_CONNECTOR_FUZZER_H
+#ifndef IPC_MODEL_CODEC_FOUR_FUZZER_H
+#define IPC_MODEL_CODEC_FOUR_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "deviceprofileconnector_fuzzer"
+#define FUZZ_PROJECT_NAME "ipcmodelcodecfour_fuzzer"
 
-#endif // DEVICE_PROFILE_CONNECTOR_FUZZER_H
+#endif // IPC_MODEL_CODEC_FOUR_FUZZER_H
