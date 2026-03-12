@@ -49,7 +49,7 @@ static int32_t SendCmdResultCb(IOwner owner, int32_t code, IpcIo *reply)
 {
     (void)code;
     int32_t cmdCode = *static_cast<int32_t *>(owner);
-    LOGI("SendCmdResultCb code:%{public}d", cmdCode);
+    LOGI("code:%{public}d", cmdCode);
     (void)IpcCmdRegister::GetInstance().ReadResponse(cmdCode, *reply, pCurRsp);
     return DM_OK;
 }
@@ -84,7 +84,7 @@ int IpcClientServerProxy::RegisterServerDeathCb(void)
 
 int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    LOGI("IpcClientServerProxy::SendCmd:%{public}d", cmdCode);
+    LOGI("SendCmd:%{public}d", cmdCode);
     uint8_t data[MAX_DM_IPC_LEN] = {0};
     IpcIo request;
 
@@ -100,7 +100,7 @@ int32_t IpcClientServerProxy::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> r
             return ERR_DM_FAILED;
         }
     }
-    LOGI("IpcClientServerProxy::SendCmd:%{public}d, end", cmdCode);
+    LOGI("SendCmd:%{public}d, end", cmdCode);
     return DM_OK;
 }
 

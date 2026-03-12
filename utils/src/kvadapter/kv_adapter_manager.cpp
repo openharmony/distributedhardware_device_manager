@@ -47,7 +47,7 @@ std::string ComposeOsTypePrefix()
 
 DM_EXPORT int32_t KVAdapterManager::Init()
 {
-    LOGI("Init Kv-Adapter manager");
+    LOGI("Kv-Adapter manager");
     {
         std::lock_guard<ffrt::mutex> lock(idCacheMapMtx_);
         idCacheMap_.clear();
@@ -129,7 +129,7 @@ DM_EXPORT int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value
         CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
 
         if (kvAdapter_->Get(dmKey, valueStr) != DM_OK) {
-            LOGE("Get kv value failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
+            LOGE("kv value failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
             return ERR_DM_FAILED;
         }
     }

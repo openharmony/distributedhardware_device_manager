@@ -128,7 +128,7 @@ ohos::distributedDeviceManager::DeviceManager CreateDeviceManager(taihe::string_
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().InitDeviceManager(
         stdBundleName, initCallback);
     if (ret != 0) {
-        LOGE("CreateDeviceManager for bundleName %{public}s failed, ret %{public}d.", stdBundleName.c_str(), ret);
+        LOGE("bundleName %{public}s failed, ret %{public}d.", stdBundleName.c_str(), ret);
         ani_errorutils::CreateBusinessError(ret);
         return taihe::make_holder<DeviceManagerImpl, ohos::distributedDeviceManager::DeviceManager>();
     }
@@ -141,7 +141,7 @@ ohos::distributedDeviceManager::DeviceManager CreateDeviceManager(taihe::string_
 
 void ReleaseDeviceManager(::ohos::distributedDeviceManager::weak::DeviceManager deviceManager)
 {
-    LOGI("ReleaseDeviceManager");
+    LOGI("start");
     DeviceManagerImpl *impl = reinterpret_cast<DeviceManagerImpl *>(deviceManager->GetInner());
     if (impl) {
         impl->ReleaseDeviceManager();
@@ -216,7 +216,7 @@ ohos::distributedDeviceManager::DeviceStateChangeResult MakeDeviceStateChangeRes
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetLocalDeviceNetWorkId(
         bundleName_, networkId);
     if (ret != 0) {
-        LOGE("GetLocalDeviceNetworkId for failed, ret %{public}d", ret);
+        LOGE("ret %{public}d", ret);
         ani_errorutils::CreateBusinessError(ret);
         return "";
     }
@@ -232,7 +232,7 @@ ohos::distributedDeviceManager::DeviceStateChangeResult MakeDeviceStateChangeRes
     std::string deviceName;
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceName(bundleName_, deviceName);
     if (ret != 0) {
-        LOGE("GetLocalDeviceName for failed, ret %{public}d", ret);
+        LOGE("ret %{public}d", ret);
         ani_errorutils::CreateBusinessError(ret);
     }
     return ::taihe::string(deviceName);
@@ -252,7 +252,7 @@ int32_t DeviceManagerImpl::GetLocalDeviceType()
     int32_t deviceType = 0;
     ret = DeviceManager::GetInstance().GetLocalDeviceType(bundleName_, deviceType);
     if (ret != 0) {
-        LOGE("GetLocalDeviceType for failed, ret %{public}d", ret);
+        LOGE("ret %{public}d", ret);
         ani_errorutils::CreateBusinessError(ret);
         return 0;
     }
@@ -308,7 +308,7 @@ void DeviceManagerImpl::ReplyUiAction(int32_t action, ::taihe::string_view actio
         return;
     }
     if (!IsSystemApp()) {
-        LOGE("ReplyUiAction not SystemApp");
+        LOGE("not SystemApp");
         ani_errorutils::CreateBusinessError(DMBusinessErrorCode::ERR_NOT_SYSTEM_APP);
         return;
     }
@@ -360,7 +360,7 @@ uintptr_t DeviceManagerImpl::GetDeviceProfileInfoList(
         auto callback = std::make_shared<DmAniGetDeviceProfileInfoListCallback>(vm, deferred);
         int32_t ret = DeviceManager::GetInstance().GetDeviceProfileInfoList(bundleName, dmOptions, callback);
         if (ret == ERR_DM_CALLBACK_REGISTER_FAILED) {
-            LOGE("GetDeviceProfileInfoList failed, bundleName:%{public}s, ret=%{public}d",
+            LOGE("bundleName:%{public}s, ret=%{public}d",
                 bundleName.c_str(), ret);
             callback->OnResult({}, ret);
         }
@@ -509,7 +509,7 @@ uintptr_t DeviceManagerImpl::SetLocalDeviceName(::taihe::string_view deviceName)
         auto callback = std::make_shared<DmAniSetLocalDeviceNameCallback>(vm, deferred);
         int32_t ret = DeviceManager::GetInstance().SetLocalDeviceName(bundleName, stdname, callback);
         if (ret == ERR_DM_CALLBACK_REGISTER_FAILED) {
-            LOGE("SetLocalDeviceName failed, bundleName:%{public}s, ret=%{public}d",
+            LOGE("bundleName:%{public}s, ret=%{public}d",
                 bundleName.c_str(), ret);
             callback->OnResult(ret);
         }
@@ -556,7 +556,7 @@ uintptr_t DeviceManagerImpl::SetRemoteDeviceName(::taihe::string_view deviceId, 
         auto callback = std::make_shared<DmAniSetRemoteDeviceNameCallback>(vm, deferred);
         int32_t ret = DeviceManager::GetInstance().SetRemoteDeviceName(bundleName, stdId, stdName, callback);
         if (ret == ERR_DM_CALLBACK_REGISTER_FAILED) {
-            LOGE("SetRemoteDeviceName failed, bundleName:%{public}s, ret=%{public}d",
+            LOGE("bundleName:%{public}s, ret=%{public}d",
                 bundleName.c_str(), ret);
             callback->OnResult(ret);
         }
@@ -599,7 +599,7 @@ void DeviceManagerImpl::RestoreLocalDeviceName()
     }
     int32_t ret = DeviceManager::GetInstance().RestoreLocalDeviceName(bundleName_);
     if (ret != 0) {
-        LOGE("RestoreLocalDeviceName, bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
+        LOGE("bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
         ani_errorutils::CreateBusinessError(ret);
     }
 }
@@ -939,7 +939,7 @@ void DeviceManagerImpl::ReleaseDeviceManager()
         ::taihe::array<::ohos::distributedDeviceManager::DeviceBasicInfo> empty = {};
         return empty;
     }
-    LOGD("DeviceManager::GetAvailableDeviceListSync");
+    LOGD("start");
     std::vector<::ohos::distributedDeviceManager::DeviceBasicInfo> deviceBasicInfos;
     if (devList.size() > 0) {
         for (size_t i = 0; i != devList.size(); ++i) {
@@ -1302,7 +1302,7 @@ void DeviceManagerImpl::JsToDmDiscoveryExtra(ani_env *env,
         jsonObj["deviceType"] = deviceType;
     }
     extra = jsonObj.Dump();
-    LOGI("JsToDmDiscoveryExtra, extra :%{public}s", extra.c_str());
+    LOGI("extra :%{public}s", extra.c_str());
 }
 
 void DeviceManagerImpl::JsToDiscoveryParam(ani_env *env,
@@ -1365,7 +1365,7 @@ void DeviceManagerImpl::ClearBindCallbacks(const std::string &bundleName)
 
 void DeviceManagerImpl::ClearBundleCallbacks(const std::string &bundleName)
 {
-    LOGI("ClearBundleCallbacks");
+    LOGI("start");
     {
         std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
         g_initCallbackMap.erase(bundleName);
@@ -1414,7 +1414,7 @@ void DeviceManagerImpl::ClearBundleCallbacks(const std::string &bundleName)
     int32_t ret = DeviceManager::GetInstance().GetIdentificationByDeviceIds(
         bundleName_, deviceIdListVec, deviceIdentificationMap);
     if (ret != DM_OK) {
-        LOGE("GetIdentificationByDeviceIds failed, ret %{public}d", ret);
+        LOGE("ret %{public}d", ret);
         CreateBusinessError(ret);
         return {};
     }

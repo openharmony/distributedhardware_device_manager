@@ -33,12 +33,12 @@ constexpr int32_t MAX_DATA_LEN = 65535;
 //LCOV_EXCL_START
 SoftbusSession::SoftbusSession()
 {
-    LOGD("SoftbusSession constructor.");
+    LOGD("constructor.");
 }
 
 SoftbusSession::~SoftbusSession()
 {
-    LOGD("SoftbusSession destructor.");
+    LOGD("destructor.");
 }
 
 int32_t SoftbusSession::RegisterSessionCallback(std::shared_ptr<ISoftbusSessionCallback> callback)
@@ -70,7 +70,7 @@ int32_t SoftbusSession::OpenAuthSession(const std::string &deviceId)
         return sessionId;
     }
     DmTraceEnd();
-    LOGI("OpenAuthSession success. sessionId: %{public}d.", sessionId);
+    LOGI("success. sessionId: %{public}d.", sessionId);
     return sessionId;
 }
 
@@ -99,7 +99,7 @@ int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevI
 int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 {
     if (message.size() > MAX_DATA_LEN) {
-        LOGE("SendData size is %{public}zu too long.", message.size());
+        LOGE("size is %{public}zu too long.", message.size());
         return ERR_DM_FAILED;
     }
 
@@ -114,7 +114,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 int32_t SoftbusSession::SendHeartbeatData(int32_t sessionId, std::string &message)
 {
     if (message.size() > MAX_DATA_LEN) {
-        LOGE("SendHeartbeatData size is %{public}zu too long.", message.size());
+        LOGE("size is %{public}zu too long.", message.size());
         return ERR_DM_FAILED;
     }
 
@@ -128,7 +128,7 @@ int32_t SoftbusSession::SendHeartbeatData(int32_t sessionId, std::string &messag
 
 int SoftbusSession::OnSessionOpened(int sessionId, int result)
 {
-    LOGI("OnSessionOpened, success, sessionId: %{public}d, result: %{public}d.", sessionId, result);
+    LOGI("success, sessionId: %{public}d, result: %{public}d.", sessionId, result);
     if (sessionCallback_ == nullptr) {
         LOGI("Session callback is not registered.");
         return DM_OK;
@@ -140,7 +140,7 @@ int SoftbusSession::OnSessionOpened(int sessionId, int result)
 
 void SoftbusSession::OnSessionClosed(int sessionId)
 {
-    LOGI("OnSessionClosed, sessionId: %{public}d.", sessionId);
+    LOGI("sessionId: %{public}d.", sessionId);
     CHECK_NULL_VOID(sessionCallback_);
     sessionCallback_->OnSessionClosed(sessionId);
     return;

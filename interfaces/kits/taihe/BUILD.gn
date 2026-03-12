@@ -57,7 +57,7 @@ if (device_manager_enable_ets_frontend) {
 
     defines = [
       "HI_LOG_ENABLE",
-      "DH_LOG_TAG=\"devicemanagertaihe\"",
+      "DH_LOG_TAG=\"dmth\"",
       "LOG_DOMAIN=0xD004110",
     ]
 

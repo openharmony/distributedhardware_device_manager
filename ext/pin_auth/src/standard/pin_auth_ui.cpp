@@ -26,12 +26,12 @@ constexpr const char* VERIFY_FAILED = "verifyFailed";
 
 PinAuthUi::PinAuthUi()
 {
-    LOGI("AuthUi constructor");
+    LOGI("constructor");
 }
 
 int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> authManager)
 {
-    LOGI("ShowPinDialog start");
+    LOGI("start");
     if (authManager == nullptr) {
         LOGE("authManager is null");
         return ERR_DM_FAILED;
@@ -49,16 +49,16 @@ int32_t PinAuthUi::ShowPinDialog(int32_t code, std::shared_ptr<DmAuthManager> au
     want.SetElement(element);
     AbilityStatus status = dmAbilityMgr->StartAbility(want);
     if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
-        LOGE("ShowPinDialog::start ui service fail");
+        LOGE("start ui service fail");
         return ERR_DM_FAILED;
     }
-    LOGI("ShowPinDialog end");
+    LOGI("end");
     return DM_OK;
 }
 
 int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
 {
-    LOGI("InputPinDialog start");
+    LOGI("start");
     if (authManager == nullptr) {
         LOGE("authManager is null");
         return ERR_DM_FAILED;
@@ -76,10 +76,10 @@ int32_t PinAuthUi::InputPinDialog(std::shared_ptr<DmAuthManager> authManager)
     want.SetElement(element);
     AbilityStatus status = dmAbilityMgr->StartAbility(want);
     if (status != AbilityStatus::ABILITY_STATUS_SUCCESS) {
-        LOGE("InputPinDialog::start ui service fail");
+        LOGE("start ui service fail");
         return ERR_DM_FAILED;
     }
-    LOGI("InputPinDialog end");
+    LOGI("end");
     return DM_OK;
 }
 } // namespace DistributedHardware

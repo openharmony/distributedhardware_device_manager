@@ -98,7 +98,7 @@ ohos_shared_library("devicemanagerext_pin_auth") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"devicemanagerext\"",
+    "DH_LOG_TAG=\"dmext\"",
     "LOG_DOMAIN=0xD004110",
   ]
 

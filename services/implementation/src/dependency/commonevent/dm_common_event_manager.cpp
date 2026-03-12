@@ -76,11 +76,11 @@ bool DmCommonEventManager::SubscribeServiceEvent(const std::vector<std::string> 
     int32_t counter = 0;
     while (counter <= MAX_TRY_TIMES) {
         if (samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_) == ERR_OK) {
-            LOGI("SubscribeServiceEvent success.");
+            LOGI("success.");
             break;
         }
         if (++counter == MAX_TRY_TIMES) {
-            LOGE("SubscribeServiceEvent failed.");
+            LOGE("SubscribeSystemAbility failed.");
         }
         sleep(1);
     }

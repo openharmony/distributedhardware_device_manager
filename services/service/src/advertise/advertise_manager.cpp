@@ -31,12 +31,12 @@ const int32_t DM_INVALID_FLAG_ID = 0;
 
 AdvertiseManager::AdvertiseManager(std::shared_ptr<SoftbusListener> softbusListener) : softbusListener_(softbusListener)
 {
-    LOGI("AdvertiseManager constructor.");
+    LOGI("constructor.");
 }
 
 AdvertiseManager::~AdvertiseManager()
 {
-    LOGI("AdvertiseManager destructor.");
+    LOGI("destructor.");
 }
 
 int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
@@ -66,14 +66,14 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->PublishSoftbusLNN(dmPubInfo, capability, customData);
     if (ret != DM_OK) {
-        LOGE("failed, softbus publish lnn ret: %{public}d", ret);
+        LOGE("softbus publish lnn ret: %{public}d", ret);
         return ret;
     }
 
     if (advertiseParam.find(PARAM_KEY_AUTO_STOP_ADVERTISE) != advertiseParam.end()) {
         int32_t stopTime = std::atoi((advertiseParam.find(PARAM_KEY_AUTO_STOP_ADVERTISE)->second).c_str());
         if ((stopTime <= 0) || (stopTime > AUTO_STOP_ADVERTISE_DEFAULT_TIME)) {
-            LOGE("StartAdvertising error, invalid input auto stop advertise time: %{public}d", stopTime);
+            LOGE("invalid input auto stop advertise time: %{public}d", stopTime);
             return DM_OK;
         }
         if (timer_ == nullptr) {
@@ -92,7 +92,7 @@ void AdvertiseManager::ConfigAdvParam(const std::map<std::string, std::string> &
     DmPublishInfo *dmPubInfo, const std::string &pkgName)
 {
     if (dmPubInfo == nullptr) {
-        LOGE("ConfigAdvParam failed, dmPubInfo is nullptr.");
+        LOGE("dmPubInfo is nullptr.");
         return;
     }
     dmPubInfo->publishId = -1;
@@ -135,7 +135,7 @@ int32_t AdvertiseManager::StopAdvertising(const std::string &pkgName, int32_t pu
     LOGI("begin for pkgName = %{public}s, publishId = %{public}d.", pkgName.c_str(), publishId);
     int32_t innerPublishId = GetAndRemoveInnerPublishId(pkgName, publishId);
     if (innerPublishId == DM_INVALID_FLAG_ID) {
-        LOGE("Failed: cannot find pkgName in cache map.");
+        LOGE("cannot find pkgName in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);

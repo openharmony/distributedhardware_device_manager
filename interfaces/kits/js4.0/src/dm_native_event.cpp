@@ -80,7 +80,7 @@ void DmNativeEvent::Off(std::string &eventType)
 
 void DmNativeEvent::OnEvent(const std::string &eventType, size_t argc, const napi_value *argv)
 {
-    LOGI("OnEvent for %{public}s", eventType.c_str());
+    LOGI("OnEvent %{public}s", eventType.c_str());
     napi_handle_scope scope = nullptr;
     napi_status status = napi_open_handle_scope(env_, &scope);
     if (status != napi_ok || scope == nullptr) {

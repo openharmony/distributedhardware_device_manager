@@ -28,7 +28,7 @@ namespace DistributedHardware {
 PinAuth::PinAuth()
 {
     pinAuthUi_ = std::make_shared<PinAuthUi>();
-    LOGI("PinAuth constructor");
+    LOGI("constructor");
 }
 
 PinAuth::~PinAuth()

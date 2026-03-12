@@ -45,18 +45,18 @@ int32_t AuthResponseState::SetAuthManager(std::shared_ptr<DmAuthManager> authMan
 
 int32_t AuthResponseState::TransitionTo(std::shared_ptr<AuthResponseState> state)
 {
-    LOGI("AuthRequestState::TransitionTo");
+    LOGI("start");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthRequestState::authManager_ null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     if (state == nullptr) {
-        LOGE("AuthRequestState::state null");
+        LOGE("null");
         return ERR_DM_FAILED;
     }
     if (context_ == nullptr) {
-        LOGE("AuthRequestState::Enter context_ is null");
+        LOGE("context_ is null");
         return ERR_DM_FAILED;
     }
     state->SetAuthManager(stateAuthManager);
@@ -74,7 +74,7 @@ int32_t AuthResponseInitState::GetStateType()
 
 int32_t AuthResponseInitState::Enter()
 {
-    LOGI("AuthResponse::AuthResponseInitState Enter");
+    LOGI("start");
     return DM_OK;
 }
 
@@ -87,11 +87,11 @@ int32_t AuthResponseNegotiateState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthResponseNegotiateState::Enter authManager_ is null");
+        LOGE("authManager_ is null");
         return ERR_DM_FAILED;
     }
     if (context_ == nullptr) {
-        LOGE("AuthResponseNegotiateState::Enter context_ is null");
+        LOGE("context_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->RespNegotiate(context_->sessionId);
@@ -105,10 +105,10 @@ int32_t AuthResponseConfirmState::GetStateType()
 
 int32_t AuthResponseConfirmState::Enter()
 {
-    LOGI("AuthResponse::AuthResponseConfirmState Enter");
+    LOGI("start");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthResponseConfirmState::Enter authManager_ is null");
+        LOGE("authManager_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->ShowConfigDialog();
@@ -122,10 +122,10 @@ int32_t AuthResponseGroupState::GetStateType()
 
 int32_t AuthResponseGroupState::Enter()
 {
-    LOGI("AuthResponse::AuthResponseGroupState Enter");
+    LOGI("start");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthResponseGroupState::Enter authManager_ is null");
+        LOGE("authManager_ is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->CreateGroup();
@@ -141,7 +141,7 @@ int32_t AuthResponseShowState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthResponseShowState::Enter authManager_  is null");
+        LOGE("authManager_  is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->ShowAuthInfoDialog();
@@ -157,7 +157,7 @@ int32_t AuthResponseFinishState::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("AuthResponseFinishState::Enter authManager_  is null");
+        LOGE("authManager_  is null");
         return ERR_DM_FAILED;
     }
     stateAuthManager->AuthenticateFinish();

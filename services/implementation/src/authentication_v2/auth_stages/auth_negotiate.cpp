@@ -96,7 +96,7 @@ std::string AuthSrcNegotiateStateMachine::GetAccountGroupIdHash(std::shared_ptr<
 
 int32_t AuthSrcNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSrcNegotiateStateMachine::Action sessionId %{public}d.", context->sessionId);
+    LOGI("sessionId %{public}d.", context->sessionId);
 
     context->reply = ERR_DM_AUTH_REJECT;
     context->accessee.dmVersion = "";
@@ -184,7 +184,7 @@ int32_t AuthSinkNegotiateStateMachine::GetSinkUserIdByDeviceType(std::shared_ptr
 int32_t AuthSinkNegotiateStateMachine::GetSinkCarUserId(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    LOGI("GetSinkCarUserId start.");
+    LOGI("start.");
     int32_t mainScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID);
     if (mainScreenUserId < 0) {
         LOGE("mainScreenUserId = %{public}d is invalid.", mainScreenUserId);
@@ -234,7 +234,7 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     int32_t ret = RespQueryAcceseeIds(context);
     if (ret != DM_OK) {
-        LOGE("DmAuthManager::ProcRespNegotiate5_1_0 fail to get all id.");
+        LOGE("fail to get all id.");
         return ret;
     }
     DeleteInvalidCredAndAcl(context);
@@ -252,7 +252,7 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
 
 int32_t AuthSinkNegotiateStateMachine::RespQueryServiceAcceseeIds(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("RespQueryServiceAcceseeIds inner1.");
+    LOGI("inner1.");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     if (!context->IsProxyBind) {
         return DM_OK;
@@ -261,7 +261,7 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryServiceAcceseeIds(std::shared_pt
         return ERR_DM_INPUT_PARA_INVALID;
     }
     for (auto item = context->subjectServiceOnes.begin(); item != context->subjectServiceOnes.end(); ++item) {
-        LOGI("RespQueryServiceAcceseeIds inner2.");
+        LOGI("inner2.");
         int64_t serviceId = item->proxyAccessee.serviceId;
         if (serviceId == 0) {
             LOGE("service id invalid.");
@@ -293,7 +293,7 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryServiceAcceseeIds(std::shared_pt
 
 int32_t AuthSinkNegotiateStateMachine::SinkNegotiateService(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("SinkNegotiateService inner1.");
+    LOGI("inner1.");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     int64_t serviceId = context->accessee.serviceId;
     if (serviceId == 0) {
@@ -327,7 +327,7 @@ int32_t AuthSinkNegotiateStateMachine::SinkNegotiateService(std::shared_ptr<DmAu
 
 int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSinkNegotiateStateMachine::Action sessionid %{public}d", context->sessionId);
+    LOGI("sessionid %{public}d", context->sessionId);
     if (IsAntiDisturbanceMode(context->businessId)) {
         LOGI("Sink is AntiDisturbMode.");
         context->reason = ERR_DM_ANTI_DISTURB_MODE;
@@ -349,17 +349,17 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
     }
     // To be compatible with historical versions, use ConvertSrcVersion to get the actual version on the source side.
     std::string preVersion = std::string(DM_VERSION_5_0_OLD_MAX);
-    LOGI("AuthSinkNegotiateStateMachine::Action start version compare %{public}s to %{public}s",
+    LOGI("start version compare %{public}s to %{public}s",
         context->accesser.dmVersion.c_str(), preVersion.c_str());
     if (CompareVersion(context->accesser.dmVersion, preVersion) == false) {
-        LOGE("AuthSinkNegotiateStateMachine::Action incompatible version");
+        LOGE("incompatible version");
         context->reason = ERR_DM_VERSION_INCOMPATIBLE;
         return ERR_DM_VERSION_INCOMPATIBLE;
     }
     SetIsProxyBind(context);
     int32_t ret = ProcRespNegotiate5_1_0(context);
     if (ret != DM_OK) {
-        LOGE("AuthSinkNegotiateStateMachine::Action proc response negotiate failed");
+        LOGE("proc response negotiate failed");
         context->reason = ret;
         return ret;
     }
@@ -836,9 +836,9 @@ void AuthSinkNegotiateStateMachine::GetP2PCredentialInfo(std::shared_ptr<DmAuthC
 
 bool AuthSinkNegotiateStateMachine::IsAntiDisturbanceMode(const std::string &businessId)
 {
-    LOGI("AuthManager::IsAntiDisturbMode start.");
+    LOGI("start.");
     if (businessId.empty()) {
-        LOGE("AuthManager::IsAntiDisturbMode businessId is empty.");
+        LOGE("businessId is empty.");
         return false;
     }
 
@@ -851,7 +851,7 @@ bool AuthSinkNegotiateStateMachine::IsAntiDisturbanceMode(const std::string &bus
     }
     std::string businessValue = event.GetBusinessValue();
     if (businessValue.empty()) {
-        LOGE("AuthManager::IsAntiDisturbMode failed: businessValue is empty.");
+        LOGE("businessValue is empty.");
         return false;
     }
     return ParseAndCheckAntiDisturbanceMode(businessId, businessValue);
@@ -862,25 +862,25 @@ bool AuthSinkNegotiateStateMachine::ParseAndCheckAntiDisturbanceMode(const std::
 {
     JsonObject jsonObject(businessValue);
     if (jsonObject.IsDiscarded()) {
-        LOGE("AuthManager::IsAntiDisturbMode failed: invalid JSON format in businessValue.");
+        LOGE("invalid JSON format in businessValue.");
         return false;
     }
     if (!IsString(jsonObject, DM_BUSINESS_ID)) {
-        LOGE("AuthManager::IsAntiDisturbMode failed: 'business_id' field is missing or invalid.");
+        LOGE("failed: 'business_id' field is missing or invalid.");
         return false;
     }
     std::string parsedBusinessId = jsonObject[DM_BUSINESS_ID].Get<std::string>();
     if (parsedBusinessId != businessId) {
-        LOGE("AuthManager::IsAntiDisturbMode failed: businessId mismatch. Expected: %{public}s, Found: %{public}s",
+        LOGE("businessId mismatch. Expected: %{public}s, Found: %{public}s",
             businessId.c_str(), parsedBusinessId.c_str());
         return false;
     }
     if (!jsonObject.Contains(DM_ANTI_DISTURBANCE_MODE) || !jsonObject[DM_ANTI_DISTURBANCE_MODE].IsBoolean()) {
-        LOGE("AuthManager::IsAntiDisturbMode failed: 'is_in_anti_disturbance_mode' field is missing or invalid.");
+        LOGE("failed: 'is_in_anti_disturbance_mode' field is missing or invalid.");
         return false;
     }
     bool isInAntiDisturbanceMode = jsonObject[DM_ANTI_DISTURBANCE_MODE].Get<bool>();
-    LOGI("AuthManager::IsAntiDisturbMode result: %{public}s", isInAntiDisturbanceMode ? "true" : "false");
+    LOGI("result: %{public}s", isInAntiDisturbanceMode ? "true" : "false");
 
     return isInAntiDisturbanceMode;
 }

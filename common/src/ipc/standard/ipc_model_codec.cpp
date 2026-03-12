@@ -345,7 +345,7 @@ void IpcModelCodec::DecodeServiceIds(std::vector<int64_t> &serviceIds, MessagePa
     const int32_t MAX_SERVICE_IDS_SIZE = 1024;
     int32_t size = parcel.ReadInt32();
     if (size < 0 || size > MAX_SERVICE_IDS_SIZE) {
-        LOGE("DecodeServiceIds: size %d", size);
+        LOGE("size %d", size);
         return;
     }
     serviceIds.resize(size);
@@ -436,7 +436,7 @@ bool IpcModelCodec::EncodeStringVector(const std::vector<std::string> &vec, Mess
         std::string str = vec[k];
         bRet = parcel.WriteString(vec[k]);
         if (!bRet) {
-            LOGE("EncodeStringVector failed");
+            LOGE("WriteString failed");
             break;
         }
     }

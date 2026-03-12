@@ -118,7 +118,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("UnInit in, pkgName %{public}s", pkgName.c_str());
+    LOGI("in, pkgName %{public}s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
     if (dmInterface_ == nullptr) {
         LOGE("DeviceManager not Init");
@@ -150,7 +150,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
 int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcClientManager::SendRequest cmdCode param invalid!");
+        LOGE("cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
     if (req == nullptr || rsp == nullptr) {
@@ -158,7 +158,7 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
     }
     std::lock_guard<std::mutex> autoLock(lock_);
     if (dmInterface_ != nullptr) {
-        LOGD("IpcClientManager::SendRequest cmdCode: %{public}d", cmdCode);
+        LOGD("cmdCode: %{public}d", cmdCode);
         return dmInterface_->SendCmd(cmdCode, req, rsp);
     } else {
         LOGE("dmInterface_ is not init.");
@@ -168,11 +168,11 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
 
 int32_t IpcClientManager::OnDmServiceDied()
 {
-    LOGI("IpcClientManager::OnDmServiceDied begin");
+    LOGI("begin");
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (dmInterface_ == nullptr) {
-            LOGE("IpcClientManager::OnDmServiceDied, dmInterface_ null");
+            LOGE("dmInterface_ null");
             return ERR_DM_POINT_NULL;
         }
         if (dmRecipient_ != nullptr) {
@@ -181,7 +181,7 @@ int32_t IpcClientManager::OnDmServiceDied()
         }
         dmInterface_ = nullptr;
     }
-    LOGI("IpcClientManager::OnDmServiceDied complete");
+    LOGI("complete");
     return DM_OK;
 }
 

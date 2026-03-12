@@ -73,12 +73,12 @@ SoftbusConnector::SoftbusConnector()
     softbusSession_ = std::make_shared<SoftbusSession>();
     hiChainAuthConnector_ = std::make_shared<HiChainAuthConnector>();
 #endif
-    LOGD("SoftbusConnector constructor.");
+    LOGD("constructor.");
 }
 
 SoftbusConnector::~SoftbusConnector()
 {
-    LOGD("SoftbusConnector destructor.");
+    LOGD("destructor.");
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -88,7 +88,7 @@ void SoftbusConnector::DeleteCredential(const DelInfoCache &acl)
     JsonObject credJson;
     int32_t ret = hiChainAuthConnector_->QueryCredInfoByCredId(acl.userId, acl.credId, credJson);
     if (ret != DM_OK || !credJson.Contains(acl.credId)) {
-        LOGE("DeleteCredential err, ret:%{public}d", ret);
+        LOGE("err, ret:%{public}d", ret);
         return;
     }
     if (!credJson[acl.credId].Contains(FILED_AUTHORIZED_APP_LIST)) {
@@ -101,7 +101,7 @@ void SoftbusConnector::DeleteCredential(const DelInfoCache &acl)
     DistributedDeviceProfile::AccessControlProfile profile =
         DeviceProfileConnector::GetInstance().GetAccessControlProfileByAccessControlId(acl.aclId);
     if (profile.GetAccessControlId() != acl.aclId) {
-        LOGE("DeleteCredential, no found profile");
+        LOGE("no found profile");
         return;
     }
     std::vector<std::string> appList;
@@ -139,7 +139,7 @@ void SoftbusConnector::SyncAclList()
         // delete seesionkey by skid
         int32_t ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, sessionKeyId);
         if (ret != DM_OK) {
-            LOGE("SyncAclList DeleteSessionKey failed. ret:%{public}d.", ret);
+            LOGE("DeleteSessionKey failed. ret:%{public}d.", ret);
         }
         DeleteCredential(item);
         // delete acl
@@ -152,13 +152,13 @@ void SoftbusConnector::SyncAclList()
 void SoftbusConnector::SyncAclList(int32_t userId, std::string credId,
     int32_t sessionKeyId, int32_t aclId)
 {
-    LOGI("SyncAclList userId:%{public}d, credId:%{public}s, sessionKeyId:%{public}d, aclId:%{public}d",
+    LOGI("userId:%{public}d, credId:%{public}s, sessionKeyId:%{public}d, aclId:%{public}d",
         userId, credId.c_str(), sessionKeyId, aclId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     // 根据skid删除sk，删除skid
     int32_t ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, sessionKeyId);
     if (ret != DM_OK) {
-        LOGE("SyncAclList DeleteSessionKey failed.");
+        LOGE("DeleteSessionKey failed.");
     }
     DeleteCredential({ userId, sessionKeyId, aclId, credId });
     // 删除本条acl
@@ -276,7 +276,7 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const DevUserInfo &localDevUse
     std::vector<AclHashItem> remoteAllAclList;
     int32_t ret = ParaseAclChecksumList(remoteAclList, remoteAllAclList);
     if (ret != DM_OK) {
-        LOGE("SyncLocalAclListProcess TAG_ACL error");
+        LOGE("TAG_ACL error");
         return ret;
     }
 
@@ -571,19 +571,19 @@ std::shared_ptr<ConnectionAddr> SoftbusConnector::GetConnectAddr(const std::stri
 void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo)
 {
     if (memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice memset_s failed.");
+        LOGE("memset_s failed.");
         return;
     }
 
     if (memcpy_s(dmDeviceInfo.deviceId, sizeof(dmDeviceInfo.deviceId), deviceInfo.devId,
                  std::min(sizeof(dmDeviceInfo.deviceId), sizeof(deviceInfo.devId))) != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
+        LOGE("copy deviceId data failed.");
         return;
     }
 
     if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), deviceInfo.devName,
                  std::min(sizeof(dmDeviceInfo.deviceName), sizeof(deviceInfo.devName))) != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
+        LOGE("copy deviceName data failed.");
         return;
     }
 
@@ -594,19 +594,19 @@ void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo,
 void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceBasicInfo &dmDeviceBasicInfo)
 {
     if (memset_s(&dmDeviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice memset_s failed.");
+        LOGE("memset_s failed.");
         return;
     }
 
     if (memcpy_s(dmDeviceBasicInfo.deviceId, sizeof(dmDeviceBasicInfo.deviceId), deviceInfo.devId,
                  std::min(sizeof(dmDeviceBasicInfo.deviceId), sizeof(deviceInfo.devId))) != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceId data failed.");
+        LOGE("copy deviceId data failed.");
         return;
     }
 
     if (memcpy_s(dmDeviceBasicInfo.deviceName, sizeof(dmDeviceBasicInfo.deviceName), deviceInfo.devName,
                  std::min(sizeof(dmDeviceBasicInfo.deviceName), sizeof(deviceInfo.devName))) != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
+        LOGE("copy deviceName data failed.");
         return;
     }
 
@@ -721,7 +721,7 @@ std::string SoftbusConnector::GetLocalDeviceNetworkId()
 int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId, std::shared_ptr<DeviceInfo> deviceInfo)
 {
     if (deviceId.empty()) {
-        LOGE("AddMemberToDiscoverMap failed, deviceId is empty.");
+        LOGE("deviceId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
@@ -732,7 +732,7 @@ int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId, st
 
 std::string SoftbusConnector::GetNetworkIdByDeviceId(const std::string &deviceId)
 {
-    LOGI("SoftbusConnector::GetNetworkIdByDeviceId");
+    LOGI("start");
     int32_t deviceCount = 0;
     NodeBasicInfo *nodeInfo = nullptr;
     if (GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount) != DM_OK) {
@@ -757,14 +757,14 @@ std::string SoftbusConnector::GetNetworkIdByDeviceId(const std::string &deviceId
 
 void SoftbusConnector::SetProcessInfo(ProcessInfo processInfo)
 {
-    LOGI("SoftbusConnector::SetProcessInfo");
+    LOGI("start");
     std::lock_guard<std::mutex> lock(processInfoVecMutex_);
     processInfoVec_.push_back(processInfo);
 }
 
 void SoftbusConnector::SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec)
 {
-    LOGI("SoftbusConnector::SetProcessInfoVec");
+    LOGI("start");
     std::lock_guard<std::mutex> lock(processInfoVecMutex_);
     processInfoVec_ = processInfoVec;
 }
@@ -772,14 +772,14 @@ void SoftbusConnector::SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec
 //LCOV_EXCL_START
 std::vector<ProcessInfo> SoftbusConnector::GetProcessInfo()
 {
-    LOGI("SoftbusConnector::GetProcessInfo");
+    LOGI("start");
     std::lock_guard<std::mutex> lock(processInfoVecMutex_);
     return processInfoVec_;
 }
 
 void SoftbusConnector::ClearProcessInfo()
 {
-    LOGI("SoftbusConnector::ClearProcessInfo");
+    LOGI("start");
     std::lock_guard<std::mutex> lock(processInfoVecMutex_);
     processInfoVec_.clear();
 }
@@ -787,7 +787,7 @@ void SoftbusConnector::ClearProcessInfo()
 
 void SoftbusConnector::SetChangeProcessInfo(ProcessInfo processInfo)
 {
-    LOGI("SoftbusConnector::SetChangeProcessInfo");
+    LOGI("start");
     std::lock_guard<std::mutex> lock(processChangeInfoVecMutex_);
     processChangeInfoVec_.push_back(processInfo);
 }
@@ -795,14 +795,14 @@ void SoftbusConnector::SetChangeProcessInfo(ProcessInfo processInfo)
 //LCOV_EXCL_START
 std::vector<ProcessInfo> SoftbusConnector::GetChangeProcessInfo()
 {
-    LOGI("SoftbusConnector::GetChangeProcessInfo");
+    LOGI("start");
     std::lock_guard<std::mutex> lock(processChangeInfoVecMutex_);
     return processChangeInfoVec_;
 }
 
 void SoftbusConnector::ClearChangeProcessInfo()
 {
-    LOGI("SoftbusConnector::ClearChangeProcessInfo");
+    LOGI("start");
     std::lock_guard<std::mutex> lock(processChangeInfoVecMutex_);
     processChangeInfoVec_.clear();
 }
@@ -810,7 +810,7 @@ void SoftbusConnector::ClearChangeProcessInfo()
 
 void SoftbusConnector::HandleDeviceOnline(std::string deviceId, int32_t authForm)
 {
-    LOGI("SoftbusConnector::HandleDeviceOnline");
+    LOGI("start");
     deviceStateManagerCallback_->OnDeviceOnline(deviceId, authForm);
     return;
 }
@@ -824,12 +824,12 @@ void SoftbusConnector::HandleDeviceOffline(std::string deviceId, const bool isOn
 
 void SoftbusConnector::OnSessionOpened(int32_t sessionId, int32_t result)
 {
-    LOGI("SoftbusConnector::OnSessionOpened");
+    LOGI("start");
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string peerUdid = "";
     int32_t ret = softbusSession_->GetPeerDeviceId(sessionId, peerUdid);
     if (ret != DM_OK) {
-        LOGE("SoftbusConnector::GetPeerUdidHash failed.");
+        LOGE("GetPeerDeviceId failed.");
         return;
     }
     remoteUdidHash_ = GetDeviceUdidHashByUdid(peerUdid);
@@ -974,19 +974,19 @@ DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &device
 void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo)
 {
     if (memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed.");
+        LOGE("memset_s failed.");
         return;
     }
 
     if (memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), nodeBasicInfo.networkId,
                  std::min(sizeof(dmDeviceInfo.networkId), sizeof(nodeBasicInfo.networkId))) != EOK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
+        LOGE("copy deviceId data failed.");
         return;
     }
 
     if (memcpy_s(dmDeviceInfo.deviceName, sizeof(dmDeviceInfo.deviceName), nodeBasicInfo.deviceName,
                  std::min(sizeof(dmDeviceInfo.deviceName), sizeof(nodeBasicInfo.deviceName))) != EOK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
+        LOGE("copy deviceName data failed.");
         return;
     }
 

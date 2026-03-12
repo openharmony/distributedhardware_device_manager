@@ -84,7 +84,7 @@ int32_t AuthSinkDataSyncState::VerifyCertificate(std::shared_ptr<DmAuthContext> 
 
 static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("SetServiceInfos::start");
+    LOGI("start");
     CHECK_NULL_VOID(context);
     if (!context->isServiceBind) {
         return;
@@ -93,7 +93,7 @@ static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
     int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfosByUdid(context->accessee.deviceId,
         dpServiceInfos);
     if (ret != DM_OK) {
-        LOGE("SetServiceInfos::Get all serviceinfos");
+        LOGE("Get all serviceinfos");
         return;
     }
     std::unordered_set<int32_t> seenServiceIds;
@@ -101,7 +101,7 @@ static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
         DistributedDeviceProfile::ServiceInfo dpServiceInfo;
         for (auto info : dpServiceInfos) {
             if (info.GetServiceId() == context->accessee.serviceId) {
-                LOGI("SetServiceInfos::servicecode:%{public}s", info.GetServiceCode().c_str());
+                LOGI("servicecode:%{public}s", info.GetServiceCode().c_str());
                 context->serviceInfos.emplace_back(info);
                 seenServiceIds.insert(info.GetServiceId());
                 break;
@@ -109,7 +109,7 @@ static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
         }
     }
     if (context->IsProxyBind && context->subjectServiceOnes.empty()) {
-        LOGE("SetServiceInfos::Is proxy bind but no subject list");
+        LOGE("Is proxy bind but no subject list");
         return;
     }
     for (auto &item : context->subjectServiceOnes) {
@@ -119,7 +119,7 @@ static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
         }
         for (auto info : dpServiceInfos) {
             if (info.GetServiceId() == item.proxyAccessee.serviceId) {
-                LOGI("SetServiceInfos::servicecode:%{public}s", info.GetServiceCode().c_str());
+                LOGI("servicecode:%{public}s", info.GetServiceCode().c_str());
                 context->serviceInfos.emplace_back(info);
                 seenServiceIds.insert(info.GetServiceId());
                 break;
@@ -130,13 +130,13 @@ static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
 
 static void CompareServiceInfos(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("CompareServiceInfos::start");
+    LOGI("start");
     CHECK_NULL_VOID(context);
     if (!context->isServiceBind || !context->IsProxyBind) {
         return;
     }
     if (context->subjectServiceOnes.empty()) {
-        LOGE("SetServiceInfos::Is proxy bind but no subject list");
+        LOGE("proxy bind but no subject list");
         return;
     }
     for (auto &item : context->serviceInfos) {
@@ -144,7 +144,7 @@ static void CompareServiceInfos(std::shared_ptr<DmAuthContext> context)
         int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
             context->accessee.deviceId, item.GetServiceId(), dpServiceInfo);
         if (ret != DM_OK) {
-            LOGE("SetServiceInfos::Get subject service failed");
+            LOGE("subject service failed");
             context->serviceId.push_back(dpServiceInfo.GetServiceId());
         }
     }
@@ -154,7 +154,7 @@ static void CompareServiceInfos(std::shared_ptr<DmAuthContext> context)
 // Received 180 synchronization message, send 190 message
 int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSinkDataSyncState::Action start");
+    LOGI("start");
     CHECK_NULL_RETURN(context, ERR_DM_FAILED);
     if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) &&
         CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_4)) {
@@ -167,7 +167,7 @@ int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     // verify device cert
     int32_t ret = VerifyCertificate(context);
     if (ret != DM_OK) {
-        LOGE("AuthSinkNegotiateStateMachine::Action cert verify fail!");
+        LOGE("cert verify fail!");
         context->reason = ret;
         return ret;
     }
@@ -191,7 +191,7 @@ int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     context->softbusConnector->SyncAclList();
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_DATA_SYNC, context);
     context->accessee.deviceName = context->softbusConnector->GetLocalDeviceName();
-    LOGI("AuthSinkDataSyncState::Action ok");
+    LOGI("ok");
     return DM_OK;
 }
 
@@ -225,7 +225,7 @@ void AuthSinkDataSyncState::ProcessMainAccesseeSessionKey(std::shared_ptr<DmAuth
             context->accessee.transmitSkTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
             context->accessee.transmitSessionKeyId = skId;
         } else {
-            LOGE("AuthSinkDataSyncState::Action DP save user session key failed");
+            LOGE("DP save user session key failed");
         }
     }
 }
@@ -248,7 +248,7 @@ void AuthSinkDataSyncState::ProcessSingleProxyAccessee(std::shared_ptr<DmAuthCon
     int32_t ret = context->authMessageProcessor->SaveDerivativeSessionKeyToDP(
         context->accessee.userId, suffix, skId);
     if (ret != DM_OK) {
-        LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+        LOGE("DP save user session key failed");
         return;
     }
 
@@ -285,35 +285,35 @@ int32_t AuthSinkDataSyncState::DerivativeSessionKey(std::shared_ptr<DmAuthContex
 
 static void PutServiceInfos(const std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("PutServiceInfos::Action start");
+    LOGI("Action start");
     CHECK_NULL_VOID(context);
     if (!context->isServiceBind || context->serviceInfos.empty()) {
         return;
     }
     for (auto &item : context->serviceInfos) {
-        LOGI("PutServiceInfos::Put service info");
-        LOGI("PutServiceInfos::servicecode:%{public}s", item.GetServiceCode().c_str());
+        LOGI("Put service info");
+        LOGI("servicecode:%{public}s", item.GetServiceCode().c_str());
         int32_t ret = DeviceProfileConnector::GetInstance().PutServiceInfo(item);
         if (ret != DM_OK) {
-            LOGE("PutServiceInfos::Put service info failed, service id:%{public}" PRId64, item.GetServiceId());
+            LOGE("Put service info failed, service id:%{public}" PRId64, item.GetServiceId());
         }
     }
 }
 
 static void DeleteServiceInfos(const std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("DeleteServiceInfos::Action start");
+    LOGI("Action start");
     CHECK_NULL_VOID(context);
     if (!context->isServiceBind || context->serviceId.empty()) {
         return;
     }
     for (auto &item : context->serviceId) {
-        LOGI("DeleteServiceInfos::Delete service info");
+        LOGI("Delete service info");
         DistributedDeviceProfile::ServiceInfo info;
         int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(context->accessee.deviceId,
             item, info);
         if (ret != DM_OK) {
-            LOGE("DeleteServiceInfos::Get service info failed, service id:%{public}" PRId64, item);
+            LOGE("Get service info failed, service id:%{public}" PRId64, item);
         }
         ret = DeviceProfileConnector::GetInstance().DeleteServiceInfo(info);
     }
@@ -322,7 +322,7 @@ static void DeleteServiceInfos(const std::shared_ptr<DmAuthContext> context)
 // Received 190 message, sent 200 message
 int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSrcDataSyncState::Action start");
+    LOGI("start");
     CHECK_NULL_RETURN(context, ERR_DM_FAILED);
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_FAILED);
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_FAILED);
@@ -360,7 +360,7 @@ int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     context->reply = DM_OK;
     context->state = static_cast<int32_t>(GetStateType());
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_REQ_FINISH, context);
-    LOGI("AuthSrcDataSyncState::Action ok");
+    LOGI("ok");
     return DM_OK;
 }
 
@@ -374,7 +374,7 @@ DmAuthStateType AuthSrcDataSyncState::GetStateType()
 // Received 200 end message, send 201
 int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSinkFinishState::Action start");
+    LOGI("start");
     int32_t ret = DM_OK;
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     LOGI("reason: %{public}d", context->reason);
@@ -392,7 +392,7 @@ int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)
     }
     context->isNeedJoinLnn = true;
     SinkFinish(context);
-    LOGI("AuthSinkFinishState::Action ok");
+    LOGI("ok");
     if (context->cleanNotifyCallback != nullptr) {
         context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime);
     }
@@ -408,7 +408,7 @@ DmAuthStateType AuthSinkFinishState::GetStateType()
 // Received 201 end message
 int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSrcFinishState::Action start");
+    LOGI("start");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     if (context->reason == ERR_DM_SKIP_AUTHENTICATE && !context->isNeedAuthenticate) {
         CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
@@ -433,7 +433,7 @@ int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
     if (context->reason == DM_BIND_TRUST_TARGET && (!context->accesser.isOnline || isNeedJoinLnn)) {
         JoinLnn(context);
     }
-    LOGI("AuthSrcFinishState::Action ok");
+    LOGI("ok");
     if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED) {
         context->connDelayCloseTime = 0;
     }

@@ -29,7 +29,7 @@ constexpr int32_t TEST_NEGATIVE = -1;
 constexpr int32_t TEST_POSITIVE = 1;
 void AuthNegotiateTest::SetUpTestCase()
 {
-    LOGI("AuthNegotiateTest::SetUpTestCase start.");
+    LOGI("start.");
 
     DmSoftbusConnector::dmSoftbusConnector = softbusConnectorMock;
     DmSoftbusSession::dmSoftbusSession = softbusSessionMock;
@@ -41,7 +41,7 @@ void AuthNegotiateTest::SetUpTestCase()
 
 void AuthNegotiateTest::TearDownTestCase()
 {
-    LOGI("AuthNegotiateTest::TearDownTestCase done.");
+    LOGI("done.");
     softbusConnectorMock = nullptr;
     softbusSessionMock = nullptr;
     DmSoftbusConnector::dmSoftbusConnector = nullptr;
@@ -56,7 +56,7 @@ void AuthNegotiateTest::TearDownTestCase()
 
 void AuthNegotiateTest::SetUp()
 {
-    LOGI("AuthNegotiateTest::SetUp start.");
+    LOGI("start.");
     softbusConnector = std::make_shared<SoftbusConnector>();
     listener = std::make_shared<DeviceManagerServiceListener>();
     hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
@@ -76,7 +76,7 @@ void AuthNegotiateTest::SetUp()
 
 void AuthNegotiateTest::TearDown()
 {
-    LOGI("AuthNegotiateTest::TearDown done.");
+    LOGI("done.");
     softbusConnector = nullptr;
     listener = nullptr;
     hiChainAuthConnector = nullptr;

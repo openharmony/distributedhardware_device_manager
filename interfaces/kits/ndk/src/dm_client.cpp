@@ -46,7 +46,7 @@ int32_t DmClient::Init()
     }
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(pkgName_, dmInitCallback_);
     if (ret != DM_OK) {
-        LOGE("Init DeviceManager failed, ret=%{public}d", ret);
+        LOGE("Init failed, ret=%{public}d", ret);
         return DM_ERR_OBTAIN_SERVICE;
     }
     return ERR_OK;

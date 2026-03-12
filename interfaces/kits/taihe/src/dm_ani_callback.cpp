@@ -56,7 +56,7 @@ DmAniInitCallback::DmAniInitCallback(ani_env* env, const taihe::string_view &bun
 
 void DmAniInitCallback::OnRemoteDied()
 {
-    LOGI("OnRemoteDied called.");
+    LOGI("called.");
     auto sharedThis = shared_from_this();
     SendEventToMainThread([sharedThis] {
         sharedThis->OnRemoteDiedInMainthread();
@@ -84,7 +84,7 @@ void DmAniInitCallback::SetServiceDieCallback(taihe::callback<void(uintptr_t dat
 
 void DmAniInitCallback::ReleaseServiceDieCallback()
 {
-    LOGI("ReleaseServiceDieCallback");
+    LOGI("start");
     std::lock_guard<std::mutex> autoLock(jsCallbackMutex_);
     serviceDieCallback_.reset();
 }
@@ -98,7 +98,7 @@ DmAniDeviceNameChangeCallback::DmAniDeviceNameChangeCallback(const std::string &
 void DmAniDeviceNameChangeCallback::OnDeviceChanged(
     const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("OnDeviceChanged called.");
+    LOGI("called.");
     auto sharedThis = shared_from_this();
     SendEventToMainThread([deviceBasicInfo, sharedThis] {
         sharedThis->OnDeviceChangedInMainThread(deviceBasicInfo);
@@ -108,7 +108,7 @@ void DmAniDeviceNameChangeCallback::OnDeviceChanged(
 void DmAniDeviceNameChangeCallback::OnDeviceChangedInMainThread(
     const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("OnDeviceChangedInMainThread called.");
+    LOGI("called.");
     ohos::distributedDeviceManager::DeviceNameChangeResult taiheInfo = {
         ::taihe::string(deviceBasicInfo.deviceName)
     };
@@ -129,7 +129,7 @@ DmAniDeviceStateChangeResultCallback::DmAniDeviceStateChangeResultCallback(const
 void DmAniDeviceStateChangeResultCallback::OnDeviceOnline(
     const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("OnDeviceOnline called.");
+    LOGI("called.");
     auto sharedThis = shared_from_this();
     SendEventToMainThread([deviceBasicInfo, sharedThis] {
         sharedThis->OnDeviceStateChangeInMainthread(
@@ -140,7 +140,7 @@ void DmAniDeviceStateChangeResultCallback::OnDeviceOnline(
 void DmAniDeviceStateChangeResultCallback::OnDeviceReady(
     const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("OnDeviceReady called.");
+    LOGI("called.");
     auto sharedThis = shared_from_this();
     SendEventToMainThread([deviceBasicInfo, sharedThis] {
         sharedThis->OnDeviceStateChangeInMainthread(
@@ -151,7 +151,7 @@ void DmAniDeviceStateChangeResultCallback::OnDeviceReady(
 void DmAniDeviceStateChangeResultCallback::OnDeviceOffline(
     const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("OnDeviceOffline called.");
+    LOGI("called.");
     auto sharedThis = shared_from_this();
     SendEventToMainThread([deviceBasicInfo, sharedThis] {
         sharedThis->OnDeviceStateChangeInMainthread(
@@ -163,7 +163,7 @@ void DmAniDeviceStateChangeResultCallback::OnDeviceStateChangeInMainthread(
     ::ohos::distributedDeviceManager::DeviceStateChange state,
     const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("OnDeviceStateChangeInMainthread called.");
+    LOGI("called.");
     OHOS::DistributedHardware::DmDeviceType dmType =
         static_cast<OHOS::DistributedHardware::DmDeviceType>(deviceBasicInfo.deviceTypeId);
     ::ohos::distributedDeviceManager::DeviceBasicInfo taiheInfo = {
@@ -246,7 +246,7 @@ void DmAniDiscoveryCallback::OnDeviceFound(uint16_t subscribeId,
 void DmAniDiscoveryCallback::OnDeviceFoundInMainThread(uint16_t subscribeId,
     const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("OnDeviceFoundInMainThread DmDeviceBasicInfo for subscribeId %{public}d", (int32_t)subscribeId);
+    LOGI("DmDeviceBasicInfo for subscribeId %{public}d", (int32_t)subscribeId);
     std::string deviceType = ani_dmutils::GetDeviceTypeById(
         static_cast<OHOS::DistributedHardware::DmDeviceType>(deviceBasicInfo.deviceTypeId));
     ::ohos::distributedDeviceManager::DeviceBasicInfo basicInfo = {
@@ -264,7 +264,7 @@ void DmAniDiscoveryCallback::OnDeviceFoundInMainThread(uint16_t subscribeId,
 
 void DmAniDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason)
 {
-    LOGI("OnDiscoveryFailed");
+    LOGI("start");
     auto sharedThis = shared_from_this();
     SendEventToMainThread([subscribeId, failedReason, sharedThis] {
         sharedThis->OnDiscoveryFailedInMainThread(subscribeId, failedReason);
@@ -273,7 +273,7 @@ void DmAniDiscoveryCallback::OnDiscoveryFailed(uint16_t subscribeId, int32_t fai
 
 void DmAniDiscoveryCallback::OnDiscoveryFailedInMainThread(uint16_t subscribeId, int32_t failedReason)
 {
-    LOGI("OnDiscoveryFailedInMainThread for subscribeId %{public}d", (int32_t)subscribeId);
+    LOGI("subscribeId %{public}d", (int32_t)subscribeId);
     std::string errCodeInfo = OHOS::DistributedHardware::GetErrorString((int)failedReason);
     ohos::distributedDeviceManager::DiscoveryFailureResult taiheResult = { failedReason };
     std::lock_guard<std::mutex> lock(jsCallbackMutex_);
@@ -315,7 +315,7 @@ void DmAniBindTargetCallback::SetTaiheCallback(
 void DmAniBindTargetCallback::OnBindResult(const OHOS::DistributedHardware::PeerTargetId &targetId, int32_t result,
     int32_t status, std::string content)
 {
-    LOGI("OnBindResult");
+    LOGI("start");
     auto sharedThis = shared_from_this();
     SendEventToMainThread([targetId, result, status, content, sharedThis] {
         sharedThis->OnBindResultInMainThread(targetId, result, status, content);
@@ -328,7 +328,7 @@ void DmAniBindTargetCallback::OnBindResultInMainThread(const OHOS::DistributedHa
     using namespace OHOS::DistributedHardware;
     using namespace ANI::distributedDeviceManager;
 
-    LOGI("OnBindResultInMainThread");
+    LOGI("start");
     std::string deviceId = content;
     ani_ref err = nullptr;
     ohos::distributedDeviceManager::BindTargetResult data = {};
@@ -368,7 +368,7 @@ void DmAniAuthenticateCallback::SetTaiheCallback(
 void DmAniAuthenticateCallback::OnAuthResult(const std::string &deviceId, const std::string &token,
     int32_t status, int32_t reason)
 {
-    LOGI("OnAuthResult");
+    LOGI("start");
     auto sharedThis = shared_from_this();
     SendEventToMainThread([deviceId, token, status, reason, sharedThis] {
         sharedThis->OnAuthResultInMainThread(deviceId, token, status, reason);
@@ -381,7 +381,7 @@ void DmAniAuthenticateCallback::OnAuthResultInMainThread(const std::string &devi
     using namespace OHOS::DistributedHardware;
     using namespace ANI::distributedDeviceManager;
 
-    LOGI("OnAuthResultInMainThread");
+    LOGI("start");
     ani_ref err = nullptr;
     ::ohos::distributedDeviceManager::BindTargetResult data = {};
     if (status == DM_AUTH_REQUEST_SUCCESS_STATUS && reason == 0) {
@@ -422,7 +422,7 @@ void DmAniGetDeviceProfileInfoListCallback::PromiseResult(ani_env* currentEnv,
     const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfos,
     int32_t code)
 {
-    LOGI("PromiseResult");
+    LOGI("start");
     if (currentEnv == nullptr) {
         return;
     }
@@ -432,7 +432,7 @@ void DmAniGetDeviceProfileInfoListCallback::PromiseResult(ani_env* currentEnv,
         if (code == OHOS::DistributedHardware::DM_OK) {
             resolveResult = ani_dmutils::DeviceProfileInfoArrayToAni(currentEnv, deviceProfileInfos);
         }
-        LOGI("PromiseResult, AniPromiseCallback");
+        LOGI("AniPromiseCallback");
         ani_errorutils::AniPromiseCallback(currentEnv, deferred_, code, resolveResult);
         deferred_ = nullptr;
     }
@@ -450,7 +450,7 @@ void DmAniGetDeviceIconInfoCallback::OnResult(
 void DmAniGetDeviceIconInfoCallback::PromiseResult(ani_env* currentEnv,
     const OHOS::DistributedHardware::DmDeviceIconInfo &deviceIconInfo, int32_t code)
 {
-    LOGI("PromiseResult");
+    LOGI("start");
     if (currentEnv == nullptr) {
         return;
     }
@@ -476,7 +476,7 @@ void DmAniSetLocalDeviceNameCallback::OnResult(int32_t code)
 
 void DmAniSetLocalDeviceNameCallback::PromiseResult(ani_env* currentEnv, int32_t code)
 {
-    LOGI("PromiseResult");
+    LOGI("start");
     if (currentEnv == nullptr) {
         return;
     }
@@ -501,7 +501,7 @@ void DmAniSetRemoteDeviceNameCallback::OnResult(int32_t code)
 
 void DmAniSetRemoteDeviceNameCallback::PromiseResult(ani_env* currentEnv, int32_t code)
 {
-    LOGI("PromiseResult");
+    LOGI("start");
     if (currentEnv == nullptr) {
         return;
     }

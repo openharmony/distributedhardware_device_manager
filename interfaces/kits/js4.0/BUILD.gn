@@ -60,7 +60,7 @@ ohos_shared_library("distributeddevicemanager") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"devicemanagerkit_js\"",
+    "DH_LOG_TAG=\"dm_js\"",
     "LOG_DOMAIN=0xD004110",
   ]
 

@@ -24,7 +24,7 @@ constexpr int32_t pinCodeLength = 6;
 
 SpatialLocationCallbackImpl::SpatialLocationCallbackImpl(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("SpatialLocationCallbackImpl Init.");
+    LOGI("Init.");
     context_ = context;
 }
 
@@ -35,17 +35,17 @@ SpatialLocationCallbackImpl::~SpatialLocationCallbackImpl()
 
 void SpatialLocationCallbackImpl::OnPinCodeChanged(const Msdp::PinCodeResponse &pinCodeResponse)
 {
-    LOGI("SpatialLocationCallbackImpl::OnPinCodeChanged Start.");
+    LOGI("Start.");
     if (pinCodeResponse.pincode.length() != pinCodeLength) {
-        LOGE("OnPinCodeChanged pincode length error.");
+        LOGE("pincode length error.");
         return;
     }
     if (!IsValidPinCodeStr(pinCodeResponse.pincode)) {
-        LOGE("OnPinCodeChanged pincode is invalid");
+        LOGE("pincode is invalid");
         return;
     }
     if (context_ == nullptr) {
-        LOGE("OnPinCodeChanged context_ empty.");
+        LOGE("context_ empty.");
         return;
     }
     context_->pinCode = pinCodeResponse.pincode;

@@ -98,7 +98,7 @@ void DMTransport::OnBytesReceived(int32_t socketId, const void *data, uint32_t d
     }
 
     if (memcpy_s(buf, dataLen + 1,  reinterpret_cast<const uint8_t *>(data), dataLen) != EOK) {
-        LOGE("OnBytesReceived: memcpy memory failed");
+        LOGE("memcpy memory failed");
         free(buf);
         return;
     }
@@ -483,7 +483,7 @@ int32_t DMTransport::Send(const std::string &rmtNetworkId, const std::string &pa
 
     if (memcpy_s(buf, payLoadSize, reinterpret_cast<const uint8_t *>(payload.c_str()),
                  payLoadSize) != EOK) {
-        LOGE("Send: memcpy memory failed");
+        LOGE("memcpy memory failed");
         free(buf);
         return ERR_DM_FAILED;
     }

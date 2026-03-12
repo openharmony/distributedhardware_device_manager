@@ -137,7 +137,7 @@ MineSoftbusListener::MineSoftbusListener()
         std::thread([]() { MatchSearchDealTask(); }).detach();
     }
 #endif
-    LOGI("MineSoftbusListener constructor");
+    LOGI("constructor");
 }
 
 MineSoftbusListener::~MineSoftbusListener()
@@ -151,7 +151,7 @@ MineSoftbusListener::~MineSoftbusListener()
         g_matchDealFlag = false;
     }
 #endif
-    LOGI("SoftbusConnector destructor");
+    LOGI("destructor");
 }
 
 int32_t MineSoftbusListener::RefreshSoftbusLNN(const string &pkgName, const string &searchJson,
@@ -541,7 +541,7 @@ int32_t MineSoftbusListener::SendBroadcastInfo(const string &pkgName, SubscribeI
 int32_t MineSoftbusListener::DmBase64Encode(char *output, size_t outputLen, const char *input,
     size_t inputLen, size_t &base64OutLen)
 {
-    LOGI("MineSoftbusListener::DmBase64Encode");
+    LOGI("start");
     if (output == nullptr || input == nullptr || outputLen == 0 || inputLen == 0) {
         LOGE("Input param invalied.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -570,7 +570,7 @@ int32_t MineSoftbusListener::DmBase64Encode(char *output, size_t outputLen, cons
 int32_t MineSoftbusListener::DmBase64Decode(char *output, size_t outputLen, const char *input,
     size_t inputLen, size_t &base64OutLen)
 {
-    LOGI("MineSoftbusListener::DmBase64Decode");
+    LOGI("start");
     if (output == nullptr || outputLen == 0 || input == nullptr || inputLen == 0) {
         LOGE("Input param invalied.");
         return ERR_DM_INPUT_PARA_INVALID;

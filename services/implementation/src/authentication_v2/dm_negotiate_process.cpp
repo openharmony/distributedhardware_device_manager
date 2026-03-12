@@ -227,7 +227,7 @@ int32_t NegotiateProcess::HandleServiceNegotiateResult(std::shared_ptr<DmAuthCon
             if (pit != acc.aclProfiles.end()) {
                 std::string se = pit->second.GetAccessee().GetAccesseeExtraData();
                 needServiceAclUpdate = !(IsServiceInAclExtraData(se, remoteServiceId));
-                LOGI("HandleServiceNegotiateResult needServiceAclUpdate %{public}d, remoteServiceId %{public}" PRId64,
+                LOGI("needServiceAclUpdate %{public}d, remoteServiceId %{public}" PRId64,
                     needServiceAclUpdate, remoteServiceId);
             }
 

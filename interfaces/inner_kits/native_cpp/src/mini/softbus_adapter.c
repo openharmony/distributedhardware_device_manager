@@ -838,7 +838,7 @@ static void OnDiscoveryDeviceFound(const DeviceInfo *deviceInfo)
         DMLOGE("UnlockDmGlobalLock failed.");
         return;
     }
-    DMLOGI("OnDiscoveryDeviceFound callback complete.");
+    DMLOGI("callback complete.");
 }
 
 static void OnRefreshDiscoveryResult(int32_t refreshId, RefreshResult reason)
@@ -967,7 +967,7 @@ static void OnSoftbusDeviceOnline(NodeBasicInfo *deviceInfo)
         DMLOGE("UnlockDmGlobalLock failed.");
         return;
     }
-    DMLOGI("OnSoftbusDeviceOnline callback complete.");
+    DMLOGI("callback complete.");
 }
 
 static void OnSoftbusDeviceOffline(NodeBasicInfo *deviceInfo)
@@ -993,13 +993,13 @@ static void OnSoftbusDeviceOffline(NodeBasicInfo *deviceInfo)
         DMLOGE("UnlockDmGlobalLock failed.");
         return;
     }
-    DMLOGI("OnSoftbusDeviceOffline callback complete.");
+    DMLOGI("callback complete.");
 }
 
 static void NodeBasicInfoCopyToDmDevice(DmDeviceBasicInfo *dmDeviceInfo, const NodeBasicInfo *nodeBasicInfo)
 {
     if (memset_s(dmDeviceInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != EOK) {
-        LOGE("NodeBasicInfoCopyToDmDevice memset_s failed.");
+        LOGE("memset_s failed.");
         return;
     }
 
@@ -1051,7 +1051,7 @@ static void DeviceInfoCopyToDmDevice(DmDeviceInfo *dmDeviceInfo, const DeviceInf
 static void DmDeviceInfoToDmBasicInfo(const DmDeviceInfo *dmDeviceInfo, DmDeviceBasicInfo *dmBasicInfo)
 {
     if (memset_s(dmBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != EOK) {
-        DMLOGE("DmDeviceInfoToDmBasicInfo memset_s failed");
+        DMLOGE("memset_s failed");
         return;
     }
     if (strcpy_s(dmBasicInfo->deviceId, sizeof(dmBasicInfo->deviceId), dmDeviceInfo->deviceId) != EOK) {

@@ -45,9 +45,9 @@ constexpr const char* UNVALID_CREDTID = "invalidCredId";
 
 int32_t AuthSinkStatePinAuthComm::ShowAuthInfoDialog(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSinkConfirmState::ShowAuthInfoDialog start");
+    LOGI("start");
     if (DmAuthState::IsScreenLocked()) {
-        LOGE("AuthSinkConfirmState::ShowAuthInfoDialog screen is locked.");
+        LOGE("screen is locked.");
         context->reason = ERR_DM_BIND_USER_CANCEL;
         context->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
         return STOP_BIND;
@@ -55,7 +55,7 @@ int32_t AuthSinkStatePinAuthComm::ShowAuthInfoDialog(std::shared_ptr<DmAuthConte
 
     DmDialogManager::GetInstance().ShowPinDialog(context->pinCode);
     std::string pinCodeHash = GetAnonyString(Crypto::Sha256(context->pinCode));
-    LOGI("ShowAuthInfoDialog pinCodeHash: %{public}s", pinCodeHash.c_str());
+    LOGI("pinCodeHash: %{public}s", pinCodeHash.c_str());
     context->timer->StartTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK),
         DmAuthState::GetTaskTimeout(context, SESSION_HEARTBEAT_TIMEOUT_TASK, SESSION_HEARTBEAT_TIMEOUT),
         [context] (std::string name) {
@@ -71,7 +71,7 @@ void AuthSinkStatePinAuthComm::HandleSessionHeartbeat(std::shared_ptr<DmAuthCont
         return;
     }
 
-    LOGI("DmAuthManager::HandleSessionHeartbeat name %{public}s", name.c_str());
+    LOGI("name %{public}s", name.c_str());
     JsonObject jsonObj;
     jsonObj[TAG_SESSION_HEARTBEAT] = TAG_SESSION_HEARTBEAT;
     std::string message = jsonObj.Dump();
@@ -83,7 +83,7 @@ void AuthSinkStatePinAuthComm::HandleSessionHeartbeat(std::shared_ptr<DmAuthCont
             AuthSinkStatePinAuthComm::HandleSessionHeartbeat(context, name);
         });
 
-    LOGI("DmAuthManager::HandleSessionHeartbeat complete.");
+    LOGI("complete.");
 }
 
 bool AuthSinkStatePinAuthComm::IsPinCodeValid(int32_t numpin)
@@ -111,12 +111,12 @@ bool AuthSinkStatePinAuthComm::IsPinCodeValid(const std::string& strpin)
 bool AuthSinkStatePinAuthComm::IsAuthCodeReady(std::shared_ptr<DmAuthContext> context)
 {
     if (context->importAuthCode.empty() || context->importPkgName.empty()) {
-        LOGE("AuthSinkStatePinAuthComm::IsAuthCodeReady, auth code not ready with authCode %{public}s and "
+        LOGE("auth code not ready with authCode %{public}s and"
             "pkgName %{public}s.", GetAnonyString(context->importAuthCode).c_str(), context->importPkgName.c_str());
         return false;
     }
     if (context->pkgName != context->importPkgName) {
-        LOGE("AuthSinkStatePinAuthComm::IsAuthCodeReady pkgName %{public}s not supported with "
+        LOGE("pkgName %{public}s not supported with"
             "import pkgName %{public}s.", context->pkgName.c_str(), context->importPkgName.c_str());
         return false;
     }
@@ -128,7 +128,7 @@ void AuthSinkStatePinAuthComm::GeneratePincode(std::shared_ptr<DmAuthContext> co
     int32_t pinCode = GenRandInt(MIN_PIN_CODE, MAX_PIN_CODE);
     context->pinCode = std::to_string(pinCode);
     std::string pinCodeHash = GetAnonyString(Crypto::Sha256(context->pinCode));
-    LOGI("GeneratePincode pinCodeHash: %{public}s", pinCodeHash.c_str());
+    LOGI("pinCodeHash: %{public}s", pinCodeHash.c_str());
 }
 
 DmAuthStateType AuthSrcPinAuthStartState::GetStateType()
@@ -138,12 +138,12 @@ DmAuthStateType AuthSrcPinAuthStartState::GetStateType()
 
 int32_t AuthSrcPinAuthStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSrcPinAuthStartState::Action start");
+    LOGI("start");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     if (DmAuthState::IsImportAuthCodeCompatibility(context->authType)) {
         int32_t ret = ProcessImportAuthInfo(context);
         if (ret != DM_OK) {
-            LOGE("AuthSrcPinAuthStartState::ProcessImportAuthInfo failed, ret: %{public}d", ret);
+            LOGE("ret: %{public}d", ret);
             return ret;
         }
     }
@@ -151,7 +151,7 @@ int32_t AuthSrcPinAuthStartState::Action(std::shared_ptr<DmAuthContext> context)
     auto ret = context->hiChainAuthConnector->AuthCredentialPinCode(context->accesser.userId, context->requestId,
         context->pinCode);
     if (ret != DM_OK) {
-        LOGE("AuthSrcPinAuthStartState::AuthDevice call AuthCredentialPinCode failed.");
+        LOGE("call AuthCredentialPinCode failed.");
         return ret;
     }
     // wait for onTransmit from hiChain
@@ -161,7 +161,7 @@ int32_t AuthSrcPinAuthStartState::Action(std::shared_ptr<DmAuthContext> context)
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_PIN_AUTH_START, context);
         return DM_OK;
     } else if (retEvent == DmEventType::ON_ERROR) {
-        LOGI("AuthSrcPinAuthStartState::AuthDevice ON_ERROR failed, maybe retry.");
+        LOGI("ON_ERROR failed, maybe retry.");
         return DM_OK;
     }
 
@@ -207,7 +207,7 @@ DmAuthStateType AuthSinkPinAuthStartState::GetStateType()
 
 int32_t AuthSinkPinAuthStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSinkPinAuthStartState::Action start");
+    LOGI("start");
     context->timer->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
     if (!context->pinNegotiateStarted) {
         context->pinNegotiateStarted = true;
@@ -222,7 +222,7 @@ int32_t AuthSinkPinAuthStartState::Action(std::shared_ptr<DmAuthContext> context
     if (context->authTypeList.empty() ||
         (context->confirmOperation != UiAction::USER_OPERATION_TYPE_ALLOW_AUTH &&
         context->confirmOperation != UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS)) {
-        LOGE("AuthSinkPinAuthStartState::Action invalid parameter.");
+        LOGE("invalid parameter.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string pinCodeHash = GetAnonyString(Crypto::Sha256(context->pinCode));
@@ -230,7 +230,7 @@ int32_t AuthSinkPinAuthStartState::Action(std::shared_ptr<DmAuthContext> context
     // process pincode auth
     auto ret = context->hiChainAuthConnector->ProcessCredData(context->requestId, context->transmitData);
     if (ret != DM_OK) {
-        LOGE("AuthSinkPinAuthStartState::Action call ProcessCredData err.");
+        LOGE("call ProcessCredData err.");
         return ret;
     }
     // wait for onTransmit from hiChain
@@ -241,7 +241,7 @@ int32_t AuthSinkPinAuthStartState::Action(std::shared_ptr<DmAuthContext> context
         return DM_OK;
     }
     if (retEvent == DmEventType::ON_ERROR) {
-        LOGI("AuthSinkPinAuthStartState::AuthDevice ON_ERROR failed, maybe retry.");
+        LOGI("ON_ERROR failed, maybe retry.");
         return DM_OK;
     }
     return STOP_BIND;
@@ -254,13 +254,13 @@ DmAuthStateType AuthSrcPinAuthMsgNegotiateState::GetStateType()
 
 int32_t AuthSrcPinAuthMsgNegotiateState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSrcPinAuthMsgNegotiateState::Action start");
+    LOGI("start");
     auto ret = context->hiChainAuthConnector->ProcessCredData(context->requestId, context->transmitData);
     if (context->authType == AUTH_TYPE_PIN_ULTRASONIC && context->ultrasonicInfo == DM_Ultrasonic_Forward) {
         context->timer->DeleteTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK));
     }
     if (ret != DM_OK) {
-        LOGE("AuthSrcPinAuthMsgNegotiateState::Action call ProcessCredData err.");
+        LOGE("call ProcessCredData err.");
         return ret;
     }
     // wait for onTransmit from hiChain
@@ -271,10 +271,10 @@ int32_t AuthSrcPinAuthMsgNegotiateState::Action(std::shared_ptr<DmAuthContext> c
         return DM_OK;
     }
     if (retEvent == DmEventType::ON_ERROR) {
-        LOGI("AuthSrcPinAuthMsgNegotiateState::AuthDevice ON_ERROR failed, maybe retry.");
+        LOGI("ON_ERROR failed, maybe retry.");
         return DM_OK;
     }
-    LOGE("AuthSrcPinAuthMsgNegotiateState::Action failed.");
+    LOGE("WaitExpectEvent ON_TRANSMIT failed.");
     return STOP_BIND;
 }
 
@@ -285,10 +285,10 @@ DmAuthStateType AuthSinkPinAuthMsgNegotiateState::GetStateType()
 
 int32_t AuthSinkPinAuthMsgNegotiateState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSinkPinAuthMsgNegotiateState::Action start");
+    LOGI("start");
     auto ret = context->hiChainAuthConnector->ProcessCredData(context->requestId, context->transmitData);
     if (ret != DM_OK) {
-        LOGE("AuthSinkPinAuthMsgNegotiateState::Action call ProcessCredData err.");
+        LOGE("call ProcessCredData err.");
         return ret;
     }
     // wait for onTransmit from hiChain
@@ -297,7 +297,7 @@ int32_t AuthSinkPinAuthMsgNegotiateState::Action(std::shared_ptr<DmAuthContext> 
         // send 131 msg
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_PIN_AUTH_MSG_NEGOTIATE, context);
     } else if (retEvent == DmEventType::ON_ERROR) {
-        LOGI("AuthSinkPinAuthMsgNegotiateState::AuthDevice WAIT ON_TRANSMIT ON_ERROR failed, maybe retry.");
+        LOGI("WAIT ON_TRANSMIT ON_ERROR failed, maybe retry.");
         return DM_OK;
     } else {
         return STOP_BIND;
@@ -312,10 +312,10 @@ int32_t AuthSinkPinAuthMsgNegotiateState::Action(std::shared_ptr<DmAuthContext> 
             return DM_OK;
         }
     }  else if (retEvent == DmEventType::ON_ERROR) {
-        LOGI("AuthSinkPinAuthMsgNegotiateState::AuthDevice WAIT ON_SESSION_KEY_RETURNED ON_ERROR failed, maybe retry.");
+        LOGI("WAIT ON_SESSION_KEY_RETURNED ON_ERROR failed, maybe retry.");
         return DM_OK;
     }
-    LOGE("AuthSinkPinAuthMsgNegotiateState::AuthDevice failed.");
+    LOGE("WaitExpectEvent ON_SESSION_KEY_RETURNED or ON_FINISH failed.");
     return STOP_BIND;
 }
 
@@ -338,10 +338,10 @@ DmAuthStateType AuthSrcPinAuthDoneState::GetStateType()
 
 int32_t AuthSrcPinAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSrcPinAuthDoneState::Action start");
+    LOGI("start");
     std::string onTransmitData = context->transmitData;
     if (context->hiChainAuthConnector->ProcessCredData(context->requestId, onTransmitData) != DM_OK) {
-        LOGE("AuthSrcPinAuthDoneState::Action failed, processCredData failed.");
+        LOGE("processCredData failed.");
         return ERR_DM_FAILED;
     }
 
@@ -349,10 +349,10 @@ int32_t AuthSrcPinAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
     DmEventType ret = context->authStateMachine->WaitExpectEvent(ON_SESSION_KEY_RETURNED);
     if (ret != ON_SESSION_KEY_RETURNED) {
         if (ret == ON_ERROR) {
-            LOGE("AuthSrcPinAuthDoneState::Action, ON_SESSION_KEY_RETURNED event not arriverd, maybe retry.");
+            LOGE("ON_SESSION_KEY_RETURNED event not arriverd, maybe retry.");
             return DM_OK;
         } else {
-            LOGE("AuthSrcPinAuthDoneState::Action failed, ON_SESSION_KEY_RETURNED event failed, other event arriverd.");
+            LOGE("ON_SESSION_KEY_RETURNED event failed, other event arriverd.");
             return ERR_DM_FAILED;
         }
     }
@@ -360,12 +360,12 @@ int32_t AuthSrcPinAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
     // wait for ON_FINISH from hichain
     ret = context->authStateMachine->WaitExpectEvent(ON_FINISH);
     if (ret == ON_FINISH) {
-        LOGI("AuthSrcPinAuthDoneState::Action wait ON_FINISH done");
+        LOGI("wait ON_FINISH done");
         context->timer->DeleteTimer(std::string(WAIT_PIN_AUTH_TIMEOUT_TASK));
         return DM_OK;
     } else if (ret == ON_ERROR) {
         return DM_OK;
-        LOGE("AuthSrcPinAuthDoneState::Action, ON_FINISH event not arriverd, maybe retry.");
+        LOGE("ON_FINISH event not arriverd, maybe retry.");
     }
 
     return ERR_DM_FAILED;
@@ -533,7 +533,7 @@ DmAuthStateType AuthSrcPinInputState::GetStateType()
 
 int32_t AuthSrcPinInputState::ShowStartAuthDialog(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSrcPinInputState::ShowStartAuthDialog start.");
+    LOGI("start.");
     if (DmAuthState::IsScreenLocked()) {
         LOGE("AuthSrcPinInputState screen is locked.");
         context->reason = ERR_DM_BIND_USER_CANCEL;
@@ -545,13 +545,13 @@ int32_t AuthSrcPinInputState::ShowStartAuthDialog(std::shared_ptr<DmAuthContext>
     context->listener->OnBindResult(context->processInfo, context->peerTargetId,
         DM_OK, static_cast<int32_t>(STATUS_DM_SHOW_PIN_INPUT_UI), "");
     DmDialogManager::GetInstance().ShowInputDialog(context->accessee.deviceName);
-    LOGI("AuthSrcPinInputState::ShowStartAuthDialog end.");
+    LOGI("end.");
     return DM_OK;
 }
 
 int32_t AuthSrcPinInputState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSrcPinInputState::Action start");
+    LOGI("start");
     CHECK_NULL_RETURN(context, STOP_BIND);
     if (context->inputPinAuthFailTimes == 0) {
         auto ret = ShowStartAuthDialog(context);
@@ -565,16 +565,16 @@ int32_t AuthSrcPinInputState::Action(std::shared_ptr<DmAuthContext> context)
     }
 
     CHECK_NULL_RETURN(context->authStateMachine, STOP_BIND);
-    LOGI("AuthSrcPinInputState::Action waitting user operation");
+    LOGI("waitting user operation");
     // wait for user operation
     if (DmEventType::ON_USER_OPERATION !=
         context->authStateMachine->WaitExpectEvent(DmEventType::ON_USER_OPERATION)) {
-        LOGI("AuthSrcPinInputState::Action wait ON_USER_OPERATION err");
+        LOGI("wait ON_USER_OPERATION err");
         return STOP_BIND;
     }
 
     if (context->pinInputResult != USER_OPERATION_TYPE_DONE_PINCODE_INPUT) {
-        LOGE("AuthSrcPinInputState::Action not USER_OPERATION_TYPE_DONE_PINCODE_INPUT err");
+        LOGE("not USER_OPERATION_TYPE_DONE_PINCODE_INPUT err");
         return STOP_BIND;
     }
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcPinAuthStartState>());
@@ -594,12 +594,12 @@ int32_t AuthSinkPinNegotiateStartState::Action(std::shared_ptr<DmAuthContext> co
     } else {
         if (context->authType == DmAuthType::AUTH_TYPE_PIN &&
             context->inputPinAuthFailTimes < MAX_AUTH_INPUT_PIN_FAIL_TIMES) {
-            LOGI("AuthSinkPinNegotiateStartState::Action input pin auth err, retry");
+            LOGI("input pin auth err, retry");
         } else {
             // try to fallback to next auth type
             auto idx = context->currentAuthTypeIdx;
             if (idx + 1 >= context->authTypeList.size()) {
-                LOGE("AuthSinkPinNegotiateStartState::Action all auth type failed");
+                LOGE("all auth type failed");
                 context->reason = ERR_DM_BIND_PIN_CODE_ERROR;
                 return ERR_DM_BIND_PIN_CODE_ERROR;
             }
@@ -616,14 +616,14 @@ int32_t AuthSinkPinNegotiateStartState::Action(std::shared_ptr<DmAuthContext> co
             HandleAuthenticateTimeout(context, name);
         });
     if (DmAuthState::IsImportAuthCodeCompatibility(context->authType)) {
-        LOGI("AuthSinkPinNegotiateStartState::Action import auth code");
+        LOGI("import auth code");
     } else if (context->authType == DmAuthType::AUTH_TYPE_PIN) {
-        LOGI("AuthSinkPinNegotiateStartState::Action input pin");
+        LOGI("input pin");
         context->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinDisplayState>());
     } else if (context->authType == DmAuthType::AUTH_TYPE_PIN_ULTRASONIC) {
-        LOGI("AuthSinkPinNegotiateStartState::Action ultrasonic pin");
+        LOGI("ultrasonic pin");
     } else {
-        LOGE("AuthSinkPinNegotiateStartState::Action authType not support");
+        LOGE("authType not support");
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -652,10 +652,10 @@ DmAuthStateType AuthSrcReverseUltrasonicStartState::GetStateType()
 
 int32_t AuthSrcReverseUltrasonicStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSrcReverseUltrasonicStartState::Action start");
+    LOGI("start");
     context->timer->StartTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK),
         GET_ULTRASONIC_PIN_TIMEOUT, [context] (std::string name) {
-            LOGI("AuthSrcReverseUltrasonicStartState::Action timeout");
+            LOGI("timeout");
             context->authStateMachine->TransitionTo(std::make_shared<AuthSrcPinNegotiateStartState>());
             return DM_OK;
         });
@@ -676,7 +676,7 @@ DmAuthStateType AuthSrcReverseUltrasonicDoneState::GetStateType()
 
 int32_t AuthSrcReverseUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSrcReverseUltrasonicDoneState::Action Start.");
+    LOGI("Start.");
     if (context->authType != AUTH_TYPE_PIN_ULTRASONIC) {
         return STOP_BIND;
     }
@@ -685,7 +685,7 @@ int32_t AuthSrcReverseUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext>
     auto ret = context->hiChainAuthConnector->AuthCredentialPinCode(osAccountId, context->requestId,
         context->pinCode);
     if (ret != DM_OK) {
-        LOGE("AuthSrcPinAuthStartState::AuthDevice failed.");
+        LOGE("AuthCredentialPinCode failed.");
         return ret;
     }
     auto retEvent = context->authStateMachine->WaitExpectEvent(DmEventType::ON_TRANSMIT);
@@ -693,7 +693,7 @@ int32_t AuthSrcReverseUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext>
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_PIN_AUTH_START, context);
         return DM_OK;
     } else if (retEvent == DmEventType::ON_ERROR) {
-        LOGI("AuthSrcReverseUltrasonicDoneState::AuthDevice ON_ERROR failed.");
+        LOGI("ON_ERROR failed.");
         context->authStateMachine->TransitionTo(std::make_shared<AuthSrcPinNegotiateStartState>());
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_PIN_AUTH_START, context);
         return DM_OK;
@@ -708,10 +708,10 @@ DmAuthStateType AuthSrcForwardUltrasonicStartState::GetStateType()
 
 int32_t AuthSrcForwardUltrasonicStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSrcForwardUltrasonicStartState::Action Start.");
+    LOGI("Start.");
     context->reply = DM_OK;
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_FORWARD_ULTRASONIC_START, context);
-    LOGI("AuthSrcForwardUltrasonicStartState::Action End.");
+    LOGI("End.");
     return DM_OK;
 }
 
@@ -722,7 +722,7 @@ DmAuthStateType AuthSrcForwardUltrasonicDoneState::GetStateType()
 
 int32_t AuthSrcForwardUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSrcForwardUltrasonicDoneState::Action Start.");
+    LOGI("Start.");
     if (context->authType != AUTH_TYPE_PIN_ULTRASONIC) {
         return STOP_BIND;
     }
@@ -774,7 +774,7 @@ DmAuthStateType AuthSinkReverseUltrasonicStartState::GetStateType()
 
 int32_t AuthSinkReverseUltrasonicStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSinkReverseUltrasonicStartState::Action Start.");
+    LOGI("Start.");
     if (context->authType != AUTH_TYPE_PIN_ULTRASONIC) {
         return STOP_BIND;
     }
@@ -813,23 +813,23 @@ DmAuthStateType AuthSinkReverseUltrasonicDoneState::GetStateType()
 
 int32_t AuthSinkReverseUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSinkReverseUltrasonicDoneState::Action Start.");
+    LOGI("Start.");
     context->timer->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
     context->timer->DeleteTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK));
     context->pinNegotiateStarted = true;
     auto ret = context->hiChainAuthConnector->ProcessCredData(context->requestId, context->transmitData);
     if (ret != DM_OK) {
-        LOGE("AuthSinkPinAuthStartState::Action call ProcessCredData err");
+        LOGE("call ProcessCredData err");
         return ret;
     }
     auto retEvent = context->authStateMachine->WaitExpectEvent(DmEventType::ON_TRANSMIT);
     if (retEvent == DmEventType::ON_TRANSMIT) {
-        LOGI("AuthSrcPinAuthStartState::AuthDevice ON_TRANSMIT.");
+        LOGI("ON_TRANSMIT.");
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_PIN_AUTH_START, context);
         return DM_OK;
     }
     if (retEvent == DmEventType::ON_ERROR) {
-        LOGI("AuthSrcPinAuthStartState::AuthDevice ON_ERROR failed.");
+        LOGI("ON_ERROR failed.");
         context->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinNegotiateStartState>());
         return DM_OK;
     }
@@ -843,7 +843,7 @@ DmAuthStateType AuthSinkForwardUltrasonicStartState::GetStateType()
 
 int32_t AuthSinkForwardUltrasonicStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSinkForwardUltrasonicStartState::Action Start.");
+    LOGI("Start.");
     if (context->authType != AUTH_TYPE_PIN_ULTRASONIC) {
         return STOP_BIND;
     }
@@ -860,7 +860,7 @@ int32_t AuthSinkForwardUltrasonicStartState::Action(std::shared_ptr<DmAuthContex
 #endif
     context->reply = DM_OK;
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_FORWARD_ULTRASONIC_NEGOTIATE, context);
-    LOGI("AuthSinkForwardUltrasonicStartState::Action End.");
+    LOGI("End.");
     return DM_OK;
 }
 
@@ -871,23 +871,23 @@ DmAuthStateType AuthSinkForwardUltrasonicDoneState::GetStateType()
 
 int32_t AuthSinkForwardUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("AuthSinkForwardUltrasonicDoneState::Action Start.");
+    LOGI("Start.");
     context->timer->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
     context->timer->DeleteTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK));
     context->pinNegotiateStarted = true;
     auto ret = context->hiChainAuthConnector->ProcessCredData(context->requestId, context->transmitData);
     if (ret != DM_OK) {
-        LOGE("AuthSinkForwardUltrasonicDoneState::Action call ProcessCredData err");
+        LOGE("call ProcessCredData err");
         return ret;
     }
     auto retEvent = context->authStateMachine->WaitExpectEvent(DmEventType::ON_TRANSMIT);
     if (retEvent == DmEventType::ON_TRANSMIT) {
-        LOGI("AuthSinkForwardUltrasonicDoneState::AuthDevice ON_TRANSMIT.");
+        LOGI("ON_TRANSMIT.");
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_PIN_AUTH_START, context);
         return DM_OK;
     }
     if (retEvent == DmEventType::ON_ERROR) {
-        LOGI("AuthSinkForwardUltrasonicDoneState::AuthDevice ON_ERROR failed.");
+        LOGI("ON_ERROR failed.");
         context->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinNegotiateStartState>());
         return DM_OK;
     }

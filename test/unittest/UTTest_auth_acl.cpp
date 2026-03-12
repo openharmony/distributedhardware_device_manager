@@ -26,7 +26,7 @@ constexpr const char *TEST_NONE_EMPTY_STRING = "test";
 std::shared_ptr<DeviceProfileConnectorMock> AuthAclTest::deviceProfileConnectorMock = nullptr;
 void AuthAclTest::SetUpTestCase()
 {
-    LOGI("AuthAclTest::SetUpTestCase start.");
+    LOGI("start.");
     DmSoftbusConnector::dmSoftbusConnector = dmSoftbusConnectorMock;
     DmSoftbusSession::dmSoftbusSession = dmSoftbusSessionMock;
     DmAuthMessageProcessorMock::dmAuthMessageProcessorMock = std::make_shared<DmAuthMessageProcessorMock>();
@@ -39,7 +39,7 @@ void AuthAclTest::SetUpTestCase()
 
 void AuthAclTest::TearDownTestCase()
 {
-    LOGI("AuthAclTest::TearDownTestCase start.");
+    LOGI("start.");
     DmSoftbusConnector::dmSoftbusConnector = nullptr;
     DmSoftbusSession::dmSoftbusSession = nullptr;
     DmAuthMessageProcessorMock::dmAuthMessageProcessorMock = nullptr;
@@ -50,7 +50,7 @@ void AuthAclTest::TearDownTestCase()
 
 void AuthAclTest::SetUp()
 {
-    LOGI("AuthAclTest::SetUp start.");
+    LOGI("start.");
     softbusConnector = std::make_shared<SoftbusConnector>();
     listener = std::make_shared<DeviceManagerServiceListener>();
     hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
@@ -59,7 +59,7 @@ void AuthAclTest::SetUp()
 
 void AuthAclTest::TearDown()
 {
-    LOGI("AuthAclTest::TearDown start.");
+    LOGI("start.");
     authManager = nullptr;
     context = nullptr;
 

@@ -79,7 +79,7 @@ PinHolder::~PinHolder()
 int32_t PinHolder::RegisterPinHolderCallback(const std::string &pkgName)
 {
     if (session_ == nullptr) {
-        LOGE("RegisterPinHolderCallback session is nullptr.");
+        LOGE("session is nullptr.");
         return ERR_DM_FAILED;
     }
     int32_t userId = -1;
@@ -108,24 +108,24 @@ int32_t PinHolder::CreatePinHolder(const std::string &pkgName,
 {
     LOGI("CreatePinHolder.");
     if (processInfo_.pkgName.empty() || processInfo_.pkgName != pkgName) {
-        LOGE("CreatePinHolder pkgName: %{public}s is not register callback.", pkgName.c_str());
+        LOGE("pkgName: %{public}s is not register callback.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
     int32_t ret = CheckTargetIdVaild(targetId);
     if (ret != DM_OK) {
-        LOGE("CreatePinHolder targetId is invalid.");
+        LOGE("targetId is invalid.");
         return ret;
     }
     if (listener_ == nullptr || session_ == nullptr) {
-        LOGE("CreatePinHolder listener or session is nullptr.");
+        LOGE("listener or session is nullptr.");
         return ERR_DM_FAILED;
     }
     if (sourceState_ != SOURCE_INIT) {
-        LOGE("CreatePinHolder failed, state is %{public}d.", sourceState_);
+        LOGE("state is %{public}d.", sourceState_);
         return ERR_DM_FAILED;
     }
     if (sessionId_ != SESSION_ID_INVALID) {
-        LOGI("CreatePinHolder session already create, sessionId: %{public}d.", sessionId_);
+        LOGI("session already create, sessionId: %{public}d.", sessionId_);
         CreateGeneratePinHolderMsg();
         return DM_OK;
     }
@@ -153,26 +153,26 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
 {
     LOGI("DestroyPinHolder.");
     if (listener_ == nullptr || session_ == nullptr) {
-        LOGE("DestroyPinHolder listener or session is nullptr.");
+        LOGE("listener or session is nullptr.");
         return ERR_DM_FAILED;
     }
     if (processInfo_.pkgName.empty() || pkgName != processInfo_.pkgName) {
-        LOGE("DestroyPinHolder pkgName: %{public}s is not register callback.", pkgName.c_str());
+        LOGE("pkgName: %{public}s is not register callback.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
     int32_t ret = CheckTargetIdVaild(targetId);
     if (ret != DM_OK) {
-        LOGE("DestroyPinHolder targetId is invalid.");
+        LOGE("targetId is invalid.");
         return ret;
     }
     if (sessionId_ == SESSION_ID_INVALID) {
-        LOGI("DestroyPinHolder session already destroy.");
+        LOGI("session already destroy.");
         listener_->OnDestroyResult(processInfo_, ret);
         listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY_RESULT, ret, "");
         return ret;
     }
     if (sourceState_ != SOURCE_CREATE) {
-        LOGE("DestroyPinHolder failed, state is %{public}d.", sourceState_);
+        LOGE("state is %{public}d.", sourceState_);
         return ERR_DM_FAILED;
     }
     if (timer_ != nullptr) {
@@ -185,7 +185,7 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     jsonObj[TAG_PAYLOAD] = payload;
     pinType_ = pinType;
     std::string message = jsonObj.Dump();
-    LOGI("DestroyPinHolder, message type is: %{public}d, pin type is: %{public}d.", MSG_TYPE_DESTROY_PIN_HOLDER,
+    LOGI("message type is: %{public}d, pin type is: %{public}d.", MSG_TYPE_DESTROY_PIN_HOLDER,
         pinType);
     ret = session_->SendData(sessionId_, message);
     int32_t stageRes =
@@ -203,7 +203,7 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
 int32_t PinHolder::CreateGeneratePinHolderMsg()
 {
     if (listener_ == nullptr || session_ == nullptr) {
-        LOGE("CreateGeneratePinHolderMsg listener or session is nullptr.");
+        LOGE("listener or session is nullptr.");
         return ERR_DM_FAILED;
     }
     if (timer_ != nullptr) {
@@ -219,7 +219,7 @@ int32_t PinHolder::CreateGeneratePinHolderMsg()
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_CREATE_PIN_HOLDER;
     jsonObj[TAG_DM_VERSION] = "";
     std::string message = jsonObj.Dump();
-    LOGI("CreateGeneratePinHolderMsg, message type is: %{public}d, pin type is: %{public}d.",
+    LOGI("message type is: %{public}d, pin type is: %{public}d.",
         MSG_TYPE_CREATE_PIN_HOLDER, pinType_);
     int32_t ret = session_->SendData(sessionId_, message);
     int32_t bizStage = static_cast<int32_t>(PinHolderStage::SEND_CREATE_PIN_HOLDER_MSG);
@@ -238,11 +238,11 @@ int32_t PinHolder::ParseMsgType(const std::string &message)
 {
     JsonObject jsonObject(message);
     if (jsonObject.IsDiscarded()) {
-        LOGE("ParseMsgType DecodeRequest jsonStr error");
+        LOGE("DecodeRequest jsonStr error");
         return ERR_DM_FAILED;
     }
     if (!IsInt32(jsonObject, TAG_MSG_TYPE)) {
-        LOGE("ParseMsgType err json string.");
+        LOGE("err json string.");
         return ERR_DM_FAILED;
     }
     int32_t msgType = jsonObject[TAG_MSG_TYPE].Get<int32_t>();
@@ -252,7 +252,7 @@ int32_t PinHolder::ParseMsgType(const std::string &message)
 void PinHolder::ProcessCloseSessionMsg(const std::string &message)
 {
     if (listener_ == nullptr || session_ == nullptr) {
-        LOGE("ProcessCloseSessionMsg listener or session is nullptr.");
+        LOGE("listener or session is nullptr.");
         return;
     }
     LOGI("CloseSessionMsg, message type is: %{public}d.", MSG_TYPE_PIN_CLOSE_SESSION);
@@ -266,16 +266,16 @@ void PinHolder::ProcessCloseSessionMsg(const std::string &message)
 void PinHolder::ProcessCreateMsg(const std::string &message)
 {
     if (listener_ == nullptr || session_ == nullptr) {
-        LOGE("ProcessCreateMsg listener or session is nullptr.");
+        LOGE("listener or session is nullptr.");
         return;
     }
     JsonObject jsonObject(message);
     if (jsonObject.IsDiscarded()) {
-        LOGE("ProcessCreateMsg DecodeRequest jsonStr error");
+        LOGE("DecodeRequest jsonStr error");
         return;
     }
     if (!IsInt32(jsonObject, TAG_PIN_TYPE) || !IsString(jsonObject, TAG_PAYLOAD)) {
-        LOGE("ProcessCreateMsg err json string.");
+        LOGE("err json string.");
         return;
     }
     DmPinType pinType = static_cast<DmPinType>(jsonObject[TAG_PIN_TYPE].Get<int32_t>());
@@ -302,7 +302,7 @@ void PinHolder::ProcessCreateMsg(const std::string &message)
     jsonObj[TAG_DM_VERSION] = "";
 
     std::string msg = jsonObj.Dump();
-    LOGI("ProcessCreateMsg, message type is: %{public}d.", MSG_TYPE_CREATE_PIN_HOLDER_RESP);
+    LOGI("message type is: %{public}d.", MSG_TYPE_CREATE_PIN_HOLDER_RESP);
     int32_t ret = session_->SendData(sessionId_, msg);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
@@ -314,17 +314,17 @@ void PinHolder::ProcessCreateRespMsg(const std::string &message)
 {
     JsonObject jsonObject(message);
     if (jsonObject.IsDiscarded()) {
-        LOGE("ProcessCreateRespMsg DecodeRequest jsonStr error.");
+        LOGE("DecodeRequest jsonStr error.");
         return;
     }
     if (!IsInt32(jsonObject, TAG_REPLY)) {
-        LOGE("ProcessCreateRespMsg err json string.");
+        LOGE("err json string.");
         return;
     }
     isRemoteSupported_ = jsonObject.Contains(TAG_DM_VERSION);
     int32_t reply = jsonObject[TAG_REPLY].Get<int32_t>();
     if (listener_ == nullptr || session_ == nullptr) {
-        LOGE("ProcessCreateRespMsg listener or session is nullptr.");
+        LOGE("listener or session is nullptr.");
         return;
     }
     if (reply == REPLY_SUCCESS) {
@@ -333,7 +333,7 @@ void PinHolder::ProcessCreateRespMsg(const std::string &message)
         sourceState_ = SOURCE_CREATE;
         sinkState_ = SINK_CREATE;
     } else {
-        LOGE("ProcessCreateRespMsg remote state is wrong.");
+        LOGE("remote state is wrong.");
         listener_->OnCreateResult(processInfo_, ERR_DM_FAILED);
         listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::CREATE_RESULT, ERR_DM_FAILED, "");
         session_->CloseSessionServer(sessionId_);
@@ -347,16 +347,16 @@ void PinHolder::ProcessCreateRespMsg(const std::string &message)
 void PinHolder::ProcessDestroyMsg(const std::string &message)
 {
     if (listener_ == nullptr || session_ == nullptr) {
-        LOGE("ProcessDestroyMsg listener or session is nullptr.");
+        LOGE("listener or session is nullptr.");
         return;
     }
     JsonObject jsonObject(message);
     if (jsonObject.IsDiscarded()) {
-        LOGE("ProcessDestroyMsg DecodeRequest jsonStr error.");
+        LOGE("DecodeRequest jsonStr error.");
         return;
     }
     if (!IsInt32(jsonObject, TAG_PIN_TYPE) || !IsString(jsonObject, TAG_PAYLOAD)) {
-        LOGE("ProcessDestroyMsg err json string.");
+        LOGE("err json string.");
         return;
     }
     DmPinType pinType = static_cast<DmPinType>(jsonObject[TAG_PIN_TYPE].Get<int32_t>());
@@ -383,7 +383,7 @@ void PinHolder::ProcessDestroyMsg(const std::string &message)
     }
 
     std::string msg = jsonObj.Dump();
-    LOGI("ProcessDestroyMsg, message type is: %{public}d.", MSG_TYPE_DESTROY_PIN_HOLDER_RESP);
+    LOGI("message type is: %{public}d.", MSG_TYPE_DESTROY_PIN_HOLDER_RESP);
     int32_t ret = session_->SendData(sessionId_, msg);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
@@ -393,9 +393,9 @@ void PinHolder::ProcessDestroyMsg(const std::string &message)
 
 void PinHolder::CloseSession(const std::string &name)
 {
-    LOGI("PinHolder::CloseSession start timer name %{public}s.", name.c_str());
+    LOGI("start timer name %{public}s.", name.c_str());
     if (session_ == nullptr) {
-        LOGE("CloseSession session is nullptr.");
+        LOGE("session is nullptr.");
         return;
     }
     JsonObject jsonObj;
@@ -426,16 +426,16 @@ void PinHolder::ProcessDestroyResMsg(const std::string &message)
 {
     JsonObject jsonObject(message);
     if (jsonObject.IsDiscarded()) {
-        LOGE("ProcessDestroyResMsg DecodeRequest jsonStr error.");
+        LOGE("DecodeRequest jsonStr error.");
         return;
     }
     if (!IsInt32(jsonObject, TAG_REPLY)) {
-        LOGE("ProcessDestroyResMsg err json string.");
+        LOGE("err json string.");
         return;
     }
     int32_t reply = jsonObject[TAG_REPLY].Get<int32_t>();
     if (listener_ == nullptr || session_ == nullptr) {
-        LOGE("ProcessDestroyResMsg listener or session is nullptr.");
+        LOGE("listener or session is nullptr.");
         return;
     }
     if (reply == REPLY_SUCCESS) {
@@ -447,7 +447,7 @@ void PinHolder::ProcessDestroyResMsg(const std::string &message)
             timer_->DeleteAll();
         }
     } else {
-        LOGE("ProcessDestroyResMsg remote state is wrong.");
+        LOGE("remote state is wrong.");
         listener_->OnDestroyResult(processInfo_, ERR_DM_FAILED);
         listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY_RESULT, ERR_DM_FAILED, "");
         sinkState_ = SINK_INIT;
@@ -461,7 +461,7 @@ void PinHolder::ProcessDestroyResMsg(const std::string &message)
 void PinHolder::OnDataReceived(int32_t sessionId, std::string message)
 {
     int32_t msgType = ParseMsgType(message);
-    LOGI("OnDataReceived, msgType: %{public}d.", msgType);
+    LOGI("msgType: %{public}d.", msgType);
     int32_t sessionSide = GetSessionSide(sessionId);
     if (sessionSide == SESSION_SIDE_SERVER && sessionId != sessionId_) {
         LOGE("another session opened, close this sessionId: %{public}d.", sessionId);
@@ -519,7 +519,7 @@ void PinHolder::GetPeerDeviceId(int32_t sessionId, std::string &udidHash)
         return;
     }
     udidHash = udidHashTmp;
-    LOGI("GetPeerDeviceId udid hash: %{public}s success.", GetAnonyString(udidHash).c_str());
+    LOGI("udid hash: %{public}s success.", GetAnonyString(udidHash).c_str());
 }
 
 void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
@@ -531,7 +531,7 @@ void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t 
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]GetPeerDeviceId failed for session: %{public}d.", sessionId);
     }
-    LOGI("OnSessionOpened, peerDeviceId: %{public}s.", GetAnonyString(peerDeviceId).c_str());
+    LOGI("peerDeviceId: %{public}s.", GetAnonyString(peerDeviceId).c_str());
     DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(static_cast<int32_t>(PinHolderStage::SESSION_OPENED),
         std::string("OnSessionOpened"), std::string(peerDeviceId));
     if (sessionSide == SESSION_SIDE_SERVER) {
@@ -594,7 +594,7 @@ void PinHolder::OnSessionClosed(int32_t sessionId)
 int32_t PinHolder::CheckTargetIdVaild(const PeerTargetId &targetId)
 {
     if (targetId.deviceId.empty() && targetId.brMac.empty() && targetId.bleMac.empty() && targetId.wifiIp.empty()) {
-        LOGE("CheckTargetIdVaild failed. targetId is empty.");
+        LOGE("failed. targetId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
@@ -604,19 +604,19 @@ int32_t PinHolder::NotifyPinHolderEvent(const std::string &pkgName, const std::s
 {
     LOGI("NotifyPinHolderEvent.");
     if (listener_ == nullptr || session_ == nullptr) {
-        LOGE("NotifyPinHolderEvent listener or session is nullptr.");
+        LOGE("listener or session is nullptr.");
         return ERR_DM_FAILED;
     }
     if (processInfo_.pkgName.empty() || pkgName != processInfo_.pkgName || event.empty()) {
-        LOGE("NotifyPinHolderEvent pkgName: %{public}s is not register callback.", pkgName.c_str());
+        LOGE("pkgName: %{public}s is not register callback.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
     if (sessionId_ == SESSION_ID_INVALID) {
-        LOGE("NotifyPinHolderEvent session invalid.");
+        LOGE("session invalid.");
         return ERR_DM_FAILED;
     }
     if (!isRemoteSupported_) {
-        LOGE("NotifyPinHolderEvent failed, remote not support.");
+        LOGE("remote not support.");
         return ERR_DM_BIND_PEER_UNSUPPORTED;
     }
     JsonObject jsonObject(event);
@@ -636,7 +636,7 @@ int32_t PinHolder::NotifyPinHolderEvent(const std::string &pkgName, const std::s
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_PIN_HOLDER_CHANGE;
     jsonObj[TAG_PIN_TYPE] = pinType;
     std::string message = jsonObj.Dump();
-    LOGI("NotifyPinHolderEvent, message type is: %{public}d, pin type is: %{public}d.",
+    LOGI("message type is: %{public}d, pin type is: %{public}d.",
         MSG_TYPE_PIN_HOLDER_CHANGE, pinType);
     int32_t ret = session_->SendData(sessionId_, message);
     if (ret != DM_OK) {
@@ -650,16 +650,16 @@ int32_t PinHolder::NotifyPinHolderEvent(const std::string &pkgName, const std::s
 void PinHolder::ProcessChangeMsg(const std::string &message)
 {
     if (listener_ == nullptr || session_ == nullptr) {
-        LOGE("ProcessChangeMsg listener or session is nullptr.");
+        LOGE("listener or session is nullptr.");
         return;
     }
     JsonObject jsonObject(message);
     if (jsonObject.IsDiscarded()) {
-        LOGE("ProcessChangeMsg DecodeRequest jsonStr error.");
+        LOGE("DecodeRequest jsonStr error.");
         return;
     }
     if (!IsInt32(jsonObject, TAG_PIN_TYPE)) {
-        LOGE("ProcessChangeMsg err json string.");
+        LOGE("err json string.");
         return;
     }
     DmPinType pinType = static_cast<DmPinType>(jsonObject[TAG_PIN_TYPE].Get<int32_t>());
@@ -684,7 +684,7 @@ void PinHolder::ProcessChangeMsg(const std::string &message)
     }
 
     std::string msg = jsonObj.Dump();
-    LOGI("ProcessChangeMsg, message type is: %{public}d.", MSG_TYPE_PIN_HOLDER_CHANGE_RESP);
+    LOGI("message type is: %{public}d.", MSG_TYPE_PIN_HOLDER_CHANGE_RESP);
     int32_t ret = session_->SendData(sessionId_, msg);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
@@ -696,22 +696,22 @@ void PinHolder::ProcessChangeRespMsg(const std::string &message)
 {
     JsonObject jsonObject(message);
     if (jsonObject.IsDiscarded()) {
-        LOGE("ProcessChangeRespMsg DecodeRequest jsonStr error.");
+        LOGE("DecodeRequest jsonStr error.");
         return;
     }
     if (!IsInt32(jsonObject, TAG_REPLY)) {
-        LOGE("ProcessChangeRespMsg err json string.");
+        LOGE("err json string.");
         return;
     }
     int32_t reply = jsonObject[TAG_REPLY].Get<int32_t>();
     if (listener_ == nullptr || session_ == nullptr) {
-        LOGE("ProcessChangeRespMsg listener or session is nullptr.");
+        LOGE("listener or session is nullptr.");
         return;
     }
     if (reply == REPLY_SUCCESS) {
         listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::PIN_TYPE_CHANGE_RESULT, DM_OK, "");
     } else {
-        LOGE("ProcessChangeRespMsg remote state is wrong.");
+        LOGE("remote state is wrong.");
         listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::PIN_TYPE_CHANGE_RESULT, ERR_DM_FAILED, "");
     }
 }

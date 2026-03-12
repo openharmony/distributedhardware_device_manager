@@ -54,7 +54,7 @@ void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32
 #endif
     DmDeviceInfo info;
     SoftbusCache::GetInstance().GetLocalDeviceInfo(info);
-    LOGI("PublishCommonEventCallback start, bleState: %{public}d, wifiState: %{public}d, screenState: %{public}d"
+    LOGI("start, bleState: %{public}d, wifiState: %{public}d, screenState: %{public}d"
          ", deviceType: %{public}d", bluetoothState, wifiState, screenState, static_cast<int32_t>(info.deviceTypeId));
     if (info.deviceTypeId == DmDeviceType::DEVICE_TYPE_WATCH ||
         info.deviceTypeId == DmDeviceType::DEVICE_TYPE_GLASSES) {
@@ -105,7 +105,7 @@ SoftbusPublish::~SoftbusPublish()
 
 void SoftbusPublish::OnSoftbusPublishResult(int publishId, PublishResult result)
 {
-    LOGD("OnSoftbusPublishResult, publishId: %{public}d, result: %{public}d.", publishId, result);
+    LOGD("publishId: %{public}d, result: %{public}d.", publishId, result);
 }
 
 int32_t SoftbusPublish::PublishSoftbusLNN()

@@ -1443,7 +1443,7 @@ ohos_unittest("UTTest_oh_device_manager") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"devicemanager_ndk\"",
+    "DH_LOG_TAG=\"dm_ndk\"",
     "LOG_DOMAIN=0xD004110",
   ]
 

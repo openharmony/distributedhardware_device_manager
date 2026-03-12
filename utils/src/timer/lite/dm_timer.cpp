@@ -36,7 +36,7 @@ DmTimer::DmTimer()
 
 DmTimer::~DmTimer()
 {
-    LOGI("DmTimer destructor");
+    LOGI("destructor");
     DeleteAll();
     if (timerState_) {
         std::unique_lock<std::mutex> locker(timerStateMutex_);

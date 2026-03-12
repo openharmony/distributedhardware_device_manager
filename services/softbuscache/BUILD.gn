@@ -35,7 +35,7 @@ if (defined(ohos_lite)) {
 
       defines = [
         "LITE_DEVICE",
-        "DH_LOG_TAG=\"dmdevicecache\"",
+        "DH_LOG_TAG=\"dmdevcache\"",
         "LOG_DOMAIN=0xD004113",
       ]
 
@@ -80,7 +80,7 @@ if (defined(ohos_lite)) {
 
     defines = [
       "HI_LOG_ENABLE",
-      "DH_LOG_TAG=\"dmdevicecache\"",
+      "DH_LOG_TAG=\"dmdevcache\"",
       "LOG_DOMAIN=0xD004113",
     ]
 

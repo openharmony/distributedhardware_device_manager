@@ -23,7 +23,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     }
     if (ANI_OK != ohos::distributedDeviceManager::ANIRegister(env)) {
-        LOGE("Error from ohos::distributedDeviceManager::ANIRegister");
+        LOGE("ANIRegister failed");
         return ANI_ERROR;
     }
     *result = ANI_VERSION_1;

@@ -44,7 +44,7 @@ int32_t IpcServerListener::GetIdentityByPkgName(std::string &name, SvcIdentity *
 int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
     if (req == nullptr || rsp == nullptr) {
-        LOGE("SendRequest req or rsp is nullptr.");
+        LOGE("req or rsp is nullptr.");
         return ERR_DM_POINT_NULL;
     }
     std::string pkgName = req->GetPkgName();
@@ -65,7 +65,7 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
     MessageOptionInit(&option);
     option.flags = TF_OP_ASYNC;
     if (::SendRequest(svc, cmdCode, &io, nullptr, option, nullptr) != DM_OK) {
-        LOGI("SendRequest failed cmdCode:%{public}d", cmdCode);
+        LOGI("failed cmdCode:%{public}d", cmdCode);
     }
     return DM_OK;
 }

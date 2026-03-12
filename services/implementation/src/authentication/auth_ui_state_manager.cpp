@@ -26,7 +26,7 @@ namespace DistributedHardware {
 constexpr const char* UI_STATE_MSG = "uiStateMsg";
 AuthUiStateManager::AuthUiStateManager(std::shared_ptr<IDeviceManagerServiceListener> listener) : listener_(listener)
 {
-    LOGI("AuthUiStateManager constructor");
+    LOGI("constructor");
 }
 
 void AuthUiStateManager::RegisterUiStateCallback(const std::string pkgName)
@@ -58,7 +58,7 @@ void AuthUiStateManager::UnRegisterUiStateCallback(const std::string pkgName)
 void AuthUiStateManager::UpdateUiState(const DmUiStateMsg msg)
 {
     if (listener_ == nullptr) {
-        LOGE("AuthUiStateManager::UpdateUiState listener is null.");
+        LOGE("listener is null.");
         return;
     }
     JsonObject jsonObj;
@@ -77,7 +77,7 @@ void AuthUiStateManager::UpdateUiState(const DmUiStateMsg msg)
     for (auto item : pkgSet_) {
         listener_->OnUiCall(item, paramJson);
     }
-    LOGI("AuthUiStateManager::UpdateUiState complete.");
+    LOGI("complete.");
 }
 } // namespace DistributedHardware
 } // namespace OHOS

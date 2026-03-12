@@ -103,7 +103,7 @@ int32_t FreezeProcess::ConvertJsonToDeviceFreezeState(const std::string &result,
     if (IsInt64(resultJson, STOP_FREEZE_TIME_KEY)) {
         freezeStateObj.stopFreezeTimeStamp = resultJson[STOP_FREEZE_TIME_KEY].Get<int64_t>();
     }
-    LOGI("ConvertJsonToDeviceFreezeState success");
+    LOGI("success");
     return DM_OK;
 }
 
@@ -128,7 +128,7 @@ int32_t FreezeProcess::ConvertJsonToBindFailedEvents(const std::string &result, 
         resultJson[FREEZE_TIMES_STAMPS_KEY].Get(freezeTimeStampsTmp);
         bindFailedEventsObj.freezeTimeStamps = freezeTimeStampsTmp;
     }
-    LOGI("ConvertJsonToBindFailedEvents success");
+    LOGI("success");
     return DM_OK;
 }
 
@@ -172,7 +172,7 @@ int32_t FreezeProcess::CleanFreezeRecord(int64_t nowTime)
         LOGE("CleanFreezeState failed");
         return ERR_DM_FAILED;
     }
-    LOGI("CleanFreezeRecord success");
+    LOGI("success");
     return DM_OK;
 }
 
@@ -204,11 +204,11 @@ int32_t FreezeProcess::CleanBindFailedEvents(int64_t reservedDataTimeStamp)
     std::string valueStr = "";
     ConvertBindFailedEventsToJson(bindFailedEventsTmp, valueStr);
     if (KVAdapterManager::GetInstance().PutFreezeData(BIND_FAILED_EVENTS_KEY, valueStr) != DM_OK) {
-        LOGE("CleanBindFailedEvents within 20mins failed");
+        LOGE("within 20mins failed");
         return ERR_DM_FAILED;
     }
     bindFailedEventsCache_ = bindFailedEventsTmp;
-    LOGI("CleanBindFailedEvents success");
+    LOGI("success");
     return DM_OK;
 }
 
@@ -228,7 +228,7 @@ int32_t FreezeProcess::CleanFreezeState(int64_t reservedDataTimeStamp)
         return ERR_DM_FAILED;
     }
     freezeStateCache_.Reset();
-    LOGI("CleanFreezeState success");
+    LOGI("success");
     return DM_OK;
 }
 
@@ -314,7 +314,7 @@ int32_t FreezeProcess::UpdateFreezeState(int64_t nowTime)
     std::string freezeStateStr = "";
     ConvertDeviceFreezeStateToJson(freezeStateTmp, freezeStateStr);
     if (KVAdapterManager::GetInstance().PutFreezeData(FREEZE_STATE_KEY, freezeStateStr) != DM_OK) {
-        LOGE("UpdateFreezeState failed");
+        LOGE("PutFreezeData failed");
         return ERR_DM_FAILED;
     }
     freezeStateCache_ = freezeStateTmp;

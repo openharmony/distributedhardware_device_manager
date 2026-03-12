@@ -76,7 +76,7 @@ IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGE
 void IpcServerStub::OnStart()
 {
     startBeginTime_ = GetTickCount();
-    LOGI("IpcServerStub::OnStart start");
+    LOGI("start");
     if (state_ == ServiceRunningState::STATE_RUNNING) {
         LOGI("IpcServerStub has already started.");
         return;
@@ -116,7 +116,7 @@ void IpcServerStub::ReclaimMemmgrFileMemForDM()
         LOGI("Start echo 1 to pid : %{public}d, path: %{public}s", memmgrPid, path.c_str());
         FILE *file = fopen(path.c_str(), "w");
         if (file == NULL) {
-            LOGE("ReclaimMemmgrFileMemForDM open file failed.");
+            LOGE("open file failed.");
             return;
         }
         size_t strLength = contentStr.length();
@@ -128,7 +128,7 @@ void IpcServerStub::ReclaimMemmgrFileMemForDM()
             LOGE("fclose failed");
         }
     }
-    LOGI("ReclaimMemmgrFileMemForDM success.");
+    LOGI("success.");
 }
 //LCOV_EXCL_STOP
 
@@ -167,7 +167,7 @@ void IpcServerStub::HandleSoftBusServerAdd()
     DeviceNameManager::GetInstance().InitDeviceNameWhenSoftBusReady();
     ReclaimMemmgrFileMemForDM();
     std::function<void()> task = [this]() {
-        LOGI("HandleSoftBusServerAdd After 5mins.");
+        LOGI("After 5mins.");
         ReclaimMemmgrFileMemForDM();
     };
     DeviceManagerService::GetInstance().HandleSoftbusRestart();
@@ -178,7 +178,7 @@ void IpcServerStub::HandleSoftBusServerAdd()
 
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
+    LOGI("systemAbilityId:%{public}d added!", systemAbilityId);
     if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
         HandleSoftBusServerAdd();
         return;
@@ -220,7 +220,7 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
 
 void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    LOGI("OnRemoveSystemAbility systemAbilityId:%{public}d removed!", systemAbilityId);
+    LOGI("systemAbilityId:%{public}d removed!", systemAbilityId);
     if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
         DeviceManagerService::GetInstance().UninitSoftbusListener();
         // call notify service offline
@@ -231,7 +231,7 @@ void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::st
 //LCOV_EXCL_START
 bool IpcServerStub::Init()
 {
-    LOGI("IpcServerStub::Init ready to init.");
+    LOGI("ready to init.");
     KVAdapterManager::GetInstance().Init();
     DeviceManagerService::GetInstance().InitDMServiceListener();
     std::lock_guard<ffrt::mutex> autoLock(registerLock_);
@@ -239,7 +239,7 @@ bool IpcServerStub::Init()
         bool ret = Publish(this);
         LOGI("Publish, cost %{public}" PRId64 " ms", GetTickCount() -  startBeginTime_);
         if (!ret) {
-            LOGE("IpcServerStub::Init Publish failed!");
+            LOGE("Publish failed!");
             return false;
         }
         registerToService_ = true;
@@ -249,7 +249,7 @@ bool IpcServerStub::Init()
 
 void IpcServerStub::OnStop()
 {
-    LOGI("IpcServerStub::OnStop ready to stop service.");
+    LOGI("ready to stop service.");
     DeviceManagerService::GetInstance().UninitDMServiceListener();
     state_ = ServiceRunningState::STATE_NOT_START;
     {
@@ -260,7 +260,7 @@ void IpcServerStub::OnStop()
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 0, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
 #endif // SUPPORT_MEMMGR
-    LOGI("IpcServerStub::OnStop end.");
+    LOGI("end.");
 }
 //LCOV_EXCL_STOP
 
@@ -288,7 +288,7 @@ int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
     MessageParcel reply;
     MessageOption option;
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcServerStub::SendCmd error: Invalid para, cmdCode: %{public}d", (int32_t)cmdCode);
+        LOGE("Invalid para, cmdCode: %{public}d", (int32_t)cmdCode);
         return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
     }
 
@@ -313,7 +313,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
 {
     LOGI("pkgName: %{public}s", processInfo.pkgName.c_str());
     if (processInfo.pkgName.empty() || listener == nullptr) {
-        LOGE("RegisterDeviceManagerListener error: input parameter invalid.");
+        LOGE("input parameter invalid.");
         return ERR_DM_POINT_NULL;
     }
 #ifdef SUPPORT_MEMMGR
@@ -437,7 +437,7 @@ int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
     std::string result("");
     int ret = DeviceManagerService::GetInstance().DmHiDumper(argsStr, result);
     if (ret != DM_OK) {
-        LOGE("Dump error, ret = %{public}d", ret);
+        LOGE("ret = %{public}d", ret);
     }
 
     ret = dprintf(fd, "%s\n", result.c_str());

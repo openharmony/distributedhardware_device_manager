@@ -47,10 +47,10 @@ int32_t IpcClientStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
     MessageParcel reply;
     MessageOption option;
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcClientStub::SetRequest cmdCode param invalid!");
+        LOGE("cmdCode param invalid!");
         return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
     }
-    LOGI("SendCmd cmdCode: %{public}d", cmdCode);
+    LOGI("cmdCode: %{public}d", cmdCode);
 
     if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
         LOGE("set request cmd failed");

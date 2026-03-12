@@ -129,7 +129,7 @@ AuthManager::AuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                          std::shared_ptr<IDeviceManagerServiceListener> listener,
                          std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector)
 {
-    LOGI("DmAuthManager constructor");
+    LOGI("constructor");
     context_ = std::make_shared<DmAuthContext>();
     context_->softbusConnector = softbusConnector;
     context_->listener = listener;
@@ -164,7 +164,7 @@ AuthManager::~AuthManager()
         std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         bindParam_.clear();
     }
-    LOGI("DmAuthManager destructor");
+    LOGI("destructor");
 }
 
 void AuthManager::RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback)
@@ -191,7 +191,7 @@ std::shared_ptr<DmAuthContext> AuthManager::GetAuthContext()
 
 std::string AuthManager::GeneratePincode()
 {
-    LOGI("AuthManager::GeneratePincode start");
+    LOGI("start");
     int32_t pinCode = GenRandInt(MIN_PIN_CODE, MAX_PIN_CODE);
     CHECK_NULL_RETURN(context_, "");
     context_->pinCode = std::to_string(pinCode);
@@ -200,10 +200,10 @@ std::string AuthManager::GeneratePincode()
 
 int32_t AuthManager::RegisterUiStateCallback(const std::string pkgName)
 {
-    LOGI("AuthManager::RegisterUiStateCallback start");
+    LOGI("start");
     CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
     if (context_->authUiStateMgr == nullptr) {
-        LOGE("AuthManager::RegisterUiStateCallback context_->authUiStateMgr is null.");
+        LOGE("context_->authUiStateMgr is null.");
         return ERR_DM_FAILED;
     }
     context_->authUiStateMgr->RegisterUiStateCallback(pkgName);
@@ -212,10 +212,10 @@ int32_t AuthManager::RegisterUiStateCallback(const std::string pkgName)
 
 int32_t AuthManager::UnRegisterUiStateCallback(const std::string pkgName)
 {
-    LOGI("AuthManager::UnRegisterUiStateCallback start");
+    LOGI("start");
     CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
     if (context_->authUiStateMgr == nullptr) {
-        LOGE("AuthManager::UnRegisterUiStateCallback context_->authUiStateMgr is null.");
+        LOGE("context_->authUiStateMgr is null.");
         return ERR_DM_FAILED;
     }
     context_->authUiStateMgr->UnRegisterUiStateCallback(pkgName);
@@ -224,35 +224,35 @@ int32_t AuthManager::UnRegisterUiStateCallback(const std::string pkgName)
 
 int32_t AuthManager::UnAuthenticateDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel)
 {
-    LOGI("AuthManager::UnAuthenticateDevice start");
+    LOGI("start");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManager::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
 {
     if (authCode.empty() || pkgName.empty()) {
-        LOGE("ImportAuthCode failed, authCode or pkgName is empty");
+        LOGE("authCode or pkgName is empty");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
     context_->importAuthCode = authCode;
     context_->importPkgName = pkgName;
     context_->pinCode = authCode;
-    LOGI("AuthManager::ImportAuthCode ok");
+    LOGI("ok");
     return DM_OK;
 }
 
 int32_t AuthManager::UnBindDevice(const std::string &pkgName, const std::string &udid,
     int32_t bindLevel, const std::string &extra)
 {
-    LOGI("AuthManager::UnBindDevice start");
+    LOGI("start");
     return ERR_DM_FAILED;
 }
 
 int32_t AuthManager::StopAuthenticateDevice(const std::string &pkgName)
 {
     (void)pkgName;
-    LOGI("AuthManager::StopAuthenticateDevice start");
+    LOGI("start");
     CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
     context_->connDelayCloseTime = 0;
     context_->reason = STOP_BIND;
@@ -273,10 +273,10 @@ int32_t AuthManager::StopAuthenticateDevice(const std::string &pkgName)
 
 void AuthManager::OnScreenLocked()
 {
-    LOGI("AuthManager::OnScreenLocked start");
+    LOGI("start");
     CHECK_NULL_VOID(context_);
     if (DmAuthState::IsImportAuthCodeCompatibility(context_->authType)) {
-        LOGI("OnScreenLocked authtype is: %{public}d, no need stop bind.", context_->authType);
+        LOGI("authtype is: %{public}d, no need stop bind.", context_->authType);
         return;
     }
     context_->reason = ERR_DM_BIND_USER_CANCEL;
@@ -285,7 +285,7 @@ void AuthManager::OnScreenLocked()
 
 void AuthManager::HandleDeviceNotTrust(const std::string &udid)
 {
-    LOGI("AuthManager::HandleDeviceNotTrust start");
+    LOGI("start");
 }
 
 int32_t AuthManager::RegisterAuthenticationType(int32_t authenticationType)
@@ -304,27 +304,27 @@ int32_t AuthManager::GetReason()
 // Save the key
 void AuthSrcManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen)
 {
-    LOGI("AuthSrcManager::AuthDeviceSessionKey start. keyLen: %{public}u", sessionKeyLen);
+    LOGI("start. keyLen: %{public}u", sessionKeyLen);
     if (context_ == nullptr || context_->authMessageProcessor == nullptr || context_->authStateMachine == nullptr) {
-        LOGE("AuthSrcManager::AuthDeviceSessionKey failed, auth context not initial.");
+        LOGE("auth context not initial.");
         return;
     }
     if (requestId != context_->requestId) {
-        LOGE("AuthSrcManager::onTransmit requestId %{public}" PRId64 "is error.", requestId);
+        LOGE("requestId %{public}" PRId64 "is error.", requestId);
         return;
     }
     int32_t ret = context_->authMessageProcessor->SaveSessionKey(sessionKey, sessionKeyLen);
     if (ret != DM_OK) {
-        LOGE("AuthSrcManager::AuthDeviceSessionKey, save session key error, ret: %{public}d", ret);
+        LOGE("save session key error, ret: %{public}d", ret);
     }
 
     context_->authStateMachine->NotifyEventFinish(ON_SESSION_KEY_RETURNED);
-    LOGI("AuthSrcManager::AuthDeviceSessionKey leave.");
+    LOGI("leave.");
 }
 
 char *AuthSrcManager::AuthDeviceRequest(int64_t requestId, int operationCode, const char *reqParams)
 {
-    LOGI("AuthSrcManager::AuthDeviceRequest start");
+    LOGI("start");
     return nullptr;
 }
 
@@ -338,7 +338,7 @@ bool AuthManager::IsAuthTypeSupported(const int32_t &authType)
 {
     CHECK_NULL_RETURN(context_, false);
     if (context_->authenticationMap.find(authType) == context_->authenticationMap.end()) {
-        LOGE("IsAuthTypeSupported failed, authType is not supported.");
+        LOGE("authType is not supported.");
         return false;
     }
     return true;
@@ -348,12 +348,12 @@ bool AuthManager::IsAuthCodeReady(const std::string &pkgName)
 {
     CHECK_NULL_RETURN(context_, false);
     if (context_->importAuthCode.empty() || context_->importPkgName.empty()) {
-        LOGE("AuthManager::IsAuthCodeReady, auth code not ready with authCode %{public}s and pkgName %{public}s.",
+        LOGE("auth code not ready with authCode %{public}s and pkgName %{public}s.",
             GetAnonyString(context_->importAuthCode).c_str(), context_->importPkgName.c_str());
         return false;
     }
     if (pkgName != context_->importPkgName) {
-        LOGE("AuthManager::IsAuthCodeReady pkgName %{public}s not supported with import pkgName %{public}s.",
+        LOGE("pkgName %{public}s not supported with import pkgName %{public}s.",
             pkgName.c_str(), context_->importPkgName.c_str());
         return false;
     }
@@ -363,24 +363,24 @@ bool AuthManager::IsAuthCodeReady(const std::string &pkgName)
 int32_t AuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGI("AuthManager::CheckAuthParamVaild start.");
+    LOGI("start.");
     if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
-        LOGE("CheckAuthParamVaild failed, authType is illegal.");
+        LOGE("authType is illegal.");
         return ERR_DM_AUTH_FAILED;
     }
     if (pkgName.empty() || deviceId.empty()) {
-        LOGE("AuthManager::CheckAuthParamVaild failed, pkgName is %{public}s, deviceId is %{public}s, extra is"
+        LOGE("pkgName is %{public}s, deviceId is %{public}s, extra is"
             "%{public}s.", pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
     if (context_->listener == nullptr || context_->authUiStateMgr == nullptr) {
-        LOGE("AuthManager::CheckAuthParamVaild listener or authUiStateMgr is nullptr.");
+        LOGE("listener or authUiStateMgr is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
     if (!IsAuthTypeSupported(authType)) {
-        LOGE("AuthManager::CheckAuthParamVaild authType %{public}d not support.", authType);
+        LOGE("authType %{public}d not support.", authType);
         context_->listener->OnAuthResult(context_->processInfo, context_->peerTargetId.deviceId, "",
             STATUS_DM_AUTH_DEFAULT,
             ERR_DM_UNSUPPORTED_AUTH_TYPE);
@@ -393,7 +393,7 @@ int32_t AuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t aut
     if ((jsonObject.IsDiscarded() || !IsString(jsonObject, PARAM_KEY_CONN_SESSIONTYPE) ||
         jsonObject[PARAM_KEY_CONN_SESSIONTYPE].Get<std::string>() != CONN_SESSION_TYPE_HML) &&
         !context_->softbusConnector->HaveDeviceInMap(deviceId)) {
-        LOGE("CheckAuthParamVaild failed, the discoveryDeviceInfoMap_ not have this device.");
+        LOGE("the discoveryDeviceInfoMap_ not have this device.");
         context_->listener->OnAuthResult(context_->processInfo, context_->peerTargetId.deviceId, "",
             STATUS_DM_AUTH_DEFAULT, ERR_DM_INPUT_PARA_INVALID);
         context_->listener->OnBindResult(context_->processInfo, context_->peerTargetId,
@@ -534,7 +534,7 @@ int32_t AuthManager::GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmD
 int32_t AuthManager::GetSrcCarUserIdByDisplayId(int32_t displayId)
 {
     CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
-    LOGI("GetSrcCarUserIdByDisplayId start.");
+    LOGI("start.");
     int32_t mainScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(MAIN_SCREEN_DISPLAYID);
     if (mainScreenUserId < 0) {
         LOGE("mainScreenUserId = %{public}d is invalid.", mainScreenUserId);
@@ -713,13 +713,13 @@ void AuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     GetAuthParam(pkgName, authType, deviceId, extra);
     CHECK_NULL_VOID(context_->authStateMachine);
     context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcStartState>());
-    LOGI("AuthManager::AuthenticateDevice complete");
+    LOGI("complete");
     return;
 }
 int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGI("AuthManager::AuthenticateDevice start auth type %{public}d.", authType);
+    LOGI("start auth type %{public}d.", authType);
     SetAuthType(authType);
     ParseServiceInfo(extra);
     int32_t ret = DM_OK;
@@ -744,7 +744,7 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
     context_->isAuthenticateDevice = true;
     if (authType == AUTH_TYPE_CRE) {
         GetConnDelayCloseTime(extra);
-        LOGI("AuthManager::AuthenticateDevice for credential type, joinLNN directly.");
+        LOGI("credential type, joinLNN directly.");
         CHECK_NULL_RETURN(context_->softbusConnector, ERR_DM_POINT_NULL);
         context_->softbusConnector->JoinLnn(deviceId, true);
         CHECK_NULL_RETURN(context_->listener, ERR_DM_POINT_NULL);
@@ -782,9 +782,9 @@ void AuthManager::GetConnDelayCloseTime(const std::string &extra)
 int32_t AuthManager::CheckSrcNegotiateSrvParam(const std::string &pkgName, int64_t serviceId,
     const std::map<std::string, std::string> &bindParam)
 {
-    LOGI("AuthManager::Check source eegotiate service param start.");
+    LOGI("source eegotiate service param start.");
     if (pkgName.empty() || serviceId == 0) {
-        LOGE("AuthManager::Check param failed, pkgName or service id is empty.");
+        LOGE("param failed, pkgName or service id is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     auto iterService = bindParam.find(PARAM_KEY_SUBJECT_SERVICE_ONES);
@@ -794,7 +794,7 @@ int32_t AuthManager::CheckSrcNegotiateSrvParam(const std::string &pkgName, int64
     }
     std::string isProxyBind = iter->second;
     if (isProxyBind == "true" && iterService == bindParam.end()) {
-        LOGE("AuthManager::Check param failed, proxyed subjects is empty.");
+        LOGE("param failed, proxyed subjects is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
@@ -804,7 +804,7 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
     const std::map<std::string, std::string> &bindParam, int sessionId, uint64_t logicalSessionId)
 {
     int ret = DM_OK;
-    LOGI("AuthManager::BindTarget start. pkgName: %{public}s", pkgName.c_str());
+    LOGI("start. pkgName: %{public}s", pkgName.c_str());
 
     struct RadarInfo info = {
         .funcName = "AuthenticateDevice",
@@ -816,12 +816,12 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
     }
     GetIsNeedJoinLnnParam(bindParam);
     if (pkgName.empty()) {
-        LOGE("AuthManager::BindTarget failed, pkgName is empty.");
+        LOGE("pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     int32_t authType = -1;
     if (ParseAuthType(bindParam, authType) != DM_OK) {
-        LOGE("AuthManager::BindTarget failed, key: %{public}s error.", PARAM_KEY_AUTH_TYPE);
+        LOGE("key: %{public}s error.", PARAM_KEY_AUTH_TYPE);
         return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
@@ -834,7 +834,7 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
         ret = AuthenticateDevice(pkgName, authType, targetId.deviceId, ParseExtraFromMap(bindParam));
         if (ret != DM_OK) { return ret; }
     } else {
-        LOGE("AuthManager::BindTarget failed, targetId is error.");
+        LOGE("targetId is error.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
@@ -879,7 +879,7 @@ void AuthSinkManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, in
 
 void AuthSinkManager::OnSessionClosed(int32_t sessionId)
 {
-    LOGI("AuthSrcManager::OnSessionClosed sessionId = %{public}d", sessionId);
+    LOGI("sessionId = %{public}d", sessionId);
     CHECK_NULL_VOID(context_);
     context_->reason = ERR_DM_SESSION_CLOSED;
     context_->authStateMachine->TransitionTo(std::make_shared<AuthSinkFinishState>());
@@ -891,7 +891,7 @@ void AuthSinkManager::OnDataReceived(int32_t sessionId, std::string message)
     context_->sessionId = sessionId;
     int32_t ret = context_->authMessageProcessor->ParseMessage(context_, message);
     if (ret != DM_OK) {
-        LOGE("OnDataReceived failed, parse input message error.");
+        LOGE("parse input message error.");
         context_->reason = ERR_DM_PARSE_MESSAGE_FAILED;
         CHECK_NULL_VOID(context_->authStateMachine);
         context_->authStateMachine->TransitionTo(std::make_shared<AuthSinkFinishState>());
@@ -916,7 +916,7 @@ int32_t AuthSinkManager::OnUserOperation(int32_t action, const std::string &para
 {
     LOGI("action %{public}d.", action);
     if (context_ == nullptr || context_->authStateMachine == nullptr) {
-        LOGE("OnUserOperation: Authenticate is not start");
+        LOGE("Authenticate is not start");
         return ERR_DM_AUTH_NOT_START;
     }
     switch (action) {
@@ -927,7 +927,7 @@ int32_t AuthSinkManager::OnUserOperation(int32_t action, const std::string &para
             context_->reply = USER_OPERATION_TYPE_ALLOW_AUTH;
             context_->userOperationParam = params;
             if (action == USER_OPERATION_TYPE_CANCEL_AUTH) {
-                LOGI("AuthSinkManager::OnUserOperation USER_OPERATION_TYPE_CANCEL_AUTH.");
+                LOGI("USER_OPERATION_TYPE_CANCEL_AUTH.");
                 context_->reply = USER_OPERATION_TYPE_CANCEL_AUTH;
             }
             context_->authStateMachine->NotifyEventFinish(DmEventType::ON_USER_OPERATION);
@@ -936,7 +936,7 @@ int32_t AuthSinkManager::OnUserOperation(int32_t action, const std::string &para
             }
             break;
         case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:
-            LOGI("AuthSinkManager::OnUserOperation USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT.");
+            LOGI("USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT.");
             context_->confirmOperation = USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT;
             context_->reason = ERR_DM_PEER_CONFIRM_TIME_OUT;
             context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
@@ -945,7 +945,7 @@ int32_t AuthSinkManager::OnUserOperation(int32_t action, const std::string &para
             }
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY:
-            LOGI("AuthSinkManager::OnUserOperation USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY.");
+            LOGI("USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY.");
             context_->confirmOperation = USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY;
             context_->reason = ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY;
             context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
@@ -954,7 +954,7 @@ int32_t AuthSinkManager::OnUserOperation(int32_t action, const std::string &para
             LOGE("this action id not support");
             break;
     }
-    LOGI("AuthSinkManager::OnUserOperation leave.");
+    LOGI("leave.");
     return DM_OK;
 }
 
@@ -975,7 +975,7 @@ void AuthSrcManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int
 
 void AuthSrcManager::OnSessionClosed(int32_t sessionId)
 {
-    LOGI("AuthSrcManager::OnSessionClosed sessionId = %{public}d", sessionId);
+    LOGI("sessionId = %{public}d", sessionId);
     CHECK_NULL_VOID(context_);
     context_->reason = ERR_DM_SESSION_CLOSED;
     CHECK_NULL_VOID(context_->authStateMachine);
@@ -995,7 +995,7 @@ void AuthSrcManager::OnDataReceived(int32_t sessionId, std::string message)
     CHECK_NULL_VOID(context_->authMessageProcessor);
     int32_t ret = context_->authMessageProcessor->ParseMessage(context_, message);
     if (ret != DM_OK) {
-        LOGE("OnDataReceived failed, parse input message error.");
+        LOGE("parse input message error.");
         context_->reason = ERR_DM_PARSE_MESSAGE_FAILED;
         CHECK_NULL_VOID(context_->authStateMachine);
         context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
@@ -1011,9 +1011,9 @@ bool AuthSrcManager::GetIsCryptoSupport()
 
 int32_t AuthSrcManager::OnUserOperation(int32_t action, const std::string &params)
 {
-    LOGI("AuthSrcManager::OnUserOperation start.");
+    LOGI("start.");
     if (context_ == nullptr || context_->authStateMachine == nullptr) {
-        LOGE("OnUserOperation: Authenticate is not start");
+        LOGE("Authenticate is not start");
         return ERR_DM_AUTH_NOT_START;
     }
 
@@ -1037,7 +1037,7 @@ int32_t AuthSrcManager::OnUserOperation(int32_t action, const std::string &param
             pinCode = paramJson[PIN_CODE_KEY].Get<std::string>();
             {
                 if (!IsNumberString(pinCode)) {
-                    LOGE("OnUserOperation jsonStr error");
+                    LOGE("jsonStr error");
                     return ERR_DM_INPUT_PARA_INVALID;
                 }
                 context_->pinCode = pinCode;
@@ -1048,13 +1048,13 @@ int32_t AuthSrcManager::OnUserOperation(int32_t action, const std::string &param
             LOGE("this action id not support");
             break;
     }
-    LOGI("AuthSrcManager::OnUserOperation leave.");
+    LOGI("leave.");
     return DM_OK;
 }
 
 void AuthSrcManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
 {
-    LOGI("AuthSrcManager::AuthDeviceError start.");
+    LOGI("start.");
     CHECK_NULL_VOID(context_);
     if (requestId != context_->requestId) {
         LOGE("requestId: %{public}" PRId64", context_->requestId: %{public}" PRId64".", requestId, context_->requestId);
@@ -1065,79 +1065,79 @@ void AuthSrcManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
     if (curState == DmAuthStateType::AUTH_SRC_PIN_AUTH_START_STATE ||
         curState == DmAuthStateType::AUTH_SRC_PIN_AUTH_MSG_NEGOTIATE_STATE ||
         curState == DmAuthStateType::AUTH_SRC_PIN_AUTH_DONE_STATE) {
-        LOGI("AuthSrcManager::AuthDeviceError Auth pin err.");
+        LOGI("Auth pin err.");
         if (context_->authType == DmAuthType::AUTH_TYPE_PIN) {
             context_->inputPinAuthFailTimes++;
         }
         context_->authStateMachine->NotifyEventFinish(DmEventType::ON_ERROR);
         context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcPinNegotiateStartState>());
     } else {
-        LOGI("AuthSrcManager::AuthDeviceError unexpected err.");
+        LOGI("unexpected err.");
         context_->reason = (errorCode == ERR_DM_HICHAIN_PROOFMISMATCH ? ERR_DM_BIND_PIN_CODE_ERROR : errorCode);
         context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
     }
-    LOGI("AuthSrcManager::AuthDeviceError leave.");
+    LOGI("leave.");
 }
 
 void AuthSinkManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
 {
-    LOGI("AuthSinkManager::AuthDeviceError start.");
+    LOGI("start.");
     CHECK_NULL_VOID(context_);
     CHECK_NULL_VOID(context_->authStateMachine);
     auto curState = context_->authStateMachine->GetCurState();
     if (curState == DmAuthStateType::AUTH_SINK_PIN_AUTH_START_STATE ||
         curState == DmAuthStateType::AUTH_SINK_PIN_AUTH_MSG_NEGOTIATE_STATE) {
-        LOGI("AuthSrcManager::AuthDeviceError Auth pin err.");
+        LOGI("Auth pin err.");
         if (context_->authType == DmAuthType::AUTH_TYPE_PIN) {
             context_->inputPinAuthFailTimes++;
         }
         context_->authStateMachine->NotifyEventFinish(DmEventType::ON_ERROR);
         context_->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinNegotiateStartState>());
     } else {
-        LOGI("AuthSinkManager::AuthDeviceError unexpected err.");
+        LOGI("unexpected err.");
         context_->reason = errorCode;
         context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
     }
-    LOGI("AuthSinkManager::AuthDeviceError leave.");
+    LOGI("leave.");
 }
 
 bool AuthSrcManager::AuthDeviceTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen)
 {
-    LOGI("AuthSrcManager::AuthDeviceTransmit start.");
+    LOGI("start.");
     // check request id first
     CHECK_NULL_RETURN(context_, false);
     if (requestId != context_->requestId) {
-        LOGE("AuthSrcManager::onTransmit requestId %{public}" PRId64"is error.", requestId);
+        LOGE("requestId %{public}" PRId64"is error.", requestId);
         return false;
     }
 
     context_->transmitData = std::string(reinterpret_cast<const char *>(data), dataLen);
     CHECK_NULL_RETURN(context_->authStateMachine, false);
     context_->authStateMachine->NotifyEventFinish(ON_TRANSMIT);
-    LOGI("AuthSrcManager::AuthDeviceTransmit leave.");
+    LOGI("leave.");
     return true;
 }
 
 bool AuthSinkManager::AuthDeviceTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen)
 {
-    LOGI("AuthSinkManager::AuthDeviceTransmit start.");
+    LOGI("start.");
     // check request id first
     CHECK_NULL_RETURN(context_, false);
     if (requestId != context_->requestId) {
-        LOGE("AuthSinkManager::onTransmit requestId %{public}" PRId64"is error.", requestId);
+        LOGE("requestId %{public}" PRId64"is error.", requestId);
         return false;
     }
 
     context_->transmitData = std::string(reinterpret_cast<const char *>(data), dataLen);
     CHECK_NULL_RETURN(context_->authStateMachine, false);
     context_->authStateMachine->NotifyEventFinish(ON_TRANSMIT);
-    LOGI("AuthSinkManager::AuthDeviceTransmit leave.");
+    LOGI("leave.");
     return true;
 }
 
 void AuthSrcManager::AuthDeviceFinish(int64_t requestId)
 {
-    LOGI("AuthSrcManager::AuthDeviceFinish start.");
+    LOGI("start.");
     CHECK_NULL_VOID(context_);
     CHECK_NULL_VOID(context_->authStateMachine);
     context_->authStateMachine->NotifyEventFinish(ON_FINISH);
@@ -1157,32 +1157,32 @@ void AuthSrcManager::AuthDeviceFinish(int64_t requestId)
         default:
             break;
     }
-    LOGI("AuthSrcManager::AuthDeviceFinish leave.");
+    LOGI("leave.");
 }
 
 void AuthSinkManager::AuthDeviceFinish(int64_t requestId)
 {
-    LOGI("AuthSinkManager::AuthDeviceFinish start.");
+    LOGI("start.");
     CHECK_NULL_VOID(context_);
     CHECK_NULL_VOID(context_->authStateMachine);
     context_->authStateMachine->NotifyEventFinish(ON_FINISH);
-    LOGI("AuthSinkManager::AuthDeviceFinish leave.");
+    LOGI("leave.");
 }
 
 void AuthSinkManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen)
 {
-    LOGI("AuthSrcManager::AuthDeviceSessionKey start. keyLen: %{public}u", sessionKeyLen);
+    LOGI("start. keyLen: %{public}u", sessionKeyLen);
     if (context_ == nullptr || context_->authMessageProcessor == nullptr || context_->authStateMachine == nullptr) {
-        LOGE("AuthSrcManager::AuthDeviceSessionKey failed, auth context not initial.");
+        LOGE("auth context not initial.");
         return;
     }
     if (requestId != context_->requestId) {
-        LOGE("AuthSrcManager::onTransmit requestId %{public}" PRId64 "is error.", requestId);
+        LOGE("requestId %{public}" PRId64 "is error.", requestId);
         return;
     }
     int32_t ret = context_->authMessageProcessor->SaveSessionKey(sessionKey, sessionKeyLen);
     if (ret != DM_OK) {
-        LOGE("AuthSrcManager::AuthDeviceSessionKey, save session key error, ret: %{public}d", ret);
+        LOGE("save session key error, ret: %{public}d", ret);
     }
 
     context_->authStateMachine->NotifyEventFinish(ON_SESSION_KEY_RETURNED);
@@ -1190,7 +1190,7 @@ void AuthSinkManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *ses
 
 char *AuthSinkManager::AuthDeviceRequest(int64_t requestId, int operationCode, const char *reqParams)
 {
-    LOGI("AuthSinkManager::AuthDeviceRequest start");
+    LOGI("start");
     (void)requestId;
     (void)reqParams;
     JsonObject jsonObj;
@@ -1207,7 +1207,7 @@ char *AuthSinkManager::AuthDeviceRequest(int64_t requestId, int operationCode, c
             jsonObj[FIELD_PIN_CODE] = pinCode;
         }
         std::string pinCodeHash = GetAnonyString(Crypto::Sha256(pinCode));
-        LOGI("AuthDeviceRequest pinCodeHash: %{public}s", pinCodeHash.c_str());
+        LOGI("pinCodeHash: %{public}s", pinCodeHash.c_str());
     } else if (curState == DmAuthStateType::AUTH_SINK_CREDENTIAL_AUTH_START_STATE) {
         if (context_->isOnline) { // Non-first time certification
             jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
@@ -1233,7 +1233,7 @@ int32_t AuthManager::GetPinCode(std::string &code)
         return ERR_DM_FAILED;
     }
     std::string pinCodeHash = GetAnonyString(Crypto::Sha256(context_->pinCode));
-    LOGI("GetPinCode pinCodeHash: %{public}s", pinCodeHash.c_str());
+    LOGI("pinCodeHash: %{public}s", pinCodeHash.c_str());
     code = context_->pinCode;
     return DM_OK;
 }
@@ -1249,14 +1249,14 @@ void AuthManager::GetBindTargetParams(std::string &pkgName, PeerTargetId &target
         std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         bindParam = bindParam_;
     }
-    LOGI("AuthManager::GetBindTargetParams get pkgName %{public}s to reuse", pkgName.c_str());
+    LOGI("get pkgName %{public}s to reuse", pkgName.c_str());
     return;
 }
 
 void AuthManager::GetAuthCodeAndPkgName(std::string &pkgName, std::string &authCode)
 {
     if (context_ == nullptr || context_->importAuthCode.empty() || context_->importPkgName.empty()) {
-        LOGE("GetAuthCodeAndPkgName failed, authCode or pkgName is empty");
+        LOGE("authCode or pkgName is empty");
         return;
     }
     authCode = context_->importAuthCode;
@@ -1266,7 +1266,7 @@ void AuthManager::GetAuthCodeAndPkgName(std::string &pkgName, std::string &authC
 void AuthManager::SetBindTargetParams(const PeerTargetId &targetId)
 {
     targetId_ = targetId;
-    LOGI("AuthManager::SetBindTargetParams set targetId to reuse");
+    LOGI("set targetId to reuse");
     return;
 }
 

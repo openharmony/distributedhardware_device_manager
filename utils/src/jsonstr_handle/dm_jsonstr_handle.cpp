@@ -49,13 +49,13 @@ DM_EXPORT std::vector<int64_t> JsonStrHandle::GetProxyTokenIdByExtra(const std::
     std::vector<int64_t> tokenIdVec;
     JsonObject extraInfoJson(extraInfo);
     if (extraInfoJson.IsDiscarded() || !IsString(extraInfoJson, TAG_PROXY)) {
-        LOGE("GetProxyTokenIdByExtra extraInfoJson error");
+        LOGE("extraInfoJson error");
         return tokenIdVec;
     }
     std::string proxyListStr = extraInfoJson[TAG_PROXY].Get<std::string>();
     JsonObject proxyList;
     if (!proxyList.Parse(proxyListStr)) {
-        LOGE("GetProxyTokenIdByExtra proxyListStr Parse error");
+        LOGE("proxyListStr Parse error");
         return tokenIdVec;
     }
     for (auto &item : proxyList.Items()) {
