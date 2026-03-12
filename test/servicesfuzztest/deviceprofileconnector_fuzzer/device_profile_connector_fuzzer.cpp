@@ -98,7 +98,8 @@ void ProcessLocalToPeerFuzzTest(FuzzedDataProvider &fdp)
     bool notifyOffline = fdp.ConsumeBool();
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
 
-    DeviceProfileConnector::GetInstance().ProcessLocalToPeer(profile, info, accountIdHash, offlineParam, notifyOffline, serviceInfos);
+    DeviceProfileConnector::GetInstance().ProcessLocalToPeer(profile, info,
+            accountIdHash, offlineParam, notifyOffline, serviceInfos);
 }
 
 void ProcessPeerToLocalFuzzTest(FuzzedDataProvider &fdp)
@@ -121,7 +122,8 @@ void ProcessPeerToLocalFuzzTest(FuzzedDataProvider &fdp)
     bool notifyOffline = fdp.ConsumeBool();
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
 
-    DeviceProfileConnector::GetInstance().ProcessPeerToLocal(profile, info, accountIdHash, offlineParam, notifyOffline, serviceInfos);
+    DeviceProfileConnector::GetInstance().ProcessPeerToLocal(profile, info,
+            accountIdHash, offlineParam, notifyOffline, serviceInfos);
 }
 
 void DeleteAclForUserRemovedFuzzTest(FuzzedDataProvider &fdp)
@@ -144,7 +146,8 @@ void DeleteAclForUserRemovedFuzzTest(FuzzedDataProvider &fdp)
     DmOfflineParam offlineParam;
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
 
-    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(userRemovedInfo, peerUserIdMap, offlineParam, serviceInfos);
+    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(userRemovedInfo,
+            peerUserIdMap, offlineParam, serviceInfos);
 }
 
 void DeleteAclForRemoteUserRemovedFuzzTest(FuzzedDataProvider &fdp)
@@ -189,7 +192,8 @@ void HandleSyncForegroundUserIdEventFuzzTest(FuzzedDataProvider &fdp)
     std::string localUdid = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
 
-    DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(remoteUserIds, remoteUdid, localUserIds, localUdid, serviceInfos);
+    DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(remoteUserIds,
+            remoteUdid, localUserIds, localUdid, serviceInfos);
 }
 
 void FillDmUserRemovedServiceInfoLocalFuzzTest(FuzzedDataProvider &fdp)
@@ -274,7 +278,8 @@ void GetPeerTokenIdForServiceProxyUnbindFuzzTest(FuzzedDataProvider &fdp)
     int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
     std::vector<uint64_t> peerTokenId;
 
-    DeviceProfileConnector::GetInstance().GetPeerTokenIdForServiceProxyUnbind(userId, localTokenId, peerUdid, serviceId, peerTokenId);
+    DeviceProfileConnector::GetInstance().GetPeerTokenIdForServiceProxyUnbind(userId,
+            localTokenId, peerUdid, serviceId, peerTokenId);
 }
 
 void HasServiceIdFuzzTest(FuzzedDataProvider &fdp)
