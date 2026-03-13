@@ -240,7 +240,8 @@ private:
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     DmAuthForm ConvertBindTypeToAuthForm(int32_t bindType);
     std::shared_ptr<AuthManagerBase> GetAuthMgr();
-    int32_t AddAuthMgr(uint64_t tokenId, int sessionId, std::shared_ptr<AuthManagerBase> authMgr);
+    int32_t AddAuthMgr(uint64_t tokenId, int sessionId, std::shared_ptr<AuthManagerBase> authMgr,
+        uint64_t logicalSessionId);
     void EraseAuthMgr(uint64_t tokenId);
     std::shared_ptr<AuthManagerBase> GetAuthMgrByTokenId(uint64_t tokenId);
     std::shared_ptr<AuthManagerBase> GetCurrentAuthMgr();
@@ -329,6 +330,8 @@ private:
     int32_t UpdateLocalServiceInfoToDp(const DmAuthInfo &dmAuthInfo,
         const DistributedDeviceProfile::LocalServiceInfo &dpServiceInfo);
     void DeleteAndNotifyOffline(const std::string &udid);
+    void NotifyRemoteFailed(int32_t sessionId, std::shared_ptr<AuthManagerBase> authMgr, int32_t reason,
+        uint64_t logicalSessionId);
 private:
     std::shared_ptr<DmTimer> timer_;
     std::map<std::string, DmAuthInfo> tokenIdPinCodeMap_;

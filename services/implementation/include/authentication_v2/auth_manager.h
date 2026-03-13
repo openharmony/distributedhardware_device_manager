@@ -106,6 +106,7 @@ public:
     int32_t RegisterAuthenticationType(int32_t authenticationType);
     void OnScreenLocked();
     int32_t StopAuthenticateDevice(const std::string &sessionName);
+    void NotifyRemoteFailed(int32_t sessionId, int32_t reason, uint64_t logicalSessionId);
     // External API begin end
 
     // Internal API begin

@@ -3545,5 +3545,12 @@ void DmAuthManager::OnLeaveLNNResult(const std::string &pkgName, const std::stri
     CHECK_NULL_VOID(listener_);
     listener_->OnLeaveLNNResult(pkgName, networkId, retCode);
 }
+
+void DmAuthManager::NotifyRemoteFailed(int32_t sessionId, int32_t reason, uint64_t logicalSessionId)
+{
+    (void)sessionId;
+    (void)reason;
+    (void)logicalSessionId;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

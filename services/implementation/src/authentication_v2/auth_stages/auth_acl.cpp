@@ -414,7 +414,8 @@ int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
         CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_REQ_FINISH, context);
         context->state = static_cast<int32_t>(GetStateType());
-    } else if (context->reason != DM_OK && context->reason != DM_BIND_TRUST_TARGET) {
+    } else if (context->reason != DM_OK && context->reason != DM_BIND_TRUST_TARGET &&
+        context->reason != ERR_DM_BIND_SINK_BUSY) {
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_REQ_FINISH, context);
     } else {
         context->state = static_cast<int32_t>(GetStateType());

@@ -244,6 +244,7 @@ public:
     virtual void PrepareSoftbusSessionCallback();
     virtual void DeleteTimer();
     virtual void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode);
+    virtual void NotifyRemoteFailed(int32_t sessionId, int32_t reason, uint64_t logicalSessionId);
 
     // Public functions
     static std::string ConvertSrcVersion(const std::string &version, const std::string &edition);

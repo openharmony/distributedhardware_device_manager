@@ -494,6 +494,7 @@ public:
     bool IsImportedAuthCodeValid();
     bool IsSrc();
     void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode);
+    void NotifyRemoteFailed(int32_t sessionId, int32_t reason, uint64_t logicalSessionId);
 
 private:
     bool IsHmlSessionType();
