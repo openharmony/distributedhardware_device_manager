@@ -249,7 +249,7 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
     context->accessee.credTypeList = credTypeJson.Dump();
     return DM_OK;
 }
-// LCOV_EXCL_START
+
 int32_t AuthSinkNegotiateStateMachine::RespQueryServiceAcceseeIds(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("RespQueryServiceAcceseeIds inner1.");
@@ -324,7 +324,7 @@ int32_t AuthSinkNegotiateStateMachine::SinkNegotiateService(std::shared_ptr<DmAu
     context->accessee.networkId = context->softbusConnector->GetLocalDeviceNetworkId();
     return RespQueryServiceAcceseeIds(context);
 }
-// LCOV_EXCL_STOP
+
 int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkNegotiateStateMachine::Action sessionid %{public}d", context->sessionId);
