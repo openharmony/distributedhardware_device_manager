@@ -99,7 +99,7 @@ void ProcessLocalToPeerFuzzTest(FuzzedDataProvider &fdp)
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
 
     DeviceProfileConnector::GetInstance().ProcessLocalToPeer(profile, info,
-        accountIdHash, offlineParam, notifyOffline, serviceInfos);
+            accountIdHash, offlineParam, notifyOffline, serviceInfos);
 }
 
 void ProcessPeerToLocalFuzzTest(FuzzedDataProvider &fdp)
@@ -123,7 +123,7 @@ void ProcessPeerToLocalFuzzTest(FuzzedDataProvider &fdp)
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
 
     DeviceProfileConnector::GetInstance().ProcessPeerToLocal(profile, info,
-        accountIdHash, offlineParam, notifyOffline, serviceInfos);
+            accountIdHash, offlineParam, notifyOffline, serviceInfos);
 }
 
 void DeleteAclForUserRemovedFuzzTest(FuzzedDataProvider &fdp)
@@ -147,7 +147,7 @@ void DeleteAclForUserRemovedFuzzTest(FuzzedDataProvider &fdp)
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
 
     DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(userRemovedInfo,
-        peerUserIdMap, offlineParam, serviceInfos);
+            peerUserIdMap, offlineParam, serviceInfos);
 }
 
 void DeleteAclForRemoteUserRemovedFuzzTest(FuzzedDataProvider &fdp)
@@ -193,7 +193,7 @@ void HandleSyncForegroundUserIdEventFuzzTest(FuzzedDataProvider &fdp)
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
 
     DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(remoteUserIds,
-        remoteUdid, localUserIds, localUdid, serviceInfos);
+            remoteUdid, localUserIds, localUdid, serviceInfos);
 }
 
 void FillDmUserRemovedServiceInfoLocalFuzzTest(FuzzedDataProvider &fdp)
@@ -279,7 +279,7 @@ void GetPeerTokenIdForServiceProxyUnbindFuzzTest(FuzzedDataProvider &fdp)
     std::vector<uint64_t> peerTokenId;
 
     DeviceProfileConnector::GetInstance().GetPeerTokenIdForServiceProxyUnbind(userId,
-        localTokenId, peerUdid, serviceId, peerTokenId);
+            localTokenId, peerUdid, serviceId, peerTokenId);
 }
 
 void HasServiceIdFuzzTest(FuzzedDataProvider &fdp)
