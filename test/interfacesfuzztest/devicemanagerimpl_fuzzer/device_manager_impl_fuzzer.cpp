@@ -43,31 +43,31 @@ class ServiceInfoStateCallbackTest : public ServiceInfoStateCallback {
 public:
     ServiceInfoStateCallbackTest() = default;
     virtual ~ServiceInfoStateCallbackTest() = default;
-    void OnServiceOnline(const DmServiceInfo &serviceInfo) override {}
-    void OnServiceOffline(const DmServiceInfo &serviceInfo) override {}
-    void OnServiceInfoChange(const DmServiceInfo &serviceInfo) override {}
+    void OnServiceStateChange(int64_t serviceId, const std::string &udid, int32_t serviceState) override {}
 };
 
 class ServicePublishCallbackTest : public ServicePublishCallback {
 public:
     ServicePublishCallbackTest() = default;
     virtual ~ServicePublishCallbackTest() = default;
-    void OnServicePublishResult(int64_t serviceId, int32_t reason) override {}
+    void OnServicePublishSuccess(int64_t publishId) override {}
+    void OnServicePublishFailure(int64_t publishId, int32_t errorCode) override {}
 };
 
 class ServiceDiscoveryCallbackTest : public ServiceDiscoveryCallback {
 public:
     ServiceDiscoveryCallbackTest() = default;
     virtual ~ServiceDiscoveryCallbackTest() = default;
-    void OnServiceFound(const DmServiceInfo &service) override {}
-    void OnServiceDiscoveryResult(int32_t resReason) override {}
+    void OnServiceDiscoverySuccess(int64_t discoverId, const std::string &udid) override {}
+    void OnServiceDiscoveryFailure(int64_t discoverId, int32_t errorCode) override {}
 };
 
 class SyncServiceInfoCallbackTest : public SyncServiceInfoCallback {
 public:
     SyncServiceInfoCallbackTest() = default;
     virtual ~SyncServiceInfoCallbackTest() = default;
-    void OnSyncServiceInfoResult(int32_t result, const std::string &content) override {}
+    void OnSyncServiceInfoSuccess(const std::string &networkId, int64_t serviceId) override {}
+    void OnSyncServiceInfoFailure(const std::string &networkId, int64_t serviceId, int32_t errorCode) override {}
 };
 
 void UnBindDeviceTest(FuzzedDataProvider &fdp)

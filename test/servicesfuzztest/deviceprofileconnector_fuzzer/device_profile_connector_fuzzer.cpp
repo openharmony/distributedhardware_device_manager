@@ -65,17 +65,11 @@ void CacheOfflineParamFuzzTest(FuzzedDataProvider &fdp)
     inputParam.info.peerUserId = fdp.ConsumeIntegral<int32_t>();
     inputParam.accountIdHash = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
 
-    DistributedDeviceProfile::Accesser accesser;
-    accesser.SetAccesserDeviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    accesser.SetAccesserUserId(fdp.ConsumeIntegral<int32_t>());
-    inputParam.profile.SetAccesser(accesser);
-
-    DistributedDeviceProfile::Accessee accessee;
-    accessee.SetAccesseeDeviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    accessee.SetAccesseeUserId(fdp.ConsumeIntegral<int32_t>());
-    inputParam.profile.SetAccessee(accessee);
-
-    inputParam.profile.SetStatus(fdp.ConsumeIntegral<int32_t>());
+    inputParam.profile.status = fdp.ConsumeIntegral<int32_t>();
+    inputParam.profile.accessee.deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    inputParam.profile.accessee.userId = fdp.ConsumeIntegral<int32_t>();
+    inputParam.profile.accesser.deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    inputParam.profile.accesser.userId = fdp.ConsumeIntegral<int32_t>();
 
     DmOfflineParam offlineParam;
     bool notifyOffline = fdp.ConsumeBool();
@@ -87,18 +81,11 @@ void CacheOfflineParamFuzzTest(FuzzedDataProvider &fdp)
 void ProcessLocalToPeerFuzzTest(FuzzedDataProvider &fdp)
 {
     DistributedDeviceProfile::AccessControlProfile profile;
-
-    DistributedDeviceProfile::Accesser accesser;
-    accesser.SetAccesserDeviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    accesser.SetAccesserUserId(fdp.ConsumeIntegral<int32_t>());
-    profile.SetAccesser(accesser);
-
-    DistributedDeviceProfile::Accessee accessee;
-    accessee.SetAccesseeDeviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    accessee.SetAccesseeUserId(fdp.ConsumeIntegral<int32_t>());
-    profile.SetAccessee(accessee);
-
-    profile.SetStatus(fdp.ConsumeIntegral<int32_t>());
+    profile.status = fdp.ConsumeIntegral<int32_t>();
+    profile.accessee.deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    profile.accessee.userId = fdp.ConsumeIntegral<int32_t>();
+    profile.accesser.deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    profile.accesser.userId = fdp.ConsumeIntegral<int32_t>();
 
     DMAclQuadInfo info;
     info.localUdid = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
@@ -118,18 +105,11 @@ void ProcessLocalToPeerFuzzTest(FuzzedDataProvider &fdp)
 void ProcessPeerToLocalFuzzTest(FuzzedDataProvider &fdp)
 {
     DistributedDeviceProfile::AccessControlProfile profile;
-
-    DistributedDeviceProfile::Accesser accesser;
-    accesser.SetAccesserDeviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    accesser.SetAccesserUserId(fdp.ConsumeIntegral<int32_t>());
-    profile.SetAccesser(accesser);
-
-    DistributedDeviceProfile::Accessee accessee;
-    accessee.SetAccesseeDeviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    accessee.SetAccesseeUserId(fdp.ConsumeIntegral<int32_t>());
-    profile.SetAccessee(accessee);
-
-    profile.SetStatus(fdp.ConsumeIntegral<int32_t>());
+    profile.status = fdp.ConsumeIntegral<int32_t>();
+    profile.accessee.deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    profile.accessee.userId = fdp.ConsumeIntegral<int32_t>();
+    profile.accesser.deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    profile.accesser.userId = fdp.ConsumeIntegral<int32_t>();
 
     DMAclQuadInfo info;
     info.localUdid = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
@@ -219,18 +199,11 @@ void HandleSyncForegroundUserIdEventFuzzTest(FuzzedDataProvider &fdp)
 void FillDmUserRemovedServiceInfoLocalFuzzTest(FuzzedDataProvider &fdp)
 {
     DistributedDeviceProfile::AccessControlProfile profile;
-
-    DistributedDeviceProfile::Accesser accesser;
-    accesser.SetAccesserDeviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    accesser.SetAccesserUserId(fdp.ConsumeIntegral<int32_t>());
-    profile.SetAccesser(accesser);
-
-    DistributedDeviceProfile::Accessee accessee;
-    accessee.SetAccesseeDeviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    accessee.SetAccesseeUserId(fdp.ConsumeIntegral<int32_t>());
-    profile.SetAccessee(accessee);
-
-    profile.SetStatus(fdp.ConsumeIntegral<int32_t>());
+    profile.status = fdp.ConsumeIntegral<int32_t>();
+    profile.accessee.deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    profile.accessee.userId = fdp.ConsumeIntegral<int32_t>();
+    profile.accesser.deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    profile.accesser.userId = fdp.ConsumeIntegral<int32_t>();
 
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
     DeviceProfileConnector::GetInstance().FillDmUserRemovedServiceInfoLocal(profile, serviceInfos);
@@ -239,18 +212,11 @@ void FillDmUserRemovedServiceInfoLocalFuzzTest(FuzzedDataProvider &fdp)
 void FillDmUserRemovedServiceInfoRemoteFuzzTest(FuzzedDataProvider &fdp)
 {
     DistributedDeviceProfile::AccessControlProfile profile;
-
-    DistributedDeviceProfile::Accesser accesser;
-    accesser.SetAccesserDeviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    accesser.SetAccesserUserId(fdp.ConsumeIntegral<int32_t>());
-    profile.SetAccesser(accesser);
-
-    DistributedDeviceProfile::Accessee accessee;
-    accessee.SetAccesseeDeviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    accessee.SetAccesseeUserId(fdp.ConsumeIntegral<int32_t>());
-    profile.SetAccessee(accessee);
-
-    profile.SetStatus(fdp.ConsumeIntegral<int32_t>());
+    profile.status = fdp.ConsumeIntegral<int32_t>();
+    profile.accessee.deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    profile.accessee.userId = fdp.ConsumeIntegral<int32_t>();
+    profile.accesser.deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    profile.accesser.userId = fdp.ConsumeIntegral<int32_t>();
 
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
     DeviceProfileConnector::GetInstance().FillDmUserRemovedServiceInfoRemote(profile, serviceInfos);
@@ -277,10 +243,10 @@ void GetServiceInfosByUdidAndUserIdFuzzTest(FuzzedDataProvider &fdp)
 void PutServiceInfoFuzzTest(FuzzedDataProvider &fdp)
 {
     DistributedDeviceProfile::ServiceInfo serviceInfo;
-    serviceInfo.SetServiceId(fdp.ConsumeIntegral<int64_t>());
-    serviceInfo.SetServiceType(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    serviceInfo.SetServiceName(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    serviceInfo.SetServiceDisplayName(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    serviceInfo.serviceId = fdp.ConsumeIntegral<int64_t>();
+    serviceInfo.serviceType = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serviceInfo.serviceName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serviceInfo.serviceDisplayName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
 
     DeviceProfileConnector::GetInstance().PutServiceInfo(serviceInfo);
 }
@@ -288,10 +254,10 @@ void PutServiceInfoFuzzTest(FuzzedDataProvider &fdp)
 void DeleteServiceInfoFuzzTest(FuzzedDataProvider &fdp)
 {
     DistributedDeviceProfile::ServiceInfo serviceInfo;
-    serviceInfo.SetServiceId(fdp.ConsumeIntegral<int64_t>());
-    serviceInfo.SetServiceType(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    serviceInfo.SetServiceName(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    serviceInfo.SetServiceDisplayName(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    serviceInfo.serviceId = fdp.ConsumeIntegral<int64_t>();
+    serviceInfo.serviceType = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serviceInfo.serviceName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serviceInfo.serviceDisplayName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
 
     DeviceProfileConnector::GetInstance().DeleteServiceInfo(serviceInfo);
 }
@@ -319,18 +285,11 @@ void GetPeerTokenIdForServiceProxyUnbindFuzzTest(FuzzedDataProvider &fdp)
 void HasServiceIdFuzzTest(FuzzedDataProvider &fdp)
 {
     DistributedDeviceProfile::AccessControlProfile profile;
-
-    DistributedDeviceProfile::Accesser accesser;
-    accesser.SetAccesserDeviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    accesser.SetAccesserUserId(fdp.ConsumeIntegral<int32_t>());
-    profile.SetAccesser(accesser);
-
-    DistributedDeviceProfile::Accessee accessee;
-    accessee.SetAccesseeDeviceId(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
-    accessee.SetAccesseeUserId(fdp.ConsumeIntegral<int32_t>());
-    profile.SetAccessee(accessee);
-
-    profile.SetStatus(fdp.ConsumeIntegral<int32_t>());
+    profile.status = fdp.ConsumeIntegral<int32_t>();
+    profile.accessee.deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    profile.accessee.userId = fdp.ConsumeIntegral<int32_t>();
+    profile.accesser.deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    profile.accesser.userId = fdp.ConsumeIntegral<int32_t>();
 
     int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
 
