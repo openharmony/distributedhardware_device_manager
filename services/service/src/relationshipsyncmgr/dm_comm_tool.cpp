@@ -257,7 +257,7 @@ int32_t DMCommTool::SendUnBindAppObj(int32_t userId, int32_t tokenId, const std:
     LOGI("Send local foreground userids success");
     return DM_OK;
 }
-//LCOV_EXCL_STOP
+
 int32_t DMCommTool::SendUnBindServiceProxyObj(const UnbindServiceProxyParam &param)
 {
     LOGI("userId: %{public}d, peerTokenId: %{public}zu, serviceId: %{public}s",
@@ -303,7 +303,7 @@ int32_t DMCommTool::SendUnBindServiceProxyObj(const UnbindServiceProxyParam &par
     LOGI("Send local foreground userids success");
     return DM_OK;
 }
-//LCOV_EXCL_STOP
+
 void DMCommTool::RspLocalFrontOrBackUserIds(const std::string &rmtNetworkId,
     const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds, int32_t socketId)
 {
@@ -620,7 +620,7 @@ void DMCommTool::ProcessReceiveUnBindAppEvent(const std::shared_ptr<InnerCommMsg
             unBindAppMsg.tokenId_, unBindAppMsg.extra_, unBindAppMsg.udid_);
     }
 }
-//LCOV_EXCL_START
+
 void DMCommTool::ProcessReceiveServiceUnbindProxyEvent(const std::shared_ptr<InnerCommMsg> &commMsg)
 {
     if (commMsg == nullptr || commMsg->commMsg == nullptr) {
@@ -686,7 +686,7 @@ void DMCommTool::ProcessReceiveRspServiceUnbindProxyEvent(const std::shared_ptr<
     }
     DeviceManagerService::GetInstance().ProcessReceiveRspSvcUnbindProxy(rmtUdid);
 }
-//LCOV_EXCL_STOP
+
 void DMCommTool::StopSocket(const std::string &networkId)
 {
     LOGI("networkId = %{public}s", GetAnonyString(networkId).c_str());

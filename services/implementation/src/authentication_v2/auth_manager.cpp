@@ -76,7 +76,7 @@ int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
     }
     return delaySeconds;
 }
-//LCOV_EXCL_START
+
 std::string GetBundleLabel(const std::string &bundleName)
 {
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -112,7 +112,7 @@ std::string GetBundleLabel(const std::string &bundleName)
     LOGI("bundle resource label is %{public}s ", (resourceInfo.label).c_str());
     return resourceInfo.label;
 }
-//LCOV_EXCL_STOP
+ 
 std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindParam)
 {
     auto iter = bindParam.find(PARAM_KEY_BIND_EXTRA_DATA);

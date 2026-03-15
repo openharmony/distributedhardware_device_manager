@@ -756,7 +756,7 @@ DmAuthStateType AuthSrcSKDeriveState::GetStateType()
 {
     return DmAuthStateType::AUTH_SRC_SK_DERIVE_STATE;
 }
-// LCOV_EXCL_START
+
 static void SetServiceInfos(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("Action start");
@@ -809,7 +809,6 @@ int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
-// LCOV_EXCL_STOP
 int32_t AuthSrcSKDeriveState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);

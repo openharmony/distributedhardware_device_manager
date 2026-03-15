@@ -1200,7 +1200,6 @@ int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(const std::string 
 #endif
 }
 
-//LCOV_EXCL_START
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DeviceManagerServiceListener::OnServiceDiscoveryResult(const ProcessInfo &processInfo,
     const std::string &serviceType, int32_t reason)
@@ -1224,7 +1223,7 @@ void DeviceManagerServiceListener::OnServiceFound(const ProcessInfo &processInfo
     pReq->SetDmServiceInfo(service);
     ipcServerListener_.SendRequest(NOTIFY_SERVICE_FOUND, pReq, pRsp);
 }
-//LCOV_EXCL_STOP
+
 void DeviceManagerServiceListener::OnServicePublishResult(const ProcessInfo &processInfo,
     int64_t serviceId, int32_t publishResult)
 {
@@ -1284,7 +1283,7 @@ void DeviceManagerServiceListener::SetNeedNotifyProcessInfos(const ProcessInfo &
     procInfoVec.push_back(bindProcessInfo);
     return;
 }
-//LCOV_EXCL_START
+
 void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName, const std::string &consumerPkgName)
 {
     LOGI("%{public}s", pkgName.c_str());
@@ -1310,7 +1309,7 @@ void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName,
     pReq->SetProcessInfo(processInfoTemp);
     ipcServerListener_.SendRequest(ON_AUTH_CODE_INVALID, pReq, pRsp);
 }
-//LCOV_EXCL_STOP
+
 std::set<ProcessInfo> DeviceManagerServiceListener::GetAlreadyOnlineProcess()
 {
     std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
@@ -1327,7 +1326,7 @@ std::set<ProcessInfo> DeviceManagerServiceListener::GetAlreadyOnlineProcess()
     }
     return processInfoSet;
 }
-//LCOV_EXCL_START
+
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t DeviceManagerServiceListener::OnServiceInfoOnline(const DmRegisterServiceState &registerServiceState,
     const DmServiceInfo &serviceInfo)
@@ -1463,6 +1462,5 @@ void DeviceManagerServiceListener::OnServiceStateOnlineResult(const ServiceState
     LOGI("success.");
 }
 #endif
-//LCOV_EXCL_STOP
 } // namespace DistributedHardware
 } // namespace OHOS
