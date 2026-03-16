@@ -127,6 +127,13 @@
             }
         },
         {
+            "name":"serve_confirm_trust_nohost",
+            "value":"يريد جهاز \u202a%1$s\u202c الوصول إلى خدمة \"\u202a%2$s\u202c\" على جهازك. هل تريد الوثوق بهذا الجهاز؟",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
             "name":"serve_confirm_trust",
             "value":"يريد تطبيق %2$s على \u202a%1$s\u202c الوصول إلى خدمة %3$s على جهازك. هل تريد منح هذا التطبيق الإذن؟",
             "attr":{

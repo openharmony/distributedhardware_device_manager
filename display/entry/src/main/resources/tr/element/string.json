@@ -127,6 +127,13 @@
             }
         },
         {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s, cihazınızdaki %2$s servisine erişmek istiyor. Bu cihaza güvenilsin mi?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
             "name":"serve_confirm_trust",
             "value":"%1$s cihazındaki %2$s uygulaması cihazınızdaki %3$s servisine erişmek istiyor. Bu uygulamaya güvenilsin mi?",
             "attr":{

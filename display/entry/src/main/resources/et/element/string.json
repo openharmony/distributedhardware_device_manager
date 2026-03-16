@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s soovib teie seadmes teenusele %2$s juurde pääseda. Kas usaldada seda seadet?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Seadmes %1$s olev rakendus %2$s soovib pääseda juurde teie seadmes olevale teenusele %3$s. Kas usaldada seda rakendust?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s soovib luua ühenduse teie seadmes olevate teenustega. Valige autoriseerimiseks teenused.",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

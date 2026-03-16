@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"‏%1$s רוצה לגשת לשירות %2$s בהתקן שלך. האם לתת אמון בהתקן זה?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"היישום %2$s ב-%1$s רוצה לגשת לשירות %3$s בהתקן שלך. לתת אמון ביישום זה?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"‏%s רוצה להתחבר לשירותים בהתקן שלך. בחר שירותים למתן הרשאה:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

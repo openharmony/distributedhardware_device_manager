@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s szeretne hozzáférni a(z) %2$s szolgáltatáshoz az Ön készülékén. Megbízik ebben a készülékben?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"A(z) %1$s készüléken lévő %2$s alkalmazás szeretné elérni a(z) %3$s szolgáltatást az Ön készülékén. Bízik ebben az alkalmazásban?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s szeretne csatlakozni az Ön készülékén lévő szolgáltatásokhoz. Válassza ki az engedélyezendő szolgáltatásokat:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

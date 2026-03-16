@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"Gustong i-access ng %1$s ang serbisyo ng %2$s sa iyong device. Pagkatiwalaan ang device na ito?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Gusto ng %2$s app sa %1$s na i-access ang serbisyo ng %3$s sa device mo. Pagkatiwalaan ang app na ito?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"Gusto ng %s na kumonekta sa mga serbisyo sa device mo. Pumili ng mga serbisyong papahintulutan:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

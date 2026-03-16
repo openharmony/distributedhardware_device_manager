@@ -127,6 +127,13 @@
             }
         },
         {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s 要求存取本機的%2$s服務。是否信任此裝置？",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
             "name":"serve_confirm_trust",
             "value":"%1$s 的%2$s要求存取本機%3$s服務。是否信任本應用程式？",
             "attr":{

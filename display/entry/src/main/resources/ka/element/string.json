@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s-ს სურს თქვენს მოწყობილობაში %2$s სერვისზე წვდომა. ენდობით ამ მოწყობილობას?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"%1$s-ზე %2$s აპს სურს თქვენს მოწყობილობაზე „%3$s“ სერვისზე წვდომა. ენდობით ამ აპს?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s-ს სურს თქვენს მოწყობილობაზე სერვისებთან დაკავშირება. აირჩიეთ ავტორიზაციისთვის სერვისები:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

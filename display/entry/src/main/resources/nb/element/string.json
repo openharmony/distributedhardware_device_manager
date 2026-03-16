@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s ønsker å få tilgang til %2$s-tjenesten på enheten din. Stole på denne enheten?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"%2$s-appen på %1$s ønsker tilgang til %3$s-tjenesten på enheten din. Stole på denne appen?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s ønsker å koble til tjenester på enheten din. Velg tjenester som skal autoriseres:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

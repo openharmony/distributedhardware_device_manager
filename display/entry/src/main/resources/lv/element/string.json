@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s vēlas piekļūt pakalpojumam %2$s jūsu ierīcē. Vai uzticēties šai ierīcei?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Lietotne %2$s ierīcē %1$s vēlas piekļūt pakalpojumam %3$s jūsu ierīcē. Vai uzticēties šai lietotnei?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s vēlas izveidot savienojumu ar pakalpojumiem jūsu ierīcē. Atlasiet pakalpojumus, kurus autorizēt:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

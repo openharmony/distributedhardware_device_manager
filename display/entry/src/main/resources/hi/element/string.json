@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s आपके डिवाइस पर %2$s सेवा तक पहुँच प्राप्त करना चाहता है। इस डिवाइस पर विश्वास करें?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"%1$s पर %2$s ऐप आपके डिवाइस पर %3$s सेवाओं तक पहुँच प्राप्त करना चाहता है। इस ऐप पर विश्वास करें?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s आपके डिवाइस पर सेवाओं से कनेक्ट होना चाहता है। अधिकृत करने के लिए सेवाएँ चुनें:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s vill ha tillgång till tjänsten %2$s på din enhet. Litar du på den här enheten?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Appen %2$s på %1$s vill komma åt tjänsten %3$s på din enhet. Litar du på den här appen?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s vill ansluta till tjänster på din enhet. Välj tjänster du vill auktorisera:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

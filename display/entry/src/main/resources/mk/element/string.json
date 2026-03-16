@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s сака да пристапи до услугата за %2$s на вашиот уред. Да се означи овој уред како доверлив?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Апликацијата %2$s на %1$s сака да пристапи до услугата за %3$s на вашиот уред. Да се верува на оваа апликација?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s сака да се поврзе со услуги на вашиот уред. Изберете услуги за да одобрите:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

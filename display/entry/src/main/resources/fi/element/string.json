@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s haluaa käyttää laitteen %2$s palvelua. Luotetaanko tähän laitteeseen?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Sovellus %2$s haluaa käyttää laitteen %1$s palvelua %3$s. Luotetaanko tähän sovellukseen?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s haluaa yhdistää laitteen palveluihin. Valitse valtuutettavat palvelut:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

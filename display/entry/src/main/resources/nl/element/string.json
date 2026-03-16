@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s vraagt toegang tot de service %2$s op uw apparaat. Dit apparaat vertrouwen?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"De %2$s-app op %1$s wil toegang krijgen tot de %3$s-service op uw apparaat. Deze app vertrouwen?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s wil verbinding maken met services op uw apparaat. Selecteer de services die u wilt autoriseren:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s құрылғысы құрылғыңыздағы %2$s қызметіне қатынасқысы келеді. Осы құрылғыға сену керек пе?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"%1$s құрылғысындағы %2$s қолданбасы құрылғыңыздағы %3$s қызметіне қатынасуды сұрап жатыр. Бұл қолданба сенімді ме?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s құрылғыңыздағы қызметтерге қосылуды сұрап жатыр. Рұқсат беру қызметтерді таңдаңыз:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

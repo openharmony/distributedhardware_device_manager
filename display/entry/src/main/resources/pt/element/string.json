@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s gostaria de acessar o serviço %2$s no seu dispositivo. Confiar neste dispositivo?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"O aplicativo %2$s em %1$s gostaria de acessar o serviço %3$s no seu dispositivo. Confiar neste aplicativo?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s gostaria de se conectar aos serviços no seu dispositivo. Selecione os serviços a serem autorizados:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

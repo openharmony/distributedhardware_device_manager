@@ -127,6 +127,13 @@
             }
         },
         {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s prosi o dostęp do usługi %2$s w tym urządzeniu. Zaufać temu urządzeniu?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
             "name":"serve_confirm_trust",
             "value":"Aplikacja %2$s na %1$s chciałaby uzyskać dostęp do usługi %3$s na twoim urządzeniu. Czy zaufać tej aplikacji?",
             "attr":{
