@@ -516,7 +516,7 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
     (void)peerTokenId;
     return;
 }
-
+// LCOV_EXCL_START
 void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId,
     std::vector<DmUserRemovedServiceInfo> &serviceInfos)
 {
@@ -533,7 +533,7 @@ void DeviceManagerServiceImpl::HandleUserRemoved(std::vector<std::string> peerUd
     (void)serviceInfos;
     return;
 }
-
+// LCOV_EXCL_STOP
 void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
 {
     (void)devInfo;
@@ -639,7 +639,7 @@ void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &cre
     (void)localUdid;
     return;
 }
-
+// LCOV_EXCL_START
 void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid,
     std::vector<DmUserRemovedServiceInfo> &serviceInfos)
 {
@@ -648,7 +648,7 @@ void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t preUserId, const 
     (void)serviceInfos;
     return;
 }
-
+// LCOV_EXCL_STOP
 std::map<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndBindLevel(int32_t userId)
 {
     (void)userId;

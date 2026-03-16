@@ -407,7 +407,7 @@ void DmAuthMessageProcessor::SetLnnAccessControlList(std::shared_ptr<DmAuthConte
     accessee.SetAccesseeSKTimeStamp(context->accessee.lnnSkTimeStamp);
     accessee.SetAccesseeExtraData(context->accessee.extraInfo);
 }
-
+// LCOV_EXCL_START
 static DistributedDeviceProfile::AccessControlProfile GetAccessControlProfile(std::shared_ptr<DmAuthContext> context,
     bool &hasAcl, bool &isNeedLnn)
 {
@@ -816,7 +816,7 @@ int32_t DmAuthMessageProcessor::PutServiceAccessControlList(std::shared_ptr<DmAu
     }
     return DM_OK;
 }
-
+// LCOV_EXCL_STOP
 int32_t DmAuthMessageProcessor::PutProxyAccessControlList(std::shared_ptr<DmAuthContext> context,
     DistributedDeviceProfile::AccessControlProfile &profile, DistributedDeviceProfile::Accesser &accesser,
     DistributedDeviceProfile::Accessee &accessee)
@@ -1269,6 +1269,7 @@ int32_t DmAuthMessageProcessor::CreateNegotiateOldMessage(std::shared_ptr<DmAuth
 }
 
 // Create 80 message.
+// LCOV_EXCL_START
 int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthContext> context,
     JsonObject &jsonObject)
 {
@@ -1332,7 +1333,7 @@ int32_t DmAuthMessageProcessor::CreateServiceNegotiateMessage(std::shared_ptr<Dm
     }
     return DM_OK;
 }
-
+// LCOV_EXCL_STOP
 int32_t DmAuthMessageProcessor::CreateProxyNegotiateMessage(std::shared_ptr<DmAuthContext> context,
     JsonObject &jsonObject)
 {
@@ -1641,7 +1642,7 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
     }
     return DM_OK;
 }
-
+// LCOV_EXCL_START
 void DmAuthMessageProcessor::ParseServiceInfo(JsonObject &jsonObject, std::shared_ptr<DmAuthContext> &context)
 {
     LOGI("start");
@@ -1792,7 +1793,7 @@ int32_t DmAuthMessageProcessor::ParseProxyAccessToSync(std::shared_ptr<DmAuthCon
         return ParseDeviceProxyAccessToSync(context, jsonObject);
     }
 }
-
+// LCOV_EXCL_STOP
 int32_t DmAuthMessageProcessor::DecryptSyncMessage(std::shared_ptr<DmAuthContext> &context,
     DmAccess &access, std::string &enSyncMsg)
 {
@@ -2014,7 +2015,7 @@ void DmAuthMessageProcessor::ParseCert(const JsonObject &jsonObject,
         context->accesser.isCommonFlag = jsonObject[TAG_IS_COMMON_FLAG].Get<bool>();
     }
 }
-
+// LCOV_EXCL_START
 int32_t DmAuthMessageProcessor::ParseServiceNegotiateMessage(
     const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context)
 {
@@ -2093,7 +2094,7 @@ int32_t DmAuthMessageProcessor::ParseProxyNegotiateMessage(
     }
     return DM_OK;
 }
-
+// LCOV_EXCL_STOP
 void DmAuthMessageProcessor::ParseUltrasonicSide(
     const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context)
 {

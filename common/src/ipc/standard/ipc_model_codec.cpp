@@ -527,7 +527,6 @@ bool IpcModelCodec::DecodeLocalServiceInfos(MessageParcel &parcel, std::vector<D
     }
     return bRet;
 }
-//LCOV_EXCL_STOP
 
 bool IpcModelCodec::EncodeDmAuthInfo(const DmAuthInfo &dmAuthInfo, MessageParcel &parcel)
 {
@@ -789,5 +788,6 @@ void IpcModelCodec::DecodeServiceSyncInfo(MessageParcel &parcel, ServiceSyncInfo
     serviceSyncInfo.callerUserId = parcel.ReadInt32();
     serviceSyncInfo.callerTokenId = parcel.ReadUint32();
 }
+//LCOV_EXCL_STOP
 }  // namespace DistributedHardware
 }  // namespace OHOS

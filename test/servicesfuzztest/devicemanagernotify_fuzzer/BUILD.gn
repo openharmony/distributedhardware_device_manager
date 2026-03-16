@@ -17,11 +17,28 @@ import("//build/test.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("DeviceProfileConnectorFuzzTest") {
+ohos_fuzztest("DeviceManagerNotifyFuzzTest") {
   module_out_path = fuzz_test_output_path
-  fuzz_config_file = "${devicemanager_path}/test/servicesfuzztest/deviceprofileconnector_fuzzer"
+  fuzz_config_file =
+      "${devicemanager_path}/test/servicesfuzztest/devicemanagernotify_fuzzer"
 
-  include_dirs = [ "${devicemanager_path}/commondependency/include" ]
+  include_dirs = [
+    "${utils_path}/include",
+    "${innerkits_path}/native_cpp/include",
+    "${innerkits_path}/native_cpp/include/ipc/standard",
+    "${innerkits_path}/native_cpp/include/ipc",
+    "${innerkits_path}/native_cpp/include/notify",
+    "${common_path}/include",
+    "${common_path}/include/ipc",
+    "${common_path}/include/ipc/model",
+    "${utils_path}/include/ipc/standard",
+    "${servicesimpl_path}/include",
+    "${servicesimpl_path}/include/dependency/softbus",
+    "${servicesimpl_path}/include/adapter",
+    "${servicesimpl_path}/include/ipc/standard",
+    "${servicesimpl_path}/include/dependency/hichain",
+    "${devicemanager_path}/test/unittest/mock",
+  ]
 
   cflags = [
     "-g",
@@ -33,27 +50,21 @@ ohos_fuzztest("DeviceProfileConnectorFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "device_profile_connector_fuzzer.cpp" ]
+  sources = [ "device_manager_notify_fuzzer.cpp" ]
 
-  deps = [
-    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
-    "${services_path}:devicemanagerservicetest",
-    "${servicesimpl_path}:devicemanagerserviceimpl",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "ffrt:libffrt",
-    "init:libbegetutil",
-    "ipc:ipc_single",
-  ]
+  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"DeviceProfileConnectorFuzzTest\"",
+    "DH_LOG_TAG=\"DeviceManagerNotifyFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
+  ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 }
 
@@ -61,6 +72,6 @@ ohos_fuzztest("DeviceProfileConnectorFuzzTest") {
 group("fuzztest") {
   testonly = true
 
-  deps = [ ":DeviceProfileConnectorFuzzTest" ]
+  deps = [ ":DeviceManagerNotifyFuzzTest" ]
 }
 ###############################################################################
