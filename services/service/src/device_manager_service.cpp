@@ -101,6 +101,8 @@ namespace {
     const int32_t SEND_DELAY_MAX_TIME = 5;
     const int32_t SEND_DELAY_MIN_TIME = 0;
     const int32_t DELAY_TIME_SEC_CONVERSION = 1000000;      // 1000*1000
+    // 2148 * 1000000 will exceed the maximum value of int32 and cause a crash
+    const int32_t SEND_LIMIT_TIME = INT32_MAX / DELAY_TIME_SEC_CONVERSION;
     const int32_t RANDOM_OFF_SET = 8;
     constexpr int32_t DM_MIN_PINCODE_SIZE = 6;
     constexpr int32_t DM_MAX_PINCODE_SIZE = 1024;
@@ -3594,7 +3596,7 @@ int32_t DeviceManagerService::CalculateBroadCastDelayTime()
         }
         timeDiff = currentTime - SendLastBroadCastTime_;
         delayTime = SEND_DELAY_MAX_TIME - timeDiff + lastDelayTime_;
-        if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME) {
+        if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME || delayTime > SEND_LIMIT_TIME) {
             delayTime = SEND_DELAY_MIN_TIME;
         }
         SendLastBroadCastTime_ = currentTime;
