@@ -2003,7 +2003,7 @@ HWTEST_F(DeviceManagerServiceImplTest, AddAuthMgr_001, testing::ext::TestSize.Le
     uint64_t tokenId = 0;
     int sessionId = 1;
     deviceManagerServiceImpl_->authMgrMap_.clear();
-    deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, nullptr);
+    deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, nullptr, 0);
     EXPECT_TRUE(deviceManagerServiceImpl_->authMgrMap_.empty());
 
     if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
@@ -2013,11 +2013,11 @@ HWTEST_F(DeviceManagerServiceImplTest, AddAuthMgr_001, testing::ext::TestSize.Le
         deviceManagerServiceImpl_->softbusConnector_, deviceManagerServiceImpl_->hiChainConnector_,
         deviceManagerServiceImpl_->listener_, deviceManagerServiceImpl_->hiChainAuthConnector_);
     deviceManagerServiceImpl_->sessionEnableMap_[sessionId] = false;
-    deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, authMgr);
+    deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, authMgr, 0);
     EXPECT_TRUE(deviceManagerServiceImpl_->authMgrMap_.empty());
 
     deviceManagerServiceImpl_->sessionEnableMap_.clear();
-    deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, authMgr);
+    deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, authMgr, 0);
     EXPECT_FALSE(deviceManagerServiceImpl_->authMgrMap_.empty());
     deviceManagerServiceImpl_->sessionEnableMap_.clear();
     deviceManagerServiceImpl_->authMgrMap_.clear();
@@ -2032,7 +2032,7 @@ HWTEST_F(DeviceManagerServiceImplTest, AddAuthMgr_002, testing::ext::TestSize.Le
         deviceManagerServiceImpl_->softbusConnector_, deviceManagerServiceImpl_->hiChainConnector_,
         deviceManagerServiceImpl_->listener_, deviceManagerServiceImpl_->hiChainAuthConnector_);
     deviceManagerServiceImpl_->authMgrMap_[tokenId] = authMgr;
-    auto ret = deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, authMgr);
+    auto ret = deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, authMgr, 0);
     EXPECT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
     deviceManagerServiceImpl_->authMgrMap_.clear();
 }

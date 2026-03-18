@@ -593,5 +593,12 @@ void AuthManagerBase::DeleteTimer()
 
 void AuthManagerBase::OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode)
 {}
+
+void AuthManagerBase::NotifyRemoteFailed(int32_t sessionId, int32_t reason, uint64_t logicalSessionId)
+{
+    (void)sessionId;
+    (void)reason;
+    (void)logicalSessionId;
+}
 }  // namespace DistributedHardware
 }  // namespace OHOS

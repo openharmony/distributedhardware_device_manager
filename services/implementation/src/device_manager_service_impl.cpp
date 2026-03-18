@@ -55,6 +55,7 @@ constexpr int32_t MAX_PIN_CODE = 999999;
 // do not directly depend on the new protocol header file.
 constexpr int32_t MSG_TYPE_REQ_ACL_NEGOTIATE = 80;
 constexpr int32_t MSG_TYPE_RESP_ACL_NEGOTIATE = 90;
+constexpr int32_t MSG_TYPE_AUTH_RESP_FINISH = 201;
 constexpr int32_t MSG_TYPE_REQ_AUTH_TERMINATE = 104;
 constexpr int32_t AUTH_SRC_FINISH_STATE = 12;
 constexpr int32_t MAX_DATA_LEN = 65535;
@@ -81,6 +82,7 @@ const int32_t MAX_TRY_STOP_CNT = 5;
 const int32_t DEFAULT_SESSION_ID = -1;
 const int32_t METATOKEN_PINCODE_LENGTH = 14;
 const int32_t METATOKEN_LENGTH = 8;
+const int32_t AUTH_SESSION_SIDE_SERVER = 0;
 constexpr const char* BIND_TARGET_PIN_TIMEOUT_TASK = "devicemanagerTimer:authpininfo";
 constexpr int32_t BIND_TARGET_PIN_TIMEOUT = 600;
 const std::map<std::string, std::string> BUNDLENAME_MAPPING = {
@@ -275,7 +277,7 @@ int32_t DeviceManagerServiceImpl::InitNewProtocolAuthMgr(bool isSrcSide, uint64_
     hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authMgr);
     LOGI("Initialize authMgr token: %{public}" PRId64 ".", tokenId);
     ImportConfig(authMgr, tokenId, pkgName);
-    return AddAuthMgr(tokenId, sessionId, authMgr);
+    return AddAuthMgr(tokenId, sessionId, authMgr, logicalSessionId);
 }
 
 int32_t DeviceManagerServiceImpl::InitOldProtocolAuthMgr(uint64_t tokenId, const std::string &pkgName, int sessionId)
@@ -288,7 +290,7 @@ int32_t DeviceManagerServiceImpl::InitOldProtocolAuthMgr(uint64_t tokenId, const
         }
         authMgr_->PrepareSoftbusSessionCallback();
         ImportConfig(authMgr_, tokenId, pkgName);
-        int32_t ret = AddAuthMgr(tokenId, sessionId, authMgr_);
+        int32_t ret = AddAuthMgr(tokenId, sessionId, authMgr_, 0);
         if (ret != DM_OK) {
             authMgr_->ClearSoftbusSessionCallback();
             return ret;
@@ -428,7 +430,8 @@ std::shared_ptr<AuthManagerBase> DeviceManagerServiceImpl::GetAuthMgr()
     return GetAuthMgrByTokenId(tokenId);
 }
 
-int32_t DeviceManagerServiceImpl::AddAuthMgr(uint64_t tokenId, int sessionId, std::shared_ptr<AuthManagerBase> authMgr)
+int32_t DeviceManagerServiceImpl::AddAuthMgr(uint64_t tokenId, int sessionId, std::shared_ptr<AuthManagerBase> authMgr,
+    uint64_t logicalSessionId)
 {
     if (authMgr == nullptr) {
         LOGE("authMgr is nullptr.");
@@ -445,6 +448,7 @@ int32_t DeviceManagerServiceImpl::AddAuthMgr(uint64_t tokenId, int sessionId, st
         std::lock_guard<ffrt::mutex> lock(authMgrMapMtx_);
         if (authMgrMap_.size() >= MAX_NEW_PROC_SESSION_COUNT_TEMP) {
             LOGE("Other bind session exist, can not start new one. authMgrMap_.size:%{public}zu", authMgrMap_.size());
+            NotifyRemoteFailed(sessionId, authMgr, ERR_DM_BIND_SINK_BUSY, logicalSessionId);
             return ERR_DM_AUTH_BUSINESS_BUSY;
         }
         authMgrMap_[tokenId] = authMgr;
@@ -456,6 +460,18 @@ int32_t DeviceManagerServiceImpl::AddAuthMgr(uint64_t tokenId, int sessionId, st
         }
     }
     return DM_OK;
+}
+
+void DeviceManagerServiceImpl::NotifyRemoteFailed(int32_t sessionId, std::shared_ptr<AuthManagerBase> authMgr,
+    int32_t reason, uint64_t logicalSessionId)
+{
+    LOGE("sessionId: %{public}d.", sessionId);
+    int32_t sessionSide = GetSessionSide(sessionId);
+    if (sessionSide != AUTH_SESSION_SIDE_SERVER) {
+        return;
+    }
+    CHECK_NULL_VOID(authMgr);
+    authMgr->NotifyRemoteFailed(sessionId, reason, logicalSessionId);
 }
 
 void DeviceManagerServiceImpl::EraseAuthMgr(uint64_t tokenId)
@@ -1246,9 +1262,7 @@ void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, 
             sessionId, dataLen);
         return;
     }
-
     LOGI("start, sessionId: %{public}d, dataLen: %{public}d.", sessionId, dataLen);
-
     JsonObject jsonObject = GetJsonObjectFromData(data, dataLen);
     if (jsonObject.IsDiscarded() || !IsInt32(jsonObject, TAG_MSG_TYPE)) {
         LOGE("MSG_TYPE parse failed.");
@@ -1261,17 +1275,11 @@ void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, 
     }
 
     std::shared_ptr<Session> curSession = GetCurSession(sessionId);
-    if (curSession == nullptr) {
-        LOGE("InitAndRegisterAuthMgr, The physical link is not created.");
-        return;
-    }
-
+    CHECK_NULL_VOID(curSession);
     std::shared_ptr<AuthManagerBase> authMgr = nullptr;
     if  (logicalSessionId != 0) {
         authMgr = GetAuthMgrByMessage(msgType, logicalSessionId, jsonObject, curSession);
-        if (authMgr == nullptr) {
-            return;
-        }
+        CHECK_NULL_VOID(authMgr);
         if (msgType == MSG_TYPE_REQ_ACL_NEGOTIATE || msgType == MSG_TYPE_RESP_ACL_NEGOTIATE) {
             curSession->version_ = DM_CURRENT_VERSION;
         }

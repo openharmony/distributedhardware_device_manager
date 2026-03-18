@@ -271,6 +271,19 @@ int32_t AuthManager::StopAuthenticateDevice(const std::string &pkgName)
     return DM_OK;
 }
 
+void AuthManager::NotifyRemoteFailed(int32_t sessionId, int32_t reason, uint64_t logicalSessionId)
+{
+    CHECK_NULL_VOID(context_);
+    if (context_->direction == DmAuthDirection::DM_AUTH_SINK) {
+        context_->reply = reason;
+        context_->reason = reason;
+        context_->sessionId = sessionId;
+        context_->logicalSessionId = logicalSessionId;
+        CHECK_NULL_VOID(context_->authMessageProcessor);
+        context_->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_RESP_FINISH, context_);
+    }
+}
+
 void AuthManager::OnScreenLocked()
 {
     LOGI("start");
