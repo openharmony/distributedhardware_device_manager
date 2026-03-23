@@ -62,16 +62,23 @@ if (device_manager_enable_ets_frontend) {
     ]
 
     sources = get_target_outputs(":run_taihe")
-    sources += [
-      "${common_path}/src/dm_anonymous.cpp",
-      "${common_path}/src/dm_error_message.cpp",
-      "src/ani_constructor.cpp",
-      "src/ani_dm_utils.cpp",
-      "src/ani_error_utils.cpp",
-      "src/ani_utils.cpp",
-      "src/dm_ani_callback.cpp",
-      "src/ohos.distributedDeviceManager.cpp",
-    ]
+    if (!device_manager_capability) {
+      sources += [
+        "src/ani_constructor.cpp",
+        "src/ohos.distributedDeviceManager.failToSupport.cpp",
+      ]
+    } else {
+      sources += [
+        "${common_path}/src/dm_anonymous.cpp",
+        "${common_path}/src/dm_error_message.cpp",
+        "src/ani_constructor.cpp",
+        "src/ani_dm_utils.cpp",
+        "src/ani_error_utils.cpp",
+        "src/ani_utils.cpp",
+        "src/dm_ani_callback.cpp",
+        "src/ohos.distributedDeviceManager.cpp",
+      ]
+    }
 
     deps = [
       ":run_taihe",

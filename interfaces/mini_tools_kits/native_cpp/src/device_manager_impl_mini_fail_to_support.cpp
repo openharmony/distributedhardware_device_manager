@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "device_manager_impl_mini_fail_to_support.h"
+#include "dm_error_type.h"
+#include "dm_log.h"
+
+namespace OHOS {
+namespace DistributedHardware {
+DeviceManagerImplMiniFailToSupport &DeviceManagerImplMiniFailToSupport::GetInstance()
+{
+    static DeviceManagerImplMiniFailToSupport instance;
+    return instance;
+}
+
+int32_t DeviceManagerImplMiniFailToSupport::InitDeviceManager(const std::string &pkgName)
+{
+    LOGI("device not support");
+    return ERR_DM_DEVICE_NOT_SUPPORT;
+}
+
+int32_t DeviceManagerImplMiniFailToSupport::UnInitDeviceManager(const std::string &pkgName)
+{
+    LOGI("device not support");
+    return ERR_DM_DEVICE_NOT_SUPPORT;
+}
+
+int32_t DeviceManagerImplMiniFailToSupport::OnDmServiceDied()
+{
+    LOGI("device not support");
+    return ERR_DM_DEVICE_NOT_SUPPORT;
+}
+
+int32_t DeviceManagerImplMiniFailToSupport::GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
+    std::string &displayName)
+{
+    LOGI("device not support");
+    return ERR_DM_DEVICE_NOT_SUPPORT;
+}
+
+} // namespace DistributedHardware
+} // namespace OHOS

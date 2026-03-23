@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023-2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -62,114 +62,122 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("devicemanagerradar") {
-    include_dirs = [
-      "include",
-      "${common_path}/include",
-      "${innerkits_path}/native_cpp/include",
-      "${json_path}/include",
-    ]
+    if (!device_manager_capability) {
+      install_enable = false
+    } else {
+      include_dirs = [
+        "include",
+        "${common_path}/include",
+        "${innerkits_path}/native_cpp/include",
+        "${json_path}/include",
+      ]
 
-    sanitize = {
-      cfi = true
-      cfi_cross_dso = true
-      debug = false
+      sanitize = {
+        cfi = true
+        cfi_cross_dso = true
+        debug = false
+      }
+
+      cflags = [
+        "-Werror",
+        "-fPIC",
+        "-fstack-protector-strong",
+      ]
+
+      ldflags = [
+        "-Wl,-z,relro",
+        "-Wl,-z,now",
+      ]
+
+      configs = [ ":cflags_config" ]
+
+      sources = [ "src/dm_radar_helper.cpp" ]
+
+      defines = [
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"dmradar\"",
+        "LOG_DOMAIN=0xD004110",
+      ]
+
+      deps = [
+        "${innerkits_path}/native_cpp:devicemanagersdk",
+        "${json_path}:devicemanagerjson",
+      ]
+
+      external_deps = [
+        "access_token:libaccesstoken_sdk",
+        "access_token:libtokenid_sdk",
+        "cJSON:cjson",
+        "c_utils:utils",
+        "hilog:libhilog",
+        "hisysevent:libhisysevent",
+        "init:libbegetutil",
+        "ipc:ipc_core",
+        "ipc:ipc_single",
+      ]
+
+      subsystem_name = "distributedhardware"
+
+      part_name = "device_manager"
     }
-
-    cflags = [
-      "-Werror",
-      "-fPIC",
-      "-fstack-protector-strong",
-    ]
-
-    ldflags = [
-      "-Wl,-z,relro",
-      "-Wl,-z,now",
-    ]
-
-    configs = [ ":cflags_config" ]
-
-    sources = [ "src/dm_radar_helper.cpp" ]
-
-    defines = [
-      "HI_LOG_ENABLE",
-      "DH_LOG_TAG=\"dmradar\"",
-      "LOG_DOMAIN=0xD004110",
-    ]
-
-    deps = [
-      "${innerkits_path}/native_cpp:devicemanagersdk",
-      "${json_path}:devicemanagerjson",
-    ]
-
-    external_deps = [
-      "access_token:libaccesstoken_sdk",
-      "access_token:libtokenid_sdk",
-      "cJSON:cjson",
-      "c_utils:utils",
-      "hilog:libhilog",
-      "hisysevent:libhisysevent",
-      "init:libbegetutil",
-      "ipc:ipc_core",
-      "ipc:ipc_single",
-    ]
-
-    subsystem_name = "distributedhardware"
-
-    part_name = "device_manager"
   }
 
   ohos_shared_library("devicemanagerradartest") {
-    include_dirs = [
-      "include",
-      "${common_path}/include",
-      "${innerkits_path}/native_cpp/include",
-      "${json_path}/include",
-    ]
+    if (!device_manager_capability) {
+      install_enable = false
+    } else {
+      include_dirs = [
+        "include",
+        "${common_path}/include",
+        "${innerkits_path}/native_cpp/include",
+        "${json_path}/include",
+      ]
 
-    sanitize = {
-      cfi = true
-      cfi_cross_dso = true
-      debug = false
+      sanitize = {
+        cfi = true
+        cfi_cross_dso = true
+        debug = false
+      }
+
+      cflags = [
+        "-Werror",
+        "-fPIC",
+        "-fstack-protector-strong",
+      ]
+
+      ldflags = [
+        "-Wl,-z,relro",
+        "-Wl,-z,now",
+      ]
+
+      sources = [ "src/dm_radar_helper.cpp" ]
+
+      defines = [
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"dmradar\"",
+        "LOG_DOMAIN=0xD004110",
+      ]
+
+      deps = [
+        "${innerkits_path}/native_cpp:devicemanagersdk",
+        "${json_path}:devicemanagerjson",
+      ]
+
+      external_deps = [
+        "access_token:libaccesstoken_sdk",
+        "access_token:libtokenid_sdk",
+        "cJSON:cjson",
+        "c_utils:utils",
+        "hilog:libhilog",
+        "hisysevent:libhisysevent",
+        "init:libbegetutil",
+        "ipc:ipc_core",
+        "ipc:ipc_single",
+      ]
+
+      subsystem_name = "distributedhardware"
+
+      part_name = "device_manager"
     }
-
-    cflags = [
-      "-Werror",
-      "-fPIC",
-      "-fstack-protector-strong",
-    ]
-
-    ldflags = [
-      "-Wl,-z,relro",
-      "-Wl,-z,now",
-    ]
-
-    sources = [ "src/dm_radar_helper.cpp" ]
-
-    defines = [
-      "HI_LOG_ENABLE",
-      "DH_LOG_TAG=\"dmradar\"",
-      "LOG_DOMAIN=0xD004110",
-    ]
-
-    deps = [
-      "${innerkits_path}/native_cpp:devicemanagersdk",
-      "${json_path}:devicemanagerjson",
-    ]
-
-    external_deps = [
-      "access_token:libaccesstoken_sdk",
-      "access_token:libtokenid_sdk",
-      "cJSON:cjson",
-      "c_utils:utils",
-      "hilog:libhilog",
-      "hisysevent:libhisysevent",
-      "init:libbegetutil",
-      "ipc:ipc_core",
-      "ipc:ipc_single",
-    ]
-
-    subsystem_name = "distributedhardware"
-
-    part_name = "device_manager"
   }
 }

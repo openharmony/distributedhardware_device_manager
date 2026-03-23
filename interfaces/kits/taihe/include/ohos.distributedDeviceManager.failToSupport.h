@@ -1,0 +1,119 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#ifndef OHOS_DISTRIBUTEDDEVICEMANAGER_FAILTOSUPPORT_H
+#define OHOS_DISTRIBUTEDDEVICEMANAGER_FAILTOSUPPORT_H
+
+#include <string>
+#include "ohos.distributedDeviceManager.proj.hpp"
+#include "ohos.distributedDeviceManager.impl.hpp"
+#include "taihe/callback.hpp"
+#include "taihe/runtime.hpp"
+
+
+namespace ANI::distributedDeviceManager {
+
+class DmImpFaiToSupport {
+public:
+    DmImpFaiToSupport() = default;
+    explicit DmImpFaiToSupport(std::shared_ptr<DmImpFaiToSupport> impl);
+    explicit DmImpFaiToSupport(const std::string &bundleName);
+    ~DmImpFaiToSupport();
+
+    int64_t GetInner();
+
+    ::taihe::string GetLocalDeviceId();
+    ::taihe::string GetLocalDeviceNetworkId();
+    ::taihe::string GetLocalDeviceName();
+    int32_t GetLocalDeviceType();
+    ::taihe::string GetDeviceName(taihe::string_view networkId);
+    int32_t GetDeviceType(taihe::string_view networkId);
+
+    ::taihe::array<::ohos::distributedDeviceManager::DeviceBasicInfo> GetAvailableDeviceListSync();
+    void ReplyUiAction(int32_t action, ::taihe::string_view actionResult);
+    uintptr_t GetDeviceProfileInfoList(
+        const ::ohos::distributedDeviceManager::DeviceProfileInfoFilterOptions &filterOptions);
+    int32_t PutDeviceProfileInfoListSync(
+        ::taihe::array_view<::ohos::distributedDeviceManager::DeviceProfileInfo> deviceProfileInfoList);
+    uintptr_t GetDeviceIconInfo(const ::ohos::distributedDeviceManager::DeviceIconInfoFilterOptions &filterOptions);
+    ::taihe::string GetLocalDisplayDeviceNameSync(int32_t maxNameLength);
+    uintptr_t SetLocalDeviceName(::taihe::string_view deviceName);
+    uintptr_t SetRemoteDeviceName(::taihe::string_view deviceId, ::taihe::string_view deviceName);
+    void SetHeartbeatPolicy(::ohos::distributedDeviceManager::StrategyForHeartbeat policy, int32_t delayTime);
+    void RestoreLocalDeviceName();
+    ::taihe::array<::taihe::string> GetDeviceNetworkIdListSync(
+        const ::ohos::distributedDeviceManager::NetworkIdQueryFilter &filterOptions);
+    ::taihe::array<::ohos::distributedDeviceManager::DeviceIdentification> GetIdentificationByDeviceIds(
+        ::taihe::array_view<::taihe::string> deviceIdList);
+    void OnDiscoverFailure(::taihe::callback_view<void(
+        ::ohos::distributedDeviceManager::DiscoveryFailureResult const&)> onDiscoverFailurecb);
+    void OnDiscoverSuccess(::taihe::callback_view<void(
+        ::ohos::distributedDeviceManager::DiscoverySuccessResult const&)> onDiscoverSuccesscb);
+    void OffDiscoverFailure(::taihe::optional_view<::taihe::callback<void(
+        ::ohos::distributedDeviceManager::DiscoveryFailureResult const&)>> offDiscoverFailurecb);
+    void OffDiscoverSuccess(::taihe::optional_view<::taihe::callback<void(
+        ::ohos::distributedDeviceManager::DiscoverySuccessResult const&)>> offDiscoverSuccesscb);
+
+    void OnDeviceNameChange(::taihe::callback_view<void(
+        ::ohos::distributedDeviceManager::DeviceNameChangeResult const&)> onDeviceNameChangecb);
+    void OnReplyResult(::taihe::callback_view<void(
+        ::ohos::distributedDeviceManager::ReplyResult const&)> onReplyResultcb);
+    void OnDeviceStateChange(::taihe::callback_view<void(
+        ::ohos::distributedDeviceManager::DeviceStateChangeResult const&)> onDeviceStateChangecb);
+    void OnServiceDie(::taihe::callback_view<void(uintptr_t)> onServiceDiecb);
+
+    void OffDeviceNameChange(::taihe::optional_view<::taihe::callback<void(
+        ::ohos::distributedDeviceManager::DeviceNameChangeResult const&)>> offDeviceNameChangecb);
+    void OffReplyResult(::taihe::optional_view<::taihe::callback<void(
+        ::ohos::distributedDeviceManager::ReplyResult const&)>> offReplyResultcb);
+    void OffDeviceStateChange(::taihe::optional_view<::taihe::callback<void(
+        ::ohos::distributedDeviceManager::DeviceStateChangeResult const&)>> offDeviceStateChangecb);
+    void OffServiceDie(::taihe::optional_view<::taihe::callback<void(uintptr_t data)>> offServiceDiecb);
+
+    void BindTarget(::taihe::string_view deviceId,
+        ::taihe::map_view<::taihe::string, ::ohos::distributedDeviceManager::IntAndStrUnionType> bindParam,
+        ::taihe::callback_view<
+            void(uintptr_t err, ::ohos::distributedDeviceManager::BindTargetResult const&)> callback);
+    void UnbindTarget(::taihe::string_view deviceId);
+    void StartDiscovering(
+        ::taihe::map_view<::taihe::string, ::ohos::distributedDeviceManager::IntAndStrUnionType> discoverParam,
+        ::taihe::optional_view<::taihe::map<::taihe::string,
+            ::ohos::distributedDeviceManager::IntAndStrUnionType>> filterOptions);
+    void StopDiscovering();
+
+    void ReleaseDeviceManager();
+    friend ohos::distributedDeviceManager::DeviceManager CreateDeviceManager(::taihe::string_view bundleName);
+private:
+    std::string bundleName_;
+};
+
+::ohos::distributedDeviceManager::DeviceBasicInfo MakeDeviceBasicInfo(::taihe::string_view deviceId,
+    ::taihe::string_view deviceName, ::taihe::string_view deviceType,
+    ::taihe::string_view networkId, ::taihe::string_view extraData);
+
+::ohos::distributedDeviceManager::DeviceNameChangeResult MakeDeviceNameChangeResult(
+    ::taihe::string_view deviceName);
+::ohos::distributedDeviceManager::ReplyResult MakeReplyResult(::taihe::string_view param);
+::ohos::distributedDeviceManager::DiscoveryFailureResult MakeDiscoveryFailureResult(int32_t reason);
+::ohos::distributedDeviceManager::DiscoverySuccessResult MakeDiscoverySuccessResult(
+    ::ohos::distributedDeviceManager::DeviceBasicInfo const& device);
+::ohos::distributedDeviceManager::DeviceStateChangeResult MakeDeviceStateChangeResult(
+    ::ohos::distributedDeviceManager::DeviceStateChange deviceStateChange,
+    ::ohos::distributedDeviceManager::DeviceBasicInfo const& deviceBasicInfo);
+::ohos::distributedDeviceManager::DeviceManager CreateDeviceManager(::taihe::string_view bundleName);
+void ReleaseDeviceManager(ohos::distributedDeviceManager::weak::DeviceManager deviceManager);
+
+} // namespace ANI::distributedDeviceManager
+
+#endif //OHOS_DISTRIBUTEDDEVICEMANAGER_FAILTOSUPPORT_H

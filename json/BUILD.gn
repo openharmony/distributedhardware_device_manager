@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Copyright (c) 2025-2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -62,56 +62,60 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("devicemanagerjson") {
-    branch_protector_ret = "pac_ret"
-
-    include_dirs = [
-      "include",
-      "${common_path}/include",
-    ]
-
-    sanitize = {
-      cfi = true
-      cfi_cross_dso = true
-      debug = false
-    }
-
-    cflags = [
-      "-Werror",
-      "-fPIC",
-      "-fstack-protector-strong",
-    ]
-
-    ldflags = [
-      "-Wl,-z,relro",
-      "-Wl,-z,now",
-    ]
-
-    configs = [ ":cflags_config" ]
-
-    if (use_nlohmann_json) {
-      sources = [ "src/json_object_nlohmannjson.cpp" ]
+    if (!device_manager_capability) {
+      install_enable = false
     } else {
-      sources = [ "src/json_object_cjson.cpp" ]
+      branch_protector_ret = "pac_ret"
+
+      include_dirs = [
+        "include",
+        "${common_path}/include",
+      ]
+
+      sanitize = {
+        cfi = true
+        cfi_cross_dso = true
+        debug = false
+      }
+
+      cflags = [
+        "-Werror",
+        "-fPIC",
+        "-fstack-protector-strong",
+      ]
+
+      ldflags = [
+        "-Wl,-z,relro",
+        "-Wl,-z,now",
+      ]
+
+      configs = [ ":cflags_config" ]
+
+      if (use_nlohmann_json) {
+        sources = [ "src/json_object_nlohmannjson.cpp" ]
+      } else {
+        sources = [ "src/json_object_cjson.cpp" ]
+      }
+
+      defines = [
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"dmjson\"",
+        "LOG_DOMAIN=0xD004110",
+      ]
+
+      deps = []
+
+      external_deps = [ "hilog:libhilog" ]
+
+      if (use_nlohmann_json) {
+        external_deps += [ "json:nlohmann_json_static" ]
+      } else {
+        external_deps += [ "cJSON:cjson" ]
+      }
+
+      subsystem_name = "distributedhardware"
+
+      part_name = "device_manager"
     }
-
-    defines = [
-      "HI_LOG_ENABLE",
-      "DH_LOG_TAG=\"dmjson\"",
-      "LOG_DOMAIN=0xD004110",
-    ]
-
-    deps = []
-
-    external_deps = [ "hilog:libhilog" ]
-
-    if (use_nlohmann_json) {
-      external_deps += [ "json:nlohmann_json_static" ]
-    } else {
-      external_deps += [ "cJSON:cjson" ]
-    }
-
-    subsystem_name = "distributedhardware"
-
-    part_name = "device_manager"
   }
 }
