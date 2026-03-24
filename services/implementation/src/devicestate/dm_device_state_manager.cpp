@@ -257,8 +257,6 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
         LOGE("On db ready pkgName is empty or uuid is empty");
         return;
     }
-    LOGI("function is called with pkgName: %{public}s and uuid = %{public}s", pkgName.c_str(),
-         GetAnonyString(uuid).c_str());
     DmDeviceInfo saveInfo;
     {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

@@ -349,10 +349,10 @@ int32_t AuthSrcPinAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
     DmEventType ret = context->authStateMachine->WaitExpectEvent(ON_SESSION_KEY_RETURNED);
     if (ret != ON_SESSION_KEY_RETURNED) {
         if (ret == ON_ERROR) {
-            LOGE("ON_SESSION_KEY_RETURNED event not arriverd, maybe retry.");
+            LOGE("ON_SESSION_KEY_RETURNED event not arrived, maybe retry.");
             return DM_OK;
         } else {
-            LOGE("ON_SESSION_KEY_RETURNED event failed, other event arriverd.");
+            LOGE("ON_SESSION_KEY_RETURNED event failed, other event arrived.");
             return ERR_DM_FAILED;
         }
     }
@@ -364,8 +364,8 @@ int32_t AuthSrcPinAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
         context->timer->DeleteTimer(std::string(WAIT_PIN_AUTH_TIMEOUT_TASK));
         return DM_OK;
     } else if (ret == ON_ERROR) {
+        LOGE("ON_FINISH event not arrived, maybe retry.");
         return DM_OK;
-        LOGE("ON_FINISH event not arriverd, maybe retry.");
     }
 
     return ERR_DM_FAILED;
