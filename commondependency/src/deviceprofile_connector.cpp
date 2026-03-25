@@ -3525,13 +3525,13 @@ bool IsProfileForBackgroundUser(const AccessControlProfile &item, const std::str
 bool IsProfileForForegroundUser(const AccessControlProfile &item, const std::string &localUdid,
     const std::vector<int32_t> &foregroundUserIds)
 {
-    if (item.GetAccesser().GetAccesserDeviceId() != localUdid &&
-        std::find(foregroundUserIds.begin(), foregroundUserIds.end(), item.GetAccesser().GetAccesserUserId()) ==
+    if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+        std::find(foregroundUserIds.begin(), foregroundUserIds.end(), item.GetAccesser().GetAccesserUserId()) !=
         foregroundUserIds.end()) {
         return true;
     }
-    if (item.GetAccessee().GetAccesseeDeviceId() != localUdid &&
-        std::find(foregroundUserIds.begin(), foregroundUserIds.end(), item.GetAccessee().GetAccesseeUserId()) ==
+    if (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+        std::find(foregroundUserIds.begin(), foregroundUserIds.end(), item.GetAccessee().GetAccesseeUserId()) !=
         foregroundUserIds.end()) {
         return true;
     }
