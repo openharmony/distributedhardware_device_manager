@@ -2485,10 +2485,7 @@ ON_IPC_SET_REQUEST(UNREGISTER_SERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, Me
 ON_IPC_READ_RESPONSE(UNREGISTER_SERVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
-    std::shared_ptr<IpcGetAuthTypeByUdidHashRsp> pRsp =
-        std::static_pointer_cast<IpcGetAuthTypeByUdidHashRsp>(pBaseRsp);
-    pRsp->SetErrCode(reply.ReadInt32());
-    pRsp->SetAuthType(reply.ReadInt32());
+    pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
