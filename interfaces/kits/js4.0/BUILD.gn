@@ -44,14 +44,20 @@ ohos_shared_library("distributeddevicemanager") {
     "${innerkits_path}/native_cpp/include/ipc",
     "${innerkits_path}/native_cpp/include/ipc/standard",
   ]
-
-  sources = [
-    "${common_path}/src/dm_anonymous.cpp",
-    "${common_path}/src/dm_error_message.cpp",
-    "src/dm_native_event.cpp",
-    "src/dm_native_util.cpp",
-    "src/native_devicemanager_js.cpp",
-  ]
+  if (!device_manager_capability) {
+    sources = [
+      "src/dm_native_event.cpp",
+      "src/native_devicemanager_js_fail_to_support.cpp",
+    ]
+  } else {
+    sources = [
+      "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/dm_error_message.cpp",
+      "src/dm_native_event.cpp",
+      "src/dm_native_util.cpp",
+      "src/native_devicemanager_js.cpp",
+    ]
+  }
 
   deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",

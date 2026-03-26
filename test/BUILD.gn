@@ -11,18 +11,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
 group("test") {
   testonly = true
 
   deps = []
   if (support_jsapi) {
-    deps += [
-      "benchmarktest:benchmarktest",
-      "commonfuzztest:fuzztest",
-      "interfacesfuzztest:fuzztest",
-      "servicesfuzztest:fuzztest",
-      "softbusfuzztest:fuzztest",
-      "unittest:unittest",
-    ]
+    if (device_manager_capability) {
+      deps += [
+        "benchmarktest:benchmarktest",
+        "commonfuzztest:fuzztest",
+        "interfacesfuzztest:fuzztest",
+        "servicesfuzztest:fuzztest",
+        "softbusfuzztest:fuzztest",
+        "unittest:unittest",
+      ]
+    }
   }
 }

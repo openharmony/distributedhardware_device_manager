@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -148,127 +148,131 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("devicemanagerserviceimpl") {
-    branch_protector_ret = "pac_ret"
+    if (!device_manager_capability) {
+      install_enable = false
+    } else {
+      branch_protector_ret = "pac_ret"
 
-    sanitize = {
-      boundary_sanitize = true
-      cfi = true
-      cfi_cross_dso = true
-      debug = false
-      integer_overflow = true
-      ubsan = true
+      sanitize = {
+        boundary_sanitize = true
+        cfi = true
+        cfi_cross_dso = true
+        debug = false
+        integer_overflow = true
+        ubsan = true
+      }
+
+      cflags = [
+        "-Werror",
+        "-fPIC",
+        "-fstack-protector-strong",
+      ]
+
+      ldflags = [
+        "-Wl,-z,relro",
+        "-Wl,-z,now",
+      ]
+
+      sources = [
+        "src/ability/standard/dm_ability_manager.cpp",
+        "src/ability/standard/dm_dialog_manager.cpp",
+        "src/attest/dm_auth_attest_common.cpp",
+        "src/attest/dm_auth_cert.cpp",
+        "src/authentication/auth_message_processor.cpp",
+        "src/authentication/auth_request_state.cpp",
+        "src/authentication/auth_response_state.cpp",
+        "src/authentication/auth_ui_state_manager.cpp",
+        "src/authentication/dm_auth_manager.cpp",
+        "src/authentication_v2/auth_manager.cpp",
+        "src/authentication_v2/auth_stages/auth_acl.cpp",
+        "src/authentication_v2/auth_stages/auth_confirm.cpp",
+        "src/authentication_v2/auth_stages/auth_credential.cpp",
+        "src/authentication_v2/auth_stages/auth_negotiate.cpp",
+        "src/authentication_v2/auth_stages/auth_pin_auth.cpp",
+        "src/authentication_v2/dm_auth_context.cpp",
+        "src/authentication_v2/dm_auth_manager_base.cpp",
+        "src/authentication_v2/dm_auth_message_processor.cpp",
+        "src/authentication_v2/dm_auth_state.cpp",
+        "src/authentication_v2/dm_auth_state_machine.cpp",
+        "src/authentication_v2/dm_negotiate_process.cpp",
+        "src/authentication_v2/dm_freeze_process.cpp",
+        "src/credential/dm_credential_manager.cpp",
+        "src/cryptomgr/crypto_mgr.cpp",
+        "src/dependency/commonevent/dm_common_event_manager.cpp",
+        "src/dependency/hichain/hichain_auth_connector.cpp",
+        "src/dependency/hichain/hichain_connector.cpp",
+        "src/dependency/hichain/mine_hichain_connector.cpp",
+        "src/dependency/softbus/softbus_connector.cpp",
+        "src/dependency/softbus/softbus_session.cpp",
+        "src/device_manager_service_impl.cpp",
+        "src/devicestate/dm_device_state_manager.cpp",
+        "src/i18n/dm_language_manager.cpp",
+      ]
+
+      public_configs = [ ":devicemanagerserviceimpl_config" ]
+
+      defines = [
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"dmsrvimpl\"",
+        "LOG_DOMAIN=0xD004110",
+      ]
+
+      deps = [
+        "${devicemanager_path}/commondependency:devicemanagerdependency",
+        "${devicemanager_path}/radar:devicemanagerradar",
+        "${innerkits_path}/native_cpp:devicemanagersdk",
+        "${json_path}:devicemanagerjson",
+        "${softbuscache_parh}:dmdevicecache",
+        "${utils_path}:devicemanagerutils",
+      ]
+
+      external_deps = [
+        "ability_base:session_info",
+        "ability_base:want",
+        "ability_runtime:ability_connect_callback_stub",
+        "ability_runtime:ability_manager",
+        "access_token:libaccesstoken_sdk",
+        "cJSON:cjson",
+        "c_utils:utils",
+        "common_event_service:cesfwk_innerkits",
+        "device_auth:deviceauth_sdk",
+        "device_info_manager:distributed_device_profile_common",
+        "device_info_manager:distributed_device_profile_sdk",
+        "dsoftbus:softbus_client",
+        "dsoftbus:softbus_utils",
+        "eventhandler:libeventhandler",
+        "ffrt:libffrt",
+        "hilog:libhilog",
+        "init:libbegetutil",
+        "ipc:ipc_core",
+        "mbedtls:mbedtls_shared",
+        "openssl:libcrypto_shared",
+        "os_account:libaccountkits",
+        "os_account:os_account_innerkits",
+        "power_manager:powermgr_client",
+        "resource_management:resmgr_napi_core",
+        "samgr:samgr_proxy",
+        "zlib:shared_libz",
+      ]
+
+      if (support_screenlock && device_manager_feature_product == "default") {
+        defines += [ "SUPPORT_SCREENLOCK" ]
+        external_deps += [ "screenlock_mgr:screenlock_client" ]
+      }
+
+      if (device_manager_common) {
+        defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
+      }
+
+      if (support_msdp) {
+        sources += [ "src/dependency/MSDP/spatial_location_callback_impl.cpp" ]
+        defines += [ "SUPPORT_MSDP" ]
+        external_deps += [ "spatial_awareness:spatial_awareness_client" ]
+      }
+
+      subsystem_name = "distributedhardware"
+
+      part_name = "device_manager"
     }
-
-    cflags = [
-      "-Werror",
-      "-fPIC",
-      "-fstack-protector-strong",
-    ]
-
-    ldflags = [
-      "-Wl,-z,relro",
-      "-Wl,-z,now",
-    ]
-
-    sources = [
-      "src/ability/standard/dm_ability_manager.cpp",
-      "src/ability/standard/dm_dialog_manager.cpp",
-      "src/attest/dm_auth_attest_common.cpp",
-      "src/attest/dm_auth_cert.cpp",
-      "src/authentication/auth_message_processor.cpp",
-      "src/authentication/auth_request_state.cpp",
-      "src/authentication/auth_response_state.cpp",
-      "src/authentication/auth_ui_state_manager.cpp",
-      "src/authentication/dm_auth_manager.cpp",
-      "src/authentication_v2/auth_manager.cpp",
-      "src/authentication_v2/auth_stages/auth_acl.cpp",
-      "src/authentication_v2/auth_stages/auth_confirm.cpp",
-      "src/authentication_v2/auth_stages/auth_credential.cpp",
-      "src/authentication_v2/auth_stages/auth_negotiate.cpp",
-      "src/authentication_v2/auth_stages/auth_pin_auth.cpp",
-      "src/authentication_v2/dm_auth_context.cpp",
-      "src/authentication_v2/dm_auth_manager_base.cpp",
-      "src/authentication_v2/dm_auth_message_processor.cpp",
-      "src/authentication_v2/dm_auth_state.cpp",
-      "src/authentication_v2/dm_auth_state_machine.cpp",
-      "src/authentication_v2/dm_negotiate_process.cpp",
-      "src/authentication_v2/dm_freeze_process.cpp",
-      "src/credential/dm_credential_manager.cpp",
-      "src/cryptomgr/crypto_mgr.cpp",
-      "src/dependency/commonevent/dm_common_event_manager.cpp",
-      "src/dependency/hichain/hichain_auth_connector.cpp",
-      "src/dependency/hichain/hichain_connector.cpp",
-      "src/dependency/hichain/mine_hichain_connector.cpp",
-      "src/dependency/softbus/softbus_connector.cpp",
-      "src/dependency/softbus/softbus_session.cpp",
-      "src/device_manager_service_impl.cpp",
-      "src/devicestate/dm_device_state_manager.cpp",
-      "src/i18n/dm_language_manager.cpp",
-    ]
-
-    public_configs = [ ":devicemanagerserviceimpl_config" ]
-
-    defines = [
-      "HI_LOG_ENABLE",
-      "DH_LOG_TAG=\"dmsrvimpl\"",
-      "LOG_DOMAIN=0xD004110",
-    ]
-
-    deps = [
-      "${devicemanager_path}/commondependency:devicemanagerdependency",
-      "${devicemanager_path}/radar:devicemanagerradar",
-      "${innerkits_path}/native_cpp:devicemanagersdk",
-      "${json_path}:devicemanagerjson",
-      "${softbuscache_parh}:dmdevicecache",
-      "${utils_path}:devicemanagerutils",
-    ]
-
-    external_deps = [
-      "ability_base:session_info",
-      "ability_base:want",
-      "ability_runtime:ability_connect_callback_stub",
-      "ability_runtime:ability_manager",
-      "access_token:libaccesstoken_sdk",
-      "cJSON:cjson",
-      "c_utils:utils",
-      "common_event_service:cesfwk_innerkits",
-      "device_auth:deviceauth_sdk",
-      "device_info_manager:distributed_device_profile_common",
-      "device_info_manager:distributed_device_profile_sdk",
-      "dsoftbus:softbus_client",
-      "dsoftbus:softbus_utils",
-      "eventhandler:libeventhandler",
-      "ffrt:libffrt",
-      "hilog:libhilog",
-      "init:libbegetutil",
-      "ipc:ipc_core",
-      "mbedtls:mbedtls_shared",
-      "openssl:libcrypto_shared",
-      "os_account:libaccountkits",
-      "os_account:os_account_innerkits",
-      "power_manager:powermgr_client",
-      "resource_management:resmgr_napi_core",
-      "samgr:samgr_proxy",
-      "zlib:shared_libz",
-    ]
-
-    if (support_screenlock && device_manager_feature_product == "default") {
-      defines += [ "SUPPORT_SCREENLOCK" ]
-      external_deps += [ "screenlock_mgr:screenlock_client" ]
-    }
-
-    if (device_manager_common) {
-      defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
-    }
-
-    if (support_msdp) {
-      sources += [ "src/dependency/MSDP/spatial_location_callback_impl.cpp" ]
-      defines += [ "SUPPORT_MSDP" ]
-      external_deps += [ "spatial_awareness:spatial_awareness_client" ]
-    }
-
-    subsystem_name = "distributedhardware"
-
-    part_name = "device_manager"
   }
 }
