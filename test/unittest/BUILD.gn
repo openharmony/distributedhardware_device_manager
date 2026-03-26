@@ -1793,6 +1793,7 @@ ohos_unittest("UTTest_dm_deviceprofile_connector") {
 ## UnitTest UTTest_dm_deviceprofile_connector_second {{{
 ohos_unittest("UTTest_dm_deviceprofile_connector_second") {
   module_out_path = module_out_path
+  use_exceptions = true
 
   include_dirs = [
     "${devicemanager_path}/commondependency/include",
