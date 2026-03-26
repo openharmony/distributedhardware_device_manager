@@ -489,6 +489,393 @@ HWTEST_F(DmAnonymousTwoTest, IsInt64_001, testing::ext::TestSize.Level1)
     bool result = IsInt64(jsonObj, "key");
     EXPECT_TRUE(result);
 }
+
+/**
+ * @tc.name: IsUint64_001
+ * @tc.desc: Test IsUint64 with valid uint64 value
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, IsUint64_001, testing::ext::TestSize.Level1)
+{
+    JsonObject jsonObj;
+    uint64_t value = 1234567890ULL;
+    jsonObj["key"] = value;
+    bool result = IsUint64(jsonObj, "key");
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: IsArray_002
+ * @tc.desc: Test IsArray with non-array value
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, IsArray_002, testing::ext::TestSize.Level1)
+{
+    JsonObject jsonObj;
+    jsonObj["key"] = "test";
+    bool result = IsArray(jsonObj, "key");
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: IsBool_001
+ * @tc.desc: Test IsBool with true value
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, IsBool_001, testing::ext::TestSize.Level1)
+{
+    JsonObject jsonObj;
+    jsonObj["key"] = true;
+    bool result = IsBool(jsonObj, "key");
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: IsBool_002
+ * @tc.desc: Test IsBool with false value
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, IsBool_002, testing::ext::TestSize.Level1)
+{
+    JsonObject jsonObj;
+    jsonObj["key"] = false;
+    bool result = IsBool(jsonObj, "key");
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: IsBool_003
+ * @tc.desc: Test IsBool with non-boolean value
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, IsBool_003, testing::ext::TestSize.Level1)
+{
+    JsonObject jsonObj;
+    jsonObj["key"] = "true";
+    bool result = IsBool(jsonObj, "key");
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: ConvertMapToJsonString_001
+ * @tc.desc: Test ConvertMapToJsonString with empty map
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, ConvertMapToJsonString_001, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> paramMap;
+    std::string result = ConvertMapToJsonString(paramMap);
+    EXPECT_EQ(result, "");
+}
+
+/**
+ * @tc.name: ConvertMapToJsonString_002
+ * @tc.desc: Test ConvertMapToJsonString with valid map
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, ConvertMapToJsonString_002, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> paramMap;
+    paramMap["key1"] = "value1";
+    paramMap["key2"] = "value2";
+    std::string result = ConvertMapToJsonString(paramMap);
+    EXPECT_FALSE(result.empty());
+    EXPECT_NE(result.find("key1"), std::string::npos);
+    EXPECT_NE(result.find("value1"), std::string::npos);
+}
+
+/**
+ * @tc.name: ConvertMapToJsonString_003
+ * @tc.desc: Test ConvertMapToJsonString with oversized map
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, ConvertMapToJsonString_003, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> paramMap;
+    for (int i = 0; i < 1001; i++) {  // MAX_MAP_LEN is 1000
+        paramMap["key" + std::to_string(i)] = "value" + std::to_string(i);
+    }
+    std::string result = ConvertMapToJsonString(paramMap);
+    EXPECT_EQ(result, "");
+}
+
+/**
+ * @tc.name: ParseMapFromJsonString_001
+ * @tc.desc: Test ParseMapFromJsonString with empty string
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, ParseMapFromJsonString_001, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> paramMap;
+    std::string jsonStr = "";
+    ParseMapFromJsonString(jsonStr, paramMap);
+    EXPECT_TRUE(paramMap.empty());
+}
+
+/**
+ * @tc.name: ParseMapFromJsonString_002
+ * @tc.desc: Test ParseMapFromJsonString with valid JSON string
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, ParseMapFromJsonString_002, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> paramMap;
+    std::string jsonStr = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
+    ParseMapFromJsonString(jsonStr, paramMap);
+    EXPECT_EQ(paramMap.size(), 2);
+    EXPECT_EQ(paramMap["key1"], "value1");
+    EXPECT_EQ(paramMap["key2"], "value2");
+}
+
+/**
+ * @tc.name: ParseMapFromJsonString_003
+ * @tc.desc: Test ParseMapFromJsonString with invalid JSON string
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, ParseMapFromJsonString_003, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> paramMap;
+    std::string jsonStr = "invalid json";
+    ParseMapFromJsonString(jsonStr, paramMap);
+    EXPECT_TRUE(paramMap.empty());
+}
+
+/**
+ * @tc.name: IsInvalidPeerTargetId_001
+ * @tc.desc: Test IsInvalidPeerTargetId with all empty fields
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, IsInvalidPeerTargetId_001, testing::ext::TestSize.Level1)
+{
+    PeerTargetId targetId;
+    targetId.deviceId = "";
+    targetId.brMac = "";
+    targetId.bleMac = "";
+    targetId.wifiIp = "";
+    targetId.serviceId = 0;
+    bool result = IsInvalidPeerTargetId(targetId);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: IsInvalidPeerTargetId_002
+ * @tc.desc: Test IsInvalidPeerTargetId with deviceId set
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, IsInvalidPeerTargetId_002, testing::ext::TestSize.Level1)
+{
+    PeerTargetId targetId;
+    targetId.deviceId = "test-device-id";
+    targetId.brMac = "";
+    targetId.bleMac = "";
+    targetId.wifiIp = "";
+    targetId.serviceId = 0;
+    bool result = IsInvalidPeerTargetId(targetId);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: IsInvalidPeerTargetId_003
+ * @tc.desc: Test IsInvalidPeerTargetId with serviceId set
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, IsInvalidPeerTargetId_003, testing::ext::TestSize.Level1)
+{
+    PeerTargetId targetId;
+    targetId.deviceId = "";
+    targetId.brMac = "";
+    targetId.bleMac = "";
+    targetId.wifiIp = "";
+    targetId.serviceId = 123;
+    bool result = IsInvalidPeerTargetId(targetId);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: ConvertCharArray2String_001
+ * @tc.desc: Test ConvertCharArray2String with null pointer
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, ConvertCharArray2String_001, testing::ext::TestSize.Level1)
+{
+    std::string result = ConvertCharArray2String(nullptr, 10);
+    EXPECT_EQ(result, "");
+}
+
+/**
+ * @tc.name: ConvertCharArray2String_002
+ * @tc.desc: Test ConvertCharArray2String with zero length
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, ConvertCharArray2String_002, testing::ext::TestSize.Level1)
+{
+    char testData[] = "test";
+    std::string result = ConvertCharArray2String(testData, 0);
+    EXPECT_EQ(result, "");
+}
+
+/**
+ * @tc.name: ConvertCharArray2String_003
+ * @tc.desc: Test ConvertCharArray2String with valid input
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, ConvertCharArray2String_003, testing::ext::TestSize.Level1)
+{
+    char testData[] = "testData";
+    std::string result = ConvertCharArray2String(testData, 8);
+    EXPECT_EQ(result, "testData");
+}
+
+/**
+ * @tc.name: ConvertCharArray2String_004
+ * @tc.desc: Test ConvertCharArray2String with oversized length
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, ConvertCharArray2String_004, testing::ext::TestSize.Level1)
+{
+    char testData[] = "test";
+    std::string result = ConvertCharArray2String(testData, 50 * 1024 * 1024);
+    EXPECT_EQ(result, "");
+}
+
+/**
+ * @tc.name: StringToInt_001
+ * @tc.desc: Test StringToInt with empty string
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, StringToInt_001, testing::ext::TestSize.Level1)
+{
+    std::string str = "";
+    int32_t result = StringToInt(str, 10);
+    EXPECT_EQ(result, 0);
+}
+
+/**
+ * @tc.name: StringToInt_002
+ * @tc.desc: Test StringToInt with valid decimal string
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, StringToInt_002, testing::ext::TestSize.Level1)
+{
+    std::string str = "12345";
+    int32_t result = StringToInt(str, 10);
+    EXPECT_EQ(result, 12345);
+}
+
+/**
+ * @tc.name: StringToInt_003
+ * @tc.desc: Test StringToInt with hexadecimal string
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, StringToInt_003, testing::ext::TestSize.Level1)
+{
+    std::string str = "FF";
+    int32_t result = StringToInt(str, 16);
+    EXPECT_EQ(result, 255);
+}
+
+/**
+ * @tc.name: StringToInt_004
+ * @tc.desc: Test StringToInt with invalid string
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, StringToInt_004, testing::ext::TestSize.Level1)
+{
+    std::string str = "abc123";
+    int32_t result = StringToInt(str, 10);
+    EXPECT_EQ(result, 0);
+}
+
+/**
+ * @tc.name: StringToInt64_001
+ * @tc.desc: Test StringToInt64 with empty string
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, StringToInt64_001, testing::ext::TestSize.Level1)
+{
+    std::string str = "";
+    int64_t result = StringToInt64(str, 10);
+    EXPECT_EQ(result, 0);
+}
+
+/**
+ * @tc.name: StringToInt64_002
+ * @tc.desc: Test StringToInt64 with valid string
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, StringToInt64_002, testing::ext::TestSize.Level1)
+{
+    std::string str = "123456789012";
+    int64_t result = StringToInt64(str, 10);
+    EXPECT_EQ(result, 123456789012LL);
+}
+
+/**
+ * @tc.name: StringToInt64_003
+ * @tc.desc: Test StringToInt64 with invalid string
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, StringToInt64_003, testing::ext::TestSize.Level1)
+{
+    std::string str = "invalid";
+    int64_t result = StringToInt64(str, 10);
+    EXPECT_EQ(result, 0);
+}
+
+/**
+ * @tc.name: VersionSplitToInt_001
+ * @tc.desc: Test VersionSplitToInt with standard version string
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, VersionSplitToInt_001, testing::ext::TestSize.Level1)
+{
+    std::string str = "1.2.3";
+    std::vector<int32_t> numVec;
+    VersionSplitToInt(str, '.', numVec);
+    EXPECT_EQ(numVec.size(), 3);
+    EXPECT_EQ(numVec[0], 1);
+    EXPECT_EQ(numVec[1], 2);
+    EXPECT_EQ(numVec[2], 3);
+}
+
+/**
+ * @tc.name: VersionSplitToInt_002
+ * @tc.desc: Test VersionSplitToInt with empty string
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, VersionSplitToInt_002, testing::ext::TestSize.Level1)
+{
+    std::string str = "";
+    std::vector<int32_t> numVec;
+    VersionSplitToInt(str, '.', numVec);
+    EXPECT_TRUE(numVec.empty());
+}
+
+/**
+ * @tc.name: CompareVecNum_001
+ * @tc.desc: Test CompareVecNum with first vector greater
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, CompareVecNum_001, testing::ext::TestSize.Level1)
+{
+    std::vector<int32_t> srcVec = {2, 0};
+    std::vector<int32_t> sinkVec = {1, 9};
+    bool result = CompareVecNum(srcVec, sinkVec);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: CompareVecNum_002
+ * @tc.desc: Test CompareVecNum with first vector smaller
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmAnonymousTwoTest, CompareVecNum_002, testing::ext::TestSize.Level1)
+{
+    std::vector<int32_t> srcVec = {1, 0};
+    std::vector<int32_t> sinkVec = {2, 9};
+    bool result = CompareVecNum(srcVec, sinkVec);
+    EXPECT_FALSE(result);
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS

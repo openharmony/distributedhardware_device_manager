@@ -48,11 +48,11 @@ int32_t AuthResponseState::TransitionTo(std::shared_ptr<AuthResponseState> state
     LOGI("start");
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
-        LOGE("null");
+        LOGE("stateAuthManager is null");
         return ERR_DM_FAILED;
     }
     if (state == nullptr) {
-        LOGE("null");
+        LOGE("state is null");
         return ERR_DM_FAILED;
     }
     if (context_ == nullptr) {

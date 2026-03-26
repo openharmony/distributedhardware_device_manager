@@ -878,7 +878,7 @@ int32_t DeviceManagerImpl::SetUserOperation(const std::string &pkgName, int32_t 
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(SERVER_USER_AUTH_OPERATION, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -908,7 +908,7 @@ int32_t DeviceManagerImpl::GetUdidByNetworkId(const std::string &pkgName, const 
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_UDID_BY_NETWORK, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -938,7 +938,7 @@ int32_t DeviceManagerImpl::GetUuidByNetworkId(const std::string &pkgName, const 
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_UUID_BY_NETWORK, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -984,7 +984,7 @@ int32_t DeviceManagerImpl::RegisterUiStateCallback(const std::string &pkgName)
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_UI_STATE_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterUiStateCallback", ret, anonyLocalUdid_);
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1014,7 +1014,7 @@ int32_t DeviceManagerImpl::UnRegisterUiStateCallback(const std::string &pkgName)
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_UI_STATE_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterUiStateCallback", ret, anonyLocalUdid_);
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1048,7 +1048,7 @@ int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, const s
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REQUEST_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1081,7 +1081,7 @@ int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const st
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(IMPORT_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1113,7 +1113,7 @@ int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const st
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(DELETE_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1142,7 +1142,7 @@ int32_t DeviceManagerImpl::RegisterCredentialCallback(const std::string &pkgName
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_CREDENTIAL_CALLBACK, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1170,7 +1170,7 @@ int32_t DeviceManagerImpl::UnRegisterCredentialCallback(const std::string &pkgNa
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_CREDENTIAL_CALLBACK, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1207,7 +1207,7 @@ int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t
     int32_t ret = ipcClientProxy_->SendRequest(NOTIFY_EVENT, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "NotifyEvent", ret, anonyLocalUdid_);
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1239,7 +1239,7 @@ int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, std::st
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REQUEST_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
@@ -1267,7 +1267,7 @@ int32_t DeviceManagerImpl::CheckCredential(const std::string &pkgName, const std
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(SERVER_GET_DMFA_INFO, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1300,7 +1300,7 @@ int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const st
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(IMPORT_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1333,7 +1333,7 @@ int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const st
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(DELETE_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1377,7 +1377,7 @@ int32_t DeviceManagerImpl::GetEncryptedUuidByNetworkId(const std::string &pkgNam
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_ENCRYPTED_UUID_BY_NETWOEKID, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1408,7 +1408,7 @@ int32_t DeviceManagerImpl::GenerateEncryptedUuid(const std::string &pkgName, con
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GENERATE_ENCRYPTED_UUID, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1672,7 +1672,7 @@ int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName,
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_NETWORKTYPE_BY_NETWORK, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1711,7 +1711,7 @@ int32_t DeviceManagerImpl::ImportAuthCode(const std::string &pkgName, const std:
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(IMPORT_AUTH_CODE, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -1732,7 +1732,7 @@ int32_t DeviceManagerImpl::ExportAuthCode(std::string &authCode)
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(EXPORT_AUTH_CODE, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -2182,7 +2182,7 @@ int32_t DeviceManagerImpl::RegisterPinHolderCallback(const std::string &pkgName,
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_PIN_HOLDER_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterPinHolderCallback", ret, anonyLocalUdid_);
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
@@ -2214,7 +2214,7 @@ int32_t DeviceManagerImpl::CreatePinHolder(const std::string &pkgName, const Pee
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(CREATE_PIN_HOLDER, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
@@ -2244,7 +2244,7 @@ int32_t DeviceManagerImpl::DestroyPinHolder(const std::string &pkgName, const Pe
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(DESTROY_PIN_HOLDER, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
@@ -2515,7 +2515,7 @@ int32_t DeviceManagerImpl::GetNetworkIdByUdid(const std::string &pkgName, const 
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_NETWORKID_BY_UDID, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
@@ -2562,7 +2562,7 @@ int32_t DeviceManagerImpl::GetAnonyLocalUdid(const std::string &pkgName, std::st
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_ANONY_LOCAL_UDID, req, rsp);
     if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
 
