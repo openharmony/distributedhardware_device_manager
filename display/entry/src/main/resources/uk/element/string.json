@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s хоче отримати доступ до служби %2$s на вашому пристрої. Довіряти цьому пристрою?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Додаток \"%2$s\" на пристрої \"%1$s\" хоче отримати доступ до служби \"%3$s\" на вашому пристрої. Довіряти цьому додатку?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"Пристрій \"%s\" хоче підключитися до служб на вашому пристрої. Виберіть служби, до яких потрібно дозволити доступ.",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

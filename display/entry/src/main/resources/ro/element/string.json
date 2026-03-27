@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s ar dori să acceseze serviciul %2$s pe dispozitivul dvs. Aveți încredere în acest dispozitiv?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Aplicația %2$s de pe %1$s dorește să acceseze serviciul %3$s de pe dispozitivul dvs. Aveți încredere în această aplicație?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s dorește să se conecteze la serviciile de pe dispozitivul dvs. Selectați serviciile de autorizat:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

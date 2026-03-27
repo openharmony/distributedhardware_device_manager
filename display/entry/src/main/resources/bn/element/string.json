@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s আপনার ডিভাইসের %2$s সেবায় অ্যাক্সেস করতে চাচ্ছে। এই ডিভাইসের উপর আস্থা রাখবেন?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"%1$s-এর %2$s অ্যাপটি আপনার ডিভাইসের %3$s সেবায় অ্যাক্সেস করতে চাচ্ছে। এই অ্যাপের উপর আস্থা রাখবেন?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s আপনার ডিভাইসের বিভিন্ন সেবার সাথে সংযোগ স্থাপন করতে চাচ্ছে। যেসব সেবার জন্য অনুমোদন দিতে চান সেগুলি নির্বাচন করুন:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

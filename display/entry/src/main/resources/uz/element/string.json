@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s qurilmangizdagi %2$s xizmatidan foydalanmoqchi. Bu qurilma ishonchlimi?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"%1$s qurilmasidagi %2$s ilovasi qurilmangizdagi %3$s xizmatidan foydalanmoqchi. Bu ilova ishonchlimi?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s qurilmangizdagi xizmatlarga ulanmoqchi. Ruxsat berish uchun xizmatlarni tanlang:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s želi dostopati do storitve %2$s v vaši napravi. Ali napravi zaupate?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Aplikacija %2$s v napravi %1$s želi dostopati do storitve %3$s v vaši napravi. Ali zaupate tej aplikaciji?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"Naprava %s želi vzpostaviti povezavo s storitvami v vaši napravi. Izberite storitve, za katere želite odobriti dovoljenje:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

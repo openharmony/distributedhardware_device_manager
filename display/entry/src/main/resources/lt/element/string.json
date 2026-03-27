@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s nori pasiekti %2$s paslaugą jūsų įrenginyje. Pasitikėti šiuo įrenginiu?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Programėlė %2$s įrenginyje %1$s norėtų gauti prieigą prie paslaugos %3$s jūsų įrenginyje. Pasitikėti šia programėle?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s norėtų prisijungti prie jūsų įrenginio paslaugų. Pasirinkite autorizuojamas paslaugas:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

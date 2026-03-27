@@ -6,6 +6,13 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"يريد جهاز \u202a%1$s\u202c الوصول إلى خدمة \"\u202a%2$s\u202c\" على جهازك. الوثوق بهذا الجهاز؟",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

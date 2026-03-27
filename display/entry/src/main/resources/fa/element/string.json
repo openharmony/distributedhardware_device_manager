@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"‏«%1$s» مایل به دسترسی به سرویس «%2$s» در دستگاه شما است. این دستگاه مورد اعتماد است؟",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"برنامه %2$s در %1$s می‌خواهد به سرویس %3$s در دستگاه شما دسترسی داشته باشد. به این برنامه اعتماد دارید؟",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"‏%s می‌خواهد به سرویس‌ها در دستگاه شما متصل شود. سرویس‌های مدنظرتان برای اعطای مجوز دسترسی را انتخاب کنید:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

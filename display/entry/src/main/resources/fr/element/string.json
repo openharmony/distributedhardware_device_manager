@@ -127,6 +127,13 @@
             }
         },
         {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s souhaite accéder au service %2$s sur votre appareil. Faire confiance à cet appareil ?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
             "name":"serve_confirm_trust",
             "value":"L'application %2$s sur %1$s souhaite accéder au service %3$s sur votre appareil. Faire confiance à cette application ?",
             "attr":{

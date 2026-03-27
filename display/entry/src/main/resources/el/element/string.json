@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"Η συσκευή %1$s θα ήθελε να έχει πρόσβαση στην υπηρεσία %2$s στη συσκευή σας. Εμπιστεύεστε αυτήν τη συσκευή;",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"Η εφαρμογή %2$s στη συσκευή %1$s θα ήθελε να έχει πρόσβαση στην υπηρεσία %3$s στη συσκευή σας. Εμπιστεύεστε αυτήν την εφαρμογή;",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"Η συσκευή %s θα ήθελε να συνδεθεί σε υπηρεσίες στη συσκευή σας. Επιλέξτε υπηρεσίες για εξουσιοδότηση:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

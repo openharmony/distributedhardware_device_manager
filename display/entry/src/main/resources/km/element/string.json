@@ -55,6 +55,27 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s ចង់ចូលប្រើសេវាកម្ម %2$s នៅលើឧបករណ៍របស់អ្នក។ ទុកចិត្តឧបករណ៍នេះឬ?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust",
+            "value":"កម្មវិធី %2$s នៅលើ %1$s ចង់ចូលប្រើសេវាកម្ម %3$s នៅលើឧបករណ៍របស់អ្នក។ ទុកចិត្តកម្មវិធីនេះឬ?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_agency_confirm_proxy",
+            "value":"%s ចង់ភ្ជាប់ទៅសេវាកម្មនៅលើឧបករណ៍របស់អ្នក។ ជ្រើសរើសសេវាកម្មដើម្បីអនុញ្ញាត៖",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

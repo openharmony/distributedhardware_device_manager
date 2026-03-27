@@ -100,7 +100,7 @@
         },
         {
             "name":"dm_authenticating",
-            "value":"Authenticating…",
+            "value":"Authenticatingâ€¦",
             "attr":{
                 "priority":"translate"
             }
@@ -122,6 +122,13 @@
         {
             "name":"dm_connect",
             "value":"Connect to %s",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s would like to access the %2$s service on your device. Trust this device?",
             "attr":{
                 "priority":"translate"
             }

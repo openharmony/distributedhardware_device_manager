@@ -127,6 +127,13 @@
             }
         },
         {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s muốn truy cập dịch vụ %2$s trên thiết bị của bạn. Tin tưởng thiết bị này?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
             "name":"serve_confirm_trust",
             "value":"Ứng dụng %2$s trên %1$s muốn truy cập dịch vụ %3$s trên thiết bị của bạn. Tin tưởng ứng dụng này?",
             "attr":{

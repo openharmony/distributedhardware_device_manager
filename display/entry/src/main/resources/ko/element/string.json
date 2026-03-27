@@ -127,6 +127,13 @@
             }
         },
         {
+            "name":"serve_confirm_trust_nohost",
+            "value":"%1$s 장치가 내 장치의 %2$s 서비스에 액세스하려고 합니다. 이 장치를 신뢰하시겠습니까?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
             "name":"serve_confirm_trust",
             "value":"%1$s의 %2$s 앱에서 내 장치의 %3$s 서비스에 액세스하려고 합니다. 이 앱을 신뢰하시겠습니까?",
             "attr":{
