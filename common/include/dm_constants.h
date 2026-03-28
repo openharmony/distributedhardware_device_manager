@@ -141,6 +141,8 @@ DM_EXPORT extern const char* PARAM_KEY_BIND_EXTRA_DATA;
 DM_EXPORT extern const char* PARAM_KEY_OS_TYPE;
 DM_EXPORT extern const char* PARAM_KEY_OS_VERSION;
 DM_EXPORT extern const char* PARAM_KEY_IS_SHOW_TRUST_DIALOG;
+DM_EXPORT extern const char* PARAM_KEY_SCREEN_ID;
+DM_EXPORT extern const char* PARAM_KEY_SCREEN_TYPE;
 DM_EXPORT extern const char* PARAM_KEY_UDID;
 DM_EXPORT extern const char* PARAM_KEY_UUID;
 DM_EXPORT extern const char* DM_CONNECTION_DISCONNECTED;

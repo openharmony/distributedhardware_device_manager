@@ -44,6 +44,21 @@ const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
 const int32_t DM_NAPI_DESCRIPTION_BUF_LENGTH = 16384;
 const int32_t DM_NAPI_BUF_LENGTH = 256;
 const int32_t MAX_OBJECT_LEN = 4096;
+const std::vector<FieldMapping> FIELD_MAPPINGS = {
+    {"appOperation", 0, APP_OPERATION, 0, DM_NAPI_DESCRIPTION_BUF_LENGTH},
+    {"customDescription", 0, CUSTOM_DESCRIPTION, 0, DM_NAPI_DESCRIPTION_BUF_LENGTH},
+    {"targetPkgName", 0, PARAM_KEY_TARGET_PKG_NAME, 0, DM_NAPI_BUF_LENGTH},
+    {"pinCode", 0, PARAM_KEY_PIN_CODE, 0, DM_NAPI_BUF_LENGTH},
+    {"authToken", 0, PARAM_KEY_AUTH_TOKEN, 0, DM_NAPI_BUF_LENGTH},
+    {"isShowTrustDialog", 0, PARAM_KEY_IS_SHOW_TRUST_DIALOG, 0, DM_NAPI_BUF_LENGTH},
+    {"screenId", 0, PARAM_KEY_SCREEN_ID, 0, DM_NAPI_BUF_LENGTH},
+    {"screenType", 0, PARAM_KEY_SCREEN_TYPE, 0, DM_NAPI_BUF_LENGTH},
+    {"brMac", 0, PARAM_KEY_BR_MAC, 0, DM_NAPI_BUF_LENGTH},
+    {"bleMac", 0, PARAM_KEY_BLE_MAC, 0, DM_NAPI_BUF_LENGTH},
+    {"wifiIP", 0, PARAM_KEY_WIFI_IP, 0, DM_NAPI_BUF_LENGTH},
+    {"wifiPort", 1, PARAM_KEY_WIFI_PORT, -1, 0},
+    {"bindLevel", 1, BIND_LEVEL, 0, 0}
+};
 
 void JsObjectToString(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                       char *dest, const int32_t destLen)
@@ -389,57 +404,52 @@ void JsToDmPublishInfo(const napi_env &env, const napi_value &object, DmPublishI
     JsObjectToBool(env, object, "ranging", info.ranging);
     return;
 }
-
+ 
+void ProcessStringField(const napi_env &env, const napi_value &object, JsonObject &jsonObj, 
+                       const FieldMapping &field) {
+    char buffer[field.bufferLength];
+    memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
+    JsObjectToString(env, object, field.name, buffer, sizeof(buffer));
+    jsonObj[field.jsonKey] = std::string(buffer);
+}
+ 
+void ProcessIntField(const napi_env &env, const napi_value &object, JsonObject &jsonObj, 
+                    const FieldMapping &field) {
+    int32_t value = field.defaultValue;
+    JsObjectToInt(env, object, field.name, value);
+    jsonObj[field.jsonKey] = value;
+}
+ 
 void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam,
                    int32_t &bindType, bool &isMetaType)
 {
+ 
+    JsonObject jsonObj;
+ 
     int32_t bindTypeTemp = -1;
     JsObjectToInt(env, object, "bindType", bindTypeTemp);
     bindType = bindTypeTemp;
-
-    char appOperation[DM_NAPI_DESCRIPTION_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "appOperation", appOperation, sizeof(appOperation));
-    char customDescription[DM_NAPI_DESCRIPTION_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "customDescription", customDescription, sizeof(customDescription));
-    char targetPkgName[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "targetPkgName", targetPkgName, sizeof(targetPkgName));
+    jsonObj[AUTH_TYPE] = bindType;
+ 
     char metaType[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "metaType", metaType, sizeof(metaType));
     std::string metaTypeStr = metaType;
     isMetaType = !metaTypeStr.empty();
-
-    char pinCode[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "pinCode", pinCode, sizeof(pinCode));
-    char authToken[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "authToken", authToken, sizeof(authToken));
-    char brMac[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "brMac", brMac, sizeof(brMac));
-    char isShowTrustDialog[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "isShowTrustDialog", isShowTrustDialog, sizeof(isShowTrustDialog));
-    char bleMac[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "bleMac", bleMac, sizeof(bleMac));
-    char wifiIP[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "wifiIP", wifiIP, sizeof(wifiIP));
-
-    int32_t wifiPort = -1;
-    JsObjectToInt(env, object, "wifiPort", wifiPort);
-    int32_t bindLevel = 0;
-    JsObjectToInt(env, object, "bindLevel", bindLevel);
-
-    JsonObject jsonObj;
-    jsonObj[AUTH_TYPE] = bindType;
-    jsonObj[APP_OPERATION] = std::string(appOperation);
-    jsonObj[CUSTOM_DESCRIPTION] = std::string(customDescription);
-    jsonObj[PARAM_KEY_TARGET_PKG_NAME] = std::string(targetPkgName);
     jsonObj[PARAM_KEY_META_TYPE] = metaTypeStr;
-    jsonObj[PARAM_KEY_PIN_CODE] = std::string(pinCode);
-    jsonObj[PARAM_KEY_AUTH_TOKEN] = std::string(authToken);
-    jsonObj[PARAM_KEY_IS_SHOW_TRUST_DIALOG] = std::string(isShowTrustDialog);
-    jsonObj[PARAM_KEY_BR_MAC] = std::string(brMac);
-    jsonObj[PARAM_KEY_BLE_MAC] = std::string(bleMac);
-    jsonObj[PARAM_KEY_WIFI_IP] = std::string(wifiIP);
-    jsonObj[PARAM_KEY_WIFI_PORT] = wifiPort;
-    jsonObj[BIND_LEVEL] = bindLevel;
+ 
+    const size_t fieldCount = FIELD_MAPPINGS.size();
+    
+    for (size_t i = 0; i < fieldCount; i++) {
+        const auto& field = FIELD_MAPPINGS[i];
+        
+        if (field.fieldType == 0) {
+            ProcessStringField(env, object, jsonObj, field);
+        } 
+        else if (field.fieldType == 1) {
+            ProcessIntField(env, object, jsonObj, field);
+        }
+    }
+ 
     bindParam = jsonObj.Dump();
 }
 

@@ -55,6 +55,19 @@ enum DMBussinessErrorCode {
     DM_ERR_SCAS_CHECK_FAILED = 11600108,
 };
 
+struct FieldMapping {
+    // Field name in JavaScript object
+    const char* name;
+    // Field type: 0=string, 1=integer
+    int32_t fieldType;
+    // Corresponding key in JSON output
+    const char* jsonKey;
+    // Default value for integer fields
+    int32_t defaultValue;
+    // Buffer length for string fields
+    int32_t bufferLength;
+};
+
 #define DM_NAPI_RETVAL_NOTHING
 #define DM_NAPI_CALL_BASE(theCall, result)       \
     do {                                         \
