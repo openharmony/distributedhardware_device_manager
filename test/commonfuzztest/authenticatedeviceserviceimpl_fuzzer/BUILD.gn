@@ -82,6 +82,7 @@ ohos_fuzztest("AuthenticateDeviceServiceImplFuzzTest") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "common_event_service:cesfwk_innerkits",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -90,7 +91,9 @@ ohos_fuzztest("AuthenticateDeviceServiceImplFuzzTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "selinux_adapter:librestorecon",
   ]
 }

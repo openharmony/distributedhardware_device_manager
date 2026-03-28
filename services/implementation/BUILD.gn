@@ -245,6 +245,7 @@ if (defined(ohos_lite)) {
         "hilog:libhilog",
         "init:libbegetutil",
         "ipc:ipc_core",
+        "kv_store:distributeddata_inner",
         "mbedtls:mbedtls_shared",
         "openssl:libcrypto_shared",
         "os_account:libaccountkits",

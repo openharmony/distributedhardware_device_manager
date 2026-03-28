@@ -72,6 +72,7 @@ ohos_fuzztest("DeviceNameManagerFuzzTest") {
   ]
 
   external_deps = [
+    "common_event_service:cesfwk_innerkits",
     "c_utils:utils",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
