@@ -405,16 +405,17 @@ void JsToDmPublishInfo(const napi_env &env, const napi_value &object, DmPublishI
     return;
 }
  
-void ProcessStringField(const napi_env &env, const napi_value &object, JsonObject &jsonObj, 
-                       const FieldMapping &field) {
-    char buffer[field.bufferLength];
-    memset_s(buffer, sizeof(buffer), 0, sizeof(buffer));
-    JsObjectToString(env, object, field.name, buffer, sizeof(buffer));
-    jsonObj[field.jsonKey] = std::string(buffer);
+void ProcessStringField(const napi_env &env, const napi_value &object, JsonObject &jsonObj,
+                        const FieldMapping &field)
+{
+    std::vector<char> buffer(field.bufferLength, 0);
+    JsObjectToString(env, object, field.name, buffer.data(), buffer.size());
+    jsonObj[field.jsonKey] = std::string(buffer.data());
 }
  
-void ProcessIntField(const napi_env &env, const napi_value &object, JsonObject &jsonObj, 
-                    const FieldMapping &field) {
+void ProcessIntField(const napi_env &env, const napi_value &object, JsonObject &jsonObj,
+                     const FieldMapping &field)
+{
     int32_t value = field.defaultValue;
     JsObjectToInt(env, object, field.name, value);
     jsonObj[field.jsonKey] = value;
@@ -423,7 +424,6 @@ void ProcessIntField(const napi_env &env, const napi_value &object, JsonObject &
 void JsToBindParam(const napi_env &env, const napi_value &object, std::string &bindParam,
                    int32_t &bindType, bool &isMetaType)
 {
- 
     JsonObject jsonObj;
  
     int32_t bindTypeTemp = -1;
@@ -444,8 +444,7 @@ void JsToBindParam(const napi_env &env, const napi_value &object, std::string &b
         
         if (field.fieldType == 0) {
             ProcessStringField(env, object, jsonObj, field);
-        } 
-        else if (field.fieldType == 1) {
+        } else if (field.fieldType == 1) {
             ProcessIntField(env, object, jsonObj, field);
         }
     }
@@ -563,6 +562,14 @@ void InsertMapParames(JsonObject &bindParamObj, std::map<std::string, std::strin
     if (IsString(bindParamObj, PARAM_KEY_IS_SHOW_TRUST_DIALOG)) {
         std::string isShowTrustDialog = bindParamObj[PARAM_KEY_IS_SHOW_TRUST_DIALOG].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_IS_SHOW_TRUST_DIALOG, isShowTrustDialog));
+    }
+    if (IsString(bindParamObj, PARAM_KEY_SCREEN_ID)) {
+        std::string screenId = bindParamObj[PARAM_KEY_SCREEN_ID].Get<std::string>();
+        bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_SCREEN_ID, screenId));
+    }
+    if (IsString(bindParamObj, PARAM_KEY_SCREEN_TYPE)) {
+        std::string screenType = bindParamObj[PARAM_KEY_SCREEN_TYPE].Get<std::string>();
+        bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_SCREEN_TYPE, screenType));
     }
     if (IsInt32(bindParamObj, BIND_LEVEL)) {
         int32_t bindLevel = bindParamObj[BIND_LEVEL].Get<std::int32_t>();

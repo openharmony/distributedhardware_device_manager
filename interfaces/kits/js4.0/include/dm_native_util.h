@@ -59,13 +59,13 @@ struct FieldMapping {
     // Field name in JavaScript object
     const char* name;
     // Field type: 0=string, 1=integer
-    int32_t fieldType;
+    uint32_t fieldType;
     // Corresponding key in JSON output
     const char* jsonKey;
     // Default value for integer fields
     int32_t defaultValue;
     // Buffer length for string fields
-    int32_t bufferLength;
+    uint32_t bufferLength;
 };
 
 #define DM_NAPI_RETVAL_NOTHING
