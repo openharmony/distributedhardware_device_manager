@@ -3505,6 +3505,7 @@ DmUserRemovedServiceInfo ParseServiceInfoForProfile(const AccessControlProfile &
     serviceInfo.isActive = isActive;
     return serviceInfo;
 }
+
 bool IsProfileForBackgroundUser(const AccessControlProfile &item, const std::string &localUdid,
     const std::vector<int32_t> &foregroundUserIds)
 {
@@ -3520,6 +3521,23 @@ bool IsProfileForBackgroundUser(const AccessControlProfile &item, const std::str
     }
     return false;
 }
+
+bool IsProfileForForegroundUser(const AccessControlProfile &item, const std::string &localUdid,
+    const std::vector<int32_t> &foregroundUserIds)
+{
+    if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+        std::find(foregroundUserIds.begin(), foregroundUserIds.end(), item.GetAccesser().GetAccesserUserId()) !=
+        foregroundUserIds.end()) {
+        return true;
+    }
+    if (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+        std::find(foregroundUserIds.begin(), foregroundUserIds.end(), item.GetAccessee().GetAccesseeUserId()) !=
+        foregroundUserIds.end()) {
+        return true;
+    }
+    return false;
+}
+
 DM_EXPORT int32_t DeviceProfileConnector::HandleAccountCommonEvent(const std::string &localUdid,
     const std::vector<std::string> &deviceVec, const std::vector<int32_t> &foregroundUserIds,
     const std::vector<int32_t> &backgroundUserIds, std::vector<DmUserRemovedServiceInfo> &serviceInfos)
@@ -3546,7 +3564,7 @@ DM_EXPORT int32_t DeviceProfileConnector::HandleAccountCommonEvent(const std::st
             serviceInfos.push_back(ParseServiceInfoForProfile(item, false));
             continue;
         }
-        if (IsProfileForBackgroundUser(item, localUdid, foregroundUserIds) && item.GetStatus() == INACTIVE) {
+        if (IsProfileForForegroundUser(item, localUdid, foregroundUserIds) && item.GetStatus() == INACTIVE) {
             item.SetStatus(ACTIVE);
             activeProfiles.push_back(item);
             if (item.GetAccesser().GetAccesserDeviceId() != localUdid || IsLnnAcl(item)) {
