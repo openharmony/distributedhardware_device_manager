@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_ACL_AUTH_INFO_H
-#define OHOS_DM_ACL_AUTH_INFO_H
+#ifndef OHOS_DM_ACL_AUTH_INFO_3RD_H
+#define OHOS_DM_ACL_AUTH_INFO_3RD_H
 
 #include <string>
 #include <cstdint>
@@ -67,4 +67,4 @@ void FromJson(const JsonItemObject &itemObject, TrustDeviceInfo3rd &trustDeviceI
 
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_ACL_AUTH_INFO_H
+#endif // OHOS_DM_ACL_AUTH_INFO_3RD_H

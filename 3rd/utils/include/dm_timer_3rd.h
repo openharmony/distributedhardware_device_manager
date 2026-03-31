@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DM_TIMER_H
-#define DM_TIMER_H
+#ifndef DM_TIMER_3RD_H
+#define DM_TIMER_3RD_H
 
 #include <atomic>
 #include <chrono>
@@ -26,40 +26,20 @@
 
 #include "ffrt.h"
 
-#ifndef DM_EXPORT
-#define DM_EXPORT __attribute__ ((visibility ("default")))
-#endif // DM_EXPORT
-
 namespace OHOS {
 namespace DistributedHardware {
 using TimerCallback = std::function<void (std::string name)>;
 
 class DmTimer {
 public:
-    DM_EXPORT DmTimer();
-    DM_EXPORT ~DmTimer();
+    DmTimer();
+    ~DmTimer();
 
-    /**
-     * @tc.name: DmTimer::StartTimer
-     * @tc.desc: start timer running
-     * @tc.type: FUNC
-     */
-    DM_EXPORT int32_t StartTimer(std::string name, int32_t timeOut,
-        TimerCallback callback);
+    int32_t StartTimer(std::string name, int32_t timeOut, TimerCallback callback);
 
-    /**
-     * @tc.name: DmTimer::DeleteTimer
-     * @tc.desc: delete timer
-     * @tc.type: FUNC
-     */
-    DM_EXPORT int32_t DeleteTimer(std::string timerName);
+    int32_t DeleteTimer(std::string timerName);
 
-    /**
-     * @tc.name: DmTimer::DeleteAll
-     * @tc.desc: delete all timer
-     * @tc.type: FUNC
-     */
-    DM_EXPORT int32_t DeleteAll();
+    int32_t DeleteAll();
 
 private:
     mutable ffrt::mutex timerMutex_;

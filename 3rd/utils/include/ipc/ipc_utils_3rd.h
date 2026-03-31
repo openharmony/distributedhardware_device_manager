@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_IPC_UTILS_H
-#define OHOS_DM_IPC_UTILS_H
+#ifndef OHOS_DM_IPC_UTILS_3RD_H
+#define OHOS_DM_IPC_UTILS_3RD_H
 
 #include "dm_log_3rd.h"
 #include "ipc_types.h"
@@ -49,4 +49,4 @@ namespace DistributedHardware {
 
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_UTILS_H
+#endif // OHOS_DM_IPC_UTILS_3RD_H

@@ -26,10 +26,10 @@ namespace OHOS {
 namespace DistributedHardware {
 
 typedef struct ProcessInfo3rd {
-    uint32_t tokenId; // tokenId(OH设备使用，三方设备为0) 
-    uint32_t uid; // 用户ID(OH Native进程使用，如sa)
-    std::string processName; // 进程名（三方设备和OH native进程使用）
-    std::string businessName; // 业务名称 业务自定义，要保证唯一性
+    uint32_t tokenId; // tokenId(used by OH devices, 0 for third-party devices) 
+    uint32_t uid; // User ID(used by OH native processes, e.g., SA)
+    std::string processName; // Process name(used by third-party devices and OH native processes)
+    std::string businessName; // Business name(customized by business, must be unique)
     int32_t userId;
 
     bool operator==(const ProcessInfo3rd &other) const
@@ -79,8 +79,6 @@ typedef struct PinCodeInfo {
     bool pincodeValidFlag = false;
     char pinCode[DM_MAX_PIN_CODE_LEN_3RD] = {0};
 } PinCodeInfo;
-
-
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif //OHOS_DM_DATA_STRUCT_3RD_H

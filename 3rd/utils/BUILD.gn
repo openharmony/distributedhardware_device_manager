@@ -49,8 +49,8 @@ ohos_shared_library("devicemanager3rdutils") {
     "src/permission_manager_3rd.cpp",
     "src/multiple_user_connector_3rd.cpp",
     "src/app_manager_3rd.cpp",
-    "src/dm_crypto.cpp",
-    "src/dm_timer.cpp",
+    "src/dm_crypto_3rd.cpp",
+    "src/dm_timer_3rd.cpp",
   ]
 
   defines = [

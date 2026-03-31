@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_SINGLE_INSTANCE_H
-#define OHOS_DM_SINGLE_INSTANCE_H
+#ifndef OHOS_DM_SINGLE_INSTANCE_3RD_H
+#define OHOS_DM_SINGLE_INSTANCE_3RD_H
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -43,4 +43,4 @@ private:                                    \
     }
 }; // namespace DistributedHardware
 }; // namespace OHOS
-#endif // OHOS_DM_SINGLE_INSTANCE_H
+#endif // OHOS_DM_SINGLE_INSTANCE_3RD_H

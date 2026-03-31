@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_KV_ADAPTER_H
-#define OHOS_DM_KV_ADAPTER_H
+#ifndef OHOS_DM_KV_ADAPTER_3RD_H
+#define OHOS_DM_KV_ADAPTER_3RD_H
 
 #include <atomic>
 #include <condition_variable>
@@ -64,4 +64,4 @@ private:
 
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_KV_ADAPTER_H
+#endif // OHOS_DM_KV_ADAPTER_3RD_H

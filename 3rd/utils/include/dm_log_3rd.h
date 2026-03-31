@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_LOG_H
-#define OHOS_DM_LOG_H
+#ifndef OHOS_DM_LOG_3RD_H
+#define OHOS_DM_LOG_3RD_H
 
 #include "hilog/log.h"
 #include <cinttypes>
@@ -70,4 +70,4 @@ namespace DistributedHardware {
     } while (0)
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_LOG_H
+#endif // OHOS_DM_LOG_3RD_H
