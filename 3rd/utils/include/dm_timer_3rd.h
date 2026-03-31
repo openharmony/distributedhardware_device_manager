@@ -30,10 +30,10 @@ namespace OHOS {
 namespace DistributedHardware {
 using TimerCallback = std::function<void (std::string name)>;
 
-class DmTimer {
+class DmTimer3rd {
 public:
-    DmTimer();
-    ~DmTimer();
+    DmTimer3rd();
+    ~DmTimer3rd();
 
     int32_t StartTimer(std::string name, int32_t timeOut, TimerCallback callback);
 

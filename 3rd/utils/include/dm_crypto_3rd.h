@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class Crypto {
+class Crypto3rd {
 public:
     static void DmGenerateStrHash(const void *data, size_t dataSize,
         unsigned char *outBuf, uint32_t outBufLen, uint32_t startIndex);

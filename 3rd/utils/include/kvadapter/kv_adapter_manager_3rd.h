@@ -28,8 +28,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-class KVAdapterManager {
-    DM_DECLARE_SINGLE_INSTANCE_BASE(KVAdapterManager);
+class KVAdapterManager3rd {
+    DM_DECLARE_SINGLE_INSTANCE_BASE(KVAdapterManager3rd);
 public:
     int32_t Init();
     void UnInit();
@@ -40,8 +40,8 @@ public:
     int32_t DeleteByKey(const std::string &key);
 
 private:
-    KVAdapterManager() = default;
-    ~KVAdapterManager() = default;
+    KVAdapterManager3rd() = default;
+    ~KVAdapterManager3rd() = default;
 
 private:
     std::shared_ptr<DistributedKv::KvStoreDeathRecipient> deathRecipient_ = nullptr;
