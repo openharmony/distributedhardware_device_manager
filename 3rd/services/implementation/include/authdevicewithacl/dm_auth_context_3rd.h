@@ -13,22 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_CONTEXT_ACL_H
-#define OHOS_DM_AUTH_CONTEXT_ACL_H
+#ifndef OHOS_DM_AUTH_CONTEXT_3RD_H
+#define OHOS_DM_AUTH_CONTEXT_3RD_H
 #include <functional>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "auth_manager.h"
+#include "auth_manager_3rd.h"
 #include "device_manager_data_struct_3rd.h"
 #include "dm_anonymous_3rd.h"
 #include "dm_auth_info_3rd.h"
-#include "dm_auth_message_processor.h"
+#include "dm_auth_message_processor_3rd.h"
 #include "dm_constants_3rd.h"
 #include "dm_log_3rd.h"
-#include "dm_timer.h"
+#include "dm_timer_3rd.h"
 #include "ffrt.h"
 #include "idevice_manager_service_listener_3rd.h"
 #include "softbus_connector_3rd.h"
@@ -37,8 +37,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-class DmAuthStateMachine;
-class DmAuthMessageProcessor;
+class DmAuthStateMachine3rd;
+class DmAuthMessageProcessor3rd;
 
 using CleanNotifyCallback = std::function<void(uint64_t, int32_t)>;
 using StopTimerAndDelDpCallback = std::function<void(const std::string&, int32_t, uint64_t)>;
@@ -123,12 +123,12 @@ struct DmAuthContext {
     DmAccess accesser;
     DmAccess accessee;
     std::vector<DmProxyAuthContext> subjectProxyOnes;
-    std::shared_ptr<DmAuthStateMachine> authStateMachine;
+    std::shared_ptr<DmAuthStateMachine3rd> authStateMachine;
     std::shared_ptr<IDeviceManagerServiceListener3rd> listener;
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector;
-    std::shared_ptr<DmAuthMessageProcessor> authMessageProcessor;
+    std::shared_ptr<HiChainAuthConnector3rd> hiChainAuthConnector;
+    std::shared_ptr<DmAuthMessageProcessor3rd> authMessageProcessor;
     std::shared_ptr<SoftbusConnector3rd> softbusConnector;
-    std::shared_ptr<DmTimer> timer;
+    std::shared_ptr<DmTimer3rd> timer;
     CleanNotifyCallback cleanNotifyCallback{nullptr};
     StopTimerAndDelDpCallback stopTimerAndDelDpCallback{nullptr};
     std::string importPkgName = "";
@@ -142,4 +142,4 @@ struct DmAuthContext {
 };
 }  // namespace DistributedHardware
 }  // namespace OHOS
-#endif  // OHOS_DM_AUTH_CONTEXT_ACL_H
+#endif  // OHOS_DM_AUTH_CONTEXT_3RD_H

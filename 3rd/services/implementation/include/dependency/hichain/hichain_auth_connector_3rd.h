@@ -13,22 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HICHAIN_AUTH_CONNECTOR_H
-#define OHOS_HICHAIN_AUTH_CONNECTOR_H
+#ifndef OHOS_HICHAIN_AUTH_CONNECTOR_3RD_H
+#define OHOS_HICHAIN_AUTH_CONNECTOR_3RD_H
 
 #include <map>
 #include <mutex>
 
 #include "device_auth.h"
 #include "device_auth_defines.h"
-#include "hichain_connector_callback.h"
+#include "hichain_connector_callback_3rd.h"
 #include "ffrt.h"
 #include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 
-class HiChainAuthConnector {
+class HiChainAuthConnector3rd {
 public:
     static bool onTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen);
     static void onFinish(int64_t requestId, int operationCode, const char *returnData);
@@ -37,20 +37,20 @@ public:
     static void onSessionKeyReturned(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
 
 public:
-    HiChainAuthConnector();
-    ~HiChainAuthConnector();
-    int32_t RegisterHiChainAuthCallbackById(int64_t id, std::shared_ptr<IDmDeviceAuthCallback> callback);
+    HiChainAuthConnector3rd();
+    ~HiChainAuthConnector3rd();
+    int32_t RegisterHiChainAuthCallbackById(int64_t id, std::shared_ptr<IDmDeviceAuthCallback3rd> callback);
     int32_t UnRegisterHiChainAuthCallbackById(int64_t id);
 
     int32_t AuthCredentialPinCode(int32_t osAccountId, int64_t authReqId, const std::string &pinCode);
     int32_t ProcessCredData(int64_t authReqId, const std::string &data);
 
 private:
-    static std::shared_ptr<IDmDeviceAuthCallback> GetDeviceAuthCallback(int64_t id);
-    static std::map<int64_t, std::shared_ptr<IDmDeviceAuthCallback>> dmDeviceAuthCallbackMap_;
+    static std::shared_ptr<IDmDeviceAuthCallback3rd> GetDeviceAuthCallback(int64_t id);
+    static std::map<int64_t, std::shared_ptr<IDmDeviceAuthCallback3rd>> dmDeviceAuthCallbackMap_;
     static ffrt::mutex dmDeviceAuthCallbackMutex_;
     DeviceAuthCallback deviceAuthCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_HICHAIN_AUTH_CONNECTOR_H
+#endif // OHOS_HICHAIN_AUTH_CONNECTOR_3RD_H

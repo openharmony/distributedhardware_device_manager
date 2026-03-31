@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_STATE_ACL_H
-#define OHOS_DM_AUTH_STATE_ACL_H
+#ifndef OHOS_DM_AUTH_STATE_3RD_H
+#define OHOS_DM_AUTH_STATE_3RD_H
 #define TYPE_TV_ID 0x9C
 
 #include <memory>
 
-#include "dm_auth_context.h"
+#include "dm_auth_context_3rd.h"
 #include "dm_auth_info_3rd.h"
 
 namespace OHOS {
@@ -52,15 +52,15 @@ enum DmAuthorizedScope : uint8_t {
     SCOPE_APP,
 };
 
-class DmAuthState {
+class DmAuthState3rd {
 public:
-    virtual ~DmAuthState() {};
+    virtual ~DmAuthState3rd() {};
     virtual DmAuthStateType GetStateType() = 0;
     virtual int32_t Action(std::shared_ptr<DmAuthContext> context) = 0;
     void SourceFinish(std::shared_ptr<DmAuthContext> context);
     void SinkFinish(std::shared_ptr<DmAuthContext> context);
     static int32_t GetTaskTimeout(std::shared_ptr<DmAuthContext> context, const char* taskName, int32_t taskTimeOut);
-    static void HandleAuthenticateTimeout(std::shared_ptr<DmAuthContext> context, std::string name);
+    static void HandleAuthenticateTimeout(std::shared_ptr<DmAuthContext> context, const std::string &name);
     void SaveAcl(std::shared_ptr<DmAuthContext> context);
     void SaveProxyAcl(std::shared_ptr<DmAuthContext> context);
     void SaveAclToDb(std::shared_ptr<DmAuthContext> context, const AccessControl3rd &accessControl3rd);
@@ -68,21 +68,21 @@ public:
     std::string BuildResultContent(std::shared_ptr<DmAuthContext> context);
 };
 
-class AuthSrcStartState : public DmAuthState {
+class AuthSrcStartState : public DmAuthState3rd {
 public:
     virtual ~AuthSrcStartState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 };
 
-class AuthSrcPinNegotiateStartState : public DmAuthState {
+class AuthSrcPinNegotiateStartState : public DmAuthState3rd {
 public:
     virtual ~AuthSrcPinNegotiateStartState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 };
 
-class AuthSinkPinNegotiateStartState : public DmAuthState {
+class AuthSinkPinNegotiateStartState : public DmAuthState3rd {
 public:
     virtual ~AuthSinkPinNegotiateStartState() {};
     DmAuthStateType GetStateType() override;
@@ -92,35 +92,35 @@ private:
     int32_t RespQueryProxyAcceseeIds(std::shared_ptr<DmAuthContext> context);
 };
 
-class AuthSrcPinAuthStartState : public DmAuthState {
+class AuthSrcPinAuthStartState : public DmAuthState3rd {
 public:
     virtual ~AuthSrcPinAuthStartState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 };
 
-class AuthSinkPinAuthStartState : public DmAuthState {
+class AuthSinkPinAuthStartState : public DmAuthState3rd {
 public:
     virtual ~AuthSinkPinAuthStartState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 };
 
-class AuthSrcPinAuthMsgNegotiateState : public DmAuthState {
+class AuthSrcPinAuthMsgNegotiateState : public DmAuthState3rd {
 public:
     virtual ~AuthSrcPinAuthMsgNegotiateState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 };
 
-class AuthSinkPinAuthMsgNegotiateState : public DmAuthState {
+class AuthSinkPinAuthMsgNegotiateState : public DmAuthState3rd {
 public:
     virtual ~AuthSinkPinAuthMsgNegotiateState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 };
 
-class AuthSrcPinAuthDoneState : public DmAuthState {
+class AuthSrcPinAuthDoneState : public DmAuthState3rd {
 public:
     virtual ~AuthSrcPinAuthDoneState() {};
     DmAuthStateType GetStateType() override;
@@ -130,7 +130,7 @@ private:
     int32_t DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context);
 };
 
-class AuthSinkPinAuthDoneState : public DmAuthState {
+class AuthSinkPinAuthDoneState : public DmAuthState3rd {
 public:
     virtual ~AuthSinkPinAuthDoneState() {};
     DmAuthStateType GetStateType() override;
@@ -140,28 +140,28 @@ private:
     int32_t DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context);
 };
 
-class AuthSrcDataSyncState : public DmAuthState {
+class AuthSrcDataSyncState : public DmAuthState3rd {
 public:
     virtual ~AuthSrcDataSyncState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 };
 
-class AuthSinkDataSyncState : public DmAuthState {
+class AuthSinkDataSyncState : public DmAuthState3rd {
 public:
     virtual ~AuthSinkDataSyncState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 };
 
-class AuthSrcFinishState : public DmAuthState {
+class AuthSrcFinishState : public DmAuthState3rd {
 public:
     virtual ~AuthSrcFinishState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 };
 
-class AuthSinkFinishState : public DmAuthState {
+class AuthSinkFinishState : public DmAuthState3rd {
 public:
     virtual ~AuthSinkFinishState() {};
     DmAuthStateType GetStateType() override;
@@ -169,4 +169,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_AUTH_STATE_ACL_H
+#endif // OHOS_DM_AUTH_STATE_3RD_H

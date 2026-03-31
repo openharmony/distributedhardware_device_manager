@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,9 +26,9 @@
 
 #include "softbus_bus_center.h"
 #include "device_manager_data_struct_3rd.h"
-#include "deviceprofile_connector.h"
+#include "deviceprofile_connector_3rd.h"
 #include "softbus_session_3rd.h"
-#include "hichain_auth_connector.h"
+#include "hichain_auth_connector_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -42,7 +42,7 @@ public:
 private:
     static std::string remoteUdidHash_;
     std::shared_ptr<SoftbusSession3rd> softbusSession_;
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
+    std::shared_ptr<HiChainAuthConnector3rd> hiChainAuthConnector_;
     static std::unordered_map<std::string, std::string> deviceUdidMap_;
     static std::mutex discoveryDeviceInfoMutex_;
     static std::mutex deviceUdidLocks_;

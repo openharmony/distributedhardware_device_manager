@@ -13,19 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_SOFTBUS_SESSION_CALLBACK_H
-#define OHOS_DM_SOFTBUS_SESSION_CALLBACK_H
+#ifndef OHOS_SESSION_CALLBACK_3RD_H
+#define OHOS_SESSION_CALLBACK_3RD_H
 
 namespace OHOS {
 namespace DistributedHardware {
-class ISoftbusSessionCallback {
+class ISessionCallback3rd {
 public:
     virtual void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result) = 0;
     virtual void OnSessionClosed(int32_t sessionId) = 0;
-    virtual void OnDataReceived(int32_t sessionId, std::string message) = 0;
-    virtual bool GetIsCryptoSupport() = 0;
-    virtual void OnAuthDeviceDataReceived(int32_t sessionId, std::string message) = 0;
+    virtual void OnDataReceived(int32_t sessionId, const std::string &message) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_SOFTBUS_SESSION_CALLBACK_H
+#endif // OHOS_SESSION_CALLBACK_3RD_H

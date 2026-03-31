@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_MESSAGE_PROCESSOR_DJI
-#define OHOS_DM_AUTH_MESSAGE_PROCESSOR_DJI
+#ifndef OHOS_DM_AUTH_MESSAGE_PROCESSOR_3RD
+#define OHOS_DM_AUTH_MESSAGE_PROCESSOR_3RD
 
 #include <cstdint>
 #include <memory>
@@ -22,7 +22,7 @@
 #include <unordered_map>
 
 #include "access_control_profile.h"
-#include "crypto_mgr.h"
+#include "crypto_mgr_3rd.h"
 #include "dm_auth_info_3rd.h"
 #include "json_object.h"
 
@@ -49,14 +49,14 @@ enum DmMessageType {
 };
 
 
-class DmAuthMessageProcessor {
+class DmAuthMessageProcessor3rd {
 public:
     using CreateMessageFuncPtr =
-        int32_t (DmAuthMessageProcessor::*)(std::shared_ptr<DmAuthContext>, JsonObject &jsonObject);
-    using ParaseMessageFuncPtr =
-        int32_t (DmAuthMessageProcessor::*)(const JsonObject &, std::shared_ptr<DmAuthContext>);
-    DmAuthMessageProcessor();
-    ~DmAuthMessageProcessor();
+        int32_t (DmAuthMessageProcessor3rd::*)(std::shared_ptr<DmAuthContext>, JsonObject &jsonObject);
+    using ParseMessageFuncPtr =
+        int32_t (DmAuthMessageProcessor3rd::*)(const JsonObject &, std::shared_ptr<DmAuthContext>);
+    DmAuthMessageProcessor3rd();
+    ~DmAuthMessageProcessor3rd();
     // Parse the message, and save the parsed information to the context
     int32_t ParseMessage(std::shared_ptr<DmAuthContext> context, const std::string &message);
     // Create a message, construct the corresponding message based on msgType
@@ -78,7 +78,7 @@ private:
     void ConstructCreateMessageFuncMap();
     void ConstructParseMessageFuncMap();
     std::unordered_map<DmMessageType, CreateMessageFuncPtr> createMessageFuncMap_;
-    std::unordered_map<DmMessageType, ParaseMessageFuncPtr> paraseMessageFuncMap_;
+    std::unordered_map<DmMessageType, ParseMessageFuncPtr> parseMessageFuncMap_;
     int32_t ParseMessage2010(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     int32_t ParseMessage2010Proxy(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     int32_t ParseMessage2020(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
@@ -116,8 +116,8 @@ private:
     int32_t EncryptSyncMessage(std::shared_ptr<DmAuthContext> &context, DmAccess &accessSide, std::string &encSyncMsg);
     std::string CompressSyncMsg(std::string &inputStr);
 private:
-    std::shared_ptr<CryptoMgr> cryptoMgr_ = nullptr;
+    std::shared_ptr<CryptoMgr3rd> cryptoMgr_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_AUTH_MESSAGE_PROCESSOR_DJI
+#endif // OHOS_DM_AUTH_MESSAGE_PROCESSOR_3RD

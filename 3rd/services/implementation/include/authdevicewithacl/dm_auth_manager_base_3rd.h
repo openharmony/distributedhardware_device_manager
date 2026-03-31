@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_ADAPTER_ACL_H
-#define OHOS_DM_AUTH_ADAPTER_ACL_H
+#ifndef OHOS_DM_AUTH_ADAPTER_3RD_H
+#define OHOS_DM_AUTH_ADAPTER_3RD_H
 
 #include <functional>
 #include <string>
@@ -23,8 +23,8 @@
 #include <cstdint>
 
 #include "device_manager_data_struct_3rd.h"
-#include "hichain_connector_callback.h"
-#include "softbus_session_callback.h"
+#include "hichain_connector_callback_3rd.h"
+#include "softbus_session_callback_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -68,8 +68,8 @@ enum DmRole {
     DM_ROLE_FA,
 };
 
-class AuthManagerBase : public ISoftbusSessionCallback,
-                        public IDmDeviceAuthCallback {
+class AuthManagerBase3rd : public ISoftbusSessionCallback3rd,
+                        public IDmDeviceAuthCallback3rd {
 public:
     virtual int32_t AuthDevice3rd(const PeerTargetId3rd &targetId, const std::map<std::string, std::string> &authParam,
         int32_t sessionId, uint64_t logicalSessionId);
@@ -80,19 +80,19 @@ public:
 
     virtual void OnSessionDisable();
 
-    virtual void OnDataReceived(const int32_t sessionId, const std::string message);
+    virtual void OnDataReceived(const int32_t sessionId, const std::string &message);
 
     virtual void OnAuthDeviceDataReceived(int32_t sessionId, std::string message);
 
     virtual int32_t EstablishAuthChannel(const std::string &deviceId);
 
-    virtual void StartNegotiate(const int32_t &sessionId);
+    virtual void StartNegotiate(const int32_t sessionId);
 
-    virtual void RespNegotiate(const int32_t &sessionId);
+    virtual void RespNegotiate(const int32_t sessionId);
 
-    virtual void SendAuthRequest(const int32_t &sessionId);
+    virtual void SendAuthRequest(const int32_t sessionId);
 
-    virtual int32_t StartAuthProcess(const int32_t &action);
+    virtual int32_t StartAuthProcess(const int32_t action);
 
     virtual void StartRespAuthProcess();
 
@@ -109,4 +109,4 @@ public:
 };
 }  // namespace DistributedHardware
 }  // namespace OHOS
-#endif  // OHOS_DM_AUTH_ADAPTER_ACL_H
+#endif  // OHOS_DM_AUTH_ADAPTER_3RD_H
