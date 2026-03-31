@@ -31,7 +31,7 @@ constexpr const char* DB_KEY_DELIMITER = "###";
 }
 
 DM_IMPLEMENT_SINGLE_INSTANCE(KVAdapterManager);
-int32_t KVAdapterManager::Init()
+int32_t KVAdapterManager3rd::Init()
 {
     LOGI("Init Kv-Adapter manager");
     int32_t ret = DM_OK;
@@ -45,7 +45,7 @@ int32_t KVAdapterManager::Init()
     return ret;
 }
 
-void KVAdapterManager::UnInit()
+void KVAdapterManager3rd::UnInit()
 {
     LOGI("Uninit Kv-Adapter manager");
     std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
@@ -54,7 +54,7 @@ void KVAdapterManager::UnInit()
     kvAdapter_ = nullptr;
 }
 
-void KVAdapterManager::ReInit()
+void KVAdapterManager3rd::ReInit()
 {
     LOGI("Re init kv adapter manager");
     std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
@@ -62,7 +62,7 @@ void KVAdapterManager::ReInit()
     kvAdapter_->ReInit();
 }
 
-int32_t KVAdapterManager::PutByKey(const std::string &key, const std::string &value)
+int32_t KVAdapterManager3rd::PutByKey(const std::string &key, const std::string &value)
 {
     std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
@@ -73,7 +73,7 @@ int32_t KVAdapterManager::PutByKey(const std::string &key, const std::string &va
     return DM_OK;
 }
 
-int32_t KVAdapterManager::Get(const std::string &key, std::string &value)
+int32_t KVAdapterManager3rd::Get(const std::string &key, std::string &value)
 {
     std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
@@ -85,7 +85,7 @@ int32_t KVAdapterManager::Get(const std::string &key, std::string &value)
     return DM_OK;
 }
 
-int32_t KVAdapterManager::GetAllByPrefix(const std::string &prefix, std::map<std::string, std::string> &acls)
+int32_t KVAdapterManager3rd::GetAllByPrefix(const std::string &prefix, std::map<std::string, std::string> &acls)
 {
     std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
@@ -97,7 +97,7 @@ int32_t KVAdapterManager::GetAllByPrefix(const std::string &prefix, std::map<std
     return DM_OK;
 }
 
-int32_t KVAdapterManager::DeleteByKey(const std::string &key)
+int32_t KVAdapterManager3rd::DeleteByKey(const std::string &key)
 {
     LOGI("start");
     std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);

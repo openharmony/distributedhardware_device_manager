@@ -27,9 +27,9 @@ const int64_t MICROSECOND_TO_SECOND = 1000000L;
 constexpr const char* TIMER_TASK = "TimerTask";
 }
 
-DmTimer::DmTimer()
+DmTimer3rd::DmTimer3rd()
 {
-    LOGI("DmTimer constructor");
+    LOGI("DmTimer3rd constructor");
     if (queue_ != nullptr) {
         LOGI("Timer is already init.");
         return;
@@ -37,20 +37,20 @@ DmTimer::DmTimer()
     queue_ = std::make_shared<ffrt::queue>(TIMER_TASK);
 }
 
-DmTimer::~DmTimer()
+DmTimer3rd::~DmTimer3rd()
 {
-    LOGI("DmTimer destructor");
+    LOGI("DmTimer3rd destructor");
     DeleteAll();
 }
 
-int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback callback)
+int32_t DmTimer3rd::StartTimer(std::string name, int32_t timeOut, TimerCallback callback)
 {
     if (name.empty() || timeOut < MIN_TIME_OUT || timeOut > MAX_TIME_OUT || callback == nullptr) {
-        LOGE("DmTimer StartTimer input value invalid");
+        LOGE("DmTimer3rd StartTimer input value invalid");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(queue_, ERR_DM_POINT_NULL);
-    LOGI("DmTimer StartTimer start name: %{public}s", name.c_str());
+    LOGI("DmTimer3rd StartTimer start name: %{public}s", name.c_str());
     std::lock_guard<ffrt::mutex> locker(timerMutex_);
 
     auto taskFunc = [callback, name] () { callback(name); };
@@ -63,13 +63,13 @@ int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback cal
     return DM_OK;
 }
 
-int32_t DmTimer::DeleteTimer(std::string timerName)
+int32_t DmTimer3rd::DeleteTimer(std::string timerName)
 {
     if (timerName.empty()) {
-        LOGE("DmTimer DeleteTimer timer is null");
+        LOGE("DmTimer3rd DeleteTimer timer is null");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DmTimer DeleteTimer start name: %{public}s", timerName.c_str());
+    LOGI("DmTimer3rd DeleteTimer start name: %{public}s", timerName.c_str());
     std::lock_guard<ffrt::mutex> locker(timerMutex_);
     auto item = timerVec_.find(timerName);
     if (item == timerVec_.end()) {
@@ -86,9 +86,9 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
     return DM_OK;
 }
 
-DM_EXPORT int32_t DmTimer::DeleteAll()
+int32_t DmTimer3rd::DeleteAll()
 {
-    LOGI("DmTimer DeleteAll start");
+    LOGI("DmTimer3rd DeleteAll start");
     std::lock_guard<ffrt::mutex> locker(timerMutex_);
     for (const auto &name : timerVec_) {
         if (name.second != nullptr && queue_ != nullptr) {

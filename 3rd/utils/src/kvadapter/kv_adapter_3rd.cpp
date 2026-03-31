@@ -41,7 +41,7 @@ namespace {
     constexpr int32_t INIT_RETRY_SLEEP_INTERVAL = 200 * 1000; // 200ms
 }
 
-int32_t KVAdapter::Init()
+int32_t KVAdapter3rd::Init()
 {
     LOGI("Init local DB, dataType: %{public}d", static_cast<int32_t>(dataType_));
     if (isInited_.load()) {
@@ -74,7 +74,7 @@ int32_t KVAdapter::Init()
     return DM_OK;
 }
 
-void KVAdapter::UnInit()
+void KVAdapter3rd::UnInit()
 {
     LOGI("KVAdapter UnInit");
     if (isInited_.load()) {
@@ -85,14 +85,14 @@ void KVAdapter::UnInit()
     }
 }
 
-int32_t KVAdapter::ReInit()
+int32_t KVAdapter3rd::ReInit()
 {
     LOGI("KVAdapter ReInit");
     UnInit();
     return Init();
 }
 
-int32_t KVAdapter::Put(const std::string &key, const std::string &value)
+int32_t KVAdapter3rd::Put(const std::string &key, const std::string &value)
 {
     if (key.empty() || key.size() > MAX_STRING_LEN || value.empty() || value.size() > MAX_STRING_LEN) {
         LOGE("Param is invalid!");
@@ -114,7 +114,7 @@ int32_t KVAdapter::Put(const std::string &key, const std::string &value)
     return DM_OK;
 }
 
-int32_t KVAdapter::Get(const std::string &key, std::string &value)
+int32_t KVAdapter3rd::Get(const std::string &key, std::string &value)
 {
     LOGI("Get data by key: %{public}s", GetAnonyString(key).c_str());
     DistributedKv::Key kvKey(key);
@@ -133,7 +133,7 @@ int32_t KVAdapter::Get(const std::string &key, std::string &value)
     return DM_OK;
 }
 
-DistributedKv::Status KVAdapter::GetLocalKvStorePtr()
+DistributedKv::Status KVAdapter3rd::GetLocalKvStorePtr()
 {
     DistributedKv::Options options = {
         .createIfMissing = true,
@@ -149,7 +149,7 @@ DistributedKv::Status KVAdapter::GetLocalKvStorePtr()
     return status;
 }
 
-int32_t KVAdapter::DeleteKvStore()
+int32_t KVAdapter3rd::DeleteKvStore()
 {
     LOGI("Delete KvStore!");
     std::lock_guard<ffrt::mutex> lock(kvDataMgrMutex_);
@@ -158,7 +158,7 @@ int32_t KVAdapter::DeleteKvStore()
     return DM_OK;
 }
 
-int32_t KVAdapter::Delete(const std::string& key)
+int32_t KVAdapter3rd::Delete(const std::string& key)
 {
     DistributedKv::Status status;
     {
@@ -177,7 +177,7 @@ int32_t KVAdapter::Delete(const std::string& key)
     return DM_OK;
 }
 
-int32_t KVAdapter::GetAllByPrefix(const std::string &prefix, std::map<std::string, std::string> &acls)
+int32_t KVAdapter3rd::GetAllByPrefix(const std::string &prefix, std::map<std::string, std::string> &acls)
 {
     if (prefix.empty()) {
         LOGE("prefix is empty");

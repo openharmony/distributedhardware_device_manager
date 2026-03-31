@@ -47,7 +47,7 @@ uint32_t HexifyLen(uint32_t len)
     return len * HEX_TO_UINT8 + 1;
 }
 
-void Crypto::DmGenerateStrHash(const void *data, size_t dataSize, unsigned char *outBuf, uint32_t outBufLen,
+void Crypto3rd::DmGenerateStrHash(const void *data, size_t dataSize, unsigned char *outBuf, uint32_t outBufLen,
     uint32_t startIndex)
 {
     if (data == nullptr || outBuf == nullptr || startIndex > outBufLen) {
@@ -60,7 +60,7 @@ void Crypto::DmGenerateStrHash(const void *data, size_t dataSize, unsigned char 
     SHA256_Final(&outBuf[startIndex], &ctx);
 }
 
-DM_EXPORT int32_t Crypto::ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
+int32_t Crypto3rd::ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
     const unsigned char *inBuf, uint32_t inLen)
 {
     if ((outBuf == nullptr) || (inBuf == nullptr) || (outBufLen < HexifyLen(inLen))) {
@@ -85,12 +85,12 @@ DM_EXPORT int32_t Crypto::ConvertBytesToHexString(char *outBuf, uint32_t outBufL
     return DM_OK;
 }
 
-std::string Crypto::Sha256(const std::string &text, bool isUpper)
+std::string Crypto3rd::Sha256(const std::string &text, bool isUpper)
 {
     return Sha256(text.data(), text.size(), isUpper);
 }
 
-std::string Crypto::Sha256(const void *data, size_t size, bool isUpper)
+std::string Crypto3rd::Sha256(const void *data, size_t size, bool isUpper)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH * HEX_TO_UINT8 + 1] = "";
     DmGenerateStrHash(data, size, hash, HexifyLen(SHA256_DIGEST_LENGTH), SHA256_DIGEST_LENGTH);
@@ -108,7 +108,7 @@ std::string Crypto::Sha256(const void *data, size_t size, bool isUpper)
     return ss.str();
 }
 
-int32_t Crypto::GetUdidHash(const std::string &udid, unsigned char *udidHash)
+int32_t Crypto3rd::GetUdidHash(const std::string &udid, unsigned char *udidHash)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
     DmGenerateStrHash(udid.data(), udid.size(), hash, SHA256_DIGEST_LENGTH, 0);
@@ -120,7 +120,7 @@ int32_t Crypto::GetUdidHash(const std::string &udid, unsigned char *udidHash)
     return DM_OK;
 }
 
-DM_EXPORT std::string Crypto::GetUdidHash(const std::string &udid)
+std::string Crypto3rd::GetUdidHash(const std::string &udid)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
     char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
@@ -134,7 +134,7 @@ DM_EXPORT std::string Crypto::GetUdidHash(const std::string &udid)
     return udidHashStr;
 }
 
-DM_EXPORT std::string Crypto::GetTokenIdHash(const std::string &tokenId)
+std::string Crypto3rd::GetTokenIdHash(const std::string &tokenId)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
     char idHash[DM_MAX_DEVICE_ID_LEN] = {0};
@@ -148,7 +148,7 @@ DM_EXPORT std::string Crypto::GetTokenIdHash(const std::string &tokenId)
     return tokenIdHash;
 }
 
-DM_EXPORT int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf,
+int32_t Crypto3rd::ConvertHexStringToBytes(unsigned char *outBuf,
     uint32_t outBufLen, const char *inBuf, uint32_t inLen)
 {
     if ((outBuf == NULL) || (inBuf == NULL) || (inLen % HEX_TO_UINT8 != 0)) {
@@ -191,7 +191,7 @@ DM_EXPORT int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf,
     return DM_OK;
 }
 
-DM_EXPORT std::string Crypto::GetGroupIdHash(const std::string &groupId)
+std::string Crypto3rd::GetGroupIdHash(const std::string &groupId)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
     DmGenerateStrHash(groupId.data(), groupId.size(), hash, SHA256_DIGEST_LENGTH, 0);
@@ -202,7 +202,7 @@ DM_EXPORT std::string Crypto::GetGroupIdHash(const std::string &groupId)
     return ss.str().substr(0, SHORT_DEVICE_ID_HASH_LENGTH);
 }
 
-int32_t Crypto::GetSecRandom(uint8_t *out, size_t outLen)
+int32_t Crypto3rd::GetSecRandom(uint8_t *out, size_t outLen)
 {
     if (out == NULL) {
         return DM_ERR;
@@ -217,10 +217,10 @@ int32_t Crypto::GetSecRandom(uint8_t *out, size_t outLen)
     return DM_OK;
 }
 
-std::string Crypto::GetSecSalt()
+std::string Crypto3rd::GetSecSalt()
 {
     uint8_t out[SALT_LENGTH] = {0};
-    if (Crypto::GetSecRandom(out, SALT_LENGTH) != DM_OK) {
+    if (Crypto3rd::GetSecRandom(out, SALT_LENGTH) != DM_OK) {
         return SALT_DEFAULT;
     }
 
@@ -232,13 +232,13 @@ std::string Crypto::GetSecSalt()
     return std::string(outHex);
 }
 
-std::string Crypto::GetHashWithSalt(const std::string &text, const std::string &salt)
+std::string Crypto3rd::GetHashWithSalt(const std::string &text, const std::string &salt)
 {
     std::string rawText = text + salt;
-    return Crypto::Sha256(rawText);
+    return Crypto3rd::Sha256(rawText);
 }
 
-DM_EXPORT int32_t Crypto::GetAccountIdHash(const std::string &accountId,
+int32_t Crypto3rd::GetAccountIdHash(const std::string &accountId,
     unsigned char *accountIdHash)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
@@ -251,7 +251,7 @@ DM_EXPORT int32_t Crypto::GetAccountIdHash(const std::string &accountId,
     return DM_OK;
 }
 
-DM_EXPORT std::string Crypto::GetAccountIdHash16(const std::string &accountId)
+std::string Crypto3rd::GetAccountIdHash16(const std::string &accountId)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
     char accountIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
