@@ -39,7 +39,7 @@ ohos_shared_library("devicemanager3rdutils") {
 
   include_dirs = [
     "include",
-    "include/ipc_3rd",
+    "include/ipc",
     "${json_path}/include",
   ]
 

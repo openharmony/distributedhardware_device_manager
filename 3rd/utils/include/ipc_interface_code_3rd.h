@@ -31,7 +31,6 @@ enum DM3rdIpcInterfaceCode {
     SAVE_TRUST_RELATION_3RD,
     QUERY_TRUST_RELATION_3RD,
     DELETE_TRUST_RELATION_3RD,
-    // Add ipc msg here
     ON_AUTH_RESULT_3RD,
     IPC_MSG_BUTT_3RD
 };
