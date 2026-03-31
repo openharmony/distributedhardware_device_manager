@@ -50,10 +50,10 @@ int32_t AppManager3rd::GetAppIdByPkgName(const std::string &pkgName, std::string
         LOGE("appIdKey %{public}s get appid failed.", appIdKey.c_str());
         return ERR_DM_FAILED;
     }
-    LOGI("PkgName %{public}s, userId %{public}d, appId %{public}s.",
-        pkgName.c_str(), userId, GetAnonyString(appId).c_str());
     CHECK_SIZE_RETURN(appIdMap_, ERR_DM_FAILED);
     appId = appIdMap_[appIdKey];
+    LOGI("PkgName %{public}s, userId %{public}d, appId %{public}s.",
+        pkgName.c_str(), userId, GetAnonyString(appId).c_str());
     return DM_OK;
 }
 
