@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "kv_adapter.h"
+#include "kv_adapter_3rd.h"
 
 #include <cinttypes>
 #include <mutex>

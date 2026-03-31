@@ -12,14 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "dm_crypto.h"
-#include "dm_log_3rd.h"
-#include "datetime_ex.h"
+#include "dm_crypto_3rd.h"
+
 #include <iostream>
 #include <sstream>
-
 #include <openssl/rand.h>
 #include "openssl/sha.h"
+
+#include "dm_log_3rd.h"
+#include "datetime_ex.h"
 
 namespace OHOS {
 namespace DistributedHardware {

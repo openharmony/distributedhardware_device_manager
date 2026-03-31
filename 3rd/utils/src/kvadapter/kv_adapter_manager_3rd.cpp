@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "kv_adapter_manager.h"
+#include "kv_adapter_manager_3rd.h"
 
 #include <mutex>
 #include <unistd.h>

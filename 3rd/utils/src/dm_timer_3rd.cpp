@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
+#include "dm_timer_3rd.h"
+
 #include "dm_log_3rd.h"
-#include "dm_timer.h"
 #include "dm_error_type_3rd.h"
 
 namespace OHOS {
