@@ -26,15 +26,10 @@ namespace OHOS {
 namespace DistributedHardware {
 
 typedef struct ProcessInfo3rd {
-    // tokenId (used by OH devices, 0 for third-party devices) 
     uint32_t tokenId;
-    // uid (used by OH native processes, e.g., SA)
     uint32_t uid;
-    // processName (used by third-party devices and OH native processes)
     std::string processName;
-    // businessName (customized by business, must be unique)
     std::string businessName;
-    // userId
     int32_t userId;
 
     bool operator==(const ProcessInfo3rd &other) const
