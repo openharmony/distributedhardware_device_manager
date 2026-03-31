@@ -17,60 +17,71 @@
 #define OHOS_DM_CONSTANTS_3RD_H
 
 #include "dm_error_type_3rd.h"
+
 namespace OHOS {
 namespace DistributedHardware {
-namespace {
-// JSON keys for authentication messages
-const char* TAG_DEVICE_ID_HASH = "deviceIdHash";
-const char* TAG_USER_ID = "userId";
-const char* TAG_ACCOUNT_ID_HASH = "accountIdHash";
-const char* TAG_TOKEN_ID_HASH = "tokenIdHash";
-const char* TAG_BUSINESS_NAME = "businessName";
-const char* TAG_PROCESS_NAME = "processName";
-const char* TAG_UID = "uid";
-const char* TAG_VERSION = "version";
-const char* TAG_PEER_BUSINESS_NAME = "peerBusinessName";
-const char* TAG_PEER_PROCESS_NAME = "peerProcessName";
-const char* TAG_DEVICE_ID = "deviceId";
-const char* TAG_ACCOUNT_ID = "accountId";
-const char* TAG_TOKEN_ID = "tokenId";
-const char* TAG_REPLY = "reply";
-const char* TAG_REASON = "reason";
-const char* TAG_DATA = "data";
-const char* TAG_SYNC = "sync";
-const char* TAG_MSG_TYPE = "msgType";
-const char* TAG_PROXY = "proxy";
-const char* TAG_PROXY_TOKEN_ID = "proxyTokenId";
-const char* TAG_PROXY_PROCESS_NAME = "proxyProcessName";
-const char* TAG_PROXY_UID = "proxyUid";
-const char* TAG_IS_PROXY_DELETE = "isProxyDelete";
 
-const int32_t MIN_PINCODE_SIZE = 6;
-const char* DM_PKG_NAME = "ohos.distributedhardware.devicemanager";
-const char* DM_VERSION_6_1_0 = "6.1.0";
-const char* DM_CURRENT_VERSION = DM_VERSION_6_1_0;
+// Tag
+extern const char* TAG_DEVICE_ID_HASH;
+extern const char* TAG_USER_ID;
+extern const char* TAG_ACCOUNT_ID_HASH;
+extern const char* TAG_TOKEN_ID_HASH;
+extern const char* TAG_BUSINESS_NAME;
+extern const char* TAG_PROCESS_NAME;
+extern const char* TAG_UID;
+extern const char* TAG_VERSION;
+extern const char* TAG_PEER_BUSINESS_NAME;
+extern const char* TAG_PEER_PROCESS_NAME;
+extern const char* TAG_DEVICE_ID;
+extern const char* TAG_ACCOUNT_ID;
+extern const char* TAG_TOKEN_ID;
+extern const char* TAG_REPLY;
+extern const char* TAG_REASON;
+extern const char* TAG_DATA;
+extern const char* TAG_SYNC;
+extern const char* TAG_MSG_TYPE;
+extern const char* TAG_NETWORKID_ID;
+extern const char* TAG_BIND_LEVEL;
+extern const char* TAG_DEVICE_VERSION;
+extern const char* TAG_SESSIONKEY;
+extern const char* TAG_SESSIONKEYS;
 
-const char* PARAM_KEY_IS_PROXY_BIND = "isProxyBind";
-const char* PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT = "isCallingProxyAsSubject";
-const char* PARAM_KEY_SUBJECT_PROXYED_SUBJECTS = "subjectProxyOnes";
-const char* TAG_PROXY_CONTEXT_ID = "proxyContextId";
-const char* TAG_DEVICE_VERSION = "deviceVersion";
-const char* TAG_NETWORKID_ID = "networkId";
-const char* TAG_BIND_LEVEL = "bindLevel";
-constexpr int32_t DEVICE_UUID_LENGTH = 65;
-const char* DM_VAL_TRUE = "true";
-const char* DM_VAL_FALSE = "false";
-const char* ACL_PREFIX = "acl_";
-const char* TAG_SESSIONKEY = "sessionKey";
-const char* TAG_SESSIONKEYS = "sessionKeys";
+// Auth
+extern const int32_t MIN_PINCODE_SIZE;
 
-const char* TAG_BIND_CALLER_USERID = "bindCallerUserId";
-const char* TAG_BIND_CALLER_TOKENID = "bindCallerTokenId";
-const char* TAG_BIND_CALLER_UID = "bindCallerUid";
-const char* TAG_BIND_CALLER_PROCESSNAME = "bindCallerProcessName";
-const char* TAG_BIND_CALLER_IS_SYSTEM_SA = "bindCallerIsSystemSA";
-const char* TAG_BIND_CALLER_BIND_LEVEL = "bindCallerBindLevel";
-}
+// DM
+extern const char* DM_PKG_NAME;
+extern const char* DM_VAL_TRUE;
+extern const char* DM_VAL_FALSE;
+
+// ACL
+extern const char* ACL_PREFIX;
+
+// Device
+extern const int32_t DEVICE_UUID_LENGTH;
+
+// Version
+extern const char* DM_VERSION_6_1_0;
+extern const char* DM_CURRENT_VERSION;
+
+// Proxy
+extern const char* TAG_PROXY;
+extern const char* TAG_PROXY_TOKEN_ID;
+extern const char* TAG_PROXY_PROCESS_NAME;
+extern const char* TAG_PROXY_UID;
+extern const char* TAG_IS_PROXY_DELETE;
+extern const char* TAG_PROXY_CONTEXT_ID;
+extern const char* PARAM_KEY_IS_PROXY_BIND;
+extern const char* PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT;
+extern const char* PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
+
+// Bind caller
+extern const char* TAG_BIND_CALLER_USERID;
+extern const char* TAG_BIND_CALLER_TOKENID;
+extern const char* TAG_BIND_CALLER_UID;
+extern const char* TAG_BIND_CALLER_PROCESSNAME;
+extern const char* TAG_BIND_CALLER_IS_SYSTEM_SA;
+extern const char* TAG_BIND_CALLER_BIND_LEVEL;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_3RD_H
