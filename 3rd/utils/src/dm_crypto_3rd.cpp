@@ -155,11 +155,10 @@ std::string Crypto3rd::GetTokenIdHash(const std::string &tokenId)
 int32_t Crypto3rd::ConvertHexStringToBytes(unsigned char *outBuf,
     uint32_t outBufLen, const char *inBuf, uint32_t inLen)
 {
-    if ((outBuf == NULL) || (inBuf == NULL) || (inLen % HEX_TO_UINT8 != 0) || (inLen == 0)) {
+    if ((outBuf == NULL) || (inBuf == NULL) || (inLen % HEX_TO_UINT8 != 0)) {
         LOGE("invalid param");
         return ERR_DM_FAILED;
     }
-
     uint32_t outLen = inLen / HEX_TO_UINT8;
     if (outBufLen < outLen) {
         LOGE("out of memory.");

@@ -43,7 +43,7 @@ DmTimer3rd::~DmTimer3rd()
     DeleteAll();
 }
 
-int32_t DmTimer3rd::StartTimer(std::string name, int32_t timeOut, TimerCallback callback)
+int32_t DmTimer3rd::StartTimer(const std::string name, int32_t timeOut, TimerCallback callback)
 {
     if (name.empty() || timeOut < MIN_TIME_OUT || timeOut > MAX_TIME_OUT || callback == nullptr) {
         LOGE("DmTimer3rd StartTimer input value invalid");
@@ -63,7 +63,7 @@ int32_t DmTimer3rd::StartTimer(std::string name, int32_t timeOut, TimerCallback 
     return DM_OK;
 }
 
-int32_t DmTimer3rd::DeleteTimer(std::string timerName)
+int32_t DmTimer3rd::DeleteTimer(const std::string timerName)
 {
     if (timerName.empty()) {
         LOGE("DmTimer3rd DeleteTimer timer is null");
