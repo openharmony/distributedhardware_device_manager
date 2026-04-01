@@ -29,6 +29,10 @@ using namespace OHOS::Security::AccessToken;
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
+}
+
 DM_IMPLEMENT_SINGLE_INSTANCE_3RD(PermissionManager3rd);
 
 bool PermissionManager3rd::CheckSystemSA(const std::string &pkgName)
@@ -81,6 +85,27 @@ int32_t PermissionManager3rd::GetCallerProcessName(std::string &processName)
     LOGI("Get process name: %{public}s success, tokenCaller ID == %{public}s.", processName.c_str(),
         GetAnonyInt32(tokenCaller).c_str());
     return DM_OK;
+}
+
+bool PermissionManager3rd::CheckAccessServicePermission(void)
+{
+    return VerifyAccessTokenByPermissionName(DM_SERVICE_ACCESS_PERMISSION);
+}
+
+bool PermissionManager3rd::VerifyAccessTokenByPermissionName(const std::string &permissionName)
+{
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        LOGE("GetCallingTokenID error.");
+        return false;
+    }
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP || tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        if (AccessTokenKit::VerifyAccessToken(tokenCaller, permissionName) == PermissionState::PERMISSION_GRANTED) {
+            return true;
+        }
+    }
+    return false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
