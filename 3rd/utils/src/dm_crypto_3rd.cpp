@@ -44,6 +44,10 @@ constexpr const char* DB_KEY_DELIMITER = "###";
 
 uint32_t HexifyLen(uint32_t len)
 {
+    if (len > (UINT32_MAX - 1) / HEX_TO_UINT8) {
+        LOGE("len is too long, len = %{public}u", len);
+        return 0;
+    }
     return len * HEX_TO_UINT8 + 1;
 }
 
@@ -151,7 +155,7 @@ std::string Crypto3rd::GetTokenIdHash(const std::string &tokenId)
 int32_t Crypto3rd::ConvertHexStringToBytes(unsigned char *outBuf,
     uint32_t outBufLen, const char *inBuf, uint32_t inLen)
 {
-    if ((outBuf == NULL) || (inBuf == NULL) || (inLen % HEX_TO_UINT8 != 0)) {
+    if ((outBuf == NULL) || (inBuf == NULL) || (inLen % HEX_TO_UINT8 != 0) || (inLen == 0)) {
         LOGE("invalid param");
         return ERR_DM_FAILED;
     }

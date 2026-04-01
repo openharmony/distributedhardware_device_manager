@@ -54,7 +54,7 @@ int32_t KVAdapter3rd::Init()
     int32_t tryTimes = MAX_INIT_RETRY_TIMES;
     while (tryTimes > 0) {
         DistributedKv::Status status = GetLocalKvStorePtr();
-        if (status == DistributedKv::Status::SUCCESS && kvStorePtr_) {
+        if (status == DistributedKv::Status::SUCCESS && kvStorePtr_ != nullptr) {
             LOGI("Init KvStorePtr Success");
             isInited_.store(true);
             return DM_OK;
@@ -163,10 +163,7 @@ int32_t KVAdapter3rd::Delete(const std::string& key)
     DistributedKv::Status status;
     {
         std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
-        if (kvStorePtr_ == nullptr) {
-            LOGE("kvStorePtr is nullptr!");
-            return ERR_DM_POINT_NULL;
-        }
+        CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
         DistributedKv::Key kvKey(key);
         status = kvStorePtr_->Delete(kvKey);
     }
@@ -186,10 +183,7 @@ int32_t KVAdapter3rd::GetAllByPrefix(const std::string &prefix, std::map<std::st
     std::vector<DistributedKv::Entry> localEntries;
     {
         std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
-        if (kvStorePtr_ == nullptr) {
-            LOGE("kvStoragePtr_ is null");
-            return ERR_DM_POINT_NULL;
-        }
+        CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
         if (kvStorePtr_->GetEntries(prefix, localEntries) != DistributedKv::Status::SUCCESS) {
             LOGE("Get entrys from DB failed.");
             return ERR_DM_FAILED;
