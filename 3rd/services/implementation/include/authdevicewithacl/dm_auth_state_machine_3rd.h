@@ -27,7 +27,7 @@
 #include <thread>
 #include <chrono>
 
-#include "dm_auth_state.h"
+#include "dm_auth_state_3rd.h"
 #include "dm_constants_3rd.h"
 #include "ffrt.h"
 
@@ -49,14 +49,14 @@ enum DmEventType {
     ON_SESSION_OPENED,
 };
 
-class DmAuthStateMachine {
+class DmAuthStateMachine3rd {
 public:
-    DmAuthStateMachine(std::shared_ptr<DmAuthContext> context);
-    ~DmAuthStateMachine();
+    DmAuthStateMachine3rd(std::shared_ptr<DmAuthContext> context);
+    ~DmAuthStateMachine3rd();
 
     // Notify state transition, execute the corresponding action for the state, and handle exceptions
     // only allowed to be called within OnDataReceived
-    int32_t TransitionTo(std::shared_ptr<DmAuthState> state);
+    int32_t TransitionTo(std::shared_ptr<DmAuthState3rd> state);
 
     // Wait for the expected event within the action, block until the expected event is completed or
     // an exception occurs, returning the actual event that occurred (only allowed to be called within actions)
@@ -81,7 +81,7 @@ private:
     void InsertSinkTransTable();
 
     // Fetch the current state and execute it
-    std::optional<std::shared_ptr<DmAuthState>> FetchAndSetCurState();
+    std::optional<std::shared_ptr<DmAuthState3rd>> FetchAndSetCurState();
 
     void SetCurState(DmAuthStateType state);
 
@@ -105,7 +105,7 @@ private:
     std::atomic<bool> running_;
 
     // Queue for storing states
-    std::queue<std::shared_ptr<DmAuthState>> statesQueue_;
+    std::queue<std::shared_ptr<DmAuthState3rd>> statesQueue_;
 
     // Synchronization primitives
     ffrt::mutex stateMutex_;
@@ -116,6 +116,10 @@ private:
     // Direction of authentication
     DmAuthDirection direction_;
     std::atomic<int32_t> reason{DM_OK};
+
+    // Thread for state machine execution
+    std::thread thread_;
+
     std::atomic<bool> isWait_ = false;
 };
 } // namespace DistributedHardware

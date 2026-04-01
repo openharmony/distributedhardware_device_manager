@@ -28,11 +28,6 @@ namespace OHOS {
 namespace DistributedHardware {
 class SoftbusSession3rd {
 public:
-    static int OnHiplaySessionOpened(int32_t sessionId, int32_t result);
-    static void OnHiplaySessionClosed(int32_t sessionId);
-    static void OnHiplayBytesReceived(int32_t sessionId, const std::string &message);
-
-public:
     SoftbusSession3rd();
     ~SoftbusSession3rd();
 
@@ -49,7 +44,7 @@ private:
 private:
     static std::map<std::string, std::shared_ptr<ISessionCallback3rd>> sessionCallback3rdMap_;
     static ffrt::mutex sessionCallback3rdLock_;
-    static std::map<std::string, int32_t> sessionId3rdMap_;  //sessionName sessionId
+    static std::map<std::string, int32_t> sessionId3rdMap_;
     static ffrt::mutex sessionId3rdMapLock_;
 };
 }

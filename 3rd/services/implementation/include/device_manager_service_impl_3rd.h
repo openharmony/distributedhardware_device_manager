@@ -25,7 +25,7 @@
 #include <semaphore>
 #include "ffrt.h"
 
-#include "auth_manager.h"
+#include "auth_manager_3rd.h"
 #include "softbus_common.h"
 
 #include "dm_single_instance_3rd.h"
@@ -41,9 +41,9 @@ namespace OHOS {
 namespace DistributedHardware {
 
 typedef struct DmAuthCallerInfo3rd {
-    uint32_t uid = -1;
+    uint32_t uid = 0;
     int32_t userId = -1;
-    uint32_t tokenId = -1;
+    uint32_t tokenId = 0;
     std::string processName = "";
     bool isSystemSA = false;
     int32_t bindLevel = -1;
@@ -75,13 +75,13 @@ public:
     int32_t ImportPinCode3rd(const std::string &businessName, const std::string &pinCode);
     int32_t AuthPincode(const PeerTargetId3rd &targetId, std::map<std::string, std::string> &authparam);
 
-    int OnDjiSessionOpened(int sessionId, int result);
-    void OnDjiSessionClosed(int sessionId);
-    void OnDjiBytesReceived(int sessionId, const void *data, uint32_t dataLen);
+    int OnAuth3rdAclSessionOpened(int sessionId, int result);
+    void OnAuth3rdAclSessionClosed(int sessionId);
+    void OnAuth3rdAclBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
-    int OnHiplaySessionOpened(int sessionId, int result);
-    void OnHiplaySessionClosed(int sessionId);
-    void OnHiplayBytesReceived(int sessionId, const void *data, uint32_t dataLen);
+    int OnAuth3rdSessionOpened(int sessionId, int result);
+    void OnAuth3rdSessionClosed(int sessionId);
+    void OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
 private:
     bool IsInvalidPeerTargetId(const PeerTargetId3rd &targetId);
@@ -104,15 +104,16 @@ private:
 
 private:
     int32_t AuthDevice3rd(const PeerTargetId3rd &targetId, const std::map<std::string, std::string> &authParam);
-    std::shared_ptr<AuthManagerBase> GetAuthMgrByTokenId(uint32_t tokenId);
-    std::shared_ptr<AuthManagerBase> GetAuthMgrByMessage(int32_t msgType,
+    std::shared_ptr<AuthManagerBase3rd> GetAuthMgrByTokenId(uint32_t tokenId);
+    std::shared_ptr<AuthManagerBase3rd> GetAuthMgrByMessage(int32_t msgType,
         uint64_t logicalSessionId, const JsonObject &jsonObject);
     int32_t InitAuthMgr(bool isSrcSide, uint32_t tokenId, uint64_t logicalSessionId,
         ProcessInfo3rd processInfo3rd);
-    int32_t AddAuthMgr(uint32_t tokenId, std::shared_ptr<AuthManagerBase> authMgr);
-    void ImportAuthCodeAndUidFromCache(std::shared_ptr<AuthManagerBase> authMgr, const ProcessInfo3rd processInfo3rd);
+    int32_t AddAuthMgr(uint32_t tokenId, std::shared_ptr<AuthManagerBase3rd> authMgr);
+    void ImportAuthCodeAndUidFromCache(std::shared_ptr<AuthManagerBase3rd> authMgr,
+        const ProcessInfo3rd processInfo3rd);
     void NotifyCleanEvent(uint64_t logicalSessionId, int32_t connDelayCloseTime);
-    std::shared_ptr<AuthManagerBase> GetAuthMgr();
+    std::shared_ptr<AuthManagerBase3rd> GetAuthMgr();
     void CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId, int32_t connDelayCloseTime);
     void EraseAuthMgr(uint32_t tokenId);
     ffrt::mutex authLock_;
@@ -120,8 +121,8 @@ private:
     std::string runningAuthDeviceId_;
     std::shared_ptr<SoftbusSession3rd> softbusSession_;
     std::shared_ptr<SoftbusConnector3rd> softbusConnector_;
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
-    std::map<uint32_t, std::shared_ptr<AuthManagerBase>> authMgrMap_;
+    std::shared_ptr<HiChainAuthConnector3rd> hiChainAuthConnector_;
+    std::map<uint32_t, std::shared_ptr<AuthManagerBase3rd>> authMgrMap_;
     ffrt::mutex authMgrMapLock_;
     ffrt::mutex logicalSessionId2TokenIdMapMtx_;
     std::map<uint64_t, uint32_t> logicalSessionId2TokenIdMap_;
@@ -129,6 +130,9 @@ private:
     ffrt::mutex tokenIdSessionIdMapMtx_;
     std::map<uint32_t, int> tokenIdSessionIdMap_;  // New protocol sharing
     ffrt::mutex mapMutex_;  // sessionsMap_ lock
+    std::map<int, bool> sessionEnableCvReadyMap_;  // Condition variable ready flag
+    std::map<int, ffrt::condition_variable> sessionEnableCvMap_;  // Condition variable corresponding to the session
+    std::map<int, ffrt::mutex> sessionEnableMutexMap_;
 };
 
 using CreateDMServiceImpl3rdFuncPtr = IDeviceManagerServiceImpl3rd *(*)(void);

@@ -13,12 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_CRYPTO_MGR_H
-#define OHOS_DM_CRYPTO_MGR_H
+#ifndef OHOS_DM_CRYPTO_MGR_3RD_H
+#define OHOS_DM_CRYPTO_MGR_3RD_H
 
 #include <cinttypes>
 #include <string>
-#include <vector>
 
 #include "ffrt.h"
 namespace OHOS {
@@ -27,7 +26,7 @@ namespace DistributedHardware {
 #define GCM_IV_LEN 12
 
 typedef struct DMSessionKey {
-    std::vector<uint8_t> key;
+    uint8_t *key = nullptr;
     uint32_t keyLen = 0;
 } DMSessionKey;
 
@@ -37,13 +36,12 @@ typedef struct AesGcmCipherKey {
     unsigned char iv[GCM_IV_LEN] = {0};
 } AesGcmCipherKey;
 
-class CryptoMgr {
+class CryptoMgr3rd {
 public:
-    CryptoMgr();
-    ~CryptoMgr();
+    CryptoMgr3rd();
+    ~CryptoMgr3rd();
     int32_t EncryptMessage(const std::string &inputMsg, std::string &outputMsg);
     int32_t DecryptMessage(const std::string &inputMsg, std::string &outputMsg);
-    int32_t SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
     int32_t ProcessSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
     void ClearSessionKey();
     std::vector<unsigned char> GetSessionKey();
@@ -66,4 +64,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_CRYPTO_MGR_H
+#endif // OHOS_DM_CRYPTO_MGR_3RD_H
