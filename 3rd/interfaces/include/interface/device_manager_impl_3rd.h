@@ -24,7 +24,7 @@
 #include "ipc_types.h"
 
 #include "device_manager_callback_3rd.h"
- #include "device_manager_3rd_ipc_interface_code.h"
+#include "device_manager_3rd_ipc_interface_code.h"
 #include "ipc_client_stub_3rd.h"
 #include "device_manager_data_struct_3rd.h"
 #include "dm_log_3rd.h"
