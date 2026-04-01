@@ -35,9 +35,9 @@ public:
     DmTimer3rd();
     ~DmTimer3rd();
 
-    int32_t StartTimer(std::string name, int32_t timeOut, TimerCallback callback);
+    int32_t StartTimer(const std::string &name, int32_t timeOut, TimerCallback callback);
 
-    int32_t DeleteTimer(std::string timerName);
+    int32_t DeleteTimer(const std::string &timerName);
 
     int32_t DeleteAll();
 
