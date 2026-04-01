@@ -32,10 +32,7 @@ using namespace OHOS::Security::AccessToken;
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace {
-constexpr int32_t DEVICE_UUID_LENGTH = 65;
-}
-DM_IMPLEMENT_SINGLE_INSTANCE(AppManager3rd);
+DM_IMPLEMENT_SINGLE_INSTANCE_3RD(AppManager3rd);
 
 int32_t AppManager3rd::GetAppIdByPkgName(const std::string &pkgName, std::string &appId, const int32_t userId)
 {
@@ -160,7 +157,7 @@ int32_t AppManager3rd::GetBundleNameByTokenId(int64_t tokenId, std::string &bund
     return DM_OK;
 }
 
-int32_t AppManager3rd::GetNativeTokenIdByName(std::string &processName,
+int32_t AppManager3rd::GetNativeTokenIdByName(const std::string &processName,
     int32_t &tokenId)
 {
     AccessTokenID nativeTokenId = AccessTokenKit::GetNativeTokenId(processName);
@@ -177,7 +174,7 @@ int32_t AppManager3rd::GetNativeTokenIdByName(std::string &processName,
 }
 
 int32_t AppManager3rd::GetHapTokenIdByName(int32_t userId,
-    std::string &bundleName, int32_t instIndex, int32_t &tokenId)
+    const std::string &bundleName, int32_t instIndex, int32_t &tokenId)
 {
     auto hapTokenId = AccessTokenKit::GetHapTokenID(userId, bundleName, instIndex);
     if (hapTokenId == 0) {

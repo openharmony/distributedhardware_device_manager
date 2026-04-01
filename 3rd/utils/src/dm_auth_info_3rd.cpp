@@ -14,9 +14,11 @@
  */
 
 #include "dm_auth_info_3rd.h"
-#include "json_object.h"
+
 #include <cstring>
 #include <algorithm>
+
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {

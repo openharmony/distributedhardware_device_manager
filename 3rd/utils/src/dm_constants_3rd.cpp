@@ -54,9 +54,6 @@ const char* DM_VAL_FALSE = "false";
 // ACL
 const char* ACL_PREFIX = "acl_";
 
-// Device
-const int32_t DEVICE_UUID_LENGTH = 65;
-
 // Version
 const char* DM_VERSION_6_1_0 = "6.1.0";
 const char* DM_CURRENT_VERSION = DM_VERSION_6_1_0;

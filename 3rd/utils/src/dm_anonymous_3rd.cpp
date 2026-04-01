@@ -15,9 +15,10 @@
 
 #include "dm_anonymous_3rd.h"
 
-#include "dm_log_3rd.h"
 #include <sstream>
 #include <set>
+
+#include "dm_log_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {

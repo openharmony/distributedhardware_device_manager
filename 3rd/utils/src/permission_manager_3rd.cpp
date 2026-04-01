@@ -29,7 +29,7 @@ using namespace OHOS::Security::AccessToken;
 
 namespace OHOS {
 namespace DistributedHardware {
-DM_IMPLEMENT_SINGLE_INSTANCE(PermissionManager3rd);
+DM_IMPLEMENT_SINGLE_INSTANCE_3RD(PermissionManager3rd);
 
 bool PermissionManager3rd::CheckSystemSA(const std::string &pkgName)
 {

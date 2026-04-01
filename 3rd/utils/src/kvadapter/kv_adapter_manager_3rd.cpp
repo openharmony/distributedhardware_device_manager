@@ -30,7 +30,7 @@ namespace {
 constexpr const char* DB_KEY_DELIMITER = "###";
 }
 
-DM_IMPLEMENT_SINGLE_INSTANCE(KVAdapterManager);
+DM_IMPLEMENT_SINGLE_INSTANCE_3RD(KVAdapterManager3rd);
 int32_t KVAdapterManager3rd::Init()
 {
     LOGI("Init Kv-Adapter manager");
@@ -38,7 +38,7 @@ int32_t KVAdapterManager3rd::Init()
     {
         std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
         if (kvAdapter_ == nullptr) {
-            kvAdapter_ = std::make_shared<KVAdapter>();
+            kvAdapter_ = std::make_shared<KVAdapter3rd>();
             ret = kvAdapter_->Init();
         }
     }

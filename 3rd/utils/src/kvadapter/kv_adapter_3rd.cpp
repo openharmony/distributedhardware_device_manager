@@ -17,6 +17,7 @@
 #include <cinttypes>
 #include <mutex>
 #include <unistd.h>
+#include "ffrt.h"
 
 #include "datetime_ex.h"
 #include "string_ex.h"
@@ -25,7 +26,6 @@
 #include "dm_anonymous_3rd.h"
 #include "dm_error_type_3rd.h"
 #include "dm_log_3rd.h"
-#include "ffrt.h"
 
 namespace OHOS {
 namespace DistributedHardware {
