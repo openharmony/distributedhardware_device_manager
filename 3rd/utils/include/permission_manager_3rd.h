@@ -27,6 +27,8 @@ class PermissionManager3rd {
 public:
     bool CheckSystemSA(const std::string &pkgName);
     int32_t GetCallerProcessName(std::string &processName);
+    bool CheckAccessServicePermission(void);
+    bool VerifyAccessTokenByPermissionName(const std::string &permissionName);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
