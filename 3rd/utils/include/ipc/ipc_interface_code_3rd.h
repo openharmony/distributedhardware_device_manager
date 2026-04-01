@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DEVICE_MANAGER_3RD_IPC_INTERFACE_CODE_H
-#define OHOS_DEVICE_MANAGER_3RD_IPC_INTERFACE_CODE_H
+#ifndef OHOS_IPC_INTERFACE_CODE_3RD_H
+#define OHOS_IPC_INTERFACE_CODE_3RD_H
 
 #include <cstdint>
 
@@ -36,4 +36,4 @@ enum DM3rdIpcInterfaceCode {
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+#endif // OHOS_IPC_INTERFACE_CODE_3RD_H

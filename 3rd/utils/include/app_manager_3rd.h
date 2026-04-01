@@ -29,15 +29,15 @@
 namespace OHOS {
 namespace DistributedHardware {
 class AppManager3rd {
-    DM_DECLARE_SINGLE_INSTANCE(AppManager3rd);
+    DM_DECLARE_SINGLE_INSTANCE_3RD(AppManager3rd);
 
 public:
     int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId, const int32_t userId);
     bool IsSystemSA();
     bool IsSystemApp();
     int32_t GetCallerName(bool isSystemSA, std::string &callerName);
-    int32_t GetNativeTokenIdByName(std::string &processName, int32_t &tokenId);
-    int32_t GetHapTokenIdByName(int32_t userId, std::string &bundleName,
+    int32_t GetNativeTokenIdByName(const std::string &processName, int32_t &tokenId);
+    int32_t GetHapTokenIdByName(int32_t userId, const std::string &bundleName,
         int32_t instIndex, int32_t &tokenId);
     int32_t GetCallerProcessName(std::string &processName);
     int32_t GetBundleNameForSelf(std::string &bundleName);

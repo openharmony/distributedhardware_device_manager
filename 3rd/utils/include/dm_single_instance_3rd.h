@@ -18,7 +18,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-#define DM_DECLARE_SINGLE_INSTANCE_BASE(className)       \
+#define DM_DECLARE_SINGLE_INSTANCE_3RD_BASE_3RD(className)       \
 public:                                               \
     static className &GetInstance();                  \
                                                       \
@@ -28,14 +28,14 @@ private:                                              \
     className(className &&) = delete;                 \
     className &operator=(className &&) = delete;
 
-#define DM_DECLARE_SINGLE_INSTANCE(className)  \
-    DM_DECLARE_SINGLE_INSTANCE_BASE(className) \
+#define DM_DECLARE_SINGLE_INSTANCE_3RD(className)  \
+    DM_DECLARE_SINGLE_INSTANCE_3RD_BASE_3RD(className) \
                                             \
 private:                                    \
     className() = default;                  \
     ~className() = default;
 
-#define DM_IMPLEMENT_SINGLE_INSTANCE(className)    \
+#define DM_IMPLEMENT_SINGLE_INSTANCE_3RD(className)    \
     className &className::GetInstance()         \
     {                                           \
         static auto instance = new className(); \

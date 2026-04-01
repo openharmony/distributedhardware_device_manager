@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 class PermissionManager3rd {
-    DM_DECLARE_SINGLE_INSTANCE(PermissionManager3rd);
+    DM_DECLARE_SINGLE_INSTANCE_3RD(PermissionManager3rd);
 public:
     bool CheckSystemSA(const std::string &pkgName);
     int32_t GetCallerProcessName(std::string &processName);

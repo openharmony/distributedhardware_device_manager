@@ -57,7 +57,7 @@ private:
     DistributedKv::DistributedKvDataManager kvDataMgr_;
     DistributedKv::DataType dataType_ = DistributedKv::DataType::TYPE_STATICS;
     std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr_ = nullptr;
-    ffrt::mutex KVAdapterMutex_;
+    ffrt::mutex kvAdapterMutex_;
     ffrt::mutex kvDataMgrMutex_;
     std::atomic<bool> isInited_ = false;
 };

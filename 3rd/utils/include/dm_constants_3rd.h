@@ -16,11 +16,10 @@
 #ifndef OHOS_DM_CONSTANTS_3RD_H
 #define OHOS_DM_CONSTANTS_3RD_H
 
+#include <cstdint>
 #include "dm_error_type_3rd.h"
-
 namespace OHOS {
 namespace DistributedHardware {
-
 // Tag
 extern const char* TAG_DEVICE_ID_HASH;
 extern const char* TAG_USER_ID;
@@ -57,9 +56,6 @@ extern const char* DM_VAL_FALSE;
 // ACL
 extern const char* ACL_PREFIX;
 
-// Device
-extern const int32_t DEVICE_UUID_LENGTH;
-
 // Version
 extern const char* DM_VERSION_6_1_0;
 extern const char* DM_CURRENT_VERSION;
@@ -82,6 +78,9 @@ extern const char* TAG_BIND_CALLER_UID;
 extern const char* TAG_BIND_CALLER_PROCESSNAME;
 extern const char* TAG_BIND_CALLER_IS_SYSTEM_SA;
 extern const char* TAG_BIND_CALLER_BIND_LEVEL;
+
+// Device
+constexpr int32_t DEVICE_UUID_LENGTH = 65;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_3RD_H

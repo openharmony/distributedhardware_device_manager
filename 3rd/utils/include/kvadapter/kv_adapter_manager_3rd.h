@@ -23,13 +23,13 @@
 
 #include "dm_single_instance_3rd.h"
 #include "ffrt.h"
-#include "kv_adapter.h"
+#include "kv_adapter_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 
 class KVAdapterManager3rd {
-    DM_DECLARE_SINGLE_INSTANCE_BASE(KVAdapterManager3rd);
+    DM_DECLARE_SINGLE_INSTANCE_3RD_BASE_3RD(KVAdapterManager3rd);
 public:
     int32_t Init();
     void UnInit();
@@ -46,7 +46,7 @@ private:
 private:
     std::shared_ptr<DistributedKv::KvStoreDeathRecipient> deathRecipient_ = nullptr;
     ffrt::mutex kvAdapterMtx_;
-    std::shared_ptr<KVAdapter> kvAdapter_ = nullptr;
+    std::shared_ptr<KVAdapter3rd> kvAdapter_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
