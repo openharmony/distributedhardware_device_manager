@@ -1,0 +1,83 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+ohos_shared_library("devicemanager3rdutils") {
+  branch_protector_ret = "pac_ret"
+
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
+
+  cflags = [
+    "-fPIC",
+    "-fstack-protector-strong",
+    "-Werror",
+  ]
+
+  ldflags = [
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
+  include_dirs = [
+    "include",
+    "include/ipc",
+    "${json_path}/include",
+  ]
+
+  sources = [
+    "src/dm_anonymous_3rd.cpp",
+    "src/dm_auth_info_3rd.cpp",
+    "src/permission_manager_3rd.cpp",
+    "src/multiple_user_connector_3rd.cpp",
+    "src/app_manager_3rd.cpp",
+    "src/dm_crypto_3rd.cpp",
+    "src/dm_timer_3rd.cpp",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"devicemanager3rdutils\"",
+    "LOG_DOMAIN=0xD004110",
+  ]
+
+  deps = [ "${json_path}:devicemanagerjson" ]
+
+  external_deps = [
+    "ability_runtime:ability_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
+    "c_utils:utils",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "os_account:libaccountkits",
+    "os_account:os_account_innerkits",
+    "ffrt:libffrt",
+    "openssl:libcrypto_shared",
+    "samgr:samgr_proxy",
+  ]
+
+  subsystem_name = "distributedhardware"
+
+  part_name = "device_manager"
+}
