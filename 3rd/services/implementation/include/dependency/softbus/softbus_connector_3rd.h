@@ -16,19 +16,7 @@
 #ifndef OHOS_DM_SOFTBUS_CONNECTOR_3RD_H
 #define OHOS_DM_SOFTBUS_CONNECTOR_3RD_H
 
-#include <map>
-#include <memory>
-#include <mutex>
-#include <queue>
-#include <string>
-#include <vector>
-#include <set>
-
-#include "softbus_bus_center.h"
-#include "device_manager_data_struct_3rd.h"
-#include "deviceprofile_connector_3rd.h"
 #include "softbus_session_3rd.h"
-#include "hichain_auth_connector_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -40,17 +28,7 @@ public:
     std::shared_ptr<SoftbusSession3rd> GetSoftbusSession();
 
 private:
-    static std::string remoteUdidHash_;
     std::shared_ptr<SoftbusSession3rd> softbusSession_;
-    std::shared_ptr<HiChainAuthConnector3rd> hiChainAuthConnector_;
-    static std::unordered_map<std::string, std::string> deviceUdidMap_;
-    static std::mutex discoveryDeviceInfoMutex_;
-    static std::mutex deviceUdidLocks_;
-    static std::mutex processInfoVecMutex_;
-    static std::mutex processChangeInfoVecMutex_;
-    static std::mutex leaveLNNMutex_;
-    static std::map<std::string, std::string> leaveLnnPkgMap_;
-    static std::mutex dmDelInfoMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

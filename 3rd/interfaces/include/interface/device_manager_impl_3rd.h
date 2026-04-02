@@ -24,7 +24,7 @@
 #include "ipc_types.h"
 
 #include "device_manager_callback_3rd.h"
-#include "device_manager_3rd_ipc_interface_code.h"
+#include "ipc_interface_code_3rd.h"
 #include "ipc_client_stub_3rd.h"
 #include "device_manager_data_struct_3rd.h"
 #include "dm_log_3rd.h"
@@ -39,7 +39,6 @@ class DeviceManagerImpl3rd {
 public:
     static DeviceManagerImpl3rd &GetInstance();
 
-public:
     class SystemAbilityListener3rd : public SystemAbilityStatusChangeStub {
     public:
         SystemAbilityListener3rd();
@@ -48,11 +47,12 @@ public:
         void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     };
 
-public:
     int32_t RegisterAuthCallback(const std::string &businessName, std::shared_ptr<DmAuthCallback> dmAuthCallback);
+
     int32_t UnRegisterAuthCallback(const std::string &businessName);
 
-    int32_t InitDeviceManager(const std::string &businessName, std::shared_ptr<DmInit3rdCallback> DmInit3rdCallback);
+    int32_t InitDeviceManager(const std::string &businessName, std::shared_ptr<DmInit3rdCallback> dmInit3rdCallback);
+
     int32_t UnInitDeviceManager(const std::string &businessName);
 
     int32_t ImportPinCode3rd(const std::string &businessName, const std::string &pinCode);
@@ -69,7 +69,6 @@ private:
     int32_t SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply);
     int32_t BuildSessionKey(const std::string &keyStr, TrustDeviceInfo3rd &deviceInfo);
 
-private:
     sptr<IRemoteObject> dm3rdremoteObject_ = nullptr;
     sptr<SystemAbilityListener3rd> saListenerCallback_ = nullptr;
     std::atomic<bool> isSubscribeDMSAChangeListener_  = false;

@@ -13,19 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_SOFTBUS_SESSION_CALLBACK_3RD_H
-#define OHOS_DM_SOFTBUS_SESSION_CALLBACK_3RD_H
+#include "softbus_connector_3rd.h"
+
+#include "dm_log_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class ISoftbusSessionCallback3rd {
-public:
-    virtual void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result) = 0;
-    virtual void OnSessionClosed(int32_t sessionId) = 0;
-    virtual void OnDataReceived(int32_t sessionId, const std::string &message) = 0;
-    virtual bool GetIsCryptoSupport() = 0;
-    virtual void OnAuthDeviceDataReceived(int32_t sessionId, std::string message) = 0;
-};
+
+SoftbusConnector3rd::SoftbusConnector3rd()
+{
+    softbusSession_ = std::make_shared<SoftbusSession3rd>();
+    LOGD("SoftbusConnector3rd constructor.");
+}
+
+SoftbusConnector3rd::~SoftbusConnector3rd()
+{
+    LOGD("SoftbusConnector3rd destructor.");
+}
+
+std::shared_ptr<SoftbusSession3rd> SoftbusConnector3rd::GetSoftbusSession()
+{
+    return softbusSession_;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_SOFTBUS_SESSION_CALLBACK_3RD_H
