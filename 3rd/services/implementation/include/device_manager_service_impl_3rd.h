@@ -16,7 +16,6 @@
 #ifndef OHOS_DM_SERVICE_IMPL_3RD_H
 #define OHOS_DM_SERVICE_IMPL_3RD_H
 
-
 #include <set>
 #include <string>
 #include <map>

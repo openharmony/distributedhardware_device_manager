@@ -15,6 +15,9 @@
 
 #include "permission_manager_3rd.h"
 
+#include <cstring>
+#include <securec.h>
+
 #include "accesstoken_kit.h"
 #include "access_token.h"
 #include "hap_token_info.h"

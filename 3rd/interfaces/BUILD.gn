@@ -11,9 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
  
-import("//build/ohos.gni")
+if (!defined(ohos_lite)) {
+  import("//build/ohos.gni")
+}
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
- 
+
+if (!defined(ohos_lite)) {
 config("devicemanager_3rd_config") {
     include_dirs = [
         "include/interface",
@@ -30,6 +33,9 @@ ohos_shared_library("devicemanager3rdsdk") {
  
     sanitize = {
         boundary_sanitize = true
+        cfi = true
+        cfi_cross_dso = true
+        debug = false
         integer_overflow = true
         ubsan = true
     }
@@ -78,4 +84,23 @@ ohos_shared_library("devicemanager3rdsdk") {
     subsystem_name = "distributedhardware"
  
     part_name = "device_manager"
+}
+} else {
+    static_library("devicemanager3rdsdk") {
+      include_dirs = []
+
+      sources = []
+
+      deps = []
+
+      cflags = [
+        "-Wall",
+        "-O2",
+        "-std=c99",
+        "-Wdate-time",
+        "-Wextra",
+        "-Wfloat-equal",
+      ]
+      cflags_cc = cflags
+    }
 }

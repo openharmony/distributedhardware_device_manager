@@ -19,6 +19,8 @@
 #include <random>
 #include <algorithm>
 #include <functional>
+#include <cstring>
+#include <securec.h>
 
 #include "json_object.h"
 

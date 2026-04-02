@@ -38,6 +38,8 @@
 #include "parameter.h"
 #include "system_ability_definition.h"
 
+#include "ipc_server_stub.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 
@@ -136,6 +138,52 @@ static void OnPinHolderSessionClosed(int sessionId)
 static void OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
     DeviceManagerService::GetInstance().OnPinHolderBytesReceived(sessionId, data, dataLen);
+}
+
+static int OnAuth3rdAclSessionOpened(int sessionId, int result)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return IpcServerStub::GetInstance().OnAuth3rdAclSessionOpened(sessionId, result);
+#else
+    return 0;
+#endif
+}
+
+static void OnAuth3rdAclSessionClosed(int sessionId)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    IpcServerStub::GetInstance().OnAuth3rdAclSessionClosed(sessionId);
+#endif
+}
+
+static void OnAuth3rdAclBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    IpcServerStub::GetInstance().OnAuth3rdAclBytesReceived(sessionId, data, dataLen);
+#endif
+}
+
+static int OnAuth3rdSessionOpened(int sessionId, int result)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return IpcServerStub::GetInstance().OnAuth3rdSessionOpened(sessionId, result);
+#else
+    return 0;
+#endif
+}
+
+static void OnAuth3rdSessionClosed(int sessionId)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    IpcServerStub::GetInstance().OnAuth3rdSessionClosed(sessionId);
+#endif
+}
+
+static void OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    IpcServerStub::GetInstance().OnAuth3rdBytesReceived(sessionId, data, dataLen);
+#endif
 }
 
 static IPublishCb softbusPublishCallback_ = {
@@ -694,6 +742,24 @@ void SoftbusListener::OnSoftbusPublishResult(int publishId, PublishResult result
 
 SoftbusListener::SoftbusListener()
 {
+    LOGD("constructor.");
+    CreateSessionServers();
+    InitSoftbusListener();
+    ClearDiscoveredDevice();
+}
+
+void SoftbusListener::CreateSessionServers()
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    CreateDefaultSessionServer();
+    CreatePinHolderSessionServer();
+    Create3rdAuthACLSessionServer();
+    Create3rdAuthSessionServer();
+#endif
+}
+
+void SoftbusListener::CreateDefaultSessionServer()
+{
     ISessionListener sessionListener = {
         .OnSessionOpened = OnSessionOpened,
         .OnSessionClosed = OnSessionClosed,
@@ -701,12 +767,14 @@ SoftbusListener::SoftbusListener()
         .OnMessageReceived = nullptr,
         .OnStreamReceived = nullptr
     };
-    LOGD("constructor.");
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t ret = CreateSessionServer(DM_PKG_NAME, DM_SESSION_NAME, &sessionListener);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]CreateSessionServer failed, ret: %{public}d.", ret);
     }
+}
+
+void SoftbusListener::CreatePinHolderSessionServer()
+{
     ISessionListener pinHolderSessionListener = {
         .OnSessionOpened = OnPinHolderSessionOpened,
         .OnSessionClosed = OnPinHolderSessionClosed,
@@ -714,22 +782,50 @@ SoftbusListener::SoftbusListener()
         .OnMessageReceived = nullptr,
         .OnStreamReceived = nullptr
     };
-    ret = CreateSessionServer(DM_PKG_NAME, DM_PIN_HOLDER_SESSION_NAME, &pinHolderSessionListener);
+    int32_t ret = CreateSessionServer(DM_PKG_NAME, DM_PIN_HOLDER_SESSION_NAME, &pinHolderSessionListener);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]CreateSessionServer pin holder failed, ret: %{public}d.", ret);
     }
-#endif
-    InitSoftbusListener();
-    ClearDiscoveredDevice();
 }
 
+void SoftbusListener::Create3rdAuthACLSessionServer()
+{
+    ISessionListener auth3rdAclSessionListener = {
+        .OnSessionOpened = OnAuth3rdAclSessionOpened,
+        .OnSessionClosed = OnAuth3rdAclSessionClosed,
+        .OnBytesReceived = OnAuth3rdAclBytesReceived,
+        .OnMessageReceived = nullptr,
+        .OnStreamReceived = nullptr
+    };
+    int32_t ret = CreateSessionServer(DM_PKG_NAME, DM_3RD_AUTH_ACL_SESSION_NAME, &auth3rdAclSessionListener);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]CreateSessionServer 3rdAcl session failed, ret: %{public}d.", ret);
+    }
+}
+
+void SoftbusListener::Create3rdAuthSessionServer()
+{
+    ISessionListener auth3rdSessionListener = {
+        .OnSessionOpened = OnAuth3rdSessionOpened,
+        .OnSessionClosed = OnAuth3rdSessionClosed,
+        .OnBytesReceived = OnAuth3rdBytesReceived,
+        .OnMessageReceived = nullptr,
+        .OnStreamReceived = nullptr
+    };
+    int32_t ret = CreateSessionServer(DM_PKG_NAME, DM_AUTH_3RD_SESSION_NAME, &auth3rdSessionListener);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]CreateSessionServer 3rd session failed, ret: %{public}d.", ret);
+    }
+}
 SoftbusListener::~SoftbusListener()
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     RemoveSessionServer(DM_PKG_NAME, DM_SESSION_NAME);
     RemoveSessionServer(DM_PKG_NAME, DM_PIN_HOLDER_SESSION_NAME);
 #endif
-    LOGD("destructor.");
+    RemoveSessionServer(DM_PKG_NAME, DM_3RD_AUTH_ACL_SESSION_NAME);
+    RemoveSessionServer(DM_PKG_NAME, DM_AUTH_3RD_SESSION_NAME);
+    LOGD("SoftbusListener destructor.");
 }
 
 int32_t SoftbusListener::InitSoftbusListener()

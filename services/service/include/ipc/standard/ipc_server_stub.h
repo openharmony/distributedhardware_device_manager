@@ -32,7 +32,7 @@
 
 #include "dm_device_info.h"
 #include "dm_single_instance.h"
-
+#include "iipc_service_stub_3rd.h"
 namespace OHOS {
 namespace DistributedHardware {
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
@@ -146,6 +146,16 @@ public:
     void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     std::set<std::string> GetSystemSA();
 
+    int OnAuth3rdAclSessionOpened(int sessionId, int result);
+    void OnAuth3rdAclSessionClosed(int sessionId);
+    void OnAuth3rdAclBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+
+    int OnAuth3rdSessionOpened(int sessionId, int result);
+    void OnAuth3rdSessionClosed(int sessionId);
+    void OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+    int32_t HandleUserRemoved(int32_t removedUserId);
+    int32_t HandleAccountLogoutEvent(int32_t userId, const std::string &accountId);
+
 private:
     IpcServerStub();
     ~IpcServerStub() override = default;
@@ -158,6 +168,7 @@ private:
     std::string AddDelimiter(const std::string &path);
     void ReclaimMemmgrFileMemForDM();
     void HandleSoftBusServerAdd();
+    bool IsIpcServiceStub3rdReady();
 
 private:
     ffrt::mutex registerLock_;
@@ -168,6 +179,12 @@ private:
     std::map<ProcessInfo, sptr<IpcRemoteBroker>> dmListener_;
     std::set<std::string> systemSA_;
     int64_t startBeginTime_ = 0;
+
+private:
+    void *ipcServiceStub3rdSoHandle_ = nullptr;
+    bool ipcServiceStub3rdSoLoaded_ = false;
+    ffrt::mutex ipcServiceStub3rdLoadLock_;
+    std::shared_ptr<IIpcServiceStub3rd> ipcServiceStub3rd_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

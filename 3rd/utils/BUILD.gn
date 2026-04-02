@@ -11,9 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
+if (!defined(ohos_lite)) {
+  import("//build/ohos.gni")
+}
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
+if (!defined(ohos_lite)) {
 ohos_shared_library("devicemanager3rdutils") {
   branch_protector_ret = "pac_ret"
 
@@ -80,4 +83,23 @@ ohos_shared_library("devicemanager3rdutils") {
   subsystem_name = "distributedhardware"
 
   part_name = "device_manager"
+}
+} else {
+    static_library("devicemanager3rdutils") {
+      include_dirs = []
+
+      sources = []
+
+      deps = []
+
+      cflags = [
+        "-Wall",
+        "-O2",
+        "-std=c99",
+        "-Wdate-time",
+        "-Wextra",
+        "-Wfloat-equal",
+      ]
+      cflags_cc = cflags
+    }
 }
