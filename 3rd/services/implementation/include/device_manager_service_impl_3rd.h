@@ -25,16 +25,16 @@
 #include <semaphore>
 #include "ffrt.h"
 
-#include "auth_manager_3rd.h"
 #include "softbus_common.h"
+#include "parameter.h"
 
+#include "auth_manager_3rd.h"
 #include "dm_single_instance_3rd.h"
 #include "dm_log_3rd.h"
 #include "device_manager_data_struct_3rd.h"
 #include "idevice_manager_service_impl_3rd.h"
 #include "idevice_manager_service_listener_3rd.h"
 #include "dm_anonymous_3rd.h"
-
 #include "softbus_connector_3rd.h"
 
 namespace OHOS {

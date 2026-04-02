@@ -82,7 +82,7 @@ int32_t DeviceManagerNotify3rd::RegisterAuthCallback(const std::string &business
     }
 
     ProcessInfo3rd processInfo3rd;
-    processInfo3rd.tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+    processInfo3rd.tokenId = static_cast<uint32_t>(OHOS::IPCSkeleton::GetCallingTokenID());
     processInfo3rd.uid = OHOS::IPCSkeleton::GetCallingUid();
     processInfo3rd.processName = processName;
     processInfo3rd.businessName = businessName;

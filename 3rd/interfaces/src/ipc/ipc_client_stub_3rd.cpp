@@ -15,13 +15,13 @@
 
 #include "ipc_client_stub_3rd.h"
 
-#include "device_manager_3rd_ipc_interface_code.h"
+#include "device_manager_notify_3rd.h"
 #include "dm_error_type_3rd.h"
 #include "dm_log_3rd.h"
+#include "ipc_interface_code_3rd.h"
 #include "ipc_object_stub.h"   // for IPCObjectStub
 #include "message_option.h"    // for MessageOption
 #include "message_parcel.h"    // for MessageParcel
-#include "device_manager_notify_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -39,6 +39,7 @@ int32_t IpcClientStub3rd::OnRemoteRequest(uint32_t code, MessageParcel &data, Me
             break;
         default:
             LOGE("invalid request code.");
+            break;
     }
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }

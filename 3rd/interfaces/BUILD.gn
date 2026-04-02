@@ -1,0 +1,81 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+ 
+import("//build/ohos.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+ 
+config("devicemanager_3rd_config") {
+    include_dirs = [
+        "include/interface",
+        "include/ipc",
+        "include/notify",
+        "${json_path}/include",
+        "${utils_3rd_path}/include",
+        "${utils_3rd_path}/include/ipc",
+    ]
+}
+ 
+ohos_shared_library("devicemanager3rdsdk") {
+    branch_protector_ret = "pac_ret"
+ 
+    sanitize = {
+        boundary_sanitize = true
+        integer_overflow = true
+        ubsan = true
+    }
+ 
+    cflags = [
+        "-Werror",
+        "-fPIC",
+        "-fstack-protector-strong",
+    ]
+ 
+    ldflags = [
+        "-Wl,-z,relro",
+        "-Wl,-z,now",
+    ]
+ 
+    sources = [
+        "src/interface/device_manager_impl_3rd.cpp",
+        "src/ipc/dm_service_load_3rd.cpp",
+        "src/ipc/ipc_client_stub_3rd.cpp",
+        "src/notify/device_manager_notify_3rd.cpp",
+    ]
+ 
+    public_configs = [ ":devicemanager_3rd_config" ]
+ 
+    defines = [
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanager3rdkit\"",
+        "LOG_DOMAIN=0xD004110",
+    ]
+ 
+    innerapi_tags = [ "platformsdk" ]
+ 
+    deps = [
+        "${utils_3rd_path}:devicemanager3rdutils",
+        "${json_path}:devicemanagerjson",
+    ]
+
+    external_deps = [
+        "c_utils:utils",
+        "ffrt:libffrt",
+        "hilog:libhilog",
+        "ipc:ipc_core",
+        "samgr:samgr_proxy",
+    ]
+ 
+    subsystem_name = "distributedhardware"
+ 
+    part_name = "device_manager"
+}

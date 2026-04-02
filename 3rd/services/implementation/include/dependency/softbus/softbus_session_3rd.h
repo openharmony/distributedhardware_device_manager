@@ -19,10 +19,11 @@
 #include <map>
 #include "ffrt.h"
 
-#include "isession_callback_3rd.h"
-#include "device_manager_data_struct_3rd.h"
 #include "inner_session.h"
 #include "session.h"
+
+#include "device_manager_data_struct_3rd.h"
+#include "isession_callback_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -32,7 +33,6 @@ public:
     ~SoftbusSession3rd();
 
     int32_t OpenSessionServer(const PeerTargetId3rd &targetId);
-
     int32_t SendData(int32_t sessionId, const std::string &message);
 
 private:
@@ -40,12 +40,6 @@ private:
     ConnectionAddr CreateWifiAddr(const PeerTargetId3rd &targetId);
     ConnectionAddr CreateBleAddr(const PeerTargetId3rd &targetId);
     ConnectionAddr CreateBrAddr(const PeerTargetId3rd &targetId);
-
-private:
-    static std::map<std::string, std::shared_ptr<ISessionCallback3rd>> sessionCallback3rdMap_;
-    static ffrt::mutex sessionCallback3rdLock_;
-    static std::map<std::string, int32_t> sessionId3rdMap_;
-    static ffrt::mutex sessionId3rdMapLock_;
 };
 }
 }
