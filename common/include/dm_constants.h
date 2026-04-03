@@ -39,6 +39,8 @@ DM_EXPORT extern const char* DM_PKG_NAME;
 DM_EXPORT extern const char* DM_SESSION_NAME;
 DM_EXPORT extern const char* DM_PIN_HOLDER_SESSION_NAME;
 DM_EXPORT extern const char* DM_SYNC_USERID_SESSION_NAME;
+DM_EXPORT extern const char* DM_3RD_AUTH_ACL_SESSION_NAME;
+DM_EXPORT extern const char* DM_AUTH_3RD_SESSION_NAME;
 DM_EXPORT extern const char* DM_CAPABILITY_OSD;
 DM_EXPORT extern const char* DM_CAPABILITY_APPROACH;
 DM_EXPORT extern const char* DM_CAPABILITY_OH_APPROACH;

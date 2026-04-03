@@ -157,6 +157,9 @@ if (defined(ohos_lite)) {
       "${utils_path}/include/kvadapter",
       "${utils_path}/include/timer",
       "${json_path}/include",
+      "${service_3rd_path}/include",
+      "${utils_3rd_path}/include/ipc",
+      "${utils_3rd_path}/include",
     ]
   }
   config("cflags_config") {

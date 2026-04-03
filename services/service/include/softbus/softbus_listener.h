@@ -156,6 +156,11 @@ private:
     static int32_t FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice);
     static void ParseConnAddrInfo(const ConnectionAddr *addrInfo, JsonObject &jsonObj);
     int32_t InitSoftPublishLNN();
+    void CreateSessionServers();
+    void CreateDefaultSessionServer();
+    void CreatePinHolderSessionServer();
+    void Create3rdAuthACLSessionServer();
+    void Create3rdAuthSessionServer();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessControlProfile &profile, DmDeviceInfo &dmDevice);
     static void ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr);

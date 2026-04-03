@@ -17,6 +17,8 @@
 
 #include <memory>
 #include <mutex>
+#include <cstring>
+#include <securec.h>
 
 #include "device_manager_notify_3rd.h"
 #include "dm_auth_info_3rd.h"

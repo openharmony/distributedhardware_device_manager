@@ -15,8 +15,10 @@
 
 #include "ipc_service_stub_3rd.h"
 
-#include "ipc_skeleton.h"
+#include <cstring>
+#include <securec.h>
 
+#include "ipc_skeleton.h"
 #include "ipc_object_stub.h"   // for IPCObjectStub
 
 #include "permission_manager_3rd.h"

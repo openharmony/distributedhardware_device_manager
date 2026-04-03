@@ -847,6 +847,7 @@ ohos_unittest("UTTest_softbus_listener") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "safwk:system_ability_fwk",
   ]
 }
 
@@ -879,6 +880,7 @@ ohos_unittest("UTTest_softbus_listener_two") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "safwk:system_ability_fwk",
   ]
 }
 

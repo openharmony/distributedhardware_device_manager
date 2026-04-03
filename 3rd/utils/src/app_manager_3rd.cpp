@@ -15,6 +15,9 @@
 
 #include "app_manager_3rd.h"
 
+#include <cstring>
+#include <securec.h>
+
 #include "accesstoken_kit.h"
 #include "access_token.h"
 #include "if_system_ability_manager.h"

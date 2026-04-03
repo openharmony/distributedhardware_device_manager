@@ -32,6 +32,11 @@ c_utils_path = "//commonlibrary/c_utils/base/"
 fuzz_test_output_path = "device_manager/device_manager"
 json_path = "${devicemanager_path}/json"
 
+interfaces_3rd_path = "${devicemanager_path}/3rd/interfaces"
+utils_3rd_path = "${devicemanager_path}/3rd/utils"
+service_3rd_path = "${devicemanager_path}/3rd/services/service"
+serviceimpl_3rd_path = "${devicemanager_path}/3rd/services/implementation"
+
 #----------------------compilation options--------------------------#
 dm_ldflags = [ "-lpthread" ]
 declare_args() {

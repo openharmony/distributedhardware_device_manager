@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify3rd);
+DM_IMPLEMENT_SINGLE_INSTANCE_3RD(DeviceManagerNotify3rd);
 
 void DeviceManagerNotify3rd::RegisterDeathRecipientCallback(const std::string &businessName,
     std::shared_ptr<DmInit3rdCallback> DmInit3rdCallback)

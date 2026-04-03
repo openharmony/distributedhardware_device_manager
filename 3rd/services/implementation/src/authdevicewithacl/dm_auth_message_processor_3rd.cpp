@@ -14,6 +14,8 @@
  */
 #include "dm_auth_message_processor_3rd.h"
 
+#include <cstring>
+#include <securec.h>
 #include <iostream>
 #include <sstream>
 #include <zlib.h>
@@ -398,7 +400,7 @@ int32_t DmAuthMessageProcessor3rd::DecryptSyncMessage(std::shared_ptr<DmAuthCont
         LOGE("TAG_COMPRESS_ORI_LEN json error");
         return ERR_DM_FAILED;
     }
-    int32_t dataLen = plainJson[TAG_COMPRESS_ORI_LEN].Get<int32_t>();
+    uint32_t dataLen = plainJson[TAG_COMPRESS_ORI_LEN].Get<uint32_t>();
     if (dataLen > MAX_MESSAGE_LENGTH) {
         LOGE("data is too long.");
         return ERR_DM_FAILED;
@@ -498,8 +500,8 @@ bool DmAuthMessageProcessor3rd::CheckAccessValidityAndAssign(std::shared_ptr<DmA
         accessTmp.processName == access.processName &&
         accessTmp.businessName == access.businessName;
         if (context->direction == DM_AUTH_SINK) {
-            isSame = (isSame && (Crypto::GetAccountIdHash16(accessTmp.accountId) == access.accountIdHash) &&
-            (Crypto::GetTokenIdHash(std::to_string(accessTmp.tokenId)) == access.tokenIdHash));
+            isSame = (isSame && (Crypto3rd::GetAccountIdHash16(accessTmp.accountId) == access.accountIdHash) &&
+            (Crypto3rd::GetTokenIdHash(std::to_string(accessTmp.tokenId)) == access.tokenIdHash));
         }
     if (isSame) {
         access.transmitSessionKeyId = accessTmp.transmitSessionKeyId;

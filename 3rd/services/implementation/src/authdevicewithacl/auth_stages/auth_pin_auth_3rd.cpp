@@ -18,7 +18,6 @@
 #include "dm_anonymous_3rd.h"
 #include "dm_auth_context_3rd.h"
 #include "dm_auth_message_processor_3rd.h"
-#include "dm_auth_state_machine_3rd.h"
 #include "dm_auth_state_3rd.h"
 #include "dm_auth_state_machine_3rd.h"
 #include "dm_crypto_3rd.h"

@@ -18,6 +18,8 @@
 #include <random>
 #include <dlfcn.h>
 #include <functional>
+#include <cstring>
+#include <securec.h>
 
 #include "device_manager_data_struct_3rd.h"
 #include "dm_anonymous_3rd.h"
