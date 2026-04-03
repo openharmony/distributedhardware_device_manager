@@ -13,14 +13,17 @@
  * limitations under the License.
  */
 
+#include "device_manager_impl_3rd.h"
+
 #include <memory>
 #include <mutex>
+#include <cstring>
+#include <securec.h>
 
-#include "device_manager_impl_3rd.h"
-#include "dm_error_type_3rd.h"
-#include "ipc_utils.h"
 #include "device_manager_notify_3rd.h"
 #include "dm_auth_info_3rd.h"
+#include "dm_error_type_3rd.h"
+#include "ipc_utils_3rd.h"
 #include "iremote_object.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
@@ -34,7 +37,7 @@ const int32_t SERVICE_INIT_MAX_NUM = 20;
 constexpr int32_t DM_MIN_PINCODE_SIZE = 6;
 constexpr int32_t DM_MAX_PINCODE_SIZE = 1024;
 constexpr uint32_t MAX_SESSION_KEY_LENGTH = 512;
-constexpr uint32_t MAX_TRUST_3RD_DEVICE_SIZE = 500;
+constexpr int32_t MAX_TRUST_3RD_DEVICE_SIZE = 500;
 }
 
 DeviceManagerImpl3rd &DeviceManagerImpl3rd::GetInstance()
@@ -125,7 +128,7 @@ int32_t DeviceManagerImpl3rd::SendRequest(uint32_t code, MessageParcel &data, Me
 }
 
 int32_t DeviceManagerImpl3rd::InitDeviceManager(const std::string &businessName,
-    std::shared_ptr<DmInit3rdCallback> DmInit3rdCallback)
+    std::shared_ptr<DmInit3rdCallback> dmInit3rdCallback)
 {
     if (businessName.empty()) {
         LOGE("Invalid parameter, businessName is empty.");
@@ -168,7 +171,7 @@ int32_t DeviceManagerImpl3rd::InitDeviceManager(const std::string &businessName,
         LOGE("InitDeviceManager failed, result: %{public}d", errcode);
         return errcode;
     }
-    DeviceManagerNotify3rd::GetInstance().RegisterDeathRecipientCallback(businessName, DmInit3rdCallback);
+    DeviceManagerNotify3rd::GetInstance().RegisterDeathRecipientCallback(businessName, dmInit3rdCallback);
 
     LOGI("Completed");
     return DM_OK;
@@ -252,9 +255,10 @@ int32_t DeviceManagerImpl3rd::AuthPincode(const PeerTargetId3rd &targetId,
     std::map<std::string, std::string> &authParam)
 {
     if (IsInvalidPeerTargetId(targetId)) {
-        LOGE("DeviceManagerImpl::BindTarget failed: input targetId is empty.");
+        LOGE("DeviceManagerImpl3rd::AuthPincode failed: input targetId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    LOGI("Start, deviceId: %{public}s", GetAnonyString(targetId.deviceId).c_str());
 
     MessageParcel data;
     WRITE_INTERFACE_TOKEN(data, ERR_DM_IPC_WRITE_FAILED);
@@ -390,10 +394,14 @@ int32_t DeviceManagerImpl3rd::BuildSessionKey(const std::string &keyStr, TrustDe
 {
     size_t keyLen = keyStr.size();
     if (keyLen > MAX_SESSION_KEY_LENGTH) {
-        LOGE("keyLen too long");
-        return ERR_DM_FAILED;
+        LOGE("SessionKey too long, len: %{public}zu", keyLen);
+        return ERR_DM_SAVE_SESSION_KEY_FAILED;
     }
     deviceInfo.sessionKey.key = (uint8_t*)calloc(keyLen, sizeof(uint8_t));
+    if (deviceInfo.sessionKey.key == nullptr) {
+        LOGE("calloc sessionKey failed");
+        return ERR_DM_FAILED;
+    }
     if (memcpy_s(deviceInfo.sessionKey.key, keyLen, keyStr.c_str(), keyLen) != DM_OK) {
         LOGE("copy key data failed.");
         if (deviceInfo.sessionKey.key != nullptr) {

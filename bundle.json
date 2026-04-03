@@ -125,6 +125,25 @@
                     ],
                     "header_base": "//foundation/distributedhardware/device_manager/interfaces/kits/ndk/include"
                 }
+            }, {
+                "type": "so",
+                "name": "//foundation/distributedhardware/device_manager/3rd/interfaces:devicemanager3rdsdk",
+                "header": {
+                    "header_files": [
+                        "device_manager_callback_3rd.h",
+                        "device_manager_impl_3rd.h"
+                    ],
+                    "header_base": "//foundation/distributedhardware/device_manager/3rd/interfaces/include/interface"
+                }
+            }, {
+                "type": "so",
+                "name": "//foundation/distributedhardware/device_manager/3rd/utils:devicemanager3rdutils",
+                "header": {
+                    "header_files": [
+                        "device_manager_data_struct_3rd.h"
+                    ],
+                    "header_base": "//foundation/distributedhardware/device_manager/3rd/utils/include"
+                }
             }],
             "test": [
                 "//foundation/distributedhardware/device_manager:device_manager_test"

@@ -1178,6 +1178,7 @@ ohos_unittest("UTTest_softbus_listener") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "kv_store:distributeddata_inner",
+    "safwk:system_ability_fwk",
   ]
 }
 
@@ -1228,6 +1229,7 @@ ohos_unittest("UTTest_softbus_listener_two") {
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "samgr:samgr_proxy",
+    "safwk:system_ability_fwk",
   ]
 }
 

@@ -1,0 +1,113 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+ohos_shared_library("devicemanagerserviceimpl3rd") {
+    branch_protector_ret = "pac_ret"
+
+    sanitize = {
+        boundary_sanitize = true
+        cfi = true
+        cfi_cross_dso = true
+        debug = false
+        integer_overflow = true
+        ubsan = true
+    }
+
+    cflags = [
+        "-Werror",
+        "-fPIC",
+        "-fstack-protector-strong",
+    ]
+
+    ldflags = [
+        "-Wl,-z,relro",
+        "-Wl,-z,now",
+    ]
+
+    include_dirs = [
+        "include",
+        "include/authdevicewithacl",
+        "include/authdevicewithacl/kvadapter",
+        "include/cryptomgr",
+        "include/dependency/hichain",
+        "include/dependency/softbus",
+        "${service_3rd_path}/include",
+        "${service_3rd_path}/include/utils",
+        "${utils_3rd_path}/include",
+        "${utils_3rd_path}/include/ipc",
+        "${utils_3rd_path}/include/kvadapter",
+        "${json_path}/include",
+    ]
+
+    sources = [
+        "src/device_manager_service_impl_3rd.cpp",
+        "src/authdevicewithacl/auth_manager_3rd.cpp",
+        "src/authdevicewithacl/dm_auth_manager_base_3rd.cpp",
+        "src/authdevicewithacl/dm_auth_message_processor_3rd.cpp",
+        "src/authdevicewithacl/dm_auth_state_3rd.cpp",
+        "src/authdevicewithacl/dm_auth_state_machine_3rd.cpp",
+        "src/authdevicewithacl/auth_stages/auth_acl_3rd.cpp",
+        "src/authdevicewithacl/auth_stages/auth_negotiate_3rd.cpp",
+        "src/authdevicewithacl/auth_stages/auth_pin_auth_3rd.cpp",
+        "${utils_3rd_path}/src/kvadapter/kv_adapter_3rd.cpp",
+        "${utils_3rd_path}/src/kvadapter/kv_adapter_manager_3rd.cpp",
+        "src/cryptomgr/crypto_mgr_3rd.cpp",
+        "src/dependency/hichain/hichain_auth_connector_3rd.cpp",
+        "src/dependency/softbus/softbus_session_3rd.cpp",
+        "src/dependency/softbus/softbus_connector_3rd.cpp",
+        "${utils_3rd_path}/src/multiple_user_connector_3rd.cpp",
+        "${service_3rd_path}/src/utils/deviceprofile_connector_3rd.cpp",
+        "${utils_3rd_path}/src/dm_constants_3rd.cpp",
+    ]
+
+    defines = [
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanagerserviceimpl3rd\"",
+        "LOG_DOMAIN=0xD004110",
+    ]
+
+    deps = [
+        "${utils_3rd_path}:devicemanager3rdutils",
+        "${json_path}:devicemanagerjson",
+    ]
+
+    external_deps = [
+        "ability_runtime:ability_manager",
+        "access_token:libaccesstoken_sdk",
+        "c_utils:utils",
+        "data_share:datashare_common",
+        "data_share:datashare_consumer",
+        "device_auth:deviceauth_sdk",
+        "device_info_manager:distributed_device_profile_common",
+        "device_info_manager:distributed_device_profile_sdk",
+        "dsoftbus:softbus_client",
+        "dsoftbus:softbus_utils",
+        "hilog:libhilog",
+        "init:libbegetutil",
+        "ipc:ipc_core",
+        "mbedtls:mbedtls_shared",
+        "os_account:libaccountkits",
+        "os_account:os_account_innerkits",
+        "samgr:samgr_proxy",
+        "ffrt:libffrt",
+        "zlib:shared_libz",
+        "openssl:libcrypto_shared",
+    ]
+
+    subsystem_name = "distributedhardware"
+
+    part_name = "device_manager"
+}

@@ -44,6 +44,8 @@
 #include "permission_manager.h"
 #include "dm_crypto.h"
 
+#include "ipc_interface_code_3rd.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
@@ -54,6 +56,13 @@ SERVER_ON_PIN_HOLDER_EVENT, UNBIND_TARGET_RESULT, REMOTE_DEVICE_TRUST_CHANGE, SE
 SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, SINK_BIND_TARGET_RESULT, GET_DEVICE_PROFILE_INFO_LIST_RESULT,
 GET_DEVICE_ICON_INFO_RESULT, SET_LOCAL_DEVICE_NAME_RESULT, SET_REMOTE_DEVICE_NAME_RESULT, SERVICE_PUBLISH_RESULT,
 ON_AUTH_CODE_INVALID, SERVER_SERVICE_STATE_NOTIFY};
+
+const std::unordered_set<int32_t> CLIENT_CODE_3RD { INIT_DEVICE_MANAGER, UNINIT_DEVICE_MANAGER, IMPORT_PINCODE_3RD,
+    GENERATE_PINCODE_3RD, AUTH_PINCODE_3RD, AUTH_DEVICE_3RD, SAVE_TRUST_RELATION_3RD, QUERY_TRUST_RELATION_3RD,
+    DELETE_TRUST_RELATION_3RD, ON_AUTH_RESULT_3RD };
+
+constexpr const char* LIB_IPC_SERVICE_STUB_3RD_NAME = "libdevicemanager3rdservice.z.so";
+
 constexpr const char* RECLAIM_MEMMGR_FILE_MEM_FOR_DMTASK = "ReclaimMemmgrFileMemForDMTask";
 }
 
@@ -264,8 +273,47 @@ void IpcServerStub::OnStop()
 }
 //LCOV_EXCL_STOP
 
+bool IpcServerStub::IsIpcServiceStub3rdReady()
+{
+    std::lock_guard<ffrt::mutex> lock(ipcServiceStub3rdLoadLock_);
+    if (ipcServiceStub3rdSoLoaded_ && (ipcServiceStub3rd_ != nullptr)) {
+        return true;
+    }
+    LOGI("libdevicemanager3rdservice start load.");
+    ipcServiceStub3rdSoHandle_ = dlopen(LIB_IPC_SERVICE_STUB_3RD_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (ipcServiceStub3rdSoHandle_ == nullptr) {
+        ipcServiceStub3rdSoHandle_ = dlopen(LIB_IPC_SERVICE_STUB_3RD_NAME, RTLD_NOW | RTLD_NODELETE);
+    }
+    if (ipcServiceStub3rdSoHandle_ == nullptr) {
+        LOGE("load libdevicemanager3rdservice so failed, errMsg: %{public}s.", dlerror());
+        return false;
+    }
+    dlerror();
+    auto func = (CreateIpcServiceStub3rdFuncPtr)dlsym(ipcServiceStub3rdSoHandle_, "CreateIpcServiceStub3rdObject");
+    if (dlerror() != nullptr || func == nullptr) {
+        dlclose(ipcServiceStub3rdSoHandle_);
+        ipcServiceStub3rdSoHandle_ = nullptr;
+        LOGE("Create object function is not exist.");
+        return false;
+    }
+
+    ipcServiceStub3rd_ = std::shared_ptr<IIpcServiceStub3rd>(func());
+    ipcServiceStub3rdSoLoaded_ = true;
+    LOGI("Success.");
+    return true;
+}
+
 int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (CLIENT_CODE_3RD.find(code) != CLIENT_CODE_3RD.end()) {
+        LOGI("CLIENT_CODE_3RD, code: %{public}d", code);
+        if (IsIpcServiceStub3rdReady()) {
+            return ipcServiceStub3rd_->OnRemoteRequest(code, data, reply, option);
+        }
+        LOGE("isload3rdSo failed");
+        return ERR_DM_FAILED;
+    }
+
     if (CLIENT_CODE.find(code) != CLIENT_CODE.end()) {
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -486,5 +534,75 @@ std::set<std::string> IpcServerStub::GetSystemSA()
     return systemSA;
 }
 //LCOV_EXCL_STOP
+
+int IpcServerStub::OnAuth3rdAclSessionOpened(int sessionId, int result)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        return ipcServiceStub3rd_->OnAuth3rdAclSessionOpened(sessionId, result);
+    }
+    LOGE("isload3rdSo failed");
+    return ERR_DM_FAILED;
+}
+
+void IpcServerStub::OnAuth3rdAclSessionClosed(int sessionId)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        ipcServiceStub3rd_->OnAuth3rdAclSessionClosed(sessionId);
+        return;
+    }
+    LOGE("isload3rdSo failed");
+}
+
+void IpcServerStub::OnAuth3rdAclBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        ipcServiceStub3rd_->OnAuth3rdAclBytesReceived(sessionId, data, dataLen);
+        return;
+    }
+    LOGE("isload3rdSo failed");
+}
+
+int IpcServerStub::OnAuth3rdSessionOpened(int sessionId, int result)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        return ipcServiceStub3rd_->OnAuth3rdSessionOpened(sessionId, result);
+    }
+    LOGE("isload3rdSo failed");
+    return ERR_DM_FAILED;
+}
+
+void IpcServerStub::OnAuth3rdSessionClosed(int sessionId)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        ipcServiceStub3rd_->OnAuth3rdSessionClosed(sessionId);
+        return;
+    }
+    LOGE("isload3rdSo failed");
+}
+
+void IpcServerStub::OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        ipcServiceStub3rd_->OnAuth3rdBytesReceived(sessionId, data, dataLen);
+        return;
+    }
+    LOGE("isload3rdSo failed");
+}
+
+int32_t IpcServerStub::HandleUserRemoved(int32_t removedUserId)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        return ipcServiceStub3rd_->HandleUserRemoved(removedUserId);
+    }
+    return ERR_DM_FAILED;
+}
+
+int32_t IpcServerStub::HandleAccountLogoutEvent(int32_t userId, const std::string &accountId)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        return ipcServiceStub3rd_->HandleAccountLogoutEvent(userId, accountId);
+    }
+    return ERR_DM_FAILED;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DM_IMPLEMENT_SINGLE_INSTANCE(DmServiceLoad3rd);
+DM_IMPLEMENT_SINGLE_INSTANCE_3RD(DmServiceLoad3rd);
 
 int32_t DmServiceLoad3rd::LoadDMService(void)
 {

@@ -58,6 +58,13 @@ if (defined(ohos_lite)) {
     ]
     if (!is_lite_system && product_name != "qemu-arm-linux-min") {
       deps += [
+        "3rd/services/service:devicemanager3rdservice",
+        "3rd/services/implementation:devicemanagerserviceimpl3rd",
+        "3rd/utils:devicemanager3rdutils",
+      ]
+    }
+    if (!is_lite_system && product_name != "qemu-arm-linux-min") {
+      deps += [
         "commondependency:devicemanagerdependencytest",
         "radar:devicemanagerradartest",
         "services/service:devicemanagerservicetest",
@@ -74,6 +81,7 @@ if (defined(ohos_lite)) {
       "interfaces/inner_kits/native_cpp:devicemanagersdk",
       "interfaces/kits:devicemanager_native_js",
       "interfaces/mini_tools_kits/native_cpp:devicemanagerminisdk",
+      "3rd/interfaces:devicemanager3rdsdk",
     ]
   }
   group("device_manager_test") {
