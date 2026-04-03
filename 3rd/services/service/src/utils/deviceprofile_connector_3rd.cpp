@@ -46,7 +46,7 @@ constexpr uint32_t MAX_SESSION_KEY_LENGTH = 512;
 const char* TAG_PEER_BUNDLE_NAME = "peerBundleName";
 const char* TAG_PEER_TOKENID = "peerTokenId";
 const char* TAG_ACL = "accessControlTable";
-const char* TAG_DMVERSION = "dmVersion";
+const char* TAG_DM_VERSION = "dmVersion";
 const char* TAG_ACL_HASH_KEY_VERSION = "aclVersion";
 const char* TAG_ACL_HASH_KEY_ACLHASHLIST = "aclHashList";
 

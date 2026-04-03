@@ -47,6 +47,8 @@ struct AccessControl3rd {
     Access3rd accesser;
     Access3rd accessee;
     std::string extra = "";
+    int32_t bindLevel = -1;
+    int32_t bindType = -1;
 };
 
 struct TrustDeviceInfo3rd {
@@ -56,6 +58,8 @@ struct TrustDeviceInfo3rd {
     int64_t createTime = 0;
     int32_t userId = -1;
     std::string extra = "";
+    int32_t bindLevel = -1;
+    int32_t bindType = -1;
 };
 
 void ToJson(JsonItemObject &itemObject, const Access3rd &access);

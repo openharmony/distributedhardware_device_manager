@@ -54,7 +54,7 @@ enum DmAuthorizedScope : uint8_t {
 
 class DmAuthState3rd {
 public:
-    virtual ~DmAuthState3rd() {};
+    virtual ~DmAuthState3rd() = default;
     virtual DmAuthStateType GetStateType() = 0;
     virtual int32_t Action(std::shared_ptr<DmAuthContext> context) = 0;
     void SourceFinish(std::shared_ptr<DmAuthContext> context);

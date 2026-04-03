@@ -62,6 +62,7 @@ private:
     void QuerySessionKey(int32_t userId, int32_t skId, TrustDeviceInfo3rd &deviceInfo);
     int32_t GetProxyDelInfo(const std::string &peerDeviceId,
         const std::map<std::string, std::string> &unbindParam, std::vector<std::string> &delKeyVec);
+    bool CheckDataPermission(int32_t tokenId, AccessControl3rd &access);
 private:
     void *dmServiceImpl3rdSoHandle_ = nullptr;
     bool isImpl3rdSoLoaded_ = false;

@@ -30,7 +30,7 @@ public:
 class DmAuthCallback {
 public:
     virtual ~DmAuthCallback() {}
-    virtual void OnAuthResult(const ProcessInfo3rd &ProcessInfo3rd, int32_t result, int32_t status,
+    virtual void OnAuthResult(const ProcessInfo3rd &processInfo3rd, int32_t result, int32_t status,
         const std::string &authContent) = 0;
 };
 } // namespace DistributedHardware

@@ -38,4 +38,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_CLIENT_STUB_H
+#endif // OHOS_DM_IPC_CLIENT_STUB_3RD_H

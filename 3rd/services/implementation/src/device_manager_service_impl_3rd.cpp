@@ -600,7 +600,9 @@ void DeviceManagerServiceImpl3rd::CleanAuthMgrByLogicalSessionId(uint64_t logica
             return;
         }
     }
-    hiChainAuthConnector_->UnRegisterHiChainAuthCallbackById(logicalSessionId);
+    if (hiChainAuthConnector_ != nullptr) {
+        hiChainAuthConnector_->UnRegisterHiChainAuthCallbackById(logicalSessionId);
+    }
     EraseAuthMgr(tokenId);
     return;
 }
