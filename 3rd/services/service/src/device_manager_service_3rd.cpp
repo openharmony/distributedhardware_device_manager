@@ -28,6 +28,7 @@
 #include "dm_log_3rd.h"
 #include "deviceprofile_connector_3rd.h"
 #include "kv_adapter_manager_3rd.h"
+#include "ipc_skeleton.h"
 #include "multiple_user_connector_3rd.h"
 #include "permission_manager_3rd.h"
 
@@ -293,10 +294,14 @@ int32_t DeviceManagerService3rd::QueryTrustRelation(const std::string &businessN
         return ret;
     }
     int32_t currentUserId = MultipleUserConnector3rd::GetCurrentAccountUserID();
+    int32_t tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
     for (const auto &it : acls) {
         JsonObject json(it.second);
         AccessControl3rd access = json.Get<AccessControl3rd>();
-        Access3rd &selfAccess = (access.trustDeviceId ==  access.accesser.deviceId) ? access.accessee : access.accesser;
+        if (!CheckDataPermission(tokenId, access)) {
+            continue;
+        }
+        Access3rd &selfAccess = (access.trustDeviceId == access.accesser.deviceId) ? access.accessee : access.accesser;
         if (selfAccess.userId != currentUserId) {
             continue;
         }
@@ -306,6 +311,8 @@ int32_t DeviceManagerService3rd::QueryTrustRelation(const std::string &businessN
         deviceInfo.createTime = access.createTime;
         deviceInfo.userId = currentUserId;
         deviceInfo.extra = access.extra;
+        deviceInfo.bindLevel = access.bindLevel;
+        deviceInfo.bindType = access.bindType;
         QuerySessionKey(currentUserId, access.sessionKeyId, deviceInfo);
         trustedDeviceList.push_back(deviceInfo);
     }
@@ -341,6 +348,27 @@ void DeviceManagerService3rd::QuerySessionKey(int32_t userId, int32_t skId, Trus
     deviceInfo.sessionKey.keyLen = keyLen;
 }
 
+bool DeviceManagerService3rd::CheckDataPermission(int32_t tokenId, AccessControl3rd &access)
+{
+    Access3rd &selfAccess = (access.trustDeviceId ==  access.accesser.deviceId) ? access.accessee : access.accesser;
+    if (selfAccess.tokenId == tokenId) {
+        return true;
+    }
+    if (access.extra.empty()) {
+        return false;
+    }
+    JsonObject jsonObject;
+    jsonObject.Parse(access.extra);
+    if (jsonObject.IsDiscarded()) {
+        return false;
+    }
+    if (IsInt32(jsonObject, TAG_PROXY_TOKEN_ID)) {
+        int32_t proxyTokenId = jsonObject[TAG_PROXY_TOKEN_ID].Get<int32_t>();
+        return tokenId == proxyTokenId;
+    }
+    return false;
+}
+
 int32_t DeviceManagerService3rd::DeleteTrustRelation(const std::string &businessName, const std::string &peerDeviceId,
     const std::map<std::string, std::string> &unbindParam)
 {
@@ -369,9 +397,13 @@ int32_t DeviceManagerService3rd::DeleteTrustRelation(const std::string &business
         LOGE("GetAllByPrefix failed ret: %{public}d.", ret);
         return ret;
     }
+    int32_t tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
     for (const auto &it : acls) {
         JsonObject json(it.second);
         AccessControl3rd access = json.Get<AccessControl3rd>();
+        if (!CheckDataPermission(tokenId, access)) {
+            continue;
+        }
         std::string key = access.trustDeviceId + access.accesser.businessName + access.accessee.businessName;
         auto keyIt = std::find(delKeyVec.begin(), delKeyVec.end(), key);
         if (keyIt != delKeyVec.end()) {

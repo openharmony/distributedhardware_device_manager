@@ -48,13 +48,9 @@ public:
     };
 
     int32_t RegisterAuthCallback(const std::string &businessName, std::shared_ptr<DmAuthCallback> dmAuthCallback);
-
     int32_t UnRegisterAuthCallback(const std::string &businessName);
-
     int32_t InitDeviceManager(const std::string &businessName, std::shared_ptr<DmInit3rdCallback> dmInit3rdCallback);
-
     int32_t UnInitDeviceManager(const std::string &businessName);
-
     int32_t ImportPinCode3rd(const std::string &businessName, const std::string &pinCode);
     int32_t GeneratePinCode(uint32_t pinLength, std::string &pincode);
     int32_t AuthPincode(const PeerTargetId3rd &targetId, std::map<std::string, std::string> &authParam);

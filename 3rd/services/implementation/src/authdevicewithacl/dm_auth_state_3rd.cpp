@@ -138,6 +138,8 @@ void DmAuthState3rd::SaveAcl(std::shared_ptr<DmAuthContext> context)
     accessControl3rd.sessionKeyId = selfAccess.transmitSessionKeyId;
     accessControl3rd.createTime = static_cast<int64_t>(GetSysTimeMs());
     accessControl3rd.extra = "";
+    accessControl3rd.bindLevel = selfAccess.bindLevel;
+    accessControl3rd.bindType = DM_POINT_TO_POINT;
     accessControl3rd.accesser.deviceId = context->accesser.deviceId;
     accessControl3rd.accesser.userId = context->accesser.userId;
     accessControl3rd.accesser.accountId = context->accesser.accountId;
@@ -161,7 +163,6 @@ void DmAuthState3rd::SaveAcl(std::shared_ptr<DmAuthContext> context)
 
 void DmAuthState3rd::SaveProxyAcl(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("start");
     CHECK_NULL_VOID(context);
     if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
         return;
@@ -179,6 +180,8 @@ void DmAuthState3rd::SaveProxyAcl(std::shared_ptr<DmAuthContext> context)
         proxyObj[TAG_PROXY_PROCESS_NAME] = selfAccess.processName;
         proxyObj[TAG_PROXY_UID] = selfAccess.uid;
         accessControl3rd.extra = proxyObj.Dump();
+        accessControl3rd.bindLevel = selfProxyAccess.bindLevel;
+        accessControl3rd.bindType = DM_POINT_TO_POINT;
 
         accessControl3rd.accesser.deviceId = context->accesser.deviceId;
         accessControl3rd.accesser.userId = context->accesser.userId;

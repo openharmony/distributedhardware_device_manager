@@ -318,6 +318,8 @@ int32_t IpcServiceStub3rd::QueryTrustRelation(MessageParcel &data, MessageParcel
             !reply.WriteInt64(deviceInfo.createTime) ||
             !reply.WriteInt32(deviceInfo.userId) ||
             !reply.WriteString(deviceInfo.extra) ||
+            !reply.WriteInt32(deviceInfo.bindLevel) ||
+            !reply.WriteInt32(deviceInfo.bindType) ||
             !reply.WriteString(skStr)) {
             LOGE("write trustedDeviceList item failed");
             return ERR_DM_IPC_WRITE_FAILED;

@@ -28,7 +28,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-extern const char* TAG_DMVERSION;
+extern const char* TAG_DM_VERSION;
 extern const char* TAG_DM_VERSION_DJI;           // compatible for new and old protocol
 
 extern const char* AUTHENTICATE_TIMEOUT_TASK;
@@ -42,7 +42,6 @@ extern const char* WAIT_PIN_AUTH_TIMEOUT_TASK;
 extern const char* SESSION_HEARTBEAT_TIMEOUT_TASK;
 
 extern const char* WAIT_SESSION_CLOSE_TIMEOUT_TASK;
-
 
 extern const int32_t CLONE_AUTHENTICATE_TIMEOUT;
 extern const int32_t CLONE_NEGOTIATE_TIMEOUT;
@@ -95,8 +94,6 @@ public:
     virtual int32_t StartAuthProcess(const int32_t action);
 
     virtual void StartRespAuthProcess();
-
-    virtual std::string GetConnectAddr(std::string deviceId);
 
     virtual int32_t GetPinCode(std::string &code);
 

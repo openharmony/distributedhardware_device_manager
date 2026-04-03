@@ -254,6 +254,7 @@ void AuthManager3rd::GetBindLevelByProcessName(const std::string &processName, i
     } else if (AppManager3rd::GetInstance().GetNativeTokenIdByName(processName, tokenId) == DM_OK) {
         bindLevel = DmRole::DM_ROLE_SA;
     } else {
+        bindLevel = DmRole::DM_ROLE_UNKNOWN;
         LOGE("src not contain the bundlename %{public}s.", processName.c_str());
     }
 }

@@ -334,12 +334,18 @@ int32_t DeviceManagerImpl3rd::AuthDevice3rd(const PeerTargetId3rd &targetId, std
         return ERR_DM_IPC_WRITE_FAILED;
     }
     MessageParcel reply;
-    int32_t sendRet = SendRequest(AUTH_DEVICE_3RD, data, reply);
-    if (sendRet != DM_OK) {
+    int32_t ret = SendRequest(AUTH_DEVICE_3RD, data, reply);
+    if (ret != DM_OK) {
         LOGE("AuthDevice3rd send request failed.");
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
-    return reply.ReadInt32();
+    READ_HELPER_RET(reply, Int32, ret, ERR_DM_IPC_READ_FAILED);
+    if (ret != DM_OK) {
+        LOGE("AuthDevice3rd failed, result: %{public}d", ret);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
 }
 
 int32_t DeviceManagerImpl3rd::QueryTrustRelation(const std::string &businessName,
@@ -383,6 +389,8 @@ int32_t DeviceManagerImpl3rd::QueryTrustRelation(const std::string &businessName
         deviceInfo.createTime = reply.ReadInt64();
         deviceInfo.userId = reply.ReadInt32();
         deviceInfo.extra = reply.ReadString();
+        deviceInfo.bindLevel = reply.ReadInt32();
+        deviceInfo.bindType = reply.ReadInt32();
         std::string keyStr = reply.ReadString();
         BuildSessionKey(keyStr, deviceInfo);
         trustedDeviceList.push_back(deviceInfo);

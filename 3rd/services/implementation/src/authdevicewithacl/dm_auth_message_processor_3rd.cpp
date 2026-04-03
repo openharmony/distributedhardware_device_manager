@@ -439,11 +439,11 @@ int32_t ParseInfoToDmAccess(const JsonObject &jsonObject, DmAccess &access)
     }
     access.transmitSkTimeStamp = jsonObject[TAG_TRANSMIT_SK_TIMESTAMP].Get<int64_t>();
 
-    if (!IsString(jsonObject, TAG_DMVERSION)) {
-        LOGE("ParseSyncMessage TAG_DMVERSION error");
+    if (!IsString(jsonObject, TAG_DM_VERSION)) {
+        LOGE("ParseSyncMessage TAG_DM_VERSION error");
         return ERR_DM_FAILED;
     }
-    access.dmVersion = jsonObject[TAG_DMVERSION].Get<std::string>();
+    access.dmVersion = jsonObject[TAG_DM_VERSION].Get<std::string>();
 
     if (IsString(jsonObject, TAG_DEVICE_ID)) {
         access.deviceId = jsonObject[TAG_DEVICE_ID].Get<std::string>();
@@ -771,7 +771,7 @@ int32_t DmAuthMessageProcessor3rd::SetSyncMsgJson(std::shared_ptr<DmAuthContext>
     DmAccess &remoteAccess = (context->direction == DM_AUTH_SOURCE) ? context->accessee : context->accesser;
     syncMsgJson[TAG_TRANSMIT_SK_ID] = std::to_string(accessSide.transmitSessionKeyId);
     syncMsgJson[TAG_TRANSMIT_SK_TIMESTAMP] = accessSide.transmitSkTimeStamp;
-    syncMsgJson[TAG_DMVERSION] = accessSide.dmVersion;
+    syncMsgJson[TAG_DM_VERSION] = accessSide.dmVersion;
     syncMsgJson[TAG_DEVICE_ID] = accessSide.deviceId;
     syncMsgJson[TAG_USER_ID] = accessSide.userId;
     syncMsgJson[TAG_ACCOUNT_ID] = accessSide.accountId;

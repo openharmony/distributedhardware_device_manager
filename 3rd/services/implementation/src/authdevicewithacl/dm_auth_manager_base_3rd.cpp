@@ -28,7 +28,7 @@ using namespace OHOS::AccountSA;
 
 namespace OHOS {
 namespace DistributedHardware {
-const char* TAG_DMVERSION = "dmVersion";
+const char* TAG_DM_VERSION = "dmVersion";
 const char* TAG_DM_VERSION_V2 = "dmVersionV2";
 
 const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
@@ -114,12 +114,6 @@ int32_t AuthManagerBase3rd::StartAuthProcess(const int32_t action)
 void AuthManagerBase3rd::StartRespAuthProcess()
 {
     LOGE("StartRespAuthProcess is not implemented in the current version");
-}
-
-std::string AuthManagerBase3rd::GetConnectAddr(std::string deviceId)
-{
-    LOGE("GetConnectAddr is not implemented in the current version");
-    return "";
 }
 
 int32_t AuthManagerBase3rd::GetPinCode(std::string &code)

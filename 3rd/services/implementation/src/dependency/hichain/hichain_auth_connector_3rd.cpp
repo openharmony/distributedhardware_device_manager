@@ -65,6 +65,7 @@ int32_t HiChainAuthConnector3rd::UnRegisterHiChainAuthCallbackById(int64_t id)
     std::lock_guard<ffrt::mutex> lock(dmDeviceAuthCallbackMutex_);
     if (dmDeviceAuthCallbackMap_.find(id) != dmDeviceAuthCallbackMap_.end()) {
         dmDeviceAuthCallbackMap_[id] = nullptr;
+        dmDeviceAuthCallbackMap_.erase(id);
     }
     return DM_OK;
 }

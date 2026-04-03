@@ -60,6 +60,7 @@
 #include "wifi_msg.h"
 #endif // SUPPORT_WIFI
 #endif
+#include "ipc_server_stub.h"
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
@@ -2951,6 +2952,7 @@ void DeviceManagerService::HandleUserRemoved(int32_t removedUserId)
             }
         }
     }
+    IpcServerStub::GetInstance().HandleUserRemoved(removedUserId);
 }
 
 void DeviceManagerService::SendUserRemovedBroadCast(const std::vector<std::string> &peerUdids, int32_t userId)
@@ -5203,6 +5205,7 @@ void DeviceManagerService::HandleAccountLogoutEventCallback(const std::string &c
     MultipleUserConnector::DeleteAccountInfoByUserId(currentUserId);
     MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(),
         MultipleUserConnector::GetCurrentDMAccountInfo());
+    IpcServerStub::GetInstance().HandleAccountLogoutEvent(currentUserId, dmAccountInfo.accountId);
 }
 
 void DeviceManagerService::InitTaskOfDelTimeOutAcl()

@@ -822,9 +822,9 @@ SoftbusListener::~SoftbusListener()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     RemoveSessionServer(DM_PKG_NAME, DM_SESSION_NAME);
     RemoveSessionServer(DM_PKG_NAME, DM_PIN_HOLDER_SESSION_NAME);
-#endif
     RemoveSessionServer(DM_PKG_NAME, DM_3RD_AUTH_ACL_SESSION_NAME);
     RemoveSessionServer(DM_PKG_NAME, DM_AUTH_3RD_SESSION_NAME);
+#endif
     LOGD("SoftbusListener destructor.");
 }
 
