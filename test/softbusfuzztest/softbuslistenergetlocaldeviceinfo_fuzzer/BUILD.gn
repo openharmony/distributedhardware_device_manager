@@ -60,6 +60,7 @@ ohos_fuzztest("SoftbusListenerGetLocalDeviceInfoFuzzTest") {
     "hilog:libhilog",
     "init:libbeget_proxy",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

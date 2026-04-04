@@ -87,6 +87,7 @@ ohos_fuzztest("PinHolderFuzzTest") {
     "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
+    "kv_store:distributeddata_inner",
     "resource_management:resmgr_napi_core",
     "safwk:system_ability_fwk",
   ]

@@ -59,6 +59,7 @@ ohos_fuzztest("OnRequestFuzzTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "safwk:system_ability_fwk",
   ]
 

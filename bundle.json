@@ -41,6 +41,7 @@
                 "device_auth",
                 "device_info_manager",
                 "dsoftbus",
+                "ets_frontend",
                 "eventhandler",
                 "ffrt",
                 "hicollie",
