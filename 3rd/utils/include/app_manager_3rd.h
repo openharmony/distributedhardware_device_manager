@@ -22,7 +22,6 @@
 
 #include "bundle_mgr_interface.h"
 #include "bundle_mgr_proxy.h"
-#include "event_handler.h"
 #include "device_manager_data_struct_3rd.h"
 #include "dm_single_instance_3rd.h"
 
