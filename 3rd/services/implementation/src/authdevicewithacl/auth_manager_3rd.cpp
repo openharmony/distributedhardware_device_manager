@@ -101,8 +101,8 @@ void AuthManager3rd::GetAuthParam(const PeerTargetId3rd &targetId, const std::ma
     context_->accesser.deviceId = std::string(localDeviceId);
 
     context_->accessee.deviceId = targetId.deviceId;
-    context_->accesser.accountId = MultipleUserConnector3rd::GetOhosAccountIdByUserId(context_->accesser.userId);
     context_->accesser.userId = MultipleUserConnector3rd::GetFirstForegroundUserId();
+    context_->accesser.accountId = MultipleUserConnector3rd::GetOhosAccountIdByUserId(context_->accesser.userId);
     if (authParam.find(TAG_BIND_CALLER_BIND_LEVEL) != authParam.end()) {
         context_->accesser.bindLevel = std::atoi(authParam.at(TAG_BIND_CALLER_BIND_LEVEL).c_str());
     }
