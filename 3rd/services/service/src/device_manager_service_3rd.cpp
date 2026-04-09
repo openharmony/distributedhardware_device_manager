@@ -294,7 +294,7 @@ int32_t DeviceManagerService3rd::QueryTrustRelation(const std::string &businessN
         return ret;
     }
     int32_t currentUserId = MultipleUserConnector3rd::GetCurrentAccountUserID();
-    int32_t tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+    uint32_t tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
     for (const auto &it : acls) {
         JsonObject json(it.second);
         AccessControl3rd access = json.Get<AccessControl3rd>();
@@ -348,7 +348,7 @@ void DeviceManagerService3rd::QuerySessionKey(int32_t userId, int32_t skId, Trus
     deviceInfo.sessionKey.keyLen = keyLen;
 }
 
-bool DeviceManagerService3rd::CheckDataPermission(int32_t tokenId, AccessControl3rd &access)
+bool DeviceManagerService3rd::CheckDataPermission(uint32_t tokenId, AccessControl3rd &access)
 {
     Access3rd &selfAccess = (access.trustDeviceId ==  access.accesser.deviceId) ? access.accessee : access.accesser;
     if (selfAccess.tokenId == tokenId) {
@@ -362,8 +362,8 @@ bool DeviceManagerService3rd::CheckDataPermission(int32_t tokenId, AccessControl
     if (jsonObject.IsDiscarded()) {
         return false;
     }
-    if (IsInt32(jsonObject, TAG_PROXY_TOKEN_ID)) {
-        int32_t proxyTokenId = jsonObject[TAG_PROXY_TOKEN_ID].Get<int32_t>();
+    if (IsUint32(jsonObject, TAG_PROXY_TOKEN_ID)) {
+        uint32_t proxyTokenId = jsonObject[TAG_PROXY_TOKEN_ID].Get<uint32_t>();
         return tokenId == proxyTokenId;
     }
     return false;
@@ -380,28 +380,44 @@ int32_t DeviceManagerService3rd::DeleteTrustRelation(const std::string &business
         LOGE("businessName or peerDeviceId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    std::vector<std::string> delKeyVec;
+    int32_t ret = PrepareDeleteKeys(peerDeviceId, businessName, unbindParam, delKeyVec);
+    if (ret != DM_OK) {
+        LOGI("PrepareDeleteKeys error %{public}d", ret);
+        return ret;
+    }
+    return DeleteTrustRelationByKeys(delKeyVec);
+}
+
+int32_t DeviceManagerService3rd::PrepareDeleteKeys(const std::string &peerDeviceId, const std::string &businessName,
+    const std::map<std::string, std::string> &unbindParam, std::vector<std::string> &delKeyVec)
+{
     std::string peerBusinessName = "";
     if (unbindParam.find(TAG_PEER_BUSINESS_NAME) != unbindParam.end()) {
         peerBusinessName = unbindParam.at(TAG_PEER_BUSINESS_NAME);
+        delKeyVec.push_back(peerDeviceId + businessName + peerBusinessName);
     }
-    std::vector<std::string> delKeyVec;
-    delKeyVec.push_back(peerDeviceId + businessName + peerBusinessName);
-    int32_t ret = GetProxyDelInfo(peerDeviceId, unbindParam, delKeyVec);
-    if (ret != DM_OK) {
-        LOGI("GetProxyDelInfo error %{public}d", ret);
-        return ret;
-    }
+    return GetProxyDelInfo(peerDeviceId, unbindParam, delKeyVec);
+}
+
+int32_t DeviceManagerService3rd::DeleteTrustRelationByKeys(const std::vector<std::string> &delKeyVec)
+{
     std::map<std::string, std::string> acls;
-    ret = KVAdapterManager3rd::GetInstance().GetAllByPrefix(ACL_PREFIX, acls);
+    int32_t ret = KVAdapterManager3rd::GetInstance().GetAllByPrefix(ACL_PREFIX, acls);
     if (ret != DM_OK) {
         LOGE("GetAllByPrefix failed ret: %{public}d.", ret);
         return ret;
     }
-    int32_t tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+    uint32_t tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+    int32_t currentUserId = MultipleUserConnector3rd::GetCurrentAccountUserID();
     for (const auto &it : acls) {
         JsonObject json(it.second);
         AccessControl3rd access = json.Get<AccessControl3rd>();
         if (!CheckDataPermission(tokenId, access)) {
+            continue;
+        }
+        Access3rd &selfAccess = (access.trustDeviceId == access.accesser.deviceId) ? access.accessee : access.accesser;
+        if (selfAccess.userId != currentUserId) {
             continue;
         }
         std::string key = access.trustDeviceId + access.accesser.businessName + access.accessee.businessName;
@@ -423,7 +439,7 @@ int32_t DeviceManagerService3rd::GetProxyDelInfo(const std::string &peerDeviceId
 {
     if (unbindParam.find(PARAM_KEY_SUBJECT_PROXYED_SUBJECTS) == unbindParam.end()) {
         LOGI("no subject proxyed apps");
-        return ERR_DM_INPUT_PARA_INVALID;
+        return DM_OK;
     }
     std::string subjectProxyOnesStr = unbindParam.at(PARAM_KEY_SUBJECT_PROXYED_SUBJECTS);
     JsonObject allProxyObj;

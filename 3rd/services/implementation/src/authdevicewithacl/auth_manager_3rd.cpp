@@ -248,7 +248,7 @@ void AuthManager3rd::AddProxyContextIfNotExists(DmProxyAuthContext &proxyAuthCon
 
 void AuthManager3rd::GetBindLevelByProcessName(const std::string &processName, int32_t userId, int32_t &bindLevel)
 {
-    int32_t tokenId = 0;
+    uint32_t tokenId = 0;
     if (AppManager3rd::GetInstance().GetHapTokenIdByName(userId, processName, 0, tokenId) == DM_OK) {
         bindLevel = DmRole::DM_ROLE_FA;
     } else if (AppManager3rd::GetInstance().GetNativeTokenIdByName(processName, tokenId) == DM_OK) {

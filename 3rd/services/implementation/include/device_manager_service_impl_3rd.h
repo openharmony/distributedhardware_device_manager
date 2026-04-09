@@ -132,6 +132,8 @@ private:
     std::map<int, bool> sessionEnableCvReadyMap_;  // Condition variable ready flag
     std::map<int, ffrt::condition_variable> sessionEnableCvMap_;  // Condition variable corresponding to the session
     std::map<int, ffrt::mutex> sessionEnableMutexMap_;
+    ffrt::mutex logicalSessionId2SessionIdMapMtx_;
+    std::map<uint64_t, int> logicalSessionId2SessionIdMap_; // The relationship logicalSessionId and physical sessionId
 };
 
 using CreateDMServiceImpl3rdFuncPtr = IDeviceManagerServiceImpl3rd *(*)(void);

@@ -70,6 +70,7 @@ private:
     int32_t AuthPincode(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t RegisterDeviceManagerListener(const ProcessInfo3rd &processInfo3rd, sptr<IpcRemoteBroker3rd> listener);
     void AddSystemSA(const std::string &pkgName);
+    void SetSaUserId(ProcessInfo3rd &processInfo3rd);
 
     int32_t AuthDevice3rd(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t QueryTrustRelation(MessageParcel &data, MessageParcel &reply, MessageOption &option);
@@ -78,6 +79,7 @@ private:
     mutable ffrt::mutex listenerLock_;
     std::map<ProcessInfo3rd, sptr<AppDeathRecipient3rd>> appRecipient3rd_;
     std::map<ProcessInfo3rd, sptr<IpcRemoteBroker3rd>> dmListener_;
+    ffrt::mutex systemSAMtx_;
     std::set<std::string> systemSA_;
 };
 } // namespace DistributedHardware

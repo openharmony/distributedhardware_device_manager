@@ -64,7 +64,7 @@ enum DmAuthScope {
 
 typedef struct DmProxyAccess {
     int32_t uid;
-    int32_t tokenId;
+    uint32_t tokenId;
     std::string businessName;
     std::string processName;
     std::string peerBusinessName;
@@ -98,7 +98,7 @@ struct DmAccess {
     int32_t uid{-1};
     std::string accountId;
     std::string accountIdHash;
-    int32_t tokenId;
+    uint32_t tokenId;
     std::string tokenIdHash;
     std::string processName;
     std::string businessName;

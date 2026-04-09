@@ -161,7 +161,7 @@ int32_t AppManager3rd::GetBundleNameByTokenId(int64_t tokenId, std::string &bund
 }
 
 int32_t AppManager3rd::GetNativeTokenIdByName(const std::string &processName,
-    int32_t &tokenId)
+    uint32_t &tokenId)
 {
     AccessTokenID nativeTokenId = AccessTokenKit::GetNativeTokenId(processName);
     if (nativeTokenId == INVALID_TOKENID) {
@@ -172,19 +172,19 @@ int32_t AppManager3rd::GetNativeTokenIdByName(const std::string &processName,
         LOGE("nativeTokenId is not SA.");
         return ERR_DM_FAILED;
     }
-    tokenId = static_cast<int32_t>(nativeTokenId);
+    tokenId = static_cast<uint32_t>(nativeTokenId);
     return DM_OK;
 }
 
 int32_t AppManager3rd::GetHapTokenIdByName(int32_t userId,
-    const std::string &bundleName, int32_t instIndex, int32_t &tokenId)
+    const std::string &bundleName, int32_t instIndex, uint32_t &tokenId)
 {
     auto hapTokenId = AccessTokenKit::GetHapTokenID(userId, bundleName, instIndex);
     if (hapTokenId == 0) {
         LOGE("GetHapTokenId failed.");
         return ERR_DM_FAILED;
     }
-    tokenId = static_cast<int32_t>(hapTokenId);
+    tokenId = static_cast<uint32_t>(hapTokenId);
     return DM_OK;
 }
 
