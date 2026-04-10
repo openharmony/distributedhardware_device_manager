@@ -30,10 +30,11 @@ struct DmSessionKey {
 };
 
 struct Access3rd {
+    // deviceIdHash
     std::string deviceId = "";
     int32_t userId = -1;
     std::string accountId = "";
-    int32_t tokenId = 0;
+    uint32_t tokenId = 0;
     std::string processName = "";
     int32_t uid = -1;
     std::string businessName = "";
@@ -41,6 +42,7 @@ struct Access3rd {
 };
 
 struct AccessControl3rd {
+    // deviceIdHash
     std::string trustDeviceId = "";
     int32_t sessionKeyId = -1;
     int64_t createTime = 0;
@@ -52,6 +54,7 @@ struct AccessControl3rd {
 };
 
 struct TrustDeviceInfo3rd {
+    // deviceIdHash
     std::string trustDeviceId = "";
     int32_t sessionKeyId = -1;
     DmSessionKey sessionKey;

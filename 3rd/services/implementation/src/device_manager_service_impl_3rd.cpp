@@ -362,6 +362,10 @@ void DeviceManagerServiceImpl3rd::AuthDeviceAclImpl(const PeerTargetId3rd &targe
         std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
         logicalSessionId2TokenIdMap_[logicalSessionId] = processInfo3rd.tokenId;
     }
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+        logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+    }
     sessionEnableCvReadyMap_[sessionId] = false;
     std::unique_lock<ffrt::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
     if (!sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::milliseconds(OPEN_AUTH_SESSION_TIMEOUT),
@@ -444,29 +448,29 @@ static uint64_t StringToUint64(const std::string& str)
 
 static uint32_t GetTokenId(bool isSrcSide, std::string &processName)
 {
-    int32_t tokenId = 0;
+    uint32_t tokenId = 0;
     if (isSrcSide) {
         // src end
-        tokenId = static_cast<int32_t>(IPCSkeleton::GetCallingTokenID());
+        tokenId = IPCSkeleton::GetCallingTokenID();
     } else {
         // sink end
-        int32_t tmpTokenId;
+        uint32_t tmpTokenId;
         // get userId
         int32_t targetUserId =  MultipleUserConnector3rd::GetCurrentAccountUserID();
         if (targetUserId == -1) {
             return tokenId;
         }
         if (AppManager3rd::GetInstance().GetHapTokenIdByName(targetUserId, processName, 0, tmpTokenId) == DM_OK) {
-            tokenId = static_cast<uint32_t>(tmpTokenId);
+            tokenId = tmpTokenId;
         } else if (AppManager3rd::GetInstance().GetNativeTokenIdByName(processName, tmpTokenId) == DM_OK) {
-            tokenId = static_cast<uint32_t>(tmpTokenId);
+            tokenId = tmpTokenId;
         } else {
             // get deviceId, take the 8 character value as tokenId
             char localDeviceId[DEVICE_UUID_LENGTH] = {0};
             GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
             std::string deviceId = std::string(localDeviceId);
             if (deviceId.length() != 0) {
-                tokenId = StringToUint64(deviceId);
+                tokenId = static_cast<uint32_t>(StringToUint64(deviceId));
             }
         }
     }
@@ -604,6 +608,17 @@ void DeviceManagerServiceImpl3rd::CleanAuthMgrByLogicalSessionId(uint64_t logica
         hiChainAuthConnector_->UnRegisterHiChainAuthCallbackById(logicalSessionId);
     }
     EraseAuthMgr(tokenId);
+    int32_t sessionId = 0;
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+        if (logicalSessionId2SessionIdMap_.find(logicalSessionId) != logicalSessionId2SessionIdMap_.end()) {
+            sessionId = logicalSessionId2SessionIdMap_[logicalSessionId];
+            logicalSessionId2SessionIdMap_.erase(logicalSessionId);
+        }
+    }
+    CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
+    softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
     return;
 }
 

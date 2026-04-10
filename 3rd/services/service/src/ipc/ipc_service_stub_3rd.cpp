@@ -99,8 +99,7 @@ int32_t IpcServiceStub3rd::InitDeviceManager(MessageParcel &data, MessageParcel 
     processInfo3rd.uid = OHOS::IPCSkeleton::GetCallingUid();
     processInfo3rd.processName = processName;
     processInfo3rd.businessName = businessName;
-    int32_t userId = MultipleUserConnector3rd::GetCurrentAccountUserID();
-    processInfo3rd.userId = userId;
+    MultipleUserConnector3rd::GetCallerUserId(processInfo3rd.userId);
     int32_t result = RegisterDeviceManagerListener(processInfo3rd, callback);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
@@ -115,6 +114,7 @@ const sptr<IpcRemoteBroker3rd> IpcServiceStub3rd::GetDmListener(ProcessInfo3rd p
         LOGE("Invalid parameter, businessName is empty.");
         return nullptr;
     }
+    SetSaUserId(processInfo3rd);
     std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
     auto iter = dmListener_.find(processInfo3rd);
     if (iter == dmListener_.end()) {
@@ -178,9 +178,20 @@ int32_t IpcServiceStub3rd::RegisterDeviceManagerListener(const ProcessInfo3rd &p
 
 void IpcServiceStub3rd::AddSystemSA(const std::string &pkgName)
 {
-    if (PermissionManager3rd::GetInstance().CheckSystemSA(pkgName)) {
-        systemSA_.insert(pkgName);
+    if (!PermissionManager3rd::GetInstance().CheckSystemSA(pkgName)) {
+        return;
     }
+    std::lock_guard<ffrt::mutex> lock(systemSAMtx_);
+    systemSA_.insert(pkgName);
+}
+
+void IpcServiceStub3rd::SetSaUserId(ProcessInfo3rd &processInfo3rd)
+{
+    std::lock_guard<ffrt::mutex> lock(systemSAMtx_);
+    if (systemSA_.find(processInfo3rd.processName) == systemSA_.end()) {
+        return;
+    }
+    processInfo3rd.userId = 0;
 }
 
 int32_t IpcServiceStub3rd::ImportPinCode3rd(MessageParcel &data, MessageParcel &reply, MessageOption &option)

@@ -62,7 +62,10 @@ private:
     void QuerySessionKey(int32_t userId, int32_t skId, TrustDeviceInfo3rd &deviceInfo);
     int32_t GetProxyDelInfo(const std::string &peerDeviceId,
         const std::map<std::string, std::string> &unbindParam, std::vector<std::string> &delKeyVec);
-    bool CheckDataPermission(int32_t tokenId, AccessControl3rd &access);
+    bool CheckDataPermission(uint32_t tokenId, AccessControl3rd &access);
+    int32_t PrepareDeleteKeys(const std::string &peerDeviceId, const std::string &businessName,
+        const std::map<std::string, std::string> &unbindParam, std::vector<std::string> &delKeyVec);
+    int32_t DeleteTrustRelationByKeys(const std::vector<std::string> &delKeyVec);
 private:
     void *dmServiceImpl3rdSoHandle_ = nullptr;
     bool isImpl3rdSoLoaded_ = false;

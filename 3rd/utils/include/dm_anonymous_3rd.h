@@ -33,6 +33,7 @@ namespace DistributedHardware {
     bool IsBool(const JsonItemObject &jsonObj, const std::string &key);
     bool IsInt64(const JsonItemObject &jsonObj, const std::string &key);
     bool IsUint64(const JsonItemObject &jsonObj, const std::string &key);
+    bool IsUint32(const JsonItemObject &jsonObj, const std::string &key);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_3RD_H

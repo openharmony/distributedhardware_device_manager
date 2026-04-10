@@ -134,13 +134,14 @@ void DmAuthState3rd::SaveAcl(std::shared_ptr<DmAuthContext> context)
     DmAccess &selfAccess = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
     DmAccess &remoteAccess = (context->direction == DM_AUTH_SOURCE) ? context->accessee : context->accesser;
     AccessControl3rd accessControl3rd;
-    accessControl3rd.trustDeviceId = remoteAccess.deviceId;
+    accessControl3rd.trustDeviceId = remoteAccess.deviceIdHash;
     accessControl3rd.sessionKeyId = selfAccess.transmitSessionKeyId;
     accessControl3rd.createTime = static_cast<int64_t>(GetSysTimeMs());
     accessControl3rd.extra = "";
     accessControl3rd.bindLevel = selfAccess.bindLevel;
     accessControl3rd.bindType = DM_POINT_TO_POINT;
-    accessControl3rd.accesser.deviceId = context->accesser.deviceId;
+    // acl save deviceIdHash
+    accessControl3rd.accesser.deviceId = context->accesser.deviceIdHash;
     accessControl3rd.accesser.userId = context->accesser.userId;
     accessControl3rd.accesser.accountId = context->accesser.accountId;
     accessControl3rd.accesser.tokenId = context->accesser.tokenId;
@@ -148,8 +149,8 @@ void DmAuthState3rd::SaveAcl(std::shared_ptr<DmAuthContext> context)
     accessControl3rd.accesser.uid = context->accesser.uid;
     accessControl3rd.accesser.businessName = context->accesser.businessName;
     accessControl3rd.accesser.version = context->accesser.dmVersion;
-
-    accessControl3rd.accessee.deviceId = context->accessee.deviceId;
+    // acl save deviceIdHash
+    accessControl3rd.accessee.deviceId = context->accessee.deviceIdHash;
     accessControl3rd.accessee.userId = context->accessee.userId;
     accessControl3rd.accessee.accountId = context->accessee.accountId;
     accessControl3rd.accessee.tokenId = context->accessee.tokenId;
@@ -172,7 +173,7 @@ void DmAuthState3rd::SaveProxyAcl(std::shared_ptr<DmAuthContext> context)
     for (auto &app : context->subjectProxyOnes) {
         DmProxyAccess &selfProxyAccess = (context->direction == DM_AUTH_SOURCE) ? app.proxyAccesser : app.proxyAccessee;
         AccessControl3rd accessControl3rd;
-        accessControl3rd.trustDeviceId = remoteAccess.deviceId;
+        accessControl3rd.trustDeviceId = remoteAccess.deviceIdHash;
         accessControl3rd.sessionKeyId = selfProxyAccess.transmitSessionKeyId;
         accessControl3rd.createTime = static_cast<int64_t>(GetSysTimeMs());
         JsonObject proxyObj;
@@ -182,8 +183,8 @@ void DmAuthState3rd::SaveProxyAcl(std::shared_ptr<DmAuthContext> context)
         accessControl3rd.extra = proxyObj.Dump();
         accessControl3rd.bindLevel = selfProxyAccess.bindLevel;
         accessControl3rd.bindType = DM_POINT_TO_POINT;
-
-        accessControl3rd.accesser.deviceId = context->accesser.deviceId;
+        // acl save deviceIdHash
+        accessControl3rd.accesser.deviceId = context->accesser.deviceIdHash;
         accessControl3rd.accesser.userId = context->accesser.userId;
         accessControl3rd.accesser.accountId = context->accesser.accountId;
         accessControl3rd.accesser.version = context->accesser.dmVersion;
@@ -191,8 +192,8 @@ void DmAuthState3rd::SaveProxyAcl(std::shared_ptr<DmAuthContext> context)
         accessControl3rd.accesser.processName = app.proxyAccesser.processName;
         accessControl3rd.accesser.uid = app.proxyAccesser.uid;
         accessControl3rd.accesser.businessName = app.proxyAccesser.businessName;
-
-        accessControl3rd.accessee.deviceId = context->accessee.deviceId;
+        // acl save deviceIdHash
+        accessControl3rd.accessee.deviceId = context->accessee.deviceIdHash;
         accessControl3rd.accessee.userId = context->accessee.userId;
         accessControl3rd.accessee.accountId = context->accessee.accountId;
         accessControl3rd.accessee.version = context->accessee.dmVersion;

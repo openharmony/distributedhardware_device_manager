@@ -35,9 +35,9 @@ public:
     bool IsSystemSA();
     bool IsSystemApp();
     int32_t GetCallerName(bool isSystemSA, std::string &callerName);
-    int32_t GetNativeTokenIdByName(const std::string &processName, int32_t &tokenId);
+    int32_t GetNativeTokenIdByName(const std::string &processName, uint32_t &tokenId);
     int32_t GetHapTokenIdByName(int32_t userId, const std::string &bundleName,
-        int32_t instIndex, int32_t &tokenId);
+        int32_t instIndex, uint32_t &tokenId);
     int32_t GetCallerProcessName(std::string &processName);
     int32_t GetBundleNameForSelf(std::string &bundleName);
     int32_t GetBundleNameByTokenId(int64_t tokenId, std::string &bundleName);

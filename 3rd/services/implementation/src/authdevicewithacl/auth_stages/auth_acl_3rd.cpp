@@ -30,7 +30,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-    int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
+
+int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkDataSyncState::Action start");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);

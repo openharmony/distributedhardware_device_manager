@@ -175,5 +175,15 @@ bool IsUint64(const JsonItemObject &jsonObj, const std::string &key)
     }
     return res;
 }
+
+bool IsUint32(const JsonItemObject &jsonObj, const std::string &key)
+{
+    bool res = jsonObj.Contains(key) && jsonObj[key].IsNumberInteger() && jsonObj[key].Get<int64_t>() >= 0 &&
+        jsonObj[key].Get<int64_t>() <= UINT32_MAX;
+    if (!res) {
+        LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
+    }
+    return res;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

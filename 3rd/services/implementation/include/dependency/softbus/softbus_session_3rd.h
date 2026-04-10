@@ -34,6 +34,7 @@ public:
 
     int32_t OpenSessionServer(const PeerTargetId3rd &targetId);
     int32_t SendData(int32_t sessionId, const std::string &message);
+    int32_t CloseAuthSession(int32_t sessionId);
 
 private:
     ConnectionAddr GetAddrByTargetId(const PeerTargetId3rd &targetId);

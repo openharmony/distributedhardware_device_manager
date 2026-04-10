@@ -48,7 +48,7 @@ void FromJson(const JsonItemObject &itemObject, Access3rd &access)
         access.accountId = itemObject["accountId"].Get<std::string>();
     }
     if (itemObject.Contains("tokenId") && itemObject["tokenId"].IsNumberInteger()) {
-        access.tokenId = itemObject["tokenId"].Get<int32_t>();
+        access.tokenId = itemObject["tokenId"].Get<uint32_t>();
     }
     if (itemObject.Contains("processName") && itemObject["processName"].IsString()) {
         access.processName = itemObject["processName"].Get<std::string>();

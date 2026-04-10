@@ -134,5 +134,12 @@ int32_t SoftbusSession3rd::SendData(int32_t sessionId, const std::string &messag
     }
     return DM_OK;
 }
+
+int32_t SoftbusSession3rd::CloseAuthSession(int32_t sessionId)
+{
+    LOGI("SoftbusSession3rd CloseAuthSession.");
+    ::CloseSession(sessionId);
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

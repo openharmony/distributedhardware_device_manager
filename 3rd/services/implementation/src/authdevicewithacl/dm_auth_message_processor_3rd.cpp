@@ -445,8 +445,8 @@ int32_t ParseInfoToDmAccess(const JsonObject &jsonObject, DmAccess &access)
     }
     access.dmVersion = jsonObject[TAG_DM_VERSION].Get<std::string>();
 
-    if (IsString(jsonObject, TAG_DEVICE_ID)) {
-        access.deviceId = jsonObject[TAG_DEVICE_ID].Get<std::string>();
+    if (IsString(jsonObject, TAG_DEVICE_ID_HASH)) {
+        access.deviceIdHash = jsonObject[TAG_DEVICE_ID_HASH].Get<std::string>();
     }
     if (IsInt32(jsonObject, TAG_USER_ID)) {
         access.userId = jsonObject[TAG_USER_ID].Get<int32_t>();
@@ -454,8 +454,8 @@ int32_t ParseInfoToDmAccess(const JsonObject &jsonObject, DmAccess &access)
     if (IsString(jsonObject, TAG_ACCOUNT_ID)) {
         access.accountId = jsonObject[TAG_ACCOUNT_ID].Get<std::string>();
     }
-    if (IsInt32(jsonObject, TAG_TOKEN_ID)) {
-        access.tokenId = jsonObject[TAG_TOKEN_ID].Get<int32_t>();
+    if (IsUint32(jsonObject, TAG_TOKEN_ID)) {
+        access.tokenId = jsonObject[TAG_TOKEN_ID].Get<uint32_t>();
     }
     if (IsString(jsonObject, TAG_BUSINESS_NAME)) {
         access.businessName = jsonObject[TAG_BUSINESS_NAME].Get<std::string>();
@@ -495,7 +495,7 @@ bool DmAuthMessageProcessor3rd::CheckAccessValidityAndAssign(std::shared_ptr<DmA
     const DmAccess &selfAccess = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
 
     bool isSame = accessTmp.dmVersion == access.dmVersion &&
-        Crypto3rd::GetUdidHash(accessTmp.deviceId) == access.deviceIdHash &&
+        accessTmp.deviceIdHash == access.deviceIdHash &&
         accessTmp.userId == access.userId &&
         accessTmp.processName == access.processName &&
         accessTmp.businessName == access.businessName;
@@ -772,7 +772,7 @@ int32_t DmAuthMessageProcessor3rd::SetSyncMsgJson(std::shared_ptr<DmAuthContext>
     syncMsgJson[TAG_TRANSMIT_SK_ID] = std::to_string(accessSide.transmitSessionKeyId);
     syncMsgJson[TAG_TRANSMIT_SK_TIMESTAMP] = accessSide.transmitSkTimeStamp;
     syncMsgJson[TAG_DM_VERSION] = accessSide.dmVersion;
-    syncMsgJson[TAG_DEVICE_ID] = accessSide.deviceId;
+    syncMsgJson[TAG_DEVICE_ID_HASH] = accessSide.deviceIdHash;
     syncMsgJson[TAG_USER_ID] = accessSide.userId;
     syncMsgJson[TAG_ACCOUNT_ID] = accessSide.accountId;
     syncMsgJson[TAG_TOKEN_ID] = accessSide.tokenId;
