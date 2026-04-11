@@ -130,7 +130,7 @@ private:
 
 ::ohos::distributedDeviceManager::DeviceBasicInfo MakeDeviceBasicInfo(::taihe::string_view deviceId,
     ::taihe::string_view deviceName, ::taihe::string_view deviceType,
-    ::taihe::string_view networkId, ::taihe::string_view extraData);
+    ::taihe::optional_view<::taihe::string> networkId);
 
 ::ohos::distributedDeviceManager::DeviceNameChangeResult MakeDeviceNameChangeResult(
     ::taihe::string_view deviceName);
