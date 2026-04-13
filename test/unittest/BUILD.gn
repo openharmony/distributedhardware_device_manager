@@ -147,6 +147,7 @@ ohos_unittest("UTTest_pin_auth") {
 
   external_deps = [
     "ability_base:want",
+    "bounds_checking_function:libsec_shared",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
@@ -302,6 +303,7 @@ ohos_unittest("UTTest_ipc_cmd_parser_client") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -352,6 +354,7 @@ ohos_unittest("UTTest_ipc_cmd_parser_service") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "cJSON:cjson",
@@ -480,6 +483,7 @@ ohos_unittest("UTTest_json_str_handle") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -524,6 +528,7 @@ ohos_unittest("UTTest_dm_pin_holder") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "c_utils:utils",
     "device_auth:deviceauth_sdk",
@@ -562,6 +567,7 @@ ohos_unittest("UTTest_ipc_get_device_info_rsp") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
@@ -676,6 +682,7 @@ ohos_unittest("UTTest_dm_credential_manager") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "cJSON:cjson_static",
     "device_auth:deviceauth_sdk",
@@ -725,6 +732,7 @@ ohos_unittest("UTTest_dm_credential_manager_service") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson_static",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -923,6 +931,7 @@ ohos_unittest("UTTest_device_manager_service_notify") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "bounds_checking_function:libsec_shared",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -959,6 +968,7 @@ ohos_unittest("UTTest_hichain_auth_connector") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -996,6 +1006,7 @@ ohos_unittest("UTTest_hichain_connector") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -1034,6 +1045,7 @@ ohos_unittest("UTTest_mine_hichain_connector") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -1067,6 +1079,7 @@ ohos_unittest("UTTest_mine_softbus_listener") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:ability_manager",
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -1111,6 +1124,7 @@ ohos_unittest("UTTest_softbus_connector") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
@@ -1165,6 +1179,7 @@ ohos_unittest("UTTest_softbus_listener") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
@@ -1214,6 +1229,7 @@ ohos_unittest("UTTest_softbus_listener_two") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "common_event_service:cesfwk_innerkits",
     "c_utils:utils",
@@ -1266,6 +1282,7 @@ ohos_unittest("UTTest_softbus_publish") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -1308,6 +1325,7 @@ ohos_unittest("UTTest_softbus_session") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -1352,6 +1370,7 @@ ohos_unittest("UTTest_dm_anonymous") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
@@ -1389,6 +1408,7 @@ ohos_unittest("UTTest_dm_anonymous_two") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
@@ -1485,6 +1505,7 @@ ohos_unittest("UTTest_dm_transport_msg") {
     "${utils_path}:devicemanagerutilstest",
   ]
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "ffrt:libffrt",
     "googletest:gmock",
@@ -1548,6 +1569,7 @@ ohos_unittest("UTTest_dm_service_sync_info") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
@@ -1581,6 +1603,7 @@ ohos_unittest("UTTest_dm_service_info") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
@@ -1610,6 +1633,7 @@ ohos_unittest("UTTest_dm_notify_key") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
@@ -1643,6 +1667,7 @@ ohos_unittest("UTTest_dm_discovery_service_param") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
@@ -1676,6 +1701,7 @@ ohos_unittest("UTTest_dm_register_service_state") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
@@ -1710,6 +1736,7 @@ ohos_unittest("UTTest_process_info") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
@@ -1976,6 +2003,7 @@ ohos_unittest("UTTest_device_manager_impl") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson_static",
     "c_utils:utils",
     "device_auth:deviceauth_sdk",
@@ -2345,6 +2373,7 @@ ohos_unittest("UTTest_dm_dfx") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
@@ -2482,6 +2511,7 @@ ohos_unittest("UTTest_device_manager_service_listener") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
@@ -2528,6 +2558,7 @@ ohos_unittest("UTTest_device_manager_service_listener_two") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -2568,6 +2599,7 @@ ohos_unittest("UTTest_auth_message_processor") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -2719,6 +2751,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "device_auth:deviceauth_sdk",
@@ -2779,6 +2812,7 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
 
   external_deps = [
     "ability_runtime:ability_connect_callback_stub",
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -2819,6 +2853,7 @@ ohos_unittest("UTTest_dm_auth_manager_third") {
 
   external_deps = [
     "ability_runtime:ability_connect_callback_stub",
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -2872,6 +2907,7 @@ ohos_unittest("UTTest_dm_radar_helper_test") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
@@ -2907,6 +2943,7 @@ ohos_unittest("UTTest_discovery_filter") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
@@ -2947,6 +2984,7 @@ ohos_unittest("UTTest_discovery_manager") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
@@ -2996,6 +3034,7 @@ ohos_unittest("UTTest_dm_deviceprofile_connector") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
@@ -3326,6 +3365,7 @@ ohos_unittest("UTTest_hichain_listener") {
   ]
 
   external_deps = [ 
+    "bounds_checking_function:libsec_shared",
     "ffrt:libffrt",
     "hilog:libhilog",
   ]
@@ -3367,6 +3407,7 @@ ohos_unittest("UTTest_dp_inited_callback") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "bounds_checking_function:libsec_shared",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -3412,6 +3453,7 @@ ohos_unittest("UTTest_kv_adapter_manager") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "ffrt:libffrt",
     "googletest:gmock",
@@ -3501,6 +3543,7 @@ ohos_unittest("UTTest_crypto_mgr") {
   ]
 
   external_deps = [ 
+    "bounds_checking_function:libsec_shared",
     "ffrt:libffrt",
     "hilog:libhilog",
   ]
@@ -3742,6 +3785,7 @@ ohos_unittest("UTTest_dm_auth_message_processor") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -4135,6 +4179,7 @@ ohos_unittest("UTTest_freeze_process") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -4215,6 +4260,7 @@ ohos_unittest("UTTest_dm_service_hichain_connector") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson_static",
     "c_utils:utils",
     "device_auth:deviceauth_sdk",

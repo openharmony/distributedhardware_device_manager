@@ -254,8 +254,11 @@ ani_array AniCreateEmptyAniArray(ani_env *env, uint32_t size)
         LOGE("GetUndefined Failed.");
         return nullptr;
     }
-    ani_array resultArray;
-    env->Array_New(size, undefinedRef, &resultArray);
+    ani_array resultArray = nullptr;
+    if (env->Array_New(size, undefinedRef, &resultArray) != ANI_OK) {
+        LOGE("Array_New failed.");
+        return nullptr;
+    }
     return resultArray;
 }
 

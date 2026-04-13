@@ -148,7 +148,10 @@ bool AniPromiseCallback(ani_env* env, ani_resolver deferred, int32_t result, ani
         ani_ref errobj = static_cast<ani_error>(CreateBusinessError(result, false));
         if (errobj == nullptr) {
             LOGE("ToBusinessError return null");
-            env->GetUndefined(&errobj);
+            if ((status = env->GetUndefined(&errobj)) != ANI_OK) {
+                LOGE("GetUndefined failed");
+                return false;
+            }
         }
         if ((status = env->PromiseResolver_Reject(deferred, static_cast<ani_error>(errobj))) != ANI_OK) {
             LOGE("PromiseResolver_Reject failed, status = %{public}d", status);

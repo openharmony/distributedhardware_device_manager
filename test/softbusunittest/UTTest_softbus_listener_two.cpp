@@ -153,21 +153,14 @@ HWTEST_F(SoftbusListenerTwoTest, OnSoftbusDeviceInfoChanged_001, testing::ext::T
 HWTEST_F(SoftbusListenerTwoTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo dmDevice;
-    DeviceInfo deviceInfo = {
-        .devId = "deviceId",
-        .devType = (DeviceType)1,
-        .devName = "11111",
-        .addrNum = 1,
-        .addr[0] = {
-            .type = static_cast<ConnectionAddrType>(5),
-            .info {
-                .ip {
-                    .ip = "172.0.0.1",
-                    .port = 0,
-                }
-            }
-        }
-    };
+    DeviceInfo deviceInfo {};
+    (void)strcpy_s(deviceInfo.devId, sizeof(deviceInfo.devId), "deviceId");
+    deviceInfo.devType = static_cast<DeviceType>(1);
+    (void)strcpy_s(deviceInfo.devName, sizeof(deviceInfo.devName), "11111");
+    deviceInfo.addrNum = 1;
+    deviceInfo.addr[0].type = static_cast<ConnectionAddrType>(5);
+    (void)strcpy_s(deviceInfo.addr[0].info.ip.ip, sizeof(deviceInfo.addr[0].info.ip.ip), "172.0.0.1");
+    deviceInfo.addr[0].info.ip.port = 0;
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
@@ -177,21 +170,14 @@ HWTEST_F(SoftbusListenerTwoTest, ConvertDeviceInfoToDmDevice_001, testing::ext::
 
 HWTEST_F(SoftbusListenerTwoTest, CacheDiscoveredDevice_001, testing::ext::TestSize.Level1)
 {
-    DeviceInfo deviceInfo = {
-        .devId = "0",
-        .devType = (DeviceType)1,
-        .devName = "11111",
-        .addrNum = 1,
-        .addr[0] = {
-            .type = ConnectionAddrType::CONNECTION_ADDR_ETH,
-            .info {
-                .ip {
-                    .ip = "172.0.0.1",
-                    .port = 0,
-                }
-            }
-        }
-    };
+    DeviceInfo deviceInfo {};
+    (void)strcpy_s(deviceInfo.devId, sizeof(deviceInfo.devId), "0");
+    deviceInfo.devType = static_cast<DeviceType>(1);
+    (void)strcpy_s(deviceInfo.devName, sizeof(deviceInfo.devName), "11111");
+    deviceInfo.addrNum = 1;
+    deviceInfo.addr[0].type = ConnectionAddrType::CONNECTION_ADDR_ETH;
+    (void)strcpy_s(deviceInfo.addr[0].info.ip.ip, sizeof(deviceInfo.addr[0].info.ip.ip), "172.0.0.1");
+    deviceInfo.addr[0].info.ip.port = 0;
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
