@@ -47,6 +47,7 @@ ohos_fuzztest("DmAnonyousFuzzTest") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "c_utils:utils",
     "device_auth:deviceauth_sdk",

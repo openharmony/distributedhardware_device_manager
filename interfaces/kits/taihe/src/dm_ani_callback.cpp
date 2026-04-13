@@ -68,8 +68,11 @@ void DmAniInitCallback::OnRemoteDiedInMainthread()
     LOGI("In");
     std::lock_guard<std::mutex> lock(jsCallbackMutex_);
     if (serviceDieCallback_.has_value()) {
-        ani_ref *undefinedResult = nullptr;
-        env_->GetUndefined(undefinedResult);
+        ani_ref undefinedResult = nullptr;
+        if (env_->GetUndefined(&undefinedResult) != ANI_OK) {
+            LOGE("GetUndefined failed");
+            return;
+        }
         serviceDieCallback_.value()(reinterpret_cast<uintptr_t>(undefinedResult));
         LOGI("call end");
     }
@@ -334,7 +337,9 @@ void DmAniBindTargetCallback::OnBindResultInMainThread(const OHOS::DistributedHa
     ohos::distributedDeviceManager::BindTargetResult data = {};
     if (status == DM_AUTH_REQUEST_SUCCESS_STATUS && result == 0) {
         LOGI("OnBindResult success");
-        env_->GetNull(&err);
+        if (env_->GetNull(&err) != ANI_OK) {
+            LOGE("GetNull failed");
+        }
         data.deviceId = taihe::string(deviceId);
     } else {
         LOGI("OnBindResult failed");
@@ -386,7 +391,9 @@ void DmAniAuthenticateCallback::OnAuthResultInMainThread(const std::string &devi
     ::ohos::distributedDeviceManager::BindTargetResult data = {};
     if (status == DM_AUTH_REQUEST_SUCCESS_STATUS && reason == 0) {
         LOGI("OnAuthResult success");
-        env_->GetNull(&err);
+        if (env_->GetNull(&err) != ANI_OK) {
+            LOGE("GetNull failed");
+        }
         data.deviceId = ::taihe::string(deviceId);
     } else {
         LOGI("OnAuthResult failed");
@@ -484,7 +491,9 @@ void DmAniSetLocalDeviceNameCallback::PromiseResult(ani_env* currentEnv, int32_t
     if (deferred_) {
         ani_object resolveResult = nullptr;
         if (code == OHOS::DistributedHardware::DM_OK) {
-            ani_utils::AniCreateInt(currentEnv, code, resolveResult);
+            if (ani_utils::AniCreateInt(currentEnv, code, resolveResult) != ANI_OK) {
+                LOGE("AniCreateInt failed");
+            }
         }
         ani_errorutils::AniPromiseCallback(currentEnv, deferred_, code, resolveResult);
         deferred_ = nullptr;
@@ -509,7 +518,9 @@ void DmAniSetRemoteDeviceNameCallback::PromiseResult(ani_env* currentEnv, int32_
     if (deferred_) {
         ani_object resolveResult = nullptr;
         if (code == OHOS::DistributedHardware::DM_OK) {
-            ani_utils::AniCreateInt(currentEnv, code, resolveResult);
+            if (ani_utils::AniCreateInt(currentEnv, code, resolveResult) != ANI_OK) {
+                LOGE("AniCreateInt failed");
+            }
         }
         ani_errorutils::AniPromiseCallback(currentEnv, deferred_, code, resolveResult);
         deferred_ = nullptr;
