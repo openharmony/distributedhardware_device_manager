@@ -57,15 +57,17 @@ enum DMBussinessErrorCode {
 
 struct FieldMapping {
     // Field name in JavaScript object
-    const char* name;
-    // Field type: 0=string, 1=integer
-    uint32_t fieldType;
+    const char* name = nullptr;
+    // Field type: 0 = string, 1 = integer
+    uint32_t fieldType = 0;
     // Corresponding key in JSON output
-    const char* jsonKey;
+    const char* jsonKey = nullptr;
     // Default value for integer fields
-    int32_t defaultValue;
+    int32_t defaultValue = 0;
     // Buffer length for string fields
-    uint32_t bufferLength;
+    uint32_t bufferLength = 0;
+    // Whether field is optional
+    bool isOptional = false;
 };
 
 #define DM_NAPI_RETVAL_NOTHING
