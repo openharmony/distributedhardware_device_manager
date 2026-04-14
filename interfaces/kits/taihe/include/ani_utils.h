@@ -88,8 +88,11 @@ public:
             return false;
         }
 
-        ani_boolean ret;
-        env_->Object_InstanceOf(obj_, cls, &ret);
+        ani_boolean ret = static_cast<ani_boolean>(false);
+        status = env_->Object_InstanceOf(obj_, cls, &ret);
+        if (status != ANI_OK) {
+            return false;
+        }
         return ret;
     }
 

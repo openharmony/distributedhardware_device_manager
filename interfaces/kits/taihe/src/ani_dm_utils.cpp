@@ -28,6 +28,54 @@ using namespace OHOS::DistributedHardware;
 const int32_t DM_NAPI_BUF_LENGTH = 256;
 const int32_t MAX_JSON_LEN = 1024 * 1024;
 
+namespace {
+ani_object CreateDeviceProfileAniObject(ani_env *env, const DmDeviceProfileInfo &nativeObj, ani_ref aniFieldServices)
+{
+    ani_string aniFieldDeviceId = ani_utils::AniCreateString(env, nativeObj.deviceId);
+    ani_string aniFieldDeviceSn = ani_utils::AniCreateString(env, nativeObj.deviceSn);
+    ani_string aniFieldMac = ani_utils::AniCreateString(env, nativeObj.mac);
+    ani_string aniFieldModel = ani_utils::AniCreateString(env, nativeObj.model);
+    ani_string aniFieldDeviceType = ani_utils::AniCreateString(env, nativeObj.deviceType);
+    ani_string aniFieldManufacturer = ani_utils::AniCreateString(env, nativeObj.manufacturer);
+    ani_string aniFieldDeviceName = ani_utils::AniCreateString(env, nativeObj.deviceName);
+    ani_string aniFieldProductId = ani_utils::AniCreateString(env, nativeObj.productId);
+    ani_string aniFieldSdkVersion = ani_utils::AniCreateString(env, nativeObj.sdkVersion);
+    ani_ref aniFieldSubProductId = ani_utils::AniCreateString(env, nativeObj.subProductId);
+    ani_ref aniFieldProductName = ani_utils::AniCreateString(env, nativeObj.productName);
+    ani_ref aniFieldInternalModel = ani_utils::AniCreateString(env, nativeObj.internalModel);
+    ani_string aniFieldBleMac = ani_utils::AniCreateString(env, nativeObj.bleMac);
+    ani_string aniFieldBrMac = ani_utils::AniCreateString(env, nativeObj.brMac);
+    ani_string aniFieldSleMac = ani_utils::AniCreateString(env, nativeObj.sleMac);
+    ani_string aniFieldFirmwareVersion = ani_utils::AniCreateString(env, nativeObj.firmwareVersion);
+    ani_string aniFieldHardwareVersion = ani_utils::AniCreateString(env, nativeObj.hardwareVersion);
+    ani_string aniFieldSoftwareVersion = ani_utils::AniCreateString(env, nativeObj.softwareVersion);
+    ani_int aniFieldProtocolType = static_cast<ani_int>(nativeObj.protocolType);
+    ani_int aniFieldSetupType = static_cast<ani_int>(nativeObj.setupType);
+    ani_string aniFieldWiseDeviceId = ani_utils::AniCreateString(env, nativeObj.wiseDeviceId);
+    ani_string aniFieldWiseUserId = ani_utils::AniCreateString(env, nativeObj.wiseUserId);
+    ani_string aniFieldRegisterTime = ani_utils::AniCreateString(env, nativeObj.registerTime);
+    ani_string aniFieldModifyTime = ani_utils::AniCreateString(env, nativeObj.modifyTime);
+    ani_string aniFieldShareTime = ani_utils::AniCreateString(env, nativeObj.shareTime);
+    ani_boolean aniFieldIsLocalDevice = static_cast<ani_boolean>(nativeObj.isLocalDevice);
+    ani_class cls = ani_utils::AniGetClass(env,
+        "@ohos.distributedDeviceManager.distributedDeviceManager._taihe_DeviceProfileInfo_inner");
+    ani_method method = ani_utils::AniGetClassMethod(env,
+        "@ohos.distributedDeviceManager.distributedDeviceManager._taihe_DeviceProfileInfo_inner", "<ctor>", nullptr);
+    ani_object aniObj = {};
+    ani_status status = env->Object_New(cls, method, &aniObj, aniFieldDeviceId, aniFieldDeviceSn, aniFieldMac,
+        aniFieldModel, aniFieldDeviceType, aniFieldManufacturer, aniFieldDeviceName, aniFieldProductId,
+        aniFieldSubProductId, aniFieldSdkVersion, aniFieldBleMac, aniFieldBrMac, aniFieldSleMac,
+        aniFieldFirmwareVersion, aniFieldHardwareVersion, aniFieldSoftwareVersion, aniFieldProtocolType,
+        aniFieldSetupType, aniFieldWiseDeviceId, aniFieldWiseUserId, aniFieldRegisterTime, aniFieldModifyTime,
+        aniFieldShareTime, aniFieldIsLocalDevice, aniFieldServices, aniFieldProductName, aniFieldInternalModel);
+    if (status != ANI_OK) {
+        LOGE("Failed to create DeviceProfileInfo object: %{public}d", status);
+        return {};
+    }
+    return aniObj;
+}
+} // namespace
+
 bool CheckJsParamStringValid(const std::string &param)
 {
     if (param.size() == 0 || param.size() >= DM_NAPI_BUF_LENGTH) {
@@ -195,7 +243,10 @@ ani_object ServiceProfileInfoToAni(ani_env *env, const OHOS::DistributedHardware
     if (jsonDataStr.size() > 0) {
         ani_field_data = ani_utils::AniCreateString(env, jsonDataStr);
     } else {
-        env->GetUndefined(&ani_field_data);
+        if (env->GetUndefined(&ani_field_data) != ANI_OK) {
+            LOGE("GetUndefined failed");
+            return {};
+        }
     }
     ani_class cls = ani_utils::AniGetClass(env,
         "@ohos.distributedDeviceManager.distributedDeviceManager._taihe_ServiceProfileInfo_inner");
@@ -217,13 +268,22 @@ ani_object ServiceProfileInfoArrayToAni(ani_env *env,
         return {};
     }
     size_t ani_field_services_size = services.size();
-    ani_array ani_field_services = {};
+    ani_array ani_field_services = nullptr;
     ani_ref aniUndefine = {};
-    env->GetUndefined(&aniUndefine);
-    env->Array_New(ani_field_services_size, aniUndefine, &ani_field_services);
+    if (env->GetUndefined(&aniUndefine) != ANI_OK) {
+        LOGE("GetUndefined failed");
+        return {};
+    }
+    if (env->Array_New(ani_field_services_size, aniUndefine, &ani_field_services) != ANI_OK) {
+        LOGE("Array_New failed");
+        return {};
+    }
     for (size_t index = 0; index < ani_field_services_size; index++) {
         ani_object aniService = ServiceProfileInfoToAni(env, services[index]);
-        env->Array_Set(ani_field_services, index, aniService);
+        if (env->Array_Set(ani_field_services, index, aniService) != ANI_OK) {
+            LOGE("Array_Set failed, index=%{public}zu", index);
+            return {};
+        }
     }
     return ani_field_services;
 }
@@ -233,45 +293,16 @@ ani_object DeviceProfileInfoToAni(ani_env *env, const OHOS::DistributedHardware:
     if (env == nullptr) {
         return {};
     }
-    ani_string ani_field_deviceId = ani_utils::AniCreateString(env, nativeObj.deviceId);
-    ani_string ani_field_deviceSn = ani_utils::AniCreateString(env, nativeObj.deviceSn);
-    ani_string ani_field_mac = ani_utils::AniCreateString(env, nativeObj.mac);
-    ani_string ani_field_model = ani_utils::AniCreateString(env, nativeObj.model);
-    ani_string ani_field_deviceType = ani_utils::AniCreateString(env, nativeObj.deviceType);
-    ani_string ani_field_manufacturer = ani_utils::AniCreateString(env, nativeObj.manufacturer);
-    ani_string ani_field_deviceName = ani_utils::AniCreateString(env, nativeObj.deviceName);
-    ani_string ani_field_productId = ani_utils::AniCreateString(env, nativeObj.productId);
-    ani_ref ani_field_subProductId = ani_utils::AniCreateString(env, nativeObj.subProductId);
-    ani_string ani_field_sdkVersion = ani_utils::AniCreateString(env, nativeObj.sdkVersion);
-    ani_string ani_field_bleMac = ani_utils::AniCreateString(env, nativeObj.bleMac);
-    ani_string ani_field_brMac = ani_utils::AniCreateString(env, nativeObj.brMac);
-    ani_string ani_field_sleMac = ani_utils::AniCreateString(env, nativeObj.sleMac);
-    ani_string ani_field_firmwareVersion = ani_utils::AniCreateString(env, nativeObj.firmwareVersion);
-    ani_string ani_field_hardwareVersion = ani_utils::AniCreateString(env, nativeObj.hardwareVersion);
-    ani_string ani_field_softwareVersion = ani_utils::AniCreateString(env, nativeObj.softwareVersion);
-    ani_int ani_field_protocolType = static_cast<ani_int>(nativeObj.protocolType);
-    ani_int ani_field_setupType = static_cast<ani_int>(nativeObj.setupType);
-    ani_string ani_field_wiseDeviceId = ani_utils::AniCreateString(env, nativeObj.wiseDeviceId);
-    ani_string ani_field_wiseUserId = ani_utils::AniCreateString(env, nativeObj.wiseUserId);
-    ani_string ani_field_registerTime = ani_utils::AniCreateString(env, nativeObj.registerTime);
-    ani_string ani_field_modifyTime = ani_utils::AniCreateString(env, nativeObj.modifyTime);
-    ani_string ani_field_shareTime = ani_utils::AniCreateString(env, nativeObj.shareTime);
-    ani_boolean ani_field_isLocalDevice = static_cast<ani_boolean>(nativeObj.isLocalDevice);
-    ani_ref ani_field_services = {};
+    ani_ref aniFieldServices = {};
     if (nativeObj.services.size() == 0) {
-        env->GetUndefined(&ani_field_services);
+        if (env->GetUndefined(&aniFieldServices) != ANI_OK) {
+            LOGE("GetUndefined failed");
+            return {};
+        }
     } else {
-        ani_field_services = ServiceProfileInfoArrayToAni(env, nativeObj.services);
+        aniFieldServices = ServiceProfileInfoArrayToAni(env, nativeObj.services);
     }
-    ani_ref ani_field_productName = ani_utils::AniCreateString(env, nativeObj.productName);
-    ani_ref ani_field_internalModel = ani_utils::AniCreateString(env, nativeObj.internalModel);
-    ani_class cls = ani_utils::AniGetClass(env,
-        "@ohos.distributedDeviceManager.distributedDeviceManager._taihe_DeviceProfileInfo_inner");
-    ani_method method = ani_utils::AniGetClassMethod(env,
-        "@ohos.distributedDeviceManager.distributedDeviceManager._taihe_DeviceProfileInfo_inner", "<ctor>", nullptr);
-    ani_object ani_obj = {};
-    CREATE_DEVICE_PROFILE_INFO_RET;
-    return ani_obj;
+    return CreateDeviceProfileAniObject(env, nativeObj, aniFieldServices);
 }
 
 ani_object DeviceProfileInfoArrayToAni(ani_env *env,
