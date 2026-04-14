@@ -562,7 +562,7 @@ int32_t SoftbusCache::GetDeviceNameFromCache(const std::string &udid, std::strin
         if (deviceInfo_.find(udid) != deviceInfo_.end()) {
             deviceName = deviceInfo_[udid].second.deviceName;
             LOGI("success deviceName: %{public}s, udid: %{public}s.",
-                deviceName.c_str(), GetAnonyString(udid).c_str());
+                GetAnonyString(deviceName).c_str(), GetAnonyString(udid).c_str());
             return DM_OK;
         }
     }
