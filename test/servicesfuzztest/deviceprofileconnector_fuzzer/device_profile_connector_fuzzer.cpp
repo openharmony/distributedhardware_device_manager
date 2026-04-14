@@ -377,36 +377,40 @@ void DeviceProfileConnectorFuzzTest(FuzzedDataProvider &fdp)
     DeviceProfileConnector::GetInstance().GetTrustNumber(localDeviceId);
 }
 
+void ConnectorFuzzTest(const uint8_t* data, size_t size)
+{
+    const size_t minSize = sizeof(int32_t) + sizeof(int32_t) + sizeof(bool);
+    if ((data == nullptr) || (size < minSize)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    DeleteAclForAccountLogOutFuzzTest(fdp);
+    DeleteAclByActhashFuzzTest(fdp);
+    CacheOfflineParamFuzzTest(fdp);
+    ProcessLocalToPeerFuzzTest(fdp);
+    ProcessPeerToLocalFuzzTest(fdp);
+    DeleteAclForUserRemovedFuzzTest(fdp);
+    DeleteAclForRemoteUserRemovedFuzzTest(fdp);
+    DeleteAccessControlListByUdidFuzzTest(fdp);
+    HandleSyncForegroundUserIdEventFuzzTest(fdp);
+    FillDmUserRemovedServiceInfoLocalFuzzTest(fdp);
+    FillDmUserRemovedServiceInfoRemoteFuzzTest(fdp);
+    GetServiceInfoByUdidAndServiceIdFuzzTest(fdp);
+    GetServiceInfosByUdidAndUserIdFuzzTest(fdp);
+    PutServiceInfoFuzzTest(fdp);
+    DeleteServiceInfoFuzzTest(fdp);
+    GetServiceInfosByUdidFuzzTest(fdp);
+    GetPeerTokenIdForServiceProxyUnbindFuzzTest(fdp);
+    HasServiceIdFuzzTest(fdp);
+    DeviceProfileConnectorFuzzTest(fdp);
+}
 }
 }
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    const size_t minSize = sizeof(int32_t) + sizeof(int32_t) + sizeof(bool);
-    if ((data == nullptr) || (size < minSize)) {
-        return 0;
-    }
-    FuzzedDataProvider fdp(data, size);
     /* Run your code on data */
-    OHOS::DistributedHardware::DeleteAclForAccountLogOutFuzzTest(fdp);
-    OHOS::DistributedHardware::DeleteAclByActhashFuzzTest(fdp);
-    OHOS::DistributedHardware::CacheOfflineParamFuzzTest(fdp);
-    OHOS::DistributedHardware::ProcessLocalToPeerFuzzTest(fdp);
-    OHOS::DistributedHardware::ProcessPeerToLocalFuzzTest(fdp);
-    OHOS::DistributedHardware::DeleteAclForUserRemovedFuzzTest(fdp);
-    OHOS::DistributedHardware::DeleteAclForRemoteUserRemovedFuzzTest(fdp);
-    OHOS::DistributedHardware::DeleteAccessControlListByUdidFuzzTest(fdp);
-    OHOS::DistributedHardware::HandleSyncForegroundUserIdEventFuzzTest(fdp);
-    OHOS::DistributedHardware::FillDmUserRemovedServiceInfoLocalFuzzTest(fdp);
-    OHOS::DistributedHardware::FillDmUserRemovedServiceInfoRemoteFuzzTest(fdp);
-    OHOS::DistributedHardware::GetServiceInfoByUdidAndServiceIdFuzzTest(fdp);
-    OHOS::DistributedHardware::GetServiceInfosByUdidAndUserIdFuzzTest(fdp);
-    OHOS::DistributedHardware::PutServiceInfoFuzzTest(fdp);
-    OHOS::DistributedHardware::DeleteServiceInfoFuzzTest(fdp);
-    OHOS::DistributedHardware::GetServiceInfosByUdidFuzzTest(fdp);
-    OHOS::DistributedHardware::GetPeerTokenIdForServiceProxyUnbindFuzzTest(fdp);
-    OHOS::DistributedHardware::HasServiceIdFuzzTest(fdp);
-    OHOS::DistributedHardware::DeviceProfileConnectorFuzzTest(fdp);
+    OHOS::DistributedHardware::ConnectorFuzzTest(data, size);
     return 0;
 }

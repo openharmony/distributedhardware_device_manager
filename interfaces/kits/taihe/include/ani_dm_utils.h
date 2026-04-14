@@ -28,17 +28,6 @@
 
 namespace ani_dmutils {
 
-#define CREATE_DEVICE_PROFILE_INFO_RET                                                                                 \
-do {                                                                                                                   \
-    env->Object_New(cls, method, &ani_obj, ani_field_deviceId, ani_field_deviceSn,                                     \
-        ani_field_mac, ani_field_model, ani_field_deviceType, ani_field_manufacturer, ani_field_deviceName,            \
-        ani_field_productId, ani_field_subProductId, ani_field_sdkVersion, ani_field_bleMac, ani_field_brMac,          \
-        ani_field_sleMac, ani_field_firmwareVersion, ani_field_hardwareVersion, ani_field_softwareVersion,             \
-        ani_field_protocolType, ani_field_setupType, ani_field_wiseDeviceId, ani_field_wiseUserId,                     \
-        ani_field_registerTime, ani_field_modifyTime, ani_field_shareTime, ani_field_isLocalDevice,                    \
-        ani_field_services, ani_field_productName, ani_field_internalModel);                                           \
-} while (0)
-
 bool CheckJsParamStringValid(const std::string &param);
 
 std::string GetDeviceTypeById(const OHOS::DistributedHardware::DmDeviceType &type);

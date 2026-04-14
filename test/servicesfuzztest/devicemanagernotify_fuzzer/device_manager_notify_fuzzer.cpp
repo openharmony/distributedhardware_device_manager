@@ -429,40 +429,44 @@ void UnRegisterAuthCodeInvalidCallbackFuzzTest(FuzzedDataProvider &fdp)
     DeviceManagerNotify::GetInstance().UnRegisterAuthCodeInvalidCallback(pkgName);
 }
 
+void NotifyFuzzTest(const uint8_t* data, size_t size)
+{
+    const size_t minSize = sizeof(int32_t) + sizeof(int64_t);
+    if ((data == nullptr) || (size < minSize)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    AuthCodeInvalidFuzzTest(fdp);
+    RegisterServicePublishCallbackFuzzTest(fdp);
+    UnRegisterServicePublishCallbackFuzzTest(fdp);
+    OnServicePublishResultFuzzTest(fdp);
+    RegisterServiceDiscoveryCallbackFuzzTest(fdp);
+    OnServiceDiscoveryResultFuzzTest(fdp);
+    OnServiceFoundFuzzTest(fdp);
+    RegisterSyncServiceInfoCallbackFuzzTest(fdp);
+    UnRegisterSyncServiceInfoCallbackFuzzTest(fdp);
+    OnSyncServiceInfoResultFuzzTest(fdp);
+    GetServiceCallBackFuzzTest(fdp);
+    OnServiceOnlineFuzzTest(fdp);
+    ServiceInfoOnlineFuzzTest(fdp);
+    OnServiceOfflineFuzzTest(fdp);
+    ServiceInfoOfflineFuzzTest(fdp);
+    OnServiceChangeFuzzTest(fdp);
+    ServiceInfoChangeFuzzTest(fdp);
+    RegisterServiceStateCallbackFuzzTest(fdp);
+    UnRegisterServiceStateCallbackFuzzTest(fdp);
+    RegisterLeaveLnnCallbackFuzzTest(fdp);
+    OnLeaveLNNResultFuzzTest(fdp);
+    RegisterAuthCodeInvalidCallbackFuzzTest(fdp);
+    UnRegisterAuthCodeInvalidCallbackFuzzTest(fdp);
+}
 }
 }
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    const size_t minSize = sizeof(int32_t) + sizeof(int64_t);
-    if ((data == nullptr) || (size < minSize)) {
-        return 0;
-    }
-    FuzzedDataProvider fdp(data, size);
     /* Run your code on data */
-    OHOS::DistributedHardware::AuthCodeInvalidFuzzTest(fdp);
-    OHOS::DistributedHardware::RegisterServicePublishCallbackFuzzTest(fdp);
-    OHOS::DistributedHardware::UnRegisterServicePublishCallbackFuzzTest(fdp);
-    OHOS::DistributedHardware::OnServicePublishResultFuzzTest(fdp);
-    OHOS::DistributedHardware::RegisterServiceDiscoveryCallbackFuzzTest(fdp);
-    OHOS::DistributedHardware::OnServiceDiscoveryResultFuzzTest(fdp);
-    OHOS::DistributedHardware::OnServiceFoundFuzzTest(fdp);
-    OHOS::DistributedHardware::RegisterSyncServiceInfoCallbackFuzzTest(fdp);
-    OHOS::DistributedHardware::UnRegisterSyncServiceInfoCallbackFuzzTest(fdp);
-    OHOS::DistributedHardware::OnSyncServiceInfoResultFuzzTest(fdp);
-    OHOS::DistributedHardware::GetServiceCallBackFuzzTest(fdp);
-    OHOS::DistributedHardware::OnServiceOnlineFuzzTest(fdp);
-    OHOS::DistributedHardware::ServiceInfoOnlineFuzzTest(fdp);
-    OHOS::DistributedHardware::OnServiceOfflineFuzzTest(fdp);
-    OHOS::DistributedHardware::ServiceInfoOfflineFuzzTest(fdp);
-    OHOS::DistributedHardware::OnServiceChangeFuzzTest(fdp);
-    OHOS::DistributedHardware::ServiceInfoChangeFuzzTest(fdp);
-    OHOS::DistributedHardware::RegisterServiceStateCallbackFuzzTest(fdp);
-    OHOS::DistributedHardware::UnRegisterServiceStateCallbackFuzzTest(fdp);
-    OHOS::DistributedHardware::RegisterLeaveLnnCallbackFuzzTest(fdp);
-    OHOS::DistributedHardware::OnLeaveLNNResultFuzzTest(fdp);
-    OHOS::DistributedHardware::RegisterAuthCodeInvalidCallbackFuzzTest(fdp);
-    OHOS::DistributedHardware::UnRegisterAuthCodeInvalidCallbackFuzzTest(fdp);
+    OHOS::DistributedHardware::NotifyFuzzTest(data, size);
     return 0;
 }
