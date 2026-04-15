@@ -58,7 +58,7 @@ void IpcClientStub3rd::OnAuthResult(MessageParcel &data, MessageParcel &reply, M
 void IpcClientStub3rd::DecodeProcessInfo(MessageParcel &parcel, ProcessInfo3rd &processInfo)
 {
     processInfo.tokenId = parcel.ReadUint32();
-    processInfo.uid = parcel.ReadUint32();
+    processInfo.uid = parcel.ReadInt32();
     processInfo.businessName = parcel.ReadString();
     processInfo.processName = parcel.ReadString();
     processInfo.userId = parcel.ReadInt32();

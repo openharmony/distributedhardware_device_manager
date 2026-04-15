@@ -36,7 +36,7 @@ struct Access3rd {
     std::string accountId = "";
     uint32_t tokenId = 0;
     std::string processName = "";
-    int32_t uid = -1;
+    int32_t uid = 0;
     std::string businessName = "";
     std::string version = "";
 };

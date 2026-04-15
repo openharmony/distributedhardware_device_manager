@@ -134,7 +134,7 @@ int32_t AuthManagerBase3rd::SetReasonAndFinish(int32_t reason, int32_t state)
 }
 
 int32_t AuthManagerBase3rd::ImportAuthCodeAndUid(const std::string &pkgName, const std::string &authCode,
-    uint32_t uid)
+    int32_t uid)
 {
     LOGE("ImportAuthCode is not implemented in the current version");
     return ERR_DM_FAILED;

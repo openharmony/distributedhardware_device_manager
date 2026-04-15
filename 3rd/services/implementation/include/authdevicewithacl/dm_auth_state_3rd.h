@@ -63,9 +63,12 @@ public:
     static void HandleAuthenticateTimeout(std::shared_ptr<DmAuthContext> context, const std::string &name);
     void SaveAcl(std::shared_ptr<DmAuthContext> context);
     void SaveProxyAcl(std::shared_ptr<DmAuthContext> context);
-    void SaveAclToDb(std::shared_ptr<DmAuthContext> context, const AccessControl3rd &accessControl3rd);
+    void SaveAclToDb(std::shared_ptr<DmAuthContext> context, const AccessControl3rd &accessControl3rd,
+        std::string &aclKey);
     static uint64_t GetSysTimeMs();
     std::string BuildResultContent(std::shared_ptr<DmAuthContext> context);
+    void BindFail(std::shared_ptr<DmAuthContext> context);
+    void DeleteAcl(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSrcStartState : public DmAuthState3rd {

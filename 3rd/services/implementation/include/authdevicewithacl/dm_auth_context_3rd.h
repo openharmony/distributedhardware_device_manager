@@ -74,6 +74,7 @@ typedef struct DmProxyAccess {
     int64_t transmitSkTimeStamp;
     int32_t bindLevel;
     std::vector<unsigned char> sessionKey;
+    std::string aclKey;
 } DmProxyAccess;
 
 struct DmProxyAuthContext {
@@ -95,7 +96,7 @@ struct DmAccess {
     std::string deviceId;
     std::string deviceIdHash;
     int32_t userId{-1};
-    int32_t uid{-1};
+    int32_t uid{0};
     std::string accountId;
     std::string accountIdHash;
     uint32_t tokenId;
@@ -109,6 +110,7 @@ struct DmAccess {
     int32_t bindLevel;
     std::string networkId;
     std::vector<unsigned char> sessionKey;
+    std::string aclKey;
 };
 
 struct DmAuthContext {

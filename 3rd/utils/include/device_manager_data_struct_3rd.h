@@ -27,7 +27,7 @@ namespace DistributedHardware {
 
 typedef struct ProcessInfo3rd {
     uint32_t tokenId;
-    uint32_t uid;
+    int32_t uid;
     std::string processName;
     std::string businessName;
     int32_t userId;
