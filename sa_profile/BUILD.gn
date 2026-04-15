@@ -12,16 +12,27 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
-ohos_sa_profile("dm_sa_profile") {
-  sources = [ "4802.json" ]
+if (!device_manager_capability) {
+  group("dm_sa_profile") {
+    deps = []
+  }
 
-  part_name = "device_manager"
-}
+  group("device_manager.cfg") {
+    deps = []
+  }
+} else {
+  ohos_sa_profile("dm_sa_profile") {
+    sources = [ "4802.json" ]
 
-ohos_prebuilt_etc("device_manager.cfg") {
-  relative_install_dir = "init"
-  source = "device_manager.cfg"
-  part_name = "device_manager"
-  subsystem_name = "distributedhardware"
+    part_name = "device_manager"
+  }
+
+  ohos_prebuilt_etc("device_manager.cfg") {
+    relative_install_dir = "init"
+    source = "device_manager.cfg"
+    part_name = "device_manager"
+    subsystem_name = "distributedhardware"
+  }
 }
