@@ -40,7 +40,7 @@ namespace OHOS {
 namespace DistributedHardware {
 
 typedef struct DmAuthCallerInfo3rd {
-    uint32_t uid = 0;
+    int32_t uid = 0;
     int32_t userId = -1;
     uint32_t tokenId = 0;
     std::string processName = "";
@@ -92,6 +92,7 @@ private:
         const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd);
     void AuthDeviceAclImpl(const PeerTargetId3rd &targetId, const PinCodeInfo pinCodeInfo,
         const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd);
+    void SessionOpenFailed(int32_t sessionId, const ProcessInfo3rd &processInfo3rd);
 
 private:
     ffrt::mutex pinCodeLock_;

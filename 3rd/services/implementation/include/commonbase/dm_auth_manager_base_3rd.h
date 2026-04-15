@@ -101,7 +101,7 @@ public:
 
     virtual int32_t SetReasonAndFinish(int32_t reason, int32_t state);
 
-    virtual int32_t ImportAuthCodeAndUid(const std::string &pkgName, const std::string &authCode, uint32_t uid);
+    virtual int32_t ImportAuthCodeAndUid(const std::string &pkgName, const std::string &authCode, int32_t uid);
     virtual void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
 };
 }  // namespace DistributedHardware

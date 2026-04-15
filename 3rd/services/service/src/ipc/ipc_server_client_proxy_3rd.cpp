@@ -25,7 +25,7 @@ bool IpcServerClientProxy3rd::EncodeProcessInfo(const ProcessInfo3rd &processInf
 {
     bool bRet = true;
     bRet = (bRet && parcel.WriteUint32(processInfo.tokenId));
-    bRet = (bRet && parcel.WriteUint32(processInfo.uid));
+    bRet = (bRet && parcel.WriteInt32(processInfo.uid));
     bRet = (bRet && parcel.WriteString(processInfo.businessName));
     bRet = (bRet && parcel.WriteString(processInfo.processName));
     bRet = (bRet && parcel.WriteInt32(processInfo.userId));

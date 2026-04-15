@@ -38,7 +38,7 @@ public:
                 std::shared_ptr<IDeviceManagerServiceListener3rd> listener,
                 std::shared_ptr<HiChainAuthConnector3rd> hiChainAuthConnector);
     virtual ~AuthManager3rd();
-    int32_t ImportAuthCodeAndUid(const std::string &businessName, const std::string &authCode, uint32_t uid);
+    int32_t ImportAuthCodeAndUid(const std::string &businessName, const std::string &authCode, int32_t uid);
     void GetAuthParam(const PeerTargetId3rd &targetId, const std::map<std::string, std::string> &authParam);
     int32_t AuthDevice3rd(const PeerTargetId3rd &targetId, const std::map<std::string, std::string> &authParam,
         int32_t sessionId, uint64_t logicalSessionId);

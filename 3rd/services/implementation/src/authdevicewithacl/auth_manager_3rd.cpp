@@ -107,7 +107,7 @@ void AuthManager3rd::GetAuthParam(const PeerTargetId3rd &targetId, const std::ma
         context_->accesser.bindLevel = std::atoi(authParam.at(TAG_BIND_CALLER_BIND_LEVEL).c_str());
     }
     if (authParam.find(TAG_BIND_CALLER_UID) != authParam.end()) {
-        context_->accesser.uid = static_cast<uint32_t>(std::atoi(authParam.at(TAG_BIND_CALLER_UID).c_str()));
+        context_->accesser.uid = static_cast<int32_t>(std::atoi(authParam.at(TAG_BIND_CALLER_UID).c_str()));
     }
     if (authParam.find(TAG_BIND_CALLER_TOKENID) != authParam.end()) {
         context_->accesser.tokenId = static_cast<uint32_t>(std::atoi(authParam.at(TAG_BIND_CALLER_TOKENID).c_str()));
@@ -492,7 +492,7 @@ int32_t AuthManager3rd::GetPinCode(std::string &code)
 }
 
 int32_t AuthManager3rd::ImportAuthCodeAndUid(const std::string &businessName, const std::string &authCode,
-    uint32_t uid)
+    int32_t uid)
 {
     if (authCode.empty() || businessName.empty()) {
         LOGE("ImportAuthCode failed, authCode or businessName is empty");
