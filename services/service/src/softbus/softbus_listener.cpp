@@ -1647,6 +1647,17 @@ int32_t SoftbusListener::GetAttrFromExtraData(DmDeviceInfo &dmDevInfo, int32_t &
 int32_t SoftbusListener::GetAttrFromCustomData(const cJSON *const customDataJson, DmDeviceInfo &dmDevInfo,
     int32_t &actionId)
 {
+    auto copyStringToBuffer = [](char *dst, size_t dstSize, const std::string &src, const char *logTag) -> int32_t {
+        if (src.size() >= dstSize) {
+            LOGE("%{public}s size invalid.", logTag);
+            return ERR_DM_FAILED;
+        }
+        if (strcpy_s(dst, dstSize, src.c_str()) != DM_OK) {
+            LOGE("copy %{public}s failed.", logTag);
+            return ERR_DM_FAILED;
+        }
+        return DM_OK;
+    };
     cJSON *actionIdJson = cJSON_GetObjectItem(customDataJson, CUSTOM_DATA_ACTIONID);
     if (actionIdJson == NULL || !cJSON_IsNumber(actionIdJson)) {
         return DM_OK;
@@ -1657,14 +1668,10 @@ int32_t SoftbusListener::GetAttrFromCustomData(const cJSON *const customDataJson
         return DM_OK;
     }
     std::string networkId = networkIdJson->valuestring;
-    if (memcpy_s(dmDevInfo.deviceId, sizeof(dmDevInfo.deviceId), networkId.c_str(),
-        std::min(sizeof(dmDevInfo.deviceId), sizeof(networkId))) != DM_OK) {
-        LOGE("copy deviceId failed.");
+    if (copyStringToBuffer(dmDevInfo.deviceId, sizeof(dmDevInfo.deviceId), networkId, "deviceId") != DM_OK) {
         return ERR_DM_FAILED;
     }
-    if (memcpy_s(dmDevInfo.networkId, sizeof(dmDevInfo.networkId), networkId.c_str(),
-        std::min(sizeof(dmDevInfo.networkId), sizeof(networkId))) != DM_OK) {
-        LOGE("copy networkId failed.");
+    if (copyStringToBuffer(dmDevInfo.networkId, sizeof(dmDevInfo.networkId), networkId, "networkId") != DM_OK) {
         return ERR_DM_FAILED;
     }
     cJSON *displayNameJson = cJSON_GetObjectItem(customDataJson, CUSTOM_DATA_DISPLAY_NAME);
@@ -1672,9 +1679,7 @@ int32_t SoftbusListener::GetAttrFromCustomData(const cJSON *const customDataJson
         return DM_OK;
     }
     std::string displayName = displayNameJson->valuestring;
-    if (memcpy_s(dmDevInfo.deviceName, sizeof(dmDevInfo.deviceName), displayName.c_str(),
-        std::min(sizeof(dmDevInfo.deviceName), sizeof(displayName))) != DM_OK) {
-        LOGE("copy deviceName failed.");
+    if (copyStringToBuffer(dmDevInfo.deviceName, sizeof(dmDevInfo.deviceName), displayName, "deviceName") != DM_OK) {
         return ERR_DM_FAILED;
     }
     return DM_OK;
