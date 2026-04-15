@@ -207,9 +207,12 @@ int32_t AuthSrcPinAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
     ret = context->authStateMachine->WaitExpectEvent(ON_FINISH);
     if (ret == ON_FINISH) {
         LOGI("AuthSrcPinAuthDoneState::Action wait ON_FINISH done");
-        DerivativeSessionKey(context);
+        int32_t skRet = DerivativeSessionKey(context);
+        if (skRet != DM_OK) {
+            LOGE("DerivativeSessionKey failed %{public}d.", skRet);
+        }
         context->timer->DeleteTimer(std::string(WAIT_PIN_AUTH_TIMEOUT_TASK));
-        return DM_OK;
+        return skRet;
     } else if (ret == ON_ERROR) {
         LOGE("AuthSrcPinAuthDoneState::Action, ON_FINISH event not arriverd, maybe retry.");
         return DM_OK;
@@ -282,8 +285,7 @@ DmAuthStateType AuthSinkPinAuthDoneState::GetStateType()
 int32_t AuthSinkPinAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkPinAuthDoneState Action");
-    DerivativeSessionKey(context);
-    return DM_OK;
+    return DerivativeSessionKey(context);
 }
 
 int32_t AuthSinkPinAuthDoneState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
