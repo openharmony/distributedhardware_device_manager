@@ -1152,6 +1152,36 @@ HWTEST_F(SoftbusListenerTest, GetAttrFromCustomData_001, testing::ext::TestSize.
     int32_t actionId = 1;
     int32_t ret = softbusListener->GetAttrFromCustomData(customDataJson, dmDevInfo, actionId);
     EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(actionId, 14526);
+    EXPECT_STREQ(dmDevInfo.deviceId, "a******1");
+    EXPECT_STREQ(dmDevInfo.networkId, "a******1");
+    EXPECT_STREQ(dmDevInfo.deviceName, "displayNameInfo");
+    cJSON_Delete(customDataJson);
+}
+
+HWTEST_F(SoftbusListenerTest, GetAttrFromCustomData_002, testing::ext::TestSize.Level0)
+{
+    std::string networkId(DM_MAX_DEVICE_ID_LEN + 16, 'n');
+    std::string displayName(DM_MAX_DEVICE_NAME_LEN + 16, 'd');
+    cJSON* customDataJson = cJSON_CreateObject();
+    ASSERT_NE(customDataJson, nullptr);
+    cJSON_AddNumberToObject(customDataJson, "actionId", 24567);
+    cJSON_AddStringToObject(customDataJson, "networkId", networkId.c_str());
+    cJSON_AddStringToObject(customDataJson, "displayName", displayName.c_str());
+
+    DmDeviceInfo dmDevInfo;
+    ASSERT_EQ(memset_s(dmDevInfo.deviceId, sizeof(dmDevInfo.deviceId), 'x', sizeof(dmDevInfo.deviceId)), EOK);
+    ASSERT_EQ(memset_s(dmDevInfo.networkId, sizeof(dmDevInfo.networkId), 'x', sizeof(dmDevInfo.networkId)), EOK);
+    ASSERT_EQ(memset_s(dmDevInfo.deviceName, sizeof(dmDevInfo.deviceName), 'x', sizeof(dmDevInfo.deviceName)), EOK);
+    int32_t actionId = 1;
+
+    int32_t ret = softbusListener->GetAttrFromCustomData(customDataJson, dmDevInfo, actionId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(actionId, 24567);
+    EXPECT_EQ(dmDevInfo.deviceId[0], 'x');
+    EXPECT_EQ(dmDevInfo.networkId[0], 'x');
+    EXPECT_EQ(dmDevInfo.deviceName[0], 'x');
+    cJSON_Delete(customDataJson);
 }
 } // namespace
 } // namespace DistributedHardware
