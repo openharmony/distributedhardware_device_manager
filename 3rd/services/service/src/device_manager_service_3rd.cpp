@@ -185,7 +185,6 @@ int32_t DeviceManagerService3rd::AuthPincode(const PeerTargetId3rd &targetId,
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    LOGI("Start, deviceId: %{public}s", targetId.deviceId.c_str());
     if (!IsDMServiceImpl3rdReady()) {
         LOGE("failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -302,6 +301,8 @@ int32_t DeviceManagerService3rd::QueryTrustRelation(const std::string &businessN
             continue;
         }
         Access3rd &selfAccess = (access.trustDeviceId == access.accesser.deviceId) ? access.accessee : access.accesser;
+        Access3rd &remoteAccess =
+            (access.trustDeviceId == access.accesser.deviceId) ? access.accesser : access.accessee;
         if (selfAccess.userId != currentUserId) {
             continue;
         }
@@ -309,7 +310,7 @@ int32_t DeviceManagerService3rd::QueryTrustRelation(const std::string &businessN
         deviceInfo.trustDeviceId = access.trustDeviceId;
         deviceInfo.sessionKeyId = access.sessionKeyId;
         deviceInfo.createTime = access.createTime;
-        deviceInfo.userId = currentUserId;
+        deviceInfo.userId = remoteAccess.userId;
         deviceInfo.extra = access.extra;
         deviceInfo.bindLevel = access.bindLevel;
         deviceInfo.bindType = access.bindType;

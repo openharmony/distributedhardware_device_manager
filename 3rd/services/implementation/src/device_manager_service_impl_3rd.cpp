@@ -206,7 +206,7 @@ bool DeviceManagerServiceImpl3rd::IsInvalidPeerTargetId(const PeerTargetId3rd &t
 
 void DeviceManagerServiceImpl3rd::GetBindCallerInfo(DmAuthCallerInfo3rd &authCallerInfo3rd, ProcessInfo3rd &processInfo)
 {
-    uint32_t uid = OHOS::IPCSkeleton::GetCallingUid();
+    int32_t uid = OHOS::IPCSkeleton::GetCallingUid();
     int32_t userId = MultipleUserConnector3rd::GetCurrentAccountUserID();
     uint32_t callingTokenId = 0;
     MultipleUserConnector3rd::GetCallingTokenId(callingTokenId);
@@ -370,10 +370,19 @@ void DeviceManagerServiceImpl3rd::AuthDeviceAclImpl(const PeerTargetId3rd &targe
     std::unique_lock<ffrt::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
     if (!sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::milliseconds(OPEN_AUTH_SESSION_TIMEOUT),
         [&] { return sessionEnableCvReadyMap_[sessionId]; })) {
-        LOGE("wait session enable timeout or enable fail, sessionId: %{public}d.", sessionId);
+        SessionOpenFailed(sessionId, processInfo3rd);
         return;
     }
     authMgr->AuthDevice3rd(targetId, authParamTmp, sessionId, logicalSessionId);
+}
+
+void DeviceManagerServiceImpl3rd::SessionOpenFailed(int32_t sessionId, const ProcessInfo3rd &processInfo3rd)
+{
+    LOGE("wait session enable timeout or enable fail, sessionId: %{public}d.", sessionId);
+    if (listener_ == nullptr) {
+        return;
+    }
+    listener_->OnAuthResult(processInfo3rd, ERR_DM_AUTH_OPEN_SESSION_FAILED, 0, "");
 }
 
 int32_t DeviceManagerServiceImpl3rd::AuthDevice3rd(const PeerTargetId3rd &targetId,
@@ -384,7 +393,6 @@ int32_t DeviceManagerServiceImpl3rd::AuthDevice3rd(const PeerTargetId3rd &target
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    LOGI("Start, deviceId: %{public}s", targetId.deviceId.c_str());
     ProcessInfo3rd processInfo3rd;
     DmAuthCallerInfo3rd authCallerInfo3rd;
     GetBindCallerInfo(authCallerInfo3rd, processInfo3rd);

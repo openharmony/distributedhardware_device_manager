@@ -23,6 +23,7 @@
 #include "dm_auth_state_machine_3rd.h"
 #include "dm_crypto_3rd.h"
 #include "dm_log_3rd.h"
+#include "deviceprofile_connector_3rd.h"
 #include "hichain_auth_connector_3rd.h"
 #include "kv_adapter_manager_3rd.h"
 #include "multiple_user_connector_3rd.h"
@@ -79,8 +80,11 @@ void DmAuthState3rd::HandleAuthenticateTimeout(std::shared_ptr<DmAuthContext> co
 std::string DmAuthState3rd::BuildResultContent(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, "");
-    const DmAccess &selfAccess = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
     JsonObject contentObj;
+    if (context->reason != DM_OK) {
+        return contentObj.Dump();
+    }
+    const DmAccess &selfAccess = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
     JsonObject skJsonArr(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     JsonObject skObj;
     skObj[TAG_BUSINESS_NAME] = selfAccess.businessName;
@@ -110,6 +114,9 @@ void DmAuthState3rd::SourceFinish(std::shared_ptr<DmAuthContext> context)
     CHECK_NULL_VOID(context->listener);
     CHECK_NULL_VOID(context->timer);
     LOGI("SourceFinish reason:%{public}d, state:%{public}d", context->reason, context->state);
+    if (context->reason != DM_OK) {
+        BindFail(context);
+    }
     context->listener->OnAuthResult(context->processInfo, context->reason, context->state, BuildResultContent(context));
     context->timer->DeleteAll();
 }
@@ -121,10 +128,59 @@ void DmAuthState3rd::SinkFinish(std::shared_ptr<DmAuthContext> context)
     CHECK_NULL_VOID(context->timer);
     CHECK_NULL_VOID(context->authMessageProcessor);
     LOGI("SinkFinish reason:%{public}d, state:%{public}d", context->reason, context->state);
+    if (context->reason != DM_OK) {
+        BindFail(context);
+    }
     context->listener->OnAuthResult(context->processInfo, context->reason, context->state,
         BuildResultContent(context));
     context->timer->DeleteAll();
     context->authMessageProcessor->CreateAndSendMsg(DmMessageType::ACL_RESP_FINISH, context);
+}
+
+void DmAuthState3rd::BindFail(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    DmAccess &access = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
+    if (access.transmitSessionKeyId != 0) {
+        DeviceProfileConnector3rd::GetInstance().DeleteSessionKey(access.userId, access.transmitSessionKeyId);
+    }
+    auto &targetList = context->subjectProxyOnes;
+    if (context->IsProxyBind && !targetList.empty()) {
+        for (auto &app : targetList) {
+            DmProxyAccess &proxyAccess = context->direction == DM_AUTH_SOURCE ? app.proxyAccesser : app.proxyAccessee;
+            if (proxyAccess.transmitSessionKeyId == 0) {
+                continue;
+            }
+            DeviceProfileConnector3rd::GetInstance().DeleteSessionKey(access.userId, proxyAccess.transmitSessionKeyId);
+        }
+    }
+    DeleteAcl(context);
+}
+
+void DmAuthState3rd::DeleteAcl(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    DmAccess &access = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
+    int32_t ret = DM_OK;
+    if (!access.aclKey.empty()) {
+        ret = KVAdapterManager3rd::GetInstance().DeleteByKey(access.aclKey);
+        if (ret != DM_OK) {
+            LOGE("DeleteByKey ret :%{public}d", ret);
+        }
+    }
+    auto &targetList = context->subjectProxyOnes;
+    if (context->IsProxyBind && !targetList.empty()) {
+        for (auto &app : targetList) {
+            DmProxyAccess &proxyAccess = context->direction == DM_AUTH_SOURCE ? app.proxyAccesser : app.proxyAccessee;
+            if (proxyAccess.aclKey.empty()) {
+                continue;
+            }
+            ret = KVAdapterManager3rd::GetInstance().DeleteByKey(proxyAccess.aclKey);
+            if (ret != DM_OK) {
+                LOGE("proxy DeleteByKey ret :%{public}d", ret);
+            }
+        }
+    }
 }
 
 void DmAuthState3rd::SaveAcl(std::shared_ptr<DmAuthContext> context)
@@ -158,7 +214,7 @@ void DmAuthState3rd::SaveAcl(std::shared_ptr<DmAuthContext> context)
     accessControl3rd.accessee.uid = context->accessee.uid;
     accessControl3rd.accessee.businessName = context->accessee.businessName;
     accessControl3rd.accessee.version = context->accessee.dmVersion;
-    SaveAclToDb(context, accessControl3rd);
+    SaveAclToDb(context, accessControl3rd, selfAccess.aclKey);
     SaveProxyAcl(context);
 }
 
@@ -201,11 +257,12 @@ void DmAuthState3rd::SaveProxyAcl(std::shared_ptr<DmAuthContext> context)
         accessControl3rd.accessee.processName = app.proxyAccessee.processName;
         accessControl3rd.accessee.uid = app.proxyAccessee.uid;
         accessControl3rd.accessee.businessName = app.proxyAccessee.businessName;
-        SaveAclToDb(context, accessControl3rd);
+        SaveAclToDb(context, accessControl3rd, selfProxyAccess.aclKey);
     }
 }
 
-void DmAuthState3rd::SaveAclToDb(std::shared_ptr<DmAuthContext> context, const AccessControl3rd &accessControl3rd)
+void DmAuthState3rd::SaveAclToDb(std::shared_ptr<DmAuthContext> context, const AccessControl3rd &accessControl3rd,
+    std::string &aclKey)
 {
     CHECK_NULL_VOID(context);
     std::string key = ACL_PREFIX + accessControl3rd.accesser.deviceId +
@@ -229,6 +286,7 @@ void DmAuthState3rd::SaveAclToDb(std::shared_ptr<DmAuthContext> context, const A
     JsonObject aclJsonObj{};
     aclJsonObj = accessControl3rd;
     std::string aclStr = aclJsonObj.Dump();
+    aclKey = key;
     ret = KVAdapterManager3rd::GetInstance().PutByKey(key, aclStr);
     LOGI("result: %{public}d", ret);
 }
