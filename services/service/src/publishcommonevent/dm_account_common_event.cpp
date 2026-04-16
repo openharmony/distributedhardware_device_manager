@@ -154,7 +154,9 @@ void DmAccountEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         beforeUserId = currentUserId;
         accountValidEvent = true;
     }
-    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED) {
+    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED ||
+        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_FOREGROUND ||
+        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_BACKGROUND) {
         currentUserId = data.GetCode();
         beforeUserId = currentUserId;
         accountValidEvent = true;
