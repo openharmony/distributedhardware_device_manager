@@ -2478,6 +2478,8 @@ void DeviceManagerService::SubscribeAccountCommonEvent()
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED);
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_STOPPED);
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_UNLOCKED);
+    AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_FOREGROUND);
+    AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_BACKGROUND);
     if (accountCommonEventManager_->SubscribeAccountCommonEvent(AccountCommonEventVec, callback)) {
         LOGI("Success");
     }
@@ -2537,7 +2539,9 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
             MultipleUserConnector::GetCurrentDMAccountInfo());
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenNickChange();
-    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_STOPPED && IsPC()) {
+    } else if ((commonEventType == CommonEventSupport::COMMON_EVENT_USER_STOPPED && IsPC()) ||
+        commonEventType == CommonEventSupport::COMMON_EVENT_USER_FOREGROUND ||
+        commonEventType == CommonEventSupport::COMMON_EVENT_USER_BACKGROUND) {
         CHECK_NULL_VOID(DMCommTool::GetInstance());
         DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
             [this, commonEventType] () {
@@ -2667,6 +2671,23 @@ void DeviceManagerService::PushPeerUdids(const std::map<std::string, int32_t> &c
     }
 }
 
+void DeviceManagerService::SendCommonEventBroadCast(const std::string commonEventType,
+    std::vector<std::string> &bleUdids, const std::vector<int32_t> &foregroundUserIds,
+    const std::vector<int32_t> &backgroundUserIds)
+{
+    if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_UNLOCKED ||
+        commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED ||
+        commonEventType == CommonEventSupport::COMMON_EVENT_USER_FOREGROUND ||
+        commonEventType == CommonEventSupport::COMMON_EVENT_USER_BACKGROUND) {
+        SendCommonEventBroadCast(bleUdids, foregroundUserIds, backgroundUserIds, true);
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_STOPPED) {
+        SendCommonEventBroadCast(bleUdids, foregroundUserIds, backgroundUserIds, false);
+    } else {
+        LOGE("commonEventType not match");
+        return;
+    }
+}
+
 void DeviceManagerService::NotifyRemoteAccountCommonEvent(const std::string commonEventType,
     const std::string &localUdid, const std::vector<std::string> &peerUdids,
     const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds)
@@ -2706,15 +2727,7 @@ void DeviceManagerService::NotifyRemoteAccountCommonEvent(const std::string comm
     }
     if (!bleUdids.empty()) {
         UpdateAcl(localUdid, bleUdids, foregroundUserIds, backgroundUserIds);
-        if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_UNLOCKED ||
-            commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
-            SendCommonEventBroadCast(bleUdids, foregroundUserIds, backgroundUserIds, true);
-        } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_STOPPED) {
-            SendCommonEventBroadCast(bleUdids, foregroundUserIds, backgroundUserIds, false);
-        } else {
-            LOGE("commonEventType not match");
-            return;
-        }
+        SendCommonEventBroadCast(commonEventType, bleUdids, foregroundUserIds, backgroundUserIds);
     }
     if (!wifiDevices.empty()) {
         NotifyRemoteAccountCommonEventByWifi(localUdid, wifiDevices, foregroundUserIds, backgroundUserIds);
