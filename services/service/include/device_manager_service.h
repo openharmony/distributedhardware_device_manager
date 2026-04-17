@@ -467,6 +467,8 @@ private:
     void SendCommonEventBroadCast(const std::vector<std::string> &peerUdids,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
         bool isNeedResponse);
+    void SendCommonEventBroadCast(const std::string commonEventType, std::vector<std::string> &bleUdids,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
     void HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId, int32_t beforeUserId);
     void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid);
     void HandleAccountLogoutEvent(int32_t userId, const std::string &accountId,
