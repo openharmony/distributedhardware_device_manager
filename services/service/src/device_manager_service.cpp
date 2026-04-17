@@ -2483,13 +2483,6 @@ void DeviceManagerService::SubscribeAccountCommonEvent()
     if (accountCommonEventManager_->SubscribeAccountCommonEvent(AccountCommonEventVec, callback)) {
         LOGI("Success");
     }
-    CHECK_NULL_VOID(DMCommTool::GetInstance());
-    std::string commonEventType = CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
-    DMCommTool::GetInstance()->Init();
-    DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
-        [this, commonEventType] () {
-            DeviceManagerService::HandleAccountCommonEvent(commonEventType);
-        });
     return;
 }
 
