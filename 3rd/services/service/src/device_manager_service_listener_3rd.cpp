@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include <set>
+#include <vector>
 #include <sstream>
 
 #include "device_manager_service_listener_3rd.h"
@@ -23,6 +23,7 @@
 #include "dm_log_3rd.h"
 #include "dm_error_type_3rd.h"
 #include "device_manager_data_struct_3rd.h"
+#include "dm_auth_info_3rd.h"
 #include "ipc_remote_broker_3rd.h"
 
 namespace OHOS {
@@ -41,6 +42,23 @@ void DeviceManagerServiceListener3rd::OnAuthResult(const ProcessInfo3rd &process
         LOGE("SendRequest fail");
         return;
     }
+}
+
+void DeviceManagerServiceListener3rd::OnAuthResult(const ProcessInfo3rd &processInfo, int32_t result, int32_t status,
+    std::vector<TrustDeviceInfo3rd> &deviceInfos, const std::string &authContent)
+{
+    sptr<IpcRemoteBroker3rd> listener = IpcServiceStub3rd::GetInstance().GetDmListener(processInfo);
+    if (listener == nullptr) {
+        FreeDeviceInfos(deviceInfos);
+        LOGE("cannot get listener for package:%{public}s.", processInfo.businessName.c_str());
+        return;
+    }
+    if (listener->SendAuthResult(processInfo, result, status, deviceInfos, authContent) != DM_OK) {
+        FreeDeviceInfos(deviceInfos);
+        LOGE("SendRequest fail");
+        return;
+    }
+    FreeDeviceInfos(deviceInfos);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

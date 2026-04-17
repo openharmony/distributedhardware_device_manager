@@ -16,9 +16,11 @@
 #ifndef OHOS_DM_IPC_SERVER_CLIENT_PROXY_3RD_H
 #define OHOS_DM_IPC_SERVER_CLIENT_PROXY_3RD_H
 
+#include <vector>
 #include "ipc_remote_broker_3rd.h"
 #include "iremote_proxy.h"
 #include "device_manager_data_struct_3rd.h"
+#include "dm_auth_info_3rd.h"
 
 namespace OHOS { class MessageOption; }
 namespace OHOS { class MessageParcel; }
@@ -31,9 +33,12 @@ public:
     ~IpcServerClientProxy3rd() {};
     int32_t SendCmd(int32_t cmdCode, const ProcessInfo3rd &processInfo, int32_t result, int32_t status,
         const std::string &authContent) override;
+    int32_t SendAuthResult(const ProcessInfo3rd &processInfo, int32_t result,
+        int32_t status, std::vector<TrustDeviceInfo3rd> &deviceInfos, const std::string &authContent) override;
 private:
     static inline BrokerDelegator<IpcServerClientProxy3rd> delegator_;
     bool EncodeProcessInfo(const ProcessInfo3rd &processInfo, MessageParcel &parcel);
+    bool EncodeTrustDeviceInfos(std::vector<TrustDeviceInfo3rd> &deviceInfos, MessageParcel &parcel);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -252,6 +252,33 @@ void DeviceManagerService3rd::OnAuth3rdBytesReceived(int sessionId, const void *
     dmServiceImpl3rd_->OnAuth3rdBytesReceived(sessionId, data, dataLen);
 }
 
+int DeviceManagerService3rd::OnAuthCred3rdSessionOpened(int sessionId, int result)
+{
+    if (!IsDMServiceImpl3rdReady()) {
+        LOGE("OnSessionOpened failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl3rd_->OnAuthCred3rdSessionOpened(sessionId, result);
+}
+
+void DeviceManagerService3rd::OnAuthCred3rdSessionClosed(int sessionId)
+{
+    if (!IsDMServiceImpl3rdReady()) {
+        LOGE("OnSessionClosed failed, instance not init or init failed.");
+        return;
+    }
+    dmServiceImpl3rd_->OnAuthCred3rdSessionClosed(sessionId);
+}
+
+void DeviceManagerService3rd::OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+    if (!IsDMServiceImpl3rdReady()) {
+        LOGE("OnBytesReceived failed, instance not init or init failed.");
+        return;
+    }
+    dmServiceImpl3rd_->OnAuthCred3rdBytesReceived(sessionId, data, dataLen);
+}
+
 int32_t DeviceManagerService3rd::AuthDevice3rd(const PeerTargetId3rd &targetId,
     const std::map<std::string, std::string> &authParam)
 {
@@ -514,6 +541,31 @@ int32_t DeviceManagerService3rd::HandleAccountLogoutEvent(int32_t userId, const 
         }
         DeviceProfileConnector3rd::GetInstance().DeleteSessionKey(userId, access.sessionKeyId);
     }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService3rd::AuthCredential(const PeerTargetId3rd &targetId,
+    std::map<std::string, std::string> &authParam)
+{
+    if (!PermissionManager3rd::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (IsInvalidPeerTargetId(targetId)) {
+        LOGE("Invalid parameter, params are empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    if (!IsDMServiceImpl3rdReady()) {
+        LOGE("failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    int32_t ret = dmServiceImpl3rd_->AuthCredential(targetId, authParam);
+    if (ret != DM_OK) {
+        LOGE("AuthCredential failed, ret: %{public}d", ret);
+        return ret;
+    }
+    LOGI("Completed");
     return DM_OK;
 }
 } // namespace DistributedHardware

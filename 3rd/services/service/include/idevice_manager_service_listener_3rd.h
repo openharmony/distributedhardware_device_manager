@@ -17,6 +17,7 @@
 #define OHOS_I_DM_SERVICE_LISTENER_3RD_H
 
 #include "device_manager_data_struct_3rd.h"
+#include "dm_auth_info_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -26,6 +27,8 @@ public:
 
     virtual void OnAuthResult(const ProcessInfo3rd &processInfo3rd, int32_t result, int32_t status,
         const std::string &authContent) = 0;
+    virtual void OnAuthResult(const ProcessInfo3rd &processInfo3rd, int32_t result, int32_t status,
+        std::vector<TrustDeviceInfo3rd> &deviceInfos, const std::string &authContent) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

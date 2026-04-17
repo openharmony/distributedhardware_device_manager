@@ -58,6 +58,7 @@ public:
     int32_t QueryTrustRelation(const std::string &businessName, std::vector<TrustDeviceInfo3rd> &trustedDeviceList);
     int32_t DeleteTrustRelation(const std::string &businessName, const std::string &peerDeviceId,
         std::map<std::string, std::string> &unbindParam);
+    int32_t AuthCredential(const PeerTargetId3rd &targetId, const std::string &authParam);
 private:
     void SubscribeDMSAChangeListener();
     int32_t ClientInit();

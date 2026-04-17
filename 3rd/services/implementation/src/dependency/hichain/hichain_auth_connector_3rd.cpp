@@ -16,7 +16,7 @@
 #include "hichain_auth_connector_3rd.h"
 
 #include <cstdlib>
-
+#include "cJSON.h"
 #include "parameter.h"
 
 #include "dm_anonymous_3rd.h"
@@ -191,6 +191,81 @@ int32_t HiChainAuthConnector3rd::ProcessCredData(int64_t authReqId, const std::s
         return ERR_DM_FAILED;
     }
     return DM_OK;
+}
+
+int32_t HiChainAuthConnector3rd::AuthCredential(int32_t osAccountId, int64_t authReqId, const std::string &credId)
+{
+    LOGI("start credId=%{public}s", GetAnonyString(credId).c_str());
+    if (credId.empty()) {
+        LOGE("credId is empty.");
+        return ERR_DM_FAILED;
+    }
+
+    JsonObject jsonAuthParam;
+    jsonAuthParam["credId"] = credId;
+    std::string authParams = jsonAuthParam.Dump();
+
+    const CredAuthManager *credAuthManager = GetCredAuthInstance();
+    int32_t ret = credAuthManager->authCredential(osAccountId, authReqId, authParams.c_str(), &deviceAuthCallback_);
+    if (ret != HC_SUCCESS) {
+        LOGE("failed ret %{public}d.", ret);
+        return ERR_DM_FAILED;
+    }
+    LOGI("leave.");
+    return DM_OK;
+}
+
+int32_t HiChainAuthConnector3rd::QueryCredentialInfo(int32_t userId, const JsonObject &queryParams,
+    JsonObject &resultJson)
+{
+    int32_t ret;
+    const CredManager *cm = GetCredMgrInstance();
+    char *credIdList = nullptr;
+    ret = cm->queryCredentialByParams(userId, queryParams.Dump().c_str(), &credIdList);
+    if (ret != DM_OK) {
+        LOGE("fail to query credential id list with ret %{public}d.", ret);
+        FreeJsonString(credIdList);
+        return ERR_DM_FAILED;
+    }
+    JsonObject credIdListJson(credIdList);
+    FreeJsonString(credIdList);
+    if (credIdListJson.IsDiscarded()) {
+        LOGE("credential id list to jsonStr error");
+        return ERR_DM_FAILED;
+    }
+
+    for (const auto& element : credIdListJson.Items()) {
+        if (!element.IsString()) {
+            continue;
+        }
+        std::string credId = element.Get<std::string>();
+
+        char *returnCredInfo = nullptr;
+        ret = cm->queryCredInfoByCredId(userId, credId.c_str(), &returnCredInfo);
+        if (ret != DM_OK) {
+            LOGE("fail to query credential info.");
+            FreeJsonString(returnCredInfo);
+            return ERR_DM_FAILED;
+        }
+        JsonObject credInfoJson(returnCredInfo);
+        FreeJsonString(returnCredInfo);
+        if (credInfoJson.IsDiscarded()) {
+            LOGE("credential info jsonStr error");
+            return ERR_DM_FAILED;
+        }
+
+        resultJson.Insert(credId, credInfoJson);
+    }
+
+    return DM_OK;
+}
+
+void HiChainAuthConnector3rd::FreeJsonString(char *jsonStr)
+{
+    if (jsonStr != nullptr) {
+        cJSON_free(jsonStr);
+        jsonStr = nullptr;
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

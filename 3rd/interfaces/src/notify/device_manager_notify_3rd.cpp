@@ -144,5 +144,27 @@ void DeviceManagerNotify3rd::OnAuthResult(const ProcessInfo3rd &processInfo3rd, 
     }
     tempCbk->OnAuthResult(processInfo3rd, result, status, authContent);
 }
+
+void DeviceManagerNotify3rd::OnAuthResult(const ProcessInfo3rd &processInfo3rd, int32_t result, int32_t status,
+    std::vector<TrustDeviceInfo3rd> &deviceInfos, const std::string &authContent)
+{
+    std::shared_ptr<DmAuthCallback> tempCbk;
+    {
+        std::lock_guard<ffrt::mutex> autoLock(dmAuthCallbackLock_);
+        if (dmAuthCallbackMap_.find(processInfo3rd) == dmAuthCallbackMap_.end()) {
+            FreeDeviceInfos(deviceInfos);
+            LOGE("No callback found.");
+            return;
+        }
+        tempCbk = dmAuthCallbackMap_[processInfo3rd];
+        dmAuthCallbackMap_.erase(processInfo3rd);
+    }
+    if (tempCbk == nullptr) {
+        FreeDeviceInfos(deviceInfos);
+        LOGE("callback is nullptr.");
+        return;
+    }
+    tempCbk->OnAuthResult(processInfo3rd, result, status, deviceInfos, authContent);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -26,6 +26,7 @@ namespace DistributedHardware {
     std::string ConvertMapToJsonString(const std::map<std::string, std::string> &paramMap);
     void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, std::string> &paramMap);
     std::string GetAnonyInt32(const int32_t value);
+    std::string GetAnonyUint32(const uint32_t value);
     std::string GetAnonyString(const std::string &value);
     std::string GetAnonyJsonString(const std::string &value);
     bool IsString(const JsonItemObject &jsonObj, const std::string &key);
@@ -34,6 +35,7 @@ namespace DistributedHardware {
     bool IsInt64(const JsonItemObject &jsonObj, const std::string &key);
     bool IsUint64(const JsonItemObject &jsonObj, const std::string &key);
     bool IsUint32(const JsonItemObject &jsonObj, const std::string &key);
+    bool IsUint8(const JsonItemObject &jsonObj, const std::string &key);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_3RD_H

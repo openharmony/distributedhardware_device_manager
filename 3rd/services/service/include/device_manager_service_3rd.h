@@ -54,6 +54,10 @@ public:
     void OnAuth3rdSessionClosed(int sessionId);
     void OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
+    int OnAuthCred3rdSessionOpened(int sessionId, int result);
+    void OnAuthCred3rdSessionClosed(int sessionId);
+    void OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+    int32_t AuthCredential(const PeerTargetId3rd &targetId, std::map<std::string, std::string> &authParam);
 private:
     bool IsDMServiceImpl3rdReady();
     int32_t GenRandInt(int32_t randMin, int32_t randMax);

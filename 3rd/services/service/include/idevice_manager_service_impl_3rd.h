@@ -41,6 +41,11 @@ public:
     virtual int OnAuth3rdSessionOpened(int sessionId, int result) = 0;
     virtual void OnAuth3rdSessionClosed(int sessionId) = 0;
     virtual void OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen) = 0;
+
+    virtual int OnAuthCred3rdSessionOpened(int sessionId, int result) = 0;
+    virtual void OnAuthCred3rdSessionClosed(int sessionId) = 0;
+    virtual void OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen) = 0;
+    virtual int32_t AuthCredential(const PeerTargetId3rd &targetId, std::map<std::string, std::string> &authParam) = 0;
 };
 
 using CreateDMServiceImpl3rdFuncPtr = IDeviceManagerServiceImpl3rd *(*)(void);

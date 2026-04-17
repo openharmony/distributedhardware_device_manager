@@ -18,9 +18,11 @@
 
 #include <cstdint>
 #include <memory>
+#include <vector>
 
 #include "iremote_broker.h"
 #include "device_manager_data_struct_3rd.h"
+#include "dm_auth_info_3rd.h"
 
 namespace OHOS { class MessageOption; }
 namespace OHOS { class MessageParcel; }
@@ -31,6 +33,8 @@ public:
     ~IpcRemoteBroker3rd() override {}
     virtual int32_t SendCmd(int32_t cmdCode, const ProcessInfo3rd &processInfo, int32_t result, int32_t status,
         const std::string &authContent) = 0;
+    virtual int32_t SendAuthResult(const ProcessInfo3rd &processInfo, int32_t result, int32_t status,
+        std::vector<TrustDeviceInfo3rd> &deviceInfos, const std::string &authContent) = 0;
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.distributedhardware.devicemanager");
 };

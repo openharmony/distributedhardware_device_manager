@@ -452,5 +452,43 @@ int32_t DeviceManagerImpl3rd::DeleteTrustRelation(const std::string &businessNam
     }
     return reply.ReadInt32();
 }
+
+int32_t DeviceManagerImpl3rd::AuthCredential(const PeerTargetId3rd &targetId, const std::string &authParam)
+{
+    if (IsInvalidPeerTargetId(targetId)) {
+        LOGE("AuthCredential failed: invalid targetId.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    if (authParam.empty()) {
+        LOGE("AuthCredential failed: authParam is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    MessageParcel data;
+    WRITE_INTERFACE_TOKEN(data, ERR_DM_IPC_WRITE_FAILED);
+    if (!data.WriteString(targetId.deviceId) ||
+        !data.WriteString(targetId.brMac) ||
+        !data.WriteString(targetId.bleMac) ||
+        !data.WriteString(targetId.wifiIp) ||
+        !data.WriteUint16(targetId.wifiPort) ||
+        !data.WriteString(authParam)) {
+        LOGE("AuthCredential write request failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    MessageParcel reply;
+    int32_t ret = SendRequest(AUTH_CREDENTIAL_3RD, data, reply);
+    if (ret != DM_OK) {
+        LOGE("AuthCredential send request failed: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    READ_HELPER_RET(reply, Int32, ret, ERR_DM_IPC_READ_FAILED);
+    if (ret != DM_OK) {
+        LOGE("AuthCredential failed, result: %{public}d", ret);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

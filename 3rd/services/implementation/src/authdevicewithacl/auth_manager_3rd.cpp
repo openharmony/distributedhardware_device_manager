@@ -73,6 +73,12 @@ AuthManager3rd::~AuthManager3rd()
     LOGI("AuthManager3rd destructor");
 }
 
+int32_t AuthManager3rd::AuthCredential(const PeerTargetId3rd &targetId,
+    const std::map<std::string, std::string> &authParam, int32_t sessionId, uint64_t logicalSessionId)
+{
+    return ERR_DM_UNSUPPORTED_METHOD;
+}
+
 int32_t AuthManager3rd::AuthDevice3rd(const PeerTargetId3rd &targetId,
     const std::map<std::string, std::string> &authParam, int32_t sessionId, uint64_t logicalSessionId)
 {

@@ -12,9 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <vector>
+#include "ipc_interface_code_3rd.h"
 #include "ipc_server_client_proxy_3rd.h"
 #include "ipc_utils_3rd.h"
+#include "dm_auth_info_3rd.h"
 #include "dm_error_type_3rd.h"
 #include "dm_log_3rd.h"
 
@@ -65,6 +67,76 @@ int32_t IpcServerClientProxy3rd::SendCmd(int32_t cmdCode, const ProcessInfo3rd &
     }
     LOGI("Completed");
     return DM_OK;
+}
+
+int32_t IpcServerClientProxy3rd::SendAuthResult(const ProcessInfo3rd &processInfo, int32_t result,
+    int32_t status, std::vector<TrustDeviceInfo3rd> &deviceInfos, const std::string &authContent)
+{
+    LOGI("SendAuthResult");
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        LOGE("remote service null");
+        return ERR_DM_POINT_NULL;
+    }
+    MessageParcel data;
+    WRITE_INTERFACE_TOKEN(data, ERR_DM_IPC_WRITE_FAILED);
+    if (!EncodeProcessInfo(processInfo, data)) {
+        LOGE("write processInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    WRITE_HELPER_RET(data, Int32, result, ERR_DM_IPC_WRITE_FAILED);
+    WRITE_HELPER_RET(data, Int32, status, ERR_DM_IPC_WRITE_FAILED);
+    WRITE_HELPER_RET(data, String, authContent, ERR_DM_IPC_WRITE_FAILED);
+    if (!EncodeTrustDeviceInfos(deviceInfos, data)) {
+        LOGE("write trustDeviceInfos failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = { MessageOption::TF_SYNC };
+
+    if (remote->SendRequest(ON_AUTH_RESULT_TRUST_3RD, data, reply, option) != DM_OK) {
+        LOGE("SendRequest fail");
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    int32_t ret = DM_OK;
+    READ_HELPER_RET(reply, Int32, ret, ERR_DM_IPC_READ_FAILED);
+    if (ret != DM_OK) {
+        LOGE("SendRequest failed, ret: %{public}d", ret);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+bool IpcServerClientProxy3rd::EncodeTrustDeviceInfos(std::vector<TrustDeviceInfo3rd> &deviceInfos,
+    MessageParcel &parcel)
+{
+    if (!parcel.WriteInt32(static_cast<int32_t>(deviceInfos.size()))) {
+        LOGE("write deviceInfos size failed");
+        return false;
+    }
+    for (auto &deviceInfo : deviceInfos) {
+        if (deviceInfo.sessionKey.key == nullptr && deviceInfo.sessionKey.keyLen > 0) {
+            LOGE("sessionKey key is null");
+            return false;
+        }
+        if (!parcel.WriteString(deviceInfo.trustDeviceId) ||
+            !parcel.WriteString(deviceInfo.deviceName) ||
+            !parcel.WriteString(deviceInfo.businessName) ||
+            !parcel.WriteString(deviceInfo.extra) ||
+            !parcel.WriteUint16(deviceInfo.deviceTypeId) ||
+            !parcel.WriteInt32(deviceInfo.sessionKeyId) ||
+            !parcel.WriteInt32(deviceInfo.userId) ||
+            !parcel.WriteInt32(deviceInfo.bindLevel) ||
+            !parcel.WriteInt32(deviceInfo.bindType) ||
+            !parcel.WriteInt64(deviceInfo.createTime) ||
+            !parcel.WriteUint32(deviceInfo.sessionKey.keyLen) ||
+            !parcel.WriteBuffer(deviceInfo.sessionKey.key, deviceInfo.sessionKey.keyLen)) {
+            LOGE("write deviceInfos item failed");
+            return false;
+        }
+    }
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

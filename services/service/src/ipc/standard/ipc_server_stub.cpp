@@ -59,7 +59,7 @@ ON_AUTH_CODE_INVALID, SERVER_SERVICE_STATE_NOTIFY};
 
 const std::unordered_set<int32_t> CLIENT_CODE_3RD { INIT_DEVICE_MANAGER, UNINIT_DEVICE_MANAGER, IMPORT_PINCODE_3RD,
     GENERATE_PINCODE_3RD, AUTH_PINCODE_3RD, AUTH_DEVICE_3RD, SAVE_TRUST_RELATION_3RD, QUERY_TRUST_RELATION_3RD,
-    DELETE_TRUST_RELATION_3RD, ON_AUTH_RESULT_3RD };
+    DELETE_TRUST_RELATION_3RD, ON_AUTH_RESULT_3RD, AUTH_CREDENTIAL_3RD};
 
 constexpr const char* LIB_IPC_SERVICE_STUB_3RD_NAME = "libdevicemanager3rdservice.z.so";
 
@@ -584,6 +584,33 @@ void IpcServerStub::OnAuth3rdBytesReceived(int sessionId, const void *data, unsi
 {
     if (IsIpcServiceStub3rdReady()) {
         ipcServiceStub3rd_->OnAuth3rdBytesReceived(sessionId, data, dataLen);
+        return;
+    }
+    LOGE("isload3rdSo failed");
+}
+
+int IpcServerStub::OnAuthCred3rdSessionOpened(int sessionId, int result)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        return ipcServiceStub3rd_->OnAuthCred3rdSessionOpened(sessionId, result);
+    }
+    LOGE("isload3rdSo failed");
+    return ERR_DM_FAILED;
+}
+
+void IpcServerStub::OnAuthCred3rdSessionClosed(int sessionId)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        ipcServiceStub3rd_->OnAuthCred3rdSessionClosed(sessionId);
+        return;
+    }
+    LOGE("isload3rdSo failed");
+}
+
+void IpcServerStub::OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        ipcServiceStub3rd_->OnAuthCred3rdBytesReceived(sessionId, data, dataLen);
         return;
     }
     LOGE("isload3rdSo failed");

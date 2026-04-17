@@ -92,5 +92,16 @@ int32_t MultipleUserConnector3rd::GetForegroundUserIds(
     }
     return DM_OK;
 }
+
+std::string MultipleUserConnector3rd::GetOhosAccountNameByUserId(int32_t userId)
+{
+    OhosAccountInfo accountInfo;
+    ErrCode ret = OhosAccountKits::GetInstance().GetOsAccountDistributedInfo(userId, accountInfo);
+    if (ret != 0 || accountInfo.name_ == "") {
+        LOGE("error ret: %{public}d", ret);
+        return "";
+    }
+    return accountInfo.name_;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

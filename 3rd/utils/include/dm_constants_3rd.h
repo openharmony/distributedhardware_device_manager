@@ -82,6 +82,10 @@ extern const char* TAG_BIND_CALLER_BIND_LEVEL;
 // Device
 constexpr int32_t DEVICE_UUID_LENGTH = 65;
 constexpr int32_t DM_POINT_TO_POINT = 256;
+
+extern const char* TAG_OPENID_HASH;
+extern const char* TAG_CRED_TYPE;
+extern const char* TAG_OWNER_ID;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_3RD_H

@@ -16,6 +16,7 @@
 #ifndef OHOS_DM_ACL_AUTH_INFO_3RD_H
 #define OHOS_DM_ACL_AUTH_INFO_3RD_H
 
+#include <vector>
 #include <string>
 #include <cstdint>
 
@@ -54,15 +55,17 @@ struct AccessControl3rd {
 };
 
 struct TrustDeviceInfo3rd {
-    // deviceIdHash
     std::string trustDeviceId = "";
-    int32_t sessionKeyId = -1;
-    DmSessionKey sessionKey;
-    int64_t createTime = 0;
-    int32_t userId = -1;
+    std::string deviceName = "";
+    std::string businessName = "";
     std::string extra = "";
+    uint16_t deviceTypeId = 0;
+    int32_t sessionKeyId = -1;
+    int32_t userId = -1;
     int32_t bindLevel = -1;
     int32_t bindType = -1;
+    int64_t createTime = 0;
+    DmSessionKey sessionKey;
 };
 
 void ToJson(JsonItemObject &itemObject, const Access3rd &access);
@@ -71,6 +74,7 @@ void ToJson(JsonItemObject &itemObject, const AccessControl3rd &accessControl);
 void FromJson(const JsonItemObject &itemObject, AccessControl3rd &accessControl);
 void ToJson(JsonItemObject &itemObject, const TrustDeviceInfo3rd &trustDeviceInfo);
 void FromJson(const JsonItemObject &itemObject, TrustDeviceInfo3rd &trustDeviceInfo);
+void FreeDeviceInfos(std::vector<TrustDeviceInfo3rd> &deviceInfos);
 
 } // namespace DistributedHardware
 } // namespace OHOS

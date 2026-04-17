@@ -42,6 +42,10 @@ public:
     virtual int OnAuth3rdSessionOpened(int sessionId, int result) = 0;
     virtual void OnAuth3rdSessionClosed(int sessionId) = 0;
     virtual void OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen) = 0;
+
+    virtual int OnAuthCred3rdSessionOpened(int sessionId, int result) = 0;
+    virtual void OnAuthCred3rdSessionClosed(int sessionId) = 0;
+    virtual void OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen) = 0;
     virtual int32_t HandleUserRemoved(int32_t removedUserId) = 0;
     virtual int32_t HandleAccountLogoutEvent(int32_t userId, const std::string &accountId) = 0;
 };
