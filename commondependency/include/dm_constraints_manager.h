@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_CONSTRAINS_MANAGER_H
-#define OHOS_CONSTRAINS_MANAGER_H
+#ifndef OHOS_DM_CONSTRAINTS_MANAGER_H
+#define OHOS_DM_CONSTRAINTS_MANAGER_H
 
 #include "dm_single_instance.h"
 #include "os_account_constraint_subscriber.h"
@@ -64,4 +64,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_CONSTRAINS_MANAGER_H
+#endif // OHOS_DM_CONSTRAINTS_MANAGER_H

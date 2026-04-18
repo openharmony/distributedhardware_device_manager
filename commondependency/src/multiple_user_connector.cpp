@@ -36,6 +36,8 @@ std::string MultipleUserConnector::accountName_ = "";
 std::mutex MultipleUserConnector::lock_;
 std::map<int32_t, DMAccountInfo> MultipleUserConnector::dmAccountInfoMap_ = {};
 std::mutex MultipleUserConnector::dmAccountInfoMaplock_;
+std::mutex MultipleUserConnector::currentForgroundUserIdLock_;
+int32_t MultipleUserConnector::currentForgroundUserId_ = -1;
 #ifndef OS_ACCOUNT_PART_EXISTS
 const int32_t DEFAULT_OS_ACCOUNT_ID = 0; // 0 is the default id when there is no os_account part
 #endif // OS_ACCOUNT_PART_EXISTS
@@ -449,11 +451,13 @@ DM_EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(int32_t displayId)
 
 DM_EXPORT void MultipleUserConnector::UpdateForgroundUserId()
 {
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     {
         std::lock_guard<std::mutex> lock(currentForgroundUserIdLock_);
         currentForgroundUserId_ = userId;
     }
+#endif
 }
 
 int32_t MultipleUserConnector::GetForgroundUserId(void)
