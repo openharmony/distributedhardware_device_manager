@@ -180,7 +180,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutAccessControlList_201, testing::ex
     DmAccessee dmAccessee;
     EXPECT_CALL(*distributedDeviceProfileClientMock_, PutAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, dmAccesser, dmAccessee);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, DeleteSigTrustACL_201, testing::ext::TestSize.Level1)
