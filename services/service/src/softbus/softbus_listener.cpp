@@ -1656,24 +1656,14 @@ int32_t SoftbusListener::GetAttrFromCustomData(const cJSON *const customDataJson
     if (networkIdJson == NULL || !cJSON_IsString(networkIdJson)) {
         return DM_OK;
     }
-    const char *networkId = cJSON_GetStringValue(networkIdJson);
-    if (networkId == nullptr) {
-        return DM_OK;
-    }
-    size_t networkIdLen = strlen(networkId);
-    if (networkIdLen >= sizeof(dmDevInfo.deviceId)) {
-        LOGE("deviceId size invalid.");
-        return ERR_DM_FAILED;
-    }
-    if (strcpy_s(dmDevInfo.deviceId, sizeof(dmDevInfo.deviceId), networkId) != DM_OK) {
+    std::string networkId = networkIdJson->valuestring;
+    if (memcpy_s(dmDevInfo.deviceId, sizeof(dmDevInfo.deviceId), networkId.c_str(),
+        networkId.size() + 1) != DM_OK) {
         LOGE("copy deviceId failed.");
         return ERR_DM_FAILED;
     }
-    if (networkIdLen >= sizeof(dmDevInfo.networkId)) {
-        LOGE("networkId size invalid.");
-        return ERR_DM_FAILED;
-    }
-    if (strcpy_s(dmDevInfo.networkId, sizeof(dmDevInfo.networkId), networkId) != DM_OK) {
+    if (memcpy_s(dmDevInfo.networkId, sizeof(dmDevInfo.networkId), networkId.c_str(),
+        networkId.size() + 1) != DM_OK) {
         LOGE("copy networkId failed.");
         return ERR_DM_FAILED;
     }
@@ -1681,22 +1671,14 @@ int32_t SoftbusListener::GetAttrFromCustomData(const cJSON *const customDataJson
     if (displayNameJson == NULL || !cJSON_IsString(displayNameJson)) {
         return DM_OK;
     }
-    const char *displayName = cJSON_GetStringValue(displayNameJson);
-    if (displayName == nullptr) {
-        return DM_OK;
-    }
-    size_t displayNameLen = strlen(displayName);
-    if (displayNameLen >= sizeof(dmDevInfo.deviceName)) {
-        LOGE("deviceName size invalid.");
-        return ERR_DM_FAILED;
-    }
-    if (strcpy_s(dmDevInfo.deviceName, sizeof(dmDevInfo.deviceName), displayName) != DM_OK) {
+    std::string displayName = displayNameJson->valuestring;
+    if (memcpy_s(dmDevInfo.deviceName, sizeof(dmDevInfo.deviceName), displayName.c_str(),
+        displayName.size() + 1) != DM_OK) {
         LOGE("copy deviceName failed.");
         return ERR_DM_FAILED;
     }
     return DM_OK;
 }
-
 
 void SoftbusListener::GetActionId(const std::string &deviceId, int32_t &actionId)
 {
