@@ -61,6 +61,7 @@
 #endif // SUPPORT_WIFI
 #endif
 #include "ipc_server_stub.h"
+#include "constrains_manager.h"
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.z.so";
@@ -485,10 +486,11 @@ DM_EXPORT void DeviceManagerService::UnRegisterCallerAppId(const std::string &pk
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                    std::vector<DmDeviceInfo> &deviceList)
 {
-    (void)extra;
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
+    CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
+    if (DmOsAccountConstraintSubscriber::GetInstance().CheckOsAccountConstraintEnabled(
+            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
     }
     bool isOnlyShowNetworkId = !(PermissionManager::GetInstance().CheckAccessServicePermission() ||
         PermissionManager::GetInstance().CheckDataSyncPermission());
@@ -536,10 +538,11 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
 int32_t DeviceManagerService::GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                       std::vector<DmDeviceInfo> &deviceList)
 {
-    (void)extra;
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName or extra is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
+    CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
+    if (DmOsAccountConstraintSubscriber::GetInstance().CheckOsAccountConstraintEnabled(
+            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
     }
     if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetAllTrustedDeviceList.", pkgName.c_str());
@@ -581,14 +584,15 @@ int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std
 int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info)
 {
     LOGI("Begin networkId %{public}s.", GetAnonyString(networkId).c_str());
+    CHECK_EMPTY_RETURN(networkId, ERR_DM_INPUT_PARA_INVALID);
+    if (CheckConstraintEnabledByNetworkId(networkId)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
+    }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission() &&
         !PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call GetDeviceInfo.");
         return ERR_DM_NO_PERMISSION;
-    }
-    if (networkId.empty()) {
-        LOGE("Invalid parameter, networkId is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     std::string peerDeviceId = "";
@@ -622,11 +626,7 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
             }
         }
     }
-    ret = softbusListener_->GetDeviceInfo(networkId, info);
-    if (ret != DM_OK) {
-        LOGE("Get DeviceInfo By NetworkId failed, ret : %{public}d", ret);
-    }
-    return ret;
+    return softbusListener_->GetDeviceInfo(networkId, info);
 }
 
 int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
@@ -770,14 +770,15 @@ int32_t DeviceManagerService::GetLocalDeviceNameOld(std::string &deviceName)
 int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                  std::string &udid)
 {
+    CHECK_EMPTY_RETURN(netWorkId, ERR_DM_INPUT_PARA_INVALID);
+    CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
+    if (CheckConstraintEnabledByNetworkId(networkId)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
+    }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetUdidByNetworkId.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
-    }
-    if (pkgName.empty() || netWorkId.empty()) {
-        LOGE("Invalid parameter, pkgName: %{public}s, netWorkId: %{public}s", pkgName.c_str(),
-            GetAnonyString(netWorkId).c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
     }
     return SoftbusListener::GetUdidByNetworkId(netWorkId.c_str(), udid);
 }
@@ -785,14 +786,15 @@ int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, con
 int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                  std::string &uuid)
 {
+    CHECK_EMPTY_RETURN(netWorkId, ERR_DM_INPUT_PARA_INVALID);
+    CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
+    if (CheckConstraintEnabledByNetworkId(networkId)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
+    }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetUuidByNetworkId.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
-    }
-    if (pkgName.empty() || netWorkId.empty()) {
-        LOGE("Invalid parameter, pkgName: %{public}s, netWorkId: %{public}s", pkgName.c_str(),
-            GetAnonyString(netWorkId).c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
     }
     return SoftbusListener::GetUuidByNetworkId(netWorkId.c_str(), uuid);
 }
@@ -833,6 +835,11 @@ int32_t DeviceManagerService::UnPublishDeviceDiscovery(const std::string &pkgNam
 int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int32_t authType,
                                                  const std::string &deviceId, const std::string &extra)
 {
+    if (DmOsAccountConstraintSubscriber::GetInstance().CheckOsAccountConstraintEnabled(
+            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        LOGI("contraint enable is true");
+        return ERR_DM_CONSTRAINT_ENABLE;
+    }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call AuthenticateDevice.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
@@ -935,6 +942,11 @@ int32_t DeviceManagerService::StopAuthenticateDevice(const std::string &pkgName)
 int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
     const std::string &bindParam)
 {
+    if (DmOsAccountConstraintSubscriber::GetInstance().CheckOsAccountConstraintEnabled(
+            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        LOGI("contraint enable is true");
+        return ERR_DM_CONSTRAINT_ENABLE;
+    }
     if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call BindDevice.");
         return ERR_DM_NO_PERMISSION;
@@ -1552,9 +1564,10 @@ int32_t DeviceManagerService::NotifyEvent(const std::string &pkgName, const int3
 int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
     std::string &uuid)
 {
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
+    CHECK_EMPTY_RETURN(networkId, ERR_DM_INPUT_PARA_INVALID);
+    if (CheckConstraintEnabledByNetworkId(networkId)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
     }
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetUuidByNetworkId(networkId.c_str(), uuid);
@@ -1615,14 +1628,15 @@ int32_t DeviceManagerService::CheckApiPermission(int32_t permissionLevel)
 int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                         int32_t &networkType)
 {
+    CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
+    CHECK_EMPTY_RETURN(netWorkId, ERR_DM_INPUT_PARA_INVALID);
+    if (CheckConstraintEnabledByNetworkId(networkId)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
+    }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetNetworkTypeByNetworkId.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
-    }
-    if (pkgName.empty() || netWorkId.empty()) {
-        LOGE("Invalid parameter, pkgName: %{public}s, netWorkId: %{public}s", pkgName.c_str(),
-            GetAnonyString(netWorkId).c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     return softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
@@ -2057,12 +2071,16 @@ int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
 int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam)
 {
-    LOGI("start");
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (DmOsAccountConstraintSubscriber::GetInstance().CheckOsAccountConstraintEnabled(
+            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        LOGI("contraint enable is true");
+        return ERR_DM_CONSTRAINT_ENABLE;
+    }
     if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty() || pkgName == std::string(DM_PKG_NAME)) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -2376,6 +2394,12 @@ int32_t DeviceManagerService::GetDeviceSecurityLevel(const std::string &pkgName,
 {
     LOGI("Begin pkgName: %{public}s, networkId: %{public}s",
         pkgName.c_str(), GetAnonyString(networkId).c_str());
+    CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
+    CHECK_EMPTY_RETURN(networkId, ERR_DM_INPUT_PARA_INVALID);
+    if (CheckConstraintEnabledByNetworkId(networkId)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
+    }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetDeviceSecurityLevel.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
@@ -2447,6 +2471,7 @@ int32_t DeviceManagerService::InitAccountInfo()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     SubscribeAccountCommonEvent();
     LOGI("Success.");
+    DmConstrainsManager::GetInctance().SubscribeOsAccountConstraints({DM_ACCOUNT_CONSTRAINT});
 #endif
     return DM_OK;
 }
@@ -2519,6 +2544,7 @@ void DeviceManagerService::SubscribeScreenLockEvent()
 DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
     const std::string commonEventType, int32_t currentUserId, int32_t beforeUserId)
 {
+    MultipleUserConnector::UpdateForgroundUserId();
     if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         HandleUserSwitchEventCallback(commonEventType, currentUserId, beforeUserId);
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGIN) {
@@ -4041,14 +4067,15 @@ int32_t DeviceManagerService::GetDeviceScreenStatus(const std::string &pkgName, 
     int32_t &screenStatus)
 {
     LOGI("Begin pkgName: %{public}s, networkId: %{public}s", pkgName.c_str(), GetAnonyString(networkId).c_str());
+    CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
+    CHECK_EMPTY_RETURN(networkId, ERR_DM_INPUT_PARA_INVALID);
+    if (CheckConstraintEnabledByNetworkId(networkId)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
+    }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetDeviceScreenStatus.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
-    }
-    if (pkgName.empty() || networkId.empty()) {
-        LOGE("Invalid parameter, pkgName: %{public}s, networkId: %{public}s", pkgName.c_str(),
-            GetAnonyString(networkId).c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetDeviceScreenStatus(networkId.c_str(), screenStatus);
@@ -4168,6 +4195,11 @@ int32_t DeviceManagerService::RegDevStateCallbackToService(const std::string &pk
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList)
 {
     LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
+    if (DmOsAccountConstraintSubscriber::GetInstance().CheckOsAccountConstraintEnabled(
+            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
+    }
     if (pkgName.empty() || pkgName == std::string(DM_PKG_NAME)) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -5246,6 +5278,12 @@ void DeviceManagerService::InitTaskOfDelTimeOutAcl()
 int32_t DeviceManagerService::BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam)
 {
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (DmOsAccountConstraintSubscriber::GetInstance().CheckOsAccountConstraintEnabled(
+            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        LOGI("contraint enable is true");
+        return ERR_DM_CONSTRAINT_ENABLE;
+    }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
@@ -5254,7 +5292,6 @@ int32_t DeviceManagerService::BindServiceTarget(const std::string &pkgName, cons
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (targetId.serviceId == 0) {
         LOGE("Invalid parameter, service id is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -5603,14 +5640,17 @@ int32_t DeviceManagerService::GetLocalServiceInfoByServiceId(int64_t serviceId, 
 int32_t DeviceManagerService::GetTrustServiceInfo(const std::string &pkgName,
     const std::map<std::string, std::string> &paramMap, std::vector<DmServiceInfo> &serviceList)
 {
-    LOGI("Start");
+    LOGI("Start pkgName %{public}s.", pkgName.c_str());
+    CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
+    if (DmOsAccountConstraintSubscriber::GetInstance().CheckOsAccountConstraintEnabled(
+            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
+
+    }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
-    }
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!PermissionManager::GetInstance().CheckSystemSA(pkgName)) {
         LOGE("The caller does not have system SA permission to call");
@@ -5676,6 +5716,10 @@ int32_t DeviceManagerService::GetPeerServiceInfoByServiceId(const std::string &n
     DmRegisterServiceInfo &serviceInfo)
 {
     LOGI("serviceId: %{public}" PRId64, serviceId);
+    if (CheckConstraintEnabledByNetworkId(networkId)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
+    }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
@@ -5879,6 +5923,18 @@ int32_t DeviceManagerService::HandleServiceStatusChange(DmDeviceState devState, 
     int32_t result = dmServiceImplExtResident_->HandleServiceStatusChange(devState, peerUdid);
     LOGI("result: %{public}d", result);
     return result;
+}
+
+bool DeviceManagerService::CheckConstraintEnabledByNetworkId(std::string &networkId)
+{
+    DmDeviceInfo deviceInfo;
+    SoftbusCache::GetInstance().GetLocalDeviceInfo(deviceInfo);
+    if (networkId == std::string(deviceInfo.networkId)) {
+        LOGI("get local deviceinfo, networkId %{public}s.", GetAnonyString(networkId).c_str());
+        return true;
+    }
+    return DmOsAccountConstraintSubscriber::GetInstance().CheckOsAccountConstraintEnabled(
+        MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT);
 }
 #endif
 } // namespace DistributedHardware

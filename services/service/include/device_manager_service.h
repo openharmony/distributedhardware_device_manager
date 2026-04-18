@@ -507,6 +507,7 @@ private:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void ParseAppUnBindRelationShip(const RelationShipChangeMsg &relationShipMsg);
 #endif
+    bool CheckConstraintEnabledByNetworkId(std::string &networkId);
 
 private:
     bool isImplsoLoaded_ = false;

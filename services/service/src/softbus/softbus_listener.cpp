@@ -39,6 +39,7 @@
 #include "system_ability_definition.h"
 
 #include "ipc_server_stub.h"
+#include "constrains_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -677,8 +678,10 @@ void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *ms
 
 void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
 {
-    if (device == nullptr) {
-        LOGE("[SOFTBUS]device is null.");
+    CHECK_NULL_VOID(device);
+    if (DmOsAccountConstraintSubscriber::GetInstance().CheckOsAccountConstraintEnabled(
+            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        LOGI("contraint enable is true");
         return;
     }
     DmDeviceInfo dmDevInfo;
@@ -709,8 +712,7 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
         GetAnonyString(dmDevInfo.deviceName).c_str(), dmDevInfo.deviceTypeId, dmDevInfo.range,
         device->isOnline, device->capabilityBitmap[0]);
     int32_t actionId = 0;
-    int32_t ret = GetAttrFromExtraData(dmDevInfo, actionId);
-    if (ret != DM_OK) {
+    if (GetAttrFromExtraData(dmDevInfo, actionId) != DM_OK) {
         LOGE("GetAttrFromExtraData failed");
         return;
     }
