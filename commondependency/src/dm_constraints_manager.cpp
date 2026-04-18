@@ -43,7 +43,7 @@ int32_t DmConstrainsManager::SubscribeOsAccountConstraints(const std::set<std::s
         std::lock_guard<std::mutex> lock(constraintSubscriberLock_);
         constraintSubscriber_ = std::make_shared<DmOsAccountConstraintSubscriber>(*this, constraintSet);
     }
-    ErrCode errcode = OHOS::AccountSA::SubscribeOsAccountConstraints(constraintSubscriber_);
+    ErrCode errcode = AccountSA::OsAccountManager::SubscribeOsAccountConstraints(constraintSubscriber_);
     if (errcode != ERR_OK) {
         LOGE("subscribe constraints failed errcode %{public}d.", errcode);
         return ERR_DM_FAILED;
