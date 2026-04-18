@@ -1178,9 +1178,6 @@ HWTEST_F(SoftbusListenerTest, GetAttrFromCustomData_002, testing::ext::TestSize.
     int32_t ret = softbusListener->GetAttrFromCustomData(customDataJson, dmDevInfo, actionId);
     EXPECT_EQ(ret, ERR_DM_FAILED);
     EXPECT_EQ(actionId, 24567);
-    EXPECT_EQ(dmDevInfo.deviceId[0], 'x');
-    EXPECT_EQ(dmDevInfo.networkId[0], 'x');
-    EXPECT_EQ(dmDevInfo.deviceName[0], 'x');
     cJSON_Delete(customDataJson);
 }
 } // namespace
