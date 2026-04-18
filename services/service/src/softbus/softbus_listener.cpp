@@ -1647,17 +1647,6 @@ int32_t SoftbusListener::GetAttrFromExtraData(DmDeviceInfo &dmDevInfo, int32_t &
 int32_t SoftbusListener::GetAttrFromCustomData(const cJSON *const customDataJson, DmDeviceInfo &dmDevInfo,
     int32_t &actionId)
 {
-    auto copyStringToBuffer = [](char *dst, size_t dstSize, const std::string &src, const char *logTag) -> int32_t {
-        if (src.size() >= dstSize) {
-            LOGE("%{public}s size invalid.", logTag);
-            return ERR_DM_FAILED;
-        }
-        if (strcpy_s(dst, dstSize, src.c_str()) != DM_OK) {
-            LOGE("copy %{public}s failed.", logTag);
-            return ERR_DM_FAILED;
-        }
-        return DM_OK;
-    };
     cJSON *actionIdJson = cJSON_GetObjectItem(customDataJson, CUSTOM_DATA_ACTIONID);
     if (actionIdJson == NULL || !cJSON_IsNumber(actionIdJson)) {
         return DM_OK;
@@ -1667,23 +1656,47 @@ int32_t SoftbusListener::GetAttrFromCustomData(const cJSON *const customDataJson
     if (networkIdJson == NULL || !cJSON_IsString(networkIdJson)) {
         return DM_OK;
     }
-    std::string networkId = networkIdJson->valuestring;
-    if (copyStringToBuffer(dmDevInfo.deviceId, sizeof(dmDevInfo.deviceId), networkId, "deviceId") != DM_OK) {
+    const char *networkId = cJSON_GetStringValue(networkIdJson);
+    if (networkId == nullptr) {
+        return DM_OK;
+    }
+    size_t networkIdLen = strlen(networkId);
+    if (networkIdLen >= sizeof(dmDevInfo.deviceId)) {
+        LOGE("deviceId size invalid.");
         return ERR_DM_FAILED;
     }
-    if (copyStringToBuffer(dmDevInfo.networkId, sizeof(dmDevInfo.networkId), networkId, "networkId") != DM_OK) {
+    if (strcpy_s(dmDevInfo.deviceId, sizeof(dmDevInfo.deviceId), networkId) != DM_OK) {
+        LOGE("copy deviceId failed.");
+        return ERR_DM_FAILED;
+    }
+    if (networkIdLen >= sizeof(dmDevInfo.networkId)) {
+        LOGE("networkId size invalid.");
+        return ERR_DM_FAILED;
+    }
+    if (strcpy_s(dmDevInfo.networkId, sizeof(dmDevInfo.networkId), networkId) != DM_OK) {
+        LOGE("copy networkId failed.");
         return ERR_DM_FAILED;
     }
     cJSON *displayNameJson = cJSON_GetObjectItem(customDataJson, CUSTOM_DATA_DISPLAY_NAME);
     if (displayNameJson == NULL || !cJSON_IsString(displayNameJson)) {
         return DM_OK;
     }
-    std::string displayName = displayNameJson->valuestring;
-    if (copyStringToBuffer(dmDevInfo.deviceName, sizeof(dmDevInfo.deviceName), displayName, "deviceName") != DM_OK) {
+    const char *displayName = cJSON_GetStringValue(displayNameJson);
+    if (displayName == nullptr) {
+        return DM_OK;
+    }
+    size_t displayNameLen = strlen(displayName);
+    if (displayNameLen >= sizeof(dmDevInfo.deviceName)) {
+        LOGE("deviceName size invalid.");
+        return ERR_DM_FAILED;
+    }
+    if (strcpy_s(dmDevInfo.deviceName, sizeof(dmDevInfo.deviceName), displayName) != DM_OK) {
+        LOGE("copy deviceName failed.");
         return ERR_DM_FAILED;
     }
     return DM_OK;
 }
+
 
 void SoftbusListener::GetActionId(const std::string &deviceId, int32_t &actionId)
 {
