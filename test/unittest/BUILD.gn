@@ -70,6 +70,7 @@ group("unittest") {
     ":UTTest_dm_screen_common_event",
     ":UTTest_dm_service_hichain_connector",
     ":UTTest_dm_service_info",
+    ":UTTest_dm_data_struct_3rd",
     ":UTTest_dm_discovery_service_param",
     ":UTTest_dm_register_service_state",
     ":UTTest_process_info",
@@ -2614,6 +2615,31 @@ ohos_unittest("UTTest_auth_message_processor") {
 }
 
 ## UTTest_auth_message_processor }}}
+
+## UnitTest UTTest_dm_data_struct_3rd {{{
+ohos_unittest("UTTest_dm_data_struct_3rd") {
+  module_out_path = module_out_path
+  sources = [ "UTTest_dm_data_struct_3rd.cpp" ]
+  deps = [
+    ":device_manager_test_common",
+    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
+    "${devicemanager_path}/interfaces/kits/js:devicemanager",
+    "${devicemanager_path}/radar:devicemanagerradartest",
+    "${ext_path}/pin_auth:devicemanagerext_pin_auth",
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${json_path}:devicemanagerjson",
+    "${services_path}:devicemanagerservicetest",
+    "${servicesimpl_path}:devicemanagerserviceimpl",
+    "${softbuscache_parh}:dmdevicecache",
+    "${utils_path}:devicemanagerutilstest",
+  ]
+  external_deps = [
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+## UnitTest UTTest_dm_data_struct_3rd }}}
 
 ## UnitTest UTTest_auth_response_state {{{
 ohos_unittest("UTTest_auth_response_state") {
