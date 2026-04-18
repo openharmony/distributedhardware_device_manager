@@ -738,7 +738,7 @@ void DeviceManagerNotify::UnRegisterBindCallback(const std::string &pkgName, con
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    std::lock_guard<std::mutex> autoLock(lock_);
+    std::lock_guard<std::mutex> autoLock(bindLock_);
     if (bindCallback_.count(pkgName) > 0) {
         bindCallback_[pkgName].erase(targetId);
         if (bindCallback_[pkgName].empty()) {
