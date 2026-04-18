@@ -18,6 +18,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <set>
 #include <string>
 #include <vector>
@@ -83,6 +84,7 @@ public:
 
 private:
     static std::shared_ptr<ISoftbusSessionCallback> sessionCallback_;
+    static std::mutex sessionCallbackMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
