@@ -470,7 +470,7 @@ int32_t MultipleUserConnector::GetForgroundUserId(void)
         std::lock_guard<std::mutex> lock(currentForgroundUserIdLock_);
         userId = currentForgroundUserId_;
     }
-    if (userId = -1) {
+    if (userId == -1) {
         std::vector<int> ids;
         ErrCode ret = OsAccountManager::QueryActiveOsAccountIds(ids);
         if (ret != 0 || ids.empty()) {

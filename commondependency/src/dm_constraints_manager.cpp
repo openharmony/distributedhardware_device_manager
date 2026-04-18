@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t DEFAULT_USERID = -1;
-DM_IMPLEMENT_SINGLE_INSTANCE(DmOsAccountConstraintSubscriber);
+DM_IMPLEMENT_SINGLE_INSTANCE(DmConstrainsManager);
 void DmOsAccountConstraintSubscriber::OnConstraintChanged(const AccountSA::OsAccountConstraintStateData &constrainData)
 {
     LOGI("userId %{public}d, constraint %{public}s, isEnable %{public}d.",
@@ -65,7 +65,7 @@ bool DmConstrainsManager::CheckOsAccountConstraintEnabled(int32_t userId,
     }
     LOGI("get constraint from cache failed, retry from account manager.");
     bool isEnabled = false;
-    ErrCode errcode = OHOS::AccountSA::CheckOsAccountConstraintEnabled(userId, constraint, isEnabled);
+    ErrCode errcode = AccountSA::OsAccountManager::CheckOsAccountConstraintEnabled(userId, constraint, isEnabled);
     if (errcode != ERR_OK) {
         LOGE("check constraint failed errcode %{public}d.", errcode);
         return false;

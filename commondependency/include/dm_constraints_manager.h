@@ -27,7 +27,7 @@ struct DmOsAccountConstraintStateData {
     std::string constraint = "";
     bool operator==(const DmOsAccountConstraintStateData &other) const
     {
-        return (userId == other.userId) && (constraint == other.constraint)
+        return (userId == other.userId) && (constraint == other.constraint);
     }
 
     bool operator<(const DmOsAccountConstraintStateData &other) const
@@ -60,7 +60,7 @@ private:
     std::mutex constraintSubscriberLock_;
     std::shared_ptr<DmOsAccountConstraintSubscriber> constraintSubscriber_;
     std::mutex dmConstrainDataLock_;
-    std::map<DmOsAccountConstraintStateData, OsAccountConstraintStateData> dmConstrainDatas_;
+    std::map<DmOsAccountConstraintStateData, AccountSA::OsAccountConstraintStateData> dmConstrainDatas_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
