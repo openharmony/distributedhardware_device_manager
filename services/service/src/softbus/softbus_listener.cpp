@@ -29,11 +29,11 @@
 #include "dm_softbus_cache.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "datetime_ex.h"
-#include "constrains_manager.h"
 #include "dm_transport_msg.h"
 #include "ffrt.h"
 #include "kv_adapter_manager.h"
 #include "multiple_user_connector.h"
+#include "dm_constraints_manager.h"
 #endif
 #include "ipc_skeleton.h"
 #include "parameter.h"

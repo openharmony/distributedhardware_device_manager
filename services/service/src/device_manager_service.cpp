@@ -5661,7 +5661,6 @@ int32_t DeviceManagerService::GetTrustServiceInfo(const std::string &pkgName,
             MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
         LOGI("contraint enable is true");
         return DM_OK;
-
     }
 #endif
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {

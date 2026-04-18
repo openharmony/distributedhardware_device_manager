@@ -1194,6 +1194,7 @@ ohos_unittest("UTTest_softbus_listener") {
     "hitrace:hitrace_meter",
     "kv_store:distributeddata_inner",
     "safwk:system_ability_fwk",
+    "os_account:libaccountkits",
   ]
 }
 
@@ -1246,6 +1247,7 @@ ohos_unittest("UTTest_softbus_listener_two") {
     "kv_store:distributeddata_inner",
     "samgr:samgr_proxy",
     "safwk:system_ability_fwk",
+    "os_account:libaccountkits",
   ]
 }
 
