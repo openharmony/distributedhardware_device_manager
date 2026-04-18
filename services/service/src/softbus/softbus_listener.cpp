@@ -1658,12 +1658,12 @@ int32_t SoftbusListener::GetAttrFromCustomData(const cJSON *const customDataJson
     }
     std::string networkId = networkIdJson->valuestring;
     if (memcpy_s(dmDevInfo.deviceId, sizeof(dmDevInfo.deviceId), networkId.c_str(),
-        networkId.size() + 1) != DM_OK) {
+        networkId.size()) != DM_OK) {
         LOGE("copy deviceId failed.");
         return ERR_DM_FAILED;
     }
     if (memcpy_s(dmDevInfo.networkId, sizeof(dmDevInfo.networkId), networkId.c_str(),
-        networkId.size() + 1) != DM_OK) {
+        networkId.size()) != DM_OK) {
         LOGE("copy networkId failed.");
         return ERR_DM_FAILED;
     }
@@ -1673,7 +1673,7 @@ int32_t SoftbusListener::GetAttrFromCustomData(const cJSON *const customDataJson
     }
     std::string displayName = displayNameJson->valuestring;
     if (memcpy_s(dmDevInfo.deviceName, sizeof(dmDevInfo.deviceName), displayName.c_str(),
-        displayName.size() + 1) != DM_OK) {
+        displayName.size()) != DM_OK) {
         LOGE("copy deviceName failed.");
         return ERR_DM_FAILED;
     }
