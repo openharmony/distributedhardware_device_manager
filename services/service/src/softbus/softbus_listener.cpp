@@ -680,7 +680,7 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
 {
     CHECK_NULL_VOID(device);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (DmOsAccountConstraintSubscriber::GetInstance().CheckOsAccountConstraintEnabled(
+    if (DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
             MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
         LOGI("contraint enable is true");
         return;
