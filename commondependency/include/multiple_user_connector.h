@@ -142,8 +142,8 @@ private:
     static std::mutex lock_;
     static std::map<int32_t, DMAccountInfo> dmAccountInfoMap_;
     static std::mutex dmAccountInfoMaplock_;
-    std::mutex currentForgroundUserIdLock_;
-    int32_t currentForgroundUserId_ = -1;
+    static std::mutex currentForgroundUserIdLock_;
+    static int32_t currentForgroundUserId_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

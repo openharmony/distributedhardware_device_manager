@@ -29,6 +29,7 @@
 #include "dm_softbus_cache.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "datetime_ex.h"
+#include "constrains_manager.h"
 #include "dm_transport_msg.h"
 #include "ffrt.h"
 #include "kv_adapter_manager.h"
@@ -39,7 +40,6 @@
 #include "system_ability_definition.h"
 
 #include "ipc_server_stub.h"
-#include "constrains_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -679,11 +679,13 @@ void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *ms
 void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
 {
     CHECK_NULL_VOID(device);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (DmOsAccountConstraintSubscriber::GetInstance().CheckOsAccountConstraintEnabled(
             MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
         LOGI("contraint enable is true");
         return;
     }
+#endif
     DmDeviceInfo dmDevInfo;
     ConvertDeviceInfoToDmDevice(*device, dmDevInfo);
     {
