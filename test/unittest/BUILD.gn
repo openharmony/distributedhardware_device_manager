@@ -33,7 +33,6 @@ group("unittest") {
     ":UTTest_auth_response_state",
     ":UTTest_crypto_mgr",
     ":UTTest_device_manager_impl",
-    ":UTTest_device_manager_impl_3rd",
     ":UTTest_device_manager_notify",
     ":UTTest_device_manager_service",
     ":UTTest_device_manager_service_impl",
@@ -2712,48 +2711,6 @@ ohos_unittest("ipc_client_manager_test") {
 }
 
 ## UnitTest ipc_client_manager_test }}}
-
-## UnitTest UTTest_device_manager_impl_3rd {{{
-ohos_unittest("UTTest_device_manager_impl_3rd") {
-  module_out_path = module_out_path
- 
-  include_dirs = [
-    "${devicemanager_path}/3rd/interfaces/include/interface",
-    "${devicemanager_path}/3rd/interfaces/include/ipc",
-    "${devicemanager_path}/3rd/interfaces/include/notify",
-    "${devicemanager_path}/3rd/utils/include",
-    "${devicemanager_path}/3rd/utils/include/ipc",
-  ]
- 
-  sources = [
-    "UTTest_device_manager_impl_3rd.cpp",
-    "mock/system_ability_manager_client_mock.cpp",
-  ]
- 
-  deps = [
-    ":device_manager_test_common",
-    "${devicemanager_path}/3rd/interfaces:devicemanager3rdsdk",
-  ]
- 
-  external_deps = [
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "googletest:gmock_main",
-    "hilog:libhilog",
-    "ipc:ipc_core",
-    "samgr:samgr_proxy",
-  ]
- 
-  cflags = [
-    "-Wall",
-    "-Werror",
-    "-g3",
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-}
- 
-## UnitTest UTTest_device_manager_impl_3rd }}}
 
 ## UnitTest UTTest_dm_auth_manager_first {{{
 ohos_unittest("UTTest_dm_auth_manager_first") {
