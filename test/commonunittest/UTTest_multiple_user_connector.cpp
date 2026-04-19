@@ -165,6 +165,47 @@ HWTEST_F(MultipleUserConnectorTest, GetUserIdByDisplayId_001, testing::ext::Test
     EXPECT_EQ(userId, expected);
 }
 
+/**
+ * @tc.name: UpdateForgroundUserId_001
+ * @tc.desc:  Update foreground user ID and verify the operation completes successfully
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(MultipleUserConnectorTest, UpdateForgroundUserId_001, testing::ext::TestSize.Level1)
+{
+    MultipleUserConnector::UpdateForgroundUserId();
+    int32_t userId = MultipleUserConnector::GetForgroundUserId();
+    EXPECT_GE(userId, 0);
+}
+
+/**
+ * @tc.name: GetForgroundUserId_001
+ * @tc.desc:  Get foreground user ID after update and verify the return value
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(MultipleUserConnectorTest, GetForgroundUserId_001, testing::ext::TestSize.Level1)
+{
+    MultipleUserConnector::UpdateForgroundUserId();
+    int32_t userId = MultipleUserConnector::GetForgroundUserId();
+    int32_t expectedUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    EXPECT_EQ(userId, expectedUserId);
+}
+
+/**
+ * @tc.name: GetForgroundUserId_002
+ * @tc.desc:  Get foreground user ID multiple times and verify consistency
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(MultipleUserConnectorTest, GetForgroundUserId_002, testing::ext::TestSize.Level1)
+{
+    MultipleUserConnector::UpdateForgroundUserId();
+    int32_t userIdFirst = MultipleUserConnector::GetForgroundUserId();
+    int32_t userIdSecond = MultipleUserConnector::GetForgroundUserId();
+    EXPECT_EQ(userIdFirst, userIdSecond);
+}
+
 }
 } // namespace DistributedHardware
 } // namespace OHOS
