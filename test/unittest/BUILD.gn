@@ -2167,7 +2167,6 @@ ohos_unittest("UTTest_permission_manager") {
     "${ext_path}/pin_auth:devicemanagerext_pin_auth",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${json_path}:devicemanagerjson",
-    "${mini_tools_kits_path}/native_cpp:devicemanagerminisdk",
     "${services_path}:devicemanagerservicetest",
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${softbuscache_parh}:dmdevicecache",
