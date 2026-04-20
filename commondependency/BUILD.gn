@@ -64,6 +64,7 @@ ohos_shared_library("devicemanagerdependency") {
 
     sources = [
       "src/deviceprofile_connector.cpp",
+      "src/dm_constraints_manager.cpp",
       "src/multiple_user_connector.cpp",
     ]
 
@@ -142,6 +143,7 @@ ohos_shared_library("devicemanagerdependencytest") {
 
     sources = [
       "src/deviceprofile_connector.cpp",
+      "src/dm_constraints_manager.cpp",
       "src/multiple_user_connector.cpp",
     ]
 

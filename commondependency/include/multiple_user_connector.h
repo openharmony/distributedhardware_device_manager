@@ -133,6 +133,8 @@ public:
     DM_EXPORT static void GetCallingTokenId(uint32_t &tokenId);
     DM_EXPORT static int32_t GetUserIdByDisplayId(int32_t displayId);
     DM_EXPORT static bool CheckMDMControl();
+    DM_EXPORT static void UpdateForgroundUserId();
+    DM_EXPORT static int32_t GetForgroundUserId();
 private:
     static int32_t oldUserId_;
     static std::string accountId_;
@@ -140,6 +142,8 @@ private:
     static std::mutex lock_;
     static std::map<int32_t, DMAccountInfo> dmAccountInfoMap_;
     static std::mutex dmAccountInfoMaplock_;
+    static std::mutex currentForgroundUserIdLock_;
+    static int32_t currentForgroundUserId_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

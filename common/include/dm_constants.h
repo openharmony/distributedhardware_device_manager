@@ -241,6 +241,7 @@ extern const int32_t DM_OH_OSTYPE;
 extern const char* PEER_UDID;
 extern const char* PEER_OSTYPE;
 extern const char* TIME_STAMP;
+extern const char* DM_ACCOUNT_CONSTRAINT;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H
