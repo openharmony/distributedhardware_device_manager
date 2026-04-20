@@ -80,7 +80,7 @@ bool DmConstrainsManager::CheckOsAccountConstraintEnabled(int32_t userId,
     dmConstrainData.userId = userId;
     dmConstrainData.constraint = constraint;
     {
-        std::lock_guard<std::mutex> lock(dmConstrainDataLock_); 
+        std::lock_guard<std::mutex> lock(dmConstrainDataLock_);
         dmConstrainDatas_[dmConstrainData] = constrainData;
     }
     return isEnabled;
@@ -103,7 +103,7 @@ void DmConstrainsManager::DeleteConstraint(int32_t userId)
 {
     LOGI("userId %{public}d.", userId);
     std::lock_guard<std::mutex> lock(dmConstrainDataLock_);
-    for (auto it = dmConstrainDatas_.begin(); it != dmConstrainDatas_.end(); ) {
+    for (auto it = dmConstrainDatas_.begin(); it != dmConstrainDatas_.end();) {
         if (it->first.userId == userId) {
             it = dmConstrainDatas_.erase(it);
         } else {

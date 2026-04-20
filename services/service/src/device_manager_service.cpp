@@ -498,10 +498,8 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         PermissionManager::GetInstance().CheckDataSyncPermission());
     std::vector<DmDeviceInfo> onlineDeviceList;
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
-    int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
-    if (ret != DM_OK) {
-        LOGE("GetTrustedDeviceList failed");
-        return ret;
+    if (softbusListener_->GetTrustedDeviceList(onlineDeviceList) != DM_OK) {
+        return ERR_DM_FAILED;
     }
     if (isOnlyShowNetworkId && !onlineDeviceList.empty()) {
         for (auto item : onlineDeviceList) {
@@ -543,7 +541,7 @@ int32_t DeviceManagerService::GetAllTrustedDeviceList(const std::string &pkgName
     CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
-            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
         LOGI("contraint enable is true");
         return DM_OK;
     }
@@ -841,7 +839,7 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
-            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
         LOGI("contraint enable is true");
         return ERR_DM_CONSTRAINT_ENABLE;
     }
@@ -950,7 +948,7 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
-            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
         LOGI("contraint enable is true");
         return ERR_DM_CONSTRAINT_ENABLE;
     }
@@ -2082,7 +2080,7 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
-            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
         LOGI("contraint enable is true");
         return ERR_DM_CONSTRAINT_ENABLE;
     }
@@ -4207,7 +4205,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
     LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
-            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
         LOGI("contraint enable is true");
         return DM_OK;
     }
@@ -5293,7 +5291,7 @@ int32_t DeviceManagerService::BindServiceTarget(const std::string &pkgName, cons
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
-            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
         LOGI("contraint enable is true");
         return ERR_DM_CONSTRAINT_ENABLE;
     }
@@ -5658,7 +5656,7 @@ int32_t DeviceManagerService::GetTrustServiceInfo(const std::string &pkgName,
     CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
-            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
         LOGI("contraint enable is true");
         return DM_OK;
     }
