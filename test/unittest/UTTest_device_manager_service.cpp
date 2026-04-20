@@ -785,7 +785,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_004, testing::ext::TestSiz
     std::string uuid = "";
     DeletePermission();
     int ret = DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -1586,7 +1586,7 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_002, testing::ext
     std::string networkId;
     std::string uuid;
     int32_t ret = DeviceManagerService::GetInstance().GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
-    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_003, testing::ext::TestSize.Level1)
@@ -1650,7 +1650,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_001, testing::ext::
     std::string netWorkId;
     int32_t networkType = 0;
     int32_t ret = DeviceManagerService::GetInstance().GetNetworkTypeByNetworkId(pkgName, netWorkId, networkType);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_002, testing::ext::TestSize.Level1)
@@ -2285,7 +2285,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_001, testing::ext::Test
     int32_t screenStatus = 1;
     DeletePermission();
     int ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_002, testing::ext::TestSize.Level1)

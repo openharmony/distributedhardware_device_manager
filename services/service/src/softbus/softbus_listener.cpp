@@ -33,6 +33,7 @@
 #include "ffrt.h"
 #include "kv_adapter_manager.h"
 #include "multiple_user_connector.h"
+#include "dm_constraints_manager.h"
 #endif
 #include "ipc_skeleton.h"
 #include "parameter.h"
@@ -677,10 +678,14 @@ void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *ms
 
 void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
 {
-    if (device == nullptr) {
-        LOGE("[SOFTBUS]device is null.");
+    CHECK_NULL_VOID(device);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
+        MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        LOGI("contraint enable is true");
         return;
     }
+#endif
     DmDeviceInfo dmDevInfo;
     ConvertDeviceInfoToDmDevice(*device, dmDevInfo);
     {
@@ -704,13 +709,10 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
             }
         }
     }
-    LOGD("DevId=%{public}s, devName=%{public}s, devType=%{public}d, range=%{public}d,"
-        "isOnline=%{public}d, capability=%{public}u", GetAnonyString(dmDevInfo.deviceId).c_str(),
-        GetAnonyString(dmDevInfo.deviceName).c_str(), dmDevInfo.deviceTypeId, dmDevInfo.range,
-        device->isOnline, device->capabilityBitmap[0]);
+    LOGD("DevId=%{public}s, capability=%{public}u", GetAnonyString(dmDevInfo.deviceId).c_str(),
+        device->capabilityBitmap[0]);
     int32_t actionId = 0;
-    int32_t ret = GetAttrFromExtraData(dmDevInfo, actionId);
-    if (ret != DM_OK) {
+    if (GetAttrFromExtraData(dmDevInfo, actionId) != DM_OK) {
         LOGE("GetAttrFromExtraData failed");
         return;
     }
