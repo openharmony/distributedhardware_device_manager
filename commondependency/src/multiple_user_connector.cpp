@@ -451,7 +451,7 @@ DM_EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(int32_t displayId)
 
 DM_EXPORT void MultipleUserConnector::UpdateForgroundUserId()
 {
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     {
         std::lock_guard<std::mutex> lock(currentForgroundUserIdLock_);
