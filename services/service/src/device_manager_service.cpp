@@ -489,7 +489,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
     CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
-            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
         LOGI("contraint enable is true");
         return DM_OK;
     }
