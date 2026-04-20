@@ -681,7 +681,7 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
     CHECK_NULL_VOID(device);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
-            MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
         LOGI("contraint enable is true");
         return;
     }
@@ -709,10 +709,8 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
             }
         }
     }
-    LOGD("DevId=%{public}s, devName=%{public}s, devType=%{public}d, range=%{public}d,"
-        "isOnline=%{public}d, capability=%{public}u", GetAnonyString(dmDevInfo.deviceId).c_str(),
-        GetAnonyString(dmDevInfo.deviceName).c_str(), dmDevInfo.deviceTypeId, dmDevInfo.range,
-        device->isOnline, device->capabilityBitmap[0]);
+    LOGD("DevId=%{public}s, capability=%{public}u", GetAnonyString(dmDevInfo.deviceId).c_str(),
+        device->capabilityBitmap[0]);
     int32_t actionId = 0;
     if (GetAttrFromExtraData(dmDevInfo, actionId) != DM_OK) {
         LOGE("GetAttrFromExtraData failed");
