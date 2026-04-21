@@ -32,7 +32,7 @@ void DmOsAccountConstraintSubscriber::OnConstraintChanged(const AccountSA::OsAcc
     manager_.AddConstraint(constrainData);
 }
 
-int32_t DmConstrainsManager::SubscribeOsAccountConstraints(const std::set<std::string> &constraintSet)
+DM_EXPORT int32_t DmConstrainsManager::SubscribeOsAccountConstraints(const std::set<std::string> &constraintSet)
 {
     LOGI("start.");
     if (constraintSet.empty()) {
@@ -52,7 +52,7 @@ int32_t DmConstrainsManager::SubscribeOsAccountConstraints(const std::set<std::s
     return DM_OK;
 }
 
-bool DmConstrainsManager::CheckOsAccountConstraintEnabled(int32_t userId,
+DM_EXPORT bool DmConstrainsManager::CheckOsAccountConstraintEnabled(int32_t userId,
     const std::string &constraint)
 {
     {

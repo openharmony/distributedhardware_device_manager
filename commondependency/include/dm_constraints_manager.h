@@ -51,8 +51,8 @@ class DmConstrainsManager {
     DM_DECLARE_SINGLE_INSTANCE_BASE(DmConstrainsManager);
 public:
     DmConstrainsManager() {}
-    int32_t SubscribeOsAccountConstraints(const std::set<std::string> &constraintSet);
-    bool CheckOsAccountConstraintEnabled(int32_t userId, const std::string &constraint);
+    DM_EXPORT int32_t SubscribeOsAccountConstraints(const std::set<std::string> &constraintSet);
+    DM_EXPORT bool CheckOsAccountConstraintEnabled(int32_t userId, const std::string &constraint);
     void AddConstraint(const AccountSA::OsAccountConstraintStateData &constrainData);
     void DeleteConstraint(int32_t userId);
 
