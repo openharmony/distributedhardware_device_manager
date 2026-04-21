@@ -292,6 +292,8 @@ public:
     virtual int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId) = 0;
     virtual int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength) = 0;
     virtual int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo) = 0;
+    virtual int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls) = 0;
+    virtual void NotifyDeviceOrAppOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

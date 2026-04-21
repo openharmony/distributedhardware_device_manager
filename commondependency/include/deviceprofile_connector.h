@@ -403,6 +403,7 @@ public:
     DM_EXPORT int32_t DeleteServiceInfo(const DistributedDeviceProfile::ServiceInfo &serviceInfo);
     DM_EXPORT void GetPeerTokenIdForServiceProxyUnbind(int32_t userId, uint64_t localTokenId,
         const std::string &peerUdid, int64_t serviceId, std::vector<uint64_t> &peerTokenId);
+    DM_EXPORT void GetInvaildSkIdAcl(std::map<std::string, DmOfflineParam> &invalidAclMap);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,
@@ -462,6 +463,8 @@ private:
         const std::string &accountIdHash, DmOfflineParam &offlineParam, bool &notifyOffline,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
 
+    void SaveInvaildSkIdAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+        std::map<std::string, DmOfflineParam> &invalidAclMap, bool isLocalAccer, DmOfflineParam &dmParam);
     void FilterNeedDeleteACLInfos(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
         const std::string &localUdid, const std::string &peerUdid, DmOfflineParam &offlineParam);
     void FilterNeedDeleteACLInfos(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
