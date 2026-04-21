@@ -17,7 +17,9 @@
 #include <algorithm>
 #include <map>
 #include <string>
+#include <set>
 #include <unordered_set>
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "access_control_profile.h"
 #include "dm_device_info.h"
 #include "dm_single_instance.h"
@@ -28,6 +30,7 @@
 #include "service_info.h"
 #include "single_instance.h"
 #include "trusted_device_info.h"
+#endif
 
 enum AllowAuthType {
     ALLOW_AUTH_ONCE = 1,
@@ -131,7 +134,7 @@ typedef struct DmOfflineParam {
     // save all the user acl between localdevid/localuserId -> remotedevid
     std::vector<DmAclIdParam> allUserAclInfos;
 } DmOfflineParam;
-
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 typedef struct DmLocalUserRemovedInfo {
     std::string localUdid = "";
     int32_t preUserId = 0;
@@ -403,7 +406,7 @@ public:
     DM_EXPORT int32_t DeleteServiceInfo(const DistributedDeviceProfile::ServiceInfo &serviceInfo);
     DM_EXPORT void GetPeerTokenIdForServiceProxyUnbind(int32_t userId, uint64_t localTokenId,
         const std::string &peerUdid, int64_t serviceId, std::vector<uint64_t> &peerTokenId);
-    DM_EXPORT void GetInvaildSkIdAcl(std::map<std::string, DmOfflineParam> &invalidAclMap);
+    DM_EXPORT void GetInvalidSkIdAcl(std::map<std::string, DmOfflineParam> &invalidAclMap);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,
@@ -463,8 +466,11 @@ private:
         const std::string &accountIdHash, DmOfflineParam &offlineParam, bool &notifyOffline,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
 
-    void SaveInvaildSkIdAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+    void SaveInvalidSkIdAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
         std::map<std::string, DmOfflineParam> &invalidAclMap, bool isLocalAccer, DmOfflineParam &dmParam);
+    bool SaveInvalidAclMap(const DistributedDeviceProfile::AccessControlProfile &acl, bool isLocalAccer,
+        DmOfflineParam &dmParam, std::set<int32_t> &invalidSkIdSet,
+        std::map<std::string, DmOfflineParam> &invalidAclMap);
     void FilterNeedDeleteACLInfos(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
         const std::string &localUdid, const std::string &peerUdid, DmOfflineParam &offlineParam);
     void FilterNeedDeleteACLInfos(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
@@ -545,4 +551,5 @@ DM_EXPORT extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();
 using CreateDpConnectorFuncPtr = IDeviceProfileConnector *(*)(void);
 } // namespace DistributedHardware
 } // namespace OHOS
+#endif // __LITEOS_M__
 #endif // OHOS_DM_DEVICEPROFILE_CONNECTOR_H

@@ -1387,7 +1387,7 @@ void DeviceProfileConnector::ProcessPeerToLocal(
     FillDmUserRemovedServiceInfoLocal(profile, serviceInfos);
 }
 
-void DeviceProfileConnector::SaveInvaildSkIdAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+void DeviceProfileConnector::SaveInvalidSkIdAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
     std::map<std::string, DmOfflineParam> &invalidAclMap, bool isLocalAccer, DmOfflineParam &dmParam)
 {
     std::string acerUdid = acl.GetAccesser().GetAccesserDeviceId();
@@ -1421,11 +1421,46 @@ void DeviceProfileConnector::SaveInvaildSkIdAcl(const DistributedDeviceProfile::
     }
 }
 
-DM_EXPORT void DeviceProfileConnector::GetInvaildSkIdAcl(std::map<std::string, DmOfflineParam> &invalidAclMap)
+bool DeviceProfileConnector::SaveInvalidAclMap(const DistributedDeviceProfile::AccessControlProfile &acl,
+    bool isLocalAccer, DmOfflineParam &dmParam, std::set<int32_t> &invalidSkIdSet,
+    std::map<std::string, DmOfflineParam> &invalidAclMap)
+{
+    int32_t skId = -1;
+    int32_t userId = -1;
+    if (isLocalAccer) {
+        skId = acl.GetAccesser().GetAccesserSessionKeyId();
+        userId = acl.GetAccesser().GetAccesserUserId();
+    } else {
+        skId = acl.GetAccessee().GetAccesseeSessionKeyId();
+        userId = acl.GetAccessee().GetAccesseeUserId();
+    }
+
+    if (invalidSkIdSet.find(skId) != invalidSkIdSet.end()) {
+        PrintProfile(acl);
+        SaveInvalidSkIdAcl(acl, invalidAclMap, isLocalAccer, dmParam);
+        return true;
+    }
+    std::vector<unsigned char> sessionKey;
+    int32_t ret = GetSessionKey(userId, skId, sessionKey);
+    if (ret != DM_OK || sessionKey.empty()) {
+        LOGE("GetSessionKey failed ret:%{public}d", ret);
+        PrintProfile(acl);
+        SaveInvalidSkIdAcl(acl, invalidAclMap, isLocalAccer, dmParam);
+        invalidSkIdSet.insert(skId);
+        return true;
+    }
+    return false;
+}
+
+DM_EXPORT void DeviceProfileConnector::GetInvalidSkIdAcl(std::map<std::string, DmOfflineParam> &invalidAclMap)
 {
     std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
-    std::set<int32_t> invaildSkIdSet;
-    int32_t localUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::set<int32_t> invalidSkIdSet;
+    int32_t localUserId = MultipleUserConnector::TryGetCurrentAccountUserID();
+    if (localUserId == -1) {
+        LOGE("get current userId failed");
+        return;
+    }
     std::string localUdid = GetLocalDeviceId();
     for (auto &item : profiles) {
         if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
@@ -1435,38 +1470,16 @@ DM_EXPORT void DeviceProfileConnector::GetInvaildSkIdAcl(std::map<std::string, D
         std::string acerUdid = item.GetAccesser().GetAccesserDeviceId();
         int32_t acerUserId = item.GetAccesser().GetAccesserUserId();
         if (acerUdid == localUdid && localUserId == acerUserId) {
-            int32_t acerSkId = item.GetAccesser().GetAccesserSessionKeyId();
-            if (invaildSkIdSet.find(acerSkId) != invaildSkIdSet.end()) {
-                PrintProfile(item);
-                SaveInvaildSkIdAcl(item, invalidAclMap, true, dmParam);
-                continue;
-            }
-            std::vector<unsigned char> sessionKey;
-            int32_t ret = GetSessionKey(acerUserId, acerSkId, sessionKey);
-            if (ret != DM_OK || sessionKey.empty()) {
-                LOGE("GetSessionKey failed ret:%{public}d", ret);
-                PrintProfile(item);
-                SaveInvaildSkIdAcl(item, invalidAclMap, true, dmParam);
-                invaildSkIdSet.insert(acerSkId);
+            LOGI("is src");
+            if (SaveInvalidAclMap(item, true, dmParam, invalidSkIdSet, invalidAclMap)) {
                 continue;
             }
         }
         std::string aceeUdid = item.GetAccessee().GetAccesseeDeviceId();
         int32_t aceeUserId = item.GetAccessee().GetAccesseeUserId();
         if (aceeUdid == localUdid && localUserId == aceeUserId) {
-            int32_t aceeSkId = item.GetAccessee().GetAccesseeSessionKeyId();
-            if (invaildSkIdSet.find(aceeSkId) != invaildSkIdSet.end()) {
-                PrintProfile(item);
-                SaveInvaildSkIdAcl(item, invalidAclMap, false, dmParam);
-                continue;
-            }
-            std::vector<unsigned char> sessionKey;
-            int32_t ret = GetSessionKey(aceeUserId, aceeSkId, sessionKey);
-            if (ret != DM_OK || sessionKey.empty()) {
-                LOGE("GetSessionKey failed ret:%{public}d", ret);
-                PrintProfile(item);
-                SaveInvaildSkIdAcl(item, invalidAclMap, false, dmParam);
-                invaildSkIdSet.insert(aceeSkId);
+            LOGI("is sink");
+            if (SaveInvalidAclMap(item, false, dmParam, invalidSkIdSet, invalidAclMap)) {
                 continue;
             }
         }
