@@ -2549,13 +2549,10 @@ void DeviceManagerService::SubscribeScreenLockEvent()
     return;
 }
 
-void DeviceManagerService::DeleteInvaildSkIdAcl()
+void DeviceManagerService::DeleteInvalidSkIdAcl()
 {
-    if (hichainListener_ == nullptr) {
-        hichainListener_ = std::make_shared<HichainListener>();
-    }
     std::map<std::string, DmOfflineParam> invalidAclMap;
-    DeviceProfileConnector::GetInstance().GetInvaildSkIdAcl(invalidAclMap);
+    DeviceProfileConnector::GetInstance().GetInvalidSkIdAcl(invalidAclMap);
     for (const auto &iter : invalidAclMap) {
         if (!IsDMServiceImplReady()) {
             LOGE("instance not init or init failed.");
@@ -2610,7 +2607,7 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
             [this, commonEventType] () {
                 DeviceManagerService::HandleAccountCommonEvent(commonEventType);
             });
-        DeleteInvaildSkIdAcl();
+        DeleteInvalidSkIdAcl();
     } else {
         LOGE("Invalied account common event.");
     }

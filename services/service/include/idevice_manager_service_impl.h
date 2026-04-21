@@ -25,6 +25,7 @@
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
+#include "deviceprofile_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
