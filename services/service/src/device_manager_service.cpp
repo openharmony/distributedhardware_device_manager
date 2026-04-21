@@ -5945,13 +5945,13 @@ bool DeviceManagerService::CheckConstraintEnabledByNetworkId(const std::string &
     SoftbusCache::GetInstance().GetLocalDeviceInfo(deviceInfo);
     if (networkId == std::string(deviceInfo.networkId)) {
         LOGI("get local deviceinfo, networkId %{public}s.", GetAnonyString(networkId).c_str());
-        return true;
+        return false;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
         MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT);
 #endif
-    return true;
+    return false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
