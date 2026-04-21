@@ -42,6 +42,8 @@ int32_t MultipleUserConnector::currentForgroundUserId_ = -1;
 const int32_t DEFAULT_OS_ACCOUNT_ID = 0; // 0 is the default id when there is no os_account part
 #endif // OS_ACCOUNT_PART_EXISTS
 const char* DM_MDM_CONSTRAINT = "constraint.distributed.transmission.outgoing";
+const int32_t GET_USERID_MAX_NUM = 3;
+const int32_t USLEEP_TIME_US_50000 = 50000; // 50ms
 
 int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 {
@@ -50,6 +52,32 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 #elif OS_ACCOUNT_PART_EXISTS
     std::vector<int> ids;
     ErrCode ret = OsAccountManager::QueryActiveOsAccountIds(ids);
+    if (ret != 0 || ids.empty()) {
+        LOGE("error ret: %{public}d", ret);
+        return -1;
+    }
+    return ids[0];
+#else // OS_ACCOUNT_PART_EXISTS
+    return DEFAULT_OS_ACCOUNT_ID;
+#endif
+}
+
+DM_EXPORT int32_t MultipleUserConnector::TryGetCurrentAccountUserID(void)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return 0;
+#elif OS_ACCOUNT_PART_EXISTS
+    int32_t retryNum = 0;
+    std::vector<int> ids;
+    ErrCode ret = 0;
+    while (retryNum < GET_USERID_MAX_NUM) {
+        ret = OsAccountManager::QueryActiveOsAccountIds(ids);
+        if (ret == 0 && !ids.empty()) {
+            break;
+        }
+        usleep(USLEEP_TIME_US_50000);
+        retryNum++;
+    }
     if (ret != 0 || ids.empty()) {
         LOGE("error ret: %{public}d", ret);
         return -1;

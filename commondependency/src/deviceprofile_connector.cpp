@@ -1387,6 +1387,92 @@ void DeviceProfileConnector::ProcessPeerToLocal(
     FillDmUserRemovedServiceInfoLocal(profile, serviceInfos);
 }
 
+void DeviceProfileConnector::SaveInvaildSkIdAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+    std::map<std::string, DmOfflineParam> &invalidAclMap, bool isLocalAccer, DmOfflineParam &dmParam)
+{
+    std::string acerUdid = acl.GetAccesser().GetAccesserDeviceId();
+    std::string aceeUdid = acl.GetAccessee().GetAccesseeDeviceId();
+    if (isLocalAccer) {
+        if (invalidAclMap.find(aceeUdid) != invalidAclMap.end()) {
+            CacheAcerAclId(acl, invalidAclMap[aceeUdid].needDelAclInfos);
+            FindLeftAcl(acl, acerUdid, aceeUdid, invalidAclMap[aceeUdid]);
+            FindUserAcl(acl, acerUdid, aceeUdid, invalidAclMap[aceeUdid]);
+            FindLnnAcl(acl, acerUdid, aceeUdid, invalidAclMap[aceeUdid]);
+        } else {
+            CacheAcerAclId(acl, dmParam.needDelAclInfos);
+            FindLeftAcl(acl, acerUdid, aceeUdid, dmParam);
+            FindUserAcl(acl, acerUdid, aceeUdid, dmParam);
+            FindLnnAcl(acl, acerUdid, aceeUdid, dmParam);
+            invalidAclMap.insert(std::pair<std::string, DmOfflineParam>(aceeUdid, dmParam));
+        }
+    } else {
+        if (invalidAclMap.find(acerUdid) != invalidAclMap.end()) {
+            CacheAceeAclId(acl, invalidAclMap[acerUdid].needDelAclInfos);
+            FindLeftAcl(acl, aceeUdid, acerUdid, invalidAclMap[acerUdid]);
+            FindUserAcl(acl, aceeUdid, acerUdid, invalidAclMap[acerUdid]);
+            FindLnnAcl(acl, aceeUdid, acerUdid, invalidAclMap[acerUdid]);
+        } else {
+            CacheAceeAclId(acl, dmParam.needDelAclInfos);
+            FindLeftAcl(acl, aceeUdid, acerUdid, dmParam);
+            FindUserAcl(acl, aceeUdid, acerUdid, dmParam);
+            FindLnnAcl(acl, aceeUdid, acerUdid, dmParam);
+            invalidAclMap.insert(std::pair<std::string, DmOfflineParam>(acerUdid, dmParam));
+        }
+    }
+}
+
+DM_EXPORT void DeviceProfileConnector::GetInvaildSkIdAcl(std::map<std::string, DmOfflineParam> &invalidAclMap)
+{
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    std::set<int32_t> invaildSkIdSet;
+    int32_t localUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::string localUdid = GetLocalDeviceId();
+    for (auto &item : profiles) {
+        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+            continue;
+        }
+        DmOfflineParam dmParam;
+        std::string acerUdid = item.GetAccesser().GetAccesserDeviceId();
+        int32_t acerUserId = item.GetAccesser().GetAccesserUserId();
+        if (acerUdid == localUdid && localUserId == acerUserId) {
+            int32_t acerSkId = item.GetAccesser().GetAccesserSessionKeyId();
+            if (invaildSkIdSet.find(acerSkId) != invaildSkIdSet.end()) {
+                PrintProfile(item);
+                SaveInvaildSkIdAcl(item, invalidAclMap, true, dmParam);
+                continue;
+            }
+            std::vector<unsigned char> sessionKey;
+            int32_t ret = GetSessionKey(acerUserId, acerSkId, sessionKey);
+            if (ret != DM_OK || sessionKey.empty()) {
+                LOGE("GetSessionKey failed ret:%{public}d", ret);
+                PrintProfile(item);
+                SaveInvaildSkIdAcl(item, invalidAclMap, true, dmParam);
+                invaildSkIdSet.insert(acerSkId);
+                continue;
+            }
+        }
+        std::string aceeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t aceeUserId = item.GetAccessee().GetAccesseeUserId();
+        if (aceeUdid == localUdid && localUserId == aceeUserId) {
+            int32_t aceeSkId = item.GetAccessee().GetAccesseeSessionKeyId();
+            if (invaildSkIdSet.find(aceeSkId) != invaildSkIdSet.end()) {
+                PrintProfile(item);
+                SaveInvaildSkIdAcl(item, invalidAclMap, false, dmParam);
+                continue;
+            }
+            std::vector<unsigned char> sessionKey;
+            int32_t ret = GetSessionKey(aceeUserId, aceeSkId, sessionKey);
+            if (ret != DM_OK || sessionKey.empty()) {
+                LOGE("GetSessionKey failed ret:%{public}d", ret);
+                PrintProfile(item);
+                SaveInvaildSkIdAcl(item, invalidAclMap, false, dmParam);
+                invaildSkIdSet.insert(aceeSkId);
+                continue;
+            }
+        }
+    }
+}
+
 DM_EXPORT void DeviceProfileConnector::DeleteAclForUserRemoved(const DmLocalUserRemovedInfo &userRemovedInfo,
     std::multimap<std::string, int32_t> &peerUserIdMap, DmOfflineParam &offlineParam,
     std::vector<DmUserRemovedServiceInfo> &serviceInfos)

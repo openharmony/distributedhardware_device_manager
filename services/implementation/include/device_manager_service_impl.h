@@ -214,6 +214,8 @@ public:
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
     int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo);
     int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength);
+    int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
+    void NotifyDeviceOrAppOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid);
 
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
@@ -277,7 +279,6 @@ private:
     void CleanSessionMapByLogicalSessionId(uint64_t logicalSessionId, int32_t connDelayCloseTime);
     int32_t DeleteAclForProcV2(const std::string &localUdid, uint32_t localTokenId, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra, int32_t userId);
-    int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
     void DeleteCredential(DmAclIdParam &acl);
     void DeleteAclByTokenId(const int32_t accessTokenId,
         std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
@@ -317,7 +318,6 @@ private:
         const std::string &deviceId, int32_t reason, uint64_t tokenId);
     void GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet, bool &notifyOffline);
     void NotifyDeviceOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid);
-    void NotifyDeviceOrAppOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid);
     void DeleteSessionKey(int32_t userId, const DistributedDeviceProfile::AccessControlProfile &profile);
     void DeleteGroupByBundleName(const std::string &localUdid, int32_t userId, const std::vector<DmAclIdParam> &acls);
     int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller, std::string &udid,
