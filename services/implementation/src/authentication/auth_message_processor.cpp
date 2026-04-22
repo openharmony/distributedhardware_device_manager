@@ -57,6 +57,7 @@ const char* TAG_SESSIONKEY_ID = "sessionKeyId";
 const int32_t MSG_MAX_SIZE = 45 * 1024;
 const int32_t GROUP_VISIBILITY_IS_PRIVATE = 0;
 const int32_t MAX_BINDTYPE_SIZE = 1000;
+constexpr int32_t MAX_DATA_LEN = 65535;
 constexpr const char* TAG_VISIBILITY = "VISIBILITY";
 constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
 constexpr const char* TAG_THUMBNAIL_SIZE = "THUMSIZE";
@@ -516,6 +517,10 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(JsonObject &json)
     }
     if (idx < sliceNum && IsString(json, TAG_APP_THUMBNAIL)) {
         std::string appSliceThumbnail = json[TAG_APP_THUMBNAIL].Get<std::string>();
+        if (appSliceThumbnail.size() > MAX_DATA_LEN - authResponseContext_->appThumbnail.size()) {
+            LOGE("appSliceThumbnail size is %{public}zu too long.", appSliceThumbnail.size());
+            return ERR_DM_FAILED;
+        }
         authResponseContext_->appThumbnail = authResponseContext_->appThumbnail + appSliceThumbnail;
         return ERR_DM_AUTH_MESSAGE_INCOMPLETE;
     }
