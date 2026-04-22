@@ -2098,10 +2098,12 @@ ohos_unittest("UTTest_multiple_user_connector") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "os_account:libaccountkits",
     "os_account:os_account_innerkits",
   ]
@@ -2137,10 +2139,12 @@ ohos_unittest("UTTest_dm_constraints_manager") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "os_account:libaccountkits",
     "os_account:os_account_innerkits",
   ]
