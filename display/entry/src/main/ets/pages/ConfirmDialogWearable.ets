@@ -111,6 +111,12 @@ struct Index {
     this.onCancel();
   }
 
+  aboutToDisappear() {
+    if (dmClass) {
+      dmClass.off('uiStateChange');
+    }
+  }
+
   destruction() {
     if (dmClass != null) {
       try {
