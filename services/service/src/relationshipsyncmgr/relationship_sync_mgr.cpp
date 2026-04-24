@@ -96,7 +96,7 @@ namespace {
      *          |     0110 0100    |    1000 0000      |
      */
     const int32_t FRONT_OR_BACK_USER_FLAG_OFFSET = 7;
-    const uint8_t FRONT_OR_BACK_USER_FLAG_MASK = 0b01111111;
+    const uint16_t FRONT_OR_BACK_USER_FLAG_MASK = 0b0111111111111111;
     const uint8_t FRONT_OR_BACK_FLAG_MASK = 0b10000000;
     // The total number of foreground and background userids offset, the 3th ~ 5th bits.
     const uint16_t ALL_USERID_NUM_MASK_OFFSET = 3;
