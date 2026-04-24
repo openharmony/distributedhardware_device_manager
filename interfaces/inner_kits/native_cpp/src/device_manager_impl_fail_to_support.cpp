@@ -25,6 +25,8 @@ DeviceManagerImplFailToSupport &DeviceManagerImplFailToSupport::GetInstance()
     return instance;
 }
 
+DeviceManager::~DeviceManager() = default;
+
 int32_t DeviceManagerImplFailToSupport::InitDeviceManager(const std::string &pkgName,
     std::shared_ptr<DmInitCallback> dmInitCallback)
 {

@@ -18,8 +18,8 @@ if (defined(ohos_lite)) {
 }
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
-if (defined(ohos_lite)) {
-  if (ohos_kernel_type == "liteos_m") {
+if (defined(ohos_lite) || !support_jsapi) {
+  if (defined(ohos_kernel_type) && ohos_kernel_type == "liteos_m") {
     static_library("devicemanager_ndk") {
       include_dirs = []
 

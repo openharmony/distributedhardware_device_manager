@@ -83,7 +83,6 @@ ohos_shared_library("devicemanagerext_pin_auth") {
     external_deps = [
       "ability_base:session_info",
       "ability_base:want",
-      "ability_runtime:ability_manager",
       "c_utils:utils",
       "device_auth:deviceauth_sdk",
       "device_info_manager:distributed_device_profile_common",
@@ -98,6 +97,9 @@ ohos_shared_library("devicemanagerext_pin_auth") {
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
     ]
+    if (support_jsapi) {
+      external_deps += [ "ability_runtime:ability_manager" ]
+    }
 
     defines = [
       "HI_LOG_ENABLE",

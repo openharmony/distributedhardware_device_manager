@@ -16,7 +16,7 @@ if (!defined(ohos_lite)) {
 }
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
-if (!defined(ohos_lite)) {
+if (!defined(ohos_lite) && support_jsapi) {
 config("devicemanager_3rd_config") {
     include_dirs = [
         "include/interface",
