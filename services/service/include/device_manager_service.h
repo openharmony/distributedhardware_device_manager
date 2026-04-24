@@ -485,6 +485,7 @@ private:
     void NotifyRemoteUnBindServiceByWifi(int32_t userId, uint64_t localTokenId, uint64_t subjectTokenId,
         int64_t serviceId, const std::string &netWorkId, bool isProxyUnbind);
     int32_t GetSubjectTokenId(const std::map<std::string, std::string> &unbindParam, uint64_t &subjectTokenId);
+    void DeleteInvalidSkIdAcl();
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();
