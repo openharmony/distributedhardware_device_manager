@@ -195,7 +195,8 @@ public:
     int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
     int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength);
     int32_t ImportAuthInfo(const DmAuthInfo &dmAuthInfo);
-
+    int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
+    void NotifyDeviceOrAppOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId, std::string &peerUdid);
 

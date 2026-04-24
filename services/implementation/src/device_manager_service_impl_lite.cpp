@@ -810,6 +810,18 @@ int32_t DeviceManagerServiceImpl::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
     return DM_OK;
 }
 
+int32_t DeviceManagerServiceImpl::DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls)
+{
+    (void)acls;
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl::NotifyDeviceOrAppOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid)
+{
+    (void)offlineParam;
+    (void)remoteUdid;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

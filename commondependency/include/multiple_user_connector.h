@@ -135,6 +135,7 @@ public:
     DM_EXPORT static bool CheckMDMControl();
     DM_EXPORT static void UpdateForgroundUserId();
     DM_EXPORT static int32_t GetForgroundUserId();
+    DM_EXPORT static int32_t TryGetCurrentAccountUserID(void);
 private:
     static int32_t oldUserId_;
     static std::string accountId_;

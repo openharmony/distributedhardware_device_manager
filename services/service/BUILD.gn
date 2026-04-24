@@ -38,6 +38,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc/model",
         "${common_path}/include/dfx",
         "${common_path}/include/dfx/lite",
+        "${devicemanager_path}/commondependency/include",
         "${utils_path}/include",
         "${utils_path}/include/appInfo/lite",
         "${utils_path}/include/crypto",
