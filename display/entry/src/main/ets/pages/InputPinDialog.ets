@@ -478,7 +478,7 @@ struct dialogPlusPage {
   aboutToDisappear() {
     console.log(TAG + 'aboutToDisappear aboutToDisappear')
     if (this.mediaQueryListener) {
-      this.mediaQueryListener.off('change', this.portraitHandler);
+      this.mediaQueryListener.off('change', portraitHandler);
     }
     if (this.dialogController) {
       this.dialogController = null;
