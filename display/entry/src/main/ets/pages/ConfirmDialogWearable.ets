@@ -115,6 +115,7 @@ struct Index {
     if (dmClass) {
       dmClass.off('uiStateChange');
     }
+    this.destruction();
   }
 
   destruction() {
