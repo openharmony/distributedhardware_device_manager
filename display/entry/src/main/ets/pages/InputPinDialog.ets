@@ -468,7 +468,7 @@ struct dialogPlusPage {
 
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear aboutToAppear');
-    this.mediaQueryListener.on('change', portraitHandler);
+    this.mediaQueryListener.on('change', this.portraitHandler);
   }
 
   onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
@@ -478,7 +478,7 @@ struct dialogPlusPage {
   aboutToDisappear() {
     console.log(TAG + 'aboutToDisappear aboutToDisappear')
     if (this.mediaQueryListener) {
-      this.mediaQueryListener.off('change', portraitHandler);
+      this.mediaQueryListener.off('change', this.portraitHandler);
     }
     if (this.dialogController) {
       this.dialogController = null;
