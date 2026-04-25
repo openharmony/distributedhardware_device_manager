@@ -456,6 +456,7 @@ struct InputCustomDialog {
 @Component
 struct dialogPlusPage {
   mediaQueryListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
+  private portraitHandler = this.onPortrait.bind(this);
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: InputCustomDialog(),
     autoCancel: false,
@@ -467,7 +468,7 @@ struct dialogPlusPage {
 
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear aboutToAppear');
-    this.mediaQueryListener.on('change', this.onPortrait.bind(this));
+    this.mediaQueryListener.on('change', portraitHandler);
   }
 
   onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
@@ -477,7 +478,7 @@ struct dialogPlusPage {
   aboutToDisappear() {
     console.log(TAG + 'aboutToDisappear aboutToDisappear')
     if (this.mediaQueryListener) {
-      this.mediaQueryListener.off('change', this.onPortrait);
+      this.mediaQueryListener.off('change', this.portraitHandler);
     }
     if (this.dialogController) {
       this.dialogController = null;
@@ -494,6 +495,8 @@ struct dialogPlusPage {
   }
 
   build() {
-    Column(this.dialogController.open())
+    if (this.dialogController) {
+      Column(this.dialogController.open())
+    }
   }
 }
