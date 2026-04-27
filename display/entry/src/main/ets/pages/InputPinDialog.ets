@@ -92,6 +92,9 @@ struct InputCustomDialog {
     console.info(TAG + 'InputCustomDialog aboutToDisappear');
     let ims = inputMethod.getSetting();
     ims.off('imeShow');
+    if (this.listener) {
+      this.listener.off('change');
+    }
   }
 
   aboutToAppear() {
@@ -453,7 +456,8 @@ struct InputCustomDialog {
 @Component
 struct dialogPlusPage {
   mediaQueryListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
-  dialogController: CustomDialogController = new CustomDialogController({
+  private portraitHandler = this.onPortrait.bind(this);
+  dialogController: CustomDialogController | null = new CustomDialogController({
     builder: InputCustomDialog(),
     autoCancel: false,
     alignment: DialogAlignment.Center,
@@ -464,7 +468,7 @@ struct dialogPlusPage {
 
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear aboutToAppear');
-    this.mediaQueryListener.on('change', this.onPortrait.bind(this));
+    this.mediaQueryListener.on('change', this.portraitHandler);
   }
 
   onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
@@ -473,6 +477,12 @@ struct dialogPlusPage {
 
   aboutToDisappear() {
     console.log(TAG + 'aboutToDisappear aboutToDisappear')
+    if (this.mediaQueryListener) {
+      this.mediaQueryListener.off('change', this.portraitHandler);
+    }
+    if (this.dialogController) {
+      this.dialogController = null;
+    }
     if (dmClass != null) {
       try {
         dmClass.off('uiStateChange');
@@ -485,6 +495,8 @@ struct dialogPlusPage {
   }
 
   build() {
-    Column(this.dialogController.open())
+    if (this.dialogController) {
+      Column(this.dialogController.open())
+    }
   }
 }
