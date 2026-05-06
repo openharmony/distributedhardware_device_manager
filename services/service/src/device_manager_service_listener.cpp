@@ -123,8 +123,8 @@ bool ParseNotifyKey(const std::string &notifyKey, ProcessInfo &processInfo)
         !std::getline(stream, tokenId, '#')) {
         return false;
     }
-    processInfo.userId = atoi(userId.c_str());
-    processInfo.tokenId = static_cast<uint64_t>(strtoull(tokenId.c_str(), nullptr, 10));
+    processInfo.userId = std::stoi(userId);
+    processInfo.tokenId = std::stoul(tokenId);
     return true;
 }
 
@@ -1029,7 +1029,8 @@ void DeviceManagerServiceListener::RemoveNotExistProcess()
     std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
     for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
         ProcessInfo processInfo;
-        if (!ParseNotifyKey(it->first, processInfo) || notifyProcessInfos.find(processInfo) == notifyProcessInfos.end()) {
+        if (!ParseNotifyKey(it->first, processInfo) ||
+            notifyProcessInfos.find(processInfo) == notifyProcessInfos.end()) {
             it = alreadyOnlinePkgName_.erase(it);
             LOGI("erase stale online notify key.");
         } else {
