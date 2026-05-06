@@ -17,10 +17,12 @@
 #define OHOS_DM_NOTIFY_3RD_H
 
 #include <map>
+#include <vector>
 #include "ffrt.h"
 
 #include "device_manager_callback_3rd.h"
 #include "device_manager_data_struct_3rd.h"
+#include "dm_auth_info_3rd.h"
 #include "dm_single_instance_3rd.h"
 
 namespace OHOS {
@@ -38,6 +40,8 @@ public:
     int32_t UnRegisterAuthCallback(const std::string &businessName);
     void OnAuthResult(const ProcessInfo3rd &processInfo3rd, int32_t result, int32_t status,
         const std::string &authContent);
+    void OnAuthResult(const ProcessInfo3rd &processInfo3rd, int32_t result, int32_t status,
+        std::vector<TrustDeviceInfo3rd> &deviceInfos, const std::string &authContent);
 private:
     ffrt::mutex dmInit3rdCallbacklock_;
     std::map<std::string, std::shared_ptr<DmInit3rdCallback>> dmInit3rdCallbackMap_;

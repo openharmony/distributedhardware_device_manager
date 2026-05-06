@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_MANAGER_3RD_H
-#define OHOS_DM_AUTH_MANAGER_3RD_H
+#ifndef OHOS_DM_AUTH_MANAGER_CRED_H
+#define OHOS_DM_AUTH_MANAGER_CRED_H
 
 #include <memory>
 #include "dm_auth_manager_base_3rd.h"
@@ -24,21 +24,19 @@
 #include "json_object.h"
 #include "softbus_connector_3rd.h"
 #include "softbus_session_3rd.h"
-#include "dm_auth_context_3rd.h"
+#include "dm_auth_context_cred.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-struct DmAuthContext;
-struct DmProxyAuthContext;
+struct DmAuthCredContext;
 
-class AuthManager3rd : public AuthManagerBase3rd,
-                    public std::enable_shared_from_this<AuthManager3rd> {
+class AuthManagerCred : public AuthManagerBase3rd,
+                    public std::enable_shared_from_this<AuthManagerCred> {
 public:
-    AuthManager3rd(std::shared_ptr<SoftbusConnector3rd> softbusConnector,
+    AuthManagerCred(std::shared_ptr<SoftbusConnector3rd> softbusConnector,
                 std::shared_ptr<IDeviceManagerServiceListener3rd> listener,
                 std::shared_ptr<HiChainAuthConnector3rd> hiChainAuthConnector);
-    virtual ~AuthManager3rd();
-    int32_t ImportAuthCodeAndUid(const std::string &businessName, const std::string &authCode, int32_t uid);
+    virtual ~AuthManagerCred();
     void GetAuthParam(const PeerTargetId3rd &targetId, const std::map<std::string, std::string> &authParam);
     int32_t AuthDevice3rd(const PeerTargetId3rd &targetId, const std::map<std::string, std::string> &authParam,
         int32_t sessionId, uint64_t logicalSessionId);
@@ -46,28 +44,16 @@ public:
         int32_t sessionId, uint64_t logicalSessionId);
     void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
 protected:
-    int32_t GetPinCode(std::string &code);
-    void ParseProxyParam(const std::map<std::string, std::string> &authParam);
-    void GetBindLevelByProcessName(const std::string &processName, int32_t userId, int32_t &bindLevel);
-    bool IsProxyBindEnabled(const std::map<std::string, std::string> &authParam);
-    void SetProxyBindFlags(const std::map<std::string, std::string> &authParam);
-    void ParseSubjectProxyedSubjects(const std::map<std::string, std::string> &authParam);
-    void ParseProxyItem(JsonItemObject &item);
-    bool ValidateProxyItem(const JsonItemObject &item);
     std::string GetPeerProcessName(const JsonItemObject &item, const std::string &defaultProcessName);
-    DmProxyAuthContext CreateProxyAuthContext(const JsonItemObject &item, const std::string &processName,
-        const std::string &peerProcessName);
-    void AddProxyContextIfNotExists(DmProxyAuthContext &proxyAuthContext, const std::string &processName,
-        const std::string &peerProcessName, uint32_t tokenId);
-    std::shared_ptr<DmAuthContext> context_;
+    std::shared_ptr<DmAuthCredContext> context_;
 };
 
-class AuthSrcManager : public AuthManager3rd {
+class AuthSrcManagerCred : public AuthManagerCred {
 public:
-    AuthSrcManager(std::shared_ptr<SoftbusConnector3rd> softbusConnector,
+    AuthSrcManagerCred(std::shared_ptr<SoftbusConnector3rd> softbusConnector,
         std::shared_ptr<IDeviceManagerServiceListener3rd> listener,
         std::shared_ptr<HiChainAuthConnector3rd> hiChainAuthConnector);
-    virtual ~AuthSrcManager() override = default;
+    virtual ~AuthSrcManagerCred() override = default;
 
     // IDmDeviceAuthCallback3rd implement begin
     bool AuthDeviceTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen) override;
@@ -87,12 +73,12 @@ public:
     // ISoftbusSessionCallback3rd implement end
 };
 
-class AuthSinkManager : public AuthManager3rd {
+class AuthSinkManagerCred : public AuthManagerCred {
 public:
-    AuthSinkManager(std::shared_ptr<SoftbusConnector3rd> softbusConnector,
+    AuthSinkManagerCred(std::shared_ptr<SoftbusConnector3rd> softbusConnector,
         std::shared_ptr<IDeviceManagerServiceListener3rd> listener,
         std::shared_ptr<HiChainAuthConnector3rd> hiChainAuthConnector);
-    virtual ~AuthSinkManager() override = default;
+    virtual ~AuthSinkManagerCred() override = default;
 
     // IDmDeviceAuthCallback3rd implement begin
     bool AuthDeviceTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen) override;
@@ -111,4 +97,4 @@ public:
 };
 }  // namespace DistributedHardware
 }  // namespace OHOS
-#endif  // OHOS_DM_AUTH_MANAGER_3RD_H
+#endif  // OHOS_DM_AUTH_MANAGER_CRED_H

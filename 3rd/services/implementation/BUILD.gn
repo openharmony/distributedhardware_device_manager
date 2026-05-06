@@ -39,6 +39,7 @@ ohos_shared_library("devicemanagerserviceimpl3rd") {
 
     include_dirs = [
         "include",
+        "include/authcredential",
         "include/authdevicewithacl",
         "include/authdevicewithacl/kvadapter",
         "include/commonbase",
@@ -55,6 +56,12 @@ ohos_shared_library("devicemanagerserviceimpl3rd") {
 
     sources = [
         "src/device_manager_service_impl_3rd.cpp",
+        "src/authcredential/auth_manager_cred.cpp",
+        "src/authcredential/dm_auth_message_processor_cred.cpp",
+        "src/authcredential/dm_auth_state_cred.cpp",
+        "src/authcredential/dm_auth_state_machine_cred.cpp",
+        "src/authcredential/auth_stages/auth_cred.cpp",
+        "src/authcredential/auth_stages/auth_negotiate_cred.cpp",
         "src/authdevicewithacl/auth_manager_3rd.cpp",
         "src/authdevicewithacl/dm_auth_message_processor_3rd.cpp",
         "src/authdevicewithacl/dm_auth_state_3rd.cpp",
@@ -88,6 +95,7 @@ ohos_shared_library("devicemanagerserviceimpl3rd") {
     external_deps = [
         "ability_runtime:ability_manager",
         "access_token:libaccesstoken_sdk",
+        "cJSON:cjson",
         "c_utils:utils",
         "data_share:datashare_common",
         "data_share:datashare_consumer",

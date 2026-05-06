@@ -76,5 +76,9 @@ const char* TAG_BIND_CALLER_UID = "bindCallerUid";
 const char* TAG_BIND_CALLER_PROCESSNAME = "bindCallerProcessName";
 const char* TAG_BIND_CALLER_IS_SYSTEM_SA = "bindCallerIsSystemSA";
 const char* TAG_BIND_CALLER_BIND_LEVEL = "bindCallerBindLevel";
+
+const char* TAG_OPENID_HASH = "openIdHash";
+const char* TAG_CRED_TYPE = "credType";
+const char* TAG_OWNER_ID = "ownerId";
 } // namespace DistributedHardware
 } // namespace OHOS

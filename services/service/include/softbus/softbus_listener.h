@@ -161,6 +161,7 @@ private:
     void CreatePinHolderSessionServer();
     void Create3rdAuthACLSessionServer();
     void Create3rdAuthSessionServer();
+    void Create3rdAuthCredSessionServer();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessControlProfile &profile, DmDeviceInfo &dmDevice);
     static void ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr);

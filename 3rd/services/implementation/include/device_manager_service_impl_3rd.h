@@ -82,6 +82,11 @@ public:
     void OnAuth3rdSessionClosed(int sessionId);
     void OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
+    int OnAuthCred3rdSessionOpened(int sessionId, int result);
+    void OnAuthCred3rdSessionClosed(int sessionId);
+    void OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+    int32_t AuthCredential(const PeerTargetId3rd &targetId, std::map<std::string, std::string> &authParam);
+
 private:
     bool IsInvalidPeerTargetId(const PeerTargetId3rd &targetId);
     void GetBindCallerInfo(DmAuthCallerInfo3rd &authCallerInfo3rd, ProcessInfo3rd &processInfo);
@@ -93,16 +98,9 @@ private:
     void AuthDeviceAclImpl(const PeerTargetId3rd &targetId, const PinCodeInfo pinCodeInfo,
         const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd);
     void SessionOpenFailed(int32_t sessionId, const ProcessInfo3rd &processInfo3rd);
-
-private:
-    ffrt::mutex pinCodeLock_;
-    std::map<ProcessInfo3rd, PinCodeInfo> pinCodeMap_;
-    std::shared_ptr<IDeviceManagerServiceListener3rd> listener_;
-    PeerTargetId3rd targetId3rd_;
-    std::map<std::string, std::string> authParam_;
-    int32_t sessionId_ = -1;
-
-private:
+    void AuthCredentialImpl(const PeerTargetId3rd &targetId,
+        const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd);
+    void CredSessionOpenFailed(int32_t sessionId, const ProcessInfo3rd &processInfo3rd);
     int32_t AuthDevice3rd(const PeerTargetId3rd &targetId, const std::map<std::string, std::string> &authParam);
     std::shared_ptr<AuthManagerBase3rd> GetAuthMgrByTokenId(uint32_t tokenId);
     std::shared_ptr<AuthManagerBase3rd> GetAuthMgrByMessage(int32_t msgType,
@@ -116,6 +114,18 @@ private:
     std::shared_ptr<AuthManagerBase3rd> GetAuthMgr();
     void CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId, int32_t connDelayCloseTime);
     void EraseAuthMgr(uint32_t tokenId);
+
+    std::shared_ptr<AuthManagerBase3rd> GetCredAuthMgrByMessage(int32_t msgType,
+        uint64_t logicalSessionId, const JsonObject &jsonObject);
+    int32_t InitCredAuthMgr(uint32_t tokenId, uint64_t logicalSessionId, ProcessInfo3rd processInfo3rd);
+
+private:
+    ffrt::mutex pinCodeLock_;
+    std::map<ProcessInfo3rd, PinCodeInfo> pinCodeMap_;
+    std::shared_ptr<IDeviceManagerServiceListener3rd> listener_;
+    PeerTargetId3rd targetId3rd_;
+    std::map<std::string, std::string> authParam_;
+    int32_t sessionId_ = -1;
     ffrt::mutex authLock_;
     bool isAuthFlowRunning_ = false;
     std::string runningAuthDeviceId_;

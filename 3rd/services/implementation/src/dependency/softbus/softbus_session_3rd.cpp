@@ -38,6 +38,7 @@ namespace {
 constexpr int32_t MAX_DATA_LEN = 4096000;   // Maximum MTU Value for Logical Session:4M
 const char* DM_3RD_AUTH_ACL_SESSION_NAME = "ohos.distributedhardware.devicemanager.auth3rdDeviceWithAcl";
 const char* DM_AUTH_3RD_SESSION_NAME = "ohos.distributedhardware.devicemanager.auth3rdDevice";
+const char* DM_AUTH_3RD_CRED_SESSION_NAME = "ohos.distributedhardware.devicemanager.auth3rdDeviceCred";
 }
 
 SoftbusSession3rd::SoftbusSession3rd()
@@ -140,6 +141,18 @@ int32_t SoftbusSession3rd::CloseAuthSession(int32_t sessionId)
     LOGI("SoftbusSession3rd CloseAuthSession.");
     ::CloseSession(sessionId);
     return DM_OK;
+}
+
+int32_t SoftbusSession3rd::OpenCredSession(const PeerTargetId3rd &targetId)
+{
+    int32_t sessionId = -1;
+    ConnectionAddr addrInfo = GetAddrByTargetId(targetId);
+    sessionId = ::OpenAuthSession(DM_AUTH_3RD_CRED_SESSION_NAME, &addrInfo, 1, nullptr);
+    if (sessionId < 0) {
+        LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId);
+        return sessionId;
+    }
+    return sessionId;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

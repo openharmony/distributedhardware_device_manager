@@ -32,6 +32,7 @@ const char* DM_PIN_HOLDER_SESSION_NAME = "ohos.distributedhardware.devicemanager
 const char* DM_SYNC_USERID_SESSION_NAME = "ohos.distributedhardware.devicemanager.syncuserid";
 const char* DM_3RD_AUTH_ACL_SESSION_NAME = "ohos.distributedhardware.devicemanager.auth3rdDeviceWithAcl";
 const char* DM_AUTH_3RD_SESSION_NAME = "ohos.distributedhardware.devicemanager.auth3rdDevice";
+const char* DM_AUTH_CRED_3RD_SESSION_NAME = "ohos.distributedhardware.devicemanager.auth3rdDeviceCred";
 const char* DM_CAPABILITY_OSD = "osdCapability";
 const char* DM_CAPABILITY_APPROACH = "approach";
 const char* DM_CAPABILITY_OH_APPROACH = "oh_approach";

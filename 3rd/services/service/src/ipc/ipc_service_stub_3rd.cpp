@@ -68,6 +68,8 @@ int32_t IpcServiceStub3rd::OnRemoteRequest(uint32_t code, MessageParcel &data, M
             return QueryTrustRelation(data, reply, option);
         case DELETE_TRUST_RELATION_3RD:
             return DeleteTrustRelation(data, reply, option);
+        case AUTH_CREDENTIAL_3RD:
+            return AuthCredential(data, reply, option);
         default:
             LOGE("invalid request code.");
             IPCObjectStub iPCObjectStub;
@@ -276,6 +278,21 @@ void IpcServiceStub3rd::OnAuth3rdBytesReceived(int sessionId, const void *data, 
     DeviceManagerService3rd::GetInstance().OnAuth3rdBytesReceived(sessionId, data, dataLen);
 }
 
+int IpcServiceStub3rd::OnAuthCred3rdSessionOpened(int sessionId, int result)
+{
+    return DeviceManagerService3rd::GetInstance().OnAuthCred3rdSessionOpened(sessionId, result);
+}
+
+void IpcServiceStub3rd::OnAuthCred3rdSessionClosed(int sessionId)
+{
+    DeviceManagerService3rd::GetInstance().OnAuthCred3rdSessionClosed(sessionId);
+}
+
+void IpcServiceStub3rd::OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+    DeviceManagerService3rd::GetInstance().OnAuthCred3rdBytesReceived(sessionId, data, dataLen);
+}
+
 int32_t IpcServiceStub3rd::AuthDevice3rd(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     (void)option;
@@ -364,6 +381,21 @@ int32_t IpcServiceStub3rd::HandleUserRemoved(int32_t removedUserId)
 int32_t IpcServiceStub3rd::HandleAccountLogoutEvent(int32_t userId, const std::string &accountId)
 {
     return DeviceManagerService3rd::GetInstance().HandleAccountLogoutEvent(userId, accountId);
+}
+
+int32_t IpcServiceStub3rd::AuthCredential(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    PeerTargetId3rd targetId;
+    DecodePeerTargetId(data, targetId);
+    std::string bindParamStr = data.ReadString();
+    std::map<std::string, std::string> bindParam;
+    ParseMapFromJsonString(bindParamStr, bindParam);
+    int32_t result = DeviceManagerService3rd::GetInstance().AuthCredential(targetId, bindParam);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
 }
 
 extern "C" IIpcServiceStub3rd *CreateIpcServiceStub3rdObject(void)

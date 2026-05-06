@@ -153,6 +153,10 @@ public:
     int OnAuth3rdSessionOpened(int sessionId, int result);
     void OnAuth3rdSessionClosed(int sessionId);
     void OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen);
+
+    int OnAuthCred3rdSessionOpened(int sessionId, int result);
+    void OnAuthCred3rdSessionClosed(int sessionId);
+    void OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen);
     int32_t HandleUserRemoved(int32_t removedUserId);
     int32_t HandleAccountLogoutEvent(int32_t userId, const std::string &accountId);
 

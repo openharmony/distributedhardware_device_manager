@@ -17,6 +17,8 @@
 
 #include <cstring>
 #include <algorithm>
+#include <string>
+#include <securec.h>
 
 #include "json_object.h"
 #include "dm_anonymous_3rd.h"
@@ -137,6 +139,18 @@ void FromJson(const JsonItemObject &itemObject, TrustDeviceInfo3rd &trustDeviceI
     }
     if (IsInt32(itemObject, "bindType")) {
         trustDeviceInfo.bindType = itemObject["bindType"].Get<int32_t>();
+    }
+}
+
+void FreeDeviceInfos(std::vector<TrustDeviceInfo3rd> &deviceInfos)
+{
+    for (auto &deviceInfo : deviceInfos) {
+        if (deviceInfo.sessionKey.key != nullptr) {
+            (void)memset_s(deviceInfo.sessionKey.key, deviceInfo.sessionKey.keyLen, 0, deviceInfo.sessionKey.keyLen);
+            free(deviceInfo.sessionKey.key);
+            deviceInfo.sessionKey.key = nullptr;
+            deviceInfo.sessionKey.keyLen = 0;
+        }
     }
 }
 } // namespace DistributedHardware

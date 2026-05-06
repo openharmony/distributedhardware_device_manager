@@ -32,6 +32,8 @@ enum DM3rdIpcInterfaceCode {
     QUERY_TRUST_RELATION_3RD,
     DELETE_TRUST_RELATION_3RD,
     ON_AUTH_RESULT_3RD,
+    AUTH_CREDENTIAL_3RD,
+    ON_AUTH_RESULT_TRUST_3RD,
     IPC_MSG_BUTT_3RD
 };
 } // namespace DistributedHardware

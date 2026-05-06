@@ -59,6 +59,10 @@ public:
     int OnAuth3rdSessionOpened(int sessionId, int result) override;
     void OnAuth3rdSessionClosed(int sessionId) override;
     void OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen) override;
+
+    int OnAuthCred3rdSessionOpened(int sessionId, int result) override;
+    void OnAuthCred3rdSessionClosed(int sessionId) override;
+    void OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen) override;
     int32_t HandleUserRemoved(int32_t removedUserId) override;
     int32_t HandleAccountLogoutEvent(int32_t userId, const std::string &accountId) override;
 private:
@@ -75,6 +79,7 @@ private:
     int32_t AuthDevice3rd(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t QueryTrustRelation(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t DeleteTrustRelation(MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t AuthCredential(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
     mutable ffrt::mutex listenerLock_;
     std::map<ProcessInfo3rd, sptr<AppDeathRecipient3rd>> appRecipient3rd_;

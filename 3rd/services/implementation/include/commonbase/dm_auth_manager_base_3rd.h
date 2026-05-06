@@ -103,6 +103,8 @@ public:
 
     virtual int32_t ImportAuthCodeAndUid(const std::string &pkgName, const std::string &authCode, int32_t uid);
     virtual void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
+    virtual int32_t AuthCredential(const PeerTargetId3rd &targetId,
+        const std::map<std::string, std::string> &authParam, int32_t sessionId, uint64_t logicalSessionId);
 };
 }  // namespace DistributedHardware
 }  // namespace OHOS

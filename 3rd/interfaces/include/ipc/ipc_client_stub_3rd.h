@@ -19,6 +19,7 @@
 #include "ipc_remote_broker_3rd.h"
 #include "iremote_stub.h"
 #include "device_manager_data_struct_3rd.h"
+#include "dm_auth_info_3rd.h"
 
 namespace OHOS { class MessageOption; }
 namespace OHOS { class MessageParcel; }
@@ -33,8 +34,12 @@ public:
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     int32_t SendCmd(int32_t cmdCode, const ProcessInfo3rd &processInfo, int32_t result, int32_t status,
         const std::string &authContent) override { return 0;};
+    int32_t SendAuthResult(const ProcessInfo3rd &processInfo, int32_t result, int32_t status,
+        std::vector<TrustDeviceInfo3rd> &deviceInfos, const std::string &authContent)  override { return 0;};
     void OnAuthResult(MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnAuthResultTrust(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void DecodeProcessInfo(MessageParcel &parcel, ProcessInfo3rd &processInfo);
+    void DecodeTrustDeviceInfos(MessageParcel &data, std::vector<TrustDeviceInfo3rd> &deviceInfos);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -18,6 +18,7 @@
 
 #include "idevice_manager_service_listener_3rd.h"
 #include  "device_manager_data_struct_3rd.h"
+#include "dm_auth_info_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -28,6 +29,8 @@ public:
 
     void OnAuthResult(const ProcessInfo3rd &processInfo3rd, int32_t result, int32_t status,
         const std::string &authContent) override;
+    void OnAuthResult(const ProcessInfo3rd &processInfo3rd, int32_t result, int32_t status,
+        std::vector<TrustDeviceInfo3rd> &deviceInfos, const std::string &authContent) override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -187,6 +187,29 @@ static void OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int
 #endif
 }
 
+static int OnAuthCred3rdSessionOpened(int sessionId, int result)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return IpcServerStub::GetInstance().OnAuthCred3rdSessionOpened(sessionId, result);
+#else
+    return 0;
+#endif
+}
+
+static void OnAuthCred3rdSessionClosed(int sessionId)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    IpcServerStub::GetInstance().OnAuthCred3rdSessionClosed(sessionId);
+#endif
+}
+
+static void OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    IpcServerStub::GetInstance().OnAuthCred3rdBytesReceived(sessionId, data, dataLen);
+#endif
+}
+
 static IPublishCb softbusPublishCallback_ = {
     .OnPublishResult = SoftbusListener::OnSoftbusPublishResult,
 };
@@ -757,6 +780,7 @@ void SoftbusListener::CreateSessionServers()
     CreatePinHolderSessionServer();
     Create3rdAuthACLSessionServer();
     Create3rdAuthSessionServer();
+    Create3rdAuthCredSessionServer();
 #endif
 }
 
@@ -819,6 +843,22 @@ void SoftbusListener::Create3rdAuthSessionServer()
         LOGE("[SOFTBUS]CreateSessionServer 3rd session failed, ret: %{public}d.", ret);
     }
 }
+
+void SoftbusListener::Create3rdAuthCredSessionServer()
+{
+    ISessionListener authCred3rdSessionListener = {
+        .OnSessionOpened = OnAuthCred3rdSessionOpened,
+        .OnSessionClosed = OnAuthCred3rdSessionClosed,
+        .OnBytesReceived = OnAuthCred3rdBytesReceived,
+        .OnMessageReceived = nullptr,
+        .OnStreamReceived = nullptr
+    };
+    int32_t ret = CreateSessionServer(DM_PKG_NAME, DM_AUTH_CRED_3RD_SESSION_NAME, &authCred3rdSessionListener);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]CreateSessionServer 3rd session failed, ret: %{public}d.", ret);
+    }
+}
+
 SoftbusListener::~SoftbusListener()
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -826,6 +866,7 @@ SoftbusListener::~SoftbusListener()
     RemoveSessionServer(DM_PKG_NAME, DM_PIN_HOLDER_SESSION_NAME);
     RemoveSessionServer(DM_PKG_NAME, DM_3RD_AUTH_ACL_SESSION_NAME);
     RemoveSessionServer(DM_PKG_NAME, DM_AUTH_3RD_SESSION_NAME);
+    RemoveSessionServer(DM_PKG_NAME, DM_AUTH_CRED_3RD_SESSION_NAME);
 #endif
     LOGD("SoftbusListener destructor.");
 }

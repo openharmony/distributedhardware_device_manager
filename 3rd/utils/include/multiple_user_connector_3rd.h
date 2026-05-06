@@ -33,7 +33,7 @@ public:
     static std::string GetOhosAccountIdByUserId(int32_t userId);
     static int32_t GetFirstForegroundUserId(void);
     static int32_t GetForegroundUserIds(std::vector<int32_t> &userVec);
-private:
+    static std::string GetOhosAccountNameByUserId(int32_t userId);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
