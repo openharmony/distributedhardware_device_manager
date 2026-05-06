@@ -20,6 +20,10 @@
 #include "dm_publish_info.h"
 #include "dm_random.h"
 #include "system_ability_definition.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "ipc_skeleton.h"
+#include "multiple_user_connector.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -28,6 +32,29 @@ const std::string AUTO_STOP_ADVERTISE_TASK = "AutoStopAdvertisingTask";
 const int32_t DM_MIN_RANDOM = 1;
 const int32_t DM_MAX_RANDOM = INT32_MAX;
 const int32_t DM_INVALID_FLAG_ID = 0;
+
+static uint32_t GetCallingTokenId()
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return IPCSkeleton::GetCallingTokenID();
+#else
+    return 0;
+#endif
+}
+
+static int32_t GetCallingUserId()
+{
+    int32_t userId = -1;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    MultipleUserConnector::GetCallerUserId(userId);
+#endif
+    return userId;
+}
+
+static std::string MakeBusinessPkgName(const std::string &pkgName, int32_t userId, uint32_t tokenId)
+{
+    return pkgName + "#" + std::to_string(userId) + "#" + std::to_string(tokenId);
+}
 
 AdvertiseManager::AdvertiseManager(std::shared_ptr<SoftbusListener> softbusListener) : softbusListener_(softbusListener)
 {
@@ -47,8 +74,9 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("begin for pkgName = %{public}s.", pkgName.c_str());
+    std::string businessPkgName = MakeBusinessPkgName(pkgName, GetCallingUserId(), GetCallingTokenId());
     DmPublishInfo dmPubInfo;
-    ConfigAdvParam(advertiseParam, &dmPubInfo, pkgName);
+    ConfigAdvParam(advertiseParam, &dmPubInfo, businessPkgName);
     std::string capability = DM_CAPABILITY_OSD;
     if (advertiseParam.find(PARAM_KEY_DISC_CAPABILITY) != advertiseParam.end()) {
         capability = advertiseParam.find(PARAM_KEY_DISC_CAPABILITY)->second;
@@ -81,8 +109,8 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
         }
         int32_t publishId = dmPubInfo.publishId;
         timer_->StartTimer(std::string(AUTO_STOP_ADVERTISE_TASK), stopTime,
-            [this, pkgName, publishId] (std::string name) {
-                AdvertiseManager::HandleAutoStopAdvertise(name, pkgName, publishId);
+            [this, businessPkgName, publishId] (std::string name) {
+                AdvertiseManager::HandleAutoStopAdvertise(name, businessPkgName, publishId);
             });
     }
     return DM_OK;
@@ -133,7 +161,8 @@ int32_t AdvertiseManager::StopAdvertising(const std::string &pkgName, int32_t pu
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("begin for pkgName = %{public}s, publishId = %{public}d.", pkgName.c_str(), publishId);
-    int32_t innerPublishId = GetAndRemoveInnerPublishId(pkgName, publishId);
+    std::string businessPkgName = MakeBusinessPkgName(pkgName, GetCallingUserId(), GetCallingTokenId());
+    int32_t innerPublishId = GetAndRemoveInnerPublishId(businessPkgName, publishId);
     if (innerPublishId == DM_INVALID_FLAG_ID) {
         LOGE("cannot find pkgName in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -197,20 +226,21 @@ int32_t AdvertiseManager::GetAndRemoveInnerPublishId(const std::string &pkgName,
     return tempPublishId;
 }
 
-void AdvertiseManager::ClearPublishIdCache(const std::string &pkgName)
+void AdvertiseManager::ClearPublishIdCache(const ProcessInfo &processInfo)
 {
-    if (pkgName.empty()) {
+    if (processInfo.pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
+    LOGI("Begin for pkgName = %{public}s.", processInfo.pkgName.c_str());
     CHECK_NULL_VOID(softbusListener_);
+    std::string businessPkgName = MakeBusinessPkgName(processInfo.pkgName, processInfo.userId, processInfo.tokenId);
     std::lock_guard<std::mutex> autoLock(pubMapLock_);
-    for (auto iter : pkgName2PubIdMap_[pkgName]) {
+    for (auto iter : pkgName2PubIdMap_[businessPkgName]) {
         softbusListener_->StopPublishSoftbusLNN(iter.second);
         publishIdSet_.erase(iter.second);
     }
-    pkgName2PubIdMap_.erase(pkgName);
+    pkgName2PubIdMap_.erase(businessPkgName);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

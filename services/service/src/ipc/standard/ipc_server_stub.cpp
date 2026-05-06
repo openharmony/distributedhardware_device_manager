@@ -503,7 +503,7 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
     DeviceManagerServiceNotify::GetInstance().ClearDiedProcessCallback(processInfo);
-    DeviceManagerService::GetInstance().ClearPublishIdCache(processInfo.pkgName);
+    DeviceManagerService::GetInstance().ClearPublishIdCache(processInfo);
     DeviceManagerService::GetInstance().UnRegisterCallerAppId(processInfo.pkgName, processInfo.userId);
     DeviceManagerService::GetInstance().ClearServiceStateCallback(processInfo.pkgName, processInfo.userId);
     DeviceManagerService::GetInstance().HandleRemoteDied(processInfo);

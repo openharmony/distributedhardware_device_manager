@@ -53,6 +53,8 @@ int64_t StringToInt64(const std::string &str, int32_t base);
 bool CompareVersion(const std::string &remoteVersion, const std::string &oldVersion);
 bool GetVersionNumber(const std::string dmVersion, int32_t &versionNum);
 std::string ComposeStr(const std::string &pkgName, uint16_t subscribeId);
+std::string ComposeStr(const std::string &pkgName, int32_t id);
+std::string ComposeStr(const std::string &pkgName, uint32_t id);
 std::string GetCallerPkgName(const std::string &pkgName);
 uint16_t GetSubscribeId(const std::string &pkgName);
 template <class T>

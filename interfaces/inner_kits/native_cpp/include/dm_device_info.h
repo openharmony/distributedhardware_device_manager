@@ -413,16 +413,22 @@ typedef struct DmAccessCallee {
 typedef struct ProcessInfo {
     int32_t userId;
     std::string pkgName;
+    uint32_t tokenId = 0;
 
     bool operator==(const ProcessInfo &other) const
     {
-        return (userId == other.userId) && (pkgName == other.pkgName);
+        return (userId == other.userId) && (pkgName == other.pkgName) && (tokenId == other.tokenId);
     }
 
     bool operator<(const ProcessInfo &other) const
     {
-        return (userId < other.userId) ||
-            (userId == other.userId && pkgName < other.pkgName);
+        if (userId != other.userId) {
+            return userId < other.userId;
+        }
+        if (pkgName != other.pkgName) {
+            return pkgName < other.pkgName;
+        }
+        return tokenId < other.tokenId;
     }
 } ProcessInfo;
 

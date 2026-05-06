@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <algorithm>
+#include <cstdlib>
 #include <set>
 #include <sstream>
 #include "cJSON.h"
@@ -68,6 +70,63 @@ std::mutex DeviceManagerServiceListener::actUnrelatedPkgNameLock_;
 std::set<std::string> DeviceManagerServiceListener::actUnrelatedPkgName_ = {};
 std::unordered_set<std::string> DeviceManagerServiceListener::highPriorityPkgNameSet_ = { "ohos.deviceprofile",
     "ohos.distributeddata.service" };
+
+std::string MakeNotifyKey(const ProcessInfo &processInfo, const std::string &deviceId)
+{
+    return processInfo.pkgName + "#" + std::to_string(processInfo.userId) + "#" +
+        std::to_string(processInfo.tokenId) + "#" + deviceId;
+}
+
+std::string MakeNotifyPrefix(const ProcessInfo &processInfo)
+{
+    return processInfo.pkgName + "#" + std::to_string(processInfo.userId) + "#" + std::to_string(processInfo.tokenId);
+}
+
+bool StartsWith(const std::string &value, const std::string &prefix)
+{
+    return value.compare(0, prefix.length(), prefix) == 0;
+}
+
+ProcessInfo FindExactProcessInfo(const std::vector<ProcessInfo> &processInfos, const ProcessInfo &target)
+{
+    for (const auto &item : processInfos) {
+        if (item == target) {
+            return item;
+        }
+    }
+    return {};
+}
+
+ProcessInfo FindUniqueProcessInfoByPkgName(const std::vector<ProcessInfo> &processInfos, const std::string &pkgName)
+{
+    ProcessInfo matchedProcessInfo;
+    for (const auto &item : processInfos) {
+        if (item.pkgName != pkgName) {
+            continue;
+        }
+        if (!matchedProcessInfo.pkgName.empty()) {
+            LOGW("multiple listeners share pkgName %{public}s, skip ambiguous callback", pkgName.c_str());
+            return {};
+        }
+        matchedProcessInfo = item;
+    }
+    return matchedProcessInfo;
+}
+
+bool ParseNotifyKey(const std::string &notifyKey, ProcessInfo &processInfo)
+{
+    std::istringstream stream(notifyKey);
+    std::string userId;
+    std::string tokenId;
+    if (!std::getline(stream, processInfo.pkgName, '#') ||
+        !std::getline(stream, userId, '#') ||
+        !std::getline(stream, tokenId, '#')) {
+        return false;
+    }
+    processInfo.userId = atoi(userId.c_str());
+    processInfo.tokenId = static_cast<uint64_t>(strtoull(tokenId.c_str(), nullptr, 10));
+    return true;
+}
 
 void handleExtraData(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
@@ -648,8 +707,9 @@ void DeviceManagerServiceListener::OnCredentialAuthStatus(const ProcessInfo &pro
 void DeviceManagerServiceListener::OnAppUnintall(const std::string &pkgName)
 {
     std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
+    std::string prefix = pkgName + "#";
     for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
-        if (it->first.find(pkgName) != std::string::npos) {
+        if (StartsWith(it->first, prefix)) {
             it = alreadyOnlinePkgName_.erase(it);
         } else {
             ++it;
@@ -677,12 +737,7 @@ void DeviceManagerServiceListener::OnSinkBindResult(const ProcessInfo &processIn
 #endif
     pReq->SetPkgName(processInfo.pkgName);
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
-    ProcessInfo processInfoTemp;
-    for (auto item : processInfos) {
-        if (item.pkgName == processInfo.pkgName) {
-            processInfoTemp = item;
-        }
-    }
+    ProcessInfo processInfoTemp = FindExactProcessInfo(processInfos, processInfo);
     if (processInfoTemp.pkgName.empty()) {
         LOGI("not register listener");
         return;
@@ -709,10 +764,13 @@ std::vector<ProcessInfo> DeviceManagerServiceListener::GetWhiteListSAProcessInfo
         return {};
     }
     std::unordered_set<std::string> notifyPkgnames = PermissionManager::GetInstance().GetWhiteListSystemSA();
+    std::vector<ProcessInfo> allProcessInfos = ipcServerListener_.GetAllProcessInfo();
     std::vector<ProcessInfo> processInfos;
-    for (const auto &it : notifyPkgnames) {
-        ProcessInfo processInfo;
-        processInfo.pkgName = it;
+    for (const auto &item : allProcessInfos) {
+        if (notifyPkgnames.find(item.pkgName) == notifyPkgnames.end()) {
+            continue;
+        }
+        ProcessInfo processInfo = item;
         processInfo.userId = 0;
         if (notifyProcessInfos.find(processInfo) == notifyProcessInfos.end()) {
             continue;
@@ -775,7 +833,7 @@ void DeviceManagerServiceListener::ProcessDeviceOnline(const std::vector<Process
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     for (const auto &it : procInfoVec) {
-        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
+        std::string notifyPkgName = MakeNotifyKey(it, std::string(info.deviceId));
         DmDeviceState notifyState = state;
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
@@ -810,7 +868,7 @@ void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<Proces
                 continue;
             }
         }
-        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
+        std::string notifyPkgName = MakeNotifyKey(it, std::string(info.deviceId));
         ClearDbReadyMap(notifyPkgName);
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
@@ -840,7 +898,7 @@ void DeviceManagerServiceListener::ProcessDeviceInfoChange(std::vector<ProcessIn
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     for (const auto &it : procInfoVec) {
         if (state == DmDeviceState::DEVICE_INFO_READY) {
-            std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
+            std::string notifyPkgName = MakeNotifyKey(it, std::string(info.deviceId));
             {
                 std::lock_guard<std::mutex> autoLock(alreadyDbReadyPkgNameLock_);
                 if (alreadyDbReadyPkgName_.find(notifyPkgName) != alreadyDbReadyPkgName_.end()) {
@@ -864,7 +922,7 @@ void DeviceManagerServiceListener::ProcessAppOnline(std::vector<ProcessInfo> &pr
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     for (const auto &it : procInfoVec) {
-        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
+        std::string notifyPkgName = MakeNotifyKey(it, std::string(info.deviceId));
         DmDeviceState notifyState = state;
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
@@ -894,7 +952,7 @@ void DeviceManagerServiceListener::ProcessAppOffline(std::vector<ProcessInfo> &p
     }
     SetNeedNotifyProcessInfos(processInfo, procInfoVec);
     for (const auto &it : procInfoVec) {
-        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
+        std::string notifyPkgName = MakeNotifyKey(it, std::string(info.deviceId));
         ClearDbReadyMap(notifyPkgName);
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
@@ -912,9 +970,9 @@ void DeviceManagerServiceListener::ProcessAppOffline(std::vector<ProcessInfo> &p
 void DeviceManagerServiceListener::OnProcessRemove(const ProcessInfo &processInfo)
 {
     std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
-    std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId);
+    std::string notifyPkgName = MakeNotifyPrefix(processInfo) + "#";
     for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
-        if (it->first.find(notifyPkgName) != std::string::npos) {
+        if (StartsWith(it->first, notifyPkgName)) {
             it = alreadyOnlinePkgName_.erase(it);
         } else {
             ++it;
@@ -926,8 +984,7 @@ void DeviceManagerServiceListener::OnDevStateCallbackAdd(const ProcessInfo &proc
     const std::vector<DmDeviceInfo> &deviceList)
 {
     for (auto item : deviceList) {
-        std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId) + "#" +
-            std::string(item.deviceId);
+        std::string notifyPkgName = MakeNotifyKey(processInfo, std::string(item.deviceId));
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
             if (alreadyOnlinePkgName_.find(notifyPkgName) != alreadyOnlinePkgName_.end()) {
@@ -948,8 +1005,7 @@ void DeviceManagerServiceListener::OnDevDbReadyCallbackAdd(const ProcessInfo &pr
     const std::vector<DmDeviceInfo> &deviceList)
 {
     for (auto item : deviceList) {
-        std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId) + "#" +
-            std::string(item.deviceId);
+        std::string notifyPkgName = MakeNotifyKey(processInfo, std::string(item.deviceId));
         {
             std::lock_guard<std::mutex> autoLock(alreadyDbReadyPkgNameLock_);
             if (alreadyDbReadyPkgName_.find(notifyPkgName) != alreadyDbReadyPkgName_.end()) {
@@ -969,18 +1025,13 @@ void DeviceManagerServiceListener::OnDevDbReadyCallbackAdd(const ProcessInfo &pr
 void DeviceManagerServiceListener::RemoveNotExistProcess()
 {
     std::set<ProcessInfo> notifyProcessInfos;
-    std::set<std::string> notifyPkgNames;
     DeviceManagerServiceNotify::GetInstance().GetCallBack(DmCommonNotifyEvent::REG_DEVICE_STATE, notifyProcessInfos);
-    int32_t pkgNameIndex = 0;
-    for (ProcessInfo processInfo : notifyProcessInfos) {
-        notifyPkgNames.insert(processInfo.pkgName);
-    }
     std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
     for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
-        std::string pkgName = GetSubStr(it->first, "#", pkgNameIndex);
-        if (find(notifyPkgNames.begin(), notifyPkgNames.end(), pkgName) == notifyPkgNames.end()) {
+        ProcessInfo processInfo;
+        if (!ParseNotifyKey(it->first, processInfo) || notifyProcessInfos.find(processInfo) == notifyProcessInfos.end()) {
             it = alreadyOnlinePkgName_.erase(it);
-            LOGI("pkgName %{public}s.", pkgName.c_str());
+            LOGI("erase stale online notify key.");
         } else {
             ++it;
         }
@@ -1121,7 +1172,7 @@ void DeviceManagerServiceListener::ProcessDeviceOnline(const std::vector<Process
         std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
         std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
         pReq->SetServiceIds(serviceIds);
-        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
+        std::string notifyPkgName = MakeNotifyKey(it, std::string(info.deviceId));
         DmDeviceState notifyState = state;
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
@@ -1147,7 +1198,7 @@ void DeviceManagerServiceListener::ProcessAppOnline(std::vector<ProcessInfo> &pr
         std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
         std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
         pReq->SetServiceIds(serviceIds);
-        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
+        std::string notifyPkgName = MakeNotifyKey(it, std::string(info.deviceId));
         DmDeviceState notifyState = state;
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
@@ -1246,13 +1297,7 @@ void DeviceManagerServiceListener::OnLeaveLNNResult(const std::string &pkgName, 
     std::shared_ptr<IpcNotifyBindResultReq> pReq = std::make_shared<IpcNotifyBindResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
-    ProcessInfo processInfoTemp;
-    for (const auto &item : processInfos) {
-        if (item.pkgName == pkgName) {
-            processInfoTemp = item;
-            break;
-        }
-    }
+    ProcessInfo processInfoTemp = FindUniqueProcessInfoByPkgName(processInfos, pkgName);
     if (processInfoTemp.pkgName.empty()) {
         LOGI("not register listener");
         return;
@@ -1296,12 +1341,7 @@ void DeviceManagerServiceListener::OnAuthCodeInvalid(const std::string &pkgName,
     std::shared_ptr<IpcReq> pReq = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
-    ProcessInfo processInfoTemp;
-    for (const auto &item : processInfos) {
-        if (item.pkgName == pkgName) {
-            processInfoTemp = item;
-        }
-    }
+    ProcessInfo processInfoTemp = FindUniqueProcessInfoByPkgName(processInfos, pkgName);
     if (processInfoTemp.pkgName.empty()) {
         LOGI("not register listener");
         return;
@@ -1316,14 +1356,10 @@ std::set<ProcessInfo> DeviceManagerServiceListener::GetAlreadyOnlineProcess()
     std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
     std::set<ProcessInfo> processInfoSet;
     for (const auto &item : alreadyOnlinePkgName_) {
-        std::string notifyPkgName = item.first;
-        std::istringstream stream(notifyPkgName);
         ProcessInfo processInfo;
-        std::string userId;
-        std::getline(stream, processInfo.pkgName, '#');
-        std::getline(stream, userId, '#');
-        processInfo.userId = atoi(userId.c_str());
-        processInfoSet.insert(processInfo);
+        if (ParseNotifyKey(item.first, processInfo)) {
+            processInfoSet.insert(processInfo);
+        }
     }
     return processInfoSet;
 }
@@ -1335,18 +1371,13 @@ int32_t DeviceManagerServiceListener::OnServiceInfoOnline(const DmRegisterServic
     LOGI("start.");
     std::shared_ptr<IpcNotifyServiceStateReq> pReq = std::make_shared<IpcNotifyServiceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-    std::string notifyPkgName = registerServiceState.pkgName;
     pReq->SetDmRegisterServiceState(registerServiceState);
     pReq->SetDmServiceInfo(serviceInfo);
     pReq->SetServiceState(DmServiceState::SERVICE_STATE_ONLINE);
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
-    ProcessInfo processInfoTemp;
-    for (const auto &item : processInfos) {
-        if (item.pkgName == registerServiceState.pkgName && item.userId == registerServiceState.userId) {
-            processInfoTemp = item;
-            break;
-        }
-    }
+    ProcessInfo targetProcessInfo { registerServiceState.userId, registerServiceState.pkgName };
+    targetProcessInfo.tokenId = registerServiceState.tokenId;
+    ProcessInfo processInfoTemp = FindExactProcessInfo(processInfos, targetProcessInfo);
     if (processInfoTemp.pkgName.empty()) {
         LOGI("not register listener");
         return ERR_DM_FAILED;
@@ -1369,18 +1400,13 @@ int32_t DeviceManagerServiceListener::OnServiceInfoOffline(const DmRegisterServi
     std::shared_ptr<IpcNotifyServiceStateReq> pReq = std::make_shared<IpcNotifyServiceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
-    std::string notifyPkgName = registerServiceState.pkgName;
     pReq->SetDmRegisterServiceState(registerServiceState);
     pReq->SetDmServiceInfo(serviceInfo);
     pReq->SetServiceState(DmServiceState::SERVICE_STATE_OFFLINE);
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
-    ProcessInfo processInfoTemp;
-    for (const auto &item : processInfos) {
-        if (item.pkgName == registerServiceState.pkgName && item.userId == registerServiceState.userId) {
-            processInfoTemp = item;
-            break;
-        }
-    }
+    ProcessInfo targetProcessInfo { registerServiceState.userId, registerServiceState.pkgName };
+    targetProcessInfo.tokenId = registerServiceState.tokenId;
+    ProcessInfo processInfoTemp = FindExactProcessInfo(processInfos, targetProcessInfo);
     if (processInfoTemp.pkgName.empty()) {
         LOGI("not register listener");
         return ERR_DM_FAILED;
@@ -1402,18 +1428,13 @@ int32_t DeviceManagerServiceListener::OnServiceInfoChange(const DmRegisterServic
     LOGI("start.");
     std::shared_ptr<IpcNotifyServiceStateReq> pReq = std::make_shared<IpcNotifyServiceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-    std::string notifyPkgName = registerServiceState.pkgName;
     pReq->SetDmRegisterServiceState(registerServiceState);
     pReq->SetDmServiceInfo(serviceInfo);
     pReq->SetServiceState(DmServiceState::SERVICE_INFO_CHANGED);
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
-    ProcessInfo processInfoTemp;
-    for (const auto &item : processInfos) {
-        if (item.pkgName == registerServiceState.pkgName && item.userId == registerServiceState.userId) {
-            processInfoTemp = item;
-            break;
-        }
-    }
+    ProcessInfo targetProcessInfo { registerServiceState.userId, registerServiceState.pkgName };
+    targetProcessInfo.tokenId = registerServiceState.tokenId;
+    ProcessInfo processInfoTemp = FindExactProcessInfo(processInfos, targetProcessInfo);
     if (processInfoTemp.pkgName.empty()) {
         LOGI("not register listener");
         return ERR_DM_FAILED;
@@ -1437,13 +1458,11 @@ void DeviceManagerServiceListener::OnSyncServiceInfoResult(const ServiceSyncInfo
     pReq->SetResult(result);
     pReq->SetContent(content);
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
-    ProcessInfo processInfoTemp;
-    for (const auto &item : processInfos) {
-        if (item.pkgName == serviceSyncInfo.pkgName) {
-            processInfoTemp = item;
-            break;
-        }
-    }
+    ProcessInfo targetProcessInfo;
+    targetProcessInfo.pkgName = serviceSyncInfo.pkgName;
+    targetProcessInfo.userId = serviceSyncInfo.callerUserId;
+    targetProcessInfo.tokenId = serviceSyncInfo.callerTokenId;
+    ProcessInfo processInfoTemp = FindExactProcessInfo(processInfos, targetProcessInfo);
     if (processInfoTemp.pkgName.empty()) {
         LOGI("not register listener");
         return;

@@ -382,6 +382,18 @@ std::string ComposeStr(const std::string &pkgName, uint16_t subscribeId)
     return strTemp;
 }
 
+std::string ComposeStr(const std::string &pkgName, int32_t id)
+{
+    std::string strTemp = pkgName + "#" + std::to_string(id);
+    return strTemp;
+}
+
+std::string ComposeStr(const std::string &pkgName, uint32_t id)
+{
+    std::string strTemp = pkgName + "#" + std::to_string(id);
+    return strTemp;
+}
+
 std::string GetCallerPkgName(const std::string &pkgName)
 {
     std::istringstream stream(pkgName);

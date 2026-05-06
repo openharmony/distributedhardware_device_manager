@@ -273,7 +273,7 @@ public:
     int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &serviceInfo);
     int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName, int32_t pinExchangeType,
         DMLocalServiceInfo &serviceInfo);
-    void ClearPublishIdCache(const std::string &pkgName);
+    void ClearPublishIdCache(const ProcessInfo &processInfo);
     bool IsPC();
     int32_t GetDeviceNetworkIdList(const std::string &pkgName, const NetworkIdQueryFilter &queryFilter,
         std::vector<std::string> &networkIds);

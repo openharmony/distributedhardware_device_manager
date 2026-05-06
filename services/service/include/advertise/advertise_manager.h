@@ -16,6 +16,7 @@
 #ifndef OHOS_ADVERTISE_MANAGER_H
 #define OHOS_ADVERTISE_MANAGER_H
 
+#include "dm_device_info.h"
 #include "dm_timer.h"
 #include "softbus_listener.h"
 
@@ -28,7 +29,7 @@ public:
 
     int32_t StartAdvertising(const std::string &pkgName, const std::map<std::string, std::string> &advertiseParam);
     int32_t StopAdvertising(const std::string &pkgName, int32_t publishId);
-    void ClearPublishIdCache(const std::string &pkgName);
+    void ClearPublishIdCache(const ProcessInfo &processInfo);
 
 private:
     void HandleAutoStopAdvertise(const std::string &timerName, const std::string &pkgName, int32_t publishId);
