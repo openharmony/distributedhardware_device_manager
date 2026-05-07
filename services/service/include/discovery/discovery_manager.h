@@ -81,6 +81,9 @@ public:
     std::set<uint16_t> ClearDiscoveryPkgName(const std::string &pkgName);
 
 private:
+    void HandleDiscoverySuccess(const std::string &pkgName, const ProcessInfo &processInfo, uint16_t externalSubId);
+    void HandleDiscoveryFailed(const std::string &pkgName, const ProcessInfo &processInfo,
+        uint16_t externalSubId, int32_t result, int32_t subscribeId);
     void StartDiscoveryTimer(const std::string &pkgName);
     void HandleDiscoveryTimeout(const std::string &pkgName);
     int32_t StartDiscovering4MetaType(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,

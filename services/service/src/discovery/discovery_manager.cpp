@@ -453,37 +453,17 @@ bool DiscoveryManager::CompareCapability(uint32_t capabilityType, const std::str
     return false;
 }
 
-void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result)
+void DiscoveryManager::HandleDiscoverySuccess(const std::string &pkgName, const ProcessInfo &processInfo,
+    uint16_t externalSubId)
 {
-    LOGI("subscribeId = %{public}d, result = %{public}d.", subscribeId, result);
-    int32_t userId = -1;
-    uint32_t tokenId = 0;
-    std::string callerPkgName = "";
-    GetPkgNameAndUserId(pkgName, callerPkgName, userId, tokenId);
-    ProcessInfo processInfo;
-    processInfo.userId = userId;
-    processInfo.pkgName = callerPkgName;
-    processInfo.tokenId = tokenId;
-    if (pkgName.empty() || (listener_ == nullptr)) {
-        LOGE("IDeviceManagerServiceListener is null.");
-        return;
-    }
-    uint16_t externalSubId = DM_INVALID_FLAG_ID;
-    {
-        std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-        for (auto iter : pkgName2SubIdMap_[pkgName]) {
-            if (iter.second == subscribeId) {
-                externalSubId = iter.first;
-                break;
-            }
-        }
-    }
-    if (result == 0) {
-        std::lock_guard<std::mutex> autoLock(locks_);
-        discoveryContextMap_[pkgName].subscribeId = (uint32_t)externalSubId;
-        listener_->OnDiscoverySuccess(processInfo, externalSubId);
-        return;
-    }
+    std::lock_guard<std::mutex> autoLock(locks_);
+    discoveryContextMap_[pkgName].subscribeId = (uint32_t)externalSubId;
+    listener_->OnDiscoverySuccess(processInfo, externalSubId);
+}
+
+void DiscoveryManager::HandleDiscoveryFailed(const std::string &pkgName, const ProcessInfo &processInfo,
+    uint16_t externalSubId, int32_t result, int32_t subscribeId)
+{
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         if (pkgNameSet_.find(pkgName) != pkgNameSet_.end()) {
@@ -505,6 +485,38 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
     }
     listener_->OnDiscoveryFailed(processInfo, (uint32_t)externalSubId, result);
     softbusListener_->StopRefreshSoftbusLNN(subscribeId);
+}
+
+void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result)
+{
+    LOGI("subscribeId = %{public}d, result = %{public}d.", subscribeId, result);
+    if (pkgName.empty() || (listener_ == nullptr)) {
+        LOGE("IDeviceManagerServiceListener is null.");
+        return;
+    }
+    int32_t userId = -1;
+    uint32_t tokenId = 0;
+    std::string callerPkgName = "";
+    GetPkgNameAndUserId(pkgName, callerPkgName, userId, tokenId);
+    ProcessInfo processInfo;
+    processInfo.userId = userId;
+    processInfo.pkgName = callerPkgName;
+    processInfo.tokenId = tokenId;
+    uint16_t externalSubId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+        for (auto iter : pkgName2SubIdMap_[pkgName]) {
+            if (iter.second == subscribeId) {
+                externalSubId = iter.first;
+                break;
+            }
+        }
+    }
+    if (result == 0) {
+        HandleDiscoverySuccess(pkgName, processInfo, externalSubId);
+        return;
+    }
+    HandleDiscoveryFailed(pkgName, processInfo, externalSubId, result, subscribeId);
 }
 
 void DiscoveryManager::StartDiscoveryTimer(const std::string &pkgName)
