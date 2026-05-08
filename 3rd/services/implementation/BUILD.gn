@@ -93,7 +93,6 @@ ohos_shared_library("devicemanagerserviceimpl3rd") {
     ]
 
     external_deps = [
-        "ability_runtime:ability_manager",
         "access_token:libaccesstoken_sdk",
         "cJSON:cjson",
         "c_utils:utils",
@@ -115,6 +114,9 @@ ohos_shared_library("devicemanagerserviceimpl3rd") {
         "zlib:shared_libz",
         "openssl:libcrypto_shared",
     ]
+    if (support_jsapi) {
+        external_deps += [ "ability_runtime:ability_manager" ]
+    }
 
     subsystem_name = "distributedhardware"
 

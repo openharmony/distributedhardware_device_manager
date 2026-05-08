@@ -230,7 +230,6 @@ if (defined(ohos_lite)) {
         "ability_base:session_info",
         "ability_base:want",
         "ability_runtime:ability_connect_callback_stub",
-        "ability_runtime:ability_manager",
         "access_token:libaccesstoken_sdk",
         "cJSON:cjson",
         "c_utils:utils",
@@ -255,6 +254,9 @@ if (defined(ohos_lite)) {
         "samgr:samgr_proxy",
         "zlib:shared_libz",
       ]
+      if (support_jsapi) {
+        external_deps += [ "ability_runtime:ability_manager" ]
+      }
 
       if (support_screenlock && device_manager_feature_product == "default") {
         defines += [ "SUPPORT_SCREENLOCK" ]
