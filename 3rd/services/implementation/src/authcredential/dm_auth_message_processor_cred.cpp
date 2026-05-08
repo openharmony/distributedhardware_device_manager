@@ -35,7 +35,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-constexpr const char* DM_TAG_LOGICAL_SESSION_ID = "logicalSessionId";
 DmAuthMessageProcessorCred::DmAuthMessageProcessorCred()
 {
     LOGI("DmAuthMessageProcessorCred constructor");

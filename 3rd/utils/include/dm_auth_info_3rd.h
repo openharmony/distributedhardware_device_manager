@@ -75,7 +75,6 @@ void FromJson(const JsonItemObject &itemObject, AccessControl3rd &accessControl)
 void ToJson(JsonItemObject &itemObject, const TrustDeviceInfo3rd &trustDeviceInfo);
 void FromJson(const JsonItemObject &itemObject, TrustDeviceInfo3rd &trustDeviceInfo);
 void FreeDeviceInfos(std::vector<TrustDeviceInfo3rd> &deviceInfos);
-
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ACL_AUTH_INFO_3RD_H

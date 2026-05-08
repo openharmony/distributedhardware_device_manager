@@ -21,21 +21,21 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-#define MAX_CONTAINER_SIZE 10000
+#define MAX_3RD_CONTAINER_SIZE 10000
 #undef LOG_TAG
 #define LOG_TAG "DHDM"
 
 #define LOGD(fmt, ...) HILOG_DEBUG(LOG_CORE, \
-    "[%{public}s][%{public}s]:" fmt, LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
+    "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
 
 #define LOGI(fmt, ...) HILOG_INFO(LOG_CORE, \
-    "[%{public}s][%{public}s]:" fmt, LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
+    "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
 
 #define LOGW(fmt, ...) HILOG_WARN(LOG_CORE, \
-    "[%{public}s][%{public}s]:" fmt, LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
+    "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
 
 #define LOGE(fmt, ...) HILOG_ERROR(LOG_CORE, \
-    "[%{public}s][%{public}s]:" fmt, LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
+    "[%{public}s][%{public}s]:" fmt, DH_LOG_TAG, __FUNCTION__, ##__VA_ARGS__)
 
 #define CHECK_NULL_VOID(ptr)                    \
     do {                                        \
@@ -55,7 +55,7 @@ namespace DistributedHardware {
 
 #define CHECK_SIZE_VOID(container)                    \
     do {                                        \
-        if ((container).size() >= MAX_CONTAINER_SIZE) {                 \
+        if ((container).size() >= MAX_3RD_CONTAINER_SIZE) {                 \
             LOGE("container size is more than max size");    \
             return;                             \
         }                                       \
@@ -63,7 +63,7 @@ namespace DistributedHardware {
 
 #define CHECK_SIZE_RETURN(container, ret)             \
     do {                                        \
-        if ((container).size() >= MAX_CONTAINER_SIZE) {                 \
+        if ((container).size() >= MAX_3RD_CONTAINER_SIZE) {                 \
             LOGE("container size is more than max size");    \
             return (ret);                       \
         }                                       \

@@ -50,6 +50,7 @@ const int32_t MIN_PINCODE_SIZE = 6;
 const char* DM_PKG_NAME = "ohos.distributedhardware.devicemanager";
 const char* DM_VAL_TRUE = "true";
 const char* DM_VAL_FALSE = "false";
+const char* DM_TAG_LOGICAL_SESSION_ID = "logicalSessionId";
 
 // ACL
 const char* ACL_PREFIX = "acl_";

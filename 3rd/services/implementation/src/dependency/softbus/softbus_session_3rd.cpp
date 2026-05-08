@@ -95,6 +95,51 @@ ConnectionAddr SoftbusSession3rd::CreateBrAddr(const PeerTargetId3rd &targetId)
     return addrBr;
 }
 
+ConnectionAddr SoftbusSession3rd::CreateBleDirectAddr(const PeerTargetId3rd &targetId)
+{
+    ConnectionAddr addrBleDirect = {
+        .type = ConnectionAddrType::CONNECTION_ADDR_RAW_BLE_DIRECT,
+        .info{
+            .br{} }
+    };
+
+    if (memcpy_s(addrBleDirect.info.bleDirect.udidHash, UDID_HASH_LEN, targetId.deviceId.c_str(),
+        targetId.deviceId.length()) != 0) {
+        LOGE("get addrBleDirect udidHash: %{public}s failed", GetAnonyString(targetId.deviceId).c_str());
+        return addrBleDirect;
+    }
+    return addrBleDirect;
+}
+
+ConnectionAddr SoftbusSession3rd::GetAuth3rdAddrByTargetId(const PeerTargetId3rd &targetId)
+{
+    if (!targetId.deviceId.empty()) {
+        return CreateBleDirectAddr(targetId);
+    }
+    if (!targetId.wifiIp.empty() && targetId.wifiIp.length() <= IP_STR_MAX_LEN) {
+        return CreateWifiAddr(targetId);
+    }
+    if (!targetId.bleMac.empty() && targetId.bleMac.length() <= BT_MAC_LEN) {
+        return CreateBleAddr(targetId);
+    }
+    if (!targetId.brMac.empty() && targetId.brMac.length() <= BT_MAC_LEN) {
+        return CreateBrAddr(targetId);
+    }
+    return ConnectionAddr{};
+}
+
+int32_t SoftbusSession3rd::OpenAuth3rdSessionServer(const PeerTargetId3rd &targetId)
+{
+    int32_t sessionId = -1;
+    ConnectionAddr addrInfo = GetAuth3rdAddrByTargetId(targetId);
+    sessionId = ::OpenAuthSession(DM_AUTH_3RD_SESSION_NAME, &addrInfo, 1, nullptr);
+    if (sessionId < 0) {
+        LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId);
+        return sessionId;
+    }
+    return sessionId;
+}
+
 ConnectionAddr SoftbusSession3rd::GetAddrByTargetId(const PeerTargetId3rd &targetId)
 {
     if (!targetId.wifiIp.empty() && targetId.wifiIp.length() <= IP_STR_MAX_LEN) {
@@ -127,10 +172,10 @@ int32_t SoftbusSession3rd::SendData(int32_t sessionId, const std::string &messag
         LOGE("SendData size is %{public}zu too long.", message.size());
         return ERR_DM_FAILED;
     }
-
+    LOGI("SendData, sessionId:%{public}d", sessionId);
     int32_t ret = SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]SendBytes failed.");
+        LOGE("[SOFTBUS]SendBytes failed, ret:%{public}d, sessionId:%{public}d", ret, sessionId);
         return ret;
     }
     return DM_OK;
@@ -138,7 +183,7 @@ int32_t SoftbusSession3rd::SendData(int32_t sessionId, const std::string &messag
 
 int32_t SoftbusSession3rd::CloseAuthSession(int32_t sessionId)
 {
-    LOGI("SoftbusSession3rd CloseAuthSession.");
+    LOGI("CloseAuthSession, sessionId:%{public}d", sessionId);
     ::CloseSession(sessionId);
     return DM_OK;
 }

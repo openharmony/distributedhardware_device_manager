@@ -12,13 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <vector>
-#include "ipc_interface_code_3rd.h"
+
 #include "ipc_server_client_proxy_3rd.h"
-#include "ipc_utils_3rd.h"
+
+#include <vector>
+
 #include "dm_auth_info_3rd.h"
 #include "dm_error_type_3rd.h"
 #include "dm_log_3rd.h"
+#include "ipc_interface_code_3rd.h"
+#include "ipc_utils_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {

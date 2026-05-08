@@ -64,6 +64,39 @@ const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t PIN_AUTH_TIMEOUT = 60;
 const int32_t EVENT_TIMEOUT = 5000; // 5000 ms
 
+int32_t AuthManagerBase3rd::AuthDevice3rd(const PeerTargetId3rd &targetId,
+    const std::map<std::string, std::string> &authParam, int32_t sessionId, uint64_t logicalSessionId)
+{
+    LOGI("start");
+    (void)targetId;
+    (void)authParam;
+    (void)sessionId;
+    (void)logicalSessionId;
+    return DM_OK;
+}
+
+int32_t AuthManagerBase3rd::AuthPincode(const PeerTargetId3rd &targetId,
+    const std::map<std::string, std::string> &authParam, int32_t sessionId, uint64_t logicalSessionId)
+{
+    LOGI("start");
+    (void)targetId;
+    (void)authParam;
+    (void)sessionId;
+    (void)logicalSessionId;
+    return DM_OK;
+}
+
+int32_t AuthManagerBase3rd::AuthCredential(const PeerTargetId3rd &targetId,
+    const std::map<std::string, std::string> &authParam, int32_t sessionId, uint64_t logicalSessionId)
+{
+    LOGI("start");
+    (void)targetId;
+    (void)authParam;
+    (void)sessionId;
+    (void)logicalSessionId;
+    return DM_OK;
+}
+
 void AuthManagerBase3rd::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
     LOGE("OnSessionOpened is not implemented in the current version");
