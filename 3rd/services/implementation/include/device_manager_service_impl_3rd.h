@@ -28,6 +28,7 @@
 #include "parameter.h"
 
 #include "auth_manager_3rd.h"
+#include "auth_pincode_manager_3rd.h"
 #include "dm_single_instance_3rd.h"
 #include "dm_log_3rd.h"
 #include "device_manager_data_struct_3rd.h"
@@ -93,14 +94,17 @@ private:
     void SetBindCallerInfoToAuthParam(const std::map<std::string, std::string> &authParam,
         std::map<std::string, std::string> &authParamTmp, const DmAuthCallerInfo3rd &authCallerInfo3rd,
         ProcessInfo3rd &processInfo);
-    void AuthPincodeImpl(const PeerTargetId3rd &targetId, const PinCodeInfo pinCodeInfo,
-        const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd);
     void AuthDeviceAclImpl(const PeerTargetId3rd &targetId, const PinCodeInfo pinCodeInfo,
         const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd);
     void SessionOpenFailed(int32_t sessionId, const ProcessInfo3rd &processInfo3rd);
     void AuthCredentialImpl(const PeerTargetId3rd &targetId,
         const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd);
     void CredSessionOpenFailed(int32_t sessionId, const ProcessInfo3rd &processInfo3rd);
+    void AuthPincodeImpl(const PeerTargetId3rd &targetId, const PinCodeInfo pinCodeInfo,
+        const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd);
+    bool SetProcessInfo3rd(const JsonObject &jsonObject, uint32_t &tokenId, ProcessInfo3rd &processInfo3rd);
+    int32_t InitAuthPincodeMgr(bool isSrcSide, uint32_t tokenId, uint64_t logicalSessionId,
+        const ProcessInfo3rd &processInfo3rd);
     int32_t AuthDevice3rd(const PeerTargetId3rd &targetId, const std::map<std::string, std::string> &authParam);
     std::shared_ptr<AuthManagerBase3rd> GetAuthMgrByTokenId(uint32_t tokenId);
     std::shared_ptr<AuthManagerBase3rd> GetAuthMgrByMessage(int32_t msgType,

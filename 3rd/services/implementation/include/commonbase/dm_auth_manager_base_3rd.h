@@ -73,6 +73,9 @@ public:
     virtual int32_t AuthDevice3rd(const PeerTargetId3rd &targetId, const std::map<std::string, std::string> &authParam,
         int32_t sessionId, uint64_t logicalSessionId);
 
+    virtual int32_t AuthPincode(const PeerTargetId3rd &targetId, const std::map<std::string, std::string> &authParam,
+        int32_t sessionId, uint64_t logicalSessionId);
+
     virtual void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result);
 
     virtual void OnSessionClosed(const int32_t sessionId);

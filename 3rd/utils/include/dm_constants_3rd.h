@@ -52,6 +52,7 @@ extern const int32_t MIN_PINCODE_SIZE;
 extern const char* DM_PKG_NAME;
 extern const char* DM_VAL_TRUE;
 extern const char* DM_VAL_FALSE;
+extern const char* DM_TAG_LOGICAL_SESSION_ID;
 
 // ACL
 extern const char* ACL_PREFIX;

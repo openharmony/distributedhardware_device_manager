@@ -13,18 +13,19 @@
  * limitations under the License.
  */
 
+#include "device_manager_service_listener_3rd.h"
+
 #include <vector>
 #include <sstream>
 
-#include "device_manager_service_listener_3rd.h"
-#include "ipc_service_stub_3rd.h"
-#include "ipc_interface_code_3rd.h"
-#include "dm_anonymous_3rd.h"
-#include "dm_log_3rd.h"
-#include "dm_error_type_3rd.h"
 #include "device_manager_data_struct_3rd.h"
 #include "dm_auth_info_3rd.h"
+#include "dm_anonymous_3rd.h"
+#include "dm_error_type_3rd.h"
+#include "dm_log_3rd.h"
+#include "ipc_interface_code_3rd.h"
 #include "ipc_remote_broker_3rd.h"
+#include "ipc_service_stub_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {

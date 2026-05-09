@@ -33,15 +33,18 @@ public:
     ~SoftbusSession3rd();
 
     int32_t OpenSessionServer(const PeerTargetId3rd &targetId);
+    int32_t OpenAuth3rdSessionServer(const PeerTargetId3rd &targetId);
     int32_t SendData(int32_t sessionId, const std::string &message);
     int32_t CloseAuthSession(int32_t sessionId);
     int32_t OpenCredSession(const PeerTargetId3rd &targetId);
 
 private:
     ConnectionAddr GetAddrByTargetId(const PeerTargetId3rd &targetId);
+    ConnectionAddr GetAuth3rdAddrByTargetId(const PeerTargetId3rd &targetId);
     ConnectionAddr CreateWifiAddr(const PeerTargetId3rd &targetId);
     ConnectionAddr CreateBleAddr(const PeerTargetId3rd &targetId);
     ConnectionAddr CreateBrAddr(const PeerTargetId3rd &targetId);
+    ConnectionAddr CreateBleDirectAddr(const PeerTargetId3rd &targetId);
 };
 }
 }

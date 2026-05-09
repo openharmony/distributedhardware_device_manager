@@ -33,7 +33,6 @@ struct DmAccess;
 struct DmProxyAuthContext;
 struct DmProxyAccess;
 
-constexpr const char* DM_TAG_LOGICAL_SESSION_ID = "logicalSessionId";
 // Message type
 enum DmMessageType {
     ACL_REQ_NEGOTIATE = 2010,
@@ -47,7 +46,6 @@ enum DmMessageType {
     ACL_REQ_FINISH = 2070,
     ACL_RESP_FINISH = 2080
 };
-
 
 class DmAuthMessageProcessor3rd {
 public:

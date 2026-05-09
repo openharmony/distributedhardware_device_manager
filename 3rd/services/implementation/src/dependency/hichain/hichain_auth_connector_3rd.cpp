@@ -83,9 +83,10 @@ int32_t HiChainAuthConnector3rd::AuthCredentialPinCode(int32_t osAccountId, int6
     const std::string &pinCode)
 {
     std::string pinCodeHash = GetAnonyString(Crypto3rd::Sha256(pinCode));
-    LOGI("AuthCredentialPinCode pinCodeHash: %{public}s", pinCodeHash.c_str());
+    LOGI("pinCodeHash:%{public}s, osAccountId:%{public}d, authReqId:%{public}" PRId64 "",
+        GetAnonyString(pinCodeHash).c_str(), osAccountId, authReqId);
     if (static_cast<int32_t>(pinCode.size()) < MIN_PINCODE_SIZE) {
-        LOGE("HiChainAuthConnector3rd::AuthCredentialPinCode failed, pinCode size is %{public}zu.", pinCode.size());
+        LOGE("failed, pinCode size is %{public}zu.", pinCode.size());
         return ERR_DM_FAILED;
     }
 
@@ -182,12 +183,12 @@ void HiChainAuthConnector3rd::onSessionKeyReturned(int64_t requestId, const uint
 
 int32_t HiChainAuthConnector3rd::ProcessCredData(int64_t authReqId, const std::string &data)
 {
-    LOGI("HiChainAuthConnector3rd::ProcessAuthData start.");
+    LOGI("ProcessAuthData start, authReqId:%{public}" PRId64 "", authReqId);
     const CredAuthManager *credAuthManager = GetCredAuthInstance();
     int32_t ret = credAuthManager->processCredData(authReqId, reinterpret_cast<const uint8_t *>(data.c_str()),
         data.length(), &deviceAuthCallback_);
     if (ret != HC_SUCCESS) {
-        LOGE("Hichain processData failed ret %{public}d.", ret);
+        LOGE("[Hichain] processData failed ret %{public}d.", ret);
         return ERR_DM_FAILED;
     }
     return DM_OK;

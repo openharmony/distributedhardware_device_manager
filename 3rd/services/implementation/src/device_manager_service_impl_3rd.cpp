@@ -31,6 +31,7 @@
 #include "dm_auth_info_3rd.h"
 #include "dm_auth_message_processor_3rd.h"
 #include "dm_auth_message_3rd.h"
+#include "dm_auth_pincode_message_processor_3rd.h"
 #include "dm_constants_3rd.h"
 #include "dm_error_type_3rd.h"
 #include "dm_log_3rd.h"
@@ -114,31 +115,6 @@ void DeviceManagerServiceImpl3rd::OnAuth3rdAclBytesReceived(int sessionId, const
         return;
     }
     authMgr->OnDataReceived(sessionId, message);
-}
-
-int DeviceManagerServiceImpl3rd::OnAuth3rdSessionOpened(int sessionId, int result)
-{
-    LOGI("OnSessionOpened, success, sessionId: %{public}d.", sessionId);
-    return DM_OK;
-}
-
-void DeviceManagerServiceImpl3rd::OnAuth3rdSessionClosed(int sessionId)
-{
-    LOGI("OnSessionClosed, success, sessionId: %{public}d.", sessionId);
-    return;
-}
-
-void DeviceManagerServiceImpl3rd::OnAuth3rdBytesReceived(int sessionId, const void *data, uint32_t dataLen)
-{
-    if (sessionId < 0 || data == nullptr || dataLen <= 0 || dataLen > MAX_DATA_LEN) {
-        LOGE("[SOFTBUS]fail to receive data from softbus with sessionId: %{public}d, dataLen: %{public}d.", sessionId,
-            dataLen);
-        return;
-    }
-    LOGI("start, sessionId: %{public}d, dataLen: %{public}d.", sessionId, dataLen);
-    std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
-    LOGI("OnBytesReceived, success, sessionId: %{public}d.", sessionId);
-    return;
 }
 
 int DeviceManagerServiceImpl3rd::OnAuthCred3rdSessionOpened(int sessionId, int result)
@@ -252,7 +228,9 @@ int32_t DeviceManagerServiceImpl3rd::ImportPinCode3rd(const std::string &busines
 
 bool DeviceManagerServiceImpl3rd::IsInvalidPeerTargetId(const PeerTargetId3rd &targetId)
 {
-    LOGI("deviceId: %{public}s", GetAnonyString(targetId.deviceId).c_str());
+    LOGI("deviceId:%{public}s, brMac:%{public}s, bleMac:%{public}s, wifiIp:%{public}s",
+        GetAnonyString(targetId.deviceId).c_str(), GetAnonyString(targetId.brMac).c_str(),
+        GetAnonyString(targetId.bleMac).c_str(), GetAnonyString(targetId.wifiIp).c_str());
     return targetId.deviceId.empty() && targetId.brMac.empty() && targetId.bleMac.empty() && targetId.wifiIp.empty();
 }
 
@@ -299,60 +277,6 @@ void DeviceManagerServiceImpl3rd::SetBindCallerInfoToAuthParam(const std::map<st
     authParamTmp[TAG_BIND_CALLER_PROCESSNAME] = authCallerInfo3rd.processName;
     authParamTmp[TAG_BIND_CALLER_IS_SYSTEM_SA] = std::to_string(authCallerInfo3rd.isSystemSA);
     authParamTmp[TAG_BIND_CALLER_BIND_LEVEL] = std::to_string(authCallerInfo3rd.bindLevel);
-}
-
-int32_t DeviceManagerServiceImpl3rd::AuthPincode(const PeerTargetId3rd &targetId,
-    std::map<std::string, std::string> &authParam)
-{
-    if (IsInvalidPeerTargetId(targetId)) {
-        LOGE("Invalid parameter, params are empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-
-    LOGI("Start, deviceId: %{public}s", GetAnonyString(targetId.deviceId).c_str());
-    ProcessInfo3rd processInfo3rd;
-    DmAuthCallerInfo3rd authCallerInfo3rd;
-    GetBindCallerInfo(authCallerInfo3rd, processInfo3rd);
-    std::map<std::string, std::string> authParamTmp;
-    SetBindCallerInfoToAuthParam(authParam, authParamTmp, authCallerInfo3rd, processInfo3rd);
-    LOGI("In, processName:%{public}s, tokenId:%{public}u", authCallerInfo3rd.processName.c_str(),
-        authCallerInfo3rd.tokenId);
-    {
-        std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
-        if (tokenIdSessionIdMap_.find(processInfo3rd.tokenId) != tokenIdSessionIdMap_.end()) {
-            LOGE("AuthPincode failed, this device is being auth. please try again later,"
-                "processName:%{public}s, tokenId:%{public}u, sessionId: %{public}d",
-                authCallerInfo3rd.processName.c_str(), authCallerInfo3rd.tokenId,
-                tokenIdSessionIdMap_[processInfo3rd.tokenId]);
-            return ERR_DM_AUTH_BUSINESS_BUSY;
-        }
-    }
-    PinCodeInfo pinCodeInfo;
-    {
-        std::lock_guard<ffrt::mutex> lock(pinCodeLock_);
-        if (pinCodeMap_.find(processInfo3rd) == pinCodeMap_.end()) {
-            LOGE("pinCodeInfo is not exist");
-            return ERR_DM_INPUT_PARA_INVALID;
-        }
-        pinCodeInfo = pinCodeMap_[processInfo3rd];
-    }
-    std::thread newThread(&DeviceManagerServiceImpl3rd::AuthPincodeImpl, this, targetId, pinCodeInfo,
-        authParamTmp, processInfo3rd);
-    newThread.detach();
-
-    LOGI("AuthPincode completed");
-    return DM_OK;
-}
-
-void DeviceManagerServiceImpl3rd::AuthPincodeImpl(const PeerTargetId3rd &targetId, const PinCodeInfo pinCodeInfo,
-    const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd)
-{
-    LOGE("processName:%{public}s, tokenId:%{public}u, businessName: %{public}s",
-        processInfo3rd.processName.c_str(), processInfo3rd.tokenId, processInfo3rd.businessName.c_str());
-    
-    targetId3rd_ = targetId;
-    authParam_ = authParamTmp;
-    return;
 }
 
 static uint64_t GenerateRandNum(int sessionId)
@@ -432,6 +356,7 @@ void DeviceManagerServiceImpl3rd::SessionOpenFailed(int32_t sessionId, const Pro
 {
     LOGE("wait session enable timeout or enable fail, sessionId: %{public}d.", sessionId);
     if (listener_ == nullptr) {
+        LOGE("listener_ is nullptr");
         return;
     }
     listener_->OnAuthResult(processInfo3rd, ERR_DM_AUTH_OPEN_SESSION_FAILED, 0, "");
@@ -444,6 +369,8 @@ int32_t DeviceManagerServiceImpl3rd::AuthDevice3rd(const PeerTargetId3rd &target
         LOGE("Invalid parameter, params are empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+
+    LOGI("Start, deviceId:%{public}s", GetAnonyString(targetId.deviceId).c_str());
 
     ProcessInfo3rd processInfo3rd;
     DmAuthCallerInfo3rd authCallerInfo3rd;
@@ -541,6 +468,7 @@ std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rd::GetAuthMgrByMes
     uint64_t logicalSessionId, const JsonObject &jsonObject)
 {
     uint32_t tokenId = 0;
+    LOGI("GetAuthMgrByMessage, msgType: %{public}d", msgType);
     if (msgType == DmMessageType::ACL_REQ_NEGOTIATE) {
         std::string processName;
         std::string businessName;
@@ -561,6 +489,18 @@ std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rd::GetAuthMgrByMes
         processInfo3rd.tokenId = tokenId;
         processInfo3rd.userId = MultipleUserConnector3rd::GetCurrentAccountUserID();
         if (InitAuthMgr(false, tokenId, logicalSessionId, processInfo3rd) != DM_OK) {
+            return nullptr;
+        }
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
+    } else if (msgType == DmPincodeMessageType::AUTH_PINCODE_REQ_NEGOTIATE) {
+        ProcessInfo3rd processInfo3rd;
+        if (!SetProcessInfo3rd(jsonObject, tokenId, processInfo3rd)) {
+            LOGE("SetProcessInfo3rd failed");
+            return nullptr;
+        }
+        if (InitAuthPincodeMgr(false, tokenId, logicalSessionId, processInfo3rd) != DM_OK) {
+            LOGE("InitAuthPincodeMgr failed");
             return nullptr;
         }
         std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
@@ -848,6 +788,196 @@ void DeviceManagerServiceImpl3rd::CredSessionOpenFailed(int32_t sessionId, const
     }
     std::vector<TrustDeviceInfo3rd> deviceInfos;
     listener_->OnAuthResult(processInfo3rd, ERR_DM_AUTH_OPEN_SESSION_FAILED, 0, deviceInfos, "");
+}
+
+bool DeviceManagerServiceImpl3rd::SetProcessInfo3rd(const JsonObject &jsonObject, uint32_t &tokenId,
+    ProcessInfo3rd &processInfo3rd)
+{
+    LOGI("SetProcessInfo3rd tokenId: %{public}d", tokenId);
+    std::string processName;
+    std::string businessName;
+    if (IsString(jsonObject, TAG_PEER_BUSINESS_NAME)) {
+        businessName = jsonObject[TAG_PEER_BUSINESS_NAME].Get<std::string>();
+    }
+    if (IsString(jsonObject, TAG_PEER_PROCESS_NAME)) {
+        processName = jsonObject[TAG_PEER_PROCESS_NAME].Get<std::string>();
+    }
+    tokenId = GetTokenId(false, processName);
+    if (tokenId == 0) {
+        LOGE("Get tokenId failed.");
+        return false;
+    }
+    processInfo3rd.processName = processName;
+    processInfo3rd.businessName = businessName;
+    processInfo3rd.tokenId = tokenId;
+    processInfo3rd.userId = MultipleUserConnector3rd::GetCurrentAccountUserID();
+    return true;
+}
+
+int32_t DeviceManagerServiceImpl3rd::InitAuthPincodeMgr(bool isSrcSide, uint32_t tokenId, uint64_t logicalSessionId,
+    const ProcessInfo3rd &processInfo3rd)
+{
+    LOGI("isSrcSide:%{public}d, tokenId: %{public}s", isSrcSide, GetAnonyString(std::to_string(tokenId)).c_str());
+    std::shared_ptr<AuthManagerBase3rd> authPincodeMgr = nullptr;
+    // Create a new auth_pincode_mgr, create authPincodeMgr
+    if (isSrcSide) {
+        // src end
+        authPincodeMgr = std::make_shared<AuthPincodeSrcManager>(softbusConnector_, listener_, hiChainAuthConnector_);
+    } else {
+        // sink end
+        authPincodeMgr = std::make_shared<AuthPincodeSinkManager>(softbusConnector_, listener_, hiChainAuthConnector_);
+    }
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime);
+    };
+    // Register resource destruction notification function
+    authPincodeMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
+    CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
+    hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authPincodeMgr);
+    LOGI("Initialize authPincodeMgr token: %{public}d.", tokenId);
+    ImportAuthCodeAndUidFromCache(authPincodeMgr, processInfo3rd);
+    return AddAuthMgr(tokenId, authPincodeMgr);
+}
+
+int32_t DeviceManagerServiceImpl3rd::AuthPincode(const PeerTargetId3rd &targetId,
+    std::map<std::string, std::string> &authParam)
+{
+    if (IsInvalidPeerTargetId(targetId)) {
+        LOGE("Invalid parameter, params are empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    LOGI("Start, deviceId:%{public}s", GetAnonyString(targetId.deviceId).c_str());
+
+    ProcessInfo3rd processInfo3rd;
+    DmAuthCallerInfo3rd authCallerInfo3rd;
+    GetBindCallerInfo(authCallerInfo3rd, processInfo3rd);
+    std::map<std::string, std::string> authParamTmp;
+    SetBindCallerInfoToAuthParam(authParam, authParamTmp, authCallerInfo3rd, processInfo3rd);
+    LOGI("In, processName:%{public}s, tokenId:%{public}u", authCallerInfo3rd.processName.c_str(),
+        authCallerInfo3rd.tokenId);
+    {
+        std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
+        if (tokenIdSessionIdMap_.find(processInfo3rd.tokenId) != tokenIdSessionIdMap_.end()) {
+            LOGE("AuthPincode failed, this device is being auth. please try again later,"
+                "processName:%{public}s, tokenId:%{public}u, sessionId: %{public}d",
+                authCallerInfo3rd.processName.c_str(), authCallerInfo3rd.tokenId,
+                tokenIdSessionIdMap_[processInfo3rd.tokenId]);
+            return ERR_DM_AUTH_BUSINESS_BUSY;
+        }
+    }
+    PinCodeInfo pinCodeInfo;
+    {
+        std::lock_guard<ffrt::mutex> lock(pinCodeLock_);
+        if (pinCodeMap_.find(processInfo3rd) == pinCodeMap_.end()) {
+            LOGE("pinCodeInfo is not exist");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+        pinCodeInfo = pinCodeMap_[processInfo3rd];
+    }
+    std::thread newThread(&DeviceManagerServiceImpl3rd::AuthPincodeImpl, this, targetId, pinCodeInfo,
+        authParamTmp, processInfo3rd);
+    newThread.detach();
+    LOGI("AuthPincode completed");
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl3rd::AuthPincodeImpl(const PeerTargetId3rd &targetId, const PinCodeInfo pinCodeInfo,
+    const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd)
+{
+    LOGE("processName:%{public}s, tokenId:%{public}u, businessName: %{public}s",
+        processInfo3rd.processName.c_str(), processInfo3rd.tokenId, processInfo3rd.businessName.c_str());
+
+    std::shared_ptr<AuthManagerBase3rd> authMgr = nullptr;
+    std::lock_guard<ffrt::mutex> autoLock(authMgrMapLock_);
+    auto it = authMgrMap_.find(processInfo3rd.tokenId);
+    if (it != authMgrMap_.end()) {
+        LOGI("AuthMgr already exists for token %{public}s",
+            GetAnonyString(std::to_string(processInfo3rd.tokenId)).c_str());
+        authMgr = it->second;
+    } else {
+        authMgr = std::make_shared<AuthPincodeSrcManager>(softbusConnector_, listener_, hiChainAuthConnector_);
+        authMgrMap_[processInfo3rd.tokenId] = authMgr;
+        LOGI("Created new AuthMgr for token:%{public}s",
+            GetAnonyString(std::to_string(processInfo3rd.tokenId)).c_str());
+    }
+    int32_t sessionId = softbusConnector_->GetSoftbusSession()->OpenAuth3rdSessionServer(targetId);
+    if (sessionId < 0) {
+        LOGE("OpenAuthSession failed, stop the authentication");
+        return;
+    }
+    uint64_t logicalSessionId = GenerateRandNum(sessionId);
+    LOGI("AuthPincodeImpl, sessionId:%{public}d, logicalSessionId:%{public}" PRIu64 "", sessionId, logicalSessionId);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime);
+    };
+    authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
+    CHECK_NULL_VOID(hiChainAuthConnector_);
+    hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authMgr);
+    ImportAuthCodeAndUidFromCache(authMgr, processInfo3rd);
+    {
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        logicalSessionId2TokenIdMap_[logicalSessionId] = processInfo3rd.tokenId;
+    }
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+        logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+    }
+    sessionEnableCvReadyMap_[sessionId] = false;
+    std::unique_lock<ffrt::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
+    if (!sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::milliseconds(OPEN_AUTH_SESSION_TIMEOUT),
+        [&] { return sessionEnableCvReadyMap_[sessionId]; })) {
+        LOGE("wait session enable timeout or enable fail, sessionId: %{public}d.", sessionId);
+        CredSessionOpenFailed(sessionId, processInfo3rd);
+        return;
+    }
+    authMgr->AuthPincode(targetId, authParamTmp, sessionId, logicalSessionId);
+    return;
+}
+
+int DeviceManagerServiceImpl3rd::OnAuth3rdSessionOpened(int sessionId, int result)
+{
+    LOGI("OnSessionOpened success, sessionId:%{public}d, res:%{public}d.", sessionId, result);
+    if (sessionEnableCvMap_.find(sessionId) != sessionEnableCvMap_.end()) {
+        std::lock_guard<ffrt::mutex> lock(sessionEnableMutexMap_[sessionId]);
+        if (result == 0) {
+            sessionEnableCvReadyMap_[sessionId] = true;
+        }
+        sessionEnableCvMap_[sessionId].notify_all();
+    }
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl3rd::OnAuth3rdSessionClosed(int sessionId)
+{
+    LOGI("OnSessionClosed, success, sessionId: %{public}d.", sessionId);
+    return;
+}
+
+void DeviceManagerServiceImpl3rd::OnAuth3rdBytesReceived(int sessionId, const void *data, uint32_t dataLen)
+{
+    if (sessionId < 0 || data == nullptr || dataLen <= 0 || dataLen > MAX_DATA_LEN) {
+        LOGE("[SOFTBUS]fail to receive data from softbus with sessionId: %{public}d, dataLen: %{public}d.", sessionId,
+            dataLen);
+        return;
+    }
+
+    LOGI("start, sessionId: %{public}d, dataLen: %{public}d.", sessionId, dataLen);
+    JsonObject jsonObject = GetJsonObjectFromData(data, dataLen);
+    if (jsonObject.IsDiscarded() || !IsInt32(jsonObject, TAG_MSG_TYPE)) {
+        LOGE("OnBytesReceived, MSG_TYPE parse failed.");
+        return;
+    }
+    int32_t msgType = jsonObject[TAG_MSG_TYPE].Get<int32_t>();
+    std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
+    std::shared_ptr<AuthManagerBase3rd> authPincodeMgr = nullptr;
+    uint64_t logicalSessionId = 0;
+    if (IsUint64(jsonObject, DM_TAG_LOGICAL_SESSION_ID)) {
+        logicalSessionId = jsonObject[DM_TAG_LOGICAL_SESSION_ID].Get<std::uint64_t>();
+    }
+    authPincodeMgr = GetAuthMgrByMessage(msgType, logicalSessionId, jsonObject);
+    CHECK_NULL_VOID(authPincodeMgr);
+    authPincodeMgr->OnDataReceived(sessionId, message);
 }
 
 extern "C" IDeviceManagerServiceImpl3rd *CreateDMServiceImpl3rdObject(void)
