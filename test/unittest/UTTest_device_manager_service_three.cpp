@@ -404,7 +404,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, SetDnPolicy_301, testing::ext::TestSize.
     std::string packName = "com.ohos.test";
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
-    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "5000";
     std::string processName = "collaboration_service";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
@@ -811,7 +811,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, SetDnPolicy_309, testing::ext::TestSize.
         .Times(AnyNumber()).WillOnce(Return(false));
     
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, SyncLocalAclListProcess_001, testing::ext::TestSize.Level1)

@@ -106,6 +106,8 @@ namespace {
     // 2148 * 1000000 will exceed the maximum value of int32 and cause a crash
     const int32_t SEND_LIMIT_TIME = INT32_MAX / DELAY_TIME_SEC_CONVERSION;
     const int32_t RANDOM_OFF_SET = 8;
+    const int32_t HEARTBEAT_DELAY_TIME_MIN = 1000;
+    const int32_t HEARTBEAT_DELAY_TIME_MAX = 15000;
     constexpr int32_t DM_MIN_PINCODE_SIZE = 6;
     constexpr int32_t DM_MAX_PINCODE_SIZE = 1024;
     constexpr int32_t DM_PARAM_STRING_LENGTH_MAX = 1024;
@@ -3532,8 +3534,12 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
         LOGE("Invalid parameter, DM_POLICY_TIMEOUT is not number.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    int32_t policyStrategy = std::atoi(policyStrategyIter->second.c_str());
     int32_t timeOut = std::atoi(timeOutIter->second.c_str());
+    if (timeOut < HEARTBEAT_DELAY_TIME_MIN || timeOut > HEARTBEAT_DELAY_TIME_MAX) {
+        LOGE("Invalid parameter, DM_POLICY_TIMEOUT is out of range.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t policyStrategy = std::atoi(policyStrategyIter->second.c_str());
     LOGD("strategy: %{public}d, timeOut: %{public}d", policyStrategy, timeOut);
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("instance not init or init failed.");
