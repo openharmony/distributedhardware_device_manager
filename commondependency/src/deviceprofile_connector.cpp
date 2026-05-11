@@ -846,12 +846,15 @@ int32_t DeviceProfileConnector::CheckAuthForm(DmAuthForm form, AccessControlProf
         return form;
     }
     if (profiles.GetBindLevel() == APP || profiles.GetBindLevel() == SERVICE) {
-        if ((discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() ||
+        uint64_t callingTokenId = static_cast<uint64_t>(IPCSkeleton::GetCallingTokenID());
+        if (((discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() &&
+            callingTokenId == profiles.GetAccesser().GetAccesserTokenId()) ||
             CheckAuthFormProxyTokenId(discoveryInfo.pkgname, profiles.GetAccesser().GetAccesserExtraData())) &&
             discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
             return form;
         }
-        if ((discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() ||
+        if (((discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() &&
+            callingTokenId == profiles.GetAccessee().GetAccesseeTokenId()) ||
             CheckAuthFormProxyTokenId(discoveryInfo.pkgname, profiles.GetAccessee().GetAccesseeExtraData())) &&
             discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
             return form;
@@ -1129,11 +1132,13 @@ DM_EXPORT std::vector<OHOS::DistributedHardware::ProcessInfo> DeviceProfileConne
         if (accesserUdid == localDeviceId) {
             processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
             processInfo.userId = item.GetAccesser().GetAccesserUserId();
+            processInfo.tokenId = static_cast<uint32_t>(item.GetAccesser().GetAccesserTokenId());
             processInfoVec.push_back(processInfo);
             extraStr = item.GetAccesser().GetAccesserExtraData();
         } else if (accesseeUdid == localDeviceId) {
             processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
             processInfo.userId = item.GetAccessee().GetAccesseeUserId();
+            processInfo.tokenId = static_cast<uint32_t>(item.GetAccessee().GetAccesseeTokenId());
             processInfoVec.push_back(processInfo);
             extraStr = item.GetAccessee().GetAccesseeExtraData();
         } else {
