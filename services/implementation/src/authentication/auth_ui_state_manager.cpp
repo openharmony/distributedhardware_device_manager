@@ -36,6 +36,7 @@ void AuthUiStateManager::RegisterUiStateCallback(const std::string pkgName)
     ProcessInfo processInfo;
     processInfo.userId = userId;
     processInfo.pkgName = pkgName;
+    MultipleUserConnector::GetCallingTokenId(processInfo.tokenId);
     std::lock_guard<ffrt::mutex> lock(pkgSetMutex_);
     pkgSet_.emplace(processInfo);
 }
@@ -47,6 +48,7 @@ void AuthUiStateManager::UnRegisterUiStateCallback(const std::string pkgName)
     ProcessInfo processInfo;
     processInfo.userId = userId;
     processInfo.pkgName = pkgName;
+    MultipleUserConnector::GetCallingTokenId(processInfo.tokenId);
     std::lock_guard<ffrt::mutex> lock(pkgSetMutex_);
     if (pkgSet_.find(processInfo) == pkgSet_.end()) {
         LOGE("AuthUiStateManager UnRegisterUiStateCallback processInfo is not exist.");

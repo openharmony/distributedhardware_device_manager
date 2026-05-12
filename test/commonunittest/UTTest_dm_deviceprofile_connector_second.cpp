@@ -42,12 +42,14 @@ void DeviceProfileConnectorSecondTest::SetUpTestCase()
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient =
         distributedDeviceProfileClientMock_;
     DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
+    DMIPCSkeleton::dmIpcSkeleton_ = ipcSkeletonMock_;
 }
 
 void DeviceProfileConnectorSecondTest::TearDownTestCase()
 {
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
+    DMIPCSkeleton::dmIpcSkeleton_ = nullptr;
 }
 
 class DpInitedCallback : public DistributedDeviceProfile::DpInitedCallbackStub {
@@ -153,14 +155,17 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckAuthForm_201, testing::ext::Test
     profiles.SetBindLevel(APP);
     profiles.accessee_.SetAccesseeBundleName("pkgName");
     profiles.accessee_.SetAccesseeDeviceId("localDeviceId");
+    profiles.accessee_.SetAccesseeTokenId(0);
     DmDiscoveryInfo discoveryInfo;
     discoveryInfo.pkgname = "pkgName";
     discoveryInfo.localDeviceId = "localDeviceId";
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillRepeatedly(Return(0));
     int32_t ret = DeviceProfileConnector::GetInstance().CheckAuthForm(form, profiles, discoveryInfo);
     EXPECT_EQ(ret, DmAuthForm::ACROSS_ACCOUNT);
 
     profiles.accesser_.SetAccesserBundleName("pkgName");
     profiles.accesser_.SetAccesserDeviceId("localDeviceId");
+    profiles.accesser_.SetAccesserTokenId(0);
     ret = DeviceProfileConnector::GetInstance().CheckAuthForm(form, profiles, discoveryInfo);
     EXPECT_EQ(ret, DmAuthForm::ACROSS_ACCOUNT);
 
@@ -605,9 +610,11 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_010, testing::ext::T
     profiles.SetBindLevel(APP);
     profiles.accesser_.SetAccesserBundleName("ohos_test");
     profiles.accesser_.SetAccesserDeviceId("localDeviceId");
+    profiles.accesser_.SetAccesserTokenId(0);
     DmDiscoveryInfo discoveryInfo;
     discoveryInfo.pkgname = "ohos_test";
     discoveryInfo.localDeviceId = "localDeviceId";
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillRepeatedly(Return(0));
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
     EXPECT_EQ(ret, SHARE);
 }
@@ -619,9 +626,11 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_011, testing::ext::T
     profiles.SetBindLevel(APP);
     profiles.accessee_.SetAccesseeBundleName("pkgName");
     profiles.accessee_.SetAccesseeDeviceId("localDeviceId");
+    profiles.accessee_.SetAccesseeTokenId(0);
     DmDiscoveryInfo discoveryInfo;
     discoveryInfo.pkgname = "pkgName";
     discoveryInfo.localDeviceId = "localDeviceId";
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillRepeatedly(Return(0));
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
     EXPECT_EQ(ret, SHARE);
 }

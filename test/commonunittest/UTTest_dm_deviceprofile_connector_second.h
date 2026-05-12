@@ -21,6 +21,7 @@
 
 #include "access_control_profile.h"
 #include "deviceprofile_connector.h"
+#include "dm_ipc_skeleton_mock.h"
 #include "distributed_device_profile_client_mock.h"
 #include "deviceprofile_connector_mock.h"
 #include "multiple_user_connector_mock.h"
@@ -40,6 +41,7 @@ public:
         std::make_shared<DistributedDeviceProfile::DistributedDeviceProfileClientMock>();
     static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
         std::make_shared<MultipleUserConnectorMock>();
+    static inline std::shared_ptr<DMIPCSkeletonMock> ipcSkeletonMock_ = std::make_shared<DMIPCSkeletonMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
