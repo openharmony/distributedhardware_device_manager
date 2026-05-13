@@ -29,6 +29,7 @@ public:
     int32_t GetCallerProcessName(std::string &processName);
     bool CheckAccessServicePermission(void);
     bool VerifyAccessTokenByPermissionName(const std::string &permissionName);
+    int32_t GetProcessNameByTokenId(uint32_t tokenId, std::string &processName);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -194,7 +194,8 @@ int32_t HiChainAuthConnector3rd::ProcessCredData(int64_t authReqId, const std::s
     return DM_OK;
 }
 
-int32_t HiChainAuthConnector3rd::AuthCredential(int32_t osAccountId, int64_t authReqId, const std::string &credId)
+int32_t HiChainAuthConnector3rd::AuthCredential(int32_t osAccountId, int64_t authReqId, const std::string &credId,
+    bool isOpenCredAuth)
 {
     LOGI("start credId=%{public}s", GetAnonyString(credId).c_str());
     if (credId.empty()) {
@@ -204,6 +205,9 @@ int32_t HiChainAuthConnector3rd::AuthCredential(int32_t osAccountId, int64_t aut
 
     JsonObject jsonAuthParam;
     jsonAuthParam["credId"] = credId;
+    if (isOpenCredAuth) {
+        jsonAuthParam[TAG_IS_OPEN_CRED_AUTH] = true;
+    }
     std::string authParams = jsonAuthParam.Dump();
 
     const CredAuthManager *credAuthManager = GetCredAuthInstance();

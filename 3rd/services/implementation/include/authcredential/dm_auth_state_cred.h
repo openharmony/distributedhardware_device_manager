@@ -19,6 +19,7 @@
 #include <memory>
 #include <vector>
 
+#include "json_object.h"
 #include "dm_auth_context_cred.h"
 #include "dm_auth_info_3rd.h"
 
@@ -72,6 +73,7 @@ public:
     int32_t QueryP2pCredential(std::shared_ptr<DmAuthCredContext> context);
     void BuildTrustDeviceInfos(std::shared_ptr<DmAuthCredContext> context,
         std::vector<TrustDeviceInfo3rd> &deviceInfos);
+    bool CheckOpenId(std::shared_ptr<DmAuthCredContext> context, const JsonItemObject &item);
 };
 
 class AuthCredSrcStartState : public DmAuthStateCred {

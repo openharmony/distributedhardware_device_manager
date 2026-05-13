@@ -34,7 +34,7 @@ typedef struct ProcessInfo3rd {
 
     bool operator==(const ProcessInfo3rd &other) const
     {
-        return (tokenId == other.tokenId) && (uid == other.uid) &&
+        return (tokenId == other.tokenId) && (uid == 0 || other.uid == 0 || uid == other.uid) &&
             (processName == other.processName) && (businessName == other.businessName) &&
             (userId == other.userId);
     }

@@ -128,8 +128,9 @@ void AuthManagerCred::GetAuthParam(const PeerTargetId3rd &targetId, const std::m
     if (authParam.find(TAG_PEER_BUSINESS_NAME) != authParam.end()) {
         context_->accessee.businessName = authParam.at(TAG_PEER_BUSINESS_NAME);
     }
-    if (authParam.find(TAG_OPENID_HASH) != authParam.end()) {
-        context_->accesser.openIdHash = authParam.at(TAG_OPENID_HASH);
+    if (authParam.find(TAG_OPENID) != authParam.end()) {
+        std::string openId = authParam.at(TAG_OPENID);
+        context_->accesser.openIdHash = Crypto3rd::Sha256(openId).substr(0, DM_OPENID_HASH_LEN);
     }
     if (authParam.find(TAG_OWNER_ID) != authParam.end()) {
         context_->accesser.ownerId = authParam.at(TAG_OWNER_ID);
@@ -382,10 +383,14 @@ char *AuthSinkManagerCred::AuthDeviceRequest(int64_t requestId, int operationCod
     LOGI("AuthSinkManagerCred::AuthDeviceRequest start");
     (void)requestId;
     (void)reqParams;
+    CHECK_NULL_RETURN(context_, nullptr);
     JsonObject jsonObj;
     jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
     jsonObj[FIELD_CRED_ID] = context_->accessee.transmitCredentialId;
     jsonObj[FIELD_SERVICE_PKG_NAME] = std::string(DM_PKG_NAME);
+    if (!context_->accesser.openIdHash.empty()) {
+        jsonObj[TAG_IS_OPEN_CRED_AUTH] = true;
+    }
     std::string jsonStr = jsonObj.Dump();
     char *buffer = strdup(jsonStr.c_str());
     return buffer;

@@ -40,6 +40,8 @@ const char* const DM_FIELD_PEER_USER_SPACE_ID = "peerUserSpaceId";
 const char* const DM_FIELD_CRED_ID = "credId";
 const char* const DM_FIELD_CRED_TYPE = "credType";
 const char* const DM_FIELD_AUTHORIZED_APP_LIST = "authorizedAppList";
+const char* const DM_FIELD_EXTEND_INFO_ID = "extendInfo";
+const char* const DM_FIELD_OPEN_ID = "openId";
 constexpr uint32_t MAX_SESSION_KEY_LENGTH = 512;
 // clone task timeout map
 const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
@@ -132,22 +134,16 @@ int32_t DmAuthStateCred::QueryCredential(std::shared_ptr<DmAuthCredContext> cont
         return QueryP2pCredential(context);
     }
     DmCredAccess &selfAccess = (context->direction == DM_AUTH_CRED_SOURCE) ? context->accesser : context->accessee;
+    std::string accountName = MultipleUserConnector3rd::GetOhosAccountNameByUserId(selfAccess.userId);
+    if (accountName.empty()) {
+        LOGE("accountName is empty");
+        return ERR_DM_QUERY_CREDENTIAL_FAILED;
+    }
     JsonObject credInfo;
     JsonObject queryParams;
-    if (!context->accesser.openIdHash.empty() && !context->accesser.ownerId.empty()) {
-        queryParams[DM_FIELD_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_UNRELATED;
-        queryParams[DM_FIELD_CRED_OWNER_ID] = context->accesser.ownerId;
-        queryParams[DM_FIELD_OPEN_ID_HASH] = context->accesser.openIdHash;
-    } else {
-        std::string accountName = MultipleUserConnector3rd::GetOhosAccountNameByUserId(selfAccess.userId);
-        if (accountName.empty()) {
-            LOGE("accountName is empty");
-            return ERR_DM_QUERY_CREDENTIAL_FAILED;
-        }
-        queryParams[DM_FIELD_DEVICE_ID] = selfAccess.deviceId;
-        queryParams[DM_FIELD_USER_ID] = accountName;
-        queryParams[DM_FIELD_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_RELATED;
-    }
+    queryParams[DM_FIELD_DEVICE_ID] = selfAccess.deviceId;
+    queryParams[DM_FIELD_USER_ID] = accountName;
+    queryParams[DM_FIELD_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_RELATED;
     int32_t ret = context->hiChainAuthConnector->QueryCredentialInfo(selfAccess.userId, queryParams, credInfo);
     if (ret != DM_OK) {
         LOGE("QueryCredentialInfo failed ret %{public}d.", ret);
@@ -157,10 +153,37 @@ int32_t DmAuthStateCred::QueryCredential(std::shared_ptr<DmAuthCredContext> cont
         if (!item.Contains(DM_FIELD_CRED_ID) || !item[DM_FIELD_CRED_ID].IsString()) {
             continue;
         }
+        if (!CheckOpenId(context, item)) {
+            continue;
+        }
         selfAccess.transmitCredentialId = item[DM_FIELD_CRED_ID].Get<std::string>();
         return DM_OK;
     }
     return ERR_DM_QUERY_CREDENTIAL_FAILED;
+}
+
+bool DmAuthStateCred::CheckOpenId(std::shared_ptr<DmAuthCredContext> context, const JsonItemObject &item)
+{
+    CHECK_NULL_RETURN(context, false);
+    if (context->accesser.openIdHash.empty()) {
+        return true;
+    }
+    if (!IsString(item, DM_FIELD_EXTEND_INFO_ID)) {
+        LOGE("extendInfo is empty.");
+        return false;
+    }
+    std::string extendInfo = item[DM_FIELD_EXTEND_INFO_ID].Get<std::string>();
+    JsonObject extendInfoJson;
+    extendInfoJson.Parse(extendInfo);
+    if (extendInfoJson.IsDiscarded() || !IsString(extendInfoJson, DM_FIELD_OPEN_ID)) {
+        LOGE("extendInfo invalid.");
+        return false;
+    }
+    std::string openId = extendInfoJson[DM_FIELD_OPEN_ID].Get<std::string>();
+    if (context->accesser.openIdHash == Crypto3rd::Sha256(openId).substr(0, DM_OPENID_HASH_LEN)) {
+        return true;
+    }
+    return false;
 }
 
 int32_t DmAuthStateCred::QueryP2pCredential(std::shared_ptr<DmAuthCredContext> context)

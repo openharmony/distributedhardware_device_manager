@@ -141,7 +141,7 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthCredContex
     }
     // Transport credential authentication
     ret = context->hiChainAuthConnector->AuthCredential(osAccountId, context->requestId,
-        context->accesser.transmitCredentialId);
+        context->accesser.transmitCredentialId, !context->accesser.openIdHash.empty());
     if (ret != DM_OK) {
         LOGE("auth cred failed.");
         return ret;

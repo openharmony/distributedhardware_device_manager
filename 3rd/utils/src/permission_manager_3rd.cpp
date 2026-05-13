@@ -90,6 +90,33 @@ int32_t PermissionManager3rd::GetCallerProcessName(std::string &processName)
     return DM_OK;
 }
 
+int32_t PermissionManager3rd::GetProcessNameByTokenId(uint32_t tokenId, std::string &processName)
+{
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
+        HapTokenInfo tokenInfo;
+        if (AccessTokenKit::GetHapTokenInfo(tokenId, tokenInfo) != EOK) {
+            LOGE("GetHapTokenInfo failed.");
+            return ERR_DM_FAILED;
+        }
+        processName = std::move(tokenInfo.bundleName);
+    } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        NativeTokenInfo tokenInfo;
+        if (AccessTokenKit::GetNativeTokenInfo(tokenId, tokenInfo) != EOK) {
+            LOGE("GetNativeTokenInfo failed.");
+            return ERR_DM_FAILED;
+        }
+        processName = std::move(tokenInfo.processName);
+    } else {
+        LOGE("GetCallerProcessName failed, unsupported process.");
+        return ERR_DM_FAILED;
+    }
+
+    LOGI("Get process name: %{public}s success, tokenId == %{public}s.", processName.c_str(),
+        GetAnonyInt32(tokenId).c_str());
+    return DM_OK;
+}
+
 bool PermissionManager3rd::CheckAccessServicePermission(void)
 {
     return VerifyAccessTokenByPermissionName(DM_SERVICE_ACCESS_PERMISSION);

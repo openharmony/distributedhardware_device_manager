@@ -81,5 +81,7 @@ const char* TAG_BIND_CALLER_BIND_LEVEL = "bindCallerBindLevel";
 const char* TAG_OPENID_HASH = "openIdHash";
 const char* TAG_CRED_TYPE = "credType";
 const char* TAG_OWNER_ID = "ownerId";
+const char* TAG_OPENID = "openId";
+const char* TAG_IS_OPEN_CRED_AUTH = "isOpenCredAuth";
 } // namespace DistributedHardware
 } // namespace OHOS

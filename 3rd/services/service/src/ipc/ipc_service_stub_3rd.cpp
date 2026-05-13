@@ -118,11 +118,12 @@ const sptr<IpcRemoteBroker3rd> IpcServiceStub3rd::GetDmListener(ProcessInfo3rd p
     }
     SetSaUserId(processInfo3rd);
     std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
-    auto iter = dmListener_.find(processInfo3rd);
-    if (iter == dmListener_.end()) {
-        return nullptr;
+    for (const auto &iter : dmListener_) {
+        if (iter.first == processInfo3rd) {
+            return iter.second;
+        }
     }
-    return iter->second;
+    return nullptr;
 }
 
 const ProcessInfo3rd IpcServiceStub3rd::GetDmListenerPkgName(const wptr<IRemoteObject> &remote)
