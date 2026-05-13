@@ -124,6 +124,9 @@ group("unittest") {
     ":UTTest_dm_auth_message_processor_cred",
     ":UTTest_dm_auth_state_cred",
     ":UTTest_dm_auth_state_machine_cred",
+    ":UTTest_auth_pincode_manager",
+    ":UTTest_auth_pincode_message_processor",
+    ":UTTest_auth_pincode_state",
   ]
 }
 
@@ -4637,6 +4640,93 @@ ohos_unittest("UTTest_dm_auth_state_machine_cred") {
 
 ## UnitTest UTTest_dm_auth_state_machine_cred }}}
 
+## UnitTest UTTest_auth_pincode_manager {{{
+ohos_unittest("UTTest_auth_pincode_manager") {
+  module_out_path = module_out_path
+
+  sources = [
+    "UTTest_auth_pincode_manager.cpp",
+  ]
+
+  deps = [
+    ":device_manager_3rd_test_common",
+    "${serviceimpl_3rd_path}:devicemanagerserviceimpl3rd",
+    "${service_3rd_path}:devicemanager3rdservice",
+    "${utils_3rd_path}:devicemanager3rdutils",
+    "${interfaces_3rd_path}:devicemanager3rdsdk",
+  ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+## UnitTest UTTest_auth_pincode_manager }}}
+
+## UnitTest UTTest_auth_pincode_message_processor {{{
+ohos_unittest("UTTest_auth_pincode_message_processor") {
+  module_out_path = module_out_path
+
+  sources = [
+    "UTTest_auth_pincode_message_processor.cpp",
+  ]
+
+  deps = [
+    ":device_manager_3rd_test_common",
+    "${serviceimpl_3rd_path}:devicemanagerserviceimpl3rd",
+    "${service_3rd_path}:devicemanager3rdservice",
+    "${utils_3rd_path}:devicemanager3rdutils",
+    "${interfaces_3rd_path}:devicemanager3rdsdk",
+  ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+## UnitTest UTTest_auth_pincode_message_processor }}}
+
+## UnitTest UTTest_auth_pincode_state {{{
+ohos_unittest("UTTest_auth_pincode_state") {
+  module_out_path = module_out_path
+
+  sources = [
+    "UTTest_auth_pincode_state.cpp",
+  ]
+
+  deps = [
+    ":device_manager_3rd_test_common",
+    "${serviceimpl_3rd_path}:devicemanagerserviceimpl3rd",
+    "${service_3rd_path}:devicemanager3rdservice",
+    "${utils_3rd_path}:devicemanager3rdutils",
+    "${interfaces_3rd_path}:devicemanager3rdsdk",
+  ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+## UnitTest UTTest_auth_pincode_state }}}
+
 ## Build device_manager_3rd_test_common.a {{{
 config("device_manager_3rd_test_common_public_config") {
   include_dirs = [
@@ -4649,6 +4739,7 @@ config("device_manager_3rd_test_common_public_config") {
     "${serviceimpl_3rd_path}/include",
     "${serviceimpl_3rd_path}/include/authcredential",
     "${serviceimpl_3rd_path}/include/authdevicewithacl",
+    "${serviceimpl_3rd_path}/include/authpincode",
     "${serviceimpl_3rd_path}/include/commonbase",
     "${serviceimpl_3rd_path}/include/dependency/softbus",
     "${serviceimpl_3rd_path}/include/dependency/hichain",
@@ -4694,6 +4785,7 @@ ohos_static_library("device_manager_3rd_test_common") {
     "${service_3rd_path}:devicemanager3rdservice",
     "${utils_3rd_path}:devicemanager3rdutils",
     "${interfaces_3rd_path}:devicemanager3rdsdk",
+    "${json_path}:devicemanagerjson",
   ]
 
   external_deps = [
