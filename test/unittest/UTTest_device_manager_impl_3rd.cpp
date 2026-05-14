@@ -768,5 +768,55 @@ HWTEST_F(DeviceManagerImpl3rdTest, DmAuthCallback_OnAuthResult_003, testing::ext
     callback->OnAuthResult(processInfo, result, status, deviceInfos, authContent);
     ASSERT_EQ(count, 2);
 }
+
+HWTEST_F(DeviceManagerImpl3rdTest, DmAuthCallback_OnAuthResult_004, testing::ext::TestSize.Level0)
+{
+    auto callback = std::make_shared<DmAuthCallback>();
+    ASSERT_NE(callback, nullptr);
+
+    ProcessInfo3rd processInfo;
+    processInfo.tokenId = 123;
+    processInfo.uid = 1000;
+    processInfo.processName = "test_process";
+    processInfo.businessName = "test_business";
+    processInfo.userId = 100;
+
+    int32_t result = 0;
+    int32_t status = 1;
+    std::string authContent = "test_auth_content";
+
+    callback->OnAuthResult(processInfo, result, status, authContent);
+    ASSERT_NE(callback, nullptr);
+}
+
+HWTEST_F(DeviceManagerImpl3rdTest, DmAuthCallback_OnAuthResult_005, testing::ext::TestSize.Level0)
+{
+    auto callback = std::make_shared<DmAuthCallback>();
+    ASSERT_NE(callback, nullptr);
+
+    ProcessInfo3rd processInfo;
+    processInfo.tokenId = 456;
+    processInfo.uid = 2000;
+    processInfo.processName = "test_process2";
+    processInfo.businessName = "test_business2";
+    processInfo.userId = 200;
+
+    int32_t result = 0;
+    int32_t status = 1;
+    std::vector<TrustDeviceInfo3rd> deviceInfos;
+    TrustDeviceInfo3rd deviceInfo;
+    deviceInfo.trustDeviceId = "device123";
+    deviceInfo.sessionKeyId = 1;
+    deviceInfo.createTime = 123456789LL;
+    deviceInfo.userId = 100;
+    deviceInfo.extra = "extra_info";
+    deviceInfo.bindLevel = 2;
+    deviceInfo.bindType = 1;
+    deviceInfos.push_back(deviceInfo);
+    std::string authContent = "test_auth_content2";
+
+    callback->OnAuthResult(processInfo, result, status, deviceInfos, authContent);
+    ASSERT_NE(callback, nullptr);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
