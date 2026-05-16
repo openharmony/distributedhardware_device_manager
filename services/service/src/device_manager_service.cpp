@@ -4803,9 +4803,9 @@ int32_t DeviceManagerService::SetLocalDeviceName(const std::string &pkgName, con
 #else
     CHECK_NULL_RETURN(listener_, ERR_DM_POINT_NULL);
     ProcessInfo processInfo = {.pkgName = pkgName};
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(processInfo.userId);
     processInfo.tokenId = IPCSkeleton::GetCallingTokenID();
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([listener = listener_, deviceName = deviceName, processInfo = processInfo]() {
         CHECK_NULL_VOID(listener);
         listener->OnSetLocalDeviceNameResult(processInfo, deviceName, DM_OK);
