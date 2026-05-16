@@ -481,12 +481,14 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
     if ((acerTokenId == static_cast<int64_t>(localTokenId)) &&
         (acerDeviceId == localUdid) && (aceeDeviceId == remoteUdid) &&
         (peerTokenId == 0 || (peerTokenId != 0 && aceeTokenId == static_cast<int64_t>(peerTokenId)))) {
-        if ((acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
-            offlineParam.hasUserAcl = true;
-        }
         ProcessInfo processInfo;
         processInfo.pkgName = acl.GetAccesser().GetAccesserBundleName();
         processInfo.userId = acl.GetAccesser().GetAccesserUserId();
+        processInfo.tokenId = acl.GetAccesser().GetAccesserTokenId();
+        if ((acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
+            offlineParam.hasUserAcl = true;
+            processInfo.tokenId = 0;
+        }
         offlineParam.processVec.push_back(processInfo);
         CacheAcerAclId(acl, offlineParam.needDelAclInfos);
         LOGI("Src del acl aclId: %{public}" PRId64 ", localUdid: %{public}s, remoteUdid: %{public}s"
@@ -499,12 +501,14 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
     if ((aceeTokenId == static_cast<int64_t>(localTokenId)) &&
         (aceeDeviceId == localUdid) && (acerDeviceId == remoteUdid) &&
         (peerTokenId == 0 || (peerTokenId != 0 && acerTokenId == static_cast<int64_t>(peerTokenId)))) {
-        if ((acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
-            offlineParam.hasUserAcl = true;
-        }
         ProcessInfo processInfo;
         processInfo.pkgName = acl.GetAccessee().GetAccesseeBundleName();
         processInfo.userId = acl.GetAccessee().GetAccesseeUserId();
+        processInfo.tokenId = acl.GetAccessee().GetAccesseeTokenId();
+        if ((acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
+            offlineParam.hasUserAcl = true;
+            processInfo.tokenId = 0;
+        }
         offlineParam.processVec.push_back(processInfo);
         CacheAceeAclId(acl, offlineParam.needDelAclInfos);
         LOGI("Sink del acl aclId: %{public}" PRId64 ", localUdid: %{public}s, remoteUdid: %{public}s"
@@ -2675,12 +2679,14 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
         acl.GetAccesser().GetAccesserDeviceId() == remoteUdid &&
         (static_cast<int32_t>(acl.GetAccesser().GetAccesserTokenId()) == remoteTokenId) &&
         acl.GetAccessee().GetAccesseeDeviceId() == localUdid) {
-        if ((acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
-            offlineParam.hasUserAcl = true;
-        }
         ProcessInfo processInfo;
         processInfo.pkgName = acl.GetAccessee().GetAccesseeBundleName();
         processInfo.userId = acl.GetAccessee().GetAccesseeUserId();
+        processInfo.tokenId = acl.GetAccessee().GetAccesseeTokenId();
+        if ((acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
+            offlineParam.hasUserAcl = true;
+            processInfo.tokenId = 0;
+        }
         offlineParam.processVec.push_back(processInfo);
         CacheAceeAclId(acl, offlineParam.needDelAclInfos);
         LOGI("Src del acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
@@ -2694,12 +2700,13 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
         acl.GetAccessee().GetAccesseeDeviceId() == remoteUdid &&
         (static_cast<int32_t>(acl.GetAccessee().GetAccesseeTokenId()) == remoteTokenId) &&
         acl.GetAccesser().GetAccesserDeviceId() == localUdid) {
-        if ((acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
-            offlineParam.hasUserAcl = true;
-        }
         ProcessInfo processInfo;
         processInfo.pkgName = acl.GetAccesser().GetAccesserBundleName();
         processInfo.userId = acl.GetAccesser().GetAccesserUserId();
+        if ((acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
+            offlineParam.hasUserAcl = true;
+            processInfo.tokenId = 0;
+        }
         offlineParam.processVec.push_back(processInfo);
         CacheAcerAclId(acl, offlineParam.needDelAclInfos);
         LOGI("Sink del acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
@@ -3058,6 +3065,7 @@ void DeviceProfileConnector::SetProcessInfoPkgName(const DistributedDeviceProfil
             processInfo.pkgName = std::string(DM_PKG_NAME);
         } else {
             processInfo.pkgName = acl.GetAccesser().GetAccesserBundleName();
+            processInfo.tokenId = static_cast<uint32_t>(acl.GetAccesser().GetAccesserTokenId());
         }
         processInfo.userId = acl.GetAccesser().GetAccesserUserId();
     } else {
@@ -3065,6 +3073,7 @@ void DeviceProfileConnector::SetProcessInfoPkgName(const DistributedDeviceProfil
             processInfo.pkgName = std::string(DM_PKG_NAME);
         } else {
             processInfo.pkgName = acl.GetAccessee().GetAccesseeBundleName();
+            processInfo.tokenId = static_cast<uint32_t>(acl.GetAccessee().GetAccesseeTokenId());
         }
         processInfo.userId = acl.GetAccessee().GetAccesseeUserId();
     }

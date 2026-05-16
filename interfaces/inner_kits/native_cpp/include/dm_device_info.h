@@ -417,7 +417,13 @@ typedef struct ProcessInfo {
 
     bool operator==(const ProcessInfo &other) const
     {
-        return (userId == other.userId) && (pkgName == other.pkgName) && (tokenId == other.tokenId);
+        if ((userId != other.userId) || (pkgName != other.pkgName)) {
+            return false;
+        }
+        if (tokenId != 0 && other.tokenId != 0 && tokenId != other.tokenId) {
+            return false;
+        }
+        return true;
     }
 
     bool operator<(const ProcessInfo &other) const

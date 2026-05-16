@@ -454,11 +454,12 @@ const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(ProcessInfo processInfo
         return nullptr;
     }
     std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
-    auto iter = dmListener_.find(processInfo);
-    if (iter == dmListener_.end()) {
-        return nullptr;
+    for (auto &iter : dmListener_) {
+        if (iter.first == processInfo) {
+            return iter.second;
+        }
     }
-    return iter->second;
+    return nullptr;
 }
 
 const ProcessInfo IpcServerStub::GetDmListenerPkgName(const wptr<IRemoteObject> &remote) const

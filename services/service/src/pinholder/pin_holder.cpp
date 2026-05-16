@@ -85,6 +85,7 @@ int32_t PinHolder::RegisterPinHolderCallback(const std::string &pkgName)
     int32_t userId = -1;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(userId);
+    MultipleUserConnector::GetCallingTokenId(processInfo_.tokenId);
 #endif
     processInfo_.userId = userId;
     processInfo_.pkgName = pkgName;

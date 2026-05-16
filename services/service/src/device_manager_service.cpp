@@ -1022,10 +1022,12 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         LOGE("UnAuthenticateDevice failed, Acl not contain the bindLevel %{public}d.", bindLevel);
         return ERR_DM_FAILED;
     }
+    uint32_t callingTokenId = 0;
+    MultipleUserConnector::GetTokenId(callingTokenId);
+    tokenId = static_cast<int64_t>(callingTokenId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::vector<std::string> peerUdids;
     peerUdids.emplace_back(udid);
-
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     std::map<std::string, std::string> wifiDevices;
     bool isBleActive = false;
