@@ -2695,7 +2695,6 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
             acl.GetBindLevel());
         isMatch = true;
     }
-
     if (acl.GetAccessee().GetAccesseeUserId() == remoteUserId &&
         acl.GetAccessee().GetAccesseeDeviceId() == remoteUdid &&
         (static_cast<int32_t>(acl.GetAccessee().GetAccesseeTokenId()) == remoteTokenId) &&
@@ -2703,6 +2702,7 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
         ProcessInfo processInfo;
         processInfo.pkgName = acl.GetAccesser().GetAccesserBundleName();
         processInfo.userId = acl.GetAccesser().GetAccesserUserId();
+        processInfo.tokenId = acl.GetAccesser().GetAccesserTokenId();
         if ((acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT)) {
             offlineParam.hasUserAcl = true;
             processInfo.tokenId = 0;
