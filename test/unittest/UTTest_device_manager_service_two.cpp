@@ -1380,19 +1380,6 @@ HWTEST_F(DeviceManagerServiceTest, RegisterLocalServiceInfo_201, testing::ext::T
     EXPECT_CALL(*deviceProfileConnectorMock_, PutLocalServiceInfo(_)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerService::GetInstance().RegisterLocalServiceInfo(serviceInfo);
     EXPECT_EQ(ret, DM_OK);
-
-    std::string localUdid = "U*******jkjk2";
-    std::vector<std::string> deviceVec{"deviceInfo"};
-    std::vector<int32_t> foregroundUserIds{10, 11};
-    std::vector<int32_t> backgroundUserIds{1, 2};
-    DeviceManagerService::GetInstance().InitDMServiceListener();
-    DeviceManagerService::GetInstance().hichainListener_ = std::make_shared<HichainListener>();
-    DeviceManagerService::GetInstance().UpdateAclAndDeleteGroup(localUdid, deviceVec,
-        foregroundUserIds, backgroundUserIds);
-
-    std::string pkgName = "pkgName";
-    DeviceManagerService::GetInstance().ClearPublishIdCache(pkgName);
-    DeviceManagerService::GetInstance().hichainListener_ = nullptr;
 }
 
 HWTEST_F(DeviceManagerServiceTest, UnRegisterLocalServiceInfo_201, testing::ext::TestSize.Level1)

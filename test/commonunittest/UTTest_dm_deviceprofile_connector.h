@@ -20,8 +20,9 @@
 #include <gtest/gtest.h>
 
 #include "deviceprofile_connector.h"
-#include "multiple_user_connector_mock.h"
 #include "dm_crypto_mock.h"
+#include "dm_ipc_skeleton_mock.h"
+#include "multiple_user_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -33,6 +34,7 @@ public:
     void TearDown();
     static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ = nullptr;
     static inline std::shared_ptr<CryptoMock> cryptoMock_ = nullptr;
+    static inline std::shared_ptr<DMIPCSkeletonMock> ipcSkeletonMock_ = std::make_shared<DMIPCSkeletonMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

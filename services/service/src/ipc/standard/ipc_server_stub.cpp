@@ -454,11 +454,12 @@ const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(ProcessInfo processInfo
         return nullptr;
     }
     std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
-    auto iter = dmListener_.find(processInfo);
-    if (iter == dmListener_.end()) {
-        return nullptr;
+    for (auto &iter : dmListener_) {
+        if (iter.first == processInfo) {
+            return iter.second;
+        }
     }
-    return iter->second;
+    return nullptr;
 }
 
 const ProcessInfo IpcServerStub::GetDmListenerPkgName(const wptr<IRemoteObject> &remote) const
@@ -503,7 +504,7 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
     DeviceManagerServiceNotify::GetInstance().ClearDiedProcessCallback(processInfo);
-    DeviceManagerService::GetInstance().ClearPublishIdCache(processInfo.pkgName);
+    DeviceManagerService::GetInstance().ClearPublishIdCache(processInfo);
     DeviceManagerService::GetInstance().UnRegisterCallerAppId(processInfo.pkgName, processInfo.userId);
     DeviceManagerService::GetInstance().ClearServiceStateCallback(processInfo.pkgName, processInfo.userId);
     DeviceManagerService::GetInstance().HandleRemoteDied(processInfo);

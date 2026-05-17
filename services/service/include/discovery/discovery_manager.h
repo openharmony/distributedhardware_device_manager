@@ -38,6 +38,7 @@ typedef struct DiscoveryContext {
 typedef struct MultiUserDiscovery {
     std::string pkgName;
     int32_t userId;
+    uint32_t tokenId = 0;
 } MultiUserDiscovery;
 
 typedef enum {
@@ -80,6 +81,9 @@ public:
     std::set<uint16_t> ClearDiscoveryPkgName(const std::string &pkgName);
 
 private:
+    void HandleDiscoverySuccess(const std::string &pkgName, const ProcessInfo &processInfo, uint16_t externalSubId);
+    void HandleDiscoveryFailed(const std::string &pkgName, const ProcessInfo &processInfo,
+        uint16_t externalSubId, int32_t result, int32_t subscribeId);
     void StartDiscoveryTimer(const std::string &pkgName);
     void HandleDiscoveryTimeout(const std::string &pkgName);
     int32_t StartDiscovering4MetaType(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
@@ -100,7 +104,8 @@ private:
     void UpdateInfoMedium(const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo &dmSubInfo);
     std::string AddMultiUserIdentify(const std::string &pkgName);
     std::string RemoveMultiUserIdentify(const std::string &pkgName);
-    void GetPkgNameAndUserId(const std::string &pkgName, std::string &callerPkgName, int32_t &userId);
+    void GetPkgNameAndUserId(const std::string &pkgName, std::string &callerPkgName,
+        int32_t &userId, uint32_t &tokenId);
     int32_t GenInnerSubId(const std::string &pkgName, uint16_t subId);
     int32_t GetAndRemoveInnerSubId(const std::string &pkgName, uint16_t subId);
     int32_t StopDiscoveringByInnerSubId(const std::string &pkgName, uint16_t subscribeId);

@@ -390,8 +390,9 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
         }
     }
     int32_t userId = -1;
+    uint32_t tokenId = 0;
     std::string callerPkgName = "";
-    GetPkgNameAndUserId(pkgName, callerPkgName, userId);
+    GetPkgNameAndUserId(pkgName, callerPkgName, userId, tokenId);
     DeviceFilterPara filterPara;
     filterPara.isOnline = false;
     filterPara.range = info.range;
@@ -408,11 +409,13 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const uint32_t 
     const DmDeviceInfo &info, const DeviceFilterPara &filterPara)
 {
     int32_t userId = -1;
+    uint32_t tokenId = 0;
     std::string callerPkgName = "";
-    GetPkgNameAndUserId(pkgName, callerPkgName, userId);
+    GetPkgNameAndUserId(pkgName, callerPkgName, userId, tokenId);
     ProcessInfo processInfo;
     processInfo.userId = userId;
     processInfo.pkgName = callerPkgName;
+    processInfo.tokenId = tokenId;
     bool isIndiscoveryContextMap = false;
     DiscoveryContext discoveryContext;
     {
@@ -450,35 +453,17 @@ bool DiscoveryManager::CompareCapability(uint32_t capabilityType, const std::str
     return false;
 }
 
-void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result)
+void DiscoveryManager::HandleDiscoverySuccess(const std::string &pkgName, const ProcessInfo &processInfo,
+    uint16_t externalSubId)
 {
-    LOGI("subscribeId = %{public}d, result = %{public}d.", subscribeId, result);
-    int32_t userId = -1;
-    std::string callerPkgName = "";
-    GetPkgNameAndUserId(pkgName, callerPkgName, userId);
-    ProcessInfo processInfo;
-    processInfo.userId = userId;
-    processInfo.pkgName = callerPkgName;
-    if (pkgName.empty() || (listener_ == nullptr)) {
-        LOGE("IDeviceManagerServiceListener is null.");
-        return;
-    }
-    uint16_t externalSubId = DM_INVALID_FLAG_ID;
-    {
-        std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-        for (auto iter : pkgName2SubIdMap_[pkgName]) {
-            if (iter.second == subscribeId) {
-                externalSubId = iter.first;
-                break;
-            }
-        }
-    }
-    if (result == 0) {
-        std::lock_guard<std::mutex> autoLock(locks_);
-        discoveryContextMap_[pkgName].subscribeId = (uint32_t)externalSubId;
-        listener_->OnDiscoverySuccess(processInfo, externalSubId);
-        return;
-    }
+    std::lock_guard<std::mutex> autoLock(locks_);
+    discoveryContextMap_[pkgName].subscribeId = (uint32_t)externalSubId;
+    listener_->OnDiscoverySuccess(processInfo, externalSubId);
+}
+
+void DiscoveryManager::HandleDiscoveryFailed(const std::string &pkgName, const ProcessInfo &processInfo,
+    uint16_t externalSubId, int32_t result, int32_t subscribeId)
+{
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         if (pkgNameSet_.find(pkgName) != pkgNameSet_.end()) {
@@ -500,6 +485,38 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
     }
     listener_->OnDiscoveryFailed(processInfo, (uint32_t)externalSubId, result);
     softbusListener_->StopRefreshSoftbusLNN(subscribeId);
+}
+
+void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result)
+{
+    LOGI("subscribeId = %{public}d, result = %{public}d.", subscribeId, result);
+    if (pkgName.empty() || (listener_ == nullptr)) {
+        LOGE("IDeviceManagerServiceListener is null.");
+        return;
+    }
+    int32_t userId = -1;
+    uint32_t tokenId = 0;
+    std::string callerPkgName = "";
+    GetPkgNameAndUserId(pkgName, callerPkgName, userId, tokenId);
+    ProcessInfo processInfo;
+    processInfo.userId = userId;
+    processInfo.pkgName = callerPkgName;
+    processInfo.tokenId = tokenId;
+    uint16_t externalSubId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+        for (auto iter : pkgName2SubIdMap_[pkgName]) {
+            if (iter.second == subscribeId) {
+                externalSubId = iter.first;
+                break;
+            }
+        }
+    }
+    if (result == 0) {
+        HandleDiscoverySuccess(pkgName, processInfo, externalSubId);
+        return;
+    }
+    HandleDiscoveryFailed(pkgName, processInfo, externalSubId, result, subscribeId);
 }
 
 void DiscoveryManager::StartDiscoveryTimer(const std::string &pkgName)
@@ -666,13 +683,14 @@ bool DiscoveryManager::CloseCommonDependencyObj()
 
 void DiscoveryManager::ClearDiscoveryCache(const ProcessInfo &processInfo)
 {
-    LOGI("PkgName: %{public}s, userId: %{public}d", processInfo.pkgName.c_str(), processInfo.userId);
+    LOGI("PkgName: %{public}s, userId: %{public}d, tokenId: %{public}u",
+        processInfo.pkgName.c_str(), processInfo.userId, processInfo.tokenId);
     std::string pkgName = processInfo.pkgName + "#";
     std::set<uint16_t> subscribeIdSet = ClearDiscoveryPkgName(pkgName);
 
     CHECK_NULL_VOID(softbusListener_);
     for (auto it : subscribeIdSet) {
-        std::string pkgNameTemp = (ComposeStr(ComposeStr(processInfo.pkgName, it), processInfo.userId));
+        std::string pkgNameTemp = ComposeStr(ComposeStr(processInfo.pkgName, processInfo.userId), processInfo.tokenId);
         softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgNameTemp);
         uint16_t innerSubId = DM_INVALID_FLAG_ID;
         {
@@ -687,7 +705,7 @@ void DiscoveryManager::ClearDiscoveryCache(const ProcessInfo &processInfo)
     std::lock_guard<std::mutex> autoLock(timerLocks_);
     CHECK_NULL_VOID(timer_);
     for (auto it : subscribeIdSet) {
-        std::string pkgNameTemp = (ComposeStr(ComposeStr(processInfo.pkgName, it), processInfo.userId));
+        std::string pkgNameTemp = ComposeStr(ComposeStr(processInfo.pkgName, processInfo.userId), processInfo.tokenId);
         timer_->DeleteTimer(pkgNameTemp);
     }
 }
@@ -743,8 +761,10 @@ std::set<uint16_t> DiscoveryManager::ClearDiscoveryPkgName(const std::string &pk
 std::string DiscoveryManager::AddMultiUserIdentify(const std::string &pkgName)
 {
     int32_t userId = -1;
+    uint32_t tokenId = 0;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(userId);
+    MultipleUserConnector::GetCallingTokenId(tokenId);
 #endif
     if (userId == -1) {
         LOGE("Get caller userId failed.");
@@ -753,7 +773,8 @@ std::string DiscoveryManager::AddMultiUserIdentify(const std::string &pkgName)
     MultiUserDiscovery multiUserDisc;
     multiUserDisc.pkgName = pkgName;
     multiUserDisc.userId = userId;
-    std::string pkgNameTemp = ComposeStr(pkgName, userId);
+    multiUserDisc.tokenId = tokenId;
+    std::string pkgNameTemp = ComposeStr(ComposeStr(pkgName, userId), tokenId);
     {
         std::lock_guard<std::mutex> autoLock(multiUserDiscLocks_);
         CHECK_SIZE_RETURN(multiUserDiscMap_, pkgNameTemp);
@@ -765,14 +786,16 @@ std::string DiscoveryManager::AddMultiUserIdentify(const std::string &pkgName)
 std::string DiscoveryManager::RemoveMultiUserIdentify(const std::string &pkgName)
 {
     int32_t userId = -1;
+    uint32_t tokenId = 0;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(userId);
+    MultipleUserConnector::GetCallingTokenId(tokenId);
 #endif
     if (userId == -1) {
         LOGE("Get caller userId failed.");
         return pkgName;
     }
-    std::string pkgNameTemp = ComposeStr(pkgName, userId);
+    std::string pkgNameTemp = ComposeStr(ComposeStr(pkgName, userId), tokenId);
     {
         std::lock_guard<std::mutex> autoLock(multiUserDiscLocks_);
         if (multiUserDiscMap_.find(pkgNameTemp) != multiUserDiscMap_.end()) {
@@ -783,13 +806,14 @@ std::string DiscoveryManager::RemoveMultiUserIdentify(const std::string &pkgName
 }
 
 void DiscoveryManager::GetPkgNameAndUserId(const std::string &pkgName, std::string &callerPkgName,
-    int32_t &userId)
+    int32_t &userId, uint32_t &tokenId)
 {
     {
         std::lock_guard<std::mutex> autoLock(multiUserDiscLocks_);
         if (multiUserDiscMap_.find(pkgName) != multiUserDiscMap_.end()) {
             callerPkgName = GetCallerPkgName(multiUserDiscMap_[pkgName].pkgName);
             userId = multiUserDiscMap_[pkgName].userId;
+            tokenId = multiUserDiscMap_[pkgName].tokenId;
             return;
         }
     }

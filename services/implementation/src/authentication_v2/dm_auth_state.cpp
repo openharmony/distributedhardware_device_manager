@@ -649,6 +649,7 @@ void DmAuthState::SetProcessInfo(std::shared_ptr<DmAuthContext> context)
     uint32_t bindLevel = static_cast<uint32_t>(localAccess.bindLevel);
     if (bindLevel == APP || bindLevel == SERVICE) {
         processInfo.pkgName = localAccess.pkgName;
+        processInfo.tokenId = static_cast<uint32_t>(localAccess.tokenId);
     } else if (bindLevel == USER) {
         processInfo.pkgName = std::string(DM_PKG_NAME);
     } else {

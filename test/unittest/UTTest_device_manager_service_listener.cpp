@@ -1259,7 +1259,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_002, testing
 
     // Pre-populate alreadyOnlinePkgName_
     std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId) +
-        "#" + std::string(info.deviceId);
+        "#" + std::to_string(processInfo.tokenId) + "#" + std::string(info.deviceId);
     listener_->alreadyOnlinePkgName_[notifyPkgName] = info;
 
     // Create mock process info list
@@ -1531,7 +1531,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_010, testing
 
     // Pre-populate alreadyOnlinePkgName_
     std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId) +
-        "#" + std::string(info.deviceId);
+        "#" + std::to_string(processInfo.tokenId) + "#" + std::string(info.deviceId);
     listener_->alreadyOnlinePkgName_[notifyPkgName] = info;
 
     // Create mock process info list
@@ -1740,9 +1740,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnProcessRemove_001, testing::ext::Te
     processInfo.userId = 100;
     processInfo.pkgName = "com.ohos.helloworld";
     DmDeviceInfo dmDeviceInfo;
-    listener_->alreadyOnlinePkgName_["com.ohos.helloworld#100"] = dmDeviceInfo;
+    listener_->alreadyOnlinePkgName_["com.ohos.helloworld#100#0#deviceId1"] = dmDeviceInfo;
     DmDeviceInfo dmDeviceInfo1;
-    listener_->alreadyOnlinePkgName_["com.ohos.network"] = dmDeviceInfo;
+    listener_->alreadyOnlinePkgName_["com.ohos.network#100#0#deviceId2"] = dmDeviceInfo;
     listener_->OnProcessRemove(processInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
@@ -1863,9 +1863,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAppUnintall_001, testing::ext::Test
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     DmDeviceInfo info;
-    listener_->alreadyOnlinePkgName_["onlinePkgName1"] = info;
+    listener_->alreadyOnlinePkgName_["onlinePkgName1#100#0#devId1"] = info;
     DmDeviceInfo info1;
-    listener_->alreadyOnlinePkgName_["onlinePkgName2"] = info1;
+    listener_->alreadyOnlinePkgName_["onlinePkgName2#100#0#devId2"] = info1;
     std::string pkgName = "onlinePkgName1";
     listener_->OnAppUnintall(pkgName);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
@@ -2012,7 +2012,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceOffline_001, testing::ex
     DmDeviceState state = DmDeviceState::DEVICE_INFO_CHANGED;
     DmDeviceInfo info;
     DmDeviceBasicInfo deviceBasicInfo;
-    std::string notifyPkgName = pro.pkgName + "#" + std::to_string(pro.userId) + "#" + std::string(info.deviceId);
+    std::string notifyPkgName = pro.pkgName + "#" + std::to_string(pro.userId) + "#" +
+        std::to_string(pro.tokenId) + "#" + std::string(info.deviceId);
     listener_->alreadyOnlinePkgName_[notifyPkgName] = info;
     listener_->ProcessDeviceOffline(procInfoVec, processInfo, state, info, deviceBasicInfo, true);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
@@ -2094,7 +2095,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, RemoveNotExistProcess_001, testing::e
     DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, processInfo);
     DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, processInfo1);
     DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, pro);
-    std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId);
+    std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId) +
+        "#" + std::to_string(processInfo.tokenId) + "#";
     DmDeviceInfo info;
     listener_->alreadyOnlinePkgName_[notifyPkgName] = info;
     listener_->RemoveNotExistProcess();

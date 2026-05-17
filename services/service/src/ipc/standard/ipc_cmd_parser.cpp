@@ -487,6 +487,7 @@ ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel 
     ProcessInfo processInfo;
     processInfo.pkgName = pkgName;
     MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    MultipleUserConnector::GetCallingTokenId(processInfo.tokenId);
     DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName, processInfo.userId);
     int32_t result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, callback);
     if (!reply.WriteInt32(result)) {
@@ -504,6 +505,7 @@ ON_IPC_CMD(UNREGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParce
     ProcessInfo processInfo;
     processInfo.pkgName = pkgName;
     MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    MultipleUserConnector::GetCallingTokenId(processInfo.tokenId);
     DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName, processInfo.userId);
     int32_t result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     if (!reply.WriteInt32(result)) {
@@ -1665,6 +1667,7 @@ ON_IPC_CMD(SYNC_CALLBACK, MessageParcel &data, MessageParcel &reply)
     ProcessInfo processInfo;
     processInfo.pkgName = pkgName;
     MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    MultipleUserConnector::GetCallingTokenId(processInfo.tokenId);
     int32_t result = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
     if (dmCommonNotifyEvent == static_cast<int32_t>(DmCommonNotifyEvent::REG_DEVICE_STATE)) {
         DeviceManagerService::GetInstance().RegDevStateCallbackToService(pkgName);
@@ -2379,6 +2382,7 @@ ON_IPC_CMD(SYNC_SERVICE_CALLBACK, MessageParcel &data, MessageParcel &reply)
     ProcessInfo processInfo;
     processInfo.pkgName = pkgName;
     MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    MultipleUserConnector::GetCallingTokenId(processInfo.tokenId);
     int32_t result = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
     if (dmCommonNotifyEvent == static_cast<int32_t>(DmCommonNotifyEvent::REG_SERVICE_STATE)) {
         DeviceManagerService::GetInstance().RegServiceStateCallback(pkgName, serviceId);

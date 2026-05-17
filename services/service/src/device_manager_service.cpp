@@ -1025,9 +1025,11 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         return ERR_DM_FAILED;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    uint32_t callingTokenId = 0;
+    MultipleUserConnector::GetTokenId(callingTokenId);
+    tokenId = static_cast<int64_t>(callingTokenId);
     std::vector<std::string> peerUdids;
     peerUdids.emplace_back(udid);
-
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     std::map<std::string, std::string> wifiDevices;
     bool isBleActive = false;
@@ -4209,6 +4211,7 @@ int32_t DeviceManagerService::RegDevStateCallbackToService(const std::string &pk
     ProcessInfo processInfo;
     processInfo.pkgName = pkgName;
     processInfo.userId = userId;
+    processInfo.tokenId = IPCSkeleton::GetCallingTokenID();
     listener_->OnDevStateCallbackAdd(processInfo, deviceList);
     if (PermissionManager::GetInstance().CheckOnReadyRetrospectiveNotificationBlackList()) {
         return DM_OK;
@@ -4808,6 +4811,7 @@ int32_t DeviceManagerService::SetLocalDeviceName(const std::string &pkgName, con
     ProcessInfo processInfo = {.pkgName = pkgName};
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    processInfo.tokenId = IPCSkeleton::GetCallingTokenID();
     ffrt::submit([listener = listener_, deviceName = deviceName, processInfo = processInfo]() {
         CHECK_NULL_VOID(listener);
         listener->OnSetLocalDeviceNameResult(processInfo, deviceName, DM_OK);
@@ -4916,10 +4920,10 @@ int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
     return DM_OK;
 }
 
-void DeviceManagerService::ClearPublishIdCache(const std::string &pkgName)
+void DeviceManagerService::ClearPublishIdCache(const ProcessInfo &processInfo)
 {
     CHECK_NULL_VOID(advertiseMgr_);
-    advertiseMgr_->ClearPublishIdCache(pkgName);
+    advertiseMgr_->ClearPublishIdCache(processInfo);
 }
 
 bool DeviceManagerService::IsPC()
@@ -5493,6 +5497,7 @@ int32_t DeviceManagerService::StopPublishService(const std::string &pkgName, int
     ProcessInfo processInfo;
     processInfo.pkgName = pkgName;
     MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    processInfo.tokenId = IPCSkeleton::GetCallingTokenID();
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("adapter instance not init or init failed");
         return ERR_DM_UNSUPPORTED_METHOD;
@@ -5517,6 +5522,7 @@ int32_t DeviceManagerService::StartDiscoveryService(const std::string &pkgName, 
     ProcessInfo processInfo;
     processInfo.pkgName = pkgName;
     MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    processInfo.tokenId = IPCSkeleton::GetCallingTokenID();
     return dmServiceImplExtResident_->StartDiscoveryService(processInfo, disParam);
 }
 
@@ -5539,6 +5545,7 @@ int32_t DeviceManagerService::StopDiscoveryService(const std::string &pkgName,
     ProcessInfo processInfo;
     processInfo.pkgName = pkgName;
     MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    processInfo.tokenId = IPCSkeleton::GetCallingTokenID();
     return dmServiceImplExtResident_->StopDiscoveryService(processInfo, discParam);
 }
 
