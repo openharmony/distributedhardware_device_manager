@@ -296,8 +296,6 @@ void DeviceManagerServiceListener::ProcessAppStateChange(const ProcessInfo &proc
 {
     LOGI("In");
     std::vector<ProcessInfo> processInfoVec = GetWhiteListSAProcessInfo(DmCommonNotifyEvent::REG_DEVICE_STATE);
-
-    // std::vector<ProcessInfo> allProcessInfos = ipcServerListener_.GetAllProcessInfo();
     switch (static_cast<int32_t>(state)) {
         case static_cast<int32_t>(DmDeviceState::DEVICE_STATE_ONLINE):
             ProcessAppOnline(processInfoVec, processInfo, state, info, deviceBasicInfo);
@@ -319,8 +317,6 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const ProcessInfo &proces
 {
     DmDeviceBasicInfo deviceBasicInfo;
     ConvertDeviceInfoToDeviceBasicInfo(processInfo.pkgName, info, deviceBasicInfo);
-    LOGI("liwei DeviceManagerServiceListener::OnDeviceStateChange pkgName = %{public}s, userId = %{public}d, tokenId = %{public}u", 
-        processInfo.pkgName.c_str(), processInfo.userId, processInfo.tokenId);
     if (processInfo.pkgName == std::string(DM_PKG_NAME)) {
         ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
     } else {
@@ -766,18 +762,17 @@ std::vector<ProcessInfo> DeviceManagerServiceListener::GetWhiteListSAProcessInfo
         return {};
     }
     std::unordered_set<std::string> notifyPkgnames = PermissionManager::GetInstance().GetWhiteListSystemSA();
-    std::vector<ProcessInfo> allProcessInfos = ipcServerListener_.GetAllProcessInfo();// 所有初始化DM的进程
+    std::vector<ProcessInfo> allProcessInfos = ipcServerListener_.GetAllProcessInfo();
     std::vector<ProcessInfo> processInfos;
     for (const auto &item : allProcessInfos) {
         if (notifyPkgnames.find(item.pkgName) == notifyPkgnames.end()) {
             continue;
         }
         ProcessInfo processInfo = item;
+        processInfo.userId = 0;
         if (notifyProcessInfos.find(processInfo) == notifyProcessInfos.end()) {
             continue;
         }
-        // 20260517
-        processInfo.userId = 0;
         processInfos.push_back(processInfo);
     }
     return processInfos;
@@ -820,7 +815,6 @@ ProcessInfo DeviceManagerServiceListener::DealBindProcessInfo(const ProcessInfo 
 {
     std::set<std::string> systemSA = ipcServerListener_.GetSystemSA();
     if (systemSA.find(processInfo.pkgName) == systemSA.end()) {
-        LOGI("liwei processInfo.pkgName = %{public}s", processInfo.pkgName.c_str());
         return processInfo;
     }
     ProcessInfo bindProcessInfo = processInfo;
@@ -922,8 +916,6 @@ void DeviceManagerServiceListener::ProcessAppOnline(std::vector<ProcessInfo> &pr
 {
     LOGI("userId %{public}d, state %{public}d, udidhash %{public}s.", processInfo.userId, static_cast<int32_t>(state),
         GetAnonyString(info.deviceId).c_str());
-    LOGI("liwei DeviceManagerServiceListener::ProcessAppOnline pkgName = %{public}s, userId = %{public}d, tokenId = %{public}u", 
-        processInfo.pkgName.c_str(), processInfo.userId, processInfo.tokenId);
     SetNeedNotifyProcessInfos(processInfo, procInfoVec);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
@@ -1202,8 +1194,6 @@ void DeviceManagerServiceListener::ProcessAppOnline(std::vector<ProcessInfo> &pr
         GetAnonyString(info.deviceId).c_str());
     SetNeedNotifyProcessInfos(processInfo, procInfoVec);
     for (const auto &it : procInfoVec) {
-    LOGI("liwei DeviceManagerServiceListener::OnDeviceStateChange pkgName = %{public}s, userId = %{public}d, tokenId = %{public}u", 
-        it.pkgName.c_str(), it.userId, it.tokenId);
         std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
         std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
         pReq->SetServiceIds(serviceIds);
@@ -1333,11 +1323,9 @@ void DeviceManagerServiceListener::SetNeedNotifyProcessInfos(const ProcessInfo &
         return;
     }
     if (find(procInfoVec.begin(), procInfoVec.end(), bindProcessInfo) != procInfoVec.end()) {
-        LOGI("liwei 1111");
         return;
     }
     procInfoVec.push_back(bindProcessInfo);
-    LOGI("liwei ServiceListener::SetNeedNotifyProcessInfos procInfoVec.size = %{public}d", procInfoVec.size());
     return;
 }
 //LCOV_EXCL_START

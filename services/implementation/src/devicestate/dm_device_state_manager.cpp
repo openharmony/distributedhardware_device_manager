@@ -224,7 +224,7 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
     CHECK_NULL_VOID(listener_);
     for (const auto &item : processInfoVec) {
         if (!item.pkgName.empty()) {
-            LOGI("liwei pkgName = %{public}s", item.pkgName.c_str());
+            LOGI("pkgName = %{public}s", item.pkgName.c_str());
             if (!remoteServiceIds.empty() && devState == DEVICE_STATE_ONLINE) {
                 std::vector<int64_t> remoteServiceIdVec(remoteServiceIds.begin(), remoteServiceIds.end());
                 listener_->OnDeviceStateChange(item, devState, devInfo, remoteServiceIdVec);

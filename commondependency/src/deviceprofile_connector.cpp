@@ -850,15 +850,12 @@ int32_t DeviceProfileConnector::CheckAuthForm(DmAuthForm form, AccessControlProf
         return form;
     }
     if (profiles.GetBindLevel() == APP || profiles.GetBindLevel() == SERVICE) {
-        uint64_t callingTokenId = static_cast<uint64_t>(IPCSkeleton::GetCallingTokenID());
-        if (((discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() &&
-            callingTokenId == profiles.GetAccesser().GetAccesserTokenId()) ||
+        if ((discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() ||
             CheckAuthFormProxyTokenId(discoveryInfo.pkgname, profiles.GetAccesser().GetAccesserExtraData())) &&
             discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
             return form;
         }
-        if (((discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() &&
-            callingTokenId == profiles.GetAccessee().GetAccesseeTokenId()) ||
+        if ((discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() ||
             CheckAuthFormProxyTokenId(discoveryInfo.pkgname, profiles.GetAccessee().GetAccesseeExtraData())) &&
             discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
             return form;
@@ -1137,8 +1134,6 @@ DM_EXPORT std::vector<OHOS::DistributedHardware::ProcessInfo> DeviceProfileConne
             processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
             processInfo.userId = item.GetAccesser().GetAccesserUserId();
             processInfo.tokenId = static_cast<uint32_t>(item.GetAccesser().GetAccesserTokenId());
-            LOGI("111 liwei DeviceProfileConnector::GetProcessInfoFromAclByUserId pkgName = %{public}s, userId = %{public}d, tokenId = %{public}u", 
-                processInfo.pkgName.c_str(), processInfo.userId, processInfo.tokenId);
             processInfoVec.push_back(processInfo);
             extraStr = item.GetAccesser().GetAccesserExtraData();
         } else if (accesseeUdid == localDeviceId) {
@@ -1146,8 +1141,6 @@ DM_EXPORT std::vector<OHOS::DistributedHardware::ProcessInfo> DeviceProfileConne
             processInfo.userId = item.GetAccessee().GetAccesseeUserId();
             processInfo.tokenId = static_cast<uint32_t>(item.GetAccessee().GetAccesseeTokenId());
             processInfoVec.push_back(processInfo);
-            LOGI("222 liwei DeviceProfileConnector::GetProcessInfoFromAclByUserId pkgName = %{public}s, userId = %{public}d, tokenId = %{public}u", 
-                processInfo.pkgName.c_str(), processInfo.userId, processInfo.tokenId);
             extraStr = item.GetAccessee().GetAccesseeExtraData();
         } else {
             continue;
