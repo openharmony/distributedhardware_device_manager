@@ -80,7 +80,7 @@ int32_t DeviceManagerServiceNotify::RegisterCallBack(int32_t dmCommonNotifyEvent
             processInfo.pkgName.c_str());
         return ERR_DM_FAILED;
     }
-    callbackMap_.at(notifyEvent).insert(processInfo);
+    callbackMap_.at(notifyEvent).insert(processInfo);// liwei 带tokenId
     return DM_OK;
 }
 
@@ -97,7 +97,7 @@ void DeviceManagerServiceNotify::GetCallBack(int32_t dmCommonNotifyEvent, std::s
         LOGE("callback is empty %{public}d.", notifyEvent);
         return;
     }
-    processInfos = callbackMap_.at(notifyEvent);
+    processInfos = callbackMap_.at(notifyEvent);// liwei 带tokenId
 }
 
 void DeviceManagerServiceNotify::ClearDiedProcessCallback(const ProcessInfo &processInfo)

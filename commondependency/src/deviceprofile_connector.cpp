@@ -1137,6 +1137,8 @@ DM_EXPORT std::vector<OHOS::DistributedHardware::ProcessInfo> DeviceProfileConne
             processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
             processInfo.userId = item.GetAccesser().GetAccesserUserId();
             processInfo.tokenId = static_cast<uint32_t>(item.GetAccesser().GetAccesserTokenId());
+            LOGI("111 liwei DeviceProfileConnector::GetProcessInfoFromAclByUserId pkgName = %{public}s, userId = %{public}d, tokenId = %{public}u", 
+                processInfo.pkgName.c_str(), processInfo.userId, processInfo.tokenId);
             processInfoVec.push_back(processInfo);
             extraStr = item.GetAccesser().GetAccesserExtraData();
         } else if (accesseeUdid == localDeviceId) {
@@ -1144,6 +1146,8 @@ DM_EXPORT std::vector<OHOS::DistributedHardware::ProcessInfo> DeviceProfileConne
             processInfo.userId = item.GetAccessee().GetAccesseeUserId();
             processInfo.tokenId = static_cast<uint32_t>(item.GetAccessee().GetAccesseeTokenId());
             processInfoVec.push_back(processInfo);
+            LOGI("222 liwei DeviceProfileConnector::GetProcessInfoFromAclByUserId pkgName = %{public}s, userId = %{public}d, tokenId = %{public}u", 
+                processInfo.pkgName.c_str(), processInfo.userId, processInfo.tokenId);
             extraStr = item.GetAccessee().GetAccesseeExtraData();
         } else {
             continue;

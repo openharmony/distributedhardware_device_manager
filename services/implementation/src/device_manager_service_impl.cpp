@@ -831,7 +831,7 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
         deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, trustDeviceId, isOnline);
     }
 }
-
+// 111
 void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline)
 {
     LOGI("networkId: %{public}s.", GetAnonyString(devInfo.networkId).c_str());
@@ -855,7 +855,7 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
     SetOnlineProcessInfo(bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState, isOnline);
 }
-
+// 111
 void DeviceManagerServiceImpl::SetOnlineProcessInfo(const uint32_t &bindType, ProcessInfo &processInfo,
     DmDeviceInfo &devInfo, const std::string &requestDeviceId, const std::string &trustDeviceId,
     DmDeviceState devState, const bool isOnline)

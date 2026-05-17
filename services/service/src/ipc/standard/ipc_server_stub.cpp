@@ -443,7 +443,7 @@ std::vector<ProcessInfo> IpcServerStub::GetAllProcessInfo()
     for (const auto &iter : dmListener_) {
         processInfoVec.push_back(iter.first);
     }
-    return processInfoVec;
+    return processInfoVec;// 带tokenId
 }
 //LCOV_EXCL_STOP
 
