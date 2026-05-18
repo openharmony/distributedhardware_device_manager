@@ -141,17 +141,17 @@ int32_t AuthSinkNegotiateStartState::RespQueryAcceseeIds(std::shared_ptr<DmAuthC
         LOGE("sink not contain the bundlename %{public}s.", context->accessee.processName.c_str());
         return ERR_DM_GET_TOKENID_FAILED;
     }
-    int32_t ret = QueryCredential(context);
-    if (ret != DM_OK) {
-        LOGE("QueryCredential failed: %{public}d.", ret);
-        return ret;
-    }
     context->accessee.tokenIdHash = Crypto3rd::GetTokenIdHash(std::to_string(context->accessee.tokenId));
     context->processInfo.tokenId = context->accessee.tokenId;
     context->processInfo.uid = context->accessee.uid;
     context->processInfo.userId = context->accessee.userId;
     context->processInfo.processName = context->accessee.processName;
     context->processInfo.businessName = context->accessee.businessName;
+    int32_t ret = QueryCredential(context);
+    if (ret != DM_OK) {
+        LOGE("QueryCredential failed: %{public}d.", ret);
+        return ret;
+    }
     return DM_OK;
 }
 
