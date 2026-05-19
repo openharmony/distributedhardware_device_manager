@@ -683,8 +683,8 @@ bool DiscoveryManager::CloseCommonDependencyObj()
 
 void DiscoveryManager::ClearDiscoveryCache(const ProcessInfo &processInfo)
 {
-    LOGI("PkgName: %{public}s, userId: %{public}d, tokenId: %{public}u",
-        processInfo.pkgName.c_str(), processInfo.userId, processInfo.tokenId);
+    LOGI("PkgName: %{public}s, userId: %{public}d, tokenId: %{public}s",
+        processInfo.pkgName.c_str(), processInfo.userId, GetAnonyInt32(processInfo.tokenId).c_str());
     std::string pkgName = processInfo.pkgName + "#";
     std::set<uint16_t> subscribeIdSet = ClearDiscoveryPkgName(pkgName);
 
