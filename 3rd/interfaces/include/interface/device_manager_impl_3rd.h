@@ -27,7 +27,6 @@
 #include "ipc_interface_code_3rd.h"
 #include "ipc_client_stub_3rd.h"
 #include "device_manager_data_struct_3rd.h"
-#include "dm_log_3rd.h"
 #include "dm_service_load_3rd.h"
 #include "device_manager_notify_3rd.h"
 #include "dm_anonymous_3rd.h"
