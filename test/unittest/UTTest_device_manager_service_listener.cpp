@@ -32,6 +32,8 @@
 #include "ipc_service_publish_result_req.h"
 #include "ipc_server_listener_mock.h"
 
+extern bool CheckProcessInfo(const OHOS::DistributedHardware::ProcessInfo &processInfo);
+
 using namespace testing;
 using namespace testing::ext;
 namespace OHOS {
@@ -2219,6 +2221,70 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthCodeInvalid_003, testing::ext::
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(processInfos));
     listener_->OnAuthCodeInvalid(pkgName, "");
     EXPECT_NE(listener_, nullptr);
+}
+
+/**
+ * @tc.name: CheckProcessInfo_001
+ * @tc.desc: Check if whitelist package is correctly identified
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, CheckProcessInfo_001, testing::ext::TestSize.Level1)
+{
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.huawei.pcassistant";
+    processInfo.userId = 100;
+    processInfo.tokenId = 123456;
+    bool result = CheckProcessInfo(processInfo);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.name: CheckProcessInfo_002
+ * @tc.desc: Check if non-whitelist package returns false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, CheckProcessInfo_002, testing::ext::TestSize.Level1)
+{
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.ohos.helloworld";
+    processInfo.userId = 100;
+    processInfo.tokenId = 123456;
+    bool result = CheckProcessInfo(processInfo);
+    EXPECT_EQ(result, false);
+}
+
+/**
+ * @tc.name: CheckProcessInfo_003
+ * @tc.desc: Check if empty pkgName returns false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, CheckProcessInfo_003, testing::ext::TestSize.Level1)
+{
+    ProcessInfo processInfo;
+    processInfo.pkgName = "";
+    processInfo.userId = 100;
+    processInfo.tokenId = 123456;
+    bool result = CheckProcessInfo(processInfo);
+    EXPECT_EQ(result, false);
+}
+
+/**
+ * @tc.name: CheckProcessInfo_004
+ * @tc.desc: Check another whitelist package
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerServiceListenerTest, CheckProcessInfo_004, testing::ext::TestSize.Level1)
+{
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.huawei.ohos.cardsde";
+    processInfo.userId = 100;
+    processInfo.tokenId = 789012;
+    bool result = CheckProcessInfo(processInfo);
+    EXPECT_EQ(result, true);
 }
 } // namespace
 } // namespace DistributedHardware

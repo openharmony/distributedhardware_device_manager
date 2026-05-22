@@ -70,6 +70,28 @@ std::mutex DeviceManagerServiceListener::actUnrelatedPkgNameLock_;
 std::set<std::string> DeviceManagerServiceListener::actUnrelatedPkgName_ = {};
 std::unordered_set<std::string> DeviceManagerServiceListener::highPriorityPkgNameSet_ = { "ohos.deviceprofile",
     "ohos.distributeddata.service" };
+constexpr const static char* ADAPTER_WHITE_LIST[] = {
+    "com.huawei.pcassistant",
+    "com.huawei.ohos.cardsde",
+    "com.huawei.android.launcher",
+};
+constexpr int32_t ADAPTER_WHITE_LIST_NUM = std::size(ADAPTER_WHITE_LIST);
+
+bool CheckProcessInfo(const ProcessInfo &processInfo)
+{
+    if (processInfo.pkgName.empty()) {
+        LOGE("pkgName is empty");
+        return false;
+    }
+    uint32_t index = 0;
+    for (; index < ADAPTER_WHITE_LIST_NUM; ++index) {
+        std::string tmp(ADAPTER_WHITE_LIST[index]);
+        if (processInfo.pkgName == tmp) {
+            return true;
+        }
+    }
+    return false;
+}
 
 std::string MakeNotifyKey(const ProcessInfo &processInfo, const std::string &deviceId)
 {
@@ -1311,14 +1333,32 @@ void DeviceManagerServiceListener::SetNeedNotifyProcessInfos(const ProcessInfo &
     std::vector<ProcessInfo> &procInfoVec)
 {
     ProcessInfo bindProcessInfo = DealBindProcessInfo(processInfo);
+    if (CheckProcessInfo(bindProcessInfo)) {
+        bindProcessInfo.tokenId = 0;
+    }
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
-    if (find(processInfos.begin(), processInfos.end(), bindProcessInfo) == processInfos.end()) {
+    bool stateFlag = false;
+    for (auto &iter : processInfos) {
+        if (iter == bindProcessInfo) {
+            LOGI("matched, pkg:%{public}s", bindProcessInfo.pkgName.c_str());
+            stateFlag = true;
+        }
+    }
+    if (!stateFlag) {
         LOGE("not init dm, pkg:%{public}s", bindProcessInfo.pkgName.c_str());
         return;
     }
     std::set<ProcessInfo> notifyProcessInfos;
     DeviceManagerServiceNotify::GetInstance().GetCallBack(DmCommonNotifyEvent::REG_DEVICE_STATE, notifyProcessInfos);
-    if (notifyProcessInfos.find(bindProcessInfo) == notifyProcessInfos.end()) {
+    bool flag = false;
+    for (auto &iter : notifyProcessInfos) {
+        if (iter == bindProcessInfo) {
+            LOGI("Contrasted, pkg:%{public}s", bindProcessInfo.pkgName.c_str());
+            flag = true;
+            break;
+        }
+    }
+    if (!flag) {
         LOGE("state callback not exist, pkg:%{public}s", bindProcessInfo.pkgName.c_str());
         return;
     }
