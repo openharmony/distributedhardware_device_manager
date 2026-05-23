@@ -44,6 +44,7 @@ public:
     bool CheckProcessValidOnGetTrustedDeviceList();
     bool CheckReadLocalDeviceName(void);
     bool CheckOnReadyRetrospectiveNotificationBlackList();
+    bool CheckPkgNameInWhiteList(const std::string &pkgName);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -70,28 +70,6 @@ std::mutex DeviceManagerServiceListener::actUnrelatedPkgNameLock_;
 std::set<std::string> DeviceManagerServiceListener::actUnrelatedPkgName_ = {};
 std::unordered_set<std::string> DeviceManagerServiceListener::highPriorityPkgNameSet_ = { "ohos.deviceprofile",
     "ohos.distributeddata.service" };
-constexpr const static char* ADAPTER_WHITE_LIST[] = {
-    "com.huawei.pcassistant",
-    "com.huawei.ohos.cardsde",
-    "com.huawei.android.launcher",
-};
-constexpr int32_t ADAPTER_WHITE_LIST_NUM = sizeof(ADAPTER_WHITE_LIST) / sizeof(ADAPTER_WHITE_LIST[0]);
-
-bool CheckProcessInfo(const ProcessInfo &processInfo)
-{
-    if (processInfo.pkgName.empty()) {
-        LOGE("pkgName is empty");
-        return false;
-    }
-    uint32_t index = 0;
-    for (; index < ADAPTER_WHITE_LIST_NUM; ++index) {
-        std::string tmp(ADAPTER_WHITE_LIST[index]);
-        if (processInfo.pkgName == tmp) {
-            return true;
-        }
-    }
-    return false;
-}
 
 std::string MakeNotifyKey(const ProcessInfo &processInfo, const std::string &deviceId)
 {
@@ -1333,7 +1311,7 @@ void DeviceManagerServiceListener::SetNeedNotifyProcessInfos(const ProcessInfo &
     std::vector<ProcessInfo> &procInfoVec)
 {
     ProcessInfo bindProcessInfo = DealBindProcessInfo(processInfo);
-    if (CheckProcessInfo(bindProcessInfo)) {
+    if (PermissionManager::GetInstance().CheckPkgNameInWhiteList(bindProcessInfo.pkgName)) {
         bindProcessInfo.tokenId = 0;
     }
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();

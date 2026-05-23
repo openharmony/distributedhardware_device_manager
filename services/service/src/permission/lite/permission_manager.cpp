@@ -120,5 +120,11 @@ bool PermissionManager::CheckOnReadyRetrospectiveNotificationBlackList()
 {
     return true;
 }
+
+bool PermissionManager::CheckPkgNameInWhiteList(const std::string &pkgName)
+{
+    (void)pkgName;
+    return true;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
