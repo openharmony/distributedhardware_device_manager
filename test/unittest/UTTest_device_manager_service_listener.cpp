@@ -663,7 +663,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::Test
     std::string appId = "test_app_id";
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(processInfo.pkgName, _, processInfo.userId))
-        .WillOnce(DoAll(testing::SetArgReferee<1>(appId), testing::Return(DM_OK)));
+        .WillRepeatedly(DoAll(testing::SetArgReferee<1>(appId), testing::Return(DM_OK)));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(testing::Return(DM_OK));
 
     // Act
@@ -916,7 +916,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_007, testing::ext::Test
     std::string appId = "test_app_id_success";
 
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(processInfo.pkgName, _, processInfo.userId))
-        .WillOnce(DoAll(testing::SetArgReferee<1>(appId), testing::Return(DM_OK)));
+        .WillRepeatedly(DoAll(testing::SetArgReferee<1>(appId), testing::Return(DM_OK)));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(testing::Return(DM_OK));
 
     // Act

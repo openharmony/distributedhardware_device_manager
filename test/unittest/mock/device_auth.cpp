@@ -45,19 +45,47 @@ int32_t (*createGroup)(int64_t requestId, const char *appId, const char *createP
     return 0;
 }
 
-int32_t (*getRelatedGroups)(const char *appId, const char *peerDeviceId, char **returnGroupVec, uint32_t *groupNum)
+DeviceGroupManager g_deviceGroupManager = {
+    .regCallback = nullptr,
+    .unRegCallback = nullptr,
+    .regDataChangeListener = nullptr,
+    .unRegDataChangeListener = nullptr,
+    .createGroup = createGroup,
+    .deleteGroup = deleteGroup,
+    .addMemberToGroup = nullptr,
+    .deleteMemberFromGroup = nullptr,
+    .processData = nullptr,
+    .addMultiMembersToGroup = nullptr,
+    .delMultiMembersFromGroup = nullptr,
+    .confirmRequest = nullptr,
+    .bindPeer = nullptr,
+    .unbindPeer = nullptr,
+    .processLiteData = nullptr,
+    .authKeyAgree = nullptr,
+    .processKeyAgreeData = nullptr,
+    .processCredential = nullptr,
+    .getRegisterInfo = nullptr,
+    .getLocalConnectInfo = nullptr,
+    .checkAccessToGroup = nullptr,
+    .getPkInfoList = nullptr,
+    .addGroupManager = nullptr,
+    .addGroupFriend = nullptr,
+    .deleteGroupManager = nullptr,
+    .deleteGroupFriend = nullptr,
+    .getGroupManagers = nullptr,
+    .getGroupFriends = nullptr,
+    .getGroupInfoById = nullptr,
+    .getGroupInfo = nullptr,
+    .getJoinedGroups = nullptr,
+    .getRelatedGroups = getRelatedGroups,
+    .getDeviceInfoById = nullptr,
+    .getTrustedDevices = nullptr,
+    .isDeviceInGroup = nullptr,
+    .destroyInfo = nullptr
+};
+
+const DeviceGroupManager* GetGmInstance(void)
 {
-    if (peerDeviceId == "123") {
-        returnGroupVec = nullptr;
-    }
-
-    if (peerDeviceId == "12345") {
-        groupNum = 0;
-    }
-
-    if (peerDeviceId == "34567") {
-        groupNum = 1;
-        returnGroupVec = "123";
-    }
+    return &g_deviceGroupManager;
 }
 }
