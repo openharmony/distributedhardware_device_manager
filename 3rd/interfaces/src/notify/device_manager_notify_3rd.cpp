@@ -75,19 +75,17 @@ int32_t DeviceManagerNotify3rd::RegisterAuthCallback(const std::string &business
         LOGE("Invalid parameter, businessName is empty or dmAuthCallback is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::string processName = "";
-    if (PermissionManager3rd::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed.");
-        return ERR_DM_FAILED;
-    }
-
     ProcessInfo3rd processInfo3rd;
-    processInfo3rd.tokenId = static_cast<uint32_t>(OHOS::IPCSkeleton::GetCallingTokenID());
-    processInfo3rd.uid = OHOS::IPCSkeleton::GetCallingUid();
-    processInfo3rd.processName = processName;
+    processInfo3rd.tokenId = static_cast<uint32_t>(OHOS::IPCSkeleton::GetSelfTokenID());
+    processInfo3rd.uid = getuid();
     processInfo3rd.businessName = businessName;
     int32_t userId = MultipleUserConnector3rd::GetCurrentAccountUserID();
     processInfo3rd.userId = userId;
+    if (PermissionManager3rd::GetInstance().GetProcessNameByTokenId(processInfo3rd.tokenId,
+        processInfo3rd.processName) != DM_OK) {
+        LOGE("Get caller process name failed.");
+        return ERR_DM_FAILED;
+    }
 
     std::lock_guard<ffrt::mutex> autoLock(dmAuthCallbackLock_);
     dmAuthCallbackMap_[processInfo3rd] = dmAuthCallback;
@@ -101,20 +99,17 @@ int32_t DeviceManagerNotify3rd::UnRegisterAuthCallback(const std::string &busine
         LOGE("Invalid parameter, businessName is empty .");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::string processName = "";
-    if (PermissionManager3rd::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed.");
-        return ERR_DM_FAILED;
-    }
-
     ProcessInfo3rd processInfo3rd;
-    processInfo3rd.tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
-    processInfo3rd.uid = OHOS::IPCSkeleton::GetCallingUid();
-    processInfo3rd.processName = processName;
+    processInfo3rd.tokenId = static_cast<uint32_t>(OHOS::IPCSkeleton::GetSelfTokenID());
+    processInfo3rd.uid = getuid();
     processInfo3rd.businessName = businessName;
     int32_t userId = MultipleUserConnector3rd::GetCurrentAccountUserID();
     processInfo3rd.userId = userId;
-
+    if (PermissionManager3rd::GetInstance().GetProcessNameByTokenId(processInfo3rd.tokenId,
+        processInfo3rd.processName) != DM_OK) {
+        LOGE("Get caller process name failed.");
+        return ERR_DM_FAILED;
+    }
     std::lock_guard<ffrt::mutex> autoLock(dmAuthCallbackLock_);
     if (dmAuthCallbackMap_.find(processInfo3rd) == dmAuthCallbackMap_.end()) {
         LOGE("Invalid parameter.");
@@ -131,12 +126,14 @@ void DeviceManagerNotify3rd::OnAuthResult(const ProcessInfo3rd &processInfo3rd, 
     std::shared_ptr<DmAuthCallback> tempCbk;
     {
         std::lock_guard<ffrt::mutex> autoLock(dmAuthCallbackLock_);
-        if (dmAuthCallbackMap_.find(processInfo3rd) == dmAuthCallbackMap_.end()) {
-            LOGE("No callback found.");
-            return;
+        for (auto iter = dmAuthCallbackMap_.begin(); iter != dmAuthCallbackMap_.end();) {
+            if (iter->first == processInfo3rd) {
+                tempCbk = iter->second;
+                iter = dmAuthCallbackMap_.erase(iter);
+            } else {
+                ++iter;
+            }
         }
-        tempCbk = dmAuthCallbackMap_[processInfo3rd];
-        dmAuthCallbackMap_.erase(processInfo3rd);
     }
     if (tempCbk == nullptr) {
         LOGE("callback is nullptr.");
@@ -151,13 +148,14 @@ void DeviceManagerNotify3rd::OnAuthResult(const ProcessInfo3rd &processInfo3rd, 
     std::shared_ptr<DmAuthCallback> tempCbk;
     {
         std::lock_guard<ffrt::mutex> autoLock(dmAuthCallbackLock_);
-        if (dmAuthCallbackMap_.find(processInfo3rd) == dmAuthCallbackMap_.end()) {
-            FreeDeviceInfos(deviceInfos);
-            LOGE("No callback found.");
-            return;
+        for (auto iter = dmAuthCallbackMap_.begin(); iter != dmAuthCallbackMap_.end();) {
+            if (iter->first == processInfo3rd) {
+                tempCbk = iter->second;
+                iter = dmAuthCallbackMap_.erase(iter);
+            } else {
+                ++iter;
+            }
         }
-        tempCbk = dmAuthCallbackMap_[processInfo3rd];
-        dmAuthCallbackMap_.erase(processInfo3rd);
     }
     if (tempCbk == nullptr) {
         FreeDeviceInfos(deviceInfos);

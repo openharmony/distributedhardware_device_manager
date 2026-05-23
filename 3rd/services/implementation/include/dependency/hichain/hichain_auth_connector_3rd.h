@@ -44,7 +44,7 @@ public:
 
     int32_t AuthCredentialPinCode(int32_t osAccountId, int64_t authReqId, const std::string &pinCode);
     int32_t ProcessCredData(int64_t authReqId, const std::string &data);
-    int32_t AuthCredential(int32_t osAccountId, int64_t authReqId, const std::string &credId);
+    int32_t AuthCredential(int32_t osAccountId, int64_t authReqId, const std::string &credId, bool isOpenCredAuth);
     int32_t QueryCredentialInfo(int32_t userId, const JsonObject &queryParams, JsonObject &resultJson);
     void FreeJsonString(char *jsonStr);
 
