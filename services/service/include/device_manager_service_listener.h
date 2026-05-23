@@ -175,9 +175,6 @@ private:
     static std::set<std::string> actUnrelatedPkgName_;
 #endif
 };
-
-bool CheckProcessInfo(const ProcessInfo &processInfo);
-
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_SERVICE_LISTENER_H
