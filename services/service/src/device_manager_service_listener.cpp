@@ -75,7 +75,7 @@ constexpr const static char* ADAPTER_WHITE_LIST[] = {
     "com.huawei.ohos.cardsde",
     "com.huawei.android.launcher",
 };
-constexpr int32_t ADAPTER_WHITE_LIST_NUM = std::size(ADAPTER_WHITE_LIST);
+constexpr int32_t ADAPTER_WHITE_LIST_NUM = sizeof(ADAPTER_WHITE_LIST) / sizeof(ADAPTER_WHITE_LIST[0]);
 
 bool CheckProcessInfo(const ProcessInfo &processInfo)
 {
@@ -1337,28 +1337,27 @@ void DeviceManagerServiceListener::SetNeedNotifyProcessInfos(const ProcessInfo &
         bindProcessInfo.tokenId = 0;
     }
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
-    bool stateFlag = false;
-    for (auto &iter : processInfos) {
-        if (iter == bindProcessInfo) {
-            LOGI("matched, pkg:%{public}s", bindProcessInfo.pkgName.c_str());
-            stateFlag = true;
+    bool isMatched = false;
+    for (const auto &item : processInfos) {
+        if (item == bindProcessInfo) {
+            isMatched = true;
+            break;
         }
     }
-    if (!stateFlag) {
+    if (!isMatched) {
         LOGE("not init dm, pkg:%{public}s", bindProcessInfo.pkgName.c_str());
         return;
     }
     std::set<ProcessInfo> notifyProcessInfos;
     DeviceManagerServiceNotify::GetInstance().GetCallBack(DmCommonNotifyEvent::REG_DEVICE_STATE, notifyProcessInfos);
-    bool flag = false;
-    for (auto &iter : notifyProcessInfos) {
-        if (iter == bindProcessInfo) {
-            LOGI("Contrasted, pkg:%{public}s", bindProcessInfo.pkgName.c_str());
-            flag = true;
+    bool isContrasted = false;
+    for (const auto &item : notifyProcessInfos) {
+        if (item == bindProcessInfo) {
+            isContrasted = true;
             break;
         }
     }
-    if (!flag) {
+    if (!isContrasted) {
         LOGE("state callback not exist, pkg:%{public}s", bindProcessInfo.pkgName.c_str());
         return;
     }
