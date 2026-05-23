@@ -15,6 +15,7 @@
 
 #include "device_manager_notify_mock.h"
 #include "gtest/gtest.h"
+#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -22,51 +23,78 @@ DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify);
 int32_t DeviceManagerNotify::RegisterGetDeviceProfileInfoListCallback(const std::string &pkgName,
     std::shared_ptr<GetDeviceProfileInfoListCallback> callback)
 {
+    if (DmDeviceManagerNotify::dmDeviceManagerNotify == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmDeviceManagerNotify::dmDeviceManagerNotify->RegisterGetDeviceProfileInfoListCallback(pkgName, callback);
 }
 
 int32_t DeviceManagerNotify::RegisterGetDeviceIconInfoCallback(const std::string &pkgName, const std::string &uk,
     std::shared_ptr<GetDeviceIconInfoCallback> callback)
 {
+    if (DmDeviceManagerNotify::dmDeviceManagerNotify == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmDeviceManagerNotify::dmDeviceManagerNotify->RegisterGetDeviceIconInfoCallback(pkgName, uk, callback);
 }
 
 int32_t DeviceManagerNotify::RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
     std::shared_ptr<ServiceInfoStateCallback> callback)
 {
+    if (DmDeviceManagerNotify::dmDeviceManagerNotify == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmDeviceManagerNotify::dmDeviceManagerNotify->RegisterServiceStateCallback(pkgName, serviceId, callback);
 }
 
 int32_t DeviceManagerNotify::UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId)
 {
+    if (DmDeviceManagerNotify::dmDeviceManagerNotify == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmDeviceManagerNotify::dmDeviceManagerNotify->UnRegisterServiceStateCallback(pkgName, serviceId);
 }
 
 void DeviceManagerNotify::RegisterServicePublishCallback(const std::string &pkgName, int64_t serviceId,
     std::shared_ptr<ServicePublishCallback> callback)
 {
+    if (DmDeviceManagerNotify::dmDeviceManagerNotify == nullptr) {
+        return;
+    }
     DmDeviceManagerNotify::dmDeviceManagerNotify->RegisterServicePublishCallback(pkgName, serviceId, callback);
 }
 
 void DeviceManagerNotify::UnRegisterServicePublishCallback(const std::string &pkgName, int64_t serviceId)
 {
+    if (DmDeviceManagerNotify::dmDeviceManagerNotify == nullptr) {
+        return;
+    }
     DmDeviceManagerNotify::dmDeviceManagerNotify->UnRegisterServicePublishCallback(pkgName, serviceId);
 }
 
 void DeviceManagerNotify::RegisterServiceDiscoveryCallback(const std::string &pkgName, const std::string &serviceType,
     std::shared_ptr<ServiceDiscoveryCallback> callback)
 {
+    if (DmDeviceManagerNotify::dmDeviceManagerNotify == nullptr) {
+        return;
+    }
     DmDeviceManagerNotify::dmDeviceManagerNotify->RegisterServiceDiscoveryCallback(pkgName, serviceType, callback);
 }
 
 void DeviceManagerNotify::UnRegisterServiceDiscoveryCallback(const std::string &pkgName, const std::string &serviceType)
 {
+    if (DmDeviceManagerNotify::dmDeviceManagerNotify == nullptr) {
+        return;
+    }
     DmDeviceManagerNotify::dmDeviceManagerNotify->UnRegisterServiceDiscoveryCallback(pkgName, serviceType);
 }
 
 void DeviceManagerNotify::RegisterSyncServiceInfoCallback(const std::string &pkgName, int32_t localUserId,
     const std::string &networkId, std::shared_ptr<SyncServiceInfoCallback> callback, int64_t serviceId)
 {
+    if (DmDeviceManagerNotify::dmDeviceManagerNotify == nullptr) {
+        return;
+    }
     DmDeviceManagerNotify::dmDeviceManagerNotify->RegisterSyncServiceInfoCallback(pkgName, localUserId,
         networkId, callback, serviceId);
 }
@@ -74,6 +102,9 @@ void DeviceManagerNotify::RegisterSyncServiceInfoCallback(const std::string &pkg
 void DeviceManagerNotify::UnRegisterSyncServiceInfoCallback(const std::string &pkgName, int32_t localUserId,
     const std::string &networkId, int64_t serviceId)
 {
+    if (DmDeviceManagerNotify::dmDeviceManagerNotify == nullptr) {
+        return;
+    }
     DmDeviceManagerNotify::dmDeviceManagerNotify->UnRegisterSyncServiceInfoCallback(pkgName, localUserId,
         networkId, serviceId);
 }

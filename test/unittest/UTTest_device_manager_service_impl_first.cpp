@@ -1150,6 +1150,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleOffline_001, testing::ext::Tes
     EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return("123456"));
     EXPECT_CALL(*deviceProfileConnectorMock_, GetUserIdAndBindLevel(_, _)).WillOnce(Return(userIdAndBindLevel));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(SHARE_TYPE));
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _, _)).WillRepeatedly(Return());
     deviceManagerServiceImpl_->HandleOffline(devState, devInfo, true);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }
@@ -1171,6 +1172,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleOffline_002, testing::ext::Tes
     EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return("123456"));
     EXPECT_CALL(*deviceProfileConnectorMock_, GetUserIdAndBindLevel(_, _)).WillOnce(Return(userIdAndBindLevel));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(APP));
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _, _, _, _)).WillRepeatedly(Return());
     deviceManagerServiceImpl_->HandleOffline(devState, devInfo, true);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }

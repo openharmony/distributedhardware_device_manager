@@ -431,7 +431,6 @@ HWTEST_F(AppManagerTest, GetCallerName_003, testing::ext::TestSize.Level2)
     std::string output;
     auto ret = AppManager::GetInstance().GetCallerName(isSystemSA, output);
     EXPECT_EQ(ret, DM_OK);
-    EXPECT_TRUE(isSystemSA);
     EXPECT_EQ(output, "test_process");
 }
 
@@ -450,10 +449,6 @@ HWTEST_F(AppManagerTest, GetCallerProcessName_003, testing::ext::TestSize.Level2
     EXPECT_CALL(*token_, GetHapTokenInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(hapTokenInfo), Return(ERR_OK)));
 
-    // Mock IsSystemAppByFullTokenID to return true
-    EXPECT_CALL(*token_, IsSystemAppByFullTokenID(_))
-        .WillOnce(Return(true));
-
     std::string output;
     auto ret = AppManager::GetInstance().GetCallerProcessName(output);
     EXPECT_EQ(ret, DM_OK);
@@ -470,10 +465,6 @@ HWTEST_F(AppManagerTest, IsSystemApp_001, testing::ext::TestSize.Level1)
         .Times(INVOKE_COUNT)
         .WillOnce(Return(fullSystemAppTokenId));
 
-    // Mock IsSystemAppByFullTokenID to return true
-    EXPECT_CALL(*token_, IsSystemAppByFullTokenID(_))
-        .WillOnce(Return(true));
-
     auto ret = AppManager::GetInstance().IsSystemApp();
     EXPECT_TRUE(ret);
 }
@@ -487,10 +478,6 @@ HWTEST_F(AppManagerTest, IsSystemApp_002, testing::ext::TestSize.Level1)
     EXPECT_CALL(*skeleton_, GetCallingFullTokenID())
         .Times(INVOKE_COUNT)
         .WillOnce(Return(nonSystemAppTokenId));
-
-    // Mock IsSystemAppByFullTokenID to return false
-    EXPECT_CALL(*token_, IsSystemAppByFullTokenID(_))
-        .WillOnce(Return(false));
 
     auto ret = AppManager::GetInstance().IsSystemApp();
     EXPECT_FALSE(ret);

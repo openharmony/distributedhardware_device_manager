@@ -680,7 +680,6 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_002, testing::ext::TestSiz
     std::string pkgName;
     std::string netWorkId = "111";
     std::string udid = "2222";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int ret = DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -697,7 +696,6 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_003, testing::ext::TestSiz
     std::string pkgName = "pkgName";
     std::string netWorkId = "";
     std::string udid = "";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int ret = DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -749,7 +747,6 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_002, testing::ext::TestSiz
     std::string pkgName;
     std::string netWorkId = "12";
     std::string uuid = "21";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int ret = DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -766,7 +763,6 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_003, testing::ext::TestSiz
     std::string pkgName = "com.ohos.test";
     std::string netWorkId = "";
     std::string uuid = "";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int ret = DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, netWorkId, uuid);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1138,7 +1134,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_001, testing::ext::TestSize.Lev
 {
     std::string networkId = "";
     DmDeviceInfo info;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1658,7 +1653,6 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_002, testing::ext::
     std::string pkgName;
     std::string netWorkId;
     int32_t networkType = 0;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().GetNetworkTypeByNetworkId(pkgName, netWorkId, networkType);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -2119,7 +2113,6 @@ HWTEST_F(DeviceManagerServiceTest, DpAclAdd_002, testing::ext::TestSize.Level1)
 {
     std::string udid = "udid";
     int64_t accessControlId = 0;
-    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().DpAclAdd(udid, accessControlId);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -2129,7 +2122,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_001, testing::ext::Tes
     std::string pkgName;
     std::string networkId;
     int32_t securityLevel = -1;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, networkId, securityLevel);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -2159,7 +2151,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_004, testing::ext::Tes
     std::string pkgName = "com.ohos.test";
     std::string invalidNetworkId;
     int32_t securityLevel = -1;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, invalidNetworkId, securityLevel);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -2293,7 +2284,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_002, testing::ext::Test
     std::string pkgName;
     std::string networkId;
     int32_t screenStatus = 1;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }

@@ -16,81 +16,124 @@
 #include "hichain_auth_connector_mock.h"
 
 #include "gtest/gtest.h"
+#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAccountId, int32_t peerOsAccountId)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return false;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->QueryCredential(localUdid, osAccountId, peerOsAccountId);
 }
 
 int32_t HiChainAuthConnector::AuthDevice(const std::string &pinCode, int32_t osAccountId, int64_t requestId)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->AuthDevice(pinCode, osAccountId, requestId);
 }
 
 int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, int32_t peerOsAccountId, std::string deviceId,
     std::string publicKey)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->ImportCredential(osAccountId, peerOsAccountId, deviceId,
         publicKey);
 }
 
 int32_t HiChainAuthConnector::ProcessCredData(int64_t authReqId, const std::string &data)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->ProcessCredData(authReqId, data);
 }
 
 int32_t HiChainAuthConnector::AddCredential(int32_t osAccountId, const std::string &authParams, std::string &creId)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->AddCredential(osAccountId, authParams, creId);
 }
 
 int32_t HiChainAuthConnector::ExportCredential(int32_t osAccountId, const std::string &credId, std::string &publicKey)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->ExportCredential(osAccountId, credId, publicKey);
 }
 
 int32_t HiChainAuthConnector::AgreeCredential(int32_t osAccountId, const std::string selfCredId,
     const std::string &authParams, std::string &credId)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->AgreeCredential(osAccountId, selfCredId, authParams, credId);
 }
 
 int32_t HiChainAuthConnector::DeleteCredential(int32_t osAccountId, const std::string &creId)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->DeleteCredential(osAccountId, creId);
 }
 
 int32_t HiChainAuthConnector::AuthCredential(int32_t osAccountId, int64_t authReqId, const std::string &credId,
     const std::string &pinCode)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->AuthCredential(osAccountId, authReqId, credId, pinCode);
 }
 
 int32_t HiChainAuthConnector::AuthCredentialPinCode(int32_t osAccountId, int64_t authReqId, const std::string &pinCode)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->AuthCredentialPinCode(osAccountId, authReqId, pinCode);
 }
 
 int32_t HiChainAuthConnector::QueryCredentialInfo(int32_t userId, const JsonObject &queryParams, JsonObject &resultJson)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->QueryCredentialInfo(userId, queryParams, resultJson);
 }
 
 int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int32_t userId, int32_t peerUserId)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->DeleteCredential(deviceId, userId, peerUserId);
 }
 
 int32_t HiChainAuthConnector::QueryCredInfoByCredId(int32_t userId, const std::string &credId, JsonObject &resultJson)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->QueryCredInfoByCredId(userId, credId, resultJson);
 }
 
 int32_t HiChainAuthConnector::UpdateCredential(const std::string &credId, int32_t userId,
     std::vector<std::string> &tokenIds)
 {
+    if (DmHiChainAuthConnector::dmHiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     return DmHiChainAuthConnector::dmHiChainAuthConnector->UpdateCredential(credId, userId, tokenIds);
 }
 } // namespace DistributedHardware

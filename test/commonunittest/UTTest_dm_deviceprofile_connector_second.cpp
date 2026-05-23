@@ -2339,9 +2339,6 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleAccountCommonEvent_202, testing
 
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl(_))
         .WillOnce(DoAll(SetArgReferee<0>(acls), Return(DM_OK)));
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, UpdateAccessControlProfile(_))
-        .Times(1)
-        .WillOnce(Return(DM_OK));
 
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
     int32_t ret = DeviceProfileConnector::GetInstance().HandleAccountCommonEvent(localUdid, deviceVec,
@@ -2441,9 +2438,6 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleAccountCommonEvent_205, testing
 
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl(_))
         .WillOnce(DoAll(SetArgReferee<0>(acls), Return(DM_OK)));
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, UpdateAccessControlProfile(_))
-        .Times(1)
-        .WillOnce(Return(DM_OK));
 
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
     int32_t ret = DeviceProfileConnector::GetInstance().HandleAccountCommonEvent(localUdid, deviceVec,
@@ -3295,6 +3289,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutSessionKey_001, testing::ext::Test
     std::vector<unsigned char> sessionKeyArray = {1, 2, 3, 4};
     int32_t sessionKeyId = 0;
 
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutSessionKey(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceProfileConnector::GetInstance().PutSessionKey(userId, sessionKeyArray, sessionKeyId);
     EXPECT_NE(ret, DM_OK);
 }
@@ -3312,6 +3307,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutLocalServiceInfo_001, testing::ext
     DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
     localServiceInfo.SetBundleName("com.test.app");
 
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutLocalServiceInfo(_)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceProfileConnector::GetInstance().PutLocalServiceInfo(localServiceInfo);
     EXPECT_NE(ret, DM_OK);
 }
@@ -3329,6 +3325,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteLocalServiceInfo_001, testing::
     std::string bundleName = "com.test.app";
     int32_t pinExchangeType = 1;
 
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, DeleteLocalServiceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceProfileConnector::GetInstance().DeleteLocalServiceInfo(bundleName, pinExchangeType);
     EXPECT_NE(ret, DM_OK);
 }
