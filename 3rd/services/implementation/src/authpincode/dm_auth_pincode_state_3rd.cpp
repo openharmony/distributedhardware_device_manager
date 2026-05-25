@@ -76,8 +76,10 @@ void DmAuthPincodeState3rd::BuildResultContent(std::shared_ptr<DmAuthPincodeCont
     }
     const DmPincodeAccess &selfAccess =
         (context->direction == DM_AUTH_PINCODE_SOURCE) ? context->accesser : context->accessee;
-
+    const DmPincodeAccess &remoteAccess =
+        (context->direction == DM_AUTH_PINCODE_SOURCE) ? context->accessee : context->accesser;
     TrustDeviceInfo3rd deviceInfo;
+    deviceInfo.trustDeviceId = remoteAccess.deviceIdHash;
     deviceInfo.businessName = selfAccess.businessName;
 
     uint32_t keyLen = selfAccess.sessionKey.size();
