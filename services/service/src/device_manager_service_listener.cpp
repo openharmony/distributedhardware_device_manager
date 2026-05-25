@@ -1311,14 +1311,31 @@ void DeviceManagerServiceListener::SetNeedNotifyProcessInfos(const ProcessInfo &
     std::vector<ProcessInfo> &procInfoVec)
 {
     ProcessInfo bindProcessInfo = DealBindProcessInfo(processInfo);
+    if (PermissionManager::GetInstance().CheckPkgNameInWhiteList(bindProcessInfo.pkgName)) {
+        bindProcessInfo.tokenId = 0;
+    }
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
-    if (find(processInfos.begin(), processInfos.end(), bindProcessInfo) == processInfos.end()) {
+    bool isMatched = false;
+    for (const auto &item : processInfos) {
+        if (item == bindProcessInfo) {
+            isMatched = true;
+            break;
+        }
+    }
+    if (!isMatched) {
         LOGE("not init dm, pkg:%{public}s", bindProcessInfo.pkgName.c_str());
         return;
     }
     std::set<ProcessInfo> notifyProcessInfos;
     DeviceManagerServiceNotify::GetInstance().GetCallBack(DmCommonNotifyEvent::REG_DEVICE_STATE, notifyProcessInfos);
-    if (notifyProcessInfos.find(bindProcessInfo) == notifyProcessInfos.end()) {
+    bool isContrasted = false;
+    for (const auto &item : notifyProcessInfos) {
+        if (item == bindProcessInfo) {
+            isContrasted = true;
+            break;
+        }
+    }
+    if (!isContrasted) {
         LOGE("state callback not exist, pkg:%{public}s", bindProcessInfo.pkgName.c_str());
         return;
     }

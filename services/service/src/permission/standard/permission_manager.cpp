@@ -110,6 +110,13 @@ constexpr const static char* ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST[] = {
 constexpr int32_t ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST_NUM =
     std::size(ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST);
 
+constexpr const static char* ADAPTER_WHITE_LIST[] = {
+    "com.huawei.pcassistant",
+    "com.huawei.ohos.cardsde",
+    "com.huawei.android.launcher",
+};
+constexpr uint32_t ADAPTER_WHITE_LIST_NUM = std::size(ADAPTER_WHITE_LIST);
+
 constexpr const char* READ_LOCAL_DEVICE_NAME_PERMISSION = "ohos.permission.READ_LOCAL_DEVICE_NAME";
 }
 
@@ -412,6 +419,22 @@ bool PermissionManager::CheckOnReadyRetrospectiveNotificationBlackList()
     for (; index < ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST_NUM; ++index) {
         if (processName == ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST[index]) {
             LOGI("no need for retrospective notification %{public}s.", processName.c_str());
+            return true;
+        }
+    }
+    return false;
+}
+
+bool PermissionManager::CheckPkgNameInWhiteList(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("pkgName is empty");
+        return false;
+    }
+    uint32_t index = 0;
+    for (; index < ADAPTER_WHITE_LIST_NUM; ++index) {
+        std::string tmp(ADAPTER_WHITE_LIST[index]);
+        if (pkgName == tmp) {
             return true;
         }
     }
