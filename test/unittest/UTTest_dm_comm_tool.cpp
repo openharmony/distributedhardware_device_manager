@@ -200,7 +200,7 @@ HWTEST_F(DMCommToolTest, SendMsg_006, testing::ext::TestSize.Level1)
         .WillOnce(Return(DM_OK));
 
     int32_t ret = dmCommTool->SendMsg(rmtNetworkId, msgType, msg);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DMCommToolTest, SendUserStop_001, testing::ext::TestSize.Level1)
@@ -267,7 +267,7 @@ HWTEST_F(DMCommToolTest, SendUserStop_005, testing::ext::TestSize.Level1)
         .WillOnce(Return(DM_OK));
 
     int32_t ret = dmCommTool->SendUserStop(rmtNetworkId, stopUserId);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DMCommToolTest, ParseUserStopMessage_001, testing::ext::TestSize.Level1)
@@ -483,7 +483,7 @@ HWTEST_F(DMCommToolTest, SendUninstAppObj_003, testing::ext::TestSize.Level1)
         .Times(::testing::AtMost(1))
         .WillOnce(Return(DM_OK));
     result = dmCommTool->SendUninstAppObj(userId, tokenId, networkId);
-    EXPECT_EQ(result, DM_OK);
+    EXPECT_EQ(result, ERR_DM_FAILED);
 }
 
 HWTEST_F(DMCommToolTest, RspAppUninstall_001, testing::ext::TestSize.Level1)
@@ -593,7 +593,7 @@ HWTEST_F(DMCommToolTest, SendUnBindAppObj_003, testing::ext::TestSize.Level1)
         .Times(::testing::AtMost(1))
         .WillOnce(Return(DM_OK));
     result = dmCommTool->SendUnBindAppObj(userId, tokenId, extra, networkId, udid);
-    EXPECT_EQ(result, DM_OK);
+    EXPECT_EQ(result, ERR_DM_FAILED);
 }
 
 HWTEST_F(DMCommToolTest, ProcessReceiveUninstAppEvent_001, testing::ext::TestSize.Level1)

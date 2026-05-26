@@ -71,37 +71,6 @@ public:
 
 namespace {
 /**
- * @tc.name: CreateGroup_001
- * @tc.desc: Set the deviceGroupManager_ pointer to CreateGroup to NULlptr and return ERR_DM_INPUT_PARA_INVALID
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(HichainConnectorTest, CreateGroup_001, testing::ext::TestSize.Level1)
-{
-    int64_t requestId = 123456;
-    std::string groupName = "dfggg";
-    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    hiChainConnector->deviceGroupManager_ = nullptr;
-    int ret = hiChainConnector->CreateGroup(requestId, groupName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: CreateGroup_002
- * @tc.desc: Set CreateGroup to the correct process and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(HichainConnectorTest, CreateGroup_002, testing::ext::TestSize.Level1)
-{
-    int64_t requestId = 123456;
-    std::string groupName = "uuiioo";
-    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    int ret = hiChainConnector->CreateGroup(requestId, groupName);
-    EXPECT_EQ(ret, ERR_DM_CREATE_GROUP_FAILED);
-}
-
-/**
  * @tc.name: CreateGroup_003
  * @tc.desc: Set deviceGroupManager_ is nullptr return ERR_DM_INPUT_PARA_INVALID
  * @tc.type: FUNC

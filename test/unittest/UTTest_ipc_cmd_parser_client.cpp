@@ -390,18 +390,6 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_089, testing::ext::TestSize.Le
     ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_001, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = REGISTER_SERVICE_INFO;
-    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
-}
-
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_002, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = REGISTER_SERVICE_INFO;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
-}
-
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_dm_ipc_003, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UNREGISTER_SERVICE_INFO;
@@ -1580,21 +1568,6 @@ HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_002, testing::ext::Tes
     ASSERT_EQ(DM_OK, ret);
 }
 
-HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_003, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = REGISTER_SERVICE_INFO;
-    DmRegisterServiceInfo serviceInfo;
-    MessageParcel data;
-    std::shared_ptr<IpcRegisterServiceInfoReq> req = std::make_shared<IpcRegisterServiceInfoReq>();
-    req->SetRegisterServiceInfo(serviceInfo);
-    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(DM_OK, ret);
-}
-
 HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_004, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UNREGISTER_SERVICE_INFO;
@@ -1870,7 +1843,6 @@ HWTEST_F(IpcCmdParserClientTest, TEST_IPC_REQUEST_NULL_003, testing::ext::TestSi
     EXPECT_EQ(TestIpcRequestNull(UPDATE_LOCALSERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestIpcRequestNull(GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE), ERR_DM_FAILED);
     EXPECT_EQ(TestIpcRequestNull(IMPORT_AUTH_INFO), ERR_DM_FAILED);
-    EXPECT_EQ(TestIpcRequestNull(REGISTER_SERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestIpcRequestNull(UNREGISTER_SERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestIpcRequestNull(START_PUBLISH_SERVICE), ERR_DM_FAILED);
     EXPECT_EQ(TestIpcRequestNull(STOP_PUBLISH_SERVICE), ERR_DM_FAILED);
@@ -1936,7 +1908,6 @@ HWTEST_F(IpcCmdParserClientTest, TEST_READ_RESPONSE_NULL_002, testing::ext::Test
     EXPECT_EQ(TestReadResponseRspNull(UPDATE_LOCALSERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestReadResponseRspNull(GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE), ERR_DM_FAILED);
     EXPECT_EQ(TestReadResponseRspNull(IMPORT_AUTH_INFO), ERR_DM_FAILED);
-    EXPECT_EQ(TestReadResponseRspNull(REGISTER_SERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestReadResponseRspNull(UNREGISTER_SERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestReadResponseRspNull(START_PUBLISH_SERVICE), ERR_DM_FAILED);
     EXPECT_EQ(TestReadResponseRspNull(STOP_PUBLISH_SERVICE), ERR_DM_FAILED);

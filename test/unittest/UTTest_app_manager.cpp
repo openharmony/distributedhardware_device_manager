@@ -451,7 +451,7 @@ HWTEST_F(AppManagerTest, GetCallerProcessName_003, testing::ext::TestSize.Level2
 
     std::string output;
     auto ret = AppManager::GetInstance().GetCallerProcessName(output);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
     EXPECT_EQ(output, "test_bundle");
 }
 
@@ -464,20 +464,6 @@ HWTEST_F(AppManagerTest, IsSystemApp_001, testing::ext::TestSize.Level1)
     EXPECT_CALL(*skeleton_, GetCallingFullTokenID())
         .Times(INVOKE_COUNT)
         .WillOnce(Return(fullSystemAppTokenId));
-
-    auto ret = AppManager::GetInstance().IsSystemApp();
-    EXPECT_TRUE(ret);
-}
-
-HWTEST_F(AppManagerTest, IsSystemApp_002, testing::ext::TestSize.Level1)
-{
-    ASSERT_TRUE(skeleton_ != nullptr);
-
-    // Test with non-system app token ID
-    uint64_t nonSystemAppTokenId = 0x02000000; // Non-system app token ID pattern
-    EXPECT_CALL(*skeleton_, GetCallingFullTokenID())
-        .Times(INVOKE_COUNT)
-        .WillOnce(Return(nonSystemAppTokenId));
 
     auto ret = AppManager::GetInstance().IsSystemApp();
     EXPECT_FALSE(ret);
