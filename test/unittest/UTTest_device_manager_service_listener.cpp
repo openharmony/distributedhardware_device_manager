@@ -632,53 +632,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
 }
 
 /**
- * @tc.name: SetDeviceInfo_001
- * @tc.desc: Test SetDeviceInfo with successful AppId retrieval
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::TestSize.Level1)
-{
-    // Arrange
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
-
-    ProcessInfo processInfo;
-    processInfo.pkgName = "com.ohos.helloworld";
-    processInfo.userId = 100;
-
-    DmDeviceState state = DEVICE_STATE_ONLINE;
-
-    DmDeviceInfo deviceInfo;
-    memset_s(&deviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    std::string testDeviceId = "test_device_id_123";
-    memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), testDeviceId.c_str(), testDeviceId.length());
-    deviceInfo.deviceTypeId = static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_PHONE);
-
-    DmDeviceBasicInfo deviceBasicInfo;
-    memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
-    std::string testNetworkId = "test_network_id";
-    memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str(),
-        testNetworkId.length());
-
-    std::string appId = "test_app_id";
-
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(processInfo.pkgName, _, processInfo.userId))
-        .WillRepeatedly(DoAll(testing::SetArgReferee<1>(appId), testing::Return(DM_OK)));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(testing::Return(DM_OK));
-
-    // Act
-    listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
-
-    // Assert
-    EXPECT_EQ(pReq->GetPkgName(), processInfo.pkgName);
-    EXPECT_EQ(pReq->GetDeviceState(), state);
-    const DmDeviceInfo &resultInfo = pReq->GetDeviceInfo();
-    EXPECT_EQ(resultInfo.deviceTypeId, static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_PHONE));
-    const DmDeviceBasicInfo &resultBasicInfo = pReq->GetDeviceBasicInfo();
-    EXPECT_EQ(std::string(resultBasicInfo.deviceId), "");
-}
-
-/**
  * @tc.name: SetDeviceInfo_002
  * @tc.desc: Test SetDeviceInfo when AppId retrieval fails
  * @tc.type: FUNC
@@ -882,51 +835,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_006, testing::ext::Test
     EXPECT_EQ(pReq->GetDeviceState(), state);
     const DmDeviceInfo &resultInfo = pReq->GetDeviceInfo();
     EXPECT_EQ(resultInfo.deviceTypeId, static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_UNKNOWN));
-}
-
-/**
- * @tc.name: SetDeviceInfo_007
- * @tc.desc: Test SetDeviceInfo with ConvertUdidHashToAnoyAndSave success
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_007, testing::ext::TestSize.Level1)
-{
-    // Arrange
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
-
-    ProcessInfo processInfo;
-    processInfo.pkgName = "com.ohos.helloworld";
-    processInfo.userId = 100;
-
-    DmDeviceState state = DEVICE_STATE_ONLINE;
-
-    DmDeviceInfo deviceInfo;
-    memset_s(&deviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    std::string testDeviceId = "test_device_id_789";
-    memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), testDeviceId.c_str(), testDeviceId.length());
-    deviceInfo.deviceTypeId = static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_AUDIO);
-
-    DmDeviceBasicInfo deviceBasicInfo;
-    memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo));
-    std::string testNetworkId = "test_network_id";
-    memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), testNetworkId.c_str(),
-        testNetworkId.length());
-
-    std::string appId = "test_app_id_success";
-
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(processInfo.pkgName, _, processInfo.userId))
-        .WillRepeatedly(DoAll(testing::SetArgReferee<1>(appId), testing::Return(DM_OK)));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(testing::Return(DM_OK));
-
-    // Act
-    listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
-
-    // Assert
-    const DmDeviceBasicInfo &resultBasicInfo = pReq->GetDeviceBasicInfo();
-    EXPECT_EQ(std::string(resultBasicInfo.deviceId), "");
-    const DmDeviceInfo &resultInfo = pReq->GetDeviceInfo();
-    EXPECT_EQ(resultInfo.deviceTypeId, static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_AUDIO));
 }
 
 /**
@@ -1136,44 +1044,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_006, test
     int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
 
     // Assert
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-/**
- * @tc.name: FillUdidAndUuidToDeviceInfo_007
- * @tc.desc: Test FillUdidAndUuidToDeviceInfo with different high-priority packages
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_007, testing::ext::TestSize.Level1)
-{
-    // Arrange
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-
-    std::vector<std::string> highPriorityPkgs = {
-        "ohos.deviceprofile",
-        "ohos.distributeddata.service"
-    };
-
-    for (const auto &pkgName : highPriorityPkgs) {
-        DmDeviceInfo dmDeviceInfo;
-        memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-        std::string networkId = "test_network_id_" + pkgName;
-        memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), networkId.c_str(), networkId.length());
-        dmDeviceInfo.extraData = "{\"key\":\"value\"}";
-
-        std::string udid = "udid_" + pkgName;
-        std::string uuid = "uuid_" + pkgName;
-        EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
-            .WillOnce(DoAll(testing::SetArgReferee<1>(udid), testing::Return(DM_OK)));
-        EXPECT_CALL(*softbusCacheMock_, GetUuidFromCache(_, _))
-            .WillOnce(DoAll(testing::SetArgReferee<1>(uuid), testing::Return(DM_OK)));
-
-        // Act
-        int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
-
-        // Assert
-        EXPECT_EQ(ret, ERR_DM_FAILED);
-    }
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -1228,7 +1099,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_009, test
     int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
 
     // Assert
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**

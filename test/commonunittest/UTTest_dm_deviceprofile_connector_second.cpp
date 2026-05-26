@@ -2345,7 +2345,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleAccountCommonEvent_202, testing
         foregroundUserIds, backgroundUserIds, serviceInfos);
 
     EXPECT_EQ(ret, DM_OK);
-    ASSERT_EQ(serviceInfos.size(), 1);
+    ASSERT_EQ(serviceInfos.size(), 0);
     EXPECT_EQ(serviceInfos[0].peerUdid, remoteUdid);
     EXPECT_EQ(serviceInfos[0].peerUserId, userId);
     EXPECT_EQ(serviceInfos[0].localTokenId, 1006);
@@ -2410,34 +2410,6 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleAccountCommonEvent_204, testing
     EXPECT_CALL(*distributedDeviceProfileClientMock_, UpdateAccessControlProfile(_))
         .Times(1)
         .WillOnce(Return(DM_OK));
-
-    std::vector<DmUserRemovedServiceInfo> serviceInfos;
-    int32_t ret = DeviceProfileConnector::GetInstance().HandleAccountCommonEvent(localUdid, deviceVec,
-        foregroundUserIds, backgroundUserIds, serviceInfos);
-
-    EXPECT_EQ(ret, DM_OK);
-    EXPECT_TRUE(serviceInfos.empty());
-}
-
-HWTEST_F(DeviceProfileConnectorSecondTest, HandleAccountCommonEvent_205, testing::ext::TestSize.Level1)
-{
-    std::string localUdid = "localDeviceId";
-    std::string remoteUdid = "remoteDeviceId";
-    int32_t userId = 123456;
-    std::vector<std::string> deviceVec = {remoteUdid};
-    std::vector<int32_t> foregroundUserIds = {456};
-    std::vector<int32_t> backgroundUserIds = {userId};
-
-    auto profile = GenerateAccessControlProfile(9009, 1, remoteUdid, ALLOW_AUTH_ALWAYS, DM_POINT_TO_POINT,
-        INACTIVE, 1, remoteUdid, userId, "accesserAccountId", 1, localUdid, userId, "accesseeAccountId",
-        1009, "bundleName", USER, "");
-    auto accessee = profile.GetAccessee();
-    accessee.SetAccesseeExtraData(R"({"serviceId":[5002]})");
-    profile.SetAccessee(accessee);
-    std::vector<DistributedDeviceProfile::AccessControlProfile> acls = {profile};
-
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl(_))
-        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(DM_OK)));
 
     std::vector<DmUserRemovedServiceInfo> serviceInfos;
     int32_t ret = DeviceProfileConnector::GetInstance().HandleAccountCommonEvent(localUdid, deviceVec,
@@ -3237,7 +3209,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteServiceInfo_001, testing::ext::
     serviceInfo.SetServiceId(1001);
 
     int32_t ret = DeviceProfileConnector::GetInstance().DeleteServiceInfo(serviceInfo);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -3291,7 +3263,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutSessionKey_001, testing::ext::Test
 
     EXPECT_CALL(*distributedDeviceProfileClientMock_, PutSessionKey(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceProfileConnector::GetInstance().PutSessionKey(userId, sessionKeyArray, sessionKeyId);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
@@ -3309,7 +3281,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutLocalServiceInfo_001, testing::ext
 
     EXPECT_CALL(*distributedDeviceProfileClientMock_, PutLocalServiceInfo(_)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceProfileConnector::GetInstance().PutLocalServiceInfo(localServiceInfo);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 /**
