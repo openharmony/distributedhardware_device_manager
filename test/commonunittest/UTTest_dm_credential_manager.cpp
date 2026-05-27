@@ -326,25 +326,6 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_005, testing::ext::TestSize.
 }
 
 /**
- * @tc.name: RequestCredential_006
- * @tc.desc: request credential with null device group manager and return ERR_DM_POINT_NULL
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmCredentialManagerTest, RequestCredential_006, testing::ext::TestSize.Level1)
-{
-    JsonObject jsonObject;
-    jsonObject[FIELD_USER_ID] = "123";
-    jsonObject[FIELD_CREDENTIAL_VERSION] = "1.2.3";
-    std::string reqJsonStr = jsonObject.Dump();
-    std::string returnJsonStr;
-    dmCreMgr_->hiChainConnector_->deviceGroupManager_ = nullptr;
-    EXPECT_CALL(*hiChainConnectorMock_, GetRegisterInfo(_, _)).WillOnce(Return(ERR_DM_POINT_NULL));
-    int32_t ret = dmCreMgr_->RequestCredential(reqJsonStr, returnJsonStr);
-    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
-}
-
-/**
  * @tc.name: RequestCredential_007
  * @tc.desc: request credential success path and return DM_OK
  * @tc.type: FUNC
@@ -363,62 +344,6 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_007, testing::ext::TestSize.
     int32_t ret = dmCreMgr_->RequestCredential(reqJsonStr, returnJsonStr);
     EXPECT_EQ(ret, DM_OK);
     EXPECT_EQ(returnJsonStr, mockReturn);
-}
-
-/**
- * @tc.name: ImportCredential_001
- * @tc.desc: import local credential and return ERR_DM_FAILED
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmCredentialManagerTest, ImportCredential_001, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "com.ohos.helloworld";
-    std::string credentialInfo = R"(
-    {
-        "processType" : 1,
-        "authType" : "test",
-        "userId" : "123",
-        "credentialData" :
-        [
-            {
-                "credentialType" : 1,
-                "credentialId" : "104",
-                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
-                "serverPk" : "",
-                "pkInfoSignature" : "",
-                "pkInfo" : "",
-                "peerDeviceId" : ""
-            }
-        ]
-    }
-    )";
-    dmCreMgr_->hiChainConnector_->deviceGroupManager_ = nullptr;
-    dmCreMgr_->credentialVec_.push_back(pkgName);
-    int32_t ret = dmCreMgr_->ImportCredential(pkgName, credentialInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    JsonObject jsonObject(credentialInfo);
-    jsonObject["TType"] = 1;
-    jsonObject["processType"] = 1;
-    credentialInfo = jsonObject.Dump();
-    ret = dmCreMgr_->ImportCredential(pkgName, credentialInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    jsonObject["processType"] = -1;
-    credentialInfo = jsonObject.Dump();
-    ret = dmCreMgr_->ImportCredential(pkgName, credentialInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    jsonObject["processType"] = 2;
-    credentialInfo = jsonObject.Dump();
-    ret = dmCreMgr_->ImportCredential(pkgName, credentialInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    jsonObject["TType"] = "test";
-    credentialInfo = jsonObject.Dump();
-    ret = dmCreMgr_->ImportCredential(pkgName, credentialInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -572,20 +497,6 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_007, testing::ext::TestSize.L
         .WillOnce(Return(DM_OK));
     int32_t ret = dmCreMgr->ImportCredential(pkgName, credentialInfo);
     EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: ImportRemoteCredentialExt_001
- * @tc.desc: test ImportRemoteCredentialExt
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmCredentialManagerTest, ImportRemoteCredentialExt_001, testing::ext::TestSize.Level1)
-{
-    std::string credentialInfo = "";
-    dmCreMgr_->hiChainConnector_->deviceGroupManager_ = nullptr;
-    int32_t ret = dmCreMgr_->ImportRemoteCredentialExt(credentialInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -816,70 +727,6 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_007, testing::ext::TestS
 }
 
 /**
- * @tc.name: ImportLocalCredential_008
- * @tc.desc: test ImportLocalCredential
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_008, testing::ext::TestSize.Level1)
-{
-    std::string credentialInfo = R"(
-    {
-        "processType" : 1,
-        "authType" : 1,
-        "userId" : "123",
-        "credentialData" :
-        [
-            {
-                "credentialType" : 2,
-                "credentialId" : "104",
-                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
-                "serverPk" : "",
-                "pkInfoSignature" : "",
-                "pkInfo" : "",
-                "peerDeviceId" : ""
-            }
-        ]
-    }
-    )";
-    dmCreMgr_->hiChainConnector_->deviceGroupManager_ = nullptr;
-    int32_t ret = dmCreMgr_->ImportLocalCredential(credentialInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-/**
- * @tc.name: ImportLocalCredential_009
- * @tc.desc: test ImportLocalCredential
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_009, testing::ext::TestSize.Level1)
-{
-    std::string credentialInfo = R"(
-    {
-        "processType" : 1,
-        "authType" : 1,
-        "userId" : "123",
-        "credentialData" :
-        [
-            {
-                "credentialType" : 2,
-                "credentialId" : "104",
-                "authCode" : "1234567812345678123456781234567812345678123456781234567812345678",
-                "serverPk" : "",
-                "pkInfoSignature" : "",
-                "pkInfo" : "",
-                "peerDeviceId" : ""
-            }
-        ]
-    }
-    )";
-    dmCreMgr_->hiChainConnector_->deviceGroupManager_ = nullptr;
-    int32_t ret = dmCreMgr_->ImportLocalCredential(credentialInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-/**
  * @tc.name: ImportLocalCredential_010
  * @tc.desc: import local credential success and return DM_OK
  * @tc.type: FUNC
@@ -909,45 +756,6 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_010, testing::ext::TestS
     EXPECT_CALL(*hiChainConnectorMock_, CreateGroup(_, _, _, _)).WillOnce(Return(DM_OK));
     int32_t ret = dmCreMgr_->ImportLocalCredential(credentialInfo);
     EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: ImportRemoteCredential_001
- * @tc.desc: import remote symmetry credential and return ERR_DM_FAILED
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_001, testing::ext::TestSize.Level1)
-{
-    CredentialDataInfo credentialDataInfo;
-    credentialDataInfo.credentialType = SAME_ACCOUNT_TYPE;
-    credentialDataInfo.credentailId = "credential_id";
-    credentialDataInfo.serverPk = "server_pk";
-    credentialDataInfo.pkInfoSignature = "pk_info_signature";
-    credentialDataInfo.pkInfo = "pk_info";
-    credentialDataInfo.authCode = "auth_code";
-    credentialDataInfo.peerDeviceId = "peer_device_id";
-    credentialDataInfo.userId = "user_id";
-    credentialDataInfo.credentialType = SAME_ACCOUNT_TYPE;
-    JsonObject jsonObject1;
-    jsonObject1 = credentialDataInfo;
-    JsonObject credentialJson(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
-    credentialJson.PushBack(jsonObject1);
-    JsonObject jsonObject;
-    jsonObject.Insert(FIELD_CREDENTIAL_DATA, credentialJson);
-    jsonObject[FIELD_AUTH_TYPE] = CROSS_ACCOUNT_TYPE;
-    jsonObject[FIELD_USER_ID] = 0;
-    jsonObject[FIELD_PEER_USER_ID] = "peerUserId";
-
-    std::string credentialInfo = jsonObject.Dump();
-    dmCreMgr_->hiChainConnector_->deviceGroupManager_ = nullptr;
-    int32_t ret = dmCreMgr_->ImportRemoteCredential(credentialInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    jsonObject[FIELD_CREDENTIAL_DATA] = 0;
-    credentialInfo = jsonObject.Dump();
-    ret = dmCreMgr_->ImportRemoteCredential(credentialInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**

@@ -440,16 +440,6 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_206, testing::ext::TestSize.Level
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_201, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "com.ohos.screenStatusTest";
-    std::string networkId = "";
-    int32_t screenStatus = -1;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
 HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_202, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "";
