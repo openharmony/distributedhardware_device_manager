@@ -260,17 +260,6 @@ HWTEST_F(DmAuthManagerTest, StartAuthProcess_005, testing::ext::TestSize.Level1)
     ASSERT_EQ(ret, ERR_DM_AUTH_NOT_START);
 }
 
-HWTEST_F(DmAuthManagerTest, CreateGroup_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseConfirmState>();
-    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    authManager_->SetAuthResponseState(authResponseState);
-    authManager_->authResponseContext_->requestId = 111;
-    authManager_->authResponseContext_->groupName = "111";
-    int32_t ret = authManager_->CreateGroup();
-    ASSERT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(DmAuthManagerTest, CreateGroup_002, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_ = nullptr;

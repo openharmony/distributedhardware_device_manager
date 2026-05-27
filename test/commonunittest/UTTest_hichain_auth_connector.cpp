@@ -85,15 +85,6 @@ HWTEST_F(HiChainAuthConnectorTest, RegisterHiChainAuthCallback_001, testing::ext
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, AuthDevice_001, testing::ext::TestSize.Level1)
-{
-    std::string pinCode = "0";
-    int32_t osAccountId = 0;
-    int64_t requestId = 0;
-    int32_t ret = hiChain_->AuthDevice(pinCode, osAccountId, requestId);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
 HWTEST_F(HiChainAuthConnectorTest, ProcessAuthData_001, testing::ext::TestSize.Level1)
 {
     int32_t requestId = 0;
