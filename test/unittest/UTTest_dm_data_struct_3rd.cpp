@@ -330,6 +330,384 @@ HWTEST_F(DmDataStruct3rdTest, PeerTargetId3rdEquals_007, testing::ext::TestSize.
     bool result = (key1 == key2);
     EXPECT_TRUE(result);
 }
+
+/**
+ * @tc.name: ProcessInfo3rdLess_001
+ * @tc.desc: Test operator< with smaller tokenId
+ *           Step 1: Prepare two ProcessInfo3rd objects with different tokenId
+ *           Step 2: Compare using operator<
+ *           Step 3: Verify result is true when tokenId is less
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, ProcessInfo3rdLess_001, testing::ext::TestSize.Level1)
+{
+    ProcessInfo3rd key1;
+    key1.tokenId = 12345;
+    key1.uid = 67890;
+    key1.processName = "com.example.process";
+    key1.businessName = "com.example.business";
+    key1.userId = 54321;
+
+    ProcessInfo3rd key2;
+    key2.tokenId = 12346;
+    key2.uid = 67890;
+    key2.processName = "com.example.process";
+    key2.businessName = "com.example.business";
+    key2.userId = 54321;
+
+    bool result = (key1 < key2);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: ProcessInfo3rdLess_002
+ * @tc.desc: Test operator< with same tokenId but smaller uid
+ *           Step 1: Prepare two ProcessInfo3rd objects with same tokenId, different uid
+ *           Step 2: Compare using operator<
+ *           Step 3: Verify result is true when uid is less
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, ProcessInfo3rdLess_002, testing::ext::TestSize.Level1)
+{
+    ProcessInfo3rd key1;
+    key1.tokenId = 12345;
+    key1.uid = 67889;
+    key1.processName = "com.example.process";
+    key1.businessName = "com.example.business";
+    key1.userId = 54321;
+
+    ProcessInfo3rd key2;
+    key2.tokenId = 12345;
+    key2.uid = 67890;
+    key2.processName = "com.example.process";
+    key2.businessName = "com.example.business";
+    key2.userId = 54321;
+
+    bool result = (key1 < key2);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: ProcessInfo3rdLess_003
+ * @tc.desc: Test operator< with same tokenId/uid but smaller processName
+ *           Step 1: Prepare two ProcessInfo3rd objects with same tokenId/uid, different processName
+ *           Step 2: Compare using operator<
+ *           Step 3: Verify result is true when processName is less
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, ProcessInfo3rdLess_003, testing::ext::TestSize.Level1)
+{
+    ProcessInfo3rd key1;
+    key1.tokenId = 12345;
+    key1.uid = 67890;
+    key1.processName = "com.example.a";
+    key1.businessName = "com.example.business";
+    key1.userId = 54321;
+
+    ProcessInfo3rd key2;
+    key2.tokenId = 12345;
+    key2.uid = 67890;
+    key2.processName = "com.example.b";
+    key2.businessName = "com.example.business";
+    key2.userId = 54321;
+
+    bool result = (key1 < key2);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: ProcessInfo3rdLess_004
+ * @tc.desc: Test operator< with same previous fields but smaller businessName
+ *           Step 1: Prepare two ProcessInfo3rd objects with same previous fields, different businessName
+ *           Step 2: Compare using operator<
+ *           Step 3: Verify result is true when businessName is less
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, ProcessInfo3rdLess_004, testing::ext::TestSize.Level1)
+{
+    ProcessInfo3rd key1;
+    key1.tokenId = 12345;
+    key1.uid = 67890;
+    key1.processName = "com.example.process";
+    key1.businessName = "com.example.a";
+    key1.userId = 54321;
+
+    ProcessInfo3rd key2;
+    key2.tokenId = 12345;
+    key2.uid = 67890;
+    key2.processName = "com.example.process";
+    key2.businessName = "com.example.b";
+    key2.userId = 54321;
+
+    bool result = (key1 < key2);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: ProcessInfo3rdLess_005
+ * @tc.desc: Test operator< with all fields same but smaller userId
+ *           Step 1: Prepare two ProcessInfo3rd objects with same previous fields, different userId
+ *           Step 2: Compare using operator<
+ *           Step 3: Verify result is true when userId is less
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, ProcessInfo3rdLess_005, testing::ext::TestSize.Level1)
+{
+    ProcessInfo3rd key1;
+    key1.tokenId = 12345;
+    key1.uid = 67890;
+    key1.processName = "com.example.process";
+    key1.businessName = "com.example.business";
+    key1.userId = 54320;
+
+    ProcessInfo3rd key2;
+    key2.tokenId = 12345;
+    key2.uid = 67890;
+    key2.processName = "com.example.process";
+    key2.businessName = "com.example.business";
+    key2.userId = 54321;
+
+    bool result = (key1 < key2);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: ProcessInfo3rdLess_006
+ * @tc.desc: Test operator< returns false when objects are equal
+ *           Step 1: Prepare two ProcessInfo3rd objects with identical values
+ *           Step 2: Compare using operator<
+ *           Step 3: Verify result is false when objects are equal
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, ProcessInfo3rdLess_006, testing::ext::TestSize.Level1)
+{
+    ProcessInfo3rd key1;
+    key1.tokenId = 12345;
+    key1.uid = 67890;
+    key1.processName = "com.example.process";
+    key1.businessName = "com.example.business";
+    key1.userId = 54321;
+
+    ProcessInfo3rd key2;
+    key2.tokenId = 12345;
+    key2.uid = 67890;
+    key2.processName = "com.example.process";
+    key2.businessName = "com.example.business";
+    key2.userId = 54321;
+
+    bool result = (key1 < key2);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: ProcessInfo3rdLess_007
+ * @tc.desc: Test operator< with self comparison
+ *           Step 1: Prepare one ProcessInfo3rd object
+ *           Step 2: Compare object with itself using operator<
+ *           Step 3: Verify result is false for self comparison
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, ProcessInfo3rdLess_007, testing::ext::TestSize.Level1)
+{
+    ProcessInfo3rd key1;
+    key1.tokenId = 12345;
+    key1.uid = 67890;
+    key1.processName = "com.example.process";
+    key1.businessName = "com.example.business";
+    key1.userId = 54321;
+
+    bool result = (key1 < key1);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: PeerTargetId3rdLess_001
+ * @tc.desc: Test operator< with smaller deviceId
+ *           Step 1: Prepare two PeerTargetId3rd objects with different deviceId
+ *           Step 2: Compare using operator<
+ *           Step 3: Verify result is true when deviceId is less
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, PeerTargetId3rdLess_001, testing::ext::TestSize.Level1)
+{
+    PeerTargetId3rd key1;
+    key1.deviceId = "device123";
+    key1.brMac = "00:11:22:33:44:55";
+    key1.bleMac = "AA:BB:CC:DD:EE:FF";
+    key1.wifiIp = "192.168.1.1";
+    key1.wifiPort = 12345;
+
+    PeerTargetId3rd key2;
+    key2.deviceId = "device456";
+    key2.brMac = "00:11:22:33:44:55";
+    key2.bleMac = "AA:BB:CC:DD:EE:FF";
+    key2.wifiIp = "192.168.1.1";
+    key2.wifiPort = 12345;
+
+    bool result = (key1 < key2);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: PeerTargetId3rdLess_002
+ * @tc.desc: Test operator< with same deviceId but smaller brMac
+ *           Step 1: Prepare two PeerTargetId3rd objects with same deviceId, different brMac
+ *           Step 2: Compare using operator<
+ *           Step 3: Verify result is true when brMac is less
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, PeerTargetId3rdLess_002, testing::ext::TestSize.Level1)
+{
+    PeerTargetId3rd key1;
+    key1.deviceId = "device123";
+    key1.brMac = "00:11:22:33:44:54";
+    key1.bleMac = "AA:BB:CC:DD:EE:FF";
+    key1.wifiIp = "192.168.1.1";
+    key1.wifiPort = 12345;
+
+    PeerTargetId3rd key2;
+    key2.deviceId = "device123";
+    key2.brMac = "00:11:22:33:44:55";
+    key2.bleMac = "AA:BB:CC:DD:EE:FF";
+    key2.wifiIp = "192.168.1.1";
+    key2.wifiPort = 12345;
+
+    bool result = (key1 < key2);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: PeerTargetId3rdLess_003
+ * @tc.desc: Test operator< with same deviceId/brMac but smaller bleMac
+ *           Step 1: Prepare two PeerTargetId3rd objects with same deviceId/brMac, different bleMac
+ *           Step 2: Compare using operator<
+ *           Step 3: Verify result is true when bleMac is less
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, PeerTargetId3rdLess_003, testing::ext::TestSize.Level1)
+{
+    PeerTargetId3rd key1;
+    key1.deviceId = "device123";
+    key1.brMac = "00:11:22:33:44:55";
+    key1.bleMac = "AA:BB:CC:DD:EE:EF";
+    key1.wifiIp = "192.168.1.1";
+    key1.wifiPort = 12345;
+
+    PeerTargetId3rd key2;
+    key2.deviceId = "device123";
+    key2.brMac = "00:11:22:33:44:55";
+    key2.bleMac = "AA:BB:CC:DD:EE:FF";
+    key2.wifiIp = "192.168.1.1";
+    key2.wifiPort = 12345;
+
+    bool result = (key1 < key2);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: PeerTargetId3rdLess_004
+ * @tc.desc: Test operator< with same previous fields but smaller wifiIp
+ *           Step 1: Prepare two PeerTargetId3rd objects with same previous fields, different wifiIp
+ *           Step 2: Compare using operator<
+ *           Step 3: Verify result is true when wifiIp is less
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, PeerTargetId3rdLess_004, testing::ext::TestSize.Level1)
+{
+    PeerTargetId3rd key1;
+    key1.deviceId = "device123";
+    key1.brMac = "00:11:22:33:44:55";
+    key1.bleMac = "AA:BB:CC:DD:EE:FF";
+    key1.wifiIp = "192.168.1.0";
+    key1.wifiPort = 12345;
+
+    PeerTargetId3rd key2;
+    key2.deviceId = "device123";
+    key2.brMac = "00:11:22:33:44:55";
+    key2.bleMac = "AA:BB:CC:DD:EE:FF";
+    key2.wifiIp = "192.168.1.1";
+    key2.wifiPort = 12345;
+
+    bool result = (key1 < key2);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: PeerTargetId3rdLess_005
+ * @tc.desc: Test operator< with all fields same but smaller wifiPort
+ *           Step 1: Prepare two PeerTargetId3rd objects with same previous fields, different wifiPort
+ *           Step 2: Compare using operator<
+ *           Step 3: Verify result is true when wifiPort is less
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, PeerTargetId3rdLess_005, testing::ext::TestSize.Level1)
+{
+    PeerTargetId3rd key1;
+    key1.deviceId = "device123";
+    key1.brMac = "00:11:22:33:44:55";
+    key1.bleMac = "AA:BB:CC:DD:EE:FF";
+    key1.wifiIp = "192.168.1.1";
+    key1.wifiPort = 12344;
+
+    PeerTargetId3rd key2;
+    key2.deviceId = "device123";
+    key2.brMac = "00:11:22:33:44:55";
+    key2.bleMac = "AA:BB:CC:DD:EE:FF";
+    key2.wifiIp = "192.168.1.1";
+    key2.wifiPort = 12345;
+
+    bool result = (key1 < key2);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: PeerTargetId3rdLess_006
+ * @tc.desc: Test operator< returns false when objects are equal
+ *           Step 1: Prepare two PeerTargetId3rd objects with identical values
+ *           Step 2: Compare using operator<
+ *           Step 3: Verify result is false when objects are equal
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, PeerTargetId3rdLess_006, testing::ext::TestSize.Level1)
+{
+    PeerTargetId3rd key1;
+    key1.deviceId = "device123";
+    key1.brMac = "00:11:22:33:44:55";
+    key1.bleMac = "AA:BB:CC:DD:EE:FF";
+    key1.wifiIp = "192.168.1.1";
+    key1.wifiPort = 12345;
+
+    PeerTargetId3rd key2;
+    key2.deviceId = "device123";
+    key2.brMac = "00:11:22:33:44:55";
+    key2.bleMac = "AA:BB:CC:DD:EE:FF";
+    key2.wifiIp = "192.168.1.1";
+    key2.wifiPort = 12345;
+
+    bool result = (key1 < key2);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: PeerTargetId3rdLess_007
+ * @tc.desc: Test operator< with self comparison
+ *           Step 1: Prepare one PeerTargetId3rd object
+ *           Step 2: Compare object with itself using operator<
+ *           Step 3: Verify result is false for self comparison
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmDataStruct3rdTest, PeerTargetId3rdLess_007, testing::ext::TestSize.Level1)
+{
+    PeerTargetId3rd key1;
+    key1.deviceId = "device123";
+    key1.brMac = "00:11:22:33:44:55";
+    key1.bleMac = "AA:BB:CC:DD:EE:FF";
+    key1.wifiIp = "192.168.1.1";
+    key1.wifiPort = 12345;
+
+    bool result = (key1 < key1);
+    EXPECT_FALSE(result);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
