@@ -702,7 +702,8 @@ bool DmAuthState::GetSessionKey(std::shared_ptr<DmAuthContext> context)
     if (!GetReuseSkId(context, skId)) {
         return false;
     }
-    return context->authMessageProcessor->GetSessionKey(context->accesser.userId, skId) == DM_OK;
+    int32_t userId = context->direction == DM_AUTH_SOURCE ? context->accesser.userId : context->accessee.userId;
+    return context->authMessageProcessor->GetSessionKey(userId, skId) == DM_OK;
 }
 
 bool DmAuthState::IsAclHasCredential(const DistributedDeviceProfile::AccessControlProfile &profile,
