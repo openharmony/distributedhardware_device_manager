@@ -98,7 +98,7 @@ std::string GeneratePinCode(uint32_t pinLength)
     std::mt19937_64 gen(rd());
     std::string pinCode = std::to_string(GenRandInt(DM_MIN_RANDOM, DM_MAX_RANDOM));
     uint32_t left_digit_count = pinLength - 1;
-    while (pinCode.length() < left_digit_count) {
+    while (pinCode.length() <= left_digit_count) {
         uint64_t rest_num = gen();
         pinCode += std::to_string(rest_num);
     }
