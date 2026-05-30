@@ -5622,7 +5622,7 @@ int32_t DeviceManagerService::SyncAllServiceInfo(const std::string &pkgName, int
     const std::string &networkId)
 {
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller: %{public}s does not have permission to call LeaveLNN.", pkgName.c_str());
+        LOGE("The caller: %{public}s does not have permission to call LeaveLNN", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
     if (!AppManager::GetInstance().IsSystemSA()) {
