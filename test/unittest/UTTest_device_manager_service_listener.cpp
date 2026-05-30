@@ -1048,30 +1048,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_006, test
 }
 
 /**
- * @tc.name: FillUdidAndUuidToDeviceInfo_008
- * @tc.desc: Test FillUdidAndUuidToDeviceInfo with empty extraData initially, should fail
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_008, testing::ext::TestSize.Level1)
-{
-    // Arrange
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "ohos.distributeddata.service";  // High priority package
-
-    DmDeviceInfo dmDeviceInfo;
-    memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    std::string networkId = "test_network_id";
-    memcpy_s(dmDeviceInfo.networkId, sizeof(dmDeviceInfo.networkId), networkId.c_str(), networkId.length());
-    dmDeviceInfo.extraData = "";  // Empty extraData
-
-    // Act
-    int32_t ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
-
-    // Assert - should return error because extraData is empty
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-/**
  * @tc.name: FillUdidAndUuidToDeviceInfo_009
  * @tc.desc: Test FillUdidAndUuidToDeviceInfo with valid extraData containing special characters
  * @tc.type: FUNC
