@@ -32,11 +32,9 @@ group("unittest") {
     ":UTTest_auth_request_state",
     ":UTTest_auth_response_state",
     ":UTTest_crypto_mgr",
-    ":UTTest_device_manager_impl",
     ":UTTest_device_manager_notify",
     ":UTTest_device_manager_service",
     ":UTTest_device_manager_service_impl",
-    ":UTTest_device_manager_service_impl_first",
     ":UTTest_device_manager_service_listener",
     ":UTTest_device_manager_service_notify",
     ":UTTest_device_manager_service_three",
@@ -49,19 +47,16 @@ group("unittest") {
     ":UTTest_dm_auth_cert",
     ":UTTest_dm_anonymous",
     ":UTTest_dm_anonymous_two",
-    ":UTTest_dm_auth_manager_first",
     ":UTTest_dm_auth_manager_second",
     ":UTTest_dm_auth_manager_third",
     ":UTTest_dm_auth_message_processor",
     ":UTTest_dm_comm_tool",
     ":UTTest_dm_common_event_manager",
-    ":UTTest_dm_credential_manager",
     ":UTTest_dm_crypto",
     ":UTTest_dm_crypto_mgr",
     ":UTTest_dm_device_state_manager",
     ":UTTest_dm_device_state_manager_two",
     ":UTTest_dm_deviceprofile_connector",
-    ":UTTest_dm_deviceprofile_connector_second",
     ":UTTest_dm_dfx",
     ":UTTest_dm_import_auth_code",
     ":UTTest_dm_pin_holder",
@@ -83,8 +78,6 @@ group("unittest") {
     ":UTTest_dm_transport_msg",
     ":UTTest_dp_inited_callback",
     ":UTTest_freeze_process",
-    ":UTTest_hichain_auth_connector",
-    ":UTTest_hichain_connector",
     ":UTTest_hichain_listener",
     ":UTTest_ipc_client_manager",
     ":UTTest_ipc_client_proxy",
@@ -649,62 +642,6 @@ ohos_unittest("device_manager_impl_test") {
 
 ## UnitTest device_manager_impl_test }}}
 
-## UnitTest UTTest_dm_credential_manager {{{
-ohos_unittest("UTTest_dm_credential_manager") {
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
-  module_out_path = module_out_path
-
-  include_dirs = [
-    "${devicemanager_path}/test/commonunittest",
-    "${servicesimpl_path}/src/credential",
-  ]
-
-   sources = [
-    "${devicemanager_path}/test/commonunittest/UTTest_dm_credential_manager.cpp",
-    "${devicemanager_path}/test/unittest/mock/hichain_connector_mock.cpp",
-  ]
-
-
-  deps = [
-    ":device_manager_test_common",
-    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
-    "${devicemanager_path}/interfaces/kits/js:devicemanager",
-    "${devicemanager_path}/radar:devicemanagerradartest",
-    "${ext_path}/pin_auth:devicemanagerext_pin_auth",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${json_path}:devicemanagerjson",
-    "${mini_tools_kits_path}/native_cpp:devicemanagerminisdk",
-    "${services_path}:devicemanagerservicetest",
-    "${servicesimpl_path}:devicemanagerserviceimpl",
-    "${softbuscache_parh}:dmdevicecache",
-    "${utils_path}:devicemanagerutilstest",
-  ]
-
-  external_deps = [
-    "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
-    "bounds_checking_function:libsec_shared",
-    "bundle_framework:appexecfwk_core",
-    "cJSON:cjson_static",
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "dsoftbus:softbus_client",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "hilog:libhilog",
-    "kv_store:distributeddata_inner",
-    "selinux_adapter:librestorecon",
-  ]
-}
-
-
 ## UnitTest UTTest_dm_credential_manager_service {{{
 ohos_unittest("UTTest_dm_credential_manager_service") {
   module_out_path = module_out_path
@@ -753,8 +690,6 @@ ohos_unittest("UTTest_dm_credential_manager_service") {
 }
 
 ## UnitTest UTTest_dm_credential_manager_service }}}
-
-## UnitTest UTTest_dm_credential_manager }}}
 
 ## UnitTest UTTest_device_manager_service {{{
 ohos_unittest("UTTest_device_manager_service") {
@@ -950,83 +885,6 @@ ohos_unittest("UTTest_device_manager_service_notify") {
 }
 
 ## UnitTest UTTest_device_manager_service_notify }}}
-
-## UnitTest UTTest_hichain_auth_connector {{{
-ohos_unittest("UTTest_hichain_auth_connector") {
-  module_out_path = module_out_path
-
-  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
-
-  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_hichain_auth_connector.cpp" ]
-
-  deps = [
-    ":device_manager_test_common",
-    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
-    "${devicemanager_path}/interfaces/kits/js:devicemanager",
-    "${devicemanager_path}/radar:devicemanagerradartest",
-    "${ext_path}/pin_auth:devicemanagerext_pin_auth",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${json_path}:devicemanagerjson",
-    "${mini_tools_kits_path}/native_cpp:devicemanagerminisdk",
-    "${services_path}:devicemanagerservicetest",
-    "${servicesimpl_path}:devicemanagerserviceimpl",
-    "${softbuscache_parh}:dmdevicecache",
-    "${utils_path}:devicemanagerutilstest",
-  ]
-
-  external_deps = [
-    "bounds_checking_function:libsec_shared",
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "hilog:libhilog",
-  ]
-}
-
-## UnitTest UTTest_hichain_auth_connector }}}
-
-## UnitTest UTTest_hichain_connector {{{
-ohos_unittest("UTTest_hichain_connector") {
-  module_out_path = module_out_path
-
-  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
-
-  sources = [
-    "${devicemanager_path}/test/commonunittest/UTTest_hichain_connector.cpp",
-  ]
-
-  deps = [
-    ":device_manager_test_common",
-    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
-    "${devicemanager_path}/interfaces/kits/js:devicemanager",
-    "${devicemanager_path}/radar:devicemanagerradartest",
-    "${ext_path}/pin_auth:devicemanagerext_pin_auth",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${json_path}:devicemanagerjson",
-    "${mini_tools_kits_path}/native_cpp:devicemanagerminisdk",
-    "${services_path}:devicemanagerservicetest",
-    "${servicesimpl_path}:devicemanagerserviceimpl",
-    "${softbuscache_parh}:dmdevicecache",
-    "${utils_path}:devicemanagerutilstest",
-  ]
-
-  external_deps = [
-    "bounds_checking_function:libsec_shared",
-    "bundle_framework:appexecfwk_core",
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "dsoftbus:softbus_client",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "hilog:libhilog",
-    "kv_store:distributeddata_inner",
-  ]
-}
-
-## UnitTest UTTest_hichain_connector }}}
 
 ## UnitTest UTTest_mine_hichain_connector {{{
 ohos_unittest("UTTest_mine_hichain_connector") {
@@ -1981,62 +1839,6 @@ ohos_unittest("UTTest_ipc_server_stub") {
 
 ## UnitTest UTTest_ipc_server_stub }}}
 
-## UnitTest UTTest_device_manager_impl {{{
-ohos_unittest("UTTest_device_manager_impl") {
-  module_out_path = module_out_path
-
-  sources = [
-    "UTTest_device_manager_impl.cpp",
-    "UTTest_device_manager_impl_four.cpp",
-    "UTTest_device_manager_impl_three.cpp",
-    "UTTest_device_manager_impl_two.cpp",
-    "mock/device_manager_notify_mock.cpp",
-  ]
-
-  deps = [
-    ":device_manager_test_common",
-    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
-    "${devicemanager_path}/interfaces/kits/js:devicemanager",
-    "${devicemanager_path}/radar:devicemanagerradartest",
-    "${ext_path}/pin_auth:devicemanagerext_pin_auth",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${json_path}:devicemanagerjson",
-    "${mini_tools_kits_path}/native_cpp:devicemanagerminisdk",
-    "${services_path}:devicemanagerservicetest",
-    "${servicesimpl_path}:devicemanagerserviceimpl",
-    "${softbuscache_parh}:dmdevicecache",
-    "${utils_path}:devicemanagerutilstest",
-  ]
-
-  external_deps = [
-    "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
-    "bounds_checking_function:libsec_shared",
-    "cJSON:cjson_static",
-    "c_utils:utils",
-    "device_auth:deviceauth_sdk",
-    "dsoftbus:softbus_client",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "googletest:gmock_main",
-    "hilog:libhilog",
-    "ipc:ipc_core",
-    "samgr:samgr_proxy",
-    "selinux_adapter:librestorecon",
-  ]
-
-  cflags = [
-    "-Wall",
-    "-Werror",
-    "-g3",
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-}
-
-## UnitTest UTTest_device_manager_impl }}}
-
 ## UnitTest UTTest_dm_import_auth_code {{{
 ohos_unittest("UTTest_dm_import_auth_code") {
   module_out_path = module_out_path
@@ -2483,56 +2285,6 @@ ohos_unittest("UTTest_device_manager_service_impl") {
 
 ## UnitTest UTTest_device_manager_service_impl }}}
 
-## UnitTest UTTest_device_manager_service_impl_first {{{
-ohos_unittest("UTTest_device_manager_service_impl_first") {
-  module_out_path = module_out_path
-
-  sources = [
-    "${servicesimpl_path}/src/device_manager_service_impl.cpp",
-    "UTTest_device_manager_service_impl_first.cpp",
-    "mock/deviceprofile_connector_mock.cpp",
-    "mock/multiple_user_connector_mock.cpp",
-    "mock/ipc_server_listener_mock.cpp",
-    "mock/softbus_session_mock.cpp",
-    "${devicemanager_path}/test/unittest/mock/dm_device_state_manager_mock.cpp",
-    "${devicemanager_path}/test/unittest/mock/hichain_connector_mock.cpp",
-  ]
-
-  deps = [
-    ":device_manager_test_common",
-    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
-    "${devicemanager_path}/interfaces/kits/js:devicemanager",
-    "${devicemanager_path}/radar:devicemanagerradartest",
-    "${ext_path}/pin_auth:devicemanagerext_pin_auth",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${json_path}:devicemanagerjson",
-    "${mini_tools_kits_path}/native_cpp:devicemanagerminisdk",
-    "${services_path}:devicemanagerservicetest",
-    "${servicesimpl_path}:devicemanagerserviceimpl",
-    "${softbuscache_parh}:dmdevicecache",
-    "${utils_path}:devicemanagerutilstest",
-  ]
-
-  external_deps = [
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "dsoftbus:softbus_client",
-    "eventhandler:libeventhandler",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "googletest:gmock_main",
-    "hilog:libhilog",
-    "kv_store:distributeddata_inner",
-    "os_account:libaccountkits",
-    "os_account:os_account_innerkits",
-  ]
-}
-
-## UnitTest UTTest_device_manager_service_impl_first }}}
-
 ## UnitTest UTTest_device_manager_service_listener {{{
 ohos_unittest("UTTest_device_manager_service_listener") {
   module_out_path = module_out_path
@@ -2793,67 +2545,6 @@ ohos_unittest("ipc_client_manager_test") {
 }
 
 ## UnitTest ipc_client_manager_test }}}
-
-## UnitTest UTTest_dm_auth_manager_first {{{
-ohos_unittest("UTTest_dm_auth_manager_first") {
-  module_out_path = module_out_path
-
-  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
-
-  sources = [
-    "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_first.cpp",
-    "mock/app_manager_mock.cpp",
-    "mock/crypto_mgr_mock.cpp",
-    "mock/deviceprofile_connector_mock.cpp",
-    "mock/dm_crypto_mock.cpp",
-    "mock/hichain_auth_connector_mock.cpp",
-    "mock/multiple_user_connector_mock.cpp",
-    "mock/softbus_session_mock.cpp",
-  ]
-
-  deps = [
-    ":device_manager_test_common",
-    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
-    "${devicemanager_path}/interfaces/kits/js:devicemanager",
-    "${devicemanager_path}/radar:devicemanagerradartest",
-    "${ext_path}/pin_auth:devicemanagerext_pin_auth",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${json_path}:devicemanagerjson",
-    "${mini_tools_kits_path}/native_cpp:devicemanagerminisdk",
-    "${services_path}:devicemanagerservicetest",
-    "${servicesimpl_path}:devicemanagerserviceimpl",
-    "${softbuscache_parh}:dmdevicecache",
-    "${utils_path}:devicemanagerutilstest",
-  ]
-
-  external_deps = [
-    "bounds_checking_function:libsec_shared",
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "dsoftbus:softbus_client",
-    "eventhandler:libeventhandler",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "googletest:gmock_main",
-    "hilog:libhilog",
-    "kv_store:distributeddata_inner",
-  ]
-
-  cflags = [
-    "-g",
-    "-O0",
-    "-Dprivate=public",
-    "-Dprotected=public",
-    "-Werror",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
-  ]
-}
-
-## UTTest_dm_auth_manager_first }}}
 
 ## UnitTest UTTest_dm_auth_manager_second {{{
 ohos_unittest("UTTest_dm_auth_manager_second") {
@@ -3123,51 +2814,6 @@ ohos_unittest("UTTest_dm_deviceprofile_connector") {
 }
 
 ## UTTest_dm_deviceprofile_connector }}}
-
-###############################
-## UnitTest UTTest_dm_deviceprofile_connector_second {{{
-ohos_unittest("UTTest_dm_deviceprofile_connector_second") {
-  module_out_path = module_out_path
-
-  include_dirs = [
-    "${devicemanager_path}/commondependency/include",
-    "${devicemanager_path}/test/commonunittest",
-  ]
-
-  sources = [
-    "${devicemanager_path}/test/commonunittest/UTTest_dm_deviceprofile_connector_second.cpp",
-    "${devicemanager_path}/test/unittest/mock/distributed_device_profile_client_mock.cpp",
-    "${devicemanager_path}/test/unittest/mock/multiple_user_connector_mock.cpp",
-  ]
-
-  deps = [
-    ":device_manager_test_common",
-    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
-    "${devicemanager_path}/interfaces/kits/js:devicemanager",
-    "${devicemanager_path}/radar:devicemanagerradartest",
-    "${ext_path}/pin_auth:devicemanagerext_pin_auth",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${json_path}:devicemanagerjson",
-    "${mini_tools_kits_path}/native_cpp:devicemanagerminisdk",
-    "${services_path}:devicemanagerservicetest",
-    "${servicesimpl_path}:devicemanagerserviceimpl",
-    "${softbuscache_parh}:dmdevicecache",
-    "${utils_path}:devicemanagerutilstest",
-  ]
-
-  external_deps = [
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "googletest:gmock_main",
-    "hilog:libhilog",
-    "ipc:ipc_core",
-    "samgr:samgr_proxy",
-  ]
-}
-
-## UTTest_dm_deviceprofile_connector_second }}}
 
 ## UnitTest UTTest_dm_comm_tool {{{
 ohos_unittest("UTTest_dm_comm_tool") {
