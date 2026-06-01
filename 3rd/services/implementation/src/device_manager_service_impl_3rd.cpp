@@ -705,14 +705,12 @@ void DeviceManagerServiceImpl3rd::ErasePincodeInfo(ProcessInfo3rd processInfo3rd
     LOGI("processName:%{public}s, tokenId:%{public}s, businessName:%{public}s, uid:%{public}d, userId:%{public}d",
         processInfo3rd.processName.c_str(), GetAnonyUint32(processInfo3rd.tokenId),
         processInfo3rd.businessName.c_str(), processInfo3rd.uid, processInfo3rd.userId);
-    {
-        std::lock_guard<ffrt::mutex> lock(pinCodeLock_);
-        if (pinCodeMap_.find(processInfo3rd) == pinCodeMap_.end()) {
-            LOGE("pinCodeInfo is not exist");
-            return;
-        }
-        pinCodeMap_.erase(processInfo3rd);
+    std::lock_guard<ffrt::mutex> lock(pinCodeLock_);
+    if (pinCodeMap_.find(processInfo3rd) == pinCodeMap_.end()) {
+        LOGE("pinCodeInfo is not exist");
+        return;
     }
+    pinCodeMap_.erase(processInfo3rd);
 }
 
 int32_t DeviceManagerServiceImpl3rd::AuthCredential(const PeerTargetId3rd &targetId,

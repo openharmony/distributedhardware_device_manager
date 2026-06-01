@@ -116,7 +116,8 @@ private:
         const ProcessInfo3rd processInfo3rd);
     void NotifyCleanEvent(uint64_t logicalSessionId, int32_t connDelayCloseTime, ProcessInfo3rd processInfo3rd);
     std::shared_ptr<AuthManagerBase3rd> GetAuthMgr();
-    void CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId, int32_t connDelayCloseTime);
+    void CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId, int32_t connDelayCloseTime,
+        ProcessInfo3rd processInfo3rd);
     void EraseAuthMgr(uint32_t tokenId);
     void ErasePincodeInfo(ProcessInfo3rd processInfo3rd);
 
