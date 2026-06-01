@@ -58,7 +58,7 @@ extern const int32_t NEGOTIATE_TIMEOUT;
 extern const int32_t WAIT_REQUEST_TIMEOUT;
 extern const int32_t EVENT_TIMEOUT;
 
-using CleanNotifyCallback = std::function<void(uint64_t, int32_t)>;
+using CleanNotifyCallback = std::function<void(uint64_t, int32_t, ProcessInfo3rd)>;
 using StopTimerAndDelDpCallback = std::function<void(const std::string&, int32_t, uint64_t)>;
 enum DmRole {
     DM_ROLE_UNKNOWN = 0,

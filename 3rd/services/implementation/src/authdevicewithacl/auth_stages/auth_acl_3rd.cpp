@@ -78,7 +78,7 @@ int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)
     SinkFinish(context);
     LOGI("AuthSinkFinishState::Action ok");
     if (context->cleanNotifyCallback != nullptr) {
-        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime);
+        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime, context->processInfo);
     }
 
     return DM_OK;
@@ -104,7 +104,7 @@ int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
         context->connDelayCloseTime = 0;
     }
     if (context->cleanNotifyCallback != nullptr) {
-        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime);
+        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime, context->processInfo);
     }
     return DM_OK;
 }

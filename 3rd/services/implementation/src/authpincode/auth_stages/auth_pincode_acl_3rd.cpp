@@ -37,7 +37,7 @@ int32_t AuthPincodeSinkFinishState::Action(std::shared_ptr<DmAuthPincodeContext>
     SinkFinish(context);
     LOGI("AuthPincodeSinkFinishState::Action ok");
     if (context->cleanNotifyCallback != nullptr) {
-        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime);
+        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime, context->processInfo);
     }
 
     return DM_OK;
@@ -63,7 +63,7 @@ int32_t AuthPincodeSrcFinishState::Action(std::shared_ptr<DmAuthPincodeContext> 
         context->connDelayCloseTime = 0;
     }
     if (context->cleanNotifyCallback != nullptr) {
-        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime);
+        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime, context->processInfo);
     }
     return DM_OK;
 }

@@ -327,8 +327,9 @@ void DeviceManagerServiceImpl3rd::AuthDeviceAclImpl(const PeerTargetId3rd &targe
         return;
     }
     uint64_t logicalSessionId = GenerateRandNum(sessionId);
-    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime) {
-        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
+        const ProcessInfo3rd &processInfo3rd) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime, processInfo3rd);
     };
     authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
     CHECK_NULL_VOID(hiChainAuthConnector_);
@@ -561,8 +562,9 @@ int32_t DeviceManagerServiceImpl3rd::InitCredAuthMgr(uint32_t tokenId, uint64_t 
 {
     std::shared_ptr<AuthManagerBase3rd> authMgr =
         std::make_shared<AuthSinkManagerCred>(softbusConnector_, listener_, hiChainAuthConnector_);
-    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime) {
-        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
+        const ProcessInfo3rd &processInfo3rd) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime, processInfo3rd);
     };
     // Register resource destruction notification function
     authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
@@ -588,8 +590,9 @@ int32_t DeviceManagerServiceImpl3rd::InitAuthMgr(bool isSrcSide, uint32_t tokenI
         authMgr = std::make_shared<AuthSinkManager>(softbusConnector_, listener_,
             hiChainAuthConnector_);
     }
-    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime) {
-        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
+        const ProcessInfo3rd &processInfo3rd) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime, processInfo3rd);
     };
     // Register resource destruction notification function
     authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
@@ -636,10 +639,11 @@ void DeviceManagerServiceImpl3rd::ImportAuthCodeAndUidFromCache(std::shared_ptr<
     }
 }
 
-void DeviceManagerServiceImpl3rd::NotifyCleanEvent(uint64_t logicalSessionId, int32_t connDelayCloseTime)
+void DeviceManagerServiceImpl3rd::NotifyCleanEvent(uint64_t logicalSessionId, int32_t connDelayCloseTime,
+    ProcessInfo3rd processInfo3rd)
 {
     LOGI("logicalSessionId: %{public}" PRIu64 ".", logicalSessionId);
-    ffrt::submit([=]() { CleanAuthMgrByLogicalSessionId(logicalSessionId, connDelayCloseTime); });
+    ffrt::submit([=]() { CleanAuthMgrByLogicalSessionId(logicalSessionId, connDelayCloseTime, processInfo3rd); });
 }
 
 std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rd::GetAuthMgr()
@@ -648,7 +652,8 @@ std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rd::GetAuthMgr()
     return GetAuthMgrByTokenId(tokenId);
 }
 
-void DeviceManagerServiceImpl3rd::CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId, int32_t connDelayCloseTime)
+void DeviceManagerServiceImpl3rd::CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId, int32_t connDelayCloseTime,
+    ProcessInfo3rd processInfo3rd)
 {
     uint32_t tokenId = 0;
     {
@@ -664,6 +669,7 @@ void DeviceManagerServiceImpl3rd::CleanAuthMgrByLogicalSessionId(uint64_t logica
         hiChainAuthConnector_->UnRegisterHiChainAuthCallbackById(logicalSessionId);
     }
     EraseAuthMgr(tokenId);
+    ErasePincodeInfo(processInfo3rd);
     int32_t sessionId = 0;
     {
         std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
@@ -691,6 +697,21 @@ void DeviceManagerServiceImpl3rd::EraseAuthMgr(uint32_t tokenId)
         std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
         LOGI("tokenIdSessionIdMap_ erase token: %{public}d", tokenId);
         tokenIdSessionIdMap_.erase(tokenId);
+    }
+}
+
+void DeviceManagerServiceImpl3rd::ErasePincodeInfo(ProcessInfo3rd processInfo3rd);
+{
+    LOGI("processName:%{public}s, tokenId:%{public}s, businessName:%{public}s, uid:%{public}d, userId:%{public}d",
+        processInfo3rd.processName.c_str(), GetAnonyUint32(processInfo3rd.tokenId),
+        processInfo3rd.businessName.c_str(), processInfo3rd.uid, processInfo3rd.userId);
+    {
+        std::lock_guard<ffrt::mutex> lock(pinCodeLock_);
+        if (pinCodeMap_.find(processInfo3rd) == pinCodeMap_.end()) {
+            LOGE("pinCodeInfo is not exist");
+            return;
+        }
+        pinCodeMap_.erase(processInfo3rd);
     }
 }
 
@@ -755,8 +776,9 @@ void DeviceManagerServiceImpl3rd::AuthCredentialImpl(const PeerTargetId3rd &targ
         return;
     }
     uint64_t logicalSessionId = GenerateRandNum(sessionId);
-    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime) {
-        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
+        const ProcessInfo3rd &processInfo3rd) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime, processInfo3rd);
     };
     authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
     CHECK_NULL_VOID(hiChainAuthConnector_);
@@ -827,8 +849,9 @@ int32_t DeviceManagerServiceImpl3rd::InitAuthPincodeMgr(bool isSrcSide, uint32_t
         // sink end
         authPincodeMgr = std::make_shared<AuthPincodeSinkManager>(softbusConnector_, listener_, hiChainAuthConnector_);
     }
-    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime) {
-        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
+        const ProcessInfo3rd &processInfo3rd) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime, processInfo3rd);
     };
     // Register resource destruction notification function
     authPincodeMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
@@ -908,8 +931,9 @@ void DeviceManagerServiceImpl3rd::AuthPincodeImpl(const PeerTargetId3rd &targetI
     }
     uint64_t logicalSessionId = GenerateRandNum(sessionId);
     LOGI("AuthPincodeImpl, sessionId:%{public}d, logicalSessionId:%{public}" PRIu64 "", sessionId, logicalSessionId);
-    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime) {
-        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
+        const ProcessInfo3rd &processInfo3rd) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime, processInfo3rd);
     };
     authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
     CHECK_NULL_VOID(hiChainAuthConnector_);
