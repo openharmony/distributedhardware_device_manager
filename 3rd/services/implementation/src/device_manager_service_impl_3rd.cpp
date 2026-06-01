@@ -703,7 +703,7 @@ void DeviceManagerServiceImpl3rd::EraseAuthMgr(uint32_t tokenId)
 void DeviceManagerServiceImpl3rd::ErasePincodeInfo(ProcessInfo3rd processInfo3rd)
 {
     LOGI("processName:%{public}s, tokenId:%{public}s, businessName:%{public}s, uid:%{public}d, userId:%{public}d",
-        processInfo3rd.processName.c_str(), GetAnonyUint32(processInfo3rd.tokenId),
+        processInfo3rd.processName.c_str(), GetAnonyUint32(processInfo3rd.tokenId).c_str(),
         processInfo3rd.businessName.c_str(), processInfo3rd.uid, processInfo3rd.userId);
     std::lock_guard<ffrt::mutex> lock(pinCodeLock_);
     if (pinCodeMap_.find(processInfo3rd) == pinCodeMap_.end()) {
