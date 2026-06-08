@@ -369,6 +369,11 @@ public:
         (void)pkgName;
         (void)consumerPkgName;
     }
+    virtual bool CheckIsOnlineAdapter(const std::string &peerUdid) override
+    {
+        (void)peerUdid;
+        return true;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS
