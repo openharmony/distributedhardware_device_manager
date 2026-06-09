@@ -65,7 +65,8 @@
                 "screenlock_mgr",
                 "selinux_adapter",
                 "wifi",
-                "zlib"
+                "zlib",
+                "taihe_ffi_gen"
             ],
             "third_party": []
         },
