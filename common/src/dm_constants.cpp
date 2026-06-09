@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -229,6 +229,11 @@ const char* META_TOKEN = "metaToken";
 const char* PIN_ERROR_COUNT = "pinErrorCount";
 const char* PIN_MATCH_FLAG = "pinMatchFlag";
 const char* TAG_ONE_TIME_PIN_CODE_FLAG = "oneTimePinCodeFlag";
+const char* ACL_LIFE_CYCLE_DAYS = "ACL_LIFE_CYCLE_DAYS";
+const int32_t ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED = -1;
+const int32_t ACL_LIFE_CYCLE_DAYS_MIN = 1;
+const int32_t ACL_LIFE_CYCLE_DAYS_MAX = 3650;
+const int32_t SECONDS_PER_DAY = 86400;
 const char* DM_ACCOUNT_CONSTRAINT = "constraint.distributed.transmission";
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+/**
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1178,6 +1178,76 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, OpenAuthSession_007, testing::ext::T
     int32_t ret = deviceManagerServiceImpl_->OpenAuthSession(deviceId, bindParam);
     EXPECT_EQ(ret, 100);
     DmSoftbusSession::dmSoftbusSession = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_Empty_ReturnsDefault, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData("");
+    EXPECT_EQ(deviceManagerServiceImpl_->GetAclAllowSeconds(profile), 365LL * SECONDS_PER_DAY);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_NoKey_ReturnsDefault, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData(R"({"foo":"bar"})");
+    EXPECT_EQ(deviceManagerServiceImpl_->GetAclAllowSeconds(profile), 365LL * SECONDS_PER_DAY);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_ValidDays_ReturnsScaled, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData(R"({"ACL_LIFE_CYCLE_DAYS":730})");
+    EXPECT_EQ(deviceManagerServiceImpl_->GetAclAllowSeconds(profile), 730LL * SECONDS_PER_DAY);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_OutOfRange_ReturnsDefault, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData(R"({"ACL_LIFE_CYCLE_DAYS":99999})");
+    EXPECT_EQ(deviceManagerServiceImpl_->GetAclAllowSeconds(profile), 365LL * SECONDS_PER_DAY);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_WrongType_ReturnsDefault, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData(R"({"ACL_LIFE_CYCLE_DAYS":"730"})");
+    EXPECT_EQ(deviceManagerServiceImpl_->GetAclAllowSeconds(profile), 365LL * SECONDS_PER_DAY);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_Malformed_ReturnsDefault, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData("not-json{{{");
+    EXPECT_EQ(deviceManagerServiceImpl_->GetAclAllowSeconds(profile), 365LL * SECONDS_PER_DAY);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_NegativeNonSentinel_ReturnsDefault, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData(R"({"ACL_LIFE_CYCLE_DAYS":-2})");
+    EXPECT_EQ(deviceManagerServiceImpl_->GetAclAllowSeconds(profile), 365LL * SECONDS_PER_DAY);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_MinDays_ReturnsScaled, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData(R"({"ACL_LIFE_CYCLE_DAYS":1})");
+    EXPECT_EQ(deviceManagerServiceImpl_->GetAclAllowSeconds(profile), 1LL * SECONDS_PER_DAY);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_MaxDays_ReturnsScaled, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData(R"({"ACL_LIFE_CYCLE_DAYS":3650})");
+    EXPECT_EQ(deviceManagerServiceImpl_->GetAclAllowSeconds(profile), 3650LL * SECONDS_PER_DAY);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_SentinelValue_ReturnsDefault, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData(R"({"ACL_LIFE_CYCLE_DAYS":-1})");
+    EXPECT_EQ(deviceManagerServiceImpl_->GetAclAllowSeconds(profile), 365LL * SECONDS_PER_DAY);
 }
 } // namespace
 } // namespace DistributedHardware

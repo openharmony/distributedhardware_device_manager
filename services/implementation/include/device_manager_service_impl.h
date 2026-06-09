@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -323,6 +323,7 @@ private:
     int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller, std::string &udid,
         int32_t &bindLevel);
     void StartAuthInfoTimer(const DmAuthInfo &dmAuthInfo, uint64_t tokenId);
+    int64_t GetAclAllowSeconds(const DistributedDeviceProfile::AccessControlProfile &profile);
     void StopAuthInfoTimerAndDeleteDP(const std::string &pkgName, int32_t pinExchangeType, uint64_t tokenId);
     void InitDpServiceInfo(const DmAuthInfo &dmAuthInfo, DistributedDeviceProfile::LocalServiceInfo &dpServiceInfo,
         bool pinMatchFlag, uint64_t tokenId, int32_t errorCount);

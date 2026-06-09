@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+/**
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,6 +30,7 @@ using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
 constexpr int32_t DP_PERMISSION_DENIED = 98566155;
+constexpr int32_t TEST_FOREGROUND_USER_ID = 100;
 void DeviceManagerServiceThreeTest::SetUp()
 {
     const int32_t permsNum = 4;
@@ -1413,6 +1414,130 @@ HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_009, TestSize.Leve
     info.description = std::string(DM_MAX_PIN_CODE_LEN, 'd');
     bool result = DeviceManagerService::GetInstance().IsImportAuthInfoValid(info);
     EXPECT_FALSE(result);
+}
+
+static DmAuthInfo MakeValidImportInfo(DMLocalServiceInfoAuthType authType)
+{
+    DmAuthInfo info;
+    info.userId = TEST_FOREGROUND_USER_ID;
+    info.pinConsumerPkgName = "com.test.valid";
+    std::string pin = "123456";
+    strncpy_s(info.pinCode, DM_MAX_PIN_CODE_LEN, pin.c_str(), pin.length());
+    std::string meta = "valid_meta";
+    strncpy_s(info.metaToken, DM_MAX_META_TOKEN_LEN, meta.c_str(), meta.length());
+    info.authType = authType;
+    info.authBoxType = DMLocalServiceInfoAuthBoxType::STATE3;
+    info.pinExchangeType = DMLocalServiceInfoPinExchangeType::PINBOX;
+    info.description = "valid desc";
+    return info;
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_AclDays_AlwaysOk, TestSize.Level1)
+{
+    DmAuthInfo info = MakeValidImportInfo(DMLocalServiceInfoAuthType::TRUST_ALWAYS);
+    info.extraInfo = R"({"ACL_LIFE_CYCLE_DAYS":730})";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::vector<int32_t>{100}), Return(DM_OK)));
+    EXPECT_TRUE(DeviceManagerService::GetInstance().IsImportAuthInfoValid(info));
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_AclDays_AlwaysMinBoundary, TestSize.Level1)
+{
+    DmAuthInfo info = MakeValidImportInfo(DMLocalServiceInfoAuthType::TRUST_ALWAYS);
+    info.extraInfo = R"({"ACL_LIFE_CYCLE_DAYS":1})";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::vector<int32_t>{100}), Return(DM_OK)));
+    EXPECT_TRUE(DeviceManagerService::GetInstance().IsImportAuthInfoValid(info));
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_AclDays_AlwaysMaxBoundary, TestSize.Level1)
+{
+    DmAuthInfo info = MakeValidImportInfo(DMLocalServiceInfoAuthType::TRUST_ALWAYS);
+    info.extraInfo = R"({"ACL_LIFE_CYCLE_DAYS":3650})";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::vector<int32_t>{100}), Return(DM_OK)));
+    EXPECT_TRUE(DeviceManagerService::GetInstance().IsImportAuthInfoValid(info));
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_AclDays_AlwaysOverMax, TestSize.Level1)
+{
+    DmAuthInfo info = MakeValidImportInfo(DMLocalServiceInfoAuthType::TRUST_ALWAYS);
+    info.extraInfo = R"({"ACL_LIFE_CYCLE_DAYS":3651})";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::vector<int32_t>{100}), Return(DM_OK)));
+    EXPECT_FALSE(DeviceManagerService::GetInstance().IsImportAuthInfoValid(info));
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_AclDays_AlwaysZero, TestSize.Level1)
+{
+    DmAuthInfo info = MakeValidImportInfo(DMLocalServiceInfoAuthType::TRUST_ALWAYS);
+    info.extraInfo = R"({"ACL_LIFE_CYCLE_DAYS":0})";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::vector<int32_t>{100}), Return(DM_OK)));
+    EXPECT_FALSE(DeviceManagerService::GetInstance().IsImportAuthInfoValid(info));
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_AclDays_AlwaysStringValueRejected, TestSize.Level1)
+{
+    DmAuthInfo info = MakeValidImportInfo(DMLocalServiceInfoAuthType::TRUST_ALWAYS);
+    info.extraInfo = R"({"ACL_LIFE_CYCLE_DAYS":"730"})";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::vector<int32_t>{100}), Return(DM_OK)));
+    EXPECT_FALSE(DeviceManagerService::GetInstance().IsImportAuthInfoValid(info));
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_AclDays_OneTimeSentinelOk, TestSize.Level1)
+{
+    DmAuthInfo info = MakeValidImportInfo(DMLocalServiceInfoAuthType::TRUST_ONETIME);
+    info.extraInfo = R"({"ACL_LIFE_CYCLE_DAYS":-1})";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::vector<int32_t>{100}), Return(DM_OK)));
+    EXPECT_TRUE(DeviceManagerService::GetInstance().IsImportAuthInfoValid(info));
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_AclDays_OneTimeMissingOk, TestSize.Level1)
+{
+    DmAuthInfo info = MakeValidImportInfo(DMLocalServiceInfoAuthType::TRUST_ONETIME);
+    info.extraInfo = "";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::vector<int32_t>{100}), Return(DM_OK)));
+    EXPECT_TRUE(DeviceManagerService::GetInstance().IsImportAuthInfoValid(info));
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_AclDays_OneTimeWithValueRejected, TestSize.Level1)
+{
+    DmAuthInfo info = MakeValidImportInfo(DMLocalServiceInfoAuthType::TRUST_ONETIME);
+    info.extraInfo = R"({"ACL_LIFE_CYCLE_DAYS":365})";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::vector<int32_t>{100}), Return(DM_OK)));
+    EXPECT_FALSE(DeviceManagerService::GetInstance().IsImportAuthInfoValid(info));
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_AclDays_MalformedJsonRejected, TestSize.Level1)
+{
+    DmAuthInfo info = MakeValidImportInfo(DMLocalServiceInfoAuthType::TRUST_ALWAYS);
+    info.extraInfo = "not-a-json{{{";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::vector<int32_t>{100}), Return(DM_OK)));
+    EXPECT_FALSE(DeviceManagerService::GetInstance().IsImportAuthInfoValid(info));
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_AclDays_NegativeNonSentinelRejected, TestSize.Level1)
+{
+    DmAuthInfo info = MakeValidImportInfo(DMLocalServiceInfoAuthType::TRUST_ALWAYS);
+    info.extraInfo = R"({"ACL_LIFE_CYCLE_DAYS":-2})";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::vector<int32_t>{100}), Return(DM_OK)));
+    EXPECT_FALSE(DeviceManagerService::GetInstance().IsImportAuthInfoValid(info));
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, IsImportAuthInfoValid_AclDays_AlwaysSentinelOk, TestSize.Level1)
+{
+    DmAuthInfo info = MakeValidImportInfo(DMLocalServiceInfoAuthType::TRUST_ALWAYS);
+    info.extraInfo = R"({"ACL_LIFE_CYCLE_DAYS":-1})";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(std::vector<int32_t>{100}), Return(DM_OK)));
+    EXPECT_TRUE(DeviceManagerService::GetInstance().IsImportAuthInfoValid(info));
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, InitTaskOfDelTimeOutAcl_002, TestSize.Level0)

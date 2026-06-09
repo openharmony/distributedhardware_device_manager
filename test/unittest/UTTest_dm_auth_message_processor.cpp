@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+/**
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,21 +20,28 @@
 #include "dm_auth_context.h"
 #include "dm_auth_state_machine.h"
 #include "deviceprofile_connector.h"
+#include "distributed_device_profile_client_mock.h"
 #include "UTTest_dm_auth_message_processor.h"
 
 using namespace testing;
 namespace OHOS {
 namespace DistributedHardware {
 constexpr int32_t DP_PERMISSION_DENIED = 98566155;
+std::shared_ptr<DistributedDeviceProfile::DistributedDeviceProfileClientMock> g_dpClientMock = nullptr;
+
 void DmAuthMessageProcessorTest::SetUpTestCase()
 {
     DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock_;
+    g_dpClientMock = std::make_shared<DistributedDeviceProfile::DistributedDeviceProfileClientMock>();
+    DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = g_dpClientMock;
 }
 
 void DmAuthMessageProcessorTest::TearDownTestCase()
 {
     DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
     deviceProfileConnectorMock_ = nullptr;
+    DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
+    g_dpClientMock = nullptr;
 }
 
 void DmAuthMessageProcessorTest::SetUp()
@@ -407,6 +414,249 @@ HWTEST_F(DmAuthMessageProcessorTest, ParseSyncMessage_004, testing::ext::TestSiz
     DmAccess access;
     int32_t result = processor->ParseSyncMessage(context, access, jsonObject);
     EXPECT_EQ(result, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, PutNonLnnAclProfile_Days_WritesAclExtraData, testing::ext::TestSize.Level1)
+{
+    auto context = std::make_shared<DmAuthContext>();
+    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
+    context->aclLifeCycleDays = 730;
+    context->accesser.extraInfo = R"({"dmVersion":"5.1.5"})";
+    context->accessee.extraInfo = R"({"dmVersion":"5.1.5"})";
+
+    DmAccess access;
+    access.bindLevel = static_cast<int32_t>(APP);
+    access.transmitBindType = DM_IDENTICAL_ACCOUNT;
+    access.isPutLnnAcl = false;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    JsonObject extraData;
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+
+    EXPECT_CALL(*g_dpClientMock, PutAccessControlProfile(_))
+        .WillOnce(Invoke([](const DistributedDeviceProfile::AccessControlProfile &profile) {
+            JsonObject out(profile.GetExtraData());
+            EXPECT_FALSE(out.IsDiscarded());
+            EXPECT_TRUE(out.Contains(ACL_LIFE_CYCLE_DAYS));
+            EXPECT_EQ(out[ACL_LIFE_CYCLE_DAYS].Get<int32_t>(), 730);
+            EXPECT_FALSE(profile.GetAccesser().GetAccesserExtraData().find(ACL_LIFE_CYCLE_DAYS) != std::string::npos);
+            EXPECT_FALSE(profile.GetAccessee().GetAccesseeExtraData().find(ACL_LIFE_CYCLE_DAYS) != std::string::npos);
+            return DM_OK;
+        }));
+
+    processor->PutNonLnnAclProfile(context, access, profile, accesser, accessee, extraData);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, PutNonLnnAclProfile_NotAlways_NoAclDays, testing::ext::TestSize.Level1)
+{
+    auto context = std::make_shared<DmAuthContext>();
+    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH;
+    context->aclLifeCycleDays = 730;
+
+    DmAccess access;
+    access.bindLevel = static_cast<int32_t>(APP);
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    JsonObject extraData;
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+
+    EXPECT_CALL(*g_dpClientMock, PutAccessControlProfile(_))
+        .WillOnce(Invoke([](const DistributedDeviceProfile::AccessControlProfile &profile) {
+            JsonObject out(profile.GetExtraData());
+            EXPECT_FALSE(out.IsDiscarded());
+            EXPECT_FALSE(out.Contains(ACL_LIFE_CYCLE_DAYS));
+            return DM_OK;
+        }));
+
+    processor->PutNonLnnAclProfile(context, access, profile, accesser, accessee, extraData);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, PutNonLnnAclProfile_Sentinel_NoAclDays, testing::ext::TestSize.Level1)
+{
+    auto context = std::make_shared<DmAuthContext>();
+    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
+    context->aclLifeCycleDays = ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED;
+
+    DmAccess access;
+    access.bindLevel = static_cast<int32_t>(APP);
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    JsonObject extraData;
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+
+    EXPECT_CALL(*g_dpClientMock, PutAccessControlProfile(_))
+        .WillOnce(Invoke([](const DistributedDeviceProfile::AccessControlProfile &profile) {
+            JsonObject out(profile.GetExtraData());
+            EXPECT_FALSE(out.IsDiscarded());
+            EXPECT_FALSE(out.Contains(ACL_LIFE_CYCLE_DAYS));
+            return DM_OK;
+        }));
+
+    processor->PutNonLnnAclProfile(context, access, profile, accesser, accessee, extraData);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, PutServiceAccessControlList_Proxy_WritesAclDays, testing::ext::TestSize.Level1)
+{
+    auto context = std::make_shared<DmAuthContext>();
+    context->IsProxyBind = true;
+    context->direction = DM_AUTH_SOURCE;
+    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
+    context->aclLifeCycleDays = 1095;
+    context->accesser.deviceId = "accesserDeviceId";
+    context->accesser.userId = 100;
+    context->accessee.deviceId = "accesseeDeviceId";
+    context->accessee.userId = 100;
+    context->accessee.tokenId = 200;
+    DmProxyAuthContext proxyApp;
+    proxyApp.proxyAccesser.isAuthed = false;
+    proxyApp.proxyAccesser.tokenId = 100;
+    proxyApp.proxyAccesser.bindLevel = static_cast<int32_t>(APP);
+    proxyApp.proxyAccessee.serviceId = 1;
+    context->subjectServiceOnes.push_back(proxyApp);
+
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+
+    EXPECT_CALL(*g_dpClientMock, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoByUdidAndServiceId(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*g_dpClientMock, PutAccessControlProfile(_))
+        .WillOnce(Invoke([](const DistributedDeviceProfile::AccessControlProfile &profile) {
+            JsonObject out(profile.GetExtraData());
+            EXPECT_FALSE(out.IsDiscarded());
+            EXPECT_TRUE(out.Contains(ACL_LIFE_CYCLE_DAYS));
+            EXPECT_EQ(out[ACL_LIFE_CYCLE_DAYS].Get<int32_t>(), 1095);
+            EXPECT_FALSE(profile.GetAccesser().GetAccesserExtraData().find(ACL_LIFE_CYCLE_DAYS) != std::string::npos);
+            EXPECT_FALSE(profile.GetAccessee().GetAccesseeExtraData().find(ACL_LIFE_CYCLE_DAYS) != std::string::npos);
+            return DM_OK;
+        }));
+
+    EXPECT_EQ(processor->PutServiceAccessControlList(context, profile, accesser, accessee), DM_OK);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, PutProxyAccessControlList_Proxy_WritesAclDays, testing::ext::TestSize.Level1)
+{
+    auto context = std::make_shared<DmAuthContext>();
+    context->IsProxyBind = true;
+    context->direction = DM_AUTH_SOURCE;
+    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
+    context->aclLifeCycleDays = 1095;
+    DmProxyAuthContext proxyApp;
+    proxyApp.proxyAccesser.isAuthed = false;
+    proxyApp.proxyAccesser.tokenId = 100;
+    proxyApp.proxyAccesser.bindLevel = static_cast<int32_t>(APP);
+    context->subjectProxyOnes.push_back(proxyApp);
+
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+
+    EXPECT_CALL(*g_dpClientMock, PutAccessControlProfile(_))
+        .WillOnce(Invoke([](const DistributedDeviceProfile::AccessControlProfile &profile) {
+            JsonObject out(profile.GetExtraData());
+            EXPECT_FALSE(out.IsDiscarded());
+            EXPECT_TRUE(out.Contains(ACL_LIFE_CYCLE_DAYS));
+            EXPECT_EQ(out[ACL_LIFE_CYCLE_DAYS].Get<int32_t>(), 1095);
+            EXPECT_FALSE(profile.GetAccesser().GetAccesserExtraData().find(ACL_LIFE_CYCLE_DAYS) != std::string::npos);
+            EXPECT_FALSE(profile.GetAccessee().GetAccesseeExtraData().find(ACL_LIFE_CYCLE_DAYS) != std::string::npos);
+            return DM_OK;
+        }));
+
+    EXPECT_EQ(processor->PutProxyAccessControlList(context, profile, accesser, accessee), DM_OK);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, PutDeviceControlList_Days_WritesAclExtraData, testing::ext::TestSize.Level1)
+{
+    auto context = std::make_shared<DmAuthContext>();
+    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
+    context->aclLifeCycleDays = 1095;
+    context->direction = DM_AUTH_SOURCE;
+    context->IsProxyBind = false;
+    context->accesser.extraInfo = R"({"dmVersion":"5.1.5"})";
+    context->accessee.extraInfo = R"({"dmVersion":"5.1.5"})";
+
+    DmAccess access;
+    access.bindLevel = static_cast<int32_t>(APP);
+    access.transmitBindType = DM_IDENTICAL_ACCOUNT;
+    access.isPutLnnAcl = false;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+
+    EXPECT_CALL(*g_dpClientMock, PutAccessControlProfile(_))
+        .WillOnce(Invoke([](const DistributedDeviceProfile::AccessControlProfile &profile) {
+            JsonObject out(profile.GetExtraData());
+            EXPECT_FALSE(out.IsDiscarded());
+            EXPECT_TRUE(out.Contains(ACL_LIFE_CYCLE_DAYS));
+            EXPECT_EQ(out[ACL_LIFE_CYCLE_DAYS].Get<int32_t>(), 1095);
+            EXPECT_FALSE(profile.GetAccesser().GetAccesserExtraData().find(ACL_LIFE_CYCLE_DAYS) != std::string::npos);
+            EXPECT_FALSE(profile.GetAccessee().GetAccesseeExtraData().find(ACL_LIFE_CYCLE_DAYS) != std::string::npos);
+            return DM_OK;
+        }));
+
+    EXPECT_EQ(processor->PutDeviceControlList(context, accesser, accessee, profile, access), DM_OK);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, PutDeviceControlList_NotAlways_NoAclDays, testing::ext::TestSize.Level1)
+{
+    auto context = std::make_shared<DmAuthContext>();
+    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH;
+    context->aclLifeCycleDays = 730;
+    context->direction = DM_AUTH_SOURCE;
+    context->IsProxyBind = false;
+
+    DmAccess access;
+    access.bindLevel = static_cast<int32_t>(APP);
+    access.transmitBindType = DM_IDENTICAL_ACCOUNT;
+    access.isPutLnnAcl = false;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+
+    EXPECT_CALL(*g_dpClientMock, PutAccessControlProfile(_))
+        .WillOnce(Invoke([](const DistributedDeviceProfile::AccessControlProfile &profile) {
+            JsonObject out(profile.GetExtraData());
+            EXPECT_FALSE(out.IsDiscarded());
+            EXPECT_FALSE(out.Contains(ACL_LIFE_CYCLE_DAYS));
+            return DM_OK;
+        }));
+
+    EXPECT_EQ(processor->PutDeviceControlList(context, accesser, accessee, profile, access), DM_OK);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, PutDeviceControlList_Sentinel_NoAclDays, testing::ext::TestSize.Level1)
+{
+    auto context = std::make_shared<DmAuthContext>();
+    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
+    context->aclLifeCycleDays = ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED;
+    context->direction = DM_AUTH_SOURCE;
+    context->IsProxyBind = false;
+
+    DmAccess access;
+    access.bindLevel = static_cast<int32_t>(APP);
+    access.transmitBindType = DM_IDENTICAL_ACCOUNT;
+    access.isPutLnnAcl = false;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+
+    EXPECT_CALL(*g_dpClientMock, PutAccessControlProfile(_))
+        .WillOnce(Invoke([](const DistributedDeviceProfile::AccessControlProfile &profile) {
+            JsonObject out(profile.GetExtraData());
+            EXPECT_FALSE(out.IsDiscarded());
+            EXPECT_FALSE(out.Contains(ACL_LIFE_CYCLE_DAYS));
+            return DM_OK;
+        }));
+
+    EXPECT_EQ(processor->PutDeviceControlList(context, accesser, accessee, profile, access), DM_OK);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

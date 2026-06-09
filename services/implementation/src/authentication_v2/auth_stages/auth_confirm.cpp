@@ -1284,6 +1284,24 @@ void AuthSinkConfirmState::ReadServiceInfo(std::shared_ptr<DmAuthContext> contex
     }
 }
 // LCOV_EXCL_START
+namespace {
+int32_t ExtractAclLifeCycleDays(const std::string &extraInfo)
+{
+    if (extraInfo.empty()) {
+        return ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED;
+    }
+    JsonObject obj(extraInfo);
+    if (obj.IsDiscarded() || !obj.Contains(ACL_LIFE_CYCLE_DAYS) || !obj[ACL_LIFE_CYCLE_DAYS].IsNumberInteger()) {
+        return ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED;
+    }
+    int32_t days = obj[ACL_LIFE_CYCLE_DAYS].Get<int32_t>();
+    if (days < ACL_LIFE_CYCLE_DAYS_MIN || days > ACL_LIFE_CYCLE_DAYS_MAX) {
+        return ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED;
+    }
+    return days;
+}
+} // namespace
+
 void AuthSinkConfirmState::ProcessImportAuthInfo(std::shared_ptr<DmAuthContext> context,
     const OHOS::DistributedDeviceProfile::LocalServiceInfo &srvInfo)
 {
@@ -1317,6 +1335,7 @@ void AuthSinkConfirmState::ProcessImportAuthInfo(std::shared_ptr<DmAuthContext> 
     }
     context->customData = srvInfo.GetDescription(); // read customData
     context->srvExtarInfo = srvInfo.GetExtraInfo();
+    context->aclLifeCycleDays = ExtractAclLifeCycleDays(srvExtraInfo);
 }
 // LCOV_EXCL_STOP
 int32_t AuthSinkConfirmState::Action(std::shared_ptr<DmAuthContext> context)
