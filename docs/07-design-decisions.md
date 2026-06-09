@@ -463,7 +463,7 @@ if (device_manager_common) {
 - ❌ 需同时维护两套等价行为路径
 - ❌ 新增代码必须主动判断"是否涉及闭源资源"，遗漏会导致开源版编译失败或运行时挂死
 
-**详细机制**：见 [docs/10-opensource-closedsource-isolation.md](10-opensource-closedsource-isolation.md)，覆盖：
+**详细机制**：见 [docs/09-opensource-closedsource-isolation.md](09-opensource-closedsource-isolation.md)，覆盖：
 - 所有 `DEVICE_MANAGER_COMMON_FLAG` 使用点的完整清单
 - `ExportAuthInfo`/`ImportAuthInfo` 两段式执行与 IPC stub 不回传 `DmAuthInfo` 的关键约束
 - 新增代码时的判断规则

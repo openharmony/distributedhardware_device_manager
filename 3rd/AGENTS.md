@@ -16,7 +16,7 @@
 | 改 3rd 服务实现 | 主栈 `services/` 对应文件 + `docs/05-interfaces/02-internal-api.md` |
 | 改绑定/解绑共享语义 | `docs/04-workflows/07-bind-unbind.md` |
 | 改导入 PIN / 代理绑定语义 | `docs/04-workflows/08-import-pin-no-popup-bind.md` |
-| 改开源/闭源差异处理 | `docs/10-opensource-closedsource-isolation.md` |
+| 改开源/闭源差异处理 | `docs/09-opensource-closedsource-isolation.md` |
 
 ## 约束
 

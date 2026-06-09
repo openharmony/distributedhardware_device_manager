@@ -28,7 +28,7 @@
 | 发布发现查询 / 监听 / 信任 / 用户 / 权限 / 上下线 | `docs/04-workflows/01-*` 至 `06-*` |
 | 绑定解绑 / Import PIN 免弹窗绑定 | `docs/04-workflows/07-bind-unbind.md`、`docs/04-workflows/08-import-pin-no-popup-bind.md` |
 | 对外/内部/依赖/DP 接口 | `docs/05-interfaces/01-*` 至 `04-*` |
-| 调试 / 架构决策 / FAQ / 开闭源隔离 / 构建测试 | `docs/06-debugging.md`、`docs/07-design-decisions.md`、`docs/08-faq.md`、`docs/10-opensource-closedsource-isolation.md`、`docs/11-build-test-verify.md` |
+| 调试 / 架构决策 / FAQ / 开闭源隔离 / 构建测试 | `docs/06-debugging.md`、`docs/07-design-decisions.md`、`docs/08-faq.md`、`docs/09-opensource-closedsource-isolation.md`、`docs/10-build-test-verify.md` |
 
 | 任务类型或术语 | 先看 / 红线 |
 |---|---|
@@ -59,7 +59,7 @@
 
 ## 6. 构建、测试与 PR
 
-- 构建、测试、minimum checks 详见 `docs/11-build-test-verify.md`；构建命令在 OpenHarmony 源码根目录执行，本仓没有 npm、cargo、Makefile。
+- 构建、测试、minimum checks 详见 `docs/10-build-test-verify.md`；构建命令在 OpenHarmony 源码根目录执行，本仓没有 npm、cargo、Makefile。
 - C++ 改动至少编译受影响顶层 target：`device_manager` / `device_manager_fwk` / `device_manager_test`；测试改动必须跑改动 UT。
 - 无法运行验证时，最终回复必须说明原因和风险。
 - 默认 remote 是 `gitcode`（`.gitcode/oh-gc-config.json`）；PR 模板在 `.gitee/PULL_REQUEST_TEMPLATE.zh-CN.md`。
