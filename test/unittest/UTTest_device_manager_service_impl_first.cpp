@@ -1222,7 +1222,8 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_Malformed_Returns
     EXPECT_EQ(deviceManagerServiceImpl_->GetAclAllowSeconds(profile), 365LL * SECONDS_PER_DAY);
 }
 
-HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_NegativeNonSentinel_ReturnsDefault, testing::ext::TestSize.Level1)
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_NegativeNonSentinel_ReturnsDefault,
+    testing::ext::TestSize.Level1)
 {
     DistributedDeviceProfile::AccessControlProfile profile;
     profile.SetExtraData(R"({"ACL_LIFE_CYCLE_DAYS":-2})");
@@ -1243,7 +1244,8 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_MaxDays_ReturnsSc
     EXPECT_EQ(deviceManagerServiceImpl_->GetAclAllowSeconds(profile), 3650LL * SECONDS_PER_DAY);
 }
 
-HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_SentinelValue_ReturnsDefault, testing::ext::TestSize.Level1)
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetAclAllowSeconds_SentinelValue_ReturnsDefault,
+    testing::ext::TestSize.Level1)
 {
     DistributedDeviceProfile::AccessControlProfile profile;
     profile.SetExtraData(R"({"ACL_LIFE_CYCLE_DAYS":-1})");
