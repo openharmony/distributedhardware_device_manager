@@ -1613,12 +1613,6 @@ hdc shell "killall hichain"
 - 《OpenHarmony HiLog 使用指南》
 - 《OpenHarmony HiSysEvent 开发指南》
 
-### 10.3 联系方式
-
-如有问题或建议，请联系：
-- 邮件列表：devicemanager@opensource.huawei.com
-- Issue 跟踪：https://gitee.com/openharmony/distributedhardware_device_manager/issues
-
 ---
 
 **文档结束**
