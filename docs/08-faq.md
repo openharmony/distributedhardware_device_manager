@@ -605,5 +605,3 @@ hilog -T HiChain | grep -i "group"
 ### 获取帮助
 - 查阅 API 文档
 - 查看源码注释
-- 提交 Issue 到代码仓库
-- 联系技术支持
