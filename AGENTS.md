@@ -28,7 +28,7 @@
 | 发布发现查询 / 监听 / 信任 / 用户 / 权限 / 上下线 | `docs/04-workflows/01-*` 至 `06-*` |
 | 绑定解绑 / Import PIN 免弹窗绑定 | `docs/04-workflows/07-bind-unbind.md`、`docs/04-workflows/08-import-pin-no-popup-bind.md` |
 | 对外/内部/依赖/DP 接口 | `docs/05-interfaces/01-*` 至 `04-*` |
-| 调试 / 架构决策 / FAQ / 路线 / 开闭源隔离 / 构建测试 | `docs/06-debugging.md` 至 `docs/11-build-test-verify.md` |
+| 调试 / 架构决策 / FAQ / 开闭源隔离 / 构建测试 | `docs/06-debugging.md`、`docs/07-design-decisions.md`、`docs/08-faq.md`、`docs/10-opensource-closedsource-isolation.md`、`docs/11-build-test-verify.md` |
 
 | 任务类型或术语 | 先看 / 红线 |
 |---|---|
