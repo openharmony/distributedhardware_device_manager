@@ -373,6 +373,8 @@ int32_t ShiftLNNGear(bool isWakeUp, const std::string &callerId);
 
 ## 4. DM → DP 接口
 
+> **调用方权限白名单**：DP 服务端对绝大多数下列接口都按调用方进程名做精确白名单校验（典型放行 `device_manager` / `softbus_server`，少数接口额外放行 `iShare`），未命中即拒绝。完整白名单清单、板上 ACL/ServiceInfo/SessionKey RDB 文件位置、以及自动化测试如何绕开权限拉数据库本地解析，集中收录在 [DP 权限白名单与板上数据库位置](04-dp-permission-and-storage.md)。
+
 ### 4.1 PutAccessControlProfile
 
 **功能**: 存储访问控制配置（ACL），建立设备间信任关系

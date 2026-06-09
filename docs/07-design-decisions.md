@@ -411,6 +411,65 @@ const char* PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT = "isCallingProxyAsSubject";
 
 ---
 
+## ADR-009: 开源/闭源版本编译宏隔离
+
+### 元信息
+- **日期**: 2024（`device_manager_common` 引入）
+- **状态**: 现行策略
+
+### 背景
+- **问题**: 同一份 DM 源码需同时支持开源版本（如 RK3568 标准镜像）和闭源版本（含 vendor `distributed_hardware_adapter` 组件 + `libdevicemanagerresident.z.so`），两者能力差异大
+- **驱动因素**:
+  - 闭源版有 vendor 私有的单/双设备兼容适配、服务注册/发现扩展、设备图标等能力
+  - 开源版没有 `libdevicemanagerresident.z.so`，调用相关接口会失败
+  - 不能强制开源用户分发闭源 so，也不能在源码里 fork 两份维护
+- **技术约束**:
+  - 构建系统是 GN，可在 `defined(global_parts_info.<component>)` 上做条件
+  - 同一份 .cpp/.h 需在两种产品形态下都能编译通过
+
+### 决策
+引入 GN 变量 `device_manager_common` 与编译宏 `DEVICE_MANAGER_COMMON_FLAG`，配套使用：
+
+```gni
+# device_manager.gni
+if (defined(global_parts_info) &&
+    defined(global_parts_info.distributedhardware_distributed_hardware_adapter)) {
+  device_manager_common = false   # 闭源
+} else {
+  device_manager_common = true    # 开源
+}
+```
+
+```gni
+# services/service/BUILD.gn / services/implementation/BUILD.gn
+if (device_manager_common) {
+  defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
+}
+```
+
+**约定**：
+- 宏存在 = 开源版本（跳过闭源专属代码、提供开源 fallback）
+- 宏不存在 = 闭源版本（含 vendor adapter resident so）
+
+### 影响
+
+**正面影响**：
+- ✅ 同一份代码支持两种产品形态
+- ✅ 开源用户拿到的源码在 RK3568 等标准镜像上可直接编译运行
+- ✅ 闭源 vendor 能力不向开源用户暴露
+
+**负面影响**：
+- ❌ 增加代码可读性负担（多处 `#ifdef`/`#ifndef`）
+- ❌ 需同时维护两套等价行为路径
+- ❌ 新增代码必须主动判断"是否涉及闭源资源"，遗漏会导致开源版编译失败或运行时挂死
+
+**详细机制**：见 [docs/10-opensource-closedsource-isolation.md](10-opensource-closedsource-isolation.md)，覆盖：
+- 所有 `DEVICE_MANAGER_COMMON_FLAG` 使用点的完整清单
+- `ExportAuthInfo`/`ImportAuthInfo` 两段式执行与 IPC stub 不回传 `DmAuthInfo` 的关键约束
+- 新增代码时的判断规则
+
+---
+
 ## 总结
 
 | ADR | 决策要点 | 关键权衡 |
@@ -423,9 +482,11 @@ const char* PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT = "isCallingProxyAsSubject";
 | ADR-006 | 认证超时分级设计 | 快速失败 vs 容错性 |
 | ADR-007 | PIN 码超时机制 | 安全性 vs 用户体验 |
 | ADR-008 | 代理认证支持 | 权限灵活性 vs 安全复杂度 |
+| ADR-009 | 开源/闭源版本编译宏隔离 | 源码统一 vs 可读性 |
 
 **设计原则总结**：
 1. **向后兼容**: v1/v2 并存保证平滑升级
 2. **扩展优先**: 插件化架构支持未来演进
 3. **安全平衡**: 在安全性和体验间寻找平衡点
 4. **状态精确**: 双层模型准确反映设备状态
+5. **源码统一**: 通过编译宏在同一份源码中兼顾开源与闭源两种产品形态

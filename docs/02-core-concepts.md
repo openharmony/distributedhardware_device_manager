@@ -359,6 +359,48 @@ ACL (Access Control List) 是 DeviceManager 实现跨设备访问控制的核心
 - **Accessee (被访问者)**: 提供服务的设备/应用
   - 包含信息: `accountId`, `networkId`, `peerId`, `pkgName`, `userId`, `tokenId`
 
+### 7.2.1 字段归属约束（关系属性 vs 实体属性）
+
+DP 持久化模型里三张表语义严格分层，**不可混用**：
+
+| 表 | 语义 | extraData 该装什么 |
+|---|---|---|
+| `access_control_table` (`AccessControlProfile`) | **一条可信关系**本身 | **关系级属性**：`ACL_LIFE_CYCLE_DAYS` (关系生命周期天数)、`IsLnnAcl` (关系是否 LNN 内置)、`serviceId` (关系绑定的服务标识)、关系级 flag |
+| `accesser_table` (`Accesser`) | 关系**主体侧实体**身份补充 | **实体级身份信息**：`dmVersion`（实体所在设备的 DM 版本号）等 |
+| `accessee_table` (`Accessee`) | 关系**客体侧实体**身份补充 | 同上，仅装实体自身信息 |
+
+**判定规则**（一句话）：如果删除/修改这个值会改变"两实体之间这条信任关系的属性"，就属于关系级，落 `AccessControlProfile.extraData`；如果只改变某一侧实体本身的描述（如版本号、设备型号），才落 `accesser/accessee` 的 extraData。
+
+**反例（曾出现，已修正）**：把 `ACL_LIFE_CYCLE_DAYS` 写到 `accessee.extraData`。错误原因——生命周期是"这条关系到期日"，不是"客体设备的属性"。同一客体设备可与同一主体建立多条不同 bindType 的 ACL，每条 ACL 的生命周期独立；如果挂在 `accessee`，多条 ACL 共用一份 `accessee` 行时会相互覆盖。
+
+**典型字段归属对照**：
+
+| 字段 | 归属 | 理由 |
+|---|---|---|
+| `ACL_LIFE_CYCLE_DAYS` | `AccessControlProfile.extraData` | 关系到期天数 |
+| `IsLnnAcl` | `AccessControlProfile.extraData` | 关系类型 flag |
+| `serviceId` | `AccessControlProfile.extraData` | 关系所属服务 |
+| `bindType` / `bindLevel` / `authenticationType` / `status` | `AccessControlProfile` 顶层字段（**有专列**） | 关系核心列 |
+| `dmVersion` | `accesser/accessee.extraData` | 实体所在设备 DM 版本 |
+| `accesseeCredentialIdStr` / `accesseeSessionKeyId` | `Accessee` 顶层字段（**有专列**） | 实体的凭证/会话密钥 |
+
+**写入侧契约**：写 ACL 时按下面分支调用：
+
+```cpp
+// 关系级：进 ACL extraData
+JsonObject aclExtra;
+aclExtra[ACL_IS_LNN_ACL_KEY] = ACL_IS_LNN_ACL_VAL_FALSE;
+aclExtra[TAG_SERVICE_ID] = access.serviceId;
+aclExtra[ACL_LIFE_CYCLE_DAYS] = context->aclLifeCycleDays;  // 关系生命周期
+profile.SetExtraData(aclExtra.Dump());
+
+// 实体级：进 accesser/accessee extraData（仅装实体身份补充）
+accesser.SetAccesserExtraData(context->accesser.extraInfo);   // 含 dmVersion
+accessee.SetAccesseeExtraData(context->accessee.extraInfo);   // 含 dmVersion
+```
+
+**读取侧契约**：消费关系级属性必须从 `profile.GetExtraData()` 读，不允许从 `accesser/accessee.extraData` 读关系级字段。
+
 ### 7.3 ACL 全生命周期
 
 #### 阶段 1: Active (活动状态)

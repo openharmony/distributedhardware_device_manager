@@ -165,6 +165,50 @@ public:
 - 权限不足
 - 介质不支持（如无蓝牙硬件时指定 BLE）
 
+### 3.5 系统自动发布机制（亮屏 + WiFi/蓝牙开启时才发布）
+
+除业务侧主动调 `PublishDeviceDiscovery` 外，DM 自身会**根据系统状态自动发布**，让本机对周边其他 DM 设备可见（用于绑定/认证发起方扫描）。该机制不依赖任何上层调用。
+
+**触发入口**：`services/service/src/softbus/softbus_publish.cpp::PublishCommonEventCallback(bluetoothState, wifiState, screenState)`
+
+由 `DeviceManagerService` 注册的 CommonEvent 订阅者（蓝牙开关、WiFi 开关、屏幕亮灭事件）回调进入，每次状态变化都重算一次"是否应该发布"。
+
+**判定规则**（按代码顺序）：
+
+| 条件组合 | 行为 |
+|---|---|
+| 设备类型是 `DEVICE_TYPE_WATCH` 或 `DEVICE_TYPE_GLASSES` | **不发布**（穿戴设备豁免）|
+| `screenState == DM_SCREEN_OFF`（熄屏）| **停止发布** → 立即返回 |
+| `screenState == DM_SCREEN_ON` && 蓝牙开关 `STATE_TURN_ON`（且 `SUPPORT_BLUETOOTH` 编译开关打开）| 先 Stop 再 `PublishSoftbusLNN()` |
+| `screenState == DM_SCREEN_ON` && WiFi 开关 `WifiState::ENABLED`（且 `SUPPORT_WIFI` 编译开关打开）| 先 Stop 再 `PublishSoftbusLNN()` |
+| 亮屏但 WiFi 和蓝牙都关 | **停止发布** |
+
+**关键不变式**：
+
+- **熄屏一律停发布**：无论 WiFi/蓝牙开关如何，熄屏立即 `StopPublishSoftbusLNN`
+- **亮屏 + WiFi 或蓝牙至少一个 ON 才发布**：两条件 AND
+- **WATCH / GLASSES 豁免**：穿戴设备从不自动发布（节能 + 安全）
+- **publish 前必先 Stop**：避免重复发布相同 `publishId`（`DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID`）
+- 任何一个事件（蓝牙/WiFi/屏幕）状态变化都会重跑判定，**不需要业务感知**
+
+**调用方**：`device_manager_service.cpp` 中 `PublishCommonEventCallback` 被两处调用：
+- L304：CommonEvent 回调 lambda（蓝牙/WiFi/屏幕状态切换时）
+- L405：屏幕亮灭事件回调（结合 `PowerMgr` 查询当前屏幕状态后触发）
+
+**编译开关依赖**：
+- `SUPPORT_BLUETOOTH`：守住蓝牙分支
+- `SUPPORT_WIFI`：守住 WiFi 分支
+- `SUPPORT_POWER_MANAGER`：守住屏幕状态查询（不存在时按 `DM_SCREEN_OFF` 兜底→不发布）
+
+**调试速查**：
+
+| 现象 | 排查 |
+|---|---|
+| 对端 source 设备调 `StartDiscovering` 找不到本机 sink | 1) 板子是否亮屏（自动测试要保持亮屏或注入 `SCREEN_ON` 事件）2) WiFi/蓝牙至少开一个 3) 本机设备类型不是 WATCH/GLASSES |
+| 自动化测试在板上跑端到端 bind，sink 不可见 | 板子在自动化场景常常熄屏 → 自动发布被停掉；需保持亮屏或业务侧改用 `PublishDeviceDiscovery` 主动发布 |
+| hilog 看到 `bluetooth publish successed` / `wifi publish successed` | 自动发布已生效 |
+| hilog 看到 `deviceType: X, not publish` | 设备类型在豁免名单（WATCH=6 / GLASSES=10） |
+
 ---
 
 ## 4. 设备发现流程
