@@ -3,18 +3,7 @@
 > 本 AGENTS.md 适用于全仓；子目录如有更近的 AGENTS.md，以子规则优先。
 > 子规则：`3rd/AGENTS.md`、`ext/pin_auth/AGENTS.md`、`services/implementation/AGENTS.md`。
 
-## 1. 任务进入前必须声明
-
-在 plan / brainstorming / TodoWrite 阶段显式写出：
-
-1. **任务分类**：命中 §3 哪类任务。
-2. **已读文档/路径**：命中 §2/§3 哪些 docs 或代码路径。
-3. **发现的约束**：命中 §4 哪些 invariant / Do not / Ask before。
-4. **是否需要 skill**：如 `openharmony-build`、`quick-pr`、`openspec-*`、调试/评审类 skill。
-
-缺少上述声明的 plan 视为未尽职。
-
-## 2. 代码地图
+## 1. 代码地图
 
 本仓对应 OpenHarmony `foundation/distributedhardware/device_manager`，子系统 `distributedhardware`。
 
@@ -40,7 +29,6 @@
 | 绑定解绑 / Import PIN 免弹窗绑定 | `docs/04-workflows/07-bind-unbind.md`、`docs/04-workflows/08-import-pin-no-popup-bind.md` |
 | 对外/内部/依赖/DP 接口 | `docs/05-interfaces/01-*` 至 `04-*` |
 | 调试 / 架构决策 / FAQ / 路线 / 开闭源隔离 / 构建测试 | `docs/06-debugging.md` 至 `docs/11-build-test-verify.md` |
-| issue-2445 ACL 生命周期 E2E | `.codespec/changes/issue-2445-acl-life-cycle-days/design.md` |
 
 | 任务类型或术语 | 先看 / 红线 |
 |---|---|
@@ -76,3 +64,4 @@
 - 无法运行验证时，最终回复必须说明原因和风险。
 - 默认 remote 是 `gitcode`（`.gitcode/oh-gc-config.json`）；PR 模板在 `.gitee/PULL_REQUEST_TEMPLATE.zh-CN.md`。
 - PR 必须填写安全自检、TDD 结果、XTS 结果；涉及 IPC、SDK 头、`bundle.json`、SA、权限、hisysevent 的改动需特别说明。
+- 新增需求需要符合 codespec 规范，通过 AI 工具生成符合 SDD 流程的设计文档，归档到 `.codespec/changes` 目录下，使用 `issue-{issue No.}-{issue description}` 命名归档文件夹，内容包括：`proposal.md`、`spec.md`、`design.md` 以及 `execution-plan.md`，有条件的使用 AI 根据需求设计生成功能验证 demo，自动验证，并输出 `REPORT.md` 报告。
