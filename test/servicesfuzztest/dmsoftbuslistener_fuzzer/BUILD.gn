@@ -58,7 +58,7 @@ ohos_fuzztest("DmSoftbusListenerFuzzTest") {
   sources = [ "dm_softbus_listener_fuzzer.cpp" ]
 
   deps = [
-    "${devicemanager_path}/services/service:devicemanagerservicetest",
+    "${devicemanager_path}/services/service:devicemanagerservice",
     "${json_path}:devicemanagerjson",
     "${utils_path}:devicemanagerutilstest",
   ]

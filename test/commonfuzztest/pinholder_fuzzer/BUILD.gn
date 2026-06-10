@@ -65,7 +65,7 @@ ohos_fuzztest("PinHolderFuzzTest") {
   deps = [
     "${ext_path}/pin_auth:devicemanagerext_pin_auth",
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${services_path}:devicemanagerservicetest",
+    "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${utils_path}:devicemanagerutilstest",
   ]

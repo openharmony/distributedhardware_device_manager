@@ -67,7 +67,6 @@ if (defined(ohos_lite)) {
       deps += [
         "commondependency:devicemanagerdependencytest",
         "radar:devicemanagerradartest",
-        "services/service:devicemanagerservicetest",
         "utils:devicemanagerutilstest",
       ]
     }

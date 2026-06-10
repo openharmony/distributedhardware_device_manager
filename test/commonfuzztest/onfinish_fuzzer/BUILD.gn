@@ -44,7 +44,7 @@ ohos_fuzztest("OnFinishFuzzTest") {
   sources = [ "on_finish_fuzzer.cpp" ]
 
   deps = [
-    "${services_path}:devicemanagerservicetest",
+    "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${utils_path}:devicemanagerutilstest",
   ]

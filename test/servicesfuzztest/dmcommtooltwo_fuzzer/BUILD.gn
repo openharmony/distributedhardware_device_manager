@@ -62,7 +62,7 @@ ohos_fuzztest("DmCommToolTwoFuzzTest") {
 
   deps = [
     "${json_path}:devicemanagerjson",
-    "${devicemanager_path}/services/service:devicemanagerservicetest",
+    "${devicemanager_path}/services/service:devicemanagerservice",
     "${utils_path}:devicemanagerutilstest",
   ]
 

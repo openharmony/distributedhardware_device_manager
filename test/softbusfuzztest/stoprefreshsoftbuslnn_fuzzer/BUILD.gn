@@ -42,7 +42,7 @@ ohos_fuzztest("StopRefreshSoftbusLnnFuzzTest") {
 
   deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${services_path}:devicemanagerservicetest",
+    "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
   ]
 

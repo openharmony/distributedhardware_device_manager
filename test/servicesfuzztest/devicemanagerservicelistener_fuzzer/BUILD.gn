@@ -57,7 +57,7 @@ ohos_fuzztest("DeviceManagerServiceListenerFuzzTest") {
   sources = [ "device_manager_service_listener_fuzzer.cpp" ]
 
   deps = [
-    "${devicemanager_path}/services/service:devicemanagerservicetest",
+    "${devicemanager_path}/services/service:devicemanagerservice",
     "${utils_path}:devicemanagerutilstest",
   ]
 
