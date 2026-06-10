@@ -4,10 +4,10 @@
 
 | 触发条件 | 先读 |
 |---|---|
-| 架构、术语、数据结构、ABI、公开出口、JSON 约束 | `docs/01-core-rules.md` |
-| 发布、发现、绑定、解绑、Import PIN、权限 | `docs/02-workflows.md` |
-| DP / ACL 持久化、推包、板端、WSL、调试验证 | `docs/03-verification.md` |
-| 构建、测试、minimum checks、完成定义 | `docs/04-build-test.md` |
+| 敏感设备标识、ACL 关系属性、JSON / C++ 约束、ABI / 公开出口、协议角色边界 | `docs/01-core-rules.md` |
+| 发布发现、绑定解绑、Import PIN 免弹框绑定、权限白名单 / 黑名单 / 系统应用判断 | `docs/02-workflows.md` |
+| DP / ACL 持久化验证、ACL 环境清理、推包验证、WSL / 双板、云端镜像 / 凭据 | `docs/03-verification.md` |
+| 构建入口、minimum checks、完成定义、无法验证时的说明 | `docs/04-build-test.md` |
 
 | 任务类型或术语 | 先读 |
 |---|---|
