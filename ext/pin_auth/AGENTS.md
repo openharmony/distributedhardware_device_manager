@@ -16,8 +16,6 @@
 - PIN 值禁止明文打印、落 hisysevent、写 PR 描述或测试日志。
 - 不改变可插拔模块加载约定，除非同步评估 `ext:ext_modules` 和构建依赖。
 - 不绕过服务侧权限和认证状态机直接建立可信关系。
-- JSON 解析必须使用 `json/json_object.h`，先判断 `IsDiscarded`。
-- 不使用 `std::stoi`、try-catch 或依赖异常的控制流。
 - 不为调试写死 PIN、超时、重试次数或 feature flag。
 
 ## 3. 验证
