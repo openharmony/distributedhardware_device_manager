@@ -33,4 +33,4 @@
 ## 3. 构建、测试与 PR
 
 - 构建、测试、minimum checks 详见 `docs/04-build-test.md`。
-- PR 必须填写安全自检、TDD 结果、XTS 结果；涉及 IPC、SDK 头、`bundle.json`、SA、权限、hisysevent 的改动需特别说明。
+- PR 必须填写安全自检、TDD 结果、XTS 结果；涉及 IPC、SDK 头、`bundle.json`、SA、权限、hisysevent 的改动需要在文档中说明。
