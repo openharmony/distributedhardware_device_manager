@@ -202,6 +202,7 @@ public:
         const DmServiceInfo &serviceInfo) = 0;
     virtual void OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
         int32_t result, const std::string &content) = 0;
+    virtual bool CheckIsOnlineAdapter(const std::string &peerUdid) = 0;
 #endif
 };
 } // namespace DistributedHardware

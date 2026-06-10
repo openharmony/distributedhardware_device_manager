@@ -1497,6 +1497,11 @@ void DeviceManagerServiceListener::OnServiceStateOnlineResult(const ServiceState
     DeviceManagerService::GetInstance().BindServiceOnline(bindParam);
     LOGI("success.");
 }
+
+bool DeviceManagerServiceListener::CheckIsOnlineAdapter(const std::string &peerUdid)
+{
+    return SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(peerUdid);
+}
 #endif
 //LCOV_EXCL_STOP
 } // namespace DistributedHardware
