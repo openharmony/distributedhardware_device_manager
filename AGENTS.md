@@ -16,11 +16,10 @@
 
 | 触发条件 | 先读 |
 |---|---|
-| 架构、术语、数据结构 | `docs/01-architecture.md`、`docs/02-core-concepts.md`、`docs/03-data-structures.md` |
-| 发布、发现、查询、监听、信任、用户、权限、上下线 | `docs/04-workflows/01-*` 至 `06-*` |
-| 绑定、解绑、Import PIN 免弹窗绑定 | `docs/04-workflows/07-bind-unbind.md`、`docs/04-workflows/08-import-pin-no-popup-bind.md` |
-| 对外、内部、依赖、DP 接口 | `docs/05-interfaces/01-*` 至 `04-*` |
-| 调试、架构决策、FAQ、开闭源隔离、构建测试 | `docs/06-debugging.md`、`docs/07-design-decisions.md`、`docs/08-faq.md`、`docs/09-opensource-closedsource-isolation.md`、`docs/10-build-test-verify.md` |
+| 架构、术语、数据结构、ABI、公开出口、JSON 约束 | `docs/01-core-rules.md` |
+| 发布、发现、绑定、解绑、Import PIN、权限 | `docs/02-workflows.md` |
+| DP / ACL 持久化、推包、板端、WSL、调试验证 | `docs/03-verification.md` |
+| 构建、测试、minimum checks、完成定义 | `docs/04-build-test.md` |
 
 | 任务类型或术语 | 红线 |
 |---|---|
@@ -52,7 +51,7 @@
 
 ## 5. 构建、测试与 PR
 
-- 构建、测试、minimum checks 详见 `docs/10-build-test-verify.md`；构建命令在 OpenHarmony 源码根目录执行，本仓没有 npm、cargo、Makefile。
+- 构建、测试、minimum checks 详见 `docs/04-build-test.md`；构建命令在 OpenHarmony 源码根目录执行，本仓没有 npm、cargo、Makefile。
 - C++ 改动至少编译受影响顶层 target：`device_manager` / `device_manager_fwk` / `device_manager_test`；测试改动必须跑改动 UT。
 - 无法运行验证时，最终回复必须说明原因和风险。
 - PR 必须填写安全自检、TDD 结果、XTS 结果；涉及 IPC、SDK 头、`bundle.json`、SA、权限、hisysevent 的改动需特别说明。

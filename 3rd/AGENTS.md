@@ -6,11 +6,10 @@
 
 | 触发条件 | 先读 |
 |---|---|
-| 改 3rd SDK 接口 | 主栈对应接口 + `docs/05-interfaces/01-external-api.md` |
-| 改 3rd 服务实现 | 主栈对应实现 + `docs/05-interfaces/02-internal-api.md` |
-| 改绑定、解绑、认证、生命周期语义 | `docs/04-workflows/07-bind-unbind.md` |
-| 改导入 PIN / 代理绑定语义 | `docs/04-workflows/08-import-pin-no-popup-bind.md` |
-| 改开源 / 闭源差异处理 | `docs/09-opensource-closedsource-isolation.md` |
+| 改 3rd SDK 接口 | 主栈对应接口 + `docs/01-core-rules.md` |
+| 改 3rd 服务实现 | 主栈对应实现 + `docs/01-core-rules.md` |
+| 改绑定、解绑、认证、生命周期语义 | `docs/02-workflows.md` |
+| 改导入 PIN / 代理绑定语义 | `docs/02-workflows.md` |
 
 ## 2. 红线
 
