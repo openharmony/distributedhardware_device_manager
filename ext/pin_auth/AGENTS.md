@@ -22,6 +22,5 @@
 
 ## 3. 验证
 
-- C++ 改动至少编译 `device_manager` 或受影响的 pin_auth target。
 - PIN 流程改动需要跑关联 UT；能上板时做真实 PIN 流程冒烟。
 - 验证日志时必须确认没有明文 PIN 和敏感设备标识。

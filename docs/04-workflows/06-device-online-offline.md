@@ -79,17 +79,6 @@ stateDiagram
     end note
 ```
 
-### 3.2 状态枚举
-
-```cpp
-// 定义在 interfaces/inner_kits/native_cpp/include/dm_device_info.h
-typedef enum {
-    DEVICE_STATE_ONLINE = 0,     // 设备物理在线，数据同步中
-    DEVICE_INFO_READY = 1,       // 设备就绪，数据同步完成
-    DEVICE_STATE_OFFLINE = 2,    // 设备物理离线
-    DEVICE_INFO_CHANGED = 3,     // 设备信息变更
-} DmDeviceState;
-```
 
 ### 3.3 状态转换条件
 
@@ -389,15 +378,6 @@ void DmDeviceStateManager::HandleDeviceStatusChange(
 }
 ```
 
-### 5.3 离线超时机制
-
-为了处理设备短暂离线的情况，DM 实现了 **300 秒离线超时机制**：
-
-**超时定义：**
-
-```cpp
-#define OFFLINE_TIMEOUT 300  // 300 秒
-```
 
 **超时处理流程：**
 
@@ -736,69 +716,6 @@ graph TB
 2. **场景适配**：根据应用需求选择连接类型
 3. **自动切换**：某种连接断开时自动切换到其他连接
 
-## 9. 关键代码路径
-
-### 9.1 上线关键路径
-
-```
-SoftBus::OnNodeOnline
-  → SoftbusListener::OnSoftbusDeviceOnline
-    → SoftbusListener::SoftbusEventQueueAdd
-      → SoftbusListener::SoftbusEventQueueHandle
-        → SoftbusListener::DeviceOnLine
-          → DeviceManagerService::HandleDeviceStatusChange(ONLINE)
-            → DmDeviceStateManager::HandleDeviceStatusChange
-              → DmDeviceStateManager::RegisterOffLineTimer
-              → DmDeviceStateManager::SaveOnlineDeviceInfo
-              → DmDeviceStateManager::ProcessDeviceStateChange
-                → DeviceManagerServiceListener::OnDeviceStateChange(ONLINE)
-```
-
-### 9.2 下线关键路径
-
-```
-SoftBus::OnNodeOffline
-  → SoftbusListener::OnSoftbusDeviceOffline
-    → SoftbusListener::SoftbusEventQueueAdd
-      → SoftbusListener::SoftbusEventQueueHandle
-        → SoftbusListener::DeviceOffLine
-          → DeviceManagerService::HandleDeviceStatusChange(OFFLINE)
-            → DmDeviceStateManager::HandleDeviceStatusChange
-              → DmDeviceStateManager::StartOffLineTimer
-              → DmDeviceStateManager::DeleteOfflineDeviceInfo
-              → DmDeviceStateManager::ProcessDeviceStateChange
-                → DeviceManagerServiceListener::OnDeviceStateChange(OFFLINE)
-```
-
-### 9.3 状态同步关键路径
-
-```
-DeviceProfile::OnDbReady
-  → DmDeviceStateManager::OnDbReady
-    → DeviceManagerServiceListener::OnDeviceStateChange(READY)
-      → 应用进程收到 DEVICE_INFO_READY
-```
-
-### 9.4 超时处理关键路径
-
-```
-DmTimer::Timeout (300s)
-  → DmDeviceStateManager::DeleteTimeOutGroup
-    → HiChainConnector::DeleteTimeOutGroup
-    → DeviceProfileConnector::DeleteTimeOutAcl
-    → DmDeviceStateManager::DeleteCredential
-    → DmDeviceStateManager::DeleteSkCredAndAcl
-```
-
-### 9.5 数据结构定义
-
-**设备状态枚举：** `interfaces/inner_kits/native_cpp/include/dm_device_info.h:122-136`
-
-**SoftBus 状态回调：** `services/implementation/include/dependency/softbus/softbus_state_callback.h`
-
-**设备状态管理器：** `services/implementation/include/devicestate/dm_device_state_manager.h`
-
-**SoftBus 监听器：** `services/service/include/softbus/softbus_listener.h`
 
 ## 10. 总结
 

@@ -19,40 +19,6 @@ DeviceManager (DM) 作为 OpenHarmony 分布式硬件系统的核心服务，构
 
 ## 2. DM SA 启停管理
 
-### 2.1 SA 注册与发布
-
-DM 通过 `sa_profile/4802.json` 配置文件注册为 SystemAbility：
-
-```json
-{
-    "process": "device_manager",
-    "systemability": [
-        {
-            "name": 4802,
-            "libpath": "libdevicemanagerservice.z.so",
-            "run-on-create": true,
-            "distributed": false,
-            "dump_level": 1
-        }
-    ]
-}
-```
-
-**关键配置说明**：
-- `name: 4802`：DM 的系统能力 ID（`DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID`）
-- `run-on-create: true`：系统启动时立即创建
-- `distributed: false`：非分布式 SA（单设备运行）
-
-**SA 实现类**：
-```cpp
-// services/service/src/ipc/standard/ipc_server_stub.cpp
-class IpcServerStub : public SystemAbility, public IRemoteStub<IpcRemoteBroker> {
-    void OnStart() override;      // SA 启动入口
-    void OnStop() override;       // SA 停止入口
-    void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
-    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
-};
-```
 
 ### 2.2 DM 启动时序
 
@@ -95,44 +61,6 @@ sequenceDiagram
     Note over DM: DM SA 完全就绪
 ```
 
-**关键代码路径**：
-```cpp
-// services/service/src/ipc/standard/ipc_server_stub.cpp
-void IpcServerStub::OnStart() {
-    // 注册依赖 SA 监听
-    AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);           // SoftBus
-    AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);     // DP
-    AddSystemAbilityListener(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN); // Account
-    AddSystemAbilityListener(SCREENLOCK_SERVICE_ID);          // 屏幕锁定
-    AddSystemAbilityListener(DEVICE_AUTH_SERVICE_ID);         // HiChain
-    AddSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);// 权限
-    AddSystemAbilityListener(RISK_ANALYSIS_MANAGER_SA_ID);    // 风险检测
-    
-    DeviceManagerService::GetInstance().SubscribePackageCommonEvent();
-}
-
-void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) {
-    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
-        DeviceManagerService::GetInstance().InitSoftbusListener();
-        if (!Init()) {  // 发布 DM SA
-            LOGE("failed to init IpcServerStub");
-            state_ = ServiceRunningState::STATE_NOT_START;
-            return;
-        }
-        state_ = ServiceRunningState::STATE_RUNNING;
-        DeviceNameManager::GetInstance().InitDeviceNameWhenSoftBusReady();
-        DeviceManagerService::GetInstance().HandleSoftbusRestart();
-    }
-    // ... 处理其他 SA
-}
-
-bool IpcServerStub::Init() {
-    KVAdapterManager::GetInstance().Init();  // 初始化 KV 存储
-    DeviceManagerService::GetInstance().InitDMServiceListener();
-    bool ret = Publish(this);  // 向 SA Framework 发布 DM
-    return ret;
-}
-```
 
 **发布时机策略**：
 - DM 在 `OnStart()` 中**只注册监听器**，**不发布自身**
@@ -403,18 +331,6 @@ public:
 };
 ```
 
-**依赖 SA 监听汇总**：
-
-| SA 名称 | SA ID | 监听作用 | 初始化操作 |
-|---------|-------|----------|------------|
-| SoftBus | `SOFTBUS_SERVER_SA_ID` | 设备组网能力 | `InitSoftbusListener()` + 发布 DM SA |
-| Distributed Profile | `DISTRIBUTED_HARDWARE_SA_ID` | 分布式配置存储 | `KVAdapterManager::Init()` |
-| HiChain | `DEVICE_AUTH_SERVICE_ID` | 设备认证能力 | `InitHichainListener()` |
-| Access Token | `ACCESS_TOKEN_MANAGER_SERVICE_ID` | 权限管理 | `InitHichainListener()` |
-| Account | `SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN` | 多用户管理 | `InitAccountInfo()` |
-| ScreenLock | `SCREENLOCK_SERVICE_ID` | 屏幕状态 | `InitScreenLockEvent()` |
-| Risk Analysis | `RISK_ANALYSIS_MANAGER_SA_ID` | 安全风险检测 | `StartDetectDeviceRisk()` |
-
 ---
 
 ## 6. 其他业务监听
@@ -530,29 +446,6 @@ graph TB
 
 ---
 
-## 8. 关键代码路径
-
-| 监听类型 | 头文件路径 | 实现文件路径 |
-|---------|-----------|-------------|
-| **SA 启停管理** | | |
-| IpcServerStub 定义 | `services/service/include/ipc/standard/ipc_server_stub.h` | `services/service/src/ipc/standard/ipc_server_stub.cpp` |
-| DeviceManagerService | `services/service/include/device_manager_service.h` | `services/implementation/src/device_manager_service_impl.cpp` |
-| **死亡通知监听** | | |
-| DmInitCallback | `interfaces/inner_kits/native_cpp/include/device_manager_callback.h` | - |
-| AppDeathRecipient | `services/service/include/ipc/standard/ipc_server_stub.h` | `services/service/src/ipc/standard/ipc_server_stub.cpp` |
-| **设备上下线监听** | | |
-| SoftbusListener | `services/service/include/softbus/softbus_listener.h` | `services/service/src/softbus/softbus_listener.cpp` |
-| DeviceManagerServiceListener | `services/service/include/device_manager_service_listener.h` | `services/service/src/device_manager_service_listener.cpp` |
-| DeviceStateCallback | `interfaces/inner_kits/native_cpp/include/device_manager_callback.h` | - |
-| **依赖 SA 就绪监听** | | |
-| SoftbusListener | `services/service/include/softbus/softbus_listener.h` | `services/service/src/softbus/softbus_listener.cpp` |
-| HichainListener | `services/service/include/hichain/hichain_listener.h` | `services/service/src/hichain/hichain_listener.cpp` |
-| KVAdapterManager | `services/service/include/utils/kv_adapter_manager.h` | `services/service/src/utils/kv_adapter_manager.cpp` |
-| **其他业务监听** | | |
-| DiscoveryCallback | `interfaces/inner_kits/native_cpp/include/device_manager_callback.h` | - |
-| DeviceManagerUiCallback | `interfaces/inner_kits/native_cpp/include/device_manager_callback.h` | - |
-| PinHolderCallback | `interfaces/inner_kits/native_cpp/include/device_manager_callback.h` | `services/service/src/pinholder/pin_holder.cpp` |
-| PinHolder | `services/service/include/pinholder/pin_holder.h` | `services/service/src/pinholder/pin_holder.cpp` |
 
 ---
 

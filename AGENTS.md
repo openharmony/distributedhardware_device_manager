@@ -55,6 +55,5 @@
 - 构建、测试、minimum checks 详见 `docs/10-build-test-verify.md`；构建命令在 OpenHarmony 源码根目录执行，本仓没有 npm、cargo、Makefile。
 - C++ 改动至少编译受影响顶层 target：`device_manager` / `device_manager_fwk` / `device_manager_test`；测试改动必须跑改动 UT。
 - 无法运行验证时，最终回复必须说明原因和风险。
-- 默认 remote 是 `gitcode`（`.gitcode/oh-gc-config.json`）；PR 模板在 `.gitee/PULL_REQUEST_TEMPLATE.zh-CN.md`。
 - PR 必须填写安全自检、TDD 结果、XTS 结果；涉及 IPC、SDK 头、`bundle.json`、SA、权限、hisysevent 的改动需特别说明。
 - 新增需求需要符合 codespec 规范，设计文档归档到 `.codespec/changes/issue-{issue No.}-{issue description}`，包含 `proposal.md`、`spec.md`、`design.md`、`execution-plan.md`；有条件时输出功能验证 `REPORT.md`。

@@ -41,38 +41,6 @@ struct ProcessInfo {
 };
 ```
 
-#### 2.1.2 MultipleUserConnector API
-
-DM 通过 `MultipleUserConnector` 类与 OS 账号服务交互：
-
-```cpp
-// 位置：commondependency/include/multiple_user_connector.h
-class MultipleUserConnector {
-public:
-    // 获取当前账号用户 ID
-    static int32_t GetCurrentAccountUserID();
-    
-    // 获取当前账号 ID
-    static std::string GetOhosAccountId();
-    
-    // 获取当前账号名称
-    static std::string GetOhosAccountName();
-    
-    // 获取前台用户 ID 列表
-    static int32_t GetForegroundUserIds(std::vector<int32_t> &userVec);
-    
-    // 获取后台用户 ID 列表
-    static int32_t GetBackgroundUserIds(std::vector<int32_t> &userIdVec);
-    
-    // 检查用户是否已解锁
-    static bool IsUserUnlocked(int32_t userId);
-    
-    // 账号信息管理
-    static void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo);
-    static DMAccountInfo GetAccountInfoByUserId(int32_t userId);
-    static void DeleteAccountInfoByUserId(int32_t userId);
-};
-```
 
 ### 2.2 用户级设备可见性
 
@@ -646,25 +614,6 @@ int32_t MigrateDeviceBetweenAccounts(
 ```
 
 ---
-
-## 8. 关键代码路径
-
-| 功能流程 | 核心函数 | 文件位置 |
-|---------|---------|---------|
-| **用户事件订阅** | `SubscribeAccountCommonEvent()` | `services/service/src/publishcommonevent/dm_account_common_event.cpp:60` |
-| **用户事件回调** | `AccountCommonEventCallback()` | `services/service/src/device_manager_service.cpp:2575` |
-| **用户切换处理** | `HandleUserSwitchEventCallback()` | `services/service/src/device_manager_service.cpp:2880` |
-| **用户删除处理** | `HandleUserRemoved()` | `services/service/src/device_manager_service.cpp:2988` |
-| **账号登出处理** | `HandleAccountLogout()` | `services/service/src/device_manager_service.cpp:2902` |
-| **前后台切换** | `HandleAccountCommonEvent()` | `services/service/src/device_manager_service.cpp:2677` |
-| **获取前台用户** | `GetForegroundUserIds()` | `commondependency/src/multiple_user_connector.cpp:286` |
-| **获取后台用户** | `GetBackgroundUserIds()` | `commondependency/src/multiple_user_connector.cpp:321` |
-| **ACL 更新** | `UpdateAcl()` | `commondependency/src/deviceprofile_connector.cpp:4000+` |
-| **ACL 激活状态** | `UpdateAclActiveStatus()` | `commondependency/src/deviceprofile_connector.cpp` |
-| **通知远程设备** | `NotifyRemoteAccountCommonEvent()` | `services/service/src/device_manager_service.cpp:2749` |
-| **账号信息管理** | `SetAccountInfo()/GetAccountInfoByUserId()` | `commondependency/src/multiple_user_connector.cpp:116+` |
-| **DP 同步** | `PutAccessControlProfileProfile()` | `commondependency/src/deviceprofile_connector.cpp` |
-| **凭证清理** | `ClearUserCredentials()` | `services/service/src/device_manager_service.cpp` |
 
 ---
 

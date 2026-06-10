@@ -53,32 +53,6 @@ graph TD
     E --> E2["单向访问权限 | 受限的信任范围"]
 ```
 
-**信任类型常量定义**（来自 `deviceprofile_connector.cpp`）：
-
-```cpp
-// 对等信任类型
-const uint32_t APP_PEER_TO_PEER_TYPE = 1;          // 应用级对等信任
-const uint32_t SERVICE_PEER_TO_PEER_TYPE = 3;      // 服务级对等信任
-const uint32_t DEVICE_PEER_TO_PEER_TYPE = 6;       // 设备级对等信任
-
-// 跨账号信任类型
-const uint32_t APP_ACROSS_ACCOUNT_TYPE = 2;        // 应用级跨账号
-const uint32_t SERVICE_ACROSS_ACCOUNT_TYPE = 4;    // 服务级跨账号
-const uint32_t DEVICE_ACROSS_ACCOUNT_TYPE = 7;     // 设备级跨账号
-
-// 其他信任类型
-const uint32_t IDENTICAL_ACCOUNT_TYPE = 8;         // 同账号信任
-const uint32_t SHARE_TYPE = 5;                     // 共享模式
-```
-
-**HiChain 组类型映射**（来自 `dm_constants.cpp`）：
-
-```cpp
-const int32_t GROUP_TYPE_INVALID_GROUP = -1;              // 无效组
-const int32_t GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP = 1;     // 同账号组
-const int32_t GROUP_TYPE_PEER_TO_PEER_GROUP = 256;        // 对等组
-const int32_t GROUP_TYPE_ACROSS_ACCOUNT_GROUP = 1282;     // 跨账号组
-```
 
 ### 2.2 信任类型判定逻辑
 
@@ -853,43 +827,6 @@ sequenceDiagram
     DM-->>App: 解绑完成
 ```
 
-## 8. 关键代码路径
-
-| 子流程 | 源代码位置 | 关键函数 |
-|--------|-----------|---------|
-| **ACL 写入** | `services/implementation/src/authentication_v2/auth_stages/auth_acl.cpp` | `AuthSinkDataSyncState::Action()`<br/>`AuthSrcDataSyncState::Action()` |
-| **ACL 查询** | `commondependency/src/deviceprofile_connector.cpp` | `GetAccessControlProfile()`<br/>`GetAclProfileByDeviceIdAndUserId()` |
-| **ACL 删除** | `commondependency/src/deviceprofile_connector.cpp` | `FilterNeedDeleteACL()`<br/>`DeleteAccessControlList()` |
-| **SessionKey 存储** | `services/implementation/src/authentication_v2/dm_auth_message_processor.cpp` | `SaveSessionKeyToDP()`<br/>`SaveDerivativeSessionKeyToDP()` |
-| **SessionKey 查询** | `commondependency/include/deviceprofile_connector.h` | `GetSessionKey()`<br/>`PutSessionKey()` |
-| **凭证组创建** | `services/implementation/src/authentication_v2/auth_stages/auth_credential.cpp` | `GenerateCredIdAndPublicKey()`<br/>`AgreeCredential()` |
-| **凭证组删除** | `services/implementation/src/authentication_v2/auth_stages/auth_credential.cpp` | `DeleteCredential()` |
-| **DP 通知回调** | `services/service/src/softbus/softbus_listener.cpp` | `OnTrustDeviceProfileAdd()`<br/>`OnTrustDeviceProfileDelete()` |
-| **老化状态检查** | `services/implementation/src/devicestate/dm_device_state_manager.cpp` | `CheckAclAging()` |
-| **信任类型判定** | `commondependency/src/deviceprofile_connector.cpp` | `CheckBindType()`<br/>`GetAppTrustDeviceList()` |
-| **三阶段转换** | `commondependency/src/deviceprofile_connector.cpp` | `DeleteSessionKey()`<br/>`InsertUserKeyToUKCache()` |
-
-**相关头文件**：
-
-```cpp
-// 认证上下文
-#include "authentication_v2/dm_auth_context.h"
-
-// 认证消息处理器
-#include "authentication_v2/dm_auth_message_processor.h"
-
-// 设备档案连接器
-#include "deviceprofile_connector.h"
-
-// 加密管理器
-#include "cryptomgr/crypto_mgr.h"
-
-// HiChain 连接器
-#include "dependency/hichain/hichain_auth_connector.h"
-
-// SoftBus 连接器
-#include "dependency/softbus/softbus_connector.h"
-```
 
 ## 9. 常见问题与调试
 

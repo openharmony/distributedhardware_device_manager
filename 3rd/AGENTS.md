@@ -24,6 +24,5 @@
 
 ## 3. 验证
 
-- C++ 改动至少编译受影响 3rd target；无法定位 target 时编译 `device_manager_fwk` 或 `device_manager`。
 - 共享概念改动要同时检查主栈 diff，最终回复列出是否同步及原因。
 - 接口语义改动要说明兼容性影响和下游 include 路径影响。
