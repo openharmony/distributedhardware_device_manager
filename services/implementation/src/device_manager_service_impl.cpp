@@ -2543,7 +2543,8 @@ void DeviceManagerServiceImpl::DeleteAlwaysAllowTimeOut()
         if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             continue;
         }
-        if ((currentTime - item.GetLastAuthTime()) > MAX_ALWAYS_ALLOW_SECONDS && item.GetLastAuthTime() > 0) {
+        int64_t allowSeconds = GetAclAllowSeconds(item);
+        if ((currentTime - item.GetLastAuthTime()) > allowSeconds && item.GetLastAuthTime() > 0) {
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
             if (item.GetAccesser().GetAccesserUserId() == currentUserId &&
                 item.GetAccesser().GetAccesserDeviceId() == localUdid) {
@@ -2557,6 +2558,27 @@ void DeviceManagerServiceImpl::DeleteAlwaysAllowTimeOut()
             CheckDeleteCredential(remoteUdid, remoteUserId);
         }
     }
+}
+
+int64_t DeviceManagerServiceImpl::GetAclAllowSeconds(
+    const DistributedDeviceProfile::AccessControlProfile &profile)
+{
+    const std::string raw = profile.GetExtraData();
+    if (raw.empty()) {
+        return MAX_ALWAYS_ALLOW_SECONDS;
+    }
+    JsonObject obj(raw);
+    if (obj.IsDiscarded() || !obj.Contains(ACL_LIFE_CYCLE_DAYS)) {
+        return MAX_ALWAYS_ALLOW_SECONDS;
+    }
+    if (!obj[ACL_LIFE_CYCLE_DAYS].IsNumberInteger()) {
+        return MAX_ALWAYS_ALLOW_SECONDS;
+    }
+    int32_t days = obj[ACL_LIFE_CYCLE_DAYS].Get<int32_t>();
+    if (days < ACL_LIFE_CYCLE_DAYS_MIN || days > ACL_LIFE_CYCLE_DAYS_MAX) {
+        return MAX_ALWAYS_ALLOW_SECONDS;
+    }
+    return static_cast<int64_t>(days) * SECONDS_PER_DAY;
 }
 
 void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId)

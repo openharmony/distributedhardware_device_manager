@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -628,6 +628,13 @@ int32_t DmAuthMessageProcessor::PutServiceControlList(std::shared_ptr<DmAuthCont
     return PutServiceAccessControlList(context, profile, accesser, accessee);
 }
 
+static bool ShouldWriteAclLifeCycleDays(std::shared_ptr<DmAuthContext> context)
+{
+    return context->confirmOperation == UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS &&
+        context->aclLifeCycleDays >= ACL_LIFE_CYCLE_DAYS_MIN &&
+        context->aclLifeCycleDays <= ACL_LIFE_CYCLE_DAYS_MAX;
+}
+
 void DmAuthMessageProcessor::PutNonLnnAclProfile(std::shared_ptr<DmAuthContext> context, DmAccess &access,
     DistributedDeviceProfile::AccessControlProfile &profile,
     DistributedDeviceProfile::Accesser &accesser,
@@ -637,6 +644,9 @@ void DmAuthMessageProcessor::PutNonLnnAclProfile(std::shared_ptr<DmAuthContext> 
     LOGI("PutNonLnnAclProfile.");
     CHECK_NULL_VOID(context);
     extraData[ACL_IS_LNN_ACL_KEY] = std::string(ACL_IS_LNN_ACL_VAL_FALSE);
+    if (ShouldWriteAclLifeCycleDays(context)) {
+        extraData[ACL_LIFE_CYCLE_DAYS] = context->aclLifeCycleDays;
+    }
     profile.SetExtraData(extraData.Dump());
     profile.SetBindLevel(access.bindLevel);
 
@@ -692,6 +702,9 @@ int32_t DmAuthMessageProcessor::PutDeviceControlList(std::shared_ptr<DmAuthConte
         std::string isLnnAclFalse = std::string(ACL_IS_LNN_ACL_VAL_FALSE);
         extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclFalse;
         extraData[TAG_SERVICE_ID] = access.serviceId;
+        if (ShouldWriteAclLifeCycleDays(context)) {
+            extraData[ACL_LIFE_CYCLE_DAYS] = context->aclLifeCycleDays;
+        }
         profile.SetExtraData(extraData.Dump());
         profile.SetBindLevel(access.bindLevel);
         SetTransmitAccessControlList(context, accesser, accessee);
@@ -786,6 +799,9 @@ int32_t DmAuthMessageProcessor::PutServiceAccessControlList(std::shared_ptr<DmAu
         JsonObject extraData;
         std::string isLnnAclFalse = std::string(ACL_IS_LNN_ACL_VAL_FALSE);
         extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclFalse;
+        if (ShouldWriteAclLifeCycleDays(context)) {
+            extraData[ACL_LIFE_CYCLE_DAYS] = context->aclLifeCycleDays;
+        }
         profile.SetExtraData(extraData.Dump());
         profile.SetBindLevel(context->direction == DM_AUTH_SOURCE ? app.proxyAccesser.bindLevel :
             app.proxyAccessee.bindLevel);
@@ -833,6 +849,9 @@ int32_t DmAuthMessageProcessor::PutProxyAccessControlList(std::shared_ptr<DmAuth
         JsonObject extraData;
         std::string isLnnAclFalse = std::string(ACL_IS_LNN_ACL_VAL_FALSE);
         extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclFalse;
+        if (ShouldWriteAclLifeCycleDays(context)) {
+            extraData[ACL_LIFE_CYCLE_DAYS] = context->aclLifeCycleDays;
+        }
         profile.SetExtraData(extraData.Dump());
         profile.SetBindLevel(context->direction == DM_AUTH_SOURCE ? app.proxyAccesser.bindLevel :
             app.proxyAccessee.bindLevel);

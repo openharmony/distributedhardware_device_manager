@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -221,6 +221,11 @@ DM_EXPORT extern const char* TAG_PIN_USER_ID;
 DM_EXPORT extern const char* PIN_ERROR_COUNT;
 DM_EXPORT extern const char* PIN_MATCH_FLAG;
 DM_EXPORT extern const char* TAG_ONE_TIME_PIN_CODE_FLAG;
+DM_EXPORT extern const char* ACL_LIFE_CYCLE_DAYS;
+DM_EXPORT extern const int32_t ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED;
+DM_EXPORT extern const int32_t ACL_LIFE_CYCLE_DAYS_MIN;
+DM_EXPORT extern const int32_t ACL_LIFE_CYCLE_DAYS_MAX;
+DM_EXPORT extern const int32_t SECONDS_PER_DAY;
 
 extern const char* DM_VERSION_5_0_1;
 extern const char* DM_VERSION_5_0_2;

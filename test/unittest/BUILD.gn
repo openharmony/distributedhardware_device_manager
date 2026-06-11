@@ -3891,6 +3891,7 @@ ohos_unittest("UTTest_dm_auth_message_processor") {
   sources = [
     "${devicemanager_path}/test/unittest/UTTest_dm_auth_message_processor.cpp",
     "${devicemanager_path}/test/unittest/mock/deviceprofile_connector_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/distributed_device_profile_client_mock.cpp",
   ]
 
   deps = [
@@ -3919,6 +3920,8 @@ ohos_unittest("UTTest_dm_auth_message_processor") {
     "googletest:gmock_main",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 }
 

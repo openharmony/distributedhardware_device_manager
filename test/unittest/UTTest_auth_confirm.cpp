@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+/**
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -511,6 +511,102 @@ HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ReadServiceInfo_003, testing::ext
         .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
     authState->ReadServiceInfo(context);
     EXPECT_EQ(srvInfo.GetBundleName(), "com.huawei.hmos.wearlink");
+}
+
+HWTEST_F(AuthConfirmTest, ProcessImportAuthInfo_AclLifeCycleDays_ParsedWhenPresent, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    context = authManager->GetAuthContext();
+    context->accessee.tokenId = 123;
+    context->authType = DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE;
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetAuthBoxType(static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM));
+    srvInfo.SetAuthType(static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ALWAYS));
+    srvInfo.SetExtraInfo(R"({"ACL_LIFE_CYCLE_DAYS":730})");
+
+    auto state = std::make_shared<AuthSinkConfirmState>();
+    state->ProcessImportAuthInfo(context, srvInfo);
+
+    EXPECT_EQ(context->aclLifeCycleDays, 730);
+    EXPECT_EQ(context->confirmOperation, UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS);
+}
+
+HWTEST_F(AuthConfirmTest, ProcessImportAuthInfo_AclLifeCycleDays_SentinelKeepsDefault, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    context = authManager->GetAuthContext();
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetAuthBoxType(static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM));
+    srvInfo.SetAuthType(static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ALWAYS));
+    srvInfo.SetExtraInfo(R"({"ACL_LIFE_CYCLE_DAYS":-1})");
+
+    auto state = std::make_shared<AuthSinkConfirmState>();
+    state->ProcessImportAuthInfo(context, srvInfo);
+
+    EXPECT_EQ(context->aclLifeCycleDays, ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED);
+}
+
+HWTEST_F(AuthConfirmTest, ProcessImportAuthInfo_AclLifeCycleDays_MissingKeepsDefault, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    context = authManager->GetAuthContext();
+    context->aclLifeCycleDays = 999;
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetExtraInfo(R"({})");
+
+    auto state = std::make_shared<AuthSinkConfirmState>();
+    state->ProcessImportAuthInfo(context, srvInfo);
+
+    EXPECT_EQ(context->aclLifeCycleDays, ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED);
+}
+
+HWTEST_F(AuthConfirmTest, ProcessImportAuthInfo_AclLifeCycleDays_MalformedKeepsDefault, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    context = authManager->GetAuthContext();
+    context->aclLifeCycleDays = 999;
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetExtraInfo("not-json");
+
+    auto state = std::make_shared<AuthSinkConfirmState>();
+    state->ProcessImportAuthInfo(context, srvInfo);
+
+    EXPECT_EQ(context->aclLifeCycleDays, ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED);
+}
+
+HWTEST_F(AuthConfirmTest, ProcessImportAuthInfo_AclLifeCycleDays_StringValueKeepsDefault,
+    testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    context = authManager->GetAuthContext();
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetExtraInfo(R"({"ACL_LIFE_CYCLE_DAYS":"730"})");
+
+    auto state = std::make_shared<AuthSinkConfirmState>();
+    state->ProcessImportAuthInfo(context, srvInfo);
+
+    EXPECT_EQ(context->aclLifeCycleDays, ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED);
+}
+
+HWTEST_F(AuthConfirmTest, ProcessImportAuthInfo_AclLifeCycleDays_NegativeNonSentinelKeepsDefault,
+    testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    context = authManager->GetAuthContext();
+    context->aclLifeCycleDays = 999;
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetExtraInfo(R"({"ACL_LIFE_CYCLE_DAYS":-2})");
+
+    auto state = std::make_shared<AuthSinkConfirmState>();
+    state->ProcessImportAuthInfo(context, srvInfo);
+
+    EXPECT_EQ(context->aclLifeCycleDays, ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED);
 }
 }  // end namespace DistributedHardware
 }  // end namespace OHOS

@@ -1759,7 +1759,36 @@ bool DeviceManagerService::IsImportAuthInfoValid(const DmAuthInfo &dmAuthInfo)
         LOGE("Invalid description.");
         return false;
     }
+    if (!IsAclLifeCycleDaysValid(dmAuthInfo)) {
+        LOGE("Invalid ACL_LIFE_CYCLE_DAYS.");
+        return false;
+    }
     return true;
+}
+
+bool DeviceManagerService::IsAclLifeCycleDaysValid(const DmAuthInfo &dmAuthInfo)
+{
+    if (dmAuthInfo.extraInfo.empty()) {
+        return true;
+    }
+    JsonObject extraObj(dmAuthInfo.extraInfo);
+    if (extraObj.IsDiscarded()) {
+        return false;
+    }
+    if (!extraObj.Contains(ACL_LIFE_CYCLE_DAYS)) {
+        return true;
+    }
+    if (!extraObj[ACL_LIFE_CYCLE_DAYS].IsNumberInteger()) {
+        return false;
+    }
+    int32_t days = extraObj[ACL_LIFE_CYCLE_DAYS].Get<int32_t>();
+    if (days == ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED) {
+        return true;
+    }
+    if (dmAuthInfo.authType != DMLocalServiceInfoAuthType::TRUST_ALWAYS) {
+        return false;
+    }
+    return days >= ACL_LIFE_CYCLE_DAYS_MIN && days <= ACL_LIFE_CYCLE_DAYS_MAX;
 }
 
 int32_t DeviceManagerService::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
@@ -1791,11 +1820,15 @@ int32_t DeviceManagerService::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
         LOGE("failed: %{public}d.", ret);
         return ret;
     }
+#ifndef DEVICE_MANAGER_COMMON_FLAG
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->ImportAuthInfo(dmAuthInfo);
+#else
+    return DM_OK;
+#endif
 }
 
 int32_t DeviceManagerService::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength)
@@ -1830,11 +1863,15 @@ int32_t DeviceManagerService::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pi
         LOGE("failed: %{public}d.", ret);
         return ret;
     }
+#ifndef DEVICE_MANAGER_COMMON_FLAG
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->ExportAuthInfo(dmAuthInfo);
+#else
+    return DM_OK;
+#endif
 }
 #endif
 

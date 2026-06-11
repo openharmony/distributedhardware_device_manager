@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -480,6 +480,7 @@ private:
     void InitTaskOfDelTimeOutAcl();
     bool IsExportAuthInfoValid(const DmAuthInfo &dmAuthInfo);
     bool IsImportAuthInfoValid(const DmAuthInfo &dmAuthInfo);
+    bool IsAclLifeCycleDaysValid(const DmAuthInfo &dmAuthInfo);
     void NotifyRemoteUnbindService(const std::map<std::string, std::string> &unbindParam,
         const std::string &netWorkId, int64_t serviceId);
     void NotifyRemoteUnBindServiceByWifi(int32_t userId, uint64_t localTokenId, uint64_t subjectTokenId,
