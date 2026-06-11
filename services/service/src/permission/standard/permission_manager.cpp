@@ -41,7 +41,8 @@ constexpr const static char* AUTH_CODE_WHITE_LIST[] = {
     "glasses_collaboration_service",
     "xr_glass_app_service",
     "gameservice_server",
-    "caas_service"
+    "caas_service",
+    "car_distributed_engine"
 };
 constexpr int32_t AUTH_CODE_WHITE_LIST_NUM = std::size(AUTH_CODE_WHITE_LIST);
 
