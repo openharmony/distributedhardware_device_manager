@@ -1,0 +1,24 @@
+# ext/pin_auth Agent 知识库
+
+> 本文件适用于 `ext/pin_auth/`。根目录 `AGENTS.md` 仍是总入口，本文件只补充 PIN 认证不可从代码稳定推断的规则。
+
+## 1. 触发条件
+
+| 触发条件 | 先读 |
+|---|---|
+| 改 PIN 生成、展示、校验、生命周期或弹框交互 | `docs/02-workflows.md` |
+| 改导入 PIN 免弹窗绑定 | `docs/02-workflows.md` |
+| 排查板端 PIN 弹框或推包验证 | `docs/03-verification.md` |
+| 改 JS API 相关展示链路 | `docs/01-core-rules.md` |
+
+## 2. 红线
+
+- PIN 值禁止明文打印、落 hisysevent、写 PR 描述或测试日志。
+- 不改变可插拔模块加载约定，除非同步评估 `ext:ext_modules` 和构建依赖。
+- 不绕过服务侧权限和认证状态机直接建立可信关系。
+- 不为调试写死 PIN、超时、重试次数或 feature flag。
+
+## 3. 验证
+
+- PIN 流程改动需要跑关联 UT；能上板时做真实 PIN 流程冒烟。
+- 验证日志时必须确认没有明文 PIN 和敏感设备标识。
