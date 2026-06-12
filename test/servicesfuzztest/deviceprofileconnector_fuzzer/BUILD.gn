@@ -37,7 +37,7 @@ ohos_fuzztest("DeviceProfileConnectorFuzzTest") {
 
   deps = [
     "${devicemanager_path}/commondependency:devicemanagerdependencytest",
-    "${services_path}:devicemanagerservice",
+    "${services_path}:devicemanagerservicetest",
     "${servicesimpl_path}:devicemanagerserviceimpl",
   ]
 

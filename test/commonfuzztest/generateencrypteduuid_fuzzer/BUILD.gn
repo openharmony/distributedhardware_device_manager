@@ -42,7 +42,7 @@ ohos_fuzztest("GenerateEncryptedUuidFuzzTest") {
 
   deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${services_path}:devicemanagerservice",
+    "${services_path}:devicemanagerservicetest",
     "${servicesimpl_path}:devicemanagerserviceimpl",
   ]
 

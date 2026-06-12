@@ -44,7 +44,7 @@ ohos_fuzztest("DmDiscoveryManagerFuzzTest") {
   sources = [ "dm_discovery_manager_fuzzer.cpp" ]
 
   deps = [
-    "${services_path}:devicemanagerservice",
+    "${services_path}:devicemanagerservicetest",
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${utils_path}:devicemanagerutilstest",
   ]

@@ -43,7 +43,7 @@ ohos_fuzztest("AuthMessageProcessorFuzzTest") {
   deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${json_path}:devicemanagerjson",
-    "${services_path}:devicemanagerservice",
+    "${services_path}:devicemanagerservicetest",
     "${servicesimpl_path}:devicemanagerserviceimpl",
   ]
 
