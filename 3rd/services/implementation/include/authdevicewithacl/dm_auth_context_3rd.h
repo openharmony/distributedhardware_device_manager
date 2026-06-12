@@ -40,7 +40,7 @@ namespace DistributedHardware {
 class DmAuthStateMachine3rd;
 class DmAuthMessageProcessor3rd;
 
-using CleanNotifyCallback = std::function<void(uint64_t, int32_t)>;
+using CleanNotifyCallback = std::function<void(uint64_t, int32_t, ProcessInfo3rd)>;
 using StopTimerAndDelDpCallback = std::function<void(const std::string&, int32_t, uint64_t)>;
 // PIN Code Authentication Type
 enum DmAuthDirection {

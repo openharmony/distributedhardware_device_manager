@@ -218,7 +218,7 @@ int32_t AuthCredSinkFinishState::Action(std::shared_ptr<DmAuthCredContext> conte
     SinkFinish(context);
     LOGI("Action ok");
     if (context->cleanNotifyCallback != nullptr) {
-        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime);
+        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime, context->processInfo);
     }
     return DM_OK;
 }
@@ -243,7 +243,7 @@ int32_t AuthCredSrcFinishState::Action(std::shared_ptr<DmAuthCredContext> contex
         context->connDelayCloseTime = 0;
     }
     if (context->cleanNotifyCallback != nullptr) {
-        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime);
+        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime, context->processInfo);
     }
     return DM_OK;
 }
