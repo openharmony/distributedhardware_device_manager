@@ -7,7 +7,7 @@ DM 发布/发现依赖屏幕事件与 Wi-Fi/蓝牙状态，需要保持双端设
 ## 2. 绑定与解绑
 
 - 绑定涉及 source 与 sink 两端：source是主动发起端，sink是被动接受端。当一端状态、参数、ACL 写入修改时，需同步确认修改对端行为，保持双端行为一致。
-- 新增认证能力默认走 `authentication_v2`，不要顺手改老协议。
+- 新增认证能力默认走 `authentication_v2`，不要顺手改老协议`authentication`。
 - 永久可信关系生命周期按单条 ACL 关系级属性处理，清理时逐条判断。
 
 ## 3. Import PIN 免弹框绑定
