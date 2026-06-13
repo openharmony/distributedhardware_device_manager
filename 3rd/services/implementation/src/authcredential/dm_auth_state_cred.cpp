@@ -102,11 +102,11 @@ void DmAuthStateCred::SinkFinish(std::shared_ptr<DmAuthCredContext> context)
     CHECK_NULL_VOID(context->timer);
     CHECK_NULL_VOID(context->authMessageProcessor);
     LOGI("SinkFinish reason:%{public}d, state:%{public}d", context->reason, context->state);
+    context->authMessageProcessor->CreateAndSendMsg(DmCredMessageType::CRED_RESP_FINISH, context);
     std::vector<TrustDeviceInfo3rd> deviceInfos;
     BuildTrustDeviceInfos(context, deviceInfos);
     context->listener->OnAuthResult(context->processInfo, context->reason, context->state, deviceInfos, "");
     context->timer->DeleteAll();
-    context->authMessageProcessor->CreateAndSendMsg(DmCredMessageType::CRED_RESP_FINISH, context);
 }
 
 uint64_t DmAuthStateCred::GetSysTimeMs()
