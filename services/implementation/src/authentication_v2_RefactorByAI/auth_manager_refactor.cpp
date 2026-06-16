@@ -13,37 +13,6 @@
  * limitations under the License.
  */
 
-/*
- * Security Refactor Summary (Based on 21 Security Principles):
- * 
- * Principle 4: Sensitive Data Transmission Protection
- *   - PIN code encrypted before transmission (AuthSinkManager::AuthDeviceRequest)
- *   - PIN code hash logged instead of raw value
- * 
- * Principle 11: Secure Random Number
- *   - PIN generated using GenRandInt (cryptographically secure)
- * 
- * Principle 12: Resource Thorough Cleanup
- *   - SecureClearString() for PIN, authCode cleanup
- *   - SecureClearBuffer() for sessionKey cleanup
- *   - Destructor clears all sensitive data
- *   - Cleanup on auth failure/cancel/timeout
- * 
- * Principle 5: State Machine Context Validation
- *   - ValidateAuthContextState() before state transitions
- *   - ValidateAuthContextForOperation() before user operations
- *   - authContextState field (invalid by default)
- * 
- * Principle 13: Switch Default Value Should Be Invalid
- *   - authContextState = AUTH_CONTEXT_INVALID (-1) by default
- *   - Must be set to AUTH_CONTEXT_VALID (0) during InitAuthState
- * 
- * Principle 14: PIN Code Generation and Disposal
- *   - IsPinCodeValid() checks lifetime expiration
- *   - ConsumePinCode() clears after use
- *   - PIN lifetime: 5 minutes (PIN_CODE_MAX_LIFETIME_MS)
- */
-
 #include <memory>
 #include <cstring>
 
