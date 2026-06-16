@@ -113,7 +113,6 @@ void HandleExtraData(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInf
         return;
     }
     cJSON_Delete(extraDataJsonObj);
-    
     cJSON *basicExtraDataJsonObj = cJSON_CreateObject();
     if (basicExtraDataJsonObj == NULL) {
         cJSON_free(customData);
