@@ -44,6 +44,14 @@ if (device_manager_enable_ets_frontend) {
       debug = false
     }
 
+    cflags = [
+      "-flto=full",
+    ]
+    ldflags = [
+      "-flto=full",
+    ]
+    shlib_type = "ani"
+
     taihe_generated_file_path = "$taihe_generated_file_path"
     subsystem_name = "$subsystem_name"
     part_name = "$part_name"
