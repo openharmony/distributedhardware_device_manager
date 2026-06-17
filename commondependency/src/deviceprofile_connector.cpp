@@ -656,8 +656,8 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfil
     return profiles;
 }
 
-std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceIdAndUserId(const std::string &deviceId,
-    int32_t userId)
+DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceIdAndUserId(
+    const std::string &deviceId, int32_t userId)
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(userId);
     std::vector<AccessControlProfile> aclProfileVec;
@@ -673,8 +673,8 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceI
 }
 //LCOV_EXCL_STOP
 
-std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceIdAndUserId(const std::string &deviceId,
-    int32_t userId, const std::string &remoteDeviceId)
+DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceIdAndUserId(
+    const std::string &deviceId, int32_t userId, const std::string &remoteDeviceId)
 {
     std::vector<AccessControlProfile> aclProfileVec;
     std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
