@@ -423,6 +423,10 @@ private:
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
         const std::string &reqDev);
     bool CheckAuthFormProxyTokenId(const std::string pkgName, const std::string &extraStr);
+    bool CheckAuthFormForAccesser(DmAuthForm form, const std::string &pkgName,
+        const DistributedDeviceProfile::AccessControlProfile &profile, bool isSystemSA, uint32_t callingTokenId);
+    bool CheckAuthFormForAccessee(DmAuthForm form, const std::string &pkgName,
+        const DistributedDeviceProfile::AccessControlProfile &profile, bool isSystemSA, uint32_t callingTokenId);
     int32_t CheckAuthForm(DmAuthForm form, DistributedDeviceProfile::AccessControlProfile profiles,
         DmDiscoveryInfo discoveryInfo);
     bool SingleUserProcess(const DistributedDeviceProfile::AccessControlProfile &profile, const DmAccessCaller &caller,
