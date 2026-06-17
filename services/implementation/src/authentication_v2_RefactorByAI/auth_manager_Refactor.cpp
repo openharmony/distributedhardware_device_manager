@@ -978,6 +978,650 @@ void AuthSinkManager::OnDataReceived(int32_t sessionId, std::string message)
 
     return;
 }
+
+bool AuthSinkManager::GetIsCryptoSupport()
+{
+    return false;
+}
+
+void AuthManager::GetRemoteDeviceId(std::string &deviceId)
+{
+    CHECK_NULL_VOID(context_);
+    deviceId = (context_->direction == DM_AUTH_SOURCE) ? context_->accessee.deviceId : context_->accesser.deviceId;
+    return;
+}
+
+int32_t AuthSinkManager::OnUserOperation(int32_t action, const std::string &params)
+{
+    LOGI("action %{public}d.", action);
+    if (context_ == nullptr || context_->authStateMachine == nullptr) {
+        LOGE("Authenticate is not start");
+        return ERR_DM_AUTH_NOT_START;
+    }
+    switch (action) {
+        case USER_OPERATION_TYPE_CANCEL_AUTH:
+        case USER_OPERATION_TYPE_ALLOW_AUTH:
+        case USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS:
+            context_->confirmOperation = static_cast<UiAction>(action);
+            context_->reply = USER_OPERATION_TYPE_ALLOW_AUTH;
+            context_->userOperationParam = params;
+            if (action == USER_OPERATION_TYPE_CANCEL_AUTH) {
+                LOGI("USER_OPERATION_TYPE_CANCEL_AUTH.");
+                context_->reply = USER_OPERATION_TYPE_CANCEL_AUTH;
+            }
+            context_->authStateMachine->NotifyEventFinish(DmEventType::ON_USER_OPERATION);
+            if (!context_->businessId.empty()) {
+                HandleBusinessEvents(context_->businessId, action);
+            }
+            break;
+        case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:
+            LOGI("USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT.");
+            context_->confirmOperation = USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT;
+            context_->reason = ERR_DM_PEER_CONFIRM_TIME_OUT;
+            context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
+            if (!context_->businessId.empty()) {
+                HandleBusinessEvents(context_->businessId, action);
+            }
+            break;
+        case USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY:
+            LOGI("USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY.");
+            context_->confirmOperation = USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY;
+            context_->reason = ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY;
+            context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
+            break;
+        default:
+            LOGE("this action id not support");
+            break;
+    }
+    LOGI("leave.");
+    return DM_OK;
+}
+
+AuthSrcManager::AuthSrcManager(std::shared_ptr<SoftbusConnector> softbusConnector,
+    std::shared_ptr<HiChainConnector> hiChainConnector,
+    std::shared_ptr<IDeviceManagerServiceListener> listener,
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector)
+    : AuthManager(softbusConnector, hiChainConnector, listener, hiChainAuthConnector)
+{
+    context_->direction = DM_AUTH_SOURCE;
+    context_->authStateMachine = std::make_shared<DmAuthStateMachine>(context_);
+}
+
+void AuthSrcManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
+{
+    LOGI("sessionId = %{public}d and sessionSide = %{public}d result = %{public}d", sessionId, sessionSide, result);
+}
+
+void AuthSrcManager::OnSessionClosed(int32_t sessionId)
+{
+    LOGI("sessionId = %{public}d", sessionId);
+    CHECK_NULL_VOID(context_);
+    SecureClearString(context_->transmitData);
+    context_->reason = ERR_DM_SESSION_CLOSED;
+    CHECK_NULL_VOID(context_->authStateMachine);
+    context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
+}
+
+void AuthSrcManager::OnSessionDisable()
+{
+    CHECK_NULL_VOID(context_);
+    context_->sessionId = -1;
+}
+
+void AuthSrcManager::OnDataReceived(int32_t sessionId, std::string message)
+{
+    CHECK_NULL_VOID(context_);
+    context_->sessionId = sessionId;
+    CHECK_NULL_VOID(context_->authMessageProcessor);
+    int32_t ret = context_->authMessageProcessor->ParseMessage(context_, message);
+    if (ret != DM_OK) {
+        LOGE("parse input message error.");
+        context_->reason = ERR_DM_PARSE_MESSAGE_FAILED;
+        CHECK_NULL_VOID(context_->authStateMachine);
+        context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
+    }
+
+    return;
+}
+
+bool AuthSrcManager::GetIsCryptoSupport()
+{
+    return false;
+}
+
+int32_t AuthSrcManager::OnUserOperation(int32_t action, const std::string &params)
+{
+    LOGI("start.");
+    if (context_ == nullptr || context_->authStateMachine == nullptr) {
+        LOGE("Authenticate is not start");
+        return ERR_DM_AUTH_NOT_START;
+    }
+
+    JsonObject paramJson;
+    paramJson.Parse(params);
+    std::string pinCode;
+    switch (action) {
+        case USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT:
+            LOGE("AuthSrcManager OnUserOperation user cancel");
+            context_->pinInputResult = USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT;
+            context_->reason = ERR_DM_BIND_USER_CANCEL_ERROR;
+            SecureClearString(context_->pinCode);
+            context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
+            break;
+        case USER_OPERATION_TYPE_DONE_PINCODE_INPUT:
+            LOGE("AuthSrcManager OnUserOperation user input done");
+            context_->pinInputResult = USER_OPERATION_TYPE_DONE_PINCODE_INPUT;
+            if (paramJson.IsDiscarded() || !IsString(paramJson, PIN_CODE_KEY)) {
+                LOGE("AuthSrcManager OnUserOperation pinCode not found");
+                return ERR_DM_INPUT_PARA_INVALID;
+            }
+            pinCode = paramJson[PIN_CODE_KEY].Get<std::string>();
+            {
+                if (!IsNumberString(pinCode)) {
+                    LOGE("jsonStr error");
+                    SecureClearString(pinCode);
+                    return ERR_DM_INPUT_PARA_INVALID;
+                }
+                SecureClearString(context_->pinCode);
+                context_->pinCode = pinCode;
+            }
+            context_->authStateMachine->NotifyEventFinish(DmEventType::ON_USER_OPERATION);
+            break;
+        default:
+            LOGE("this action id not support");
+            break;
+    }
+    LOGI("leave.");
+    return DM_OK;
+}
+
+void AuthSrcManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
+{
+    LOGI("start.");
+    CHECK_NULL_VOID(context_);
+    if (requestId != context_->requestId) {
+        LOGE("requestId: %{public}" PRId64", context_->requestId: %{public}" PRId64".", requestId, context_->requestId);
+        return;
+    }
+    CHECK_NULL_VOID(context_->authStateMachine);
+    auto curState = context_->authStateMachine->GetCurState();
+    if (curState == DmAuthStateType::AUTH_SRC_PIN_AUTH_START_STATE ||
+        curState == DmAuthStateType::AUTH_SRC_PIN_AUTH_MSG_NEGOTIATE_STATE ||
+        curState == DmAuthStateType::AUTH_SRC_PIN_AUTH_DONE_STATE) {
+        LOGI("Auth pin err.");
+        if (context_->authType == DmAuthType::AUTH_TYPE_PIN) {
+            context_->inputPinAuthFailTimes++;
+        }
+        context_->authStateMachine->NotifyEventFinish(DmEventType::ON_ERROR);
+        context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcPinNegotiateStartState>());
+    } else {
+        LOGI("unexpected err.");
+        context_->reason = (errorCode == ERR_DM_HICHAIN_PROOFMISMATCH ? ERR_DM_BIND_PIN_CODE_ERROR : errorCode);
+        context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
+    }
+    LOGI("leave.");
+}
+
+void AuthSinkManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
+{
+    LOGI("start.");
+    CHECK_NULL_VOID(context_);
+    CHECK_NULL_VOID(context_->authStateMachine);
+    auto curState = context_->authStateMachine->GetCurState();
+    if (curState == DmAuthStateType::AUTH_SINK_PIN_AUTH_START_STATE ||
+        curState == DmAuthStateType::AUTH_SINK_PIN_AUTH_MSG_NEGOTIATE_STATE) {
+        LOGI("Auth pin err.");
+        if (context_->authType == DmAuthType::AUTH_TYPE_PIN) {
+            context_->inputPinAuthFailTimes++;
+        }
+        context_->authStateMachine->NotifyEventFinish(DmEventType::ON_ERROR);
+        context_->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinNegotiateStartState>());
+    } else {
+        LOGI("unexpected err.");
+        context_->reason = errorCode;
+        context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
+    }
+    LOGI("leave.");
+}
+
+bool AuthSrcManager::AuthDeviceTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen)
+{
+    LOGI("start.");
+    CHECK_NULL_RETURN(context_, false);
+    if (requestId != context_->requestId) {
+        LOGE("requestId %{public}" PRId64"is error.", requestId);
+        return false;
+    }
+
+    SecureClearString(context_->transmitData);
+    context_->transmitData = std::string(reinterpret_cast<const char *>(data), dataLen);
+    CHECK_NULL_RETURN(context_->authStateMachine, false);
+    context_->authStateMachine->NotifyEventFinish(ON_TRANSMIT);
+    LOGI("leave.");
+    return true;
+}
+
+bool AuthSinkManager::AuthDeviceTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen)
+{
+    LOGI("start.");
+    CHECK_NULL_RETURN(context_, false);
+    if (requestId != context_->requestId) {
+        LOGE("requestId %{public}" PRId64"is error.", requestId);
+        return false;
+    }
+
+    SecureClearString(context_->transmitData);
+    context_->transmitData = std::string(reinterpret_cast<const char *>(data), dataLen);
+    CHECK_NULL_RETURN(context_->authStateMachine, false);
+    context_->authStateMachine->NotifyEventFinish(ON_TRANSMIT);
+    LOGI("leave.");
+    return true;
+}
+
+void AuthSrcManager::AuthDeviceFinish(int64_t requestId)
+{
+    LOGI("start.");
+    CHECK_NULL_VOID(context_);
+    CHECK_NULL_VOID(context_->authStateMachine);
+    context_->authStateMachine->NotifyEventFinish(ON_FINISH);
+    DmAuthStateType curState = context_->authStateMachine->GetCurState();
+    switch (curState) {
+        case DmAuthStateType::AUTH_SRC_PIN_AUTH_DONE_STATE:
+            if (!context_->isNeedAuthenticate) {
+                LOGI("skip authenticate.");
+                context_->reason = ERR_DM_SKIP_AUTHENTICATE;
+                context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
+            } else {
+                context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialExchangeState>());
+            }
+            break;
+        default:
+            break;
+    }
+    LOGI("leave.");
+}
+
+void AuthSinkManager::AuthDeviceFinish(int64_t requestId)
+{
+    LOGI("start.");
+    CHECK_NULL_VOID(context_);
+    CHECK_NULL_VOID(context_->authStateMachine);
+    context_->authStateMachine->NotifyEventFinish(ON_FINISH);
+    LOGI("leave.");
+}
+
+void AuthSinkManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen)
+{
+    LOGI("start. keyLen: %{public}u", sessionKeyLen);
+    if (context_ == nullptr || context_->authMessageProcessor == nullptr || context_->authStateMachine == nullptr) {
+        LOGE("auth context not initial.");
+        return;
+    }
+    if (requestId != context_->requestId) {
+        LOGE("requestId %{public}" PRId64 "is error.", requestId);
+        return;
+    }
+    int32_t ret = context_->authMessageProcessor->SaveSessionKey(sessionKey, sessionKeyLen);
+    if (ret != DM_OK) {
+        LOGE("save session key error, ret: %{public}d", ret);
+    }
+
+    context_->authStateMachine->NotifyEventFinish(ON_SESSION_KEY_RETURNED);
+}
+
+char *AuthSinkManager::AuthDeviceRequest(int64_t requestId, int operationCode, const char *reqParams)
+{
+    LOGI("start");
+    (void)requestId;
+    (void)reqParams;
+    JsonObject jsonObj;
+
+    DmAuthStateType curState = context_->authStateMachine->GetCurState();
+    if (curState == DmAuthStateType::AUTH_SINK_PIN_AUTH_START_STATE ||
+        curState == DmAuthStateType::AUTH_SINK_REVERSE_ULTRASONIC_DONE_STATE||
+        curState == DmAuthStateType::AUTH_SINK_FORWARD_ULTRASONIC_DONE_STATE) {
+        std::string pinCode = "";
+        if (GetPinCode(pinCode) == ERR_DM_FAILED || pinCode == "") {
+            jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_REJECTED;
+        } else {
+            jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
+            jsonObj[FIELD_PIN_CODE] = pinCode;
+        }
+        std::string pinCodeHash = GetAnonyString(Crypto::Sha256(pinCode));
+        LOGI("pinCodeHash: %{public}s", pinCodeHash.c_str());
+    } else if (curState == DmAuthStateType::AUTH_SINK_CREDENTIAL_AUTH_START_STATE) {
+        if (context_->isOnline) {
+            jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
+            jsonObj[FIELD_CRED_ID] = context_->accessee.transmitCredentialId;
+        } else if (!context_->isAppCredentialVerified) {
+            jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
+            jsonObj[FIELD_CRED_ID] = context_->accessee.transmitCredentialId;
+        } else {
+            jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
+            jsonObj[FIELD_CRED_ID] = context_->accessee.lnnCredentialId;
+        }
+    }
+    jsonObj[FIELD_SERVICE_PKG_NAME] = std::string(DM_PKG_NAME);
+    std::string jsonStr = jsonObj.Dump();
+    char *buffer = strdup(jsonStr.c_str());
+    return buffer;
+}
+
+int32_t AuthManager::GetPinCode(std::string &code)
+{
+    if (context_ == nullptr) {
+        LOGE("AuthManager failed to GetPinCode because context_ is nullptr");
+        return ERR_DM_FAILED;
+    }
+    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(context_->pinCode));
+    LOGI("pinCodeHash: %{public}s", pinCodeHash.c_str());
+    code = context_->pinCode;
+    return DM_OK;
+}
+
+void AuthManager::GetBindTargetParams(std::string &pkgName, PeerTargetId &targetId,
+    std::map<std::string, std::string> &bindParam)
+{
+    CHECK_NULL_VOID(context_);
+    pkgName = context_->pkgName;
+    targetId = targetId_;
+    {
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
+        bindParam = bindParam_;
+    }
+    LOGI("get pkgName %{public}s to reuse", pkgName.c_str());
+    return;
+}
+
+void AuthManager::GetAuthCodeAndPkgName(std::string &pkgName, std::string &authCode)
+{
+    if (context_ == nullptr || context_->importAuthCode.empty() || context_->importPkgName.empty()) {
+        LOGE("authCode or pkgName is empty");
+        return;
+    }
+    authCode = context_->importAuthCode;
+    pkgName = context_->importPkgName;
+}
+
+void AuthManager::SetBindTargetParams(const PeerTargetId &targetId)
+{
+    targetId_ = targetId;
+    LOGI("set targetId to reuse");
+    return;
+}
+
+void AuthManager::ClearSoftbusSessionCallback()
+{}
+
+void AuthManager::PrepareSoftbusSessionCallback()
+{}
+
+void AuthManager::GetBindCallerInfo()
+{
+    LOGI("start.");
+    CHECK_NULL_VOID(context_);
+    {
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
+        if (bindParam_.find("bindCallerUserId") != bindParam_.end()) {
+            context_->processInfo.userId = std::atoi(bindParam_["bindCallerUserId"].c_str());
+        }
+        if (bindParam_.find("bindCallerTokenId") != bindParam_.end()) {
+            context_->accesser.tokenId = std::atoi(bindParam_["bindCallerTokenId"].c_str());
+        }
+        if (bindParam_.find("bindCallerBindLevel") != bindParam_.end()) {
+            context_->accesser.bindLevel = std::atoi(bindParam_["bindCallerBindLevel"].c_str());
+        }
+        if (bindParam_.find("bindCallerBundleName") != bindParam_.end()) {
+            context_->accesser.bundleName = bindParam_["bindCallerBundleName"];
+        }
+        if (bindParam_.find("bindCallerHostPkgLabel") != bindParam_.end()) {
+            context_->pkgLabel = bindParam_["bindCallerHostPkgLabel"];
+        }
+    }
+}
+
+void AuthManager::DeleteTimer()
+{
+    if (context_ != nullptr) {
+        context_->successFinished = true;
+        SecureClearString(context_->pinCode);
+        SecureClearString(context_->importAuthCode);
+        SecureClearString(context_->transmitData);
+        context_->authStateMachine->Stop();
+        context_->timer->DeleteAll();
+        if (context_->authMessageProcessor != nullptr) {
+            context_->authMessageProcessor->ClearSessionKey();
+        }
+        LOGI("AuthManager context deleteTimer successful.");
+    }
+    {
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
+        bindParam_.clear();
+    }
+    LOGI("end.");
+}
+
+//LCOV_EXCL_START
+int32_t AuthManager::HandleBusinessEvents(const std::string &businessId, int32_t action)
+{
+    LOGI("businessId %{public}s, action %{public}d.", businessId.c_str(), action);
+    DistributedDeviceProfile::BusinessEvent rejectEvent;
+    rejectEvent.SetBusinessKey(DM_REJECT_KEY);
+    JsonObject rejectJson;
+    rejectJson[DM_BUSINESS_ID] = businessId;
+    rejectJson[DM_AUTH_DIALOG_REJECT] =
+        (action == USER_OPERATION_TYPE_CANCEL_AUTH || action == USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT);
+    rejectJson[DM_TIMESTAMP] = std::to_string(GetCurrentTimestamp());
+    rejectEvent.SetBusinessValue(rejectJson.Dump());
+    int32_t ret = DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutBusinessEvent(rejectEvent);
+    if (ret != DM_OK) {
+        LOGE("HandleBusinessEvents failed to store reject_event, ret: %{public}d", ret);
+        return ret;
+    }
+    LOGI("HandleBusinessEvents successfully stored reject_event.");
+    return DM_OK;
+}
+int32_t AuthManager::CheckProxyAuthParamVaild(const std::string &extra)
+{
+    LOGI("start.");
+    JsonObject jsonObject(extra);
+    if (jsonObject.IsDiscarded() || !IsString(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
+        return DM_OK;
+    }
+    if (jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<std::string>() != DM_VAL_TRUE) {
+        return DM_OK;
+    }
+    bool isSystemSA = false;
+    if (bindParam_.find(BIND_CALLER_IS_SYSTEM_SA) != bindParam_.end()) {
+        isSystemSA = static_cast<bool>(std::atoi(bindParam_[BIND_CALLER_IS_SYSTEM_SA].c_str()));
+    }
+    if (!isSystemSA) {
+        LOGE("no proxy permission");
+        return ERR_DM_NO_PERMISSION;
+    }
+
+    if (context_->isServiceBind) {
+        LOGI("CheckServiceAuthParamVaild enter");
+        return CheckServiceAuthParamVaild(jsonObject);
+    }
+    if (!jsonObject.Contains(PARAM_KEY_SUBJECT_PROXYED_SUBJECTS) ||
+        !IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+        LOGE("no subject proxyed apps");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
+    JsonObject allProxyObj;
+    allProxyObj.Parse(subjectProxyOnesStr);
+    for (auto const &item : allProxyObj.Items()) {
+        if (!item.Contains(TAG_BUNDLE_NAME) || !IsString(item, TAG_BUNDLE_NAME)) {
+            LOGE("bundleName invalid");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+        if (!item.Contains(TAG_TOKENID) || !IsInt64(item, TAG_TOKENID)) {
+            LOGE("tokenId invalid");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+    }
+    return DM_OK;
+}
+
+int32_t AuthManager::CheckServiceAuthParamVaild(const JsonObject &jsonObject)
+{
+    LOGI("start.");
+    if (!jsonObject.Contains(PARAM_KEY_SUBJECT_SERVICE_ONES) ||
+        !IsString(jsonObject, PARAM_KEY_SUBJECT_SERVICE_ONES)) {
+        LOGE("no subject proxyed services");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string subjectServiceOnesStr = jsonObject[PARAM_KEY_SUBJECT_SERVICE_ONES].Get<std::string>();
+    JsonObject allServiceObj;
+    allServiceObj.Parse(subjectServiceOnesStr);
+    for (auto const &item : allServiceObj.Items()) {
+        if (!item.Contains(PARAM_KEY_LOCAL_PKGNAME) || !IsString(item, PARAM_KEY_LOCAL_PKGNAME)) {
+            LOGE("pkgName invalid");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+        if (!item.Contains(PARAM_KEY_LOCAL_TOKENID) || !IsString(item, PARAM_KEY_LOCAL_TOKENID)) {
+            LOGE("tokenId invalid");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+        if (!item.Contains(PARAM_KEY_PEER_SERVICEID) || !IsString(item, PARAM_KEY_PEER_SERVICEID)) {
+            LOGE("serviceId invalid");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+    }
+    return DM_OK;
+}
+
+void AuthManager::ParseProxyJsonObject(const JsonObject &jsonObject)
+{
+    if (context_ == nullptr || jsonObject.IsDiscarded() || !IsString(jsonObject, PARAM_KEY_IS_PROXY_BIND) ||
+        jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<std::string>() != DM_VAL_TRUE) {
+        return;
+    }
+    context_->IsProxyBind = true;
+    if (IsString(jsonObject, PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT) &&
+        jsonObject[PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT].Get<std::string>() == DM_VAL_FALSE) {
+        context_->IsCallingProxyAsSubject = false;
+    }
+    if (!IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+        LOGE("no subject proxyed apps");
+        return;
+    }
+    std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
+    JsonObject allProxyObj;
+    allProxyObj.Parse(subjectProxyOnesStr);
+    for (auto const &item : allProxyObj.Items()) {
+        if (!IsString(item, TAG_BUNDLE_NAME)) {
+            LOGE("bundleName invalid");
+            return;
+        }
+        if (!IsInt64(item, TAG_TOKENID)) {
+            LOGE("tokenId invalid");
+            return;
+        }
+        std::string bundleName = item[TAG_BUNDLE_NAME].Get<std::string>();
+        if (context_->accesser.bundleName == bundleName) {
+            LOGE("proxy bundleName same as caller bundleName");
+            return;
+        }
+        std::string peerBundleName = bundleName;
+        if (item.Contains(PARAM_KEY_PEER_BUNDLE_NAME) && IsString(item, PARAM_KEY_PEER_BUNDLE_NAME)) {
+            peerBundleName = item[PARAM_KEY_PEER_BUNDLE_NAME].Get<std::string>();
+        }
+        DmProxyAuthContext proxyAuthContext;
+        proxyAuthContext.proxyContextId = Crypto::Sha256(bundleName + peerBundleName);
+        if (std::find(context_->subjectProxyOnes.begin(), context_->subjectProxyOnes.end(), proxyAuthContext) ==
+            context_->subjectProxyOnes.end()) {
+            proxyAuthContext.proxyAccesser.bundleName = bundleName;
+            proxyAuthContext.proxyAccesser.tokenId = item[TAG_TOKENID].Get<int64_t>();
+            proxyAuthContext.proxyAccesser.tokenIdHash =
+                Crypto::GetTokenIdHash(std::to_string(proxyAuthContext.proxyAccesser.tokenId));
+            proxyAuthContext.proxyAccessee.bundleName = peerBundleName;
+            GetBindLevelByBundleName(bundleName, context_->accesser.userId, proxyAuthContext.proxyAccesser.bindLevel);
+            context_->subjectProxyOnes.push_back(proxyAuthContext);
+        }
+    }
+}
+
+void AuthManager::ParseServiceJsonObject(const JsonObject &jsonObject)
+{
+    LOGI("ParseServiceJsonObject inner1");
+    if (context_ == nullptr || jsonObject.IsDiscarded() || !IsString(jsonObject, PARAM_KEY_IS_PROXY_BIND) ||
+        jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<std::string>() != DM_VAL_TRUE) {
+        LOGI("ParseServiceJsonObject inner2");
+        return;
+    }
+    context_->IsProxyBind = true;
+    if (IsString(jsonObject, PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT) &&
+        jsonObject[PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT].Get<std::string>() == DM_VAL_FALSE) {
+        context_->IsCallingProxyAsSubject = false;
+    }
+    if (!IsString(jsonObject, PARAM_KEY_SUBJECT_SERVICE_ONES)) {
+        LOGE("no subject proxyed apps");
+        return;
+    }
+    LOGI("ParseServiceJsonObject inner3");
+    std::string subjectServiceOnesStr = jsonObject[PARAM_KEY_SUBJECT_SERVICE_ONES].Get<std::string>();
+    JsonObject allServiceObj;
+    allServiceObj.Parse(subjectServiceOnesStr);
+    for (auto const &item : allServiceObj.Items()) {
+        if (!IsString(item, PARAM_KEY_LOCAL_PKGNAME)) {
+            LOGE("local pkgName invalid");
+            return;
+        }
+        if (!IsString(item, PARAM_KEY_LOCAL_TOKENID)) {
+            LOGE("local tokenId invalid");
+            return;
+        }
+        if (!IsString(item, PARAM_KEY_PEER_SERVICEID)) {
+            LOGE("peer serviceId invalid");
+            return;
+        }
+        DmProxyAuthContext proxyAuthContext;
+        if (std::find(context_->subjectServiceOnes.begin(), context_->subjectServiceOnes.end(), proxyAuthContext) ==
+            context_->subjectServiceOnes.end()) {
+            proxyAuthContext.proxyAccesser.pkgName = item[PARAM_KEY_LOCAL_PKGNAME].Get<std::string>();
+            proxyAuthContext.proxyAccesser.tokenId = std::stoll(item[PARAM_KEY_LOCAL_TOKENID].Get<std::string>());
+            proxyAuthContext.proxyAccesser.tokenIdHash =
+                Crypto::GetTokenIdHash(std::to_string(proxyAuthContext.proxyAccesser.tokenId));
+            proxyAuthContext.proxyAccessee.serviceId = std::stoll(item[PARAM_KEY_PEER_SERVICEID].Get<std::string>());
+            proxyAuthContext.proxyContextId = Crypto::Sha256(proxyAuthContext.proxyAccesser.tokenIdHash +
+                std::to_string(proxyAuthContext.proxyAccesser.serviceId));
+            proxyAuthContext.proxyAccesser.bindLevel = context_->accesser.bindLevel;
+            context_->subjectServiceOnes.push_back(proxyAuthContext);
+        }
+    }
+}
+
+void AuthManager::GetBindLevelByBundleName(std::string &bundleName, int32_t userId, int32_t &bindLevel)
+{
+    int64_t tokenId = 0;
+    if (AppManager::GetInstance().GetHapTokenIdByName(userId, bundleName, 0, tokenId) == DM_OK) {
+        bindLevel = DmRole::DM_ROLE_FA;
+    } else if (AppManager::GetInstance().GetNativeTokenIdByName(bundleName, tokenId) == DM_OK) {
+        bindLevel = DmRole::DM_ROLE_SA;
+    } else {
+        LOGE("src not contain the bundlename %{public}s.", bundleName.c_str());
+    }
+}
+
+void AuthManager::GetDelayCloseConnTime(const JsonObject &jsonObject)
+{
+    CHECK_NULL_VOID(context_);
+    context_->connDelayCloseTime = 0;
+    const int32_t MICROSECOND_PER_SECOND = 1000000L;
+    if (context_->connSessionType != CONN_SESSION_TYPE_HML) {
+        context_->connDelayCloseTime = DEFAULT_DELAY_CLOSE_TIME_US;
+    }
+    if (context_->connDelayCloseTime == 0) {
+        context_->connDelayCloseTime = HML_SESSION_TIMEOUT * MICROSECOND_PER_SECOND;
+    }
+    if (jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].IsString()) {
+        std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
+        context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr) * MICROSECOND_PER_SECOND;
+    }
+}
 //LCOV_EXCL_STOP
 }  // namespace DistributedHardware
 }  // namespace OHOS
