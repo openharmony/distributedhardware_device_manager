@@ -1250,7 +1250,7 @@ int32_t DeviceManagerService::ValidateUnBindTokenId(const std::string &pkgName, 
     char localUdid[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
     int32_t localUserId = MultipleUserConnector::GetCurrentAccountUserID();
-    std::vector<AccessControlProfile> profiles =
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAclProfileByDeviceIdAndUserId(std::string(localUdid),
             localUserId, peerUdid);
     if (profiles.empty()) {
