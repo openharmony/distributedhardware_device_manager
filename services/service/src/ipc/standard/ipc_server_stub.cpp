@@ -64,6 +64,7 @@ const std::unordered_set<int32_t> CLIENT_CODE_3RD { INIT_DEVICE_MANAGER, UNINIT_
 constexpr const char* LIB_IPC_SERVICE_STUB_3RD_NAME = "libdevicemanager3rdservice.z.so";
 
 constexpr const char* RECLAIM_MEMMGR_FILE_MEM_FOR_DMTASK = "ReclaimMemmgrFileMemForDMTask";
+constexpr const char* START_DETECT_DEVICE_RISK_TASK = "StartDetectDeviceRiskTask";
 }
 
 DM_IMPLEMENT_SINGLE_INSTANCE(IpcServerStub);
@@ -222,7 +223,8 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
         return;
     }
     if (systemAbilityId == RISK_ANALYSIS_MANAGER_SA_ID) {
-        DeviceManagerService::GetInstance().StartDetectDeviceRisk();
+        ffrt::submit([=]() { DeviceManagerService::GetInstance().StartDetectDeviceRisk(); },
+            ffrt::task_attr().name(START_DETECT_DEVICE_RISK_TASK));
         return;
     }
 }
