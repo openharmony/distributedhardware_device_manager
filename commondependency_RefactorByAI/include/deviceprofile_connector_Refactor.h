@@ -1,0 +1,462 @@
+/*
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef OHOS_DM_DEVICEPROFILE_CONNECTOR_REFACTOR_H
+#define OHOS_DM_DEVICEPROFILE_CONNECTOR_REFACTOR_H
+
+#include <algorithm>
+#include <map>
+#include <string>
+#include <set>
+#include <unordered_set>
+#include <vector>
+#include <cstring>
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "access_control_profile.h"
+#include "dm_device_info.h"
+#include "dm_single_instance.h"
+#include "i_dp_inited_callback.h"
+#include "json_object.h"
+#include "local_service_info.h"
+#include "parameter.h"
+#include "service_info.h"
+#include "single_instance.h"
+#include "trusted_device_info.h"
+#endif
+
+enum AllowAuthType {
+    ALLOW_AUTH_ONCE = 1,
+    ALLOW_AUTH_ALWAYS = 2
+};
+
+DM_EXPORT extern const uint32_t INVALIED_TYPE;
+DM_EXPORT extern const uint32_t APP_PEER_TO_PEER_TYPE;
+DM_EXPORT extern const uint32_t APP_ACROSS_ACCOUNT_TYPE;
+DM_EXPORT extern const uint32_t SHARE_TYPE;
+DM_EXPORT extern const uint32_t DEVICE_PEER_TO_PEER_TYPE;
+DM_EXPORT extern const uint32_t DEVICE_ACROSS_ACCOUNT_TYPE;
+DM_EXPORT extern const uint32_t IDENTICAL_ACCOUNT_TYPE;
+DM_EXPORT extern const uint32_t SERVICE_PEER_TO_PEER_TYPE;
+DM_EXPORT extern const uint32_t SERVICE_ACROSS_ACCOUNT_TYPE;
+
+DM_EXPORT extern const uint32_t DM_INVALIED_TYPE;
+DM_EXPORT extern const uint32_t USER;
+DM_EXPORT extern const uint32_t SERVICE;
+DM_EXPORT extern const uint32_t APP;
+
+extern const char* TAG_PEER_BUNDLE_NAME;
+DM_EXPORT extern const char* TAG_PEER_TOKENID;
+
+const uint32_t DM_IDENTICAL_ACCOUNT = 1;
+const uint32_t DM_SHARE = 2;
+const uint32_t DM_LNN = 3;
+const uint32_t DM_POINT_TO_POINT = 256;
+const uint32_t DM_ACROSS_ACCOUNT = 1282;
+const int32_t DM_VERSION_INT_5_1_0 = 510;
+
+constexpr size_t DM_MAX_UDID_LEN = 64;
+constexpr size_t DM_MIN_UDID_LEN = 16;
+constexpr size_t DM_MAX_ACCOUNT_ID_LEN = 128;
+constexpr size_t DM_MAX_CRED_ID_LEN = 256;
+
+enum ProfileState {
+    INACTIVE = 0,
+    ACTIVE = 1
+};
+
+enum DmDeviceIdValidationResult {
+    DM_DEVICE_ID_VALID = 0,
+    DM_DEVICE_ID_EMPTY = 1,
+    DM_DEVICE_ID_INVALID_LENGTH = 2,
+    DM_DEVICE_ID_INVALID_FORMAT = 3
+};
+
+typedef struct DmDiscoveryInfo {
+    std::string pkgname;
+    std::string localDeviceId;
+    int32_t userId;
+    std::string remoteDeviceIdHash;
+} DmDiscoveryInfo;
+
+typedef struct DmAclInfo {
+    std::string sessionKey;
+    int32_t bindType;
+    int32_t state;
+    std::string trustDeviceId;
+    int32_t bindLevel;
+    int32_t authenticationType;
+    std::string deviceIdHash;
+} DmAclInfo;
+
+typedef struct DmAccesser {
+    uint64_t requestTokenId;
+    std::string requestBundleName;
+    int32_t requestUserId;
+    std::string requestAccountId;
+    std::string requestDeviceId;
+    int32_t requestTargetClass;
+    std::string requestDeviceName;
+} DmAccesser;
+
+typedef struct DmAccessee {
+    uint64_t trustTokenId;
+    std::string trustBundleName;
+    int32_t trustUserId;
+    std::string trustAccountId;
+    std::string trustDeviceId;
+    int32_t trustTargetClass;
+    std::string trustDeviceName;
+} DmAccessee;
+
+typedef struct DmAclIdParam {
+    std::string udid;
+    int32_t userId;
+    int64_t accessControlId;
+    int32_t skId;
+    std::string credId;
+    std::string pkgName;
+    std::unordered_set<int64_t> tokenIds;
+} DmAclIdParam;
+
+typedef struct DmOfflineParam {
+    uint32_t bindType;
+    std::vector<OHOS::DistributedHardware::ProcessInfo> processVec;
+    std::vector<std::string> credIdVec;
+    std::vector<int32_t> skIdVec;
+    int32_t leftAclNumber;
+    int32_t peerUserId;
+    bool hasLnnAcl = false;
+    bool hasUserAcl = false;
+    bool isNewVersion = true;
+    int64_t accessControlId;
+    std::vector<DmAclIdParam> needDelAclInfos;
+    std::vector<DmAclIdParam> allLnnAclInfos;
+    std::vector<DmAclIdParam> allLeftAppOrSvrAclInfos;
+    std::vector<DmAclIdParam> allUserAclInfos;
+} DmOfflineParam;
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+typedef struct DmLocalUserRemovedInfo {
+    std::string localUdid = "";
+    int32_t preUserId = 0;
+    std::vector<std::string> peerUdids = {};
+} DmLocalUserRemovedInfo;
+
+typedef struct DmRemoteUserRemovedInfo {
+    std::string peerUdid = "";
+    int32_t peerUserId = 0;
+    std::vector<int32_t> localUserIds = {};
+} DmRemoteUserRemovedInfo;
+
+typedef struct DmCacheOfflineInputParam {
+    OHOS::DistributedDeviceProfile::AccessControlProfile profile;
+    OHOS::DistributedHardware::DMAclQuadInfo info;
+    std::string accountIdHash = "";
+} DmCacheOfflineOutputParam;
+
+struct AclHashItem {
+    std::string version;
+    std::vector<std::string> aclHashList;
+};
+
+struct AuthOnceAclInfo {
+    std::string peerUdid;
+    int32_t peerUserId = 0;
+    int32_t localUserId = 0;
+    bool operator==(const AuthOnceAclInfo &other) const
+    {
+        return peerUserId == other.peerUserId && localUserId == other.localUserId && peerUdid == other.peerUdid;
+    }
+};
+
+struct AuthOnceAclInfoHash {
+    std::size_t operator()(const AuthOnceAclInfo &info) const
+    {
+        std::size_t h1 = std::hash<std::string>{}(info.peerUdid);
+        std::size_t h2 = std::hash<int32_t>{}(info.peerUserId);
+        std::size_t h3 = std::hash<int32_t>{}(info.localUserId);
+        constexpr std::size_t shift1 = 1;
+        constexpr std::size_t shift2 = 2;
+        return h1 ^ (h2 << shift1) ^ (h3 << shift2);
+    }
+};
+
+namespace OHOS {
+namespace DistributedHardware {
+
+class DmSecureUtils {
+public:
+    static void SecureClearString(std::string &str);
+    static void SecureClearBuffer(void *buffer, size_t size);
+    static DmDeviceIdValidationResult ValidateDeviceId(const std::string &deviceId);
+    static bool IsValidAccountId(const std::string &accountId);
+    static bool IsValidUserId(int32_t userId);
+    static bool IsValidTokenId(int64_t tokenId);
+    static bool IsValidBindType(uint32_t bindType);
+    static bool IsValidBindLevel(uint32_t bindLevel);
+};
+
+class IDeviceProfileConnector {
+public:
+    virtual ~IDeviceProfileConnector() {}
+    virtual int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm) = 0;
+    virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds,
+        const std::string &localUdid) = 0;
+    virtual int32_t HandleUserSwitched(const std::string &localUdid, const std::vector<std::string> &deviceVec,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
+    virtual bool CheckAclStatusAndForegroundNotMatch(const std::string &localUdid,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
+    virtual int32_t HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid) = 0;
+    virtual int32_t HandleUserStop(int32_t stopUserId, const std::string &localUdid,
+        const std::vector<std::string> &acceptEventUdids) = 0;
+    virtual int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos) = 0;
+    virtual int32_t GetAllAuthOnceAclInfos(std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> &aclInfos) = 0;
+};
+
+class DeviceProfileConnector : public IDeviceProfileConnector {
+    DM_DECLARE_SINGLE_INSTANCE(DeviceProfileConnector);
+public:
+    DM_EXPORT DmOfflineParam FilterNeedDeleteACL(const std::string &localDeviceId, uint32_t localTokenId,
+        const std::string &remoteDeviceId, const std::string &extra);
+    DM_EXPORT DmOfflineParam FilterNeedDeleteACL(const std::string &peerUdid);
+    DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile>
+        GetAccessControlProfile();
+    DM_EXPORT DmOfflineParam HandleServiceUnBindEvent(int32_t remoteUserId,
+        const std::string &remoteUdid, const std::string &localUdid, int32_t tokenId);
+    DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfileByUserId(
+        int32_t userId);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByDeviceIdAndUserId(
+        const std::string &deviceId, int32_t userId);
+    DM_EXPORT uint32_t CheckBindType(std::string peerUdid, std::string localUdid);
+    DM_EXPORT int32_t PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser,
+        DmAccessee dmAccessee);
+    int32_t UpdateAccessControlList(int32_t userId, std::string &oldAccountId, std::string &newAccountId);
+    DM_EXPORT void UpdateAclStatus(const DistributedDeviceProfile::AccessControlProfile &profile);
+    DM_EXPORT std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceList(
+        const std::string &pkgName, const std::string &deviceId);
+    DM_EXPORT std::vector<int32_t> GetBindTypeByPkgName(std::string pkgName,
+        std::string requestDeviceId, std::string trustUdid);
+    DM_EXPORT uint64_t GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId);
+    DM_EXPORT std::vector<int32_t> SyncAclByBindType(std::string pkgName,
+        std::vector<int32_t> bindTypeVec, std::string localDeviceId, std::string targetDeviceId);
+    int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm);
+
+    DM_EXPORT bool DeleteAclForAccountLogOut(const DMAclQuadInfo &info, const std::string &accountId,
+        DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    DM_EXPORT bool DeleteAclByActhash(const DMAclQuadInfo &info, const std::string &accountIdHash,
+        DmOfflineParam &offlineParam, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    DM_EXPORT void CacheOfflineParam(const DmCacheOfflineInputParam &inputParam,
+        DmOfflineParam &offlineParam, bool &notifyOffline, std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    DM_EXPORT void DeleteAclForUserRemoved(const DmLocalUserRemovedInfo &userRemovedInfo,
+        std::multimap<std::string, int32_t> &peerUserIdMap, DmOfflineParam &offlineParam,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    DM_EXPORT void DeleteAclForRemoteUserRemoved(
+        DmRemoteUserRemovedInfo &userRemovedInfo, DmOfflineParam &offlineParam,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    DM_EXPORT DmOfflineParam DeleteAccessControlList(const std::string &pkgName,
+        const std::string &localDeviceId, const std::string &remoteDeviceId, int32_t bindLevel,
+        const std::string &extra);
+    DM_EXPORT std::vector<OHOS::DistributedHardware::ProcessInfo>
+        GetProcessInfoFromAclByUserId(const std::string &localDeviceId, const std::string &targetDeviceId,
+        int32_t userId);
+    DM_EXPORT DistributedDeviceProfile::AccessControlProfile GetAccessControlProfileByAccessControlId(
+        int64_t accessControlId);
+    DM_EXPORT void DeleteAccessControlList(const std::string &udid);
+    DM_EXPORT std::vector<std::pair<int64_t, int64_t>> GetAgentToProxyVecFromAclByUserId(
+        const std::string &localDeviceId, const std::string &targetDeviceId, int32_t userId);
+    DM_EXPORT bool CheckSrcDevIdInAclForDevBind(const std::string &pkgName,
+        const std::string &deviceId);
+    DM_EXPORT bool CheckSinkDevIdInAclForDevBind(const std::string &pkgName,
+        const std::string &deviceId);
+    DM_EXPORT uint32_t DeleteTimeOutAcl(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId,
+        DmOfflineParam &offlineParam);
+    DM_EXPORT int32_t GetTrustNumber(const std::string &deviceId);
+    bool CheckDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId);
+    std::vector<int32_t> CompareBindType(std::vector<DistributedDeviceProfile::AccessControlProfile> profiles,
+        std::string pkgName, std::vector<int32_t> &sinkBindType, std::string localDeviceId, std::string targetDeviceId);
+    DM_EXPORT int32_t IsSameAccount(const std::string &udid);
+    DM_EXPORT bool CheckAccessControl(const DmAccessCaller &caller,
+        const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid);
+    DM_EXPORT bool CheckIsSameAccount(const DmAccessCaller &caller,
+        const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid);
+    DM_EXPORT int32_t GetBindLevel(const std::string &pkgName,
+        const std::string &localUdid, const std::string &udid, uint64_t &tokenId);
+    std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds, const std::string &localUdid);
+    DM_EXPORT std::vector<std::string> GetDeviceIdAndUdidListByTokenId(const std::vector<int32_t> &userIds,
+        const std::string &localUdid, int32_t tokenId);
+    DM_EXPORT std::multimap<std::string, int32_t> GetDeviceIdAndUserId(
+        int32_t userId, const std::string &accountId, const std::string &localUdid);
+    int32_t HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
+        const std::string &remoteUdid, const std::string &localUdid);
+    DM_EXPORT int32_t HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+        const std::string &localUdid, DmOfflineParam &offlineParam, int32_t tokenId);
+    DM_EXPORT DmOfflineParam HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+        int32_t tokenId, const std::string &localUdid);
+    DM_EXPORT DmOfflineParam HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+        int32_t tokenId, const std::string &localUdid, int32_t peerTokenId);
+    DM_EXPORT void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
+        const std::string &localUdid, int32_t localUserId, const std::string &localAccountId);
+    DM_EXPORT void GetRemoteTokenIds(const std::string &localUdid, const std::string &udid,
+        std::unordered_set<int64_t> &remoteTokenIds);
+    DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile>
+        GetAllAccessControlProfile();
+    DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAllAclIncludeLnnAcl();
+    DM_EXPORT void DeleteAccessControlById(int64_t accessControlId);
+    DM_EXPORT int32_t HandleUserSwitched(const std::string &localUdid,
+        const std::vector<std::string> &deviceVec, int32_t currentUserId, int32_t beforeUserId);
+    DM_EXPORT int32_t HandleUserSwitched(const std::string &localUdid,
+        const std::vector<std::string> &deviceVec, const std::vector<int32_t> &foregroundUserIds,
+        const std::vector<int32_t> &backgroundUserIds);
+    bool CheckAclStatusAndForegroundNotMatch(const std::string &localUdid,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    DM_EXPORT void HandleUserSwitched(
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &activeProfiles,
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &inActiveProfiles);
+    DM_EXPORT void HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds,
+        const std::string &remoteUdid, const std::vector<int32_t> &localUserIds, std::string &localUdid,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    std::vector<ProcessInfo> GetOfflineProcessInfo(std::string &localUdid, const std::vector<int32_t> &localUserIds,
+        const std::string &remoteUdid, const std::vector<int32_t> &remoteUserIds);
+    DM_EXPORT std::map<int32_t, int32_t> GetUserIdAndBindLevel(
+        const std::string &localUdid, const std::string &peerUdid);
+    DM_EXPORT void UpdateACL(std::string &localUdid, const std::vector<int32_t> &localUserIds,
+        const std::string &remoteUdid, const std::vector<int32_t> &remoteFrontUserIds,
+        const std::vector<int32_t> &remoteBackUserIds, DmOfflineParam &offlineParam);
+    DM_EXPORT std::multimap<std::string, int32_t> GetDevIdAndUserIdByActHash(
+        const std::string &localUdid, const std::string &peerUdid, int32_t peerUserId,
+        const std::string &peerAccountHash);
+    DM_EXPORT std::multimap<std::string, int32_t> GetDeviceIdAndUserId(
+        const std::string &localUdid, int32_t localUserId);
+    DM_EXPORT void HandleSyncBackgroundUserIdEvent(
+        const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
+        const std::vector<int32_t> &localUserIds, std::string &localUdid,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    DM_EXPORT int32_t DeleteSessionKey(int32_t userId, int32_t sessionKeyId);
+    DM_EXPORT int32_t GetSessionKey(int32_t userId, int32_t sessionKeyId,
+        std::vector<unsigned char> &sessionKeyArray);
+    DM_EXPORT int32_t SubscribeDeviceProfileInited(
+        sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback);
+    DM_EXPORT int32_t UnSubscribeDeviceProfileInited();
+    DM_EXPORT int32_t PutAllTrustedDevices(
+        const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos);
+    DM_EXPORT int32_t CheckDeviceInfoPermission(const std::string &localUdid,
+        const std::string &peerDeviceId);
+    DM_EXPORT int32_t UpdateAclDeviceName(const std::string &udid,
+        const std::string &newDeviceName, bool isLocal = false);
+    DM_EXPORT int32_t PutLocalServiceInfo(
+        const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo);
+    DM_EXPORT int32_t DeleteLocalServiceInfo(const std::string &bundleName,
+        int32_t pinExchangeType);
+    DM_EXPORT int32_t UpdateLocalServiceInfo(
+        const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo);
+    DM_EXPORT int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        const std::string &bundleName, int32_t pinExchangeType,
+        DistributedDeviceProfile::LocalServiceInfo &localServiceInfo);
+    DM_EXPORT int32_t PutSessionKey(int32_t userId, const std::vector<unsigned char> &sessionKeyArray,
+        int32_t &sessionKeyId);
+    int32_t HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid);
+    int32_t HandleUserStop(int32_t stopUserId, const std::string &localUdid,
+        const std::vector<std::string> &acceptEventUdids);
+    DM_EXPORT std::string IsAuthNewVersion(int32_t bindLevel, std::string localUdid, std::string remoteUdid,
+        int32_t tokenId, int32_t userId);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByDeviceIdAndUserId(
+        const std::string &deviceId, int32_t userId, const std::string &remoteDeviceId);
+    DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclList(const std::string localUdid,
+        int32_t localUserId, const std::string remoteUdid, int32_t remoteUserId);
+    DM_EXPORT bool ChecksumAcl(DistributedDeviceProfile::AccessControlProfile &acl,
+        std::vector<std::string> &acLStrList);
+    DM_EXPORT std::string AccessToStr(DistributedDeviceProfile::AccessControlProfile acl);
+    DM_EXPORT int32_t GetVersionByExtra(std::string &extraInfo, std::string &dmVersion);
+    DM_EXPORT void GetAllVerionAclMap(DistributedDeviceProfile::AccessControlProfile &acl,
+        std::map<std::string, std::vector<std::string>> &aclMap, std::string dmVersion = "");
+    void GenerateAclHash(DistributedDeviceProfile::AccessControlProfile &acl,
+        std::map<std::string, std::vector<std::string>> &aclMap, const std::string &dmVersion);
+    DM_EXPORT int32_t CheckIsSameAccountByUdidHash(const std::string &udidHash);
+    DM_EXPORT int32_t GetAclListHashStr(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string &aclListHash, std::string dmVersion = "");
+    DM_EXPORT bool IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile);
+    DM_EXPORT void CacheAcerAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
+        std::vector<DmAclIdParam> &aclInfos);
+    DM_EXPORT void CacheAceeAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
+        std::vector<DmAclIdParam> &aclInfos);
+    DM_EXPORT void AclHashItemToJson(JsonItemObject &itemObject, const AclHashItem &value);
+    DM_EXPORT void AclHashVecToJson(JsonItemObject &itemObject, const std::vector<AclHashItem> &values);
+    DM_EXPORT void AclHashItemFromJson(const JsonItemObject &itemObject, AclHashItem &value);
+    DM_EXPORT void AclHashVecFromJson(const JsonItemObject &itemObject, std::vector<AclHashItem> &values);
+    void DeleteCacheAcl(std::vector<int64_t> delAclIdVec,
+        std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles);
+    DM_EXPORT int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
+        std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    DM_EXPORT bool CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    DM_EXPORT bool CheckSinkAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    DM_EXPORT bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    DM_EXPORT bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    DM_EXPORT void DeleteHoDevice(const std::string &peerUdid, const std::vector<int32_t> &foreGroundUserIds,
+        const std::vector<int32_t> &backGroundUserIds);
+    DM_EXPORT bool IsAllowAuthAlways(const std::string &localUdid, int32_t userId, const std::string &peerUdid,
+        const std::string &pkgName, int64_t tokenId);
+    int32_t GetAllAuthOnceAclInfos(std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> &aclInfos);
+    DM_EXPORT void DeleteDpInvalidAcl();
+    DM_EXPORT bool CheckUserIdIsForegroundUserId(const int32_t userId);
+    DM_EXPORT void GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
+        DMLocalServiceInfoAuthType &authType);
+    DM_EXPORT std::unordered_set<int32_t> GetActiveAuthOncePeerUserId(const std::string &peerUdid, int32_t localUserId);
+    DM_EXPORT std::unordered_set<AuthOnceAclInfo, AuthOnceAclInfoHash> GetAuthOnceAclInfos(const std::string &peerUdid);
+    DM_EXPORT bool AuthOnceAclIsActive(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId);
+    DM_EXPORT bool CheckAccessControlProfileByTokenId(int32_t tokenId);
+    DM_EXPORT int32_t GetServiceInfosByUdid(const std::string &udid,
+        std::vector<DistributedDeviceProfile::ServiceInfo> &serviceInfos);
+    DM_EXPORT int32_t GetServiceInfosByUdidAndUserId(const std::string &udid, int32_t userId,
+        std::vector<DistributedDeviceProfile::ServiceInfo> &serviceInfos);
+    DM_EXPORT int32_t GetServiceInfoByUdidAndServiceId(const std::string &udid, int64_t serviceId,
+        DistributedDeviceProfile::ServiceInfo &dpServiceInfo);
+    DM_EXPORT int32_t PutServiceInfo(const DistributedDeviceProfile::ServiceInfo &dpServiceInfo);
+    DM_EXPORT int32_t DeleteServiceInfo(const DistributedDeviceProfile::ServiceInfo &serviceInfo);
+    DM_EXPORT void GetPeerTokenIdForServiceProxyUnbind(int32_t userId, uint64_t localTokenId,
+        const std::string &peerUdid, int64_t serviceId, std::vector<uint64_t> &peerTokenId);
+    DM_EXPORT void GetInvalidSkIdAcl(std::map<std::string, DmOfflineParam> &invalidAclMap);
+
+private:
+    int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
+    void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,
+        std::vector<int32_t> &bindTypeVec, std::string trustUdid);
+    void ProcessBindType(DistributedDeviceProfile::AccessControlProfile profiles, std::string localDeviceId,
+        std::vector<int32_t> &sinkBindType, std::vector<int32_t> &bindTypeIndex,
+        uint32_t index, std::string targetDeviceId);
+    bool CheckAppLevelAccess(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DmAccessCaller &caller, const DmAccessCallee &callee);
+    bool CheckSinkShareType(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const int32_t &userId, const std::string &deviceId, const std::string &trustDeviceId, const int32_t &bindType);
+    std::unordered_map<std::string, DmAuthForm> GetAuthFormMap(const std::string &pkgName, const std::string &deviceId,
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &profilesFilter, const int32_t &userId);
+    int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
+        const std::string &reqDev);
+};
+
+DM_EXPORT extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();
+using CreateDpConnectorFuncPtr = IDeviceProfileConnector *(*)(void);
+
+} // namespace DistributedHardware
+} // namespace OHOS
+#endif // __LITEOS_M__
+#endif // OHOS_DM_DEVICEPROFILE_CONNECTOR_REFACTOR_H
