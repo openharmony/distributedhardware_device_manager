@@ -1284,16 +1284,6 @@ void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (IsDMServiceAdapterResidentLoad()) {
-        int32_t ret = dmServiceImplExtResident_->GetServiceNodeKeyInfo(DM_PKG_NAME, devInfo.networkId);
-        if (ret == DM_OK) {
-            std::string localUdid = GetLocalDeviceUdid();
-            std::string peerNetworkId = devInfo.networkId;
-            ffrt::submit([dmServiceImplExtResident = dmServiceImplExtResident_,
-                peerNetworkId = peerNetworkId, localUdid = localUdid]() {
-                    dmServiceImplExtResident->SyncServiceInfoOnline(localUdid, peerNetworkId);
-            },
-                ffrt::task_attr().name(SYNC_SERVICE_INFO_ONLINE_TASK));
-        }
         std::string peerUdid(devInfo.deviceId);
         int32_t state = static_cast<int32_t>(devState);
         dmServiceImplExtResident_->HandleServiceStatusChange(devState, peerUdid);
