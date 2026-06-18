@@ -23,6 +23,8 @@
 #include "token_setproc.h"
 #include "softbus_common.h"
 #include "softbus_error_code.h"
+#include "ipc_skeleton_mock.h"
+#include "access_control_profile.h"
 #include <cstring>
 #include <utility>
 
@@ -1936,6 +1938,184 @@ HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_008, testing::ext::TestSize
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).Times(AnyNumber()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().BindServiceTarget(pkgName, targetId, bindParam);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_TokenIdZero_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos.test.pkgName";
+    std::string deviceId = "deviceId";
+    std::string extra;
+
+    auto skeleton = IPCSkeletonInterface::GetOrCreateIPCSkeleton();
+    auto skeletonMock = std::static_pointer_cast<IPCSkeletonMock>(skeleton);
+
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
+    EXPECT_CALL(*skeletonMock, GetCallingTokenID()).WillOnce(Return(0));
+
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId, extra);
+    EXPECT_EQ(ret, ERR_DM_GET_TOKENID_FAILED);
+
+    IPCSkeletonInterface::ReleaseIPCSkeleton();
+}
+
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_GetUdidFailed_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos.test.pkgName";
+    std::string deviceId = "deviceId";
+    std::string extra;
+
+    auto skeleton = IPCSkeletonInterface::GetOrCreateIPCSkeleton();
+    auto skeletonMock = std::static_pointer_cast<IPCSkeletonMock>(skeleton);
+
+    DeviceManagerService::GetInstance().softbusListener_ = softbusListenerMock_;
+
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
+    EXPECT_CALL(*skeletonMock, GetCallingTokenID()).WillOnce(Return(12345));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(ERR_DM_FAILED));
+
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId, extra);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    IPCSkeletonInterface::ReleaseIPCSkeleton();
+}
+
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_EmptyAcl_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos.test.pkgName";
+    std::string deviceId = "deviceId";
+    std::string extra;
+
+    auto skeleton = IPCSkeletonInterface::GetOrCreateIPCSkeleton();
+    auto skeletonMock = std::static_pointer_cast<IPCSkeletonMock>(skeleton);
+
+    DeviceManagerService::GetInstance().softbusListener_ = softbusListenerMock_;
+
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
+    EXPECT_CALL(*skeletonMock, GetCallingTokenID()).WillOnce(Return(12345));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAclProfileByDeviceIdAndUserId(_, _, _))
+        .WillOnce(Return(std::vector<DistributedDeviceProfile::AccessControlProfile>()));
+
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId, extra);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+
+    IPCSkeletonInterface::ReleaseIPCSkeleton();
+}
+
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_TokenIdMatchAsAccesser_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos.test.pkgName";
+    std::string deviceId = "deviceId";
+    std::string extra;
+
+    auto skeleton = IPCSkeletonInterface::GetOrCreateIPCSkeleton();
+    auto skeletonMock = std::static_pointer_cast<IPCSkeletonMock>(skeleton);
+
+    DeviceManagerService::GetInstance().softbusListener_ = softbusListenerMock_;
+
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserTokenId(12345);
+    accesser.SetAccesserDeviceId("localUdid");
+    profile.SetAccesser(accesser);
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles = {profile};
+
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
+    EXPECT_CALL(*skeletonMock, GetCallingTokenID()).WillOnce(Return(12345));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAclProfileByDeviceIdAndUserId(_, _, _))
+        .WillOnce(Return(profiles));
+
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId, extra);
+    EXPECT_EQ(ret, DM_OK);
+
+    IPCSkeletonInterface::ReleaseIPCSkeleton();
+}
+
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_TokenIdMatchAsAccessee_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos.test.pkgName";
+    std::string deviceId = "deviceId";
+    std::string extra;
+
+    auto skeleton = IPCSkeletonInterface::GetOrCreateIPCSkeleton();
+    auto skeletonMock = std::static_pointer_cast<IPCSkeletonMock>(skeleton);
+
+    DeviceManagerService::GetInstance().softbusListener_ = softbusListenerMock_;
+
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeTokenId(12345);
+    accessee.SetAccesseeDeviceId("localUdid");
+    profile.SetAccessee(accessee);
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles = {profile};
+
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
+    EXPECT_CALL(*skeletonMock, GetCallingTokenID()).WillOnce(Return(12345));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAclProfileByDeviceIdAndUserId(_, _, _))
+        .WillOnce(Return(profiles));
+
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId, extra);
+    EXPECT_EQ(ret, DM_OK);
+
+    IPCSkeletonInterface::ReleaseIPCSkeleton();
+}
+
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_TokenIdNotMatch_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos.test.pkgName";
+    std::string deviceId = "deviceId";
+    std::string extra;
+
+    auto skeleton = IPCSkeletonInterface::GetOrCreateIPCSkeleton();
+    auto skeletonMock = std::static_pointer_cast<IPCSkeletonMock>(skeleton);
+
+    DeviceManagerService::GetInstance().softbusListener_ = softbusListenerMock_;
+
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserTokenId(99999);
+    accesser.SetAccesserDeviceId("localUdid");
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeTokenId(88888);
+    accessee.SetAccesseeDeviceId("localUdid");
+    profile.SetAccesser(accesser);
+    profile.SetAccessee(accessee);
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles = {profile};
+
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
+    EXPECT_CALL(*skeletonMock, GetCallingTokenID()).WillOnce(Return(12345));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAclProfileByDeviceIdAndUserId(_, _, _))
+        .WillOnce(Return(profiles));
+
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId, extra);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+
+    IPCSkeletonInterface::ReleaseIPCSkeleton();
+}
+
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_SystemSA_SkipTokenId_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos.test.pkgName";
+    std::string deviceId = "deviceId";
+    std::string extra;
+
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
+
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId, extra);
+    EXPECT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware
