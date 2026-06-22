@@ -143,6 +143,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         }
         dmInterface_ = nullptr;
     }
+    UnSubscribeDMSAChangeListener();
     LOGI("completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
@@ -250,6 +251,32 @@ void IpcClientManager::SystemAbilityListener::OnAddSystemAbility(int32_t systemA
             return;
         }
         DeviceManagerImpl::GetInstance().SyncServiceCallbacksToService(serviceCallbackMap);
+    }
+}
+
+void IpcClientManager::UnSubscribeDMSAChangeListener()
+{
+    if (saListenerCallback == nullptr) {
+        LOGE("saListenerCallback is nullptr.");
+        return;
+    }
+    sptr<ISystemAbilityManager> systemAbilityManager =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+
+    if (systemAbilityManager == nullptr) {
+        LOGE("get system ability manager failed.");
+        return;
+    }
+
+    if (isSubscribeDMSAChangeListener.load()) {
+        LOGI("try subscribe source sa change listener, sa id: %{public}d", DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+        int32_t ret = systemAbilityManager->UnSubscribeSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID,
+            saListenerCallback);
+        if (ret != DM_OK) {
+            LOGE("unsubscribe source sa change failed: %{public}d", ret);
+            return;
+        }
+        isSubscribeDMSAChangeListener.store(false);
     }
 }
 } // namespace DistributedHardware

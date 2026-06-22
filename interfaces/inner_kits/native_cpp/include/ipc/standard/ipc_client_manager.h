@@ -68,6 +68,7 @@ public:
 private:
     int32_t ClientInit();
     void SubscribeDMSAChangeListener();
+    void UnSubscribeDMSAChangeListener();
 private:
     std::mutex lock_;
     std::map<std::string, sptr<IpcClientStub>> dmListener_;
