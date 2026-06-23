@@ -19,7 +19,7 @@ import type { AsyncCallback, Callback } from './@ohos.base';
  * Providers interfaces to create a {@link deviceManager} instances.
  *
  * @since 7
- * @Syscap SystemCapability.DISTRIBUTEDHARDWARE.deviceManager
+ * @Syscap SystemCapability.DistributedHardware.deviceManager
  *
  */
 declare namespace deviceManager {
