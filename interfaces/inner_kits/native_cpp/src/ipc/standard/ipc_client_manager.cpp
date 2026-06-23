@@ -269,7 +269,7 @@ void IpcClientManager::UnSubscribeDMSAChangeListener()
     }
 
     if (isSubscribeDMSAChangeListener.load()) {
-        LOGI("try subscribe source sa change listener, sa id: %{public}d", DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+        LOGI("try unsubscribe source sa change listener, sa id: %{public}d", DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         int32_t ret = systemAbilityManager->UnSubscribeSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID,
             saListenerCallback);
         if (ret != DM_OK) {
