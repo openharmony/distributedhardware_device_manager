@@ -1968,8 +1968,6 @@ HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_GetUdidFaile
     auto skeleton = IPCSkeletonInterface::GetOrCreateIPCSkeleton();
     auto skeletonMock = std::static_pointer_cast<IPCSkeletonMock>(skeleton);
 
-    DeviceManagerService::GetInstance().softbusListener_ = softbusListenerMock_;
-
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
     EXPECT_CALL(*skeletonMock, GetCallingTokenID()).WillOnce(Return(12345));
@@ -1989,8 +1987,6 @@ HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_EmptyAcl_001
 
     auto skeleton = IPCSkeletonInterface::GetOrCreateIPCSkeleton();
     auto skeletonMock = std::static_pointer_cast<IPCSkeletonMock>(skeleton);
-
-    DeviceManagerService::GetInstance().softbusListener_ = softbusListenerMock_;
 
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
@@ -2013,8 +2009,6 @@ HWTEST_F(DeviceManagerServiceTest, ValidateUnBindParams_NonSA_TokenIdMatchAsAcce
 
     auto skeleton = IPCSkeletonInterface::GetOrCreateIPCSkeleton();
     auto skeletonMock = std::static_pointer_cast<IPCSkeletonMock>(skeleton);
-
-    DeviceManagerService::GetInstance().softbusListener_ = softbusListenerMock_;
 
     DistributedDeviceProfile::AccessControlProfile profile;
     DistributedDeviceProfile::Accesser accesser;
@@ -2046,8 +2040,6 @@ HWTEST_F(DeviceManagerServiceTest, ValidateUnBindParams_NonSA_TokenIdMatchAsAcce
     auto skeleton = IPCSkeletonInterface::GetOrCreateIPCSkeleton();
     auto skeletonMock = std::static_pointer_cast<IPCSkeletonMock>(skeleton);
 
-    DeviceManagerService::GetInstance().softbusListener_ = softbusListenerMock_;
-
     DistributedDeviceProfile::AccessControlProfile profile;
     DistributedDeviceProfile::Accessee accessee;
     accessee.SetAccesseeTokenId(12345);
@@ -2077,8 +2069,6 @@ HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_TokenIdNotMa
 
     auto skeleton = IPCSkeletonInterface::GetOrCreateIPCSkeleton();
     auto skeletonMock = std::static_pointer_cast<IPCSkeletonMock>(skeleton);
-
-    DeviceManagerService::GetInstance().softbusListener_ = softbusListenerMock_;
 
     DistributedDeviceProfile::AccessControlProfile profile;
     DistributedDeviceProfile::Accesser accesser;
