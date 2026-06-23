@@ -2005,7 +2005,7 @@ HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_EmptyAcl_001
     IPCSkeletonInterface::ReleaseIPCSkeleton();
 }
 
-HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_TokenIdMatchAsAccesser, testing::ext::TestSize.Level1)
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindParams_NonSA_TokenIdMatchAsAccesser, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ohos.test.pkgName";
     std::string deviceId = "deviceId";
@@ -2037,7 +2037,7 @@ HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_TokenIdMatch
     IPCSkeletonInterface::ReleaseIPCSkeleton();
 }
 
-HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_NonSA_TokenIdMatchAsAccessee, testing::ext::TestSize.Level1)
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindParams_NonSA_TokenIdMatchAsAccessee, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ohos.test.pkgName";
     std::string deviceId = "deviceId";
