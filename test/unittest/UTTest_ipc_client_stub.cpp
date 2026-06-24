@@ -228,6 +228,98 @@ HWTEST_F(IpcClientStubTest, SendCmd_005, testing::ext::TestSize.Level0)
     ret = instance->SendCmd(cmdCode, req, rsp);
     ASSERT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: OnRemoteRequest_004
+ * @tc.desc: 1. write a matching interface token into the data parcel
+ *           2. set code is GET_TRUST_DEVICE_LIST
+ *           3. call IpcClientStub OnRemoteRequest
+ *           4. check the descriptor-match branch is taken and OnIpcCmd path runs
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(IpcClientStubTest, OnRemoteRequest_004, testing::ext::TestSize.Level0)
+{
+    // 1. set MessageOption not null
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    // write a matching interface token so GetDescriptor() == ReadInterfaceToken() is true
+    data.WriteInterfaceToken(u"ohos.distributedhardware.devicemanager");
+    // 2. set code is GET_TRUST_DEVICE_LIST
+    int code = GET_TRUST_DEVICE_LIST;
+    sptr<IpcClientStub> instance(new IpcClientStub());
+    EXPECT_CALL(*ipcCmdRegisterMock_, SetRequest(_, _, _)).WillRepeatedly(Return(DM_OK));
+    EXPECT_CALL(*ipcCmdRegisterMock_, OnIpcCmd(_, _, _)).WillRepeatedly(Return(DM_OK));
+    // 3. call IpcClientStub OnRemoteRequest - exercises the descriptor-match + OnIpcCmd path
+    int ret = instance->OnRemoteRequest(code, data, reply, option);
+    // 4. result must not be the descriptor-mismatch error (ERR_DM_IPC_READ_FAILED)
+    ASSERT_NE(ret, ERR_DM_IPC_READ_FAILED);
+}
+
+/**
+ * @tc.name: SendCmd_006
+ * @tc.desc: 1. set a valid cmdCode below IPC_MSG_BUTT
+ *              set non-null req and rsp
+ *           2. the real IpcCmdRegister SetRequest fails (unregistered handler) -> ERR_DM_UNSUPPORTED_IPC_COMMAND
+ *           3. call IpcClientStub SendCmd and check it returns ERR_DM_IPC_SEND_REQUEST_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientStubTest, SendCmd_006, testing::ext::TestSize.Level0)
+{
+    // 1. valid cmdCode (< IPC_MSG_BUTT) with non-null req/rsp so the SetRequest branch is reached
+    int cmdCode = 1;
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    sptr<IpcClientStub> instance = sptr<IpcClientStub>(new IpcClientStub());
+    // 2. IpcCmdRegister.SetRequest fails -> SendCmd returns ERR_DM_IPC_SEND_REQUEST_FAILED
+    EXPECT_CALL(*ipcCmdRegisterMock_, SetRequest(_, _, _)).WillRepeatedly(Return(ERR_DM_FAILED));
+    int ret = instance->SendCmd(cmdCode, req, rsp);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+}
+
+/**
+ * @tc.name: SendCmd_007
+ * @tc.desc: 1. set cmdCode exactly at IPC_MSG_BUTT boundary (>= IPC_MSG_BUTT)
+ *              set non-null req and rsp
+ *           2. call IpcClientStub SendCmd
+ *           3. check the invalid-cmdCode branch routes through IPCObjectStub::OnRemoteRequest (305)
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientStubTest, SendCmd_007, testing::ext::TestSize.Level0)
+{
+    // 1. cmdCode == IPC_MSG_BUTT triggers the cmdCode >= IPC_MSG_BUTT branch
+    int cmdCode = IPC_MSG_BUTT;
+    int result = 305;
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    sptr<IpcClientStub> instance = sptr<IpcClientStub>(new IpcClientStub());
+    // 2. call SendCmd, invalid cmdCode routes through IPCObjectStub::OnRemoteRequest
+    int ret = instance->SendCmd(cmdCode, req, rsp);
+    // 3. result is 305 as the boundary case routes to IPCObjectStub
+    ASSERT_EQ(ret, result);
+}
+
+/**
+ * @tc.name: SendCmd_008
+ * @tc.desc: 1. set a valid cmdCode at the upper boundary (IPC_MSG_BUTT - 1)
+ *              set non-null req/rsp
+ *           2. real IpcCmdRegister SetRequest fails for the last valid code
+ *           3. check SendCmd returns ERR_DM_IPC_SEND_REQUEST_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(IpcClientStubTest, SendCmd_008, testing::ext::TestSize.Level0)
+{
+    // 1. cmdCode == IPC_MSG_BUTT - 1 is the last valid value (passes the < IPC_MSG_BUTT guard)
+    int cmdCode = IPC_MSG_BUTT - 1;
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    sptr<IpcClientStub> instance = sptr<IpcClientStub>(new IpcClientStub());
+    // 2. SetRequest fails (handler not registered for this code) -> send-request-failed
+    EXPECT_CALL(*ipcCmdRegisterMock_, SetRequest(_, _, _)).WillRepeatedly(Return(ERR_DM_FAILED));
+    int ret = instance->SendCmd(cmdCode, req, rsp);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

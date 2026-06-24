@@ -123,5 +123,81 @@ HWTEST_F(SoftbusPublishTest, PublishCommonEventCallback_002, testing::ext::TestS
     EXPECT_EQ(GetStopPublishLnnMockCallCount(), 1);
     EXPECT_EQ(GetStopPublishLnnMockLastPublishId(), DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
 }
+
+/**
+ * @tc.name: PublishSoftbusLNN_003
+ * @tc.desc: Verify PublishSoftbusLNN returns DM_OK when PublishLNN mock returns DM_OK twice in a row.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusPublishTest, PublishSoftbusLNN_003, testing::ext::TestSize.Level1)
+{
+    SetPublishLnnMockRet(DM_OK);
+    SoftbusPublish softbusPublish;
+    int32_t ret = softbusPublish.PublishSoftbusLNN();
+    EXPECT_EQ(ret, DM_OK);
+    ret = softbusPublish.PublishSoftbusLNN();
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(GetPublishLnnMockCallCount(), 2);
+}
+
+/**
+ * @tc.name: StopPublishSoftbusLNN_003
+ * @tc.desc: Verify StopPublishSoftbusLNN returns DM_OK for a different valid publishId.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusPublishTest, StopPublishSoftbusLNN_003, testing::ext::TestSize.Level1)
+{
+    SetStopPublishLnnMockRet(DM_OK);
+    SoftbusPublish softbusPublish;
+    int publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
+    int32_t ret = softbusPublish.StopPublishSoftbusLNN(publishId);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(GetStopPublishLnnMockCallCount(), 1);
+    EXPECT_EQ(GetStopPublishLnnMockLastPublishId(), publishId);
+}
+
+/**
+ * @tc.name: OnSoftbusPublishResult_001
+ * @tc.desc: Verify OnSoftbusPublishResult static callback runs without crash for various result values.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusPublishTest, OnSoftbusPublishResult_001, testing::ext::TestSize.Level1)
+{
+    int publishId = 100;
+    SoftbusPublish::OnSoftbusPublishResult(publishId, PUBLISH_LNN_SUCCESS);
+    SoftbusPublish::OnSoftbusPublishResult(publishId + 1, static_cast<PublishResult>(1));
+    SUCCEED();
+}
+
+/**
+ * @tc.name: PublishCommonEventCallback_003
+ * @tc.desc: Verify PublishCommonEventCallback does nothing for DEVICE_TYPE_GLASSES.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusPublishTest, PublishCommonEventCallback_003, testing::ext::TestSize.Level1)
+{
+    PrepareLocalDeviceInfoMock(static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_GLASSES));
+    PublishCommonEventCallback(0, 0, DM_SCREEN_ON);
+    EXPECT_EQ(GetPublishLnnMockCallCount(), 0);
+    EXPECT_EQ(GetStopPublishLnnMockCallCount(), 0);
+}
+
+/**
+ * @tc.name: PublishCommonEventCallback_004
+ * @tc.desc: Verify PublishCommonEventCallback with PHONE device and SCREEN_ON but no bt/wifi state does not publish.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusPublishTest, PublishCommonEventCallback_004, testing::ext::TestSize.Level1)
+{
+    PrepareLocalDeviceInfoMock(static_cast<uint16_t>(DmDeviceType::DEVICE_TYPE_PHONE));
+    PublishCommonEventCallback(0, 0, DM_SCREEN_ON);
+    EXPECT_EQ(GetPublishLnnMockCallCount(), 0);
+    SUCCEED();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

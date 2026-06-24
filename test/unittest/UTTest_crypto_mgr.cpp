@@ -123,5 +123,75 @@ HWTEST_F(CryptoMgrTest, EncryptAndDecryptMessage_005, testing::ext::TestSize.Lev
     cryptoMgr->DecryptMessage(encryptData, decryptData);
     EXPECT_NE(ret, DM_OK);
 }
+
+HWTEST_F(CryptoMgrTest, SaveSessionKey_001, testing::ext::TestSize.Level2)
+{
+    auto cryptoMgr = std::make_shared<CryptoMgr>();
+    // keyLen exceeds MAX_SESSION_KEY_LENGTH (512), hits the early-return branch.
+    const size_t overLen = 513;
+    uint8_t sessionKey[overLen] = {'\0'};
+    auto ret = cryptoMgr->SaveSessionKey(sessionKey, overLen);
+    EXPECT_EQ(ret, ERR_DM_SAVE_SESSION_KEY_FAILED);
+}
+
+HWTEST_F(CryptoMgrTest, GetSessionKey_001, testing::ext::TestSize.Level2)
+{
+    auto cryptoMgr = std::make_shared<CryptoMgr>();
+    // Without saving a session key first, GetSessionKey derefs a nullptr-backed range;
+    // cover the getter path after a valid SaveSessionKey so the returned vector is non-empty.
+    uint8_t sessionKey[SESSION_KEY_LENGTH] = "sessionKey_km99";
+    auto ret = cryptoMgr->SaveSessionKey(sessionKey, SESSION_KEY_LENGTH);
+    ASSERT_EQ(ret, DM_OK);
+    std::vector<unsigned char> key = cryptoMgr->GetSessionKey();
+    EXPECT_EQ(key.size(), static_cast<size_t>(SESSION_KEY_LENGTH));
+}
+
+HWTEST_F(CryptoMgrTest, ClearSessionKey_001, testing::ext::TestSize.Level2)
+{
+    auto cryptoMgr = std::make_shared<CryptoMgr>();
+    uint8_t sessionKey[SESSION_KEY_LENGTH] = "sessionKey_lm11";
+    auto ret = cryptoMgr->SaveSessionKey(sessionKey, SESSION_KEY_LENGTH);
+    ASSERT_EQ(ret, DM_OK);
+    // Cover ClearSessionKey's null-guard: calling twice should be safe (key freed on first call).
+    cryptoMgr->ClearSessionKey();
+    cryptoMgr->ClearSessionKey();
+    std::vector<unsigned char> key = cryptoMgr->GetSessionKey();
+    EXPECT_EQ(key.empty(), true);
+}
+
+HWTEST_F(CryptoMgrTest, ProcessSessionKey_EncryptDecrypt_001, testing::ext::TestSize.Level2)
+{
+    auto cryptoMgr = std::make_shared<CryptoMgr>();
+    // ProcessSessionKey (copy-based key set) is distinct from SaveSessionKey; exercise the full
+    // encrypt/decrypt round-trip through the ProcessSessionKey path.
+    uint8_t sessionKey[SESSION_KEY_LENGTH] = "sessionKey_pm22";
+    auto ret = cryptoMgr->ProcessSessionKey(sessionKey, SESSION_KEY_LENGTH);
+    ASSERT_EQ(ret, DM_OK);
+
+    JsonObject jsonObj;
+    jsonObj[TAG_DEVICE_ID] = "51352yyyy";
+    jsonObj[TAG_CRYPTO_SUPPORT] = true;
+    std::string message = jsonObj.Dump();
+    std::string encryptData;
+    std::string decryptData;
+    ret = cryptoMgr->EncryptMessage(message, encryptData);
+    ASSERT_EQ(ret, DM_OK);
+    ret = cryptoMgr->DecryptMessage(encryptData, decryptData);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_STREQ(decryptData.c_str(), message.c_str());
+}
+
+HWTEST_F(CryptoMgrTest, DecryptMessage_InvalidHex_001, testing::ext::TestSize.Level2)
+{
+    auto cryptoMgr = std::make_shared<CryptoMgr>();
+    uint8_t sessionKey[SESSION_KEY_LENGTH] = "sessionKey_qm33";
+    auto ret = cryptoMgr->ProcessSessionKey(sessionKey, SESSION_KEY_LENGTH);
+    ASSERT_EQ(ret, DM_OK);
+    // Odd-length / too-short hex string falls into the inputMsgBytesLen < OVERHEAD_LEN branch.
+    std::string invalidHex = "ab";
+    std::string decryptData;
+    ret = cryptoMgr->DecryptMessage(invalidHex, decryptData);
+    EXPECT_NE(ret, DM_OK);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

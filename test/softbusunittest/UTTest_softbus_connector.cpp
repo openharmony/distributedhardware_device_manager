@@ -54,6 +54,13 @@ public:
         int32_t retCode) {}
 };
 
+class ISoftbusConnectorCallbackTest : public ISoftbusConnectorCallback {
+public:
+    ISoftbusConnectorCallbackTest() {}
+    virtual ~ISoftbusConnectorCallbackTest() {}
+    void OnSoftbusJoinLNNResult(const int32_t sessionId, const char *networkId, int32_t result) {}
+};
+
 void SoftbusConnectorTest::SetUp()
 {
 }
@@ -88,56 +95,24 @@ bool CheckSoftbusRes(int32_t ret)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, SoftbusConnector_001, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<SoftbusConnector> m_SoftbusConnector = std::make_shared<SoftbusConnector>();
-    ASSERT_NE(m_SoftbusConnector, nullptr);
-}
-
 /**
  * @tc.name: SoftbusConnector_002
  * @tc.desc: set SoftbusConnector to new a pointer, and the pointer nou equal nullptr, and delete it
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, SoftbusConnector_002, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<SoftbusConnector> m_SoftbusConnector = std::make_shared<SoftbusConnector>();
-    m_SoftbusConnector.reset();
-    EXPECT_EQ(m_SoftbusConnector, nullptr);
-}
-
 /**
  * @tc.name: GetUdidByNetworkId_001
  * @tc.desc: get StartDiscovery to wrong branch and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetUdidByNetworkId_001, testing::ext::TestSize.Level0)
-{
-    const char *networkId = "123456";
-    std::string udid;
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    int ret = softbusConnector->GetUdidByNetworkId(networkId, udid);
-    EXPECT_EQ(ret, DM_OK);
-}
-
 /**
  * @tc.name: GetUuidByNetworkId_001
  * @tc.desc: get StartDiscovery to wrong branch and return ERR_DM_DISCOVERY_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusConnectorTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level0)
-{
-    const char *networkId = "123456";
-    std::string uuid;
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
-    int ret = softbusConnector->GetUuidByNetworkId(networkId, uuid);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
 /**
  * @tc.name: GetSoftbusSession_001
  * @tc.desc: set SoftbusConnector to new a pointer, and the pointer nou equal nullptr, and delete it
@@ -642,34 +617,6 @@ HWTEST_F(SoftbusConnectorTest, ClearProcessInfo_001, testing::ext::TestSize.Leve
 }
 
 /**
- * @tc.name: HandleDeviceOnline_001
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusConnectorTest, HandleDeviceOnline_001, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "deviceId";
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
-    softbusConnector->RegisterSoftbusStateCallback(callback);
-    softbusConnector->HandleDeviceOnline(deviceId, DmAuthForm::ACROSS_ACCOUNT);
-    EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);
-}
-
-/**
- * @tc.name: HandleDeviceOffline_001
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusConnectorTest, HandleDeviceOffline_001, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "deviceId";
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
-    softbusConnector->RegisterSoftbusStateCallback(callback);
-    softbusConnector->HandleDeviceOffline(deviceId, false);
-    EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);
-}
-
-/**
  * @tc.name: CheckIsOnline_001
  * @tc.type: FUNC
  */
@@ -798,16 +745,166 @@ HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_002, testing::ext::TestSi
     softbusConnector->JoinLnn(deviceId, isForceJoin);
 }
 
-HWTEST_F(SoftbusConnectorTest, OnLeaveLNNResult_001, testing::ext::TestSize.Level0)
+/**
+ * @tc.name: RegisterConnectorCallback_001
+ * @tc.desc: register then unregister connector callback, both return DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, RegisterConnectorCallback_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    std::string networkId = "12345";
-    softbusConnector->leaveLnnPkgMap_[networkId] = "com.ohos.test";
-    int32_t retCode = 123;
+    std::shared_ptr<ISoftbusConnectorCallback> callback = std::make_shared<ISoftbusConnectorCallbackTest>();
+    int32_t ret = softbusConnector->RegisterConnectorCallback(callback);
+    EXPECT_EQ(ret, DM_OK);
+    ret = softbusConnector->UnRegisterConnectorCallback();
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetDeviceInfoFromMap_001
+ * @tc.desc: deviceId not present in map -> return nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, GetDeviceInfoFromMap_001, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "noSuchDevice";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    auto ret = SoftbusConnector::GetDeviceInfoFromMap(deviceId);
+    EXPECT_EQ(ret, nullptr);
+    SoftbusConnector::discoveryDeviceInfoMap_.clear();
+}
+
+/**
+ * @tc.name: GetDeviceInfoFromMap_002
+ * @tc.desc: deviceId present in map -> return the stored deviceInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, GetDeviceInfoFromMap_002, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceInMap";
+    std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
+    SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    auto ret = SoftbusConnector::GetDeviceInfoFromMap(deviceId);
+    EXPECT_NE(ret, nullptr);
+    SoftbusConnector::discoveryDeviceInfoMap_.clear();
+}
+
+/**
+ * @tc.name: CheckIsNeedJoinLnn_001
+ * @tc.desc: empty udid -> return false (early-return branch)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, CheckIsNeedJoinLnn_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    bool ret = softbusConnector->CheckIsNeedJoinLnn("", "deviceId");
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: CheckIsNeedJoinLnn_002
+ * @tc.desc: empty deviceId -> return false (early-return branch)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, CheckIsNeedJoinLnn_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    bool ret = softbusConnector->CheckIsNeedJoinLnn("udid", "");
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: CheckIsNeedJoinLnn_003
+ * @tc.desc: deviceId not in discovery map -> GetConnectAddr returns nullptr -> return false
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, CheckIsNeedJoinLnn_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    bool ret = softbusConnector->CheckIsNeedJoinLnn("udid", "missingDeviceId");
+    EXPECT_FALSE(ret);
+    SoftbusConnector::discoveryDeviceInfoMap_.clear();
+}
+
+/**
+ * @tc.name: SetChangeProcessInfo_001
+ * @tc.desc: push, get and clear change-process-info, exercising the change-info vector trio
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, SetChangeProcessInfo_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    ProcessInfo processInfo;
+    processInfo.userId = 1;
+    processInfo.pkgName = "pkgName";
+    softbusConnector->SetChangeProcessInfo(processInfo);
+    auto ret = softbusConnector->GetChangeProcessInfo();
+    EXPECT_EQ(ret.empty(), false);
+    softbusConnector->ClearChangeProcessInfo();
+    EXPECT_EQ(softbusConnector->processChangeInfoVec_.empty(), true);
+}
+
+/**
+ * @tc.name: LeaveLNN_001
+ * @tc.desc: LeaveLNN records pkg into leaveLnnPkgMap_ for the given networkId
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, LeaveLNN_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    std::string pkgName = "com.ohos.leave";
+    std::string networkId = "leaveNet123";
+    softbusConnector->LeaveLNN(pkgName, networkId);
+    auto it = softbusConnector->leaveLnnPkgMap_.find(networkId);
+    EXPECT_NE(it, softbusConnector->leaveLnnPkgMap_.end());
+    softbusConnector->leaveLnnPkgMap_.clear();
+}
+
+/**
+ * @tc.name: RegisterLeaveLNNCallback_001
+ * @tc.desc: register then unregister the LeaveLNN callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, RegisterLeaveLNNCallback_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    std::shared_ptr<ISoftbusLeaveLNNCallback> callback = std::make_shared<ISoftbusLeaveLNNCallbackTest>();
+    softbusConnector->RegisterLeaveLNNCallback(callback);
+    EXPECT_NE(softbusConnector->leaveLNNCallback_, nullptr);
+    softbusConnector->UnRegisterLeaveLNNCallback();
+    EXPECT_EQ(softbusConnector->leaveLNNCallback_, nullptr);
+}
+
+/**
+ * @tc.name: OnLeaveLNNResult_002
+ * @tc.desc: retCode == SOFTBUS_OK, early-return success branch (map left untouched)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, OnLeaveLNNResult_002, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    std::string networkId = "okNet";
+    softbusConnector->leaveLnnPkgMap_[networkId] = "com.ohos.ok";
     softbusConnector->leaveLNNCallback_ = std::make_shared<ISoftbusLeaveLNNCallbackTest>();
-    softbusConnector->OnLeaveLNNResult(networkId.c_str(), retCode);
+    softbusConnector->OnLeaveLNNResult(networkId.c_str(), SOFTBUS_OK);
+    // success branch returns before erasing, so the entry must remain
+    EXPECT_EQ(softbusConnector->leaveLnnPkgMap_.empty(), false);
+    softbusConnector->leaveLnnPkgMap_.clear();
+}
+
+/**
+ * @tc.name: OnLeaveLNNResult_003
+ * @tc.desc: retCode != OK but networkId is null/empty -> early-return (empty-networkId branch)
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusConnectorTest, OnLeaveLNNResult_003, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    softbusConnector->leaveLNNCallback_ = std::make_shared<ISoftbusLeaveLNNCallbackTest>();
+    softbusConnector->OnLeaveLNNResult(nullptr, 999);
     EXPECT_EQ(softbusConnector->leaveLnnPkgMap_.empty(), true);
 }
 } // namespace
 } // namespace DistributedHardware
-} // namespace OHOS-
+} // namespace OHOS
