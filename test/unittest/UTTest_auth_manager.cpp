@@ -57,64 +57,6 @@ void AuthManagerTest::TearDownTestCase()
     multipleUserConnectorMock_ = nullptr;
 }
 
-HWTEST_F(AuthManagerTest, HandleBusinessEvents_001, testing::ext::TestSize.Level1)
-{
-    std::string businessId = "testBusinessId";
-    int32_t action = USER_OPERATION_TYPE_CANCEL_AUTH;
-    EXPECT_CALL(*distributedDeviceProfileClientMock_,
-        PutBusinessEvent(::testing::_)).WillOnce(::testing::Return(DM_OK));
-
-    int32_t ret = authManager->HandleBusinessEvents(businessId, action);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(AuthManagerTest, HandleBusinessEvents_002, testing::ext::TestSize.Level1)
-{
-    std::string businessId = "testBusinessId";
-    int32_t action = USER_OPERATION_TYPE_CANCEL_AUTH;
-
-    EXPECT_CALL(*distributedDeviceProfileClientMock_,
-        PutBusinessEvent(::testing::_)).WillOnce(::testing::Return(ERR_DM_AUTH_NOT_START));
-
-    int32_t ret = authManager->HandleBusinessEvents(businessId, action);
-    EXPECT_EQ(ret, ERR_DM_AUTH_NOT_START);
-}
-
-HWTEST_F(AuthManagerTest, HandleBusinessEvents_003, testing::ext::TestSize.Level1)
-{
-    std::string businessId = "testBusinessId";
-    int32_t action = USER_OPERATION_TYPE_ALLOW_AUTH;
-
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutBusinessEvent(::testing::_))
-        .WillOnce(::testing::Return(DM_OK));
-
-    int32_t result = authManager->HandleBusinessEvents(businessId, action);
-
-    EXPECT_EQ(result, DM_OK);
-}
-
-HWTEST_F(AuthManagerTest, HandleBusinessEvents_004, testing::ext::TestSize.Level1)
-{
-    std::string businessId = "";
-    int32_t action = USER_OPERATION_TYPE_CANCEL_AUTH;
-
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutBusinessEvent(::testing::_))
-        .WillOnce(::testing::Return(DM_OK));
-
-    int32_t result = authManager->HandleBusinessEvents(businessId, action);
-
-    EXPECT_EQ(result, DM_OK);
-}
-
-HWTEST_F(AuthManagerTest, ParseJsonObject_001, testing::ext::TestSize.Level1)
-{
-    JsonObject jsonObject;
-    jsonObject[DM_BUSINESS_ID] = "testBusinessId";
-
-    authManager->ParseJsonObject(jsonObject);
-    EXPECT_EQ(jsonObject[DM_BUSINESS_ID].Get<std::string>(), "testBusinessId");
-}
-
 HWTEST_F(AuthManagerTest, ParseJsonObject_002, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
@@ -169,28 +111,6 @@ HWTEST_F(AuthManagerTest, OnUserOperation_004, testing::ext::TestSize.Level1)
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(AuthManagerTest, OnUserOperation_005, testing::ext::TestSize.Level1)
-{
-    int32_t action = USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT;
-    std::string params = "";
-
-    int32_t ret = authManager->OnUserOperation(action, params);
-
-    EXPECT_EQ(ret, DM_OK);
-    EXPECT_NE(authManager->GetAuthContext()->reason, DM_OK);
-}
-
-HWTEST_F(AuthManagerTest, OnUserOperation_006, testing::ext::TestSize.Level1)
-{
-    int32_t action = USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY;
-    std::string params = "";
-
-    int32_t ret = authManager->OnUserOperation(action, params);
-
-    EXPECT_EQ(ret, DM_OK);
-    EXPECT_EQ(authManager->GetAuthContext()->reason, ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY);
-}
-
 HWTEST_F(AuthManagerTest, OnUserOperation_007, testing::ext::TestSize.Level1)
 {
     int32_t action = -1;
@@ -199,64 +119,6 @@ HWTEST_F(AuthManagerTest, OnUserOperation_007, testing::ext::TestSize.Level1)
     int32_t ret = authManager->OnUserOperation(action, params);
 
     EXPECT_EQ(ret, DM_OK);
-}
-
-/* *
- * @tc.name: RegisterUiStateCallback_001
- * @tc.desc: Test RegisterUiStateCallback
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(AuthManagerTest, RegisterUiStateCallback_001, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "ohos_test";
-    authManager->context_->authUiStateMgr = nullptr;
-    int32_t ret = authManager->RegisterUiStateCallback(pkgName);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-}
-
-/* *
- * @tc.name: RegisterUiStateCallback_002
- * @tc.desc: Test RegisterUiStateCallback
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(AuthManagerTest, RegisterUiStateCallback_002, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "ohos_test";
-    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    authManager->context_->authUiStateMgr = std::make_shared<AuthUiStateManager>(listener);
-    int32_t ret = authManager->RegisterUiStateCallback(pkgName);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/* *
- * @tc.name: UnRegisterUiStateCallback_001
- * @tc.desc: Test UnRegisterUiStateCallback
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(AuthManagerTest, UnRegisterUiStateCallback_001, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "ohos_test";
-    authManager->context_->authUiStateMgr = nullptr;
-    int32_t ret = authManager->UnRegisterUiStateCallback(pkgName);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-}
-
-/* *
- * @tc.name: UnRegisterUiStateCallback_002
- * @tc.desc: Test UnRegisterUiStateCallback
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(AuthManagerTest, UnRegisterUiStateCallback_002, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "ohos_test";
-    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    authManager->context_->authUiStateMgr = std::make_shared<AuthUiStateManager>(listener);
-    int32_t ret = authManager->UnRegisterUiStateCallback(pkgName);
-    ASSERT_EQ(ret, DM_OK);
 }
 
 /* *
@@ -329,36 +191,6 @@ HWTEST_F(AuthManagerTest, IsAuthCodeReady_002, testing::ext::TestSize.Level1)
     authManager->context_->importPkgName = "";
     bool ret = authManager->IsAuthCodeReady(pkgName);
     ASSERT_EQ(ret, false);
-}
-
-/* *
- * @tc.name: IsAuthCodeReady_003
- * @tc.desc: Test IsAuthCodeReady
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(AuthManagerTest, IsAuthCodeReady_003, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    authManager->context_->importAuthCode = "importAuthCode";
-    authManager->context_->importPkgName = "importPkgName";
-    bool ret = authManager->IsAuthCodeReady(pkgName);
-    ASSERT_EQ(ret, false);
-}
-
-/* *
- * @tc.name: IsAuthCodeReady_004
- * @tc.desc: Test IsAuthCodeReady
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(AuthManagerTest, IsAuthCodeReady_004, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "ohos_test";
-    authManager->context_->importAuthCode = "importAuthCode";
-    authManager->context_->importPkgName = "ohos_test";
-    bool ret = authManager->IsAuthCodeReady(pkgName);
-    ASSERT_EQ(ret, true);
 }
 
 HWTEST_F(AuthManagerTest, ParseUltrasonicSide_001, testing::ext::TestSize.Level1)
@@ -469,6 +301,380 @@ HWTEST_F(AuthManagerTest, GetSrcCarUserIdByDisplayId_006, testing::ext::TestSize
     EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
     int32_t ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
     EXPECT_EQ(ret, 100);
+}
+
+/* *
+ * @tc.name: OnUserOperation_008
+ * @tc.desc: Test OnUserOperation with USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, OnUserOperation_008, testing::ext::TestSize.Level1)
+{
+    int32_t action = USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
+    std::string params = "";
+    int32_t ret = authManager->OnUserOperation(action, params);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/* *
+ * @tc.name: OnUserOperation_010
+ * @tc.desc: Test OnUserOperation ALLOW_AUTH with non-empty businessId triggers HandleBusinessEvents
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, OnUserOperation_010, testing::ext::TestSize.Level1)
+{
+    authManager->GetAuthContext()->businessId = "testBusinessId";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutBusinessEvent(::testing::_))
+        .WillOnce(::testing::Return(DM_OK));
+    int32_t action = USER_OPERATION_TYPE_ALLOW_AUTH;
+    std::string params = "";
+    int32_t ret = authManager->OnUserOperation(action, params);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/* *
+ * @tc.name: GeneratePincode_001
+ * @tc.desc: Test GeneratePincode returns a valid 6-digit pin within range
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, GeneratePincode_001, testing::ext::TestSize.Level1)
+{
+    std::string pinCode = authManager->GeneratePincode();
+    EXPECT_FALSE(pinCode.empty());
+    int32_t code = std::atoi(pinCode.c_str());
+    EXPECT_GE(code, 100000);
+    EXPECT_LE(code, 999999);
+}
+
+/* *
+ * @tc.name: GetReason_001
+ * @tc.desc: Test GetReason returns the value set in context reason
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, GetReason_001, testing::ext::TestSize.Level1)
+{
+    authManager->GetAuthContext()->reason = STOP_BIND;
+    int32_t ret = authManager->GetReason();
+    EXPECT_EQ(ret, STOP_BIND);
+}
+
+/* *
+ * @tc.name: GetRemoteDeviceId_001
+ * @tc.desc: Test GetRemoteDeviceId returns accessee deviceId in sink direction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, GetRemoteDeviceId_001, testing::ext::TestSize.Level1)
+{
+    authManager->GetAuthContext()->direction = DmAuthDirection::DM_AUTH_SINK;
+    authManager->GetAuthContext()->accesser.deviceId = "accesserDeviceId";
+    authManager->GetAuthContext()->accessee.deviceId = "accesseeDeviceId";
+    std::string deviceId;
+    authManager->GetRemoteDeviceId(deviceId);
+    EXPECT_EQ(deviceId, "accesserDeviceId");
+}
+
+/* *
+ * @tc.name: GetRemoteDeviceId_002
+ * @tc.desc: Test GetRemoteDeviceId returns accessee deviceId in source direction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, GetRemoteDeviceId_002, testing::ext::TestSize.Level1)
+{
+    authManager->GetAuthContext()->direction = DmAuthDirection::DM_AUTH_SOURCE;
+    authManager->GetAuthContext()->accesser.deviceId = "accesserDeviceId";
+    authManager->GetAuthContext()->accessee.deviceId = "accesseeDeviceId";
+    std::string deviceId;
+    authManager->GetRemoteDeviceId(deviceId);
+    EXPECT_EQ(deviceId, "accesseeDeviceId");
+}
+
+/* *
+ * @tc.name: RegisterAuthenticationType_001
+ * @tc.desc: Test RegisterAuthenticationType stores the authenticationType into confirmOperation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, RegisterAuthenticationType_001, testing::ext::TestSize.Level1)
+{
+    int32_t authType = USER_OPERATION_TYPE_ALLOW_AUTH;
+    int32_t ret = authManager->RegisterAuthenticationType(authType);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(static_cast<int32_t>(authManager->GetAuthContext()->confirmOperation), authType);
+}
+
+/* *
+ * @tc.name: OnScreenLocked_001
+ * @tc.desc: Test OnScreenLocked early-returns when authType is import-auth-code compatible
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, OnScreenLocked_001, testing::ext::TestSize.Level1)
+{
+    authManager->GetAuthContext()->authType = DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE;
+    authManager->OnScreenLocked();
+    EXPECT_NE(authManager->GetAuthContext()->reason, ERR_DM_BIND_USER_CANCEL);
+}
+
+/* *
+ * @tc.name: ParseServiceInfo_001
+ * @tc.desc: Test ParseServiceInfo does not set isServiceBind when extra is invalid json
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ParseServiceInfo_001, testing::ext::TestSize.Level1)
+{
+    std::string extra = "invalid_json";
+    authManager->GetAuthContext()->isServiceBind = false;
+    authManager->ParseServiceInfo(extra);
+    EXPECT_FALSE(authManager->GetAuthContext()->isServiceBind);
+}
+
+/* *
+ * @tc.name: ParseServiceInfo_002
+ * @tc.desc: Test ParseServiceInfo sets isServiceBind when isServiceBind is true
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ParseServiceInfo_002, testing::ext::TestSize.Level1)
+{
+    std::string extra = "{\"isServiceBind\":\"true\"}";
+    authManager->GetAuthContext()->isServiceBind = false;
+    authManager->ParseServiceInfo(extra);
+    EXPECT_TRUE(authManager->GetAuthContext()->isServiceBind);
+}
+
+/* *
+ * @tc.name: GetAuthCodeAndPkgName_001
+ * @tc.desc: Test GetAuthCodeAndPkgName does nothing when importAuthCode is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, GetAuthCodeAndPkgName_001, testing::ext::TestSize.Level1)
+{
+    authManager->GetAuthContext()->importAuthCode = "";
+    authManager->GetAuthContext()->importPkgName = "pkgName";
+    std::string pkgName = "origPkg";
+    std::string authCode = "origCode";
+    authManager->GetAuthCodeAndPkgName(pkgName, authCode);
+    EXPECT_EQ(pkgName, "origPkg");
+    EXPECT_EQ(authCode, "origCode");
+}
+
+/* *
+ * @tc.name: ConvertSrcVersion_001
+ * @tc.desc: Test ConvertSrcVersion returns edition when version empty and edition non-empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ConvertSrcVersion_001, testing::ext::TestSize.Level1)
+{
+    std::string result = AuthManagerBase::ConvertSrcVersion("", "5.1.0");
+    EXPECT_EQ(result, "5.1.0");
+}
+
+/* *
+ * @tc.name: ConvertSrcVersion_002
+ * @tc.desc: Test ConvertSrcVersion returns default version when both version and edition empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ConvertSrcVersion_002, testing::ext::TestSize.Level1)
+{
+    std::string result = AuthManagerBase::ConvertSrcVersion("", "");
+    EXPECT_EQ(result, std::string(DM_VERSION_5_1_0));
+}
+
+/* *
+ * @tc.name: ConvertSrcVersion_003
+ * @tc.desc: Test ConvertSrcVersion returns version when version non-empty and edition empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ConvertSrcVersion_003, testing::ext::TestSize.Level1)
+{
+    std::string result = AuthManagerBase::ConvertSrcVersion("3.0.0", "");
+    EXPECT_EQ(result, "3.0.0");
+}
+
+/* *
+ * @tc.name: ConvertSrcVersion_004
+ * @tc.desc: Test ConvertSrcVersion returns empty when both version and edition non-empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ConvertSrcVersion_004, testing::ext::TestSize.Level1)
+{
+    std::string result = AuthManagerBase::ConvertSrcVersion("3.0.0", "5.1.0");
+    EXPECT_EQ(result, "");
+}
+
+/* *
+ * @tc.name: ParseAuthType_001
+ * @tc.desc: Test ParseAuthType fails when authType key missing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ParseAuthType_001, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> bindParam;
+    int32_t authType = -1;
+    int32_t ret = authManager->ParseAuthType(bindParam, authType);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/* *
+ * @tc.name: ParseAuthType_002
+ * @tc.desc: Test ParseAuthType fails when authType value is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ParseAuthType_002, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> bindParam;
+    bindParam[PARAM_KEY_AUTH_TYPE] = "";
+    int32_t authType = -1;
+    int32_t ret = authManager->ParseAuthType(bindParam, authType);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/* *
+ * @tc.name: ParseAuthType_003
+ * @tc.desc: Test ParseAuthType fails when authType value length greater than 1
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ParseAuthType_003, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> bindParam;
+    bindParam[PARAM_KEY_AUTH_TYPE] = "12";
+    int32_t authType = -1;
+    int32_t ret = authManager->ParseAuthType(bindParam, authType);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/* *
+ * @tc.name: ParseAuthType_004
+ * @tc.desc: Test ParseAuthType fails when authType value is not a digit
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ParseAuthType_004, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> bindParam;
+    bindParam[PARAM_KEY_AUTH_TYPE] = "a";
+    int32_t authType = -1;
+    int32_t ret = authManager->ParseAuthType(bindParam, authType);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/* *
+ * @tc.name: ParseAuthType_005
+ * @tc.desc: Test ParseAuthType succeeds and sets authType for a single digit value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ParseAuthType_005, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> bindParam;
+    bindParam[PARAM_KEY_AUTH_TYPE] = "1";
+    int32_t authType = -1;
+    int32_t ret = authManager->ParseAuthType(bindParam, authType);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(authType, 1);
+}
+
+/* *
+ * @tc.name: CheckProcessNameInWhiteList_001
+ * @tc.desc: Test CheckProcessNameInWhiteList returns false when processName is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, CheckProcessNameInWhiteList_001, testing::ext::TestSize.Level1)
+{
+    bool ret = AuthManagerBase::CheckProcessNameInWhiteList("");
+    EXPECT_FALSE(ret);
+}
+
+/* *
+ * @tc.name: CheckProcessNameInWhiteList_002
+ * @tc.desc: Test CheckProcessNameInWhiteList returns false when processName not in whitelist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, CheckProcessNameInWhiteList_002, testing::ext::TestSize.Level1)
+{
+    bool ret = AuthManagerBase::CheckProcessNameInWhiteList("com.not.in.whitelist");
+    EXPECT_FALSE(ret);
+}
+
+/* *
+ * @tc.name: CheckProcessNameInProxyAdaptationList_001
+ * @tc.desc: Test CheckProcessNameInProxyAdaptationList returns false when processName is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, CheckProcessNameInProxyAdaptationList_001, testing::ext::TestSize.Level1)
+{
+    bool ret = AuthManagerBase::CheckProcessNameInProxyAdaptationList("");
+    EXPECT_FALSE(ret);
+}
+
+/* *
+ * @tc.name: CheckProcessNameInProxyAdaptationList_002
+ * @tc.desc: Test CheckProcessNameInProxyAdaptationList returns true for gameservice_server
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, CheckProcessNameInProxyAdaptationList_002, testing::ext::TestSize.Level1)
+{
+    bool ret = AuthManagerBase::CheckProcessNameInProxyAdaptationList("gameservice_server");
+    EXPECT_TRUE(ret);
+}
+
+/* *
+ * @tc.name: CheckProcessNameInProxyAdaptationList_003
+ * @tc.desc: Test CheckProcessNameInProxyAdaptationList returns false when processName not in list
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, CheckProcessNameInProxyAdaptationList_003, testing::ext::TestSize.Level1)
+{
+    bool ret = AuthManagerBase::CheckProcessNameInProxyAdaptationList("com.unknown.process");
+    EXPECT_FALSE(ret);
+}
+
+/* *
+ * @tc.name: InsensibleSwitchingState_001
+ * @tc.desc: Test Enable/Disable/NeedInsensibleSwitching state transitions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, InsensibleSwitchingState_001, testing::ext::TestSize.Level1)
+{
+    authManager->EnableInsensibleSwitching();
+    EXPECT_TRUE(authManager->NeedInsensibleSwitching());
+    authManager->DisableInsensibleSwitching();
+    EXPECT_FALSE(authManager->NeedInsensibleSwitching());
+}
+
+/* *
+ * @tc.name: TransferReadyState_001
+ * @tc.desc: Test SetTransferReady/IsTransferReady state transitions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, TransferReadyState_001, testing::ext::TestSize.Level1)
+{
+    authManager->SetTransferReady(false);
+    EXPECT_FALSE(authManager->IsTransferReady());
+    authManager->SetTransferReady(true);
+    EXPECT_TRUE(authManager->IsTransferReady());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

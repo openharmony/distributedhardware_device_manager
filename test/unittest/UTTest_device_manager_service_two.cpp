@@ -78,7 +78,6 @@ void SetSetDnPolicyPermission()
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
-
 /**
  * @tc.name: GetTrustedDeviceList_201
  * @tc.type: FUNC
@@ -328,7 +327,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_201, testing::ext::TestSize.Level
     std::string packName = "com.ohos.test";
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
-    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "1000";
     std::string processName = "collaboration_service";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))

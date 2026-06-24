@@ -376,6 +376,51 @@ HWTEST_F(DeviceManagerServiceListenerTwoTest, SetExistPkgName_001, testing::ext:
 
     listener_->ProcessDeviceOffline(procInfoVec, processInfo, state, info, deviceBasicInfo, isOnline);
 }
+
+/**
+ * @tc.name: OpenAuthSessionWithPara_002
+ * @tc.desc: The int64_t serviceId overload delegates to DeviceManagerService::OpenAuthSessionWithPara;
+ *           when the adapter resident is not loaded it returns ERR_DM_UNSUPPORTED_METHOD.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceListenerTwoTest, OpenAuthSessionWithPara_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    ASSERT_NE(listener_, nullptr);
+    int32_t ret = listener_->OpenAuthSessionWithPara(static_cast<int64_t>(1001));
+    // The listener forwards to the real DeviceManagerService, whose adapter resident is not loaded in UT.
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+}
+
+/**
+ * @tc.name: OnDeviceTrustChange_002
+ * @tc.desc: OnDeviceTrustChange with no registered callbacks (empty loop) executes without crash.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceListenerTwoTest, OnDeviceTrustChange_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    ASSERT_NE(listener_, nullptr);
+    std::string udid = "testUdid";
+    std::string uuid = "testUuid";
+    listener_->OnDeviceTrustChange(udid, uuid, DmAuthForm::PEER_TO_PEER);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: OnAppUnintall_002
+ * @tc.desc: OnAppUnintall with a pkgName that matches no online entry leaves the map unchanged.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceManagerServiceListenerTwoTest, OnAppUnintall_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    ASSERT_NE(listener_, nullptr);
+    listener_->alreadyOnlinePkgName_["com.ohos.other#100#1#dev"] = ProcessInfo();
+    size_t sizeBefore = listener_->alreadyOnlinePkgName_.size();
+    listener_->OnAppUnintall("com.ohos.unmatched");
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.size(), sizeBefore);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

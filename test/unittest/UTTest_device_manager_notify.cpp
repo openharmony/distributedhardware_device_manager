@@ -1934,6 +1934,399 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterPackageCallback_006, testing::ext::T
     ASSERT_EQ(checkMap3, nullptr);
     ASSERT_EQ(checkMap4, nullptr);
 }
+
+/**
+ * @tc.name: RegisterPublishCallback_001
+ * @tc.desc: 1. set pkgName not null, publishId not null, callback not null
+ *           2. call RegisterPublishCallback
+ *           3. check map entry not null
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterPublishCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test.publish";
+    int32_t publishId = 1;
+    int count = 0;
+    std::shared_ptr<PublishCallback> callback = std::make_shared<PublishCallbackTest>(count);
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, callback);
+    std::shared_ptr<PublishCallback> checkMap =
+        DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId];
+    ASSERT_NE(checkMap, nullptr);
+}
+
+/**
+ * @tc.name: RegisterPublishCallback_002
+ * @tc.desc: 1. set pkgName empty
+ *           2. call RegisterPublishCallback
+ *           3. check map entry not created
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterPublishCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t publishId = 1;
+    int count = 0;
+    DeviceManagerNotify::GetInstance().devicePublishCallbacks_.clear();
+    std::shared_ptr<PublishCallback> callback = std::make_shared<PublishCallbackTest>(count);
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, callback);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().devicePublishCallbacks_.count(pkgName), 0);
+}
+
+/**
+ * @tc.name: UnRegisterPublishCallback_001
+ * @tc.desc: 1. register a publish callback
+ *           2. call UnRegisterPublishCallback with matching pkgName and publishId
+ *           3. check map entry removed
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterPublishCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test.publish.unreg";
+    int32_t publishId = 2;
+    int count = 0;
+    std::shared_ptr<PublishCallback> callback = std::make_shared<PublishCallbackTest>(count);
+    DeviceManagerNotify::GetInstance().RegisterPublishCallback(pkgName, publishId, callback);
+    ASSERT_NE(DeviceManagerNotify::GetInstance().devicePublishCallbacks_[pkgName][publishId], nullptr);
+    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().devicePublishCallbacks_.count(pkgName), 0);
+}
+
+/**
+ * @tc.name: UnRegisterPublishCallback_002
+ * @tc.desc: 1. set pkgName empty
+ *           2. call UnRegisterPublishCallback with empty pkgName
+ *           3. check early-return guard
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterPublishCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t publishId = 2;
+    // empty pkgName guard should not erase anything and not crash
+    DeviceManagerNotify::GetInstance().devicePublishCallbacks_.clear();
+    DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(pkgName, publishId);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().devicePublishCallbacks_.count(pkgName), 0);
+}
+
+/**
+ * @tc.name: RegisterDeviceManagerFaCallback_001
+ * @tc.desc: 1. set pkgName not null and callback not null
+ *           2. call RegisterDeviceManagerFaCallback
+ *           3. check dmUiCallback map entry not null
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceManagerFaCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test.fa";
+    int count = 0;
+    std::shared_ptr<DeviceManagerUiCallback> callback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, callback);
+    ASSERT_NE(DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName], nullptr);
+}
+
+/**
+ * @tc.name: UnRegisterDeviceManagerFaCallback_001
+ * @tc.desc: 1. register a FA callback
+ *           2. call UnRegisterDeviceManagerFaCallback with empty pkgName (guard)
+ *           3. call UnRegisterDeviceManagerFaCallback with valid pkgName
+ *           4. check entry removed after valid call
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceManagerFaCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test.fa.unreg";
+    int count = 0;
+    std::shared_ptr<DeviceManagerUiCallback> callback = std::make_shared<DeviceManagerFaCallbackTest>(count);
+    DeviceManagerNotify::GetInstance().RegisterDeviceManagerFaCallback(pkgName, callback);
+    // empty pkgName guard: nothing removed
+    std::string emptyPkg;
+    DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(emptyPkg);
+    ASSERT_NE(DeviceManagerNotify::GetInstance().dmUiCallback_[pkgName], nullptr);
+    DeviceManagerNotify::GetInstance().UnRegisterDeviceManagerFaCallback(pkgName);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().dmUiCallback_.count(pkgName), 0);
+}
+
+/**
+ * @tc.name: RegisterCredentialCallback_001
+ * @tc.desc: 1. set pkgName not null and callback not null
+ *           2. call RegisterCredentialCallback
+ *           3. check credentialCallback map entry not null
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterCredentialCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test.cred";
+    std::shared_ptr<CredentialCallback> callback = std::make_shared<CredentialCallbackTest>();
+    DeviceManagerNotify::GetInstance().RegisterCredentialCallback(pkgName, callback);
+    ASSERT_NE(DeviceManagerNotify::GetInstance().credentialCallback_[pkgName], nullptr);
+}
+
+/**
+ * @tc.name: UnRegisterCredentialCallback_001
+ * @tc.desc: 1. register a credential callback
+ *           2. call UnRegisterCredentialCallback with empty pkgName (guard)
+ *           3. call UnRegisterCredentialCallback with valid pkgName
+ *           4. check entry removed after valid call
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterCredentialCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test.cred.unreg";
+    std::shared_ptr<CredentialCallback> callback = std::make_shared<CredentialCallbackTest>();
+    DeviceManagerNotify::GetInstance().RegisterCredentialCallback(pkgName, callback);
+    // empty pkgName guard: nothing removed
+    std::string emptyPkg;
+    DeviceManagerNotify::GetInstance().UnRegisterCredentialCallback(emptyPkg);
+    ASSERT_NE(DeviceManagerNotify::GetInstance().credentialCallback_[pkgName], nullptr);
+    DeviceManagerNotify::GetInstance().UnRegisterCredentialCallback(pkgName);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().credentialCallback_.count(pkgName), 0);
+}
+
+/**
+ * @tc.name: RegisterDeviceStatusCallback_001
+ * @tc.desc: 1. set pkgName not null and callback not null
+ *           2. call RegisterDeviceStatusCallback
+ *           3. check deviceStatusCallback map entry not null
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStatusCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test.status";
+    std::shared_ptr<DeviceStatusCallback> callback = std::make_shared<DeviceStatusCallbackTest>();
+    DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
+    ASSERT_NE(DeviceManagerNotify::GetInstance().deviceStatusCallback_[pkgName], nullptr);
+}
+
+/**
+ * @tc.name: RegisterDeviceStatusCallback_002
+ * @tc.desc: 1. set callback null
+ *           2. call RegisterDeviceStatusCallback with null callback
+ *           3. check map entry not created (guard branch)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterDeviceStatusCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test.status.null";
+    std::shared_ptr<DeviceStatusCallback> callback = nullptr;
+    DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceStatusCallback_.count(pkgName), 0);
+}
+
+/**
+ * @tc.name: UnRegisterDeviceStatusCallback_001
+ * @tc.desc: 1. register a device status callback
+ *           2. call UnRegisterDeviceStatusCallback with empty pkgName (guard)
+ *           3. call UnRegisterDeviceStatusCallback with valid pkgName
+ *           4. check entry removed after valid call
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceStatusCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test.status.unreg";
+    std::shared_ptr<DeviceStatusCallback> callback = std::make_shared<DeviceStatusCallbackTest>();
+    DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
+    ASSERT_NE(DeviceManagerNotify::GetInstance().deviceStatusCallback_[pkgName], nullptr);
+    // empty pkgName guard: nothing removed
+    std::string emptyPkg;
+    DeviceManagerNotify::GetInstance().UnRegisterDeviceStatusCallback(emptyPkg);
+    ASSERT_NE(DeviceManagerNotify::GetInstance().deviceStatusCallback_[pkgName], nullptr);
+    DeviceManagerNotify::GetInstance().UnRegisterDeviceStatusCallback(pkgName);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceStatusCallback_.count(pkgName), 0);
+}
+
+/**
+ * @tc.name: RegisterPinHolderCallback_001
+ * @tc.desc: 1. set pkgName not null and callback not null
+ *           2. call RegisterPinHolderCallback
+ *           3. check pinHolderCallback map entry not null
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterPinHolderCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test.pin";
+    std::shared_ptr<PinHolderCallback> callback = std::make_shared<PinHolderCallbackTest>();
+    DeviceManagerNotify::GetInstance().RegisterPinHolderCallback(pkgName, callback);
+    ASSERT_NE(DeviceManagerNotify::GetInstance().pinHolderCallback_[pkgName], nullptr);
+}
+
+/**
+ * @tc.name: RegisterPinHolderCallback_002
+ * @tc.desc: 1. set callback null
+ *           2. call RegisterPinHolderCallback with null callback
+ *           3. check map entry not created (guard branch)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, RegisterPinHolderCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test.pin.null";
+    std::shared_ptr<PinHolderCallback> callback = nullptr;
+    DeviceManagerNotify::GetInstance().RegisterPinHolderCallback(pkgName, callback);
+    EXPECT_EQ(DeviceManagerNotify::GetInstance().pinHolderCallback_.count(pkgName), 0);
+}
+
+/**
+ * @tc.name: OnDeviceFound_001
+ * @tc.desc: 1. set pkgName empty
+ *           2. call OnDeviceFound with empty pkgName
+ *           3. check early-return guard (no crash)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    uint16_t subscribeId = 0;
+    DmDeviceInfo deviceInfo;
+    DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, deviceInfo);
+    SUCCEED();
+}
+
+/**
+ * @tc.name: OnDiscoverySuccess_001
+ * @tc.desc: 1. set pkgName empty
+ *           2. call OnDiscoverySuccess with empty pkgName
+ *           3. check early-return guard (no crash)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnDiscoverySuccess_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    uint16_t subscribeId = 0;
+    DeviceManagerNotify::GetInstance().OnDiscoverySuccess(pkgName, subscribeId);
+    SUCCEED();
+}
+
+/**
+ * @tc.name: OnDiscoveryFailed_001
+ * @tc.desc: 1. set pkgName empty
+ *           2. call OnDiscoveryFailed with empty pkgName
+ *           3. check early-return guard (no crash)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnDiscoveryFailed_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    uint16_t subscribeId = 0;
+    int32_t failedReason = -1;
+    DeviceManagerNotify::GetInstance().OnDiscoveryFailed(pkgName, subscribeId, failedReason);
+    SUCCEED();
+}
+
+/**
+ * @tc.name: OnPublishResult_001
+ * @tc.desc: 1. set pkgName empty
+ *           2. call OnPublishResult with empty pkgName
+ *           3. check early-return guard (no crash)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnPublishResult_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t publishId = 0;
+    int32_t publishResult = 0;
+    DeviceManagerNotify::GetInstance().OnPublishResult(pkgName, publishId, publishResult);
+    SUCCEED();
+}
+
+/**
+ * @tc.name: OnAuthResult_001
+ * @tc.desc: 1. set pkgName empty
+ *           2. call OnAuthResult with empty pkgName
+ *           3. check early-return guard (no crash)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnAuthResult_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string deviceId = "1";
+    std::string token = "1";
+    int32_t status = 0;
+    int32_t reason = 0;
+    DeviceManagerNotify::GetInstance().OnAuthResult(pkgName, deviceId, token, status, reason);
+    SUCCEED();
+}
+
+/**
+ * @tc.name: OnAuthResult_002
+ * @tc.desc: 1. set deviceId empty (others valid)
+ *           2. call OnAuthResult with empty deviceId
+ *           3. check early-return guard (no crash)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnAuthResult_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test.auth";
+    std::string deviceId;
+    std::string token = "1";
+    int32_t status = 0;
+    int32_t reason = 0;
+    DeviceManagerNotify::GetInstance().OnAuthResult(pkgName, deviceId, token, status, reason);
+    SUCCEED();
+}
+
+/**
+ * @tc.name: OnUiCall_001
+ * @tc.desc: 1. set pkgName empty
+ *           2. call OnUiCall with empty pkgName
+ *           3. check early-return guard (no crash)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnUiCall_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string paramJson = "{}";
+    DeviceManagerNotify::GetInstance().OnUiCall(pkgName, paramJson);
+    SUCCEED();
+}
+
+/**
+ * @tc.name: OnCredentialResult_001
+ * @tc.desc: 1. set pkgName empty
+ *           2. call OnCredentialResult with empty pkgName
+ *           3. check early-return guard (no crash)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t action = 0;
+    std::string credentialResult = "{}";
+    DeviceManagerNotify::GetInstance().OnCredentialResult(pkgName, action, credentialResult);
+    SUCCEED();
+}
+
+/**
+ * @tc.name: OnRemoteDied_001
+ * @tc.desc: 1. call OnRemoteDied with no registered callbacks
+ *           2. check no crash
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DeviceManagerNotifyTest, OnRemoteDied_001, testing::ext::TestSize.Level0)
+{
+    DeviceManagerNotify::GetInstance().OnRemoteDied();
+    SUCCEED();
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS
