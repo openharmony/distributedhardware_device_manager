@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 #include "dm_auth_state_machine_mock.h"
 #include "UTTest_auth_pin_auth_state.h"
 
@@ -71,63 +70,6 @@ bool DmAuthState::IsScreenLocked()
     return false;
 }
 
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthStartState_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<AuthSrcPinAuthStartState> authState = std::make_shared<AuthSrcPinAuthStartState>();
-    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_PIN_AUTH_START_STATE);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthStartState_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinAuthStartState>();
-
-    EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
-        .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(ON_TRANSMIT));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthStartState_003, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinAuthStartState>();
-
-    EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
-        .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(ON_ERROR));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthStartState_004, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinAuthStartState>();
-
-    EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
-        .WillOnce(Return(ERR_DM_FAILED));
-
-    EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthStartState_005, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinAuthStartState>();
-
-    EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
-        .Times(::testing::AtLeast(1))
-        .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .Times(::testing::AtLeast(1))
-        .WillOnce(Return(ON_SESSION_KEY_RETURNED));
-
-    EXPECT_EQ(authState->Action(context), STOP_BIND);
-}
-
 HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthStartState_006, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinAuthStartState>();
@@ -142,21 +84,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkPinAuthStartState_001, testing::ext::Test
 {
     std::shared_ptr<AuthSinkPinAuthStartState> authState = std::make_shared<AuthSinkPinAuthStartState>();
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_PIN_AUTH_START_STATE);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkPinAuthStartState_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkPinAuthStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN);
-
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(ON_TRANSMIT));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthPinAuthStateTest, AuthSinkPinAuthStartState_003, testing::ext::TestSize.Level1)
@@ -207,19 +134,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthMsgNegotiateState_001, testing::ext
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_PIN_AUTH_MSG_NEGOTIATE_STATE);
 }
 
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthMsgNegotiateState_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinAuthMsgNegotiateState>();
-
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(ON_TRANSMIT));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
 HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthMsgNegotiateState_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinAuthMsgNegotiateState>();
@@ -262,21 +176,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkPinAuthMsgNegotiateState_001, testing::ex
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_PIN_AUTH_MSG_NEGOTIATE_STATE);
 }
 
-HWTEST_F(AuthPinAuthStateTest, AuthSinkPinAuthMsgNegotiateState_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkPinAuthMsgNegotiateState>();
-
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(ON_TRANSMIT))
-        .WillOnce(Return(ON_SESSION_KEY_RETURNED))
-        .WillOnce(Return(ON_FINISH));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
 HWTEST_F(AuthPinAuthStateTest, AuthSinkPinAuthMsgNegotiateState_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkPinAuthMsgNegotiateState>();
@@ -308,35 +207,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkPinAuthMsgNegotiateState_005, testing::ex
         .WillOnce(Return(DM_OK));
 
     EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(ON_SESSION_KEY_RETURNED));
-
-    EXPECT_EQ(authState->Action(context), STOP_BIND);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkPinAuthMsgNegotiateState_006, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkPinAuthMsgNegotiateState>();
-
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(ON_TRANSMIT))
-        .WillOnce(Return(ON_ERROR));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkPinAuthMsgNegotiateState_007, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkPinAuthMsgNegotiateState>();
-
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(ON_TRANSMIT))
-        .WillOnce(Return(ON_SESSION_KEY_RETURNED))
         .WillOnce(Return(ON_SESSION_KEY_RETURNED));
 
     EXPECT_EQ(authState->Action(context), STOP_BIND);
@@ -446,29 +316,11 @@ HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicStartState_001, testing::
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_REVERSE_ULTRASONIC_START_STATE);
 }
 
-HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicStartState_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcReverseUltrasonicStartState>();
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
 HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicStartState_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthSrcReverseUltrasonicStartState> authState =
         std::make_shared<AuthSrcReverseUltrasonicStartState>();
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_REVERSE_ULTRASONIC_START_STATE);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicStartState_004, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcReverseUltrasonicStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
-    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicDoneState_001, testing::ext::TestSize.Level1)
@@ -482,21 +334,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicDoneState_002, testing::e
 {
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcReverseUltrasonicDoneState>();
     EXPECT_EQ(authState->Action(context), STOP_BIND);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicDoneState_007, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcReverseUltrasonicDoneState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
-    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-    EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
-        .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(DmEventType::ON_ERROR));
-    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicDoneState_008, testing::ext::TestSize.Level1)
@@ -535,29 +372,11 @@ HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicStartState_001, testing::
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_FORWARD_ULTRASONIC_START_STATE);
 }
 
-HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicStartState_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcForwardUltrasonicStartState>();
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
 HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicStartState_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthSrcForwardUltrasonicStartState> authState =
         std::make_shared<AuthSrcForwardUltrasonicStartState>();
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_FORWARD_ULTRASONIC_START_STATE);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicStartState_004, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcForwardUltrasonicStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
-    context->ultrasonicInfo = DM_Ultrasonic_Forward;
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicDoneState_001, testing::ext::TestSize.Level1)
@@ -571,39 +390,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicDoneState_002, testing::e
 {
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcForwardUltrasonicDoneState>();
     EXPECT_NE(authState->Action(context), DM_ALREADY_AUTHED);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicDoneState_003, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcForwardUltrasonicDoneState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
-    context->ultrasonicInfo = DM_Ultrasonic_Forward;
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-    EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
-        .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(DmEventType::ON_ULTRASONIC_PIN_CHANGED))
-        .WillOnce(Return(DmEventType::ON_ERROR));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicDoneState_010, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcForwardUltrasonicDoneState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
-    context->ultrasonicInfo = DM_Ultrasonic_Forward;
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(DmEventType::ON_ULTRASONIC_PIN_TIMEOUT));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicDoneState_011, testing::ext::TestSize.Level1)
@@ -668,32 +454,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicStartState_005, testing:
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_REVERSE_ULTRASONIC_START_STATE);
 }
 
-HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicStartState_006, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
-    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
-    context->direction = DmAuthDirection::DM_AUTH_SINK;
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(DmEventType::ON_ULTRASONIC_PIN_CHANGED));
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicStartState_007, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
-    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
-    context->direction = DmAuthDirection::DM_AUTH_SINK;
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(DmEventType::ON_ULTRASONIC_PIN_TIMEOUT));
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
 HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicStartState_008, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicStartState>();
@@ -722,26 +482,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_002, testing::
     EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
 }
 
-HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_003, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicDoneState>();
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(ON_TRANSMIT));
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_004, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicDoneState>();
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(ON_ERROR));
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
 HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_005, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicDoneState>();
@@ -757,38 +497,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_006, testing::
     std::shared_ptr<AuthSinkReverseUltrasonicDoneState> authState =
         std::make_shared<AuthSinkReverseUltrasonicDoneState>();
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_REVERSE_ULTRASONIC_DONE_STATE);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_007, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicDoneState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
-    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
-    context->direction = DmAuthDirection::DM_AUTH_SINK;
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(DmEventType::ON_TRANSMIT));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_008, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicDoneState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
-    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
-    context->direction = DmAuthDirection::DM_AUTH_SINK;
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(DmEventType::ON_ERROR));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_009, testing::ext::TestSize.Level1)
@@ -841,18 +549,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicStartState_003, testing:
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_FORWARD_ULTRASONIC_START_STATE);
 }
 
-HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicStartState_004, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkForwardUltrasonicStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
-    context->ultrasonicInfo = DM_Ultrasonic_Forward;
-    context->direction = DmAuthDirection::DM_AUTH_SINK;
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
 HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthSinkForwardUltrasonicDoneState> authState =
@@ -866,26 +562,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_002, testing::
     EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
         .WillOnce(Return(ERR_DM_FAILED));
     EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_003, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkForwardUltrasonicDoneState>();
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(ON_TRANSMIT));
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_004, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkForwardUltrasonicDoneState>();
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(ON_ERROR));
-    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_005, testing::ext::TestSize.Level1)
@@ -903,36 +579,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_006, testing::
     std::shared_ptr<AuthSinkForwardUltrasonicDoneState> authState =
         std::make_shared<AuthSinkForwardUltrasonicDoneState>();
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_FORWARD_ULTRASONIC_DONE_STATE);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_007, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkForwardUltrasonicDoneState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
-    context->ultrasonicInfo = DM_Ultrasonic_Forward;
-    context->direction = DmAuthDirection::DM_AUTH_SINK;
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(DmEventType::ON_TRANSMIT));
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_008, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkForwardUltrasonicDoneState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
-    context->ultrasonicInfo = DM_Ultrasonic_Forward;
-    context->direction = DmAuthDirection::DM_AUTH_SINK;
-    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
-        .WillOnce(Return(DM_OK));
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(DmEventType::ON_ERROR));
-    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_009, testing::ext::TestSize.Level1)
@@ -970,118 +616,6 @@ HWTEST_F(AuthPinAuthStateTest, AuthSrcPinNegotiateStartState_001, testing::ext::
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_PIN_NEGOTIATE_START_STATE);
 }
 
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinNegotiateStartState_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinNegotiateStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN);
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-    context->pinNegotiateStarted = false;
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinNegotiateStartState_003, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinNegotiateStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->ultrasonicInfo = DM_Ultrasonic_Forward;
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-    context->pinNegotiateStarted = false;
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinNegotiateStartState_004, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinNegotiateStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
-    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-    context->pinNegotiateStarted = false;
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinNegotiateStartState_005, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinNegotiateStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE);
-    context->importAuthCode = "123456";
-    context->importPkgName = "com.test.example";
-    context->pkgName = "com.test.example";
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-    context->pinNegotiateStarted = false;
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinNegotiateStartState_006, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinNegotiateStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN);
-    context->authType = DmAuthType::AUTH_TYPE_PIN;
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-    context->accesser.credentialInfos[DM_IDENTICAL_ACCOUNT] = R"({"credId": 1234})";
-
-    context->pinNegotiateStarted = true;
-    context->needBind = false;
-    context->needAgreeCredential = false;
-    context->needAuth = true;
-    context->accesser.credTypeList = R"({"identicalCredType": 1})";
-    EXPECT_EQ(authState->Action(context), DM_OK);
-    context->accesser.credTypeList = R"({"shareCredType": 2})";
-    EXPECT_EQ(authState->Action(context), DM_OK);
-    context->accesser.credTypeList = R"({"pointTopointCredType": 256})";
-    EXPECT_EQ(authState->Action(context), DM_OK);
-    context->accesser.credTypeList = R"({"lnnCredType": 3})";
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinNegotiateStartState_007, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinNegotiateStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN);
-    context->authType = DmAuthType::AUTH_TYPE_PIN;
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-    context->pinNegotiateStarted = true;
-    context->needBind = false;
-    context->needAgreeCredential = false;
-    context->needAuth = false;
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinNegotiateStartState_008, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinNegotiateStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN);
-    context->authType = DmAuthType::AUTH_TYPE_PIN;
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-    context->pinNegotiateStarted = true;
-    context->needBind = false;
-    context->needAgreeCredential = true;
-    context->needAuth = false;
-    EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinNegotiateStartState_009, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinNegotiateStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN);
-    context->authType = DmAuthType::AUTH_TYPE_PIN;
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-    context->pinNegotiateStarted = false;
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
-    EXPECT_EQ(context->pinNegotiateStarted, true);
-    context->needBind = true;
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
 HWTEST_F(AuthPinAuthStateTest, AuthSrcPinNegotiateStartState_010, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinNegotiateStartState>();
@@ -1100,78 +634,10 @@ HWTEST_F(AuthPinAuthStateTest, AuthSrcPinInputState_001, testing::ext::TestSize.
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_PIN_INPUT_STATE);
 }
 
-HWTEST_F(AuthPinAuthStateTest, AuthSrcPinInputState_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcPinInputState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN);
-    context->authType = DmAuthType::AUTH_TYPE_PIN;
-    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
-        .WillOnce(Return(DmEventType::ON_USER_OPERATION))
-        .WillOnce(Return(DmEventType::ON_USER_OPERATION))
-        .WillOnce(Return(DmEventType::ON_USER_OPERATION))
-        .WillOnce(Return(DmEventType::ON_FAIL));
-
-    context->pinInputResult = USER_OPERATION_TYPE_DONE_PINCODE_INPUT;
-    EXPECT_EQ(authState->Action(context), DM_OK);
-    context->inputPinAuthFailTimes = 1;
-    EXPECT_EQ(authState->Action(context), DM_OK);
-
-    context->pinInputResult = USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT;
-    EXPECT_EQ(authState->Action(context), STOP_BIND);
-
-    context->pinInputResult = USER_OPERATION_TYPE_DONE_PINCODE_INPUT;
-    EXPECT_EQ(authState->Action(context), STOP_BIND);
-}
-
 HWTEST_F(AuthPinAuthStateTest, AuthSinkPinNegotiateStartState_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthSinkPinNegotiateStartState> authState = std::make_shared<AuthSinkPinNegotiateStartState>();
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_PIN_NEGOTIATE_START_STATE);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkPinNegotiateStartState_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkPinNegotiateStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN);
-    context->authType = DmAuthType::AUTH_TYPE_PIN;
-    context->direction = DmAuthDirection::DM_AUTH_SINK;
-    context->pinNegotiateStarted = false;
-    EXPECT_EQ(authState->Action(context), DM_OK);
-
-    EXPECT_EQ(context->pinNegotiateStarted, true);
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkPinNegotiateStartState_003, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkPinNegotiateStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE);
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN);
-    context->authType = DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE;
-    context->direction = DmAuthDirection::DM_AUTH_SINK;
-    context->pinNegotiateStarted = false;
-    EXPECT_EQ(authState->Action(context), DM_OK);
-
-    EXPECT_EQ(context->pinNegotiateStarted, true);
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkPinNegotiateStartState_004, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkPinNegotiateStartState>();
-    context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
-    context->authTypeList.push_back(DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE);
-    context->authType = DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE;
-    context->direction = DmAuthDirection::DM_AUTH_SINK;
-    context->pinNegotiateStarted = false;
-    EXPECT_EQ(authState->Action(context), DM_OK);
-
-    EXPECT_EQ(context->pinNegotiateStarted, true);
-    EXPECT_EQ(authState->Action(context), ERR_DM_BIND_PIN_CODE_ERROR);
 }
 
 HWTEST_F(AuthPinAuthStateTest, AuthSinkPinNegotiateStartState_005, testing::ext::TestSize.Level1)

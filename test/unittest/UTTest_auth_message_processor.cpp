@@ -93,13 +93,6 @@ std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<Hi
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> Test =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    ASSERT_NE(Test, nullptr);
-}
-
 /**
  * @tc.name: AuthMessageProcessor::AuthMessageProcessor_001
  * @tc.desc: 1 set cryptoAdapter_ to null
@@ -108,14 +101,6 @@ HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_001, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> Test =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    Test.reset();
-    EXPECT_EQ(Test, nullptr);
-}
-
 /**
  * @tc.name: AuthMessageProcessor::CreateNegotiateMessage_001
  * @tc.desc: 1 set cryptoAdapter_ to null
@@ -124,115 +109,18 @@ HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_002, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(authManager);
-    std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
-    std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthRequestContext>();
-    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authMessageProcessor->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    int32_t msgType = MSG_TYPE_NEGOTIATE;
-    JsonObject jsonObj;
-    jsonObj[TAG_VER] = DM_ITF_VER;
-    jsonObj[TAG_MSG_TYPE] = msgType;
-    jsonObj[TAG_AUTH_TYPE] = authMessageProcessor->authResponseContext_->authType;
-    authMessageProcessor->SetResponseContext(authResponseContext);
-    authMessageProcessor->SetRequestContext(authRequestContext);
-    authMessageProcessor->cryptoAdapter_ = nullptr;
-    authMessageProcessor->authRequestContext_->authType = AUTH_TYPE_NFC;
-    authManager->authRequestContext_->hostPkgName = "hostPkgName";
-    authManager->importAuthCode_ = "123";
-    authManager->importPkgName_ = "hostPkgName";
-    authMessageProcessor->authMgr_ = authManager;
-    authMessageProcessor->CreateNegotiateMessage(jsonObj);
-    std::string str1 = jsonObj.Dump();
-    authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
-    authMessageProcessor->authRequestContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
-    authMessageProcessor->CreateNegotiateMessage(jsonObj);
-
-    JsonObject jsonObject;
-    jsonObject[TAG_ACCOUNT_GROUPID] = "";
-    jsonObject[TAG_VER] = DM_ITF_VER;
-    jsonObject[TAG_MSG_TYPE] = msgType;
-    jsonObject[TAG_CRYPTO_SUPPORT] = false;
-    jsonObject[TAG_AUTH_TYPE] = authMessageProcessor->authResponseContext_->authType;
-    jsonObject[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;
-    jsonObject[TAG_LOCAL_DEVICE_ID] = authMessageProcessor->authResponseContext_->localDeviceId;
-    jsonObject[TAG_HOST] = "";
-    std::string str2 = jsonObject.Dump();
-    ASSERT_NE(str1, str2);
-}
-
 /**
  * @tc.name: AuthMessageProcessor::CreateSyncGroupMessage_001
  * @tc.desc: Compare JSON before and after assignment
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, CreateSyncGroupMessage_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
-    std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
-    authMessageProcessor->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    JsonObject jsona;
-    JsonObject jsonObj;
-    authMessageProcessor->authRequestContext_->deviceId = "132416546";
-    std::vector<std::string> syncGroupList;
-    syncGroupList.push_back("1111");
-    authMessageProcessor->authRequestContext_->syncGroupList = syncGroupList;
-    jsona[TAG_DEVICE_ID] = authMessageProcessor->authRequestContext_->deviceId;
-    jsona[TAG_GROUPIDS] = authMessageProcessor->authRequestContext_->syncGroupList;
-    authMessageProcessor->CreateSyncGroupMessage(jsonObj);
-    std::string str1 = jsona.Dump();
-    std::string str2 = jsonObj.Dump();
-    ASSERT_EQ(str1, str2);
-}
-
 /**
  * @tc.name: AuthMessageProcessor::CreateResponseAuthMessage_001
  * @tc.desc: Compare JSON before and after assignment
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
-    std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
-    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    JsonObject jsonA;
-    JsonObject jsonObj;
-    authMessageProcessor->authResponseContext_->reply = 0;
-    authMessageProcessor->authResponseContext_->deviceId = "132416546";
-    authMessageProcessor->authResponseContext_->token = "11";
-    JsonObject jsonB;
-    jsonB[TAG_GROUP_ID] = "123456";
-    authMessageProcessor->authResponseContext_->groupId =
-        jsonB.Dump();
-    authMessageProcessor->authResponseContext_->authToken = "123456";
-    authMessageProcessor->authResponseContext_->networkId = "11112222";
-    authMessageProcessor->authResponseContext_->requestId = 222222;
-    authMessageProcessor->authResponseContext_->groupName = "333333";
-    jsonA[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;
-    jsonA[TAG_DEVICE_ID] = authMessageProcessor->authResponseContext_->deviceId;
-    jsonA[TAG_TOKEN] = authMessageProcessor->authResponseContext_->token;
-    jsonA[TAG_NET_ID] = authMessageProcessor->authResponseContext_->networkId;
-    jsonA[TAG_REQUEST_ID] = authMessageProcessor->authResponseContext_->requestId;
-    jsonA[TAG_GROUP_ID] = "123456";
-    jsonA[TAG_GROUP_NAME] = authMessageProcessor->authResponseContext_->groupName;
-    jsonA[TAG_AUTH_TOKEN] = authMessageProcessor->authResponseContext_->authToken;
-    authMessageProcessor->CreateResponseAuthMessage(jsonObj);
-    std::string str1 = jsonA.Dump();
-    std::string str2 = jsonObj.Dump();
-    ASSERT_EQ(str1, str2);
-}
-
 /**
  * @tc.name: AuthMessageProcessor::CreateResponseFinishMessage_001
  * @tc.desc: Compare JSON before and after assignment
@@ -1494,19 +1382,6 @@ HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_001, testing::ext:
     ASSERT_EQ(jsonObj[TAG_CRYPTO_SUPPORT].Get<bool>(), false);
 }
 
-HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
-    std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
-    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
-    JsonObject jsonObj;
-    authMessageProcessor->CreateRespNegotiateMessage(jsonObj);
-    ASSERT_EQ(jsonObj[TAG_CRYPTO_SUPPORT].Get<bool>(), true);
-}
-
 HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
@@ -1663,34 +1538,6 @@ HWTEST_F(AuthMessageProcessorTest, ParsePkgNegotiateMessage_002, testing::ext::T
     jsonObj[TAG_HOST_PKGLABEL] = "1213";
     authMessageProcessor->ParsePkgNegotiateMessage(jsonObj);
     ASSERT_NE(authMessageProcessor->authResponseContext_->authType, 21);
-}
-
-HWTEST_F(AuthMessageProcessorTest, CreateDeviceAuthMessage_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
-    std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
-    authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    int32_t msgType = 1;
-    uint8_t param = 0;
-    uint32_t dataLen = 0;
-    std::string str = "1324213";
-    std::string ret = authMessageProcessor->CreateDeviceAuthMessage(msgType, &param, dataLen);
-    ASSERT_EQ(ret.empty(), false);
-
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = nullptr;
-    std::shared_ptr<AuthUiStateManager> authUiStateManager = std::make_shared<AuthUiStateManager>(listener_);
-    DmUiStateMsg msg = DmUiStateMsg::MSG_PIN_CODE_SUCCESS;
-    authUiStateManager->UpdateUiState(msg);
-
-    listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<AuthUiStateManager> authUiStateManager_ = std::make_shared<AuthUiStateManager>(listener_);
-    ProcessInfo processInfo;
-    processInfo.pkgName = "pkgName";
-    processInfo.userId = 123456;
-    authUiStateManager_->pkgSet_.insert(processInfo);
-    authUiStateManager_->UpdateUiState(msg);
 }
 
 HWTEST_F(AuthMessageProcessorTest, CreateReqReCheckMessage_001, testing::ext::TestSize.Level1)

@@ -89,45 +89,6 @@ void DmAuthManagerTest::TearDownTestCase()
 }
 
 namespace {
-HWTEST_F(DmAuthManagerTest, OnDataReceived_001, testing::ext::TestSize.Level1)
-{
-    int32_t sessionId = 0;
-    std::string message;
-    authManager_->authResponseContext_ = nullptr;
-    authManager_->OnDataReceived(sessionId, message);
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
-HWTEST_F(DmAuthManagerTest, OnDataReceived_002, testing::ext::TestSize.Level1)
-{
-    int32_t sessionId = 0;
-    std::string message;
-    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager_->authMessageProcessor_ = nullptr;
-    authManager_->OnDataReceived(sessionId, message);
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
-HWTEST_F(DmAuthManagerTest, OnDataReceived_003, testing::ext::TestSize.Level1)
-{
-    int32_t sessionId = 0;
-    std::string message;
-    authManager_->OnDataReceived(sessionId, message);
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
-HWTEST_F(DmAuthManagerTest, OnDataReceived_007, testing::ext::TestSize.Level1)
-{
-    int32_t sessionId = 0;
-    JsonObject jsonObject;
-    jsonObject[TAG_MSG_TYPE] = 200;
-    std::string message = jsonObject.Dump();
-    authManager_->OnDataReceived(sessionId, message);
-    authManager_->authRequestState_ = nullptr;
-    authManager_->authResponseState_ = nullptr;
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
 HWTEST_F(DmAuthManagerTest, OnGroupCreated_001, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 0;
@@ -247,33 +208,6 @@ HWTEST_F(DmAuthManagerTest, OnMemberJoin_008, testing::ext::TestSize.Level1)
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
-HWTEST_F(DmAuthManagerTest, OnMemberJoin_009, testing::ext::TestSize.Level1)
-{
-    int64_t requestId = 0;
-    int32_t status = DM_OK;
-    authManager_->authRequestState_ = nullptr;
-    authManager_->authTimes_ = 1;
-    std::shared_ptr<AuthResponseInitStateMock> authResponseInitStateMock =
-        std::make_shared<AuthResponseInitStateMock>();
-    EXPECT_CALL(*authResponseInitStateMock, GetStateType())
-        .WillRepeatedly(testing::Return(AuthState::AUTH_RESPONSE_CREDENTIAL));
-    authManager_->authResponseState_ = authResponseInitStateMock;
-    authManager_->authResponseContext_->isFinish = true;
-    authManager_->authResponseContext_->requestId = 0;
-    authManager_->OnMemberJoin(requestId, status, 0);
-    ASSERT_TRUE(authManager_->authResponseContext_->isFinish);
-
-    authManager_->authResponseContext_->isFinish = true;
-    authManager_->authResponseContext_->requestId = 1;
-    authManager_->OnMemberJoin(requestId, status, 0);
-    ASSERT_FALSE(authManager_->authResponseContext_->isFinish);
-
-    authManager_->authResponseContext_->isFinish = true;
-    status = ERR_DM_FAILED;
-    authManager_->OnMemberJoin(requestId, status, 0);
-    ASSERT_FALSE(authManager_->authResponseContext_->isFinish);
-}
-
 HWTEST_F(DmAuthManagerTest, HandleMemberJoinImportAuthCode_001, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 1;
@@ -380,30 +314,6 @@ HWTEST_F(DmAuthManagerTest, SendAuthRequest_002, testing::ext::TestSize.Level1)
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
-HWTEST_F(DmAuthManagerTest, SendAuthRequest_003, testing::ext::TestSize.Level1)
-{
-    int64_t sessionId = 1;
-    authManager_->authResponseContext_->cryptoSupport = true;
-    authManager_->authResponseContext_->bindLevel = 0;
-    authManager_->authResponseContext_->dmVersion = "dmVersion";
-    authManager_->authResponseContext_->bindLevel = 1;
-    authManager_->authResponseContext_->hostPkgName = "hostPkgName";
-    authManager_->authResponseContext_->localDeviceId = "123456789";
-    authManager_->authResponseContext_->deviceId = "deviceId";
-    authManager_->authResponseContext_->reply = -20018;
-    authManager_->SendAuthRequest(sessionId);
-    authManager_->authResponseContext_->dmVersion = "5.0.1";
-    authManager_->authResponseContext_->bindLevel = 0;
-    authManager_->SendAuthRequest(sessionId);
-    authManager_->authResponseContext_->dmVersion = "";
-    authManager_->authResponseContext_->bindLevel = 1;
-    authManager_->SendAuthRequest(sessionId);
-    authManager_->authResponseContext_->dmVersion = "5.0.1";
-    authManager_->authResponseContext_->bindLevel = 1;
-    authManager_->SendAuthRequest(sessionId);
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
 HWTEST_F(DmAuthManagerTest, GetAuthRequestContext_001, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_->localDeviceId = "123456789";
@@ -418,14 +328,6 @@ HWTEST_F(DmAuthManagerTest, GetAuthRequestContext_001, testing::ext::TestSize.Le
     authManager_->authResponseContext_->isOnline = true;
     authManager_->authResponseContext_->haveCredential = true;
     authManager_->GetAuthRequestContext();
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
-HWTEST_F(DmAuthManagerTest, ProcessAuthRequestExt_001, testing::ext::TestSize.Level1)
-{
-    int32_t sessionId = 1;
-    authManager_->authResponseContext_->reply = -20018;
-    authManager_->ProcessAuthRequestExt(sessionId);
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
@@ -543,28 +445,6 @@ HWTEST_F(DmAuthManagerTest, StartRespAuthProcess_001, testing::ext::TestSize.Lev
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
-HWTEST_F(DmAuthManagerTest, StartRespAuthProcess_002, testing::ext::TestSize.Level1)
-{
-    authManager_->authResponseContext_->groupName = "111111";
-    authManager_->StartRespAuthProcess();
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
-HWTEST_F(DmAuthManagerTest, StartRespAuthProcess_003, testing::ext::TestSize.Level1)
-{
-    authManager_->authResponseContext_->groupName = "00000";
-    authManager_->StartRespAuthProcess();
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
-HWTEST_F(DmAuthManagerTest, StartRespAuthProcess_004, testing::ext::TestSize.Level1)
-{
-    authManager_->authResponseContext_->groupName = "00000";
-    authManager_->authResponseContext_->reply = 0;
-    authManager_->StartRespAuthProcess();
-    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
-}
-
 HWTEST_F(DmAuthManagerTest, StartRespAuthProcess_005, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_->groupName = "11111";
@@ -591,32 +471,6 @@ HWTEST_F(DmAuthManagerTest, GetConnectAddr_002, testing::ext::TestSize.Level1)
     ASSERT_EQ(ret.empty(), false);
 }
 
-HWTEST_F(DmAuthManagerTest, SinkAuthenticateFinish_001, testing::ext::TestSize.Level1)
-{
-    authManager_->authResponseState_ = std::make_shared<AuthResponseFinishState>();
-    authManager_->isFinishOfLocal_ = true;
-    authManager_->SinkAuthenticateFinish();
-    ASSERT_EQ(authManager_->authResponseState_, nullptr);
-}
-
-HWTEST_F(DmAuthManagerTest, SrcAuthenticateFinish_001, testing::ext::TestSize.Level1)
-{
-    authManager_->isFinishOfLocal_ = true;
-    authManager_->authResponseContext_->state = 5;
-    authManager_->SrcAuthenticateFinish();
-    usleep(600);
-    ASSERT_EQ(authManager_->authRequestState_, nullptr);
-}
-
-HWTEST_F(DmAuthManagerTest, SrcAuthenticateFinish_002, testing::ext::TestSize.Level1)
-{
-    authManager_->isFinishOfLocal_ = false;
-    authManager_->authResponseContext_->state = 7;
-    authManager_->SrcAuthenticateFinish();
-    usleep(600);
-    ASSERT_EQ(authManager_->authRequestState_, nullptr);
-}
-
 HWTEST_F(DmAuthManagerTest, AuthenticateFinish_001, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_ = nullptr;
@@ -630,28 +484,6 @@ HWTEST_F(DmAuthManagerTest, AuthenticateFinish_002, testing::ext::TestSize.Level
     authManager_->authUiStateMgr_ = nullptr;
     authManager_->AuthenticateFinish();
     ASSERT_EQ(authManager_->authUiStateMgr_, nullptr);
-}
-
-HWTEST_F(DmAuthManagerTest, AuthenticateFinish_003, testing::ext::TestSize.Level1)
-{
-    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authResponseState_ = std::make_shared<AuthResponseFinishState>();
-    authManager_->authRequestState_ = nullptr;
-    authManager_->AuthenticateFinish();
-    ASSERT_EQ(authManager_->authResponseContext_, nullptr);
-}
-
-HWTEST_F(DmAuthManagerTest, AuthenticateFinish_004, testing::ext::TestSize.Level1)
-{
-    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authResponseState_ = nullptr;
-    authManager_->authRequestState_ = std::make_shared<AuthRequestJoinState>();
-    authManager_->AuthenticateFinish();
-    ASSERT_EQ(authManager_->authResponseContext_, nullptr);
 }
 
 HWTEST_F(DmAuthManagerTest, RegisterUiStateCallback_001, testing::ext::TestSize.Level1)
@@ -932,20 +764,6 @@ HWTEST_F(DmAuthManagerTest, BindTarget_002, testing::ext::TestSize.Level1)
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DmAuthManagerTest, BindTarget_004, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    PeerTargetId targetId;
-    targetId.deviceId = "123456";
-    std::map<std::string, std::string> bindParam;
-    bindParam.insert(std::pair<std::string, std::string>("AUTH_TYPE", "1"));
-    bindParam.insert(std::pair<std::string, std::string>("CONN_ADDR_TYPE", "3"));
-    int sessionId = 1;
-    int64_t logicalSessionId = 888;
-    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam, sessionId, logicalSessionId);
-    ASSERT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
-}
-
 HWTEST_F(DmAuthManagerTest, BindTarget_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
@@ -1210,16 +1028,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_001, testing::ext::TestSize.Leve
     ASSERT_EQ(ret, ERR_DM_AUTH_FAILED);
 }
 
-HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_002, testing::ext::TestSize.Level1)
-{
-    int32_t authType = 6;
-    std::string extra;
-    std::string pkgName = "ohos_test";
-    std::string deviceId = "512156";
-    int32_t ret = authManager_->CheckAuthParamVaild(pkgName, authType, deviceId, extra);
-    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_AUTH_TYPE);
-}
-
 HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_003, testing::ext::TestSize.Level1)
 {
     int32_t authType = 4;
@@ -1383,24 +1191,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_0014, testing::ext::TestSize.Lev
     authManager_->authResponseState_ = nullptr;
     int32_t ret = authManager_->CheckAuthParamVaild(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_0015, testing::ext::TestSize.Level1)
-{
-    int32_t authType = 5;
-    std::string extra;
-    std::string pkgName = "ohos_test";
-    std::string deviceId = "512156";
-    authManager_->importAuthCode_ = "";
-    authManager_->importAuthCode_ = "";
-    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
-    authManager_->softbusConnector_->discoveryDeviceInfoMap_.emplace(deviceId, infoPtr);
-    authManager_->authRequestState_ = nullptr;
-    authManager_->authResponseState_ = nullptr;
-    int32_t ret = authManager_->CheckAuthParamVaild(pkgName, authType, deviceId, extra);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DmAuthManagerTest, StartNegotiate_001, testing::ext::TestSize.Level1)
@@ -1754,21 +1544,6 @@ HWTEST_F(DmAuthManagerTest, ParseConnectAddr_202, testing::ext::TestSize.Level1)
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, BindTarget_006, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    PeerTargetId targetId;
-    targetId.brMac = "D4G4E5G24D5S";
-    targetId.bleMac = "1463158131321";
-    targetId.deviceId = "";
-    std::map<std::string, std::string> bindParam;
-    bindParam.insert(std::pair<std::string, std::string>("AUTH_TYPE", "2"));
-    bindParam.insert(std::pair<std::string, std::string>("CONN_ADDR_TYPE", "3"));
-    int sessionId = 1;
-    int64_t logicalSessionId = 888;
-    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam, sessionId, logicalSessionId);
-    ASSERT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

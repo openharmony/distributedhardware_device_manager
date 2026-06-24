@@ -660,4 +660,3 @@ HWTEST_F(DmAuthMessageProcessorTest, PutDeviceControlList_Sentinel_NoAclDays, te
 }
 } // namespace DistributedHardware
 } // namespace OHOS
-

@@ -54,7 +54,6 @@ HWTEST_F(HichainListenerTest, RegisterDataChangeCb_002, testing::ext::TestSize.L
     ASSERT_NO_FATAL_FAILURE(listerner.RegisterDataChangeCb());
 }
 
-
 /**
  * @tc.name: OnHichainDeviceUnBound_001
  * @tc.type: FUNC

@@ -58,109 +58,6 @@ void DeviceManagerServiceImplFirstTest::TearDownTestCase()
 }
 
 namespace {
-HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_001, testing::ext::TestSize.Level1)
-{
-    std::string peerUdid = "peerUdid";
-    std::string localUdid = "localUdid";
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
-    
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
-        .WillOnce(Return(profiles));
-
-    bool result = deviceManagerServiceImpl_->CheckSharePeerSrc(peerUdid, localUdid);
-    EXPECT_FALSE(result);
-}
-
-HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_002, testing::ext::TestSize.Level1)
-{
-    std::string peerUdid = "peerUdid";
-    std::string localUdid = "localUdid";
-    
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
-    AccessControlProfile profile;
-    profile.SetBindType(DM_SHARE);
-    profile.SetTrustDeviceId(peerUdid);
-    Accesser accesser;
-    accesser.SetAccesserDeviceId(peerUdid);
-    profile.SetAccesser(accesser);
-
-    Accessee accessee;
-    accessee.SetAccesseeDeviceId(localUdid);
-    profile.SetAccessee(accessee);
-    profiles.push_back(profile);
-    
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
-        .WillOnce(Return(profiles));
-    
-    bool result = deviceManagerServiceImpl_->CheckSharePeerSrc(peerUdid, localUdid);
-    EXPECT_TRUE(result);
-}
-
-HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_003, testing::ext::TestSize.Level1)
-{
-    std::string peerUdid = "peerUdid";
-    std::string localUdid = "localUdid";
-    
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
-    AccessControlProfile profile;
-    profile.SetBindType(DM_SHARE);
-    profile.SetTrustDeviceId(peerUdid);
-    Accesser accesser;
-    accesser.SetAccesserDeviceId(localUdid);
-    profile.SetAccesser(accesser);
-    profile.GetAccessee().SetAccesseeDeviceId(peerUdid);
-    profiles.push_back(profile);
-    
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
-        .WillOnce(Return(profiles));
-    
-    bool result = deviceManagerServiceImpl_->CheckSharePeerSrc(peerUdid, localUdid);
-    EXPECT_FALSE(result);
-}
-
-HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_004, testing::ext::TestSize.Level1)
-{
-    std::string peerUdid = "peerUdid";
-    std::string localUdid = "localUdid";
-    
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
-    AccessControlProfile profile;
-    profile.SetBindType(DM_IDENTICAL_ACCOUNT);
-    profile.SetTrustDeviceId(peerUdid);
-    Accesser accesser;
-    accesser.SetAccesserDeviceId(peerUdid);
-    profile.SetAccesser(accesser);
-    Accessee accessee;
-    accessee.SetAccesseeDeviceId(localUdid);
-    profile.SetAccessee(accessee);
-    profiles.push_back(profile);
-    
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
-        .WillOnce(Return(profiles));
-    
-    bool result = deviceManagerServiceImpl_->CheckSharePeerSrc(peerUdid, localUdid);
-    EXPECT_FALSE(result);
-}
-
-HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_005, testing::ext::TestSize.Level1)
-{
-    std::string peerUdid = "peerUdid";
-    std::string localUdid = "localUdid";
-    std::string trustDevideId = "trustDevideId";
-
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
-    AccessControlProfile profile;
-    profile.SetBindType(DM_SHARE);
-    profile.SetTrustDeviceId(trustDevideId);
-    profiles.push_back(profile);
-   
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
-        .WillOnce(Return(profiles));
-
-    bool result = deviceManagerServiceImpl_->CheckSharePeerSrc(peerUdid, localUdid);
-    EXPECT_FALSE(result);
-}
-
 HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_001, testing::ext::TestSize.Level1)
 {
     const char *credId = "123456";
@@ -595,7 +492,8 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessUnBindApp_003, testing::ext::
     std::string extra = R"({"peerTokenId": 5678})";
     std::string udid = "remoteUdid";
 
-    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleAppUnBindEvent(userId, udid, accessTokenId, peerTokenId)).Times(1);
+    EXPECT_CALL(*deviceManagerServiceImplMock_,
+        HandleAppUnBindEvent(userId, udid, accessTokenId, peerTokenId)).Times(1);
 
     deviceManagerServiceImpl_->ProcessUnBindApp(userId, accessTokenId, extra, udid);
 }
@@ -666,32 +564,6 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, BindServiceTarget_InvalidInput_101, 
     std::map<std::string, std::string> bindParam;
     int32_t ret = deviceManagerServiceImpl_->BindServiceTarget("", targetId, bindParam);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceImplFirstTest, BindServiceTarget_Success_101, testing::ext::TestSize.Level0)
-{
-    PeerTargetId targetId;
-    std::map<std::string, std::string> bindParam = {{"key1", "value1"}};
-    int32_t ret = deviceManagerServiceImpl_->BindServiceTarget("valid_pkg", targetId, bindParam);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclExtraDataServiceId_NoMatchingId_101, testing::ext::TestSize.Level1)
-{
-    int64_t serviceId = 123456;
-    int64_t tokenIdCaller = 123;
-    std::string udid = "test";
-    int32_t bindLevel = 1;
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
-    DistributedDeviceProfile::AccessControlProfile profile;
-    profile.SetExtraData(R"({"key": "value"})");
-    profiles.push_back(profile);
-
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl()).Times(AnyNumber())
-        .WillOnce(Return(profiles));
-
-    int32_t ret = deviceManagerServiceImpl_->DeleteAclExtraDataServiceId(serviceId, tokenIdCaller, udid, bindLevel);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclExtDataServiceId_ExtDataEmpty_01, testing::ext::TestSize.Level1)

@@ -1496,7 +1496,6 @@ HWTEST_F(DeviceManagerServiceImplTest, ConvertBindTypeToAuthForm_102, testing::e
     EXPECT_EQ(authForm, DmAuthForm::IDENTICAL_ACCOUNT);
 }
 
-
 HWTEST_F(DeviceManagerServiceImplTest, ConvertBindTypeToAuthForm_103, testing::ext::TestSize.Level1)
 {
     int32_t bindType = DM_POINT_TO_POINT;

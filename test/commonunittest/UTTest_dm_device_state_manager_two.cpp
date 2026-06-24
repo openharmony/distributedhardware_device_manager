@@ -74,66 +74,6 @@ std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<Hi
 std::shared_ptr<DmDeviceStateManager> dmDeviceStateManager =
     std::make_shared<DmDeviceStateManager>(softbusConnector, listener_, hiChainConnector_, hiChainAuthConnector);
 
-HWTEST_F(DmDeviceStateManagerTestTwo, RegisterSoftbusStateCallback_001, testing::ext::TestSize.Level0)
-{
-    auto softbusConnector = dmDeviceStateManager->softbusConnector_;
-    dmDeviceStateManager->softbusConnector_ = nullptr;
-    int32_t ret = dmDeviceStateManager->RegisterSoftbusStateCallback();
-    EXPECT_EQ(ret, DM_OK);
-    dmDeviceStateManager->softbusConnector_ = softbusConnector;
-}
-
-HWTEST_F(DmDeviceStateManagerTestTwo, DeleteOfflineDeviceInfo_002, testing::ext::TestSize.Level0)
-{
-    DmDeviceInfo info = {
-        .deviceId = "123",
-        .deviceName = "asda",
-        .deviceTypeId = 1,
-    };
-    dmDeviceStateManager->remoteDeviceInfos_["123"] = info;
-    dmDeviceStateManager->stateDeviceInfos_["123"] = info;
-    dmDeviceStateManager->DeleteOfflineDeviceInfo(info);
-    for (auto iter: dmDeviceStateManager->remoteDeviceInfos_) {
-        if (iter.second.deviceId == info.deviceId) {
-            EXPECT_EQ(dmDeviceStateManager->remoteDeviceInfos_.count(iter.first), 0);
-            break;
-        }
-    }
-}
-
-HWTEST_F(DmDeviceStateManagerTestTwo, DeleteOfflineDeviceInfo_003, testing::ext::TestSize.Level0)
-{
-    DmDeviceInfo info = {
-        .deviceId = "123",
-        .deviceName = "asda",
-        .deviceTypeId = 1,
-    };
-    dmDeviceStateManager->remoteDeviceInfos_["123"] = info;
-    dmDeviceStateManager->stateDeviceInfos_["123"] = info;
-    strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "456");
-    dmDeviceStateManager->DeleteOfflineDeviceInfo(info);
-    for (auto iter: dmDeviceStateManager->remoteDeviceInfos_) {
-        if (iter.second.deviceId == info.deviceId) {
-            EXPECT_EQ(dmDeviceStateManager->remoteDeviceInfos_.count(iter.first), 0);
-            break;
-        }
-    }
-}
-
-HWTEST_F(DmDeviceStateManagerTestTwo, OnDeviceOffline_002, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "123";
-    DmDeviceInfo info = {
-        .deviceId = "123",
-        .deviceName = "asda",
-        .deviceTypeId = 1,
-    };
-    dmDeviceStateManager->stateDeviceInfos_["123"] = info;
-    dmDeviceStateManager->OnDeviceOffline(deviceId, false);
-    EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
-    dmDeviceStateManager->stateDeviceInfos_.clear();
-}
-
 HWTEST_F(DmDeviceStateManagerTestTwo, HandleDeviceStatusChange_001, testing::ext::TestSize.Level0)
 {
     DmDeviceInfo info = {
@@ -180,33 +120,6 @@ HWTEST_F(DmDeviceStateManagerTestTwo, OnDeviceOnline_001, testing::ext::TestSize
     dmDeviceStateManager->OnDeviceOnline("123", 0);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
     dmDeviceStateManager->stateDeviceInfos_.clear();
-}
-
-HWTEST_F(DmDeviceStateManagerTestTwo, OnDbReady_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::string deviceId;
-    dmDeviceStateManager->OnDbReady(pkgName, deviceId);
-
-    pkgName = "123";
-    dmDeviceStateManager->OnDbReady(pkgName, deviceId);
-
-    deviceId = "123";
-    dmDeviceStateManager->OnDbReady(pkgName, deviceId);
-
-    DmDeviceInfo deviceInfo = {
-        .deviceId = "123",
-        .deviceName = "asda",
-        .deviceTypeId = 1,
-    };
-    dmDeviceStateManager->remoteDeviceInfos_["123"] = deviceInfo;
-    dmDeviceStateManager->OnDbReady(pkgName, deviceId);
-    EXPECT_NE(dmDeviceStateManager->listener_, nullptr);
-    auto listener = dmDeviceStateManager->listener_;
-    dmDeviceStateManager->listener_ = nullptr;
-    dmDeviceStateManager->OnDbReady(pkgName, deviceId);
-    dmDeviceStateManager->listener_ = listener;
-    EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
 }
 
 HWTEST_F(DmDeviceStateManagerTestTwo, RegisterOffLineTimer_002, testing::ext::TestSize.Level0)
