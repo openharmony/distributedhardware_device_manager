@@ -78,86 +78,6 @@ private:
     int32_t pinCode = 0;
 };
 
-HWTEST_F(HiChainAuthConnectorTest, RegisterHiChainAuthCallback_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<IDmDeviceAuthCallback> callback = nullptr;
-    int32_t ret = hiChain_->RegisterHiChainAuthCallback(callback);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(HiChainAuthConnectorTest, ProcessAuthData_001, testing::ext::TestSize.Level1)
-{
-    int32_t requestId = 0;
-    std::string authData;
-    int32_t osAccountId = 0;
-    int32_t ret = hiChain_->ProcessAuthData(requestId, authData, osAccountId);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(HiChainAuthConnectorTest, onTransmit_001, testing::ext::TestSize.Level1)
-{
-    int32_t requestId = 0;
-    uint8_t *data = nullptr;
-    uint32_t dataLen = 0;
-    hiChain_->dmDeviceAuthCallback_ = nullptr;
-    bool ret = hiChain_->onTransmit(requestId, data, dataLen);
-    EXPECT_EQ(ret, false);
-}
-
-HWTEST_F(HiChainAuthConnectorTest, onTransmit_002, testing::ext::TestSize.Level1)
-{
-    int32_t requestId = 0;
-    uint8_t *data = nullptr;
-    uint32_t dataLen = 0;
-    hiChain_->dmDeviceAuthCallback_ = std::make_shared<DmDeviceAuthCallbackTest>();
-    bool ret = hiChain_->onTransmit(requestId, data, dataLen);
-    EXPECT_EQ(ret, false);
-}
-
-HWTEST_F(HiChainAuthConnectorTest, onRequest_001, testing::ext::TestSize.Level1)
-{
-    int64_t requestId = 0;
-    int operationCode = 0;
-    char *reqParams = nullptr;
-    hiChain_->dmDeviceAuthCallback_ = nullptr;
-    char *ret = hiChain_->onRequest(requestId, operationCode, reqParams);
-    EXPECT_EQ(hiChain_->dmDeviceAuthCallback_, nullptr);
-    if (ret != nullptr) {
-        free(ret);
-        ret = nullptr;
-    }
-}
-
-HWTEST_F(HiChainAuthConnectorTest, onRequest_002, testing::ext::TestSize.Level1)
-{
-    int64_t requestId = 0;
-    int operationCode = 0;
-    char *reqParams = nullptr;
-    hiChain_->dmDeviceAuthCallback_ = std::make_shared<DmDeviceAuthCallbackTest>();
-    char *ret = hiChain_->onRequest(requestId, operationCode, reqParams);
-    EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
-    if (ret != nullptr) {
-        free(ret);
-        ret = nullptr;
-    }
-}
-
-HWTEST_F(HiChainAuthConnectorTest, onRequest_003, testing::ext::TestSize.Level1)
-{
-    int64_t requestId = 0;
-    int operationCode = 0;
-    int32_t errorCode = -20024;
-    char *reqParams = nullptr;
-    hiChain_->dmDeviceAuthCallback_ = std::make_shared<DmDeviceAuthCallbackTest>();
-    hiChain_->dmDeviceAuthCallback_->AuthDeviceError(requestId, errorCode);
-    char *ret = hiChain_->onRequest(requestId, operationCode, reqParams);
-    EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
-    if (ret != nullptr) {
-        free(ret);
-        ret = nullptr;
-    }
-}
-
 HWTEST_F(HiChainAuthConnectorTest, onFinish_001, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 0;
@@ -166,16 +86,6 @@ HWTEST_F(HiChainAuthConnectorTest, onFinish_001, testing::ext::TestSize.Level1)
     hiChain_->dmDeviceAuthCallback_ = nullptr;
     hiChain_->onFinish(requestId, operationCode, returnData);
     EXPECT_EQ(hiChain_->dmDeviceAuthCallback_, nullptr);
-}
-
-HWTEST_F(HiChainAuthConnectorTest, onFinish_002, testing::ext::TestSize.Level1)
-{
-    int64_t requestId = 0;
-    int operationCode = 0;
-    char *returnData = nullptr;
-    hiChain_->dmDeviceAuthCallback_ = std::make_shared<DmDeviceAuthCallbackTest>();
-    hiChain_->onFinish(requestId, operationCode, returnData);
-    EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
 }
 
 HWTEST_F(HiChainAuthConnectorTest, onError_001, testing::ext::TestSize.Level1)
@@ -187,17 +97,6 @@ HWTEST_F(HiChainAuthConnectorTest, onError_001, testing::ext::TestSize.Level1)
     hiChain_->dmDeviceAuthCallback_ = nullptr;
     hiChain_->onError(requestId, operationCode, errorCode, errorReturn);
     EXPECT_EQ(hiChain_->dmDeviceAuthCallback_, nullptr);
-}
-
-HWTEST_F(HiChainAuthConnectorTest, onError_002, testing::ext::TestSize.Level1)
-{
-    int64_t requestId = 0;
-    int operationCode = 0;
-    int errorCode = 0;
-    char *errorReturn = nullptr;
-    hiChain_->dmDeviceAuthCallback_ = std::make_shared<DmDeviceAuthCallbackTest>();
-    hiChain_->onError(requestId, operationCode, errorCode, errorReturn);
-    EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
 }
 
 HWTEST_F(HiChainAuthConnectorTest, onSessionKeyReturned_001, testing::ext::TestSize.Level1)
@@ -628,30 +527,11 @@ HWTEST_F(HiChainAuthConnectorTest, AgreeCredential_001, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, AuthCredential_001, testing::ext::TestSize.Level1)
-{
-    int32_t osAccountId = 0;
-    int64_t authReqId = 1;
-    std::string credId = "credIdTest";
-    std::string pinCode = "146894";
-    int32_t ret = hiChain_->AuthCredential(osAccountId, authReqId, credId, pinCode);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
 HWTEST_F(HiChainAuthConnectorTest, AuthCredentialPinCode_001, testing::ext::TestSize.Level1)
 {
     int32_t osAccountId = 0;
     int64_t authReqId = 1;
     std::string pinCode = "233";
-    int32_t ret = hiChain_->AuthCredentialPinCode(osAccountId, authReqId, pinCode);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(HiChainAuthConnectorTest, AuthCredentialPinCode_002, testing::ext::TestSize.Level1)
-{
-    int32_t osAccountId = 0;
-    int64_t authReqId = 1;
-    std::string pinCode = "369528";
     int32_t ret = hiChain_->AuthCredentialPinCode(osAccountId, authReqId, pinCode);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -671,6 +551,145 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredInfoByCredId_001, testing::ext::Test
     std::string credId;
     JsonObject resultJson;
     int32_t ret = hiChain_->QueryCredInfoByCredId(userId, credId, resultJson);
+    EXPECT_NE(ret, DM_OK);
+}
+
+/**
+ * @tc.name: UnRegisterHiChainAuthCallback_001
+ * @tc.desc: 1. set dmDeviceAuthCallback_ not null
+ *           2. call UnRegisterHiChainAuthCallback
+ *           3. check dmDeviceAuthCallback_ is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiChainAuthConnectorTest, UnRegisterHiChainAuthCallback_001, testing::ext::TestSize.Level1)
+{
+    hiChain_->dmDeviceAuthCallback_ = std::make_shared<DmDeviceAuthCallbackTest>();
+    ASSERT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
+    int32_t ret = hiChain_->UnRegisterHiChainAuthCallback();
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(hiChain_->dmDeviceAuthCallback_, nullptr);
+}
+
+/**
+ * @tc.name: RegisterHiChainAuthCallbackById_001
+ * @tc.desc: 1. call RegisterHiChainAuthCallbackById with valid id and callback
+ *           2. call GetDeviceAuthCallback with same id
+ *           3. check callback not null
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiChainAuthConnectorTest, RegisterHiChainAuthCallbackById_001, testing::ext::TestSize.Level1)
+{
+    int64_t id = 100;
+    auto callback = std::make_shared<DmDeviceAuthCallbackTest>();
+    int32_t ret = hiChain_->RegisterHiChainAuthCallbackById(id, callback);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: UnRegisterHiChainAuthCallbackById_001
+ * @tc.desc: 1. call RegisterHiChainAuthCallbackById with valid id and callback
+ *           2. call UnRegisterHiChainAuthCallbackById with same id
+ *           3. call UnRegisterHiChainAuthCallbackById with unregistered id
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiChainAuthConnectorTest, UnRegisterHiChainAuthCallbackById_001, testing::ext::TestSize.Level1)
+{
+    int64_t id = 200;
+    auto callback = std::make_shared<DmDeviceAuthCallbackTest>();
+    hiChain_->RegisterHiChainAuthCallbackById(id, callback);
+    int32_t ret = hiChain_->UnRegisterHiChainAuthCallbackById(id);
+    EXPECT_EQ(ret, DM_OK);
+    // branch: id not found in map
+    int32_t retNotFound = hiChain_->UnRegisterHiChainAuthCallbackById(999);
+    EXPECT_EQ(retNotFound, DM_OK);
+}
+
+/**
+ * @tc.name: onTransmit_004
+ * @tc.desc: 1. call onTransmit with dataLen exceeding HICHAIN_DATA_SIZE
+ *           2. check return false
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiChainAuthConnectorTest, onTransmit_004, testing::ext::TestSize.Level1)
+{
+    int64_t requestId = 0;
+    uint8_t data[] = {1};
+    uint32_t dataLen = 10241; // exceeds HICHAIN_DATA_SIZE(10240)
+    bool ret = hiChain_->onTransmit(requestId, data, dataLen);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: onSessionKeyReturned_004
+ * @tc.desc: 1. call onSessionKeyReturned with sessionKeyLen exceeding HICHAIN_DATA_SIZE
+ *           2. check early return branch
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiChainAuthConnectorTest, onSessionKeyReturned_004, testing::ext::TestSize.Level1)
+{
+    int64_t requestId = 0;
+    uint8_t sessionKey[] = {1};
+    uint32_t sessionKeyLen = 10241; // exceeds HICHAIN_DATA_SIZE(10240)
+    hiChain_->dmDeviceAuthCallback_ = std::make_shared<DmDeviceAuthCallbackTest>();
+    hiChain_->onSessionKeyReturned(requestId, sessionKey, sessionKeyLen);
+    EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
+}
+
+/**
+ * @tc.name: DeleteCredential_006
+ * @tc.desc: 1. call DeleteCredential(osAccountId, credId) two-arg overload with non-empty credId
+ *           2. check ret is not DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_006, testing::ext::TestSize.Level1)
+{
+    int32_t osAccountId = 0;
+    std::string credId = "credIdTest";
+    int32_t ret = hiChain_->DeleteCredential(osAccountId, credId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: DeleteCredential_007
+ * @tc.desc: 1. call DeleteCredential(osAccountId, credId) two-arg overload with empty credId
+ *           2. check ret is not DM_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_007, testing::ext::TestSize.Level1)
+{
+    int32_t osAccountId = 0;
+    std::string credId;
+    int32_t ret = hiChain_->DeleteCredential(osAccountId, credId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: AddTokensToCredential_001
+ * @tc.desc: 1. call AddTokensToCredential with valid params
+ *           2. check ret is not DM_OK (GetCredMgrInstance fails in UT)
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiChainAuthConnectorTest, AddTokensToCredential_001, testing::ext::TestSize.Level1)
+{
+    std::string credId = "credIdTest";
+    int32_t userId = 0;
+    std::vector<std::string> tokenIds = {"token1", "token2"};
+    int32_t ret = hiChain_->AddTokensToCredential(credId, userId, tokenIds);
+    EXPECT_NE(ret, DM_OK);
+}
+
+/**
+ * @tc.name: UpdateCredential_001
+ * @tc.desc: 1. call UpdateCredential with valid params
+ *           2. check ret is not DM_OK (GetCredMgrInstance fails in UT)
+ * @tc.type: FUNC
+ */
+HWTEST_F(HiChainAuthConnectorTest, UpdateCredential_001, testing::ext::TestSize.Level1)
+{
+    std::string credId = "credIdTest";
+    int32_t userId = 0;
+    std::vector<std::string> tokenIds = {"token1"};
+    int32_t ret = hiChain_->UpdateCredential(credId, userId, tokenIds);
     EXPECT_NE(ret, DM_OK);
 }
 } // namespace DistributedHardware

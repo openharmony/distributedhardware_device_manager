@@ -205,8 +205,135 @@ HWTEST_F(FreezeProcessTest, IsInWhiteList_002, testing::ext::TestSize.Level1)
     FreezeProcess freezeProcess;
     std::string invalidPkg = "com.not.in.whitelist";
     bool result = freezeProcess.IsInWhiteList(invalidPkg);
-    
+
     EXPECT_FALSE(result);
+}
+
+HWTEST_F(FreezeProcessTest, IsInWhiteList_003, testing::ext::TestSize.Level1)
+{
+    FreezeProcess freezeProcess;
+    std::string validPkg = "CollaborationFwk";
+    bool result = freezeProcess.IsInWhiteList(validPkg);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(FreezeProcessTest, CleanBindFailedEvents_002, testing::ext::TestSize.Level0)
+{
+    int64_t reservedDataTimeStamp = 1633072800;
+    BindFailedEvents bindFailedEventsCache;
+    bindFailedEventsCache.failedTimeStamps = {1633071000, 1633070900};
+    bindFailedEventsCache.freezeTimeStamps = {1633070800};
+    FreezeProcess freezeProcess;
+    freezeProcess.bindFailedEventsCache_ = bindFailedEventsCache;
+    int32_t result = freezeProcess.CleanBindFailedEvents(reservedDataTimeStamp);
+
+    EXPECT_NE(result, ERR_DM_TIME_OUT);
+}
+
+HWTEST_F(FreezeProcessTest, CleanBindFailedEvents_003, testing::ext::TestSize.Level0)
+{
+    int64_t reservedDataTimeStamp = 1633072800;
+    BindFailedEvents bindFailedEventsCache;
+    bindFailedEventsCache.failedTimeStamps = {1633073000};
+    FreezeProcess freezeProcess;
+    freezeProcess.bindFailedEventsCache_ = bindFailedEventsCache;
+    int32_t result = freezeProcess.CleanBindFailedEvents(reservedDataTimeStamp);
+
+    EXPECT_EQ(result, DM_OK);
+    EXPECT_EQ(freezeProcess.bindFailedEventsCache_.failedTimeStamps.size(), 1);
+}
+
+HWTEST_F(FreezeProcessTest, CleanFreezeState_002, testing::ext::TestSize.Level0)
+{
+    int64_t reservedDataTimeStamp = 1633072800;
+    DeviceFreezeState freezeStateCache;
+    freezeStateCache.startFreezeTimeStamp = 1633071000;
+    freezeStateCache.stopFreezeTimeStamp = 1633071100;
+    FreezeProcess freezeProcess;
+    freezeProcess.freezeStateCache_ = freezeStateCache;
+    int32_t result = freezeProcess.CleanFreezeState(reservedDataTimeStamp);
+
+    EXPECT_NE(result, ERR_DM_TIME_OUT);
+}
+
+HWTEST_F(FreezeProcessTest, CleanFreezeState_003, testing::ext::TestSize.Level0)
+{
+    int64_t reservedDataTimeStamp = 1633072800;
+    DeviceFreezeState freezeStateCache;
+    freezeStateCache.startFreezeTimeStamp = 1633073000;
+    freezeStateCache.stopFreezeTimeStamp = 1633073100;
+    FreezeProcess freezeProcess;
+    freezeProcess.freezeStateCache_ = freezeStateCache;
+    int32_t result = freezeProcess.CleanFreezeState(reservedDataTimeStamp);
+
+    EXPECT_EQ(result, DM_OK);
+}
+
+HWTEST_F(FreezeProcessTest, UpdateFreezeRecord_002, testing::ext::TestSize.Level0)
+{
+    BindFailedEvents bindFailedEventsCache;
+    bindFailedEventsCache.failedTimeStamps = {1633072700, 1633072750};
+    FreezeProcess freezeProcess;
+    freezeProcess.bindFailedEventsCache_ = bindFailedEventsCache;
+    int32_t result = freezeProcess.UpdateFreezeRecord();
+
+    EXPECT_NE(result, ERR_DM_TIME_OUT);
+}
+
+HWTEST_F(FreezeProcessTest, IsNeedFreeze_001, testing::ext::TestSize.Level1)
+{
+    FreezeProcess freezeProcess;
+    bool result = freezeProcess.IsNeedFreeze(nullptr);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(FreezeProcessTest, IsNeedFreeze_002, testing::ext::TestSize.Level1)
+{
+    FreezeProcess freezeProcess;
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->accessee.bundleName = "com.not.in.whitelist";
+    bool result = freezeProcess.IsNeedFreeze(context);
+
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(FreezeProcessTest, DeleteFreezeRecord_001, testing::ext::TestSize.Level0)
+{
+    FreezeProcess freezeProcess;
+    DeviceFreezeState freezeStateCache;
+    freezeStateCache.startFreezeTimeStamp = 1633071000;
+    freezeStateCache.stopFreezeTimeStamp = 1633071100;
+    freezeProcess.freezeStateCache_ = freezeStateCache;
+    BindFailedEvents bindFailedEventsCache;
+    bindFailedEventsCache.failedTimeStamps = {1633071000};
+    freezeProcess.bindFailedEventsCache_ = bindFailedEventsCache;
+    int32_t result = freezeProcess.DeleteFreezeRecord();
+
+    EXPECT_NE(result, ERR_DM_TIME_OUT);
+}
+
+HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_WhenEmptyArray, testing::ext::TestSize.Level0)
+{
+    std::string validJsonResult = R"({"failedTimeStamps": [], "freezeTimeStamps": []})";
+    BindFailedEvents bindFailedEventsObj;
+    FreezeProcess freezeProcess;
+    int32_t result = freezeProcess.ConvertJsonToBindFailedEvents(validJsonResult, bindFailedEventsObj);
+    EXPECT_EQ(result, DM_OK);
+    EXPECT_EQ(bindFailedEventsObj.failedTimeStamps.size(), 0);
+    EXPECT_EQ(bindFailedEventsObj.freezeTimeStamps.size(), 0);
+}
+
+HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_WhenBothZero, testing::ext::TestSize.Level0)
+{
+    std::string validJsonResult = "{\"startFreezeTimeStamp\":0,\"stopFreezeTimeStamp\":0}";
+    DeviceFreezeState freezeStateObj;
+    FreezeProcess freezeProcess;
+    int32_t result = freezeProcess.ConvertJsonToDeviceFreezeState(validJsonResult, freezeStateObj);
+    EXPECT_EQ(result, DM_OK);
+    EXPECT_EQ(freezeStateObj.startFreezeTimeStamp, 0);
+    EXPECT_EQ(freezeStateObj.stopFreezeTimeStamp, 0);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

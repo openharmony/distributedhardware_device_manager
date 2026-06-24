@@ -24,6 +24,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 constexpr const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
+constexpr int32_t MAX_TIME_OUT_VALUE = 600;
 void TimeHeapTest::SetUp()
 {
 }
@@ -184,6 +185,78 @@ HWTEST_F(TimeHeapTest, DeleteTimer_004, testing::ext::TestSize.Level0)
     timer->timerVec_[AUTHENTICATE_TIMEOUT_TASK] = nullptr;
     int32_t ret = timer->DeleteTimer(name);
     EXPECT_EQ(DM_OK, ret);
+}
+
+/**
+ * @tc.name: TimeHeapTest::StartTimer_003
+ * @tc.desc: StartTimer with timeOut equal to MAX_TIME_OUT boundary (600) succeeds.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(TimeHeapTest, StartTimer_003, testing::ext::TestSize.Level0)
+{
+    std::string name = std::string(AUTHENTICATE_TIMEOUT_TASK);
+    std::shared_ptr<DmTimer> timer = std::make_shared<DmTimer>();
+    int32_t ret = timer->StartTimer(name, MAX_TIME_OUT_VALUE, TimeOut);
+    EXPECT_EQ(DM_OK, ret);
+}
+
+/**
+ * @tc.name: TimeHeapTest::StartTimer_004
+ * @tc.desc: StartTimer overwrites an existing timer name (re-entry into timerVec_[name]).
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(TimeHeapTest, StartTimer_004, testing::ext::TestSize.Level0)
+{
+    std::string name = std::string(AUTHENTICATE_TIMEOUT_TASK);
+    int32_t timeOut = 10;
+    std::shared_ptr<DmTimer> timer = std::make_shared<DmTimer>();
+    int32_t ret = timer->StartTimer(name, timeOut, TimeOut);
+    EXPECT_EQ(DM_OK, ret);
+    // overwrite the existing entry with a new handle
+    ret = timer->StartTimer(name, timeOut, TimeOut);
+    EXPECT_EQ(DM_OK, ret);
+    EXPECT_EQ(timer->timerVec_.size(), static_cast<size_t>(1));
+}
+
+/**
+ * @tc.name: TimeHeapTest::DeleteTimer_005
+ * @tc.desc: DeleteTimer cancels a real running task (found item, non-null handle).
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(TimeHeapTest, DeleteTimer_005, testing::ext::TestSize.Level0)
+{
+    std::string name = std::string(AUTHENTICATE_TIMEOUT_TASK);
+    int32_t timeOut = 300;
+    std::shared_ptr<DmTimer> timer = std::make_shared<DmTimer>();
+    int32_t ret = timer->StartTimer(name, timeOut, TimeOut);
+    EXPECT_EQ(DM_OK, ret);
+    // item found, non-null handle, queue non-null -> cancel path
+    ret = timer->DeleteTimer(name);
+    EXPECT_EQ(DM_OK, ret);
+    EXPECT_EQ(timer->timerVec_.size(), static_cast<size_t>(0));
+}
+
+/**
+ * @tc.name: TimeHeapTest::DeleteAll_004
+ * @tc.desc: DeleteAll cancels real running tasks (non-null handle) across multiple entries.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(TimeHeapTest, DeleteAll_004, testing::ext::TestSize.Level0)
+{
+    std::string name1 = std::string(AUTHENTICATE_TIMEOUT_TASK);
+    std::string name2 = "secondTimer";
+    int32_t timeOut = 300;
+    std::shared_ptr<DmTimer> timer = std::make_shared<DmTimer>();
+    EXPECT_EQ(timer->StartTimer(name1, timeOut, TimeOut), DM_OK);
+    EXPECT_EQ(timer->StartTimer(name2, timeOut, TimeOut), DM_OK);
+    // both entries non-null handle, queue non-null -> cancel path for each
+    int32_t ret = timer->DeleteAll();
+    EXPECT_EQ(DM_OK, ret);
+    EXPECT_EQ(timer->timerVec_.size(), static_cast<size_t>(0));
 }
 }
 }

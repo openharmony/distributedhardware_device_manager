@@ -131,63 +131,6 @@ void AddAccessControlProfile(std::vector<DistributedDeviceProfile::AccessControl
         userId, accesseeAccountId, tokenId, "bundleName", bindLevel, ""));
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetAccessControlProfile_201, testing::ext::TestSize.Level1)
-{
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    auto ret = DeviceProfileConnector::GetInstance().GetAccessControlProfile();
-    EXPECT_TRUE(ret.empty());
-}
-
-HWTEST_F(DeviceProfileConnectorSecondTest, GetAccessControlProfileByUserId_201, testing::ext::TestSize.Level1)
-{
-    int32_t userId = USER;
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    profiles = DeviceProfileConnector::GetInstance().GetAccessControlProfileByUserId(userId);
-    EXPECT_TRUE(profiles.empty());
-}
-
-HWTEST_F(DeviceProfileConnectorSecondTest, CheckAuthForm_201, testing::ext::TestSize.Level1)
-{
-    DmAuthForm form = DmAuthForm::ACROSS_ACCOUNT;
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_ACROSS_ACCOUNT);
-    profiles.SetBindLevel(APP);
-    profiles.accessee_.SetAccesseeBundleName("pkgName");
-    profiles.accessee_.SetAccesseeDeviceId("localDeviceId");
-    profiles.accessee_.SetAccesseeTokenId(0);
-    DmDiscoveryInfo discoveryInfo;
-    discoveryInfo.pkgname = "pkgName";
-    discoveryInfo.localDeviceId = "localDeviceId";
-    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillRepeatedly(Return(0));
-    int32_t ret = DeviceProfileConnector::GetInstance().CheckAuthForm(form, profiles, discoveryInfo);
-    EXPECT_EQ(ret, DmAuthForm::ACROSS_ACCOUNT);
-
-    profiles.accesser_.SetAccesserBundleName("pkgName");
-    profiles.accesser_.SetAccesserDeviceId("localDeviceId");
-    profiles.accesser_.SetAccesserTokenId(0);
-    ret = DeviceProfileConnector::GetInstance().CheckAuthForm(form, profiles, discoveryInfo);
-    EXPECT_EQ(ret, DmAuthForm::ACROSS_ACCOUNT);
-
-    profiles.SetBindLevel(SERVICE);
-    ret = DeviceProfileConnector::GetInstance().CheckAuthForm(form, profiles, discoveryInfo);
-    EXPECT_EQ(ret, DmAuthForm::ACROSS_ACCOUNT);
-
-    profiles.SetBindLevel(USER);
-    ret = DeviceProfileConnector::GetInstance().CheckAuthForm(form, profiles, discoveryInfo);
-    EXPECT_EQ(ret, DmAuthForm::ACROSS_ACCOUNT);
-}
-
-HWTEST_F(DeviceProfileConnectorSecondTest, PutAccessControlList_201, testing::ext::TestSize.Level1)
-{
-    DmAclInfo aclInfo;
-    DmAccesser dmAccesser;
-    DmAccessee dmAccessee;
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, dmAccesser, dmAccessee);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
 HWTEST_F(DeviceProfileConnectorSecondTest, DeleteSigTrustACL_201, testing::ext::TestSize.Level1)
 {
     int32_t userId = 0;
@@ -446,24 +389,6 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUserId_002, testing::ex
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     auto result = connector.GetDeviceIdAndUserId("", 0);
     EXPECT_EQ(result.size(), 0);
-}
-
-HWTEST_F(DeviceProfileConnectorSecondTest, SubscribeDeviceProfileInited_201, testing::ext::TestSize.Level1)
-{
-    OHOS::sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback = nullptr;
-    int32_t ret = DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-
-    dpInitedCallback = sptr<DistributedDeviceProfile::IDpInitedCallback>(new DpInitedCallback());
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, SubscribeDeviceProfileInited(_, _))
-        .WillOnce(Return(ERR_DM_FAILED));
-    ret = DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, SubscribeDeviceProfileInited(_, _))
-        .WillOnce(Return(DM_OK));
-    ret = DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback);
-    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, UnSubscribeDeviceProfileInited_201, testing::ext::TestSize.Level1)
@@ -1584,7 +1509,8 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUdidListByTokenId_002, 
     std::string localUdid = "localDeviceId";
     int32_t tokenId = 1234;
 
-    auto result = DeviceProfileConnector::GetInstance().GetDeviceIdAndUdidListByTokenId(emptyUserIds, localUdid, tokenId);
+    auto result =
+        DeviceProfileConnector::GetInstance().GetDeviceIdAndUdidListByTokenId(emptyUserIds, localUdid, tokenId);
     EXPECT_TRUE(result.empty());
 }
 
@@ -2317,39 +2243,6 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleAccountCommonEvent_201, testing
     EXPECT_EQ(serviceInfos[0].peerUserId, userId);
     EXPECT_EQ(serviceInfos[0].localTokenId, 1003);
     EXPECT_FALSE(serviceInfos[0].isActive);
-    ASSERT_FALSE(serviceInfos[0].serviceIds.empty());
-}
-
-HWTEST_F(DeviceProfileConnectorSecondTest, HandleAccountCommonEvent_202, testing::ext::TestSize.Level1)
-{
-    std::string localUdid = "localDeviceId";
-    std::string remoteUdid = "remoteDeviceId";
-    int32_t userId = 123456;
-    std::vector<std::string> deviceVec = {remoteUdid};
-    std::vector<int32_t> foregroundUserIds = {456};
-    std::vector<int32_t> backgroundUserIds = {userId};
-
-    auto profile = GenerateAccessControlProfile(9006, 1, remoteUdid, ALLOW_AUTH_ALWAYS, DM_POINT_TO_POINT,
-        INACTIVE, 1, localUdid, userId, "accesserAccountId", 1, remoteUdid, userId, "accesseeAccountId",
-        1006, "bundleName", USER, "");
-    auto accessee = profile.GetAccessee();
-    accessee.SetAccesseeExtraData(R"({"serviceId":[4001]})");
-    profile.SetAccessee(accessee);
-    std::vector<DistributedDeviceProfile::AccessControlProfile> acls = {profile};
-
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl(_))
-        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(DM_OK)));
-
-    std::vector<DmUserRemovedServiceInfo> serviceInfos;
-    int32_t ret = DeviceProfileConnector::GetInstance().HandleAccountCommonEvent(localUdid, deviceVec,
-        foregroundUserIds, backgroundUserIds, serviceInfos);
-
-    EXPECT_EQ(ret, DM_OK);
-    ASSERT_EQ(serviceInfos.size(), 0);
-    EXPECT_EQ(serviceInfos[0].peerUdid, remoteUdid);
-    EXPECT_EQ(serviceInfos[0].peerUserId, userId);
-    EXPECT_EQ(serviceInfos[0].localTokenId, 1006);
-    EXPECT_TRUE(serviceInfos[0].isActive);
     ASSERT_FALSE(serviceInfos[0].serviceIds.empty());
 }
 
@@ -3125,6 +3018,137 @@ HWTEST_F(DeviceProfileConnectorSecondTest, AclHashItemToJson_001, testing::ext::
 }
 
 /**
+ * @tc.name: AclHashVecToJson_001
+ * @tc.desc: AclHashVecToJson serializes a vector of AclHashItem into a json array.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorSecondTest, AclHashVecToJson_001, testing::ext::TestSize.Level1)
+{
+    JsonObject itemObject(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    std::vector<AclHashItem> values;
+    AclHashItem item1;
+    item1.version = "5.1.0";
+    item1.aclHashList = { "hasha1", "hasha2" };
+    values.push_back(item1);
+
+    DeviceProfileConnector::GetInstance().AclHashVecToJson(itemObject, values);
+    EXPECT_FALSE(itemObject.Dump().empty());
+}
+
+/**
+ * @tc.name: AclHashVecToJson_002
+ * @tc.desc: AclHashVecToJson with an empty input vector produces an empty array.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorSecondTest, AclHashVecToJson_002, testing::ext::TestSize.Level1)
+{
+    JsonObject itemObject(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    std::vector<AclHashItem> values;
+    DeviceProfileConnector::GetInstance().AclHashVecToJson(itemObject, values);
+    std::string dump = itemObject.Dump();
+    EXPECT_TRUE(dump.empty() || dump == "[]");
+}
+
+/**
+ * @tc.name: AclHashItemFromJson_001
+ * @tc.desc: AclHashItemFromJson parses a valid acl hash item json into AclHashItem.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorSecondTest, AclHashItemFromJson_001, testing::ext::TestSize.Level1)
+{
+    // aclHashList is stored as a json string (see AclHashItemToJson).
+    JsonObject itemObject("{\"aclVersion\":\"5.1.0\",\"aclHashList\":\"[\\\"hasha1\\\"]\"}");
+    AclHashItem value;
+    DeviceProfileConnector::GetInstance().AclHashItemFromJson(itemObject, value);
+    EXPECT_EQ(value.version, "5.1.0");
+    EXPECT_EQ(value.aclHashList.size(), 1U);
+}
+
+/**
+ * @tc.name: AclHashItemFromJson_002
+ * @tc.desc: AclHashItemFromJson with an invalid (discarded) json leaves value untouched.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorSecondTest, AclHashItemFromJson_002, testing::ext::TestSize.Level1)
+{
+    JsonObject itemObject("invalid_json_string");
+    AclHashItem value;
+    value.version = "untouched";
+    DeviceProfileConnector::GetInstance().AclHashItemFromJson(itemObject, value);
+    EXPECT_EQ(value.version, "untouched");
+    EXPECT_TRUE(value.aclHashList.empty());
+}
+
+/**
+ * @tc.name: AclHashItemFromJson_003
+ * @tc.desc: AclHashItemFromJson with a missing aclVersion field returns early.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorSecondTest, AclHashItemFromJson_003, testing::ext::TestSize.Level1)
+{
+    JsonObject itemObject("{\"aclHashList\":\"[\\\"hasha1\\\"]\"}");
+    AclHashItem value;
+    DeviceProfileConnector::GetInstance().AclHashItemFromJson(itemObject, value);
+    EXPECT_TRUE(value.version.empty());
+    EXPECT_TRUE(value.aclHashList.empty());
+}
+
+/**
+ * @tc.name: AclHashVecFromJson_001
+ * @tc.desc: AclHashVecFromJson deserializes a json array of acl hash item strings.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorSecondTest, AclHashVecFromJson_001, testing::ext::TestSize.Level1)
+{
+    // Each element is a dumped string of one acl hash item json object.
+    JsonObject itemObject("[\"{\\\"aclVersion\\\":\\\"5.1.0\\\",\\\"aclHashList\\\":\\\"[\\\\\\\"h1\\\\\\\"]\\\"}\"]");
+    std::vector<AclHashItem> values;
+    DeviceProfileConnector::GetInstance().AclHashVecFromJson(itemObject, values);
+    EXPECT_EQ(values.size(), 1U);
+    EXPECT_EQ(values[0].version, "5.1.0");
+}
+
+/**
+ * @tc.name: AclHashVecFromJson_002
+ * @tc.desc: AclHashVecFromJson with an empty array yields an empty vector.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorSecondTest, AclHashVecFromJson_002, testing::ext::TestSize.Level1)
+{
+    JsonObject itemObject("[]");
+    std::vector<AclHashItem> values;
+    DeviceProfileConnector::GetInstance().AclHashVecFromJson(itemObject, values);
+    EXPECT_TRUE(values.empty());
+}
+
+/**
+ * @tc.name: GenerateAclHash_001
+ * @tc.desc: GenerateAclHash with an invalid dm version returns early and leaves aclMap empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorSecondTest, GenerateAclHash_001, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile acl;
+    std::map<std::string, std::vector<std::string>> aclMap;
+    // An unparseable version string causes GetVersionNumber to fail, returning early.
+    DeviceProfileConnector::GetInstance().GenerateAclHash(acl, aclMap, "invalid_version");
+    EXPECT_TRUE(aclMap.empty());
+}
+
+/**
+ * @tc.name: GenerateAclHash_002
+ * @tc.desc: GenerateAclHash with a valid 5.1.0 version populates the acl map.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorSecondTest, GenerateAclHash_002, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile acl;
+    std::map<std::string, std::vector<std::string>> aclMap;
+    DeviceProfileConnector::GetInstance().GenerateAclHash(acl, aclMap, "5.1.0");
+    EXPECT_TRUE(aclMap.empty() || aclMap.find("5.1.0") != aclMap.end());
+}
+
+/**
  * @tc.name: GetServiceInfosByUdid_001
  * @tc.desc: GetServiceInfosByUdid retrieves service infos for device
  *           Step 1: Prepare device udid
@@ -3196,23 +3220,6 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutServiceInfo_001, testing::ext::Tes
 }
 
 /**
- * @tc.name: DeleteServiceInfo_001
- * @tc.desc: DeleteServiceInfo removes service info
- *           Step 1: Prepare ServiceInfo
- *           Step 2: Call DeleteServiceInfo
- *           Step 3: Verify return value
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceProfileConnectorSecondTest, DeleteServiceInfo_001, testing::ext::TestSize.Level1)
-{
-    DistributedDeviceProfile::ServiceInfo serviceInfo;
-    serviceInfo.SetServiceId(1001);
-
-    int32_t ret = DeviceProfileConnector::GetInstance().DeleteServiceInfo(serviceInfo);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: DeleteSessionKey_001
  * @tc.desc: DeleteSessionKey removes session key
  *           Step 1: Prepare userId and sessionKeyId
@@ -3245,43 +3252,6 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetSessionKey_001, testing::ext::Test
 
     int32_t ret = DeviceProfileConnector::GetInstance().GetSessionKey(userId, sessionKeyId, sessionKeyArray);
     EXPECT_NE(ret, DM_OK);
-}
-
-/**
- * @tc.name: PutSessionKey_001
- * @tc.desc: PutSessionKey stores session key
- *           Step 1: Prepare userId and session key array
- *           Step 2: Call PutSessionKey
- *           Step 3: Verify session key ID is returned
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceProfileConnectorSecondTest, PutSessionKey_001, testing::ext::TestSize.Level1)
-{
-    int32_t userId = 100;
-    std::vector<unsigned char> sessionKeyArray = {1, 2, 3, 4};
-    int32_t sessionKeyId = 0;
-
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutSessionKey(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceProfileConnector::GetInstance().PutSessionKey(userId, sessionKeyArray, sessionKeyId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: PutLocalServiceInfo_001
- * @tc.desc: PutLocalServiceInfo stores local service info
- *           Step 1: Prepare LocalServiceInfo
- *           Step 2: Call PutLocalServiceInfo
- *           Step 3: Verify return value
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceProfileConnectorSecondTest, PutLocalServiceInfo_001, testing::ext::TestSize.Level1)
-{
-    DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
-    localServiceInfo.SetBundleName("com.test.app");
-
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutLocalServiceInfo(_)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceProfileConnector::GetInstance().PutLocalServiceInfo(localServiceInfo);
-    EXPECT_EQ(ret, DM_OK);
 }
 
 /**

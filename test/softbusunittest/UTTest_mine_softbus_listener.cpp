@@ -1304,6 +1304,225 @@ HWTEST_F(MineSoftbusListenerTest, GetMatchResult_003, testing::ext::TestSize.Lev
     auto ret = mineListener->GetMatchResult(matchItemNum, matchItemResult);
     EXPECT_EQ(ret, BUSINESS_EXACT_MATCH);
 }
+
+/* ===== success-path branches previously untested ===== */
+
+/**
+ * @tc.name: ParseSearchAllDevice_101
+ * @tc.desc: findDeviceMode=1 with a non-empty pkgName builds a valid BroadcastHead (success path).
+ * @tc.type: FUNC
+ */
+HWTEST_F(MineSoftbusListenerTest, ParseSearchAllDevice_101, testing::ext::TestSize.Level1)
+{
+    size_t outLen = 0;
+    char output[DISC_MAX_CUST_DATA_LEN] = {0};
+    JsonObject jsonObj;
+    jsonObj["findDeviceMode"] = 1;
+    string pkgName = "pkgName_002";
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    int32_t ret = mineListener->ParseSearchAllDevice(jsonObj, pkgName, output, &outLen);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(outLen, sizeof(BroadcastHead));
+}
+
+/**
+ * @tc.name: DmBase64Encode_101
+ * @tc.desc: DmBase64Encode succeeds with valid output buffer and non-empty input.
+ * @tc.type: FUNC
+ */
+HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_101, testing::ext::TestSize.Level1)
+{
+    char output[DISC_MAX_CUST_DATA_LEN] = {0};
+    size_t outputLen = DISC_MAX_CUST_DATA_LEN;
+    char input[64] = "hello";
+    size_t inputLen = strlen(input);
+    size_t base64OutLen = 0;
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    int32_t ret = mineListener->DmBase64Encode(output, outputLen, input, inputLen, base64OutLen);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_GT(base64OutLen, 0U);
+}
+
+/**
+ * @tc.name: SendBroadcastInfo_101
+ * @tc.desc: SendBroadcastInfo succeeds when given a valid output buffer with non-zero length.
+ * @tc.type: FUNC
+ */
+HWTEST_F(MineSoftbusListenerTest, SendBroadcastInfo_101, testing::ext::TestSize.Level1)
+{
+    size_t outLen = 0;
+    char output[DISC_MAX_CUST_DATA_LEN] = {0};
+    JsonObject jsonObj;
+    jsonObj["findDeviceMode"] = 1;
+    string pkgName = "pkgName_sendbc";
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    int32_t parseRet = mineListener->ParseSearchAllDevice(jsonObj, pkgName, output, &outLen);
+    ASSERT_EQ(parseRet, DM_OK);
+    ASSERT_GT(outLen, 0U);
+
+    SubscribeInfo subscribeInfo;
+    int32_t ret = mineListener->SendBroadcastInfo(pkgName, subscribeInfo, output, outLen);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: RefreshSoftbusLNN_101
+ * @tc.desc: RefreshSoftbusLNN happy path returns DM_OK with a valid findDeviceMode=1 json and pkgName.
+ * @tc.type: FUNC
+ */
+HWTEST_F(MineSoftbusListenerTest, RefreshSoftbusLNN_101, testing::ext::TestSize.Level1)
+{
+    JsonObject jsonObj;
+    jsonObj["findDeviceMode"] = 1;
+    string pkgName = "pkgName_refresh";
+    string searchJson = jsonObj.Dump();
+    DmSubscribeInfo dmSubscribeInfo;
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    int32_t ret = mineListener->RefreshSoftbusLNN(pkgName, searchJson, dmSubscribeInfo);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: DmBase64Encode_102
+ * @tc.desc: DmBase64Encode handles empty-but-non-null input correctly (inputLen > 0 with data).
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_102, testing::ext::TestSize.Level1)
+{
+    char output[DISC_MAX_CUST_DATA_LEN] = {0};
+    size_t outputLen = DISC_MAX_CUST_DATA_LEN;
+    std::string input = "OpenHarmony device manager test payload";
+    size_t inputLen = input.length();
+    size_t base64OutLen = 0;
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    int32_t ret = mineListener->DmBase64Encode(output, outputLen, input.c_str(), inputLen, base64OutLen);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_GT(base64OutLen, 0U);
+}
+
+/**
+ * @tc.name: DmBase64Decode_102
+ * @tc.desc: DmBase64Decode returns invalid when outputLen is zero.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_102, testing::ext::TestSize.Level1)
+{
+    char output[DISC_MAX_CUST_DATA_LEN] = {0};
+    size_t outputLen = 0;
+    std::string input = "validInput";
+    size_t inputLen = input.length();
+    size_t base64OutLen = 0;
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    int32_t ret = mineListener->DmBase64Decode(output, outputLen, input.c_str(), inputLen, base64OutLen);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: SetSubscribeInfo_002
+ * @tc.desc: SetSubscribeInfo copies all fields from DmSubscribeInfo to SubscribeInfo.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(MineSoftbusListenerTest, SetSubscribeInfo_002, testing::ext::TestSize.Level1)
+{
+    DmSubscribeInfo dmSubscribeInfo;
+    dmSubscribeInfo.subscribeId = 100;
+    dmSubscribeInfo.mode = static_cast<DmDiscoverMode>(1);
+    dmSubscribeInfo.medium = static_cast<DmExchangeMedium>(1);
+    dmSubscribeInfo.freq = static_cast<DmExchangeFreq>(2);
+    dmSubscribeInfo.isSameAccount = true;
+    dmSubscribeInfo.isWakeRemote = true;
+    (void)strcpy_s(dmSubscribeInfo.capability, sizeof(dmSubscribeInfo.capability), DM_CAPABILITY_OSD);
+    SubscribeInfo subscribeInfo;
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    mineListener->SetSubscribeInfo(dmSubscribeInfo, subscribeInfo);
+    EXPECT_EQ(subscribeInfo.subscribeId, 100);
+    EXPECT_EQ(subscribeInfo.mode, (DiscoverMode)1);
+    EXPECT_EQ(subscribeInfo.medium, (ExchangeMedium)1);
+    EXPECT_EQ(subscribeInfo.freq, (ExchangeFreq)2);
+    EXPECT_TRUE(subscribeInfo.isSameAccount);
+    EXPECT_TRUE(subscribeInfo.isWakeRemote);
+}
+
+/**
+ * @tc.name: SetBroadcastPkgname_003
+ * @tc.desc: SetBroadcastPkgname succeeds with a longer pkgName string.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(MineSoftbusListenerTest, SetBroadcastPkgname_003, testing::ext::TestSize.Level1)
+{
+    string pkgName = "com.ohos.test.package.name.longer";
+    BroadcastHead broadcastHead;
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    int32_t ret = mineListener->SetBroadcastPkgname(pkgName, broadcastHead);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetSha256Hash_005
+ * @tc.desc: GetSha256Hash succeeds with a longer input string.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_005, testing::ext::TestSize.Level1)
+{
+    std::string data = "a quick brown fox jumps over the lazy dog";
+    size_t outLen = data.length();
+    char output[DISC_MAX_CUST_DATA_LEN] = {0};
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    int32_t ret = mineListener->GetSha256Hash(data.c_str(), outLen, output);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: SetBroadcastTrustOptions_005
+ * @tc.desc: SetBroadcastTrustOptions with no trustOptions field sets trustFilter to 0.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_005, testing::ext::TestSize.Level1)
+{
+    BroadcastHead broadcastHead;
+    broadcastHead.trustFilter = 99;
+    JsonObject jsonObj;
+    jsonObj["otherKey"] = 1;
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    int32_t ret = mineListener->SetBroadcastTrustOptions(jsonObj, broadcastHead);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(broadcastHead.trustFilter, 0);
+}
+
+/**
+ * @tc.name: StopRefreshSoftbusLNN_002
+ * @tc.desc: StopRefreshSoftbusLNN with a different subscribeId returns a softbus error.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(MineSoftbusListenerTest, StopRefreshSoftbusLNN_002, testing::ext::TestSize.Level1)
+{
+    uint16_t subscribeId = 999;
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    int32_t ret = mineListener->StopRefreshSoftbusLNN(subscribeId);
+    EXPECT_TRUE(CheckSoftbusRes(ret));
+}
+
+/**
+ * @tc.name: OnPublishResult_003
+ * @tc.desc: OnPublishResult with a different reason value runs without crash.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(MineSoftbusListenerTest, OnPublishResult_003, testing::ext::TestSize.Level1)
+{
+    int publishId = 100;
+    PublishResult reason = static_cast<PublishResult>(1);
+    std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
+    mineListener->OnPublishResult(publishId, reason);
+    SUCCEED();
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

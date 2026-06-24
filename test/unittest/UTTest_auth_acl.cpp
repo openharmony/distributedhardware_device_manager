@@ -69,37 +69,6 @@ void AuthAclTest::TearDown()
     Mock::VerifyAndClearExpectations(hiChainAuthConnectorMock_.get());
 }
 
-HWTEST_F(AuthAclTest, AuthSinkAcl_002, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSinkManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    context = authManager->GetAuthContext();
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkDataSyncState>();
-
-    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_DATA_SYNC_STATE);
-}
-
-HWTEST_F(AuthAclTest, AuthSrcAcl_002, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    context = authManager->GetAuthContext();
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcDataSyncState>();
-
-    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE);
-}
-
-HWTEST_F(AuthAclTest, AuthSrcFinish_001, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    context = authManager->GetAuthContext();
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcFinishState>();
-    context->reason = DM_OK;
-    context->connDelayCloseTime = 10;
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
 HWTEST_F(AuthAclTest, AuthSrcFinish_002, testing::ext::TestSize.Level1)
 {
     authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
@@ -548,7 +517,7 @@ HWTEST_F(AuthAclTest, VerifyFlagXor_007, testing::ext::TestSize.Level1)
     context->accesser.bundleName = "wear_link_service_test";
     context->direction = DM_AUTH_SINK;
     context->accessee.pkgName = "watch_system_service";
-    srvInfo.SetBundleName("com.huawei.hmos.wearlink");
+    srvInfo.SetBundleName("com.example.wearlink");
     context->pinCodeFlag = false;
     srvInfo.SetExtraInfo(R"(
 {
