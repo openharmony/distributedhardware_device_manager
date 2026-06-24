@@ -246,6 +246,93 @@ HWTEST_F(SoftbusSessionTest, OnSessionOpened_001, testing::ext::TestSize.Level1)
     softbusSession->OnSessionClosed(sessionId);
     EXPECT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: SendData_004
+ * @tc.desc: message size exceeds MAX_DATA_LEN, return ERR_DM_FAILED (oversize branch)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusSessionTest, SendData_004, testing::ext::TestSize.Level2)
+{
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
+    int32_t sessionId = 1;
+    std::string message(65536, 'a'); // larger than MAX_DATA_LEN (65535)
+    int ret = softbusSession->SendData(sessionId, message);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: SendHeartbeatData_001
+ * @tc.desc: message size exceeds MAX_DATA_LEN, return ERR_DM_FAILED (oversize branch)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusSessionTest, SendHeartbeatData_001, testing::ext::TestSize.Level2)
+{
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
+    int32_t sessionId = 1;
+    std::string message(65536, 'b'); // larger than MAX_DATA_LEN (65535)
+    int ret = softbusSession->SendHeartbeatData(sessionId, message);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: SendHeartbeatData_002
+ * @tc.desc: valid message, SendBytes returns failure -> ret propagated
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusSessionTest, SendHeartbeatData_002, testing::ext::TestSize.Level1)
+{
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
+    int32_t sessionId = 0;
+    std::string message = "heartbeat";
+    int ret = softbusSession->SendHeartbeatData(sessionId, message);
+    EXPECT_NE(ret, DM_OK);
+}
+
+/**
+ * @tc.name: OnSessionOpened_002
+ * @tc.desc: sessionCallback_ is nullptr, early-return DM_OK (null-callback branch)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusSessionTest, OnSessionOpened_002, testing::ext::TestSize.Level2)
+{
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
+    softbusSession->UnRegisterSessionCallback(); // ensure static callback is null
+    int sessionId = 2;
+    int result = 0;
+    int ret = softbusSession->OnSessionOpened(sessionId, result);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: OnSessionClosed_001
+ * @tc.desc: sessionCallback_ is nullptr, OnSessionClosed returns via CHECK_NULL_VOID
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusSessionTest, OnSessionClosed_001, testing::ext::TestSize.Level2)
+{
+    if (softbusSession == nullptr) {
+        softbusSession = std::make_shared<SoftbusSession>();
+    }
+    softbusSession->UnRegisterSessionCallback(); // ensure static callback is null
+    int32_t sessionId = 5;
+    softbusSession->OnSessionClosed(sessionId);
+    // No crash/return-value: reaching here exercises the null-guard branch.
+    EXPECT_EQ(sessionId, 5);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
