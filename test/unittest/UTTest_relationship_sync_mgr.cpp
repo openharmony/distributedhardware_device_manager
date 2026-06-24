@@ -1413,6 +1413,410 @@ HWTEST_F(ReleationShipSyncMgrTest, FromAppUninstallPayLoad_001, testing::ext::Te
     ASSERT_EQ(result, false);
 }
 
+HWTEST_F(ReleationShipSyncMgrTest, FromStopUserPayLoad_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    bool result = msg.FromStopUserPayLoad(nullptr);
+    ASSERT_EQ(result, false);
+
+    cJSON *payloadJson = cJSON_CreateArray();
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x34));
+    result = msg.FromStopUserPayLoad(payloadJson);
+    ASSERT_EQ(result, false);
+    cJSON_Delete(payloadJson);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromStopUserPayLoad_002, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    cJSON *payloadJson = cJSON_CreateArray();
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x34));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x12));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x56));
+
+    bool result = msg.FromStopUserPayLoad(payloadJson);
+    ASSERT_TRUE(result);
+    ASSERT_EQ(msg.userId, 0x1234);
+    cJSON_Delete(payloadJson);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_StopUser_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    cJSON *payloadJson = cJSON_CreateArray();
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x34));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x12));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x56));
+
+    bool ret = msg.FromBroadcastPayLoad(payloadJson, RelationShipChangeType::STOP_USER);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(msg.userId, 0x1234);
+
+    ret = msg.FromBroadcastPayLoad(nullptr, RelationShipChangeType::SERVICE_UNBIND);
+    EXPECT_FALSE(ret);
+    cJSON_Delete(payloadJson);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_StopUser_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::STOP_USER;
+    msg.userId = 12345;
+
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(len, 3);
+    if (load != nullptr) {
+        delete[] load;
+        load = nullptr;
+    }
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, IsValid_StopUser_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::STOP_USER;
+    msg.userId = 12345;
+    ASSERT_TRUE(msg.IsValid());
+
+    msg.userId = UINT32_MAX;
+    ASSERT_FALSE(msg.IsValid());
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, IsChangeTypeValid_002, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    EXPECT_TRUE(msg.IsChangeTypeValid(
+        static_cast<uint32_t>(RelationShipChangeType::SHARE_UNBIND)));
+    EXPECT_TRUE(msg.IsChangeTypeValid(
+        static_cast<uint32_t>(RelationShipChangeType::STOP_USER)));
+    EXPECT_TRUE(msg.IsChangeTypeValid(
+        static_cast<uint32_t>(RelationShipChangeType::SERVICEINFO_UNREGISTER)));
+    EXPECT_FALSE(msg.IsChangeTypeValid(99));
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_003, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.userIdInfos.push_back({12345, true});
+    msg.syncUserIdFlag = false;
+    msg.isNewEvent = true;
+
+    uint8_t *msgPtr = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToSyncFrontOrBackUserIdPayLoad(msgPtr, len);
+    ASSERT_TRUE(result);
+    ASSERT_NE(msgPtr, nullptr);
+    if (msgPtr != nullptr) {
+        delete[] msgPtr;
+        msgPtr = nullptr;
+    }
+}
+
+/**
+ * @tc.name: IsChangeTypeValid_003
+ * @tc.desc: Verify the no-argument IsChangeTypeValid returns true for a valid type and false for TYPE_MAX.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, IsChangeTypeValid_003, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::ACCOUNT_LOGOUT;
+    EXPECT_TRUE(msg.IsChangeTypeValid());
+    msg.type = RelationShipChangeType::DEVICE_UNBIND;
+    EXPECT_TRUE(msg.IsChangeTypeValid());
+    msg.type = RelationShipChangeType::SYNC_USERID;
+    EXPECT_TRUE(msg.IsChangeTypeValid());
+    msg.type = RelationShipChangeType::TYPE_MAX;
+    EXPECT_FALSE(msg.IsChangeTypeValid());
+}
+
+/**
+ * @tc.name: ToString_001
+ * @tc.desc: Verify ToString produces a non-empty string with expected markers for a DEVICE_UNBIND msg.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToString_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::DEVICE_UNBIND;
+    msg.userId = 100;
+    msg.accountId = "acct";
+    msg.tokenId = 200;
+    msg.peerUdid = "peerUdid";
+    std::string str = msg.ToString();
+    EXPECT_FALSE(str.empty());
+    EXPECT_NE(str.find("MsgType"), std::string::npos);
+}
+
+/**
+ * @tc.name: ToMapKey_001
+ * @tc.desc: Verify ToMapKey returns a non-empty key that differs for different userIds.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToMapKey_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg1;
+    msg1.type = RelationShipChangeType::DEVICE_UNBIND;
+    msg1.userId = 1;
+    std::string key1 = msg1.ToMapKey();
+
+    RelationShipChangeMsg msg2;
+    msg2.type = RelationShipChangeType::DEVICE_UNBIND;
+    msg2.userId = 2;
+    std::string key2 = msg2.ToMapKey();
+
+    EXPECT_FALSE(key1.empty());
+    EXPECT_NE(key1, key2);
+}
+
+/**
+ * @tc.name: GetCurrentTimeSec_001
+ * @tc.desc: Verify GetCurrentTimeSec returns true and a value within expected bounds.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, GetCurrentTimeSec_001, testing::ext::TestSize.Level1)
+{
+    int32_t sec = 0;
+    bool ret = ReleationShipSyncMgr::GetInstance().GetCurrentTimeSec(sec);
+    EXPECT_TRUE(ret);
+    EXPECT_GT(sec, 0);
+    EXPECT_LE(sec, 60);
+}
+
+/**
+ * @tc.name: IsValid_002
+ * @tc.desc: Verify IsValid for SYNC_USERID with empty userIdInfos returns false.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, IsValid_002, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::SYNC_USERID;
+    EXPECT_FALSE(msg.IsValid());
+
+    msg.userIdInfos.push_back({1, true});
+    EXPECT_TRUE(msg.IsValid());
+}
+
+/**
+ * @tc.name: IsValid_003
+ * @tc.desc: Verify IsValid for APP_UNINSTALL requires both userId and tokenId set.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, IsValid_003, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::APP_UNINSTALL;
+    msg.userId = UINT32_MAX;
+    msg.tokenId = UINT64_MAX;
+    EXPECT_FALSE(msg.IsValid());
+
+    msg.userId = 1;
+    EXPECT_FALSE(msg.IsValid());
+
+    msg.tokenId = 2;
+    EXPECT_TRUE(msg.IsValid());
+}
+
+/**
+ * @tc.name: IsValid_004
+ * @tc.desc: Verify IsValid for SERVICEINFO_UNREGISTER requires userId and serviceId set.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, IsValid_004, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::SERVICEINFO_UNREGISTER;
+    msg.userId = UINT32_MAX;
+    msg.serviceId = INT64_MAX;
+    EXPECT_FALSE(msg.IsValid());
+
+    msg.userId = 1;
+    EXPECT_FALSE(msg.IsValid());
+
+    msg.serviceId = 2;
+    EXPECT_TRUE(msg.IsValid());
+}
+
+/**
+ * @tc.name: HandleBroadcastPayLoadByType_001
+ * @tc.desc: Verify HandleBroadcastPayLoadByType returns true for DEVICE_UNBIND and false for TYPE_MAX.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, HandleBroadcastPayLoadByType_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::DEVICE_UNBIND;
+    msg.userId = 100;
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool ret = msg.HandleBroadcastPayLoadByType(load, len);
+    EXPECT_TRUE(ret);
+    EXPECT_NE(load, nullptr);
+    if (load != nullptr) {
+        delete[] load;
+    }
+
+    RelationShipChangeMsg msg2;
+    msg2.type = RelationShipChangeType::TYPE_MAX;
+    uint8_t *load2 = nullptr;
+    uint32_t len2 = 0;
+    bool ret2 = msg2.HandleBroadcastPayLoadByType(load2, len2);
+    EXPECT_FALSE(ret2);
+}
+
+/**
+ * @tc.name: HandleBroadcastPayLoadExt_001
+ * @tc.desc: Verify HandleBroadcastPayLoadExt returns true for STOP_USER and false for TYPE_MAX.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, HandleBroadcastPayLoadExt_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::STOP_USER;
+    msg.userId = 100;
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool ret = msg.HandleBroadcastPayLoadExt(load, len);
+    EXPECT_TRUE(ret);
+    if (load != nullptr) {
+        delete[] load;
+    }
+
+    RelationShipChangeMsg msg2;
+    msg2.type = RelationShipChangeType::TYPE_MAX;
+    uint8_t *load2 = nullptr;
+    uint32_t len2 = 0;
+    bool ret2 = msg2.HandleBroadcastPayLoadExt(load2, len2);
+    EXPECT_FALSE(ret2);
+}
+
+/**
+ * @tc.name: ToBroadcastPayLoadTwo_001
+ * @tc.desc: Verify ToBroadcastPayLoadTwo returns true for DEL_USER and STOP_USER, false for invalid.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoadTwo_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::DEL_USER;
+    msg.userId = 100;
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool ret = msg.ToBroadcastPayLoadTwo(load, len);
+    EXPECT_TRUE(ret);
+    EXPECT_NE(load, nullptr);
+    if (load != nullptr) {
+        delete[] load;
+    }
+
+    msg.type = RelationShipChangeType::TYPE_MAX;
+    load = nullptr;
+    len = 0;
+    ret = msg.ToBroadcastPayLoadTwo(load, len);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ParseTrustRelationShipChange_008
+ * @tc.desc: Verify ParseTrustRelationShipChange returns default msg for invalid json string.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_008, testing::ext::TestSize.Level1)
+{
+    std::string invalidMsg = "not_a_json";
+    RelationShipChangeMsg msg = ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(invalidMsg);
+    EXPECT_EQ(msg.userId, UINT32_MAX);
+}
+
+/**
+ * @tc.name: SyncTrustRelationShip_010
+ * @tc.desc: Verify SyncTrustRelationShip for STOP_USER with valid userId produces non-empty json.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_010, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::STOP_USER;
+    msg.userId = 100;
+    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+    EXPECT_FALSE(broadCastMsg.empty());
+}
+
+/**
+ * @tc.name: SyncTrustRelationShip_011
+ * @tc.desc: Verify SyncTrustRelationShip for DEL_USER with valid userId produces non-empty json.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_011, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::DEL_USER;
+    msg.userId = 200;
+    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+    EXPECT_FALSE(broadCastMsg.empty());
+}
+
+/**
+ * @tc.name: FromDelUserPayLoad_002
+ * @tc.desc: Verify FromDelUserPayLoad returns false for null and too-small arrays, true for valid.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, FromDelUserPayLoad_002, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    EXPECT_FALSE(msg.FromDelUserPayLoad(nullptr));
+
+    cJSON *smallArr = cJSON_CreateArray();
+    cJSON_AddItemToArray(smallArr, cJSON_CreateNumber(0x34));
+    cJSON_AddItemToArray(smallArr, cJSON_CreateNumber(0x12));
+    EXPECT_FALSE(msg.FromDelUserPayLoad(smallArr));
+    cJSON_Delete(smallArr);
+
+    cJSON *validArr = cJSON_CreateArray();
+    cJSON_AddItemToArray(validArr, cJSON_CreateNumber(0x34));
+    cJSON_AddItemToArray(validArr, cJSON_CreateNumber(0x12));
+    cJSON_AddItemToArray(validArr, cJSON_CreateNumber(0x56));
+    EXPECT_TRUE(msg.FromDelUserPayLoad(validArr));
+    EXPECT_EQ(msg.userId, 0x1234);
+    cJSON_Delete(validArr);
+}
+
+/**
+ * @tc.name: ToJson_FromJson_001
+ * @tc.desc: Verify ToJson and FromJson round-trip for DEVICE_UNBIND message.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToJson_FromJson_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::DEVICE_UNBIND;
+    msg.userId = 100;
+    msg.peerUdids.push_back("peerUdid001");
+    std::string json = msg.ToJson();
+    EXPECT_FALSE(json.empty());
+
+    RelationShipChangeMsg parsed = ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(json);
+    EXPECT_EQ(parsed.userId, 100);
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS
