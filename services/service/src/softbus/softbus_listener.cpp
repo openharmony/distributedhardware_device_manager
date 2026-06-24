@@ -1268,7 +1268,6 @@ void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, JsonObje
         LOGI("Unknown connection address type: %{public}d.", addrInfo->type);
     }
 }
-//LCOV_EXCL_STOP
 
 int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType)
 {
@@ -1347,7 +1346,6 @@ int32_t SoftbusListener::GetTargetInfoFromCache(const std::string &deviceId, Pee
     return DM_OK;
 }
 
-//LCOV_EXCL_START
 void SoftbusListener::ClearDiscoveredDevice()
 {
     std::lock_guard<std::mutex> lock(g_deviceMapMutex);
@@ -1386,7 +1384,6 @@ bool SoftbusListener::IsDmRadarHelperReady()
     dmRadarHelper_ = func();
     return true;
 }
-//LCOV_EXCL_STOP
 
 bool SoftbusListener::CloseDmRadarHelperObj(std::string name)
 {
@@ -1528,7 +1525,6 @@ int32_t SoftbusListener::SetForegroundUserIdsToDSoftBus(const std::string &remot
     return DM_OK;
 }
 
-//LCOV_EXCL_START
 void SoftbusListener::DeleteCacheDeviceInfo()
 {
     LOGI("start.");
@@ -1545,7 +1541,6 @@ void SoftbusListener::DeleteCacheDeviceInfo()
         DeviceOffLine(it);
     }
 }
-//LCOV_EXCL_STOP
 
 int32_t SoftbusListener::SetLocalDisplayName(const std::string &displayName)
 {
@@ -1559,7 +1554,6 @@ int32_t SoftbusListener::SetLocalDisplayName(const std::string &displayName)
     return DM_OK;
 }
 
-//LCOV_EXCL_START
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void SoftbusListener::ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessControlProfile &profile,
     DmDeviceInfo &deviceInfo)
