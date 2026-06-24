@@ -14,7 +14,10 @@
  */
 
 #include "UTTest_dm_auth_state_cred.h"
+#include "device_manager_service_listener_3rd.h"
+#include "dm_auth_state_machine_cred.h"
 #include "dm_log_3rd.h"
+#include "hichain_auth_connector_3rd.h"
 
 using namespace testing;
 
@@ -178,5 +181,141 @@ HWTEST_F(DmAuthStateCredTest, AuthCredSinkFinishState_GetStateType_001, testing:
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::CRED_AUTH_SINK_FINISH_STATE);
 }
 
+/**
+ * @tc.name: QueryCredential_001
+ * @tc.desc: Cover DmAuthStateCred::QueryCredential null-context early-return guard that returns
+ *           ERR_DM_POINT_NULL without dereferencing the context.
+ * @tc.type: FUNC
+ * @tc.require: AR000H59TL
+ */
+HWTEST_F(DmAuthStateCredTest, QueryCredential_001, testing::ext::TestSize.Level1)
+{
+    authState = std::make_shared<AuthCredSrcFinishState>();
+    std::shared_ptr<DmAuthCredContext> nullContext = nullptr;
+    int32_t ret = authState->QueryCredential(nullContext);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: QueryCredential_002
+ * @tc.desc: Cover DmAuthStateCred::QueryCredential null-hiChainAuthConnector guard that returns
+ *           ERR_DM_POINT_NULL when the context is valid but the connector is absent.
+ * @tc.type: FUNC
+ * @tc.require: AR000H59TL
+ */
+HWTEST_F(DmAuthStateCredTest, QueryCredential_002, testing::ext::TestSize.Level1)
+{
+    authState = std::make_shared<AuthCredSrcFinishState>();
+    int32_t ret = authState->QueryCredential(context);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: QueryP2pCredential_001
+ * @tc.desc: Cover DmAuthStateCred::QueryP2pCredential null-hiChainAuthConnector guard that returns
+ *           ERR_DM_POINT_NULL when the connector is absent.
+ * @tc.type: FUNC
+ * @tc.require: AR000H59TL
+ */
+HWTEST_F(DmAuthStateCredTest, QueryP2pCredential_001, testing::ext::TestSize.Level1)
+{
+    authState = std::make_shared<AuthCredSrcFinishState>();
+    context->accesser.credType = DM_AUTH_CREDENTIAL_ACCOUNT_UNRELATED;
+    int32_t ret = authState->QueryP2pCredential(context);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: CheckOpenId_001
+ * @tc.desc: Cover DmAuthStateCred::CheckOpenId null-context guard that returns false.
+ * @tc.type: FUNC
+ * @tc.require: AR000H59TL
+ */
+HWTEST_F(DmAuthStateCredTest, CheckOpenId_001, testing::ext::TestSize.Level1)
+{
+    authState = std::make_shared<AuthCredSrcFinishState>();
+    std::shared_ptr<DmAuthCredContext> nullContext = nullptr;
+    JsonObject item("{\"extendInfo\":\"{}\"}");
+    bool ret = authState->CheckOpenId(nullContext, item);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: CheckOpenId_002
+ * @tc.desc: Cover DmAuthStateCred::CheckOpenId short-circuit branch that returns true when the
+ *           context accesser openIdHash is empty.
+ * @tc.type: FUNC
+ * @tc.require: AR000H59TL
+ */
+HWTEST_F(DmAuthStateCredTest, CheckOpenId_002, testing::ext::TestSize.Level1)
+{
+    authState = std::make_shared<AuthCredSrcFinishState>();
+    JsonObject item("{\"extendInfo\":\"{}\"}");
+    bool ret = authState->CheckOpenId(context, item);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: HandleAuthenticateTimeout_001
+ * @tc.desc: Cover DmAuthStateCred::HandleAuthenticateTimeout null-context early-return guard that
+ *           returns without dereferencing the context.
+ * @tc.type: FUNC
+ * @tc.require: AR000H59TL
+ */
+HWTEST_F(DmAuthStateCredTest, HandleAuthenticateTimeout_001, testing::ext::TestSize.Level1)
+{
+    authState = std::make_shared<AuthCredSrcFinishState>();
+    std::shared_ptr<DmAuthCredContext> nullContext = nullptr;
+    authState->HandleAuthenticateTimeout(nullContext, "testTimer");
+    SUCCEED();
+}
+
+/**
+ * @tc.name: SourceFinish_001
+ * @tc.desc: Cover DmAuthStateCred::SourceFinish null-context early-return guard that returns
+ *           without dereferencing the context.
+ * @tc.type: FUNC
+ * @tc.require: AR000H59TL
+ */
+HWTEST_F(DmAuthStateCredTest, SourceFinish_001, testing::ext::TestSize.Level1)
+{
+    authState = std::make_shared<AuthCredSrcFinishState>();
+    std::shared_ptr<DmAuthCredContext> nullContext = nullptr;
+    authState->SourceFinish(nullContext);
+    SUCCEED();
+}
+
+/**
+ * @tc.name: SinkFinish_001
+ * @tc.desc: Cover DmAuthStateCred::SinkFinish null-context early-return guard that returns
+ *           without dereferencing the context.
+ * @tc.type: FUNC
+ * @tc.require: AR000H59TL
+ */
+HWTEST_F(DmAuthStateCredTest, SinkFinish_001, testing::ext::TestSize.Level1)
+{
+    authState = std::make_shared<AuthCredSinkFinishState>();
+    std::shared_ptr<DmAuthCredContext> nullContext = nullptr;
+    authState->SinkFinish(nullContext);
+    SUCCEED();
+}
+
+/**
+ * @tc.name: BuildTrustDeviceInfos_004
+ * @tc.desc: Cover DmAuthStateCred::BuildTrustDeviceInfos sink-direction branch where reason is
+ *           DM_OK but the accessee sessionKey is empty, yielding zero device infos.
+ * @tc.type: FUNC
+ * @tc.require: AR000H59TL
+ */
+HWTEST_F(DmAuthStateCredTest, BuildTrustDeviceInfos_004, testing::ext::TestSize.Level1)
+{
+    std::vector<TrustDeviceInfo3rd> deviceInfos;
+    context->reason = DM_OK;
+    context->direction = DM_AUTH_CRED_SINK;
+    context->accessee.sessionKey.clear();
+    authState = std::make_shared<AuthCredSinkFinishState>();
+    authState->BuildTrustDeviceInfos(context, deviceInfos);
+    EXPECT_EQ(deviceInfos.size(), 0);
+}
 }
 }

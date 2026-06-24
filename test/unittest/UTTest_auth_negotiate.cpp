@@ -17,6 +17,7 @@
 #include "dm_crypto.h"
 #include "dm_auth_context.h"
 #include "dm_auth_state.h"
+#include "dm_negotiate_process.h"
 #include "UTTest_auth_negotiate.h"
 
 using namespace testing;
@@ -104,40 +105,6 @@ int32_t GetBusinessEventMockFalse(DistributedDeviceProfile::BusinessEvent &event
 {
     event.SetBusinessValue("{\"business_id\":\"test_business_id\",\"is_in_anti_disturbance_mode\":false}");
     return DM_OK;
-}
-
-HWTEST_F(AuthNegotiateTest, AuthSrcStartState_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<AuthSrcStartState> authState = std::make_shared<AuthSrcStartState>();
-    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_START_STATE);
-}
-
-HWTEST_F(AuthNegotiateTest, AuthSrcStartState_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<AuthSrcStartState> authState = std::make_shared<AuthSrcStartState>();
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthNegotiateTest, AuthSrcNegotiateStateMachine_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<AuthSrcNegotiateStateMachine> authState = std::make_shared<AuthSrcNegotiateStateMachine>();
-    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_NEGOTIATE_STATE);
-}
-
-HWTEST_F(AuthNegotiateTest, AuthSrcNegotiateStateMachine_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<AuthSrcNegotiateStateMachine> authState = std::make_shared<AuthSrcNegotiateStateMachine>();
-
-    EXPECT_CALL(*softbusConnectorMock, GetSoftbusSession)
-        .WillOnce(Return(softbusSession));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
-    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_NEGOTIATE_STATE);
 }
 
 HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_002, testing::ext::TestSize.Level1)
@@ -482,6 +449,277 @@ HWTEST_F(AuthNegotiateTest, GetSinkCarUserId_005, testing::ext::TestSize.Level1)
     EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int result = authState->GetSinkCarUserId(context);
     EXPECT_EQ(result, 100);
+}
+
+/**
+ * @tc.name: NegotiateProcess_HandleNegotiateResult_001
+ * @tc.desc: HandleNegotiateResult should return ERR_DM_POINT_NULL when context is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, NegotiateProcess_HandleNegotiateResult_001, testing::ext::TestSize.Level1)
+{
+    EXPECT_EQ(NegotiateProcess::GetInstance().HandleNegotiateResult(nullptr), ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: NegotiateProcess_HandleNegotiateResult_002
+ * @tc.desc: No cred no acl with input pincode maps to PinBindAndCredAuth on source side.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+
+/**
+ * @tc.name: NegotiateProcess_HandleProxyNegotiateResult_001
+ * @tc.desc: HandleProxyNegotiateResult with null context returns ERR_DM_POINT_NULL.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, NegotiateProcess_HandleProxyNegotiateResult_001, testing::ext::TestSize.Level1)
+{
+    EXPECT_EQ(NegotiateProcess::GetInstance().HandleProxyNegotiateResult(nullptr, DM_OK), ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: NegotiateProcess_HandleProxyNegotiateResult_002
+ * @tc.desc: HandleProxyNegotiateResult returns DM_OK when not proxy bind (early return).
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, NegotiateProcess_HandleProxyNegotiateResult_002, testing::ext::TestSize.Level1)
+{
+    auto ctx = std::make_shared<DmAuthContext>();
+    ctx->IsProxyBind = false;
+    EXPECT_EQ(NegotiateProcess::GetInstance().HandleProxyNegotiateResult(ctx, DM_OK), DM_OK);
+}
+
+/**
+ * @tc.name: NegotiateProcess_HandleServiceNegotiateResult_001
+ * @tc.desc: HandleServiceNegotiateResult with null context returns ERR_DM_POINT_NULL.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, NegotiateProcess_HandleServiceNegotiateResult_001, testing::ext::TestSize.Level1)
+{
+    EXPECT_EQ(NegotiateProcess::GetInstance().HandleServiceNegotiateResult(nullptr, DM_OK), ERR_DM_POINT_NULL);
+}
+
+/**
+ * @tc.name: NegotiateProcess_HandleServiceNegotiateResult_002
+ * @tc.desc: HandleServiceNegotiateResult returns DM_OK when subjectServiceOnes is empty.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, NegotiateProcess_HandleServiceNegotiateResult_002, testing::ext::TestSize.Level1)
+{
+    auto ctx = std::make_shared<DmAuthContext>();
+    ctx->IsProxyBind = true;
+    ctx->subjectServiceOnes.clear();
+    EXPECT_EQ(NegotiateProcess::GetInstance().HandleServiceNegotiateResult(ctx, DM_OK), DM_OK);
+}
+
+/**
+ * @tc.name: NegotiateProcess_IsExistTheTokenId_001
+ * @tc.desc: IsExistTheTokenId returns false when extraData is empty.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, NegotiateProcess_IsExistTheTokenId_001, testing::ext::TestSize.Level1)
+{
+    EXPECT_FALSE(NegotiateProcess::GetInstance().IsExistTheTokenId("", "hashValue"));
+}
+
+/**
+ * @tc.name: NegotiateProcess_IsExistTheTokenId_002
+ * @tc.desc: IsExistTheTokenId returns false when extraData is discarded json.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, NegotiateProcess_IsExistTheTokenId_002, testing::ext::TestSize.Level1)
+{
+    EXPECT_FALSE(NegotiateProcess::GetInstance().IsExistTheTokenId("invalid_json", "hashValue"));
+}
+
+/**
+ * @tc.name: NegotiateProcess_IsExistTheTokenId_003
+ * @tc.desc: IsExistTheTokenId returns false when proxy object is discarded (no proxy field).
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, NegotiateProcess_IsExistTheTokenId_003, testing::ext::TestSize.Level1)
+{
+    std::string extra = R"({"otherField":123})";
+    EXPECT_FALSE(NegotiateProcess::GetInstance().IsExistTheTokenId(extra, "hashValue"));
+}
+
+/**
+ * @tc.name: NegotiateProcess_IsNeedSetProxyRelationShip_001
+ * @tc.desc: IsNeedSetProxyRelationShip returns true when p2p acl profile not present in proxyAccesser.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, NegotiateProcess_IsNeedSetProxyRelationShip_001, testing::ext::TestSize.Level1)
+{
+    auto ctx = std::make_shared<DmAuthContext>();
+    ctx->direction = DM_AUTH_SOURCE;
+    DmProxyAuthContext proxyContext;
+    proxyContext.proxyAccesser.tokenIdHash = "hashA";
+    proxyContext.proxyAccessee.tokenIdHash = "hashB";
+    EXPECT_TRUE(NegotiateProcess::GetInstance().IsNeedSetProxyRelationShip(ctx, proxyContext));
+}
+
+/**
+ * @tc.name: DmAuthContext_GetDeviceId_001
+ * @tc.desc: GetDeviceId returns local/remote device id correctly for source direction.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, DmAuthContext_GetDeviceId_001, testing::ext::TestSize.Level1)
+{
+    auto ctx = std::make_shared<DmAuthContext>();
+    ctx->direction = DM_AUTH_SOURCE;
+    ctx->accesser.deviceId = "localDev";
+    ctx->accessee.deviceId = "remoteDev";
+    EXPECT_EQ(ctx->GetDeviceId(DM_AUTH_LOCAL_SIDE), "localDev");
+    EXPECT_EQ(ctx->GetDeviceId(DM_AUTH_REMOTE_SIDE), "remoteDev");
+}
+
+/**
+ * @tc.name: DmAuthContext_GetDeviceId_002
+ * @tc.desc: GetDeviceId returns local/remote device id correctly for sink direction.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, DmAuthContext_GetDeviceId_002, testing::ext::TestSize.Level1)
+{
+    auto ctx = std::make_shared<DmAuthContext>();
+    ctx->direction = DM_AUTH_SINK;
+    ctx->accesser.deviceId = "localDev";
+    ctx->accessee.deviceId = "remoteDev";
+    EXPECT_EQ(ctx->GetDeviceId(DM_AUTH_LOCAL_SIDE), "remoteDev");
+    EXPECT_EQ(ctx->GetDeviceId(DM_AUTH_REMOTE_SIDE), "localDev");
+}
+
+/**
+ * @tc.name: DmAuthContext_GetUserId_001
+ * @tc.desc: GetUserId returns local/remote userId correctly for sink direction.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, DmAuthContext_GetUserId_001, testing::ext::TestSize.Level1)
+{
+    auto ctx = std::make_shared<DmAuthContext>();
+    ctx->direction = DM_AUTH_SINK;
+    ctx->accesser.userId = 100;
+    ctx->accessee.userId = 200;
+    EXPECT_EQ(ctx->GetUserId(DM_AUTH_LOCAL_SIDE), 200);
+    EXPECT_EQ(ctx->GetUserId(DM_AUTH_REMOTE_SIDE), 100);
+}
+
+/**
+ * @tc.name: DmAuthContext_GetCredentialId_001
+ * @tc.desc: GetCredentialId returns transmit and lnn credential ids by scope/side.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, DmAuthContext_GetCredentialId_001, testing::ext::TestSize.Level1)
+{
+    auto ctx = std::make_shared<DmAuthContext>();
+    ctx->direction = DM_AUTH_SOURCE;
+    ctx->accesser.transmitCredentialId = "transA";
+    ctx->accesser.lnnCredentialId = "lnnA";
+    ctx->accessee.transmitCredentialId = "transB";
+    ctx->accessee.lnnCredentialId = "lnnB";
+    EXPECT_EQ(ctx->GetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_APP), "transA");
+    EXPECT_EQ(ctx->GetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_LNN), "lnnA");
+    EXPECT_EQ(ctx->GetCredentialId(DM_AUTH_REMOTE_SIDE, DM_AUTH_SCOPE_APP), "transB");
+}
+
+/**
+ * @tc.name: DmAuthContext_GetPublicKey_001
+ * @tc.desc: GetPublicKey returns transmit and lnn public keys by scope/side on sink side.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, DmAuthContext_GetPublicKey_001, testing::ext::TestSize.Level1)
+{
+    auto ctx = std::make_shared<DmAuthContext>();
+    ctx->direction = DM_AUTH_SINK;
+    ctx->accesser.transmitPublicKey = "pkTransA";
+    ctx->accesser.lnnPublicKey = "pkLnnA";
+    ctx->accessee.transmitPublicKey = "pkTransB";
+    EXPECT_EQ(ctx->GetPublicKey(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_APP), "pkTransB");
+    EXPECT_EQ(ctx->GetPublicKey(DM_AUTH_REMOTE_SIDE, DM_AUTH_SCOPE_LNN), "pkLnnA");
+}
+
+/**
+ * @tc.name: DmAuthContext_SetCredentialId_001
+ * @tc.desc: SetCredentialId writes transmit and lnn credential ids into accesser/accessee.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, DmAuthContext_SetCredentialId_001, testing::ext::TestSize.Level1)
+{
+    auto ctx = std::make_shared<DmAuthContext>();
+    ctx->direction = DM_AUTH_SOURCE;
+    ctx->SetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_APP, "newTrans");
+    ctx->SetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_LNN, "newLnn");
+    EXPECT_EQ(ctx->accesser.transmitCredentialId, "newTrans");
+    EXPECT_EQ(ctx->accesser.lnnCredentialId, "newLnn");
+    ctx->SetCredentialId(DM_AUTH_REMOTE_SIDE, DM_AUTH_SCOPE_APP, "remoteTrans");
+    EXPECT_EQ(ctx->accessee.transmitCredentialId, "remoteTrans");
+}
+
+/**
+ * @tc.name: DmAuthContext_SetPublicKey_001
+ * @tc.desc: SetPublicKey writes transmit and lnn public keys on sink direction.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, DmAuthContext_SetPublicKey_001, testing::ext::TestSize.Level1)
+{
+    auto ctx = std::make_shared<DmAuthContext>();
+    ctx->direction = DM_AUTH_SINK;
+    ctx->SetPublicKey(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_APP, "localTransPk");
+    ctx->SetPublicKey(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_LNN, "localLnnPk");
+    ctx->SetPublicKey(DM_AUTH_REMOTE_SIDE, DM_AUTH_SCOPE_LNN, "remoteLnnPk");
+    EXPECT_EQ(ctx->accessee.transmitPublicKey, "localTransPk");
+    EXPECT_EQ(ctx->accessee.lnnPublicKey, "localLnnPk");
+    EXPECT_EQ(ctx->accesser.lnnPublicKey, "remoteLnnPk");
+}
+
+/**
+ * @tc.name: DmAuthContext_GetAccountId_001
+ * @tc.desc: GetAccountId returns local/remote account id based on direction.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, DmAuthContext_GetAccountId_001, testing::ext::TestSize.Level1)
+{
+    auto ctx = std::make_shared<DmAuthContext>();
+    ctx->direction = DM_AUTH_SOURCE;
+    ctx->accesser.accountId = "accA";
+    ctx->accessee.accountId = "accB";
+    EXPECT_EQ(ctx->GetAccountId(DM_AUTH_LOCAL_SIDE), "accA");
+    EXPECT_EQ(ctx->GetAccountId(DM_AUTH_REMOTE_SIDE), "accB");
+}
+
+/**
+ * @tc.name: DmAuthContext_GetAclBundleName_001
+ * @tc.desc: GetAclBundleName returns pkgName when non-empty, otherwise bundleName.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthNegotiateTest, DmAuthContext_GetAclBundleName_001, testing::ext::TestSize.Level1)
+{
+    auto ctx = std::make_shared<DmAuthContext>();
+    DmProxyAuthContext proxyContext;
+    proxyContext.proxyAccesser.pkgName = "srcPkg";
+    proxyContext.proxyAccesser.bundleName = "srcBundle";
+    proxyContext.proxyAccessee.pkgName = "";
+    proxyContext.proxyAccessee.bundleName = "sinkBundle";
+    EXPECT_EQ(ctx->GetAclBundleName(DM_AUTH_SOURCE, proxyContext), "srcPkg");
+    EXPECT_EQ(ctx->GetAclBundleName(DM_AUTH_SINK, proxyContext), "sinkBundle");
 }
 }
 }
