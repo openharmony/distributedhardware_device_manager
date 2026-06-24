@@ -25,6 +25,7 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
     constexpr int32_t SALT_STRING_LENGTH = 16;
+    constexpr int32_t SHA256_HEX_LEN = 64; // SHA256_DIGEST_LENGTH(32) * 2
     const std::string SALT_DEFAULT = "salt_defsalt_def";
     const std::string UDID_SAMPLE = "3fde738fb2b8c910023d949166125bc9ed49e9e2fc8f4826d652b2839def2238";
 }
@@ -113,6 +114,203 @@ HWTEST_F(DmCryptoTest, GetHashWithSalt_01, testing::ext::TestSize.Level1)
 
     std::cout << "hash2: " << hash2 << std::endl;
     std::cout << "hash6: " << hash6 << std::endl;
+}
+
+/**
+ * @tc.name: GetSecRandom_02
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCryptoTest, GetSecRandom_02, testing::ext::TestSize.Level1)
+{
+    // null out buffer -> DM_ERR early return
+    int32_t ret = Crypto::GetSecRandom(nullptr, 8);
+    EXPECT_EQ(ret, -1);
+
+    // zero length -> DM_ERR early return
+    uint8_t buffer[8] = {0};
+    ret = Crypto::GetSecRandom(buffer, 0);
+    EXPECT_EQ(ret, -1);
+}
+
+/**
+ * @tc.name: Sha256_01
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCryptoTest, Sha256_01, testing::ext::TestSize.Level1)
+{
+    // string overload default lowercase
+    std::string text = "c9ed49e9e2fc8f4826d652b2839d";
+    std::string hashLower = Crypto::Sha256(text);
+    EXPECT_EQ(hashLower.length(), static_cast<size_t>(SHA256_HEX_LEN));
+
+    // uppercase path (isUpper = true)
+    std::string hashUpper = Crypto::Sha256(text, true);
+    EXPECT_EQ(hashUpper.length(), static_cast<size_t>(SHA256_HEX_LEN));
+    EXPECT_STRNE(hashLower.c_str(), hashUpper.c_str());
+
+    // void* overload
+    std::string hashVoid = Crypto::Sha256(text.data(), text.size());
+    EXPECT_STREQ(hashLower.c_str(), hashVoid.c_str());
+}
+
+/**
+ * @tc.name: ConvertHexStringToBytes_01
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCryptoTest, ConvertHexStringToBytes_01, testing::ext::TestSize.Level1)
+{
+    // null outBuf -> ERR_DM_FAILED
+    const char *hexIn = "1a2b";
+    int32_t ret = Crypto::ConvertHexStringToBytes(nullptr, 4, hexIn, 4);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    // null inBuf -> ERR_DM_FAILED
+    uint8_t out[2] = {0};
+    ret = Crypto::ConvertHexStringToBytes(out, 2, nullptr, 4);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    // odd length -> ERR_DM_FAILED
+    ret = Crypto::ConvertHexStringToBytes(out, 2, hexIn, 3);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ConvertHexStringToBytes_02
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCryptoTest, ConvertHexStringToBytes_02, testing::ext::TestSize.Level1)
+{
+    // outBufLen smaller than outLen -> ERR_DM_FAILED
+    const char *hexIn = "1a2b";
+    uint8_t out[1] = {0};
+    int32_t ret = Crypto::ConvertHexStringToBytes(out, 1, hexIn, 4);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ConvertHexStringToBytes_03
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCryptoTest, ConvertHexStringToBytes_03, testing::ext::TestSize.Level1)
+{
+    // valid lowercase hex -> DM_OK
+    const char *hexLower = "1a2b";
+    uint8_t out[2] = {0};
+    int32_t ret = Crypto::ConvertHexStringToBytes(out, 2, hexLower, 4);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(out[0], 0x1a);
+    EXPECT_EQ(out[1], 0x2b);
+
+    // valid uppercase hex path -> DM_OK (even length exercises 'A'-'F' branch)
+    const char *hexUpper = "0F1A";
+    uint8_t out2[2] = {0};
+    ret = Crypto::ConvertHexStringToBytes(out2, 2, hexUpper, 4);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(out2[0], 0x0f);
+    EXPECT_EQ(out2[1], 0x1a);
+
+    // invalid char -> ERR_DM_FAILED
+    const char *hexInvalid = "1g2b";
+    uint8_t out3[2] = {0};
+    ret = Crypto::ConvertHexStringToBytes(out3, 2, hexInvalid, 4);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ConvertBytesToHexString_01
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCryptoTest, ConvertBytesToHexString_01, testing::ext::TestSize.Level1)
+{
+    // null outBuf -> ERR_DM_INPUT_PARA_INVALID
+    unsigned char in[2] = {0x1a, 0xff};
+    int32_t ret = Crypto::ConvertBytesToHexString(nullptr, 8, in, 2);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    // null inBuf -> ERR_DM_INPUT_PARA_INVALID
+    char out[5] = {0};
+    ret = Crypto::ConvertBytesToHexString(out, 5, nullptr, 2);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    // outBufLen too small -> ERR_DM_INPUT_PARA_INVALID
+    ret = Crypto::ConvertBytesToHexString(out, 2, in, 2);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: ConvertBytesToHexString_02
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCryptoTest, ConvertBytesToHexString_02, testing::ext::TestSize.Level1)
+{
+    // valid conversion covering digit(<10) and letter(>=10) branches
+    unsigned char in[2] = {0x1a, 0xff};
+    char out[5] = {0};
+    int32_t ret = Crypto::ConvertBytesToHexString(out, 5, in, 2);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_STREQ(out, "1aff");
+
+    // value entirely below 10
+    unsigned char in2[1] = {0x09};
+    char out2[3] = {0};
+    ret = Crypto::ConvertBytesToHexString(out2, 3, in2, 1);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_STREQ(out2, "09");
+}
+
+/**
+ * @tc.name: GetUdidHash_02
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCryptoTest, GetUdidHash_02, testing::ext::TestSize.Level1)
+{
+    // string overload returns 16-char short hash
+    std::string hash = Crypto::GetUdidHash(UDID_SAMPLE);
+    EXPECT_EQ(hash.length(), static_cast<size_t>(16));
+    std::cout << "udidHash string: " << hash << std::endl;
+}
+
+/**
+ * @tc.name: GetTokenIdHash_01
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCryptoTest, GetTokenIdHash_01, testing::ext::TestSize.Level1)
+{
+    std::string tokenId = "token123456";
+    std::string hash = Crypto::GetTokenIdHash(tokenId);
+    EXPECT_EQ(hash.length(), static_cast<size_t>(32));
+    std::cout << "tokenIdHash: " << hash << std::endl;
+}
+
+/**
+ * @tc.name: GetGroupIdHash_01
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCryptoTest, GetGroupIdHash_01, testing::ext::TestSize.Level1)
+{
+    std::string groupId = "groupTestId";
+    std::string hash = Crypto::GetGroupIdHash(groupId);
+    EXPECT_EQ(hash.length(), static_cast<size_t>(16));
+    std::cout << "groupIdHash: " << hash << std::endl;
+}
+
+/**
+ * @tc.name: GetAccountIdHash_01
+ * @tc.type: FUNC
+ */
+HWTEST_F(DmCryptoTest, GetAccountIdHash_01, testing::ext::TestSize.Level1)
+{
+    std::string accountId = "accountIdTest";
+    // int32_t overload returns first 3 bytes (6 chars)
+    unsigned char hash[7] = {0};
+    int32_t ret = Crypto::GetAccountIdHash(accountId, hash);
+    EXPECT_EQ(ret, DM_OK);
+    std::string hashStr(reinterpret_cast<const char *>(hash));
+    EXPECT_EQ(hashStr.length(), static_cast<size_t>(6));
+
+    // string overload returns first 16 bytes (32 chars)
+    std::string hash16 = Crypto::GetAccountIdHash16(accountId);
+    EXPECT_EQ(hash16.length(), static_cast<size_t>(32));
 }
 } // DistributedHardware
 } // OHOS

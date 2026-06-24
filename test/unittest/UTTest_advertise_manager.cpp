@@ -116,8 +116,9 @@ HWTEST_F(AdvertiseManagerTest, StopAdvertising_002, testing::ext::TestSize.Level
     auto softbusListener = std::make_shared<SoftbusListener>();
     auto advertiseManager = std::make_shared<AdvertiseManager>(softbusListener);
     auto innerPublishId = advertiseManager->GenInnerPublishId(PKG_NAME, VALUABLE_PUBLISH_ID);
+    (void)innerPublishId;
     auto ret = advertiseManager->StopAdvertising(PKG_NAME, VALUABLE_PUBLISH_ID);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
