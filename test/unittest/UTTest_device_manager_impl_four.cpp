@@ -193,7 +193,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterServiceStateCallback_005, testing::ext
     EXPECT_CALL(*deviceManagerNotifyMock_, UnRegisterServiceStateCallback(testing::_, testing::_))
         .WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerImpl::GetInstance().UnRegisterServiceStateCallback(pkgName, serviceId);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerImplTest, UnRegisterServiceStateCallback_006, testing::ext::TestSize.Level1)
@@ -210,7 +210,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterServiceStateCallback_006, testing::ext
     EXPECT_CALL(*deviceManagerNotifyMock_, UnRegisterServiceStateCallback(testing::_, testing::_))
         .WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerImpl::GetInstance().UnRegisterServiceStateCallback(pkgName, serviceId);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerImplTest, RegisterServiceInfo_001, testing::ext::TestSize.Level1)

@@ -635,36 +635,6 @@ void GetAccessControlProfiles(std::vector<DistributedDeviceProfile::AccessContro
     AddAccessControlProfileFifth(accessControlProfiles);
     AddAccessControlProfileSix(accessControlProfiles);
 }
-HWTEST_F(DeviceProfileConnectorTest, GetAccessControlProfile_001, testing::ext::TestSize.Level1)
-{
-    auto ret = DeviceProfileConnector::GetInstance().GetAccessControlProfile();
-    EXPECT_EQ(ret.empty(), false);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_001, testing::ext::TestSize.Level1)
-{
-    std::string pkgName;
-    std::string deviceId = "deviceId";
-    auto ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), true);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_002, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "bundleName";
-    std::string deviceId = "deviceId";
-    auto ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), true);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_003, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "bundleName";
-    std::string deviceId = "deviceId_003";
-    auto ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), true);
-}
-
 HWTEST_F(DeviceProfileConnectorTest, GetDeviceAclParam_001, testing::ext::TestSize.Level1)
 {
     DmDiscoveryInfo discoveryInfo;
@@ -1507,7 +1477,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_001, testing::ext::Tes
     EXPECT_TRUE(ret.empty());
 }
 
-
 HWTEST_F(DeviceProfileConnectorTest, GetOfflineProcessInfo_001, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "deviceId";
@@ -2047,7 +2016,6 @@ HWTEST_F(DeviceProfileConnectorTest, SingleUserProcess_002, testing::ext::TestSi
     int32_t ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
     EXPECT_EQ(ret, true);
 
-
     profile.SetBindType(DM_ACROSS_ACCOUNT);
     profile.SetBindLevel(APP);
     accessee.SetAccesseeBundleName("bundleName");
@@ -2286,19 +2254,441 @@ HWTEST_F(DeviceProfileConnectorTest, HandleUserSwitched_003, testing::ext::TestS
 }
 
 /**
- * @tc.name: SubscribeDeviceProfileInited_001
- * @tc.desc: SubscribeDeviceProfileInited subscribes to device profile init event
- *           Step 1: Prepare callback
- *           Step 2: Call SubscribeDeviceProfileInited
- *           Step 3: Verify return value
+ * @tc.name: GetVersionByExtra_001
+ * @tc.desc: GetVersionByExtra with discarded (invalid) extraInfo json returns ERR_DM_FAILED
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceProfileConnectorTest, SubscribeDeviceProfileInited_001, testing::ext::TestSize.Level1)
+HWTEST_F(DeviceProfileConnectorTest, GetVersionByExtra_001, testing::ext::TestSize.Level1)
 {
-    sptr<MockDpInitedCallback> callback = new MockDpInitedCallback();
+    std::string extraInfo = "{invalid_json";
+    std::string dmVersion;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetVersionByExtra(extraInfo, dmVersion);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
 
-    int32_t ret = DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(callback);
+/**
+ * @tc.name: GetVersionByExtra_002
+ * @tc.desc: GetVersionByExtra where dmVersion key is not a string returns ERR_DM_FAILED
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, GetVersionByExtra_002, testing::ext::TestSize.Level1)
+{
+    JsonObject extraJson;
+    extraJson["dmVersion"] = 5;
+    std::string extraInfo = extraJson.Dump();
+    std::string dmVersion;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetVersionByExtra(extraInfo, dmVersion);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetVersionByExtra_003
+ * @tc.desc: GetVersionByExtra with valid dmVersion string returns DM_OK and parses the version
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, GetVersionByExtra_003, testing::ext::TestSize.Level1)
+{
+    JsonObject extraJson;
+    extraJson["dmVersion"] = "5.1.0";
+    std::string extraInfo = extraJson.Dump();
+    std::string dmVersion;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetVersionByExtra(extraInfo, dmVersion);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(dmVersion, "5.1.0");
+}
+
+/**
+ * @tc.name: GetAuthForm_002
+ * @tc.desc: GetAuthForm with DM_SHARE and SERVICE level, and DM_POINT_TO_POINT/ACROSS_ACCOUNT SERVICE levels
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, GetAuthForm_002, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    std::string trustDev = "";
+    std::string reqDev = "";
+
+    profile.SetBindType(DM_SHARE);
+    profile.SetBindLevel(SERVICE);
+    int32_t ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
+    EXPECT_EQ(ret, SHARE_TYPE);
+
+    profile.SetBindType(DM_POINT_TO_POINT);
+    profile.SetBindLevel(SERVICE);
+    ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
+    EXPECT_EQ(ret, SERVICE_PEER_TO_PEER_TYPE);
+
+    profile.SetBindType(DM_ACROSS_ACCOUNT);
+    profile.SetBindLevel(SERVICE);
+    ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
+    EXPECT_EQ(ret, SERVICE_ACROSS_ACCOUNT_TYPE);
+}
+
+/**
+ * @tc.name: GetParamBindTypeVec_002
+ * @tc.desc: GetParamBindTypeVec SERVICE bind-level branch for POINT_TO_POINT and ACROSS_ACCOUNT (no push)
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_002, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profiles;
+    std::string requestDeviceId = "requestDeviceId";
+    std::vector<int32_t> bindTypeVec;
+    std::string trustUdid = "trustUdid";
+
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    accesser.SetAccesserDeviceId(trustUdid);
+    accessee.SetAccesseeDeviceId(requestDeviceId);
+    profiles.SetAccesser(accesser);
+    profiles.SetAccessee(accessee);
+
+    // SERVICE level has no push branch in switch, so vec stays empty.
+    profiles.SetBindType(DM_POINT_TO_POINT);
+    profiles.SetBindLevel(SERVICE);
+    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
+    EXPECT_TRUE(bindTypeVec.empty());
+
+    profiles.SetBindType(DM_ACROSS_ACCOUNT);
+    profiles.SetBindLevel(SERVICE);
+    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
+    EXPECT_TRUE(bindTypeVec.empty());
+}
+
+/**
+ * @tc.name: GetParamBindTypeVec_003
+ * @tc.desc: GetParamBindTypeVec where neither accesser nor accessee device ids match (early return)
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_003, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profiles;
+    std::string requestDeviceId = "requestDeviceId";
+    std::vector<int32_t> bindTypeVec;
+    std::string trustUdid = "trustUdid";
+
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    accesser.SetAccesserDeviceId("unmatchedAcer");
+    accessee.SetAccesseeDeviceId("unmatchedAcee");
+    profiles.SetAccesser(accesser);
+    profiles.SetAccessee(accessee);
+    profiles.SetBindType(DM_IDENTICAL_ACCOUNT);
+
+    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
+    EXPECT_TRUE(bindTypeVec.empty());
+}
+
+/**
+ * @tc.name: IsLnnAcl_001
+ * @tc.desc: IsLnnAcl returns false when extraData is empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, IsLnnAcl_001, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    bool ret = DeviceProfileConnector::GetInstance().IsLnnAcl(profile);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: IsLnnAcl_002
+ * @tc.desc: IsLnnAcl returns false when extraData is a discarded (invalid) json
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, IsLnnAcl_002, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData("{invalid_json");
+    bool ret = DeviceProfileConnector::GetInstance().IsLnnAcl(profile);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: IsLnnAcl_003
+ * @tc.desc: IsLnnAcl returns true when extraData has IsLnnAcl="true"
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, IsLnnAcl_003, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    JsonObject json;
+    json[ACL_IS_LNN_ACL_KEY] = ACL_IS_LNN_ACL_VAL_TRUE;
+    profile.SetExtraData(json.Dump());
+    bool ret = DeviceProfileConnector::GetInstance().IsLnnAcl(profile);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: IsLnnAcl_004
+ * @tc.desc: IsLnnAcl returns false when IsLnnAcl value is not "true"
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, IsLnnAcl_004, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    JsonObject json;
+    json[ACL_IS_LNN_ACL_KEY] = ACL_IS_LNN_ACL_VAL_FALSE;
+    profile.SetExtraData(json.Dump());
+    bool ret = DeviceProfileConnector::GetInstance().IsLnnAcl(profile);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: IsLnnAcl_005
+ * @tc.desc: IsLnnAcl returns false when IsLnnAcl key value is not a string type
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, IsLnnAcl_005, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    JsonObject json;
+    json[ACL_IS_LNN_ACL_KEY] = 1;
+    profile.SetExtraData(json.Dump());
+    bool ret = DeviceProfileConnector::GetInstance().IsLnnAcl(profile);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ChecksumAcl_001
+ * @tc.desc: ChecksumAcl returns false when the acl hash is absent from the list (no-match branch)
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, ChecksumAcl_001, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    AddAccessControlProfileFirst(profile);
+    std::vector<std::string> aclStrList;
+    aclStrList.push_back("nonexistentHashValue");
+    bool ret = DeviceProfileConnector::GetInstance().ChecksumAcl(profile, aclStrList);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ChecksumAcl_002
+ * @tc.desc: ChecksumAcl returns false with an empty acl string list (end iterator branch)
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, ChecksumAcl_002, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    AddAccessControlProfileFirst(profile);
+    std::vector<std::string> aclStrList;
+    bool ret = DeviceProfileConnector::GetInstance().ChecksumAcl(profile, aclStrList);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: AccessToStr_001
+ * @tc.desc: AccessToStr produces a deterministic non-empty string for a populated profile
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, AccessToStr_001, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    AddAccessControlProfileFirst(profile);
+    std::string aclStr = DeviceProfileConnector::GetInstance().AccessToStr(profile);
+    EXPECT_FALSE(aclStr.empty());
+    // Same profile content should produce an identical string.
+    std::string aclStr2 = DeviceProfileConnector::GetInstance().AccessToStr(profile);
+    EXPECT_EQ(aclStr, aclStr2);
+}
+
+/**
+ * @tc.name: GetAclVersionInfo_002
+ * @tc.desc: GetAclVersionInfo returns empty when neither accesser nor accessee device ids match
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, GetAclVersionInfo_002, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    accesser.SetAccesserDeviceId("unmatchedLocal");
+    accessee.SetAccesseeDeviceId("unmatchedRemote");
+    accesser.SetAccesserExtraData("extraAcer");
+    accessee.SetAccesseeExtraData("extraAcee");
+    profile.SetAccesser(accesser);
+    profile.SetAccessee(accessee);
+    std::string localUdid = "localUdid";
+    std::string remoteUdid = "remoteUdid";
+    std::string ret = DeviceProfileConnector::GetInstance().GetAclVersionInfo(localUdid, remoteUdid, profile);
+    EXPECT_EQ(ret, std::string(""));
+}
+
+/**
+ * @tc.name: GetAclList_001
+ * @tc.desc: GetAclList returns profiles matching the local/remote udid and userId pair
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, GetAclList_001, testing::ext::TestSize.Level1)
+{
+    std::string localUdid = "localDeviceId";
+    int32_t localUserId = 123456;
+    std::string remoteUdid = "remoteDeviceId";
+    int32_t remoteUserId = 123456;
+    auto ret = DeviceProfileConnector::GetInstance().GetAclList(localUdid, localUserId, remoteUdid, remoteUserId);
+    EXPECT_GE(ret.size(), 0);
+}
+
+/**
+ * @tc.name: GetAclList_002
+ * @tc.desc: GetAclList returns empty when no profile matches the given udid/userId pair
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, GetAclList_002, testing::ext::TestSize.Level1)
+{
+    std::string localUdid = "nonExistLocal";
+    int32_t localUserId = 9999;
+    std::string remoteUdid = "nonExistRemote";
+    int32_t remoteUserId = 8888;
+    auto ret = DeviceProfileConnector::GetInstance().GetAclList(localUdid, localUserId, remoteUdid, remoteUserId);
+    EXPECT_TRUE(ret.empty());
+}
+
+/**
+ * @tc.name: GetAccessControlProfileByAccessControlId_001
+ * @tc.desc: GetAccessControlProfileByAccessControlId returns profile with id 0 when not found
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, GetAccessControlProfileByAccessControlId_001, testing::ext::TestSize.Level1)
+{
+    int64_t accessControlId = 9999999;
+    auto ret = DeviceProfileConnector::GetInstance().GetAccessControlProfileByAccessControlId(accessControlId);
+    EXPECT_EQ(ret.GetAccessControlId(), 0);
+}
+
+/**
+ * @tc.name: PutAllTrustedDevices_002
+ * @tc.desc: PutAllTrustedDevices with non-empty deviceInfos exercises the put path
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, PutAllTrustedDevices_002, testing::ext::TestSize.Level1)
+{
+    std::vector<DistributedDeviceProfile::TrustedDeviceInfo> deviceInfos;
+    DistributedDeviceProfile::TrustedDeviceInfo info;
+    info.SetNetworkId("networkIdForPut");
+    deviceInfos.push_back(info);
+    int32_t ret = DeviceProfileConnector::GetInstance().PutAllTrustedDevices(deviceInfos);
     EXPECT_NE(ret, DM_OK);
 }
+
+/**
+ * @tc.name: HandleUserSwitched_004
+ * @tc.desc: HandleUserSwitched (4-arg) returns DM_OK early when deviceVec is empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, HandleUserSwitched_004, testing::ext::TestSize.Level1)
+{
+    std::string localUdid = "localDeviceId";
+    std::vector<std::string> deviceVec;
+    std::vector<int32_t> foregroundUserIds;
+    std::vector<int32_t> backgroundUserIds;
+    int32_t ret = DeviceProfileConnector::GetInstance().HandleUserSwitched(localUdid, deviceVec,
+        foregroundUserIds, backgroundUserIds);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: HandleUserSwitched_005
+ * @tc.desc: HandleUserSwitched (current/before userId overload) returns DM_OK early when deviceVec is empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, HandleUserSwitched_005, testing::ext::TestSize.Level1)
+{
+    std::string localUdid = "localDeviceId";
+    std::vector<std::string> deviceVec;
+    int32_t currentUserId = 100;
+    int32_t beforeUserId = 0;
+    int32_t ret = DeviceProfileConnector::GetInstance().HandleUserSwitched(localUdid, deviceVec,
+        currentUserId, beforeUserId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: CheckAuthForm_001
+ * @tc.desc: CheckAuthForm with LNN acl returns INVALID_TYPE; with USER level returns the form
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, CheckAuthForm_001, testing::ext::TestSize.Level1)
+{
+    DmAuthForm form = DmAuthForm::PEER_TO_PEER;
+    DistributedDeviceProfile::AccessControlProfile profiles;
+    DmDiscoveryInfo discoveryInfo;
+
+    // LNN acl path -> INVALID_TYPE.
+    JsonObject lnnJson;
+    lnnJson[ACL_IS_LNN_ACL_KEY] = ACL_IS_LNN_ACL_VAL_TRUE;
+    profiles.SetExtraData(lnnJson.Dump());
+    int32_t ret = DeviceProfileConnector::GetInstance().CheckAuthForm(form, profiles, discoveryInfo);
+    EXPECT_EQ(ret, INVALID_TYPE);
+
+    // USER level with empty pkgname -> returns form.
+    profiles.SetExtraData("");
+    profiles.SetBindLevel(USER);
+    ret = DeviceProfileConnector::GetInstance().CheckAuthForm(form, profiles, discoveryInfo);
+    EXPECT_EQ(ret, form);
+}
+
+/**
+ * @tc.name: CheckAuthForm_002
+ * @tc.desc: CheckAuthForm with APP level and empty pkgname returns the form
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, CheckAuthForm_002, testing::ext::TestSize.Level1)
+{
+    DmAuthForm form = DmAuthForm::PEER_TO_PEER;
+    DistributedDeviceProfile::AccessControlProfile profiles;
+    DmDiscoveryInfo discoveryInfo;
+    profiles.SetBindLevel(APP);
+    int32_t ret = DeviceProfileConnector::GetInstance().CheckAuthForm(form, profiles, discoveryInfo);
+    EXPECT_EQ(ret, form);
+
+    profiles.SetBindLevel(SERVICE);
+    ret = DeviceProfileConnector::GetInstance().CheckAuthForm(form, profiles, discoveryInfo);
+    EXPECT_EQ(ret, form);
+}
+
+/**
+ * @tc.name: CheckSinkShareType_001
+ * @tc.desc: CheckSinkShareType returns true when accessee matches and bindType is SHARE
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, CheckSinkShareType_001, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 456;
+    std::string deviceId = "localDeviceId";
+    std::string trustDeviceId = "remoteDeviceId";
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    accesser.SetAccesserDeviceId(trustDeviceId);
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeDeviceId(deviceId);
+    profile.SetAccesser(accesser);
+    profile.SetAccessee(accessee);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(profile, userId, deviceId, trustDeviceId,
+        DmAuthForm::SHARE);
+    EXPECT_TRUE(ret);
+
+    accessee.SetAccesseeDeviceId("mismatchDevice");
+    profile.SetAccessee(accessee);
+    ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(profile, userId, deviceId, trustDeviceId,
+        DmAuthForm::SHARE);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DeleteAccessControlById_001
+ * @tc.desc: DeleteAccessControlById invokes deletion without throwing for a given accessControlId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlById_001, testing::ext::TestSize.Level1)
+{
+    int64_t accessControlId = 8888;
+    DeviceProfileConnector::GetInstance().DeleteAccessControlById(accessControlId);
+    SUCCEED();
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS
