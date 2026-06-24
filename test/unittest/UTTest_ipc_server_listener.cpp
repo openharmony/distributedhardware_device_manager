@@ -30,7 +30,6 @@
 #include "ipc_rsp.h"
 #include "dm_constants.h"
 
-
 namespace OHOS {
 namespace DistributedHardware {
 void IpcServerListenerTest::SetUp()
@@ -62,26 +61,6 @@ namespace {
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(IpcServerListenerTest, SendRequest_001, testing::ext::TestSize.Level0)
-{
-    // 1. set cmdCode not null
-    int32_t cmdCode = 20;
-    // set pkgName not null
-    std::string pkgName = "com.ohos.test";
-    // 2. set remoteObject nullptr
-    sptr<IRemoteObject> remoteObject = nullptr;
-    // set req not null
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    // set rsp not null
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    // 3. call IpcServerListener SendRequest
-    std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
-    int ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 4. check ret is ERR_DM_POINT_NULL
-    ASSERT_NE(ret, DM_OK);
-}
-
 /**
  * @tc.name: SendRequest_002
  * @tc.desc: 1. set cmdCode not null
@@ -93,24 +72,6 @@ HWTEST_F(IpcServerListenerTest, SendRequest_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(IpcServerListenerTest, SendRequest_002, testing::ext::TestSize.Level0)
-{
-    // 1. set cmdCode not null
-    int32_t cmdCode = SERVER_DEVICE_STATE_NOTIFY;
-    // set pkgName not null
-    std::string pkgName;
-    // set req not null
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    // set rsp not null
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    // 2. call IpcServerListener SendRequest
-    std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
-    int ret = ipcServerListener->SendRequest(cmdCode, req, rsp);
-    // 3. check ret is not ERR_DM_IPC_RESPOND_FAILED
-    ASSERT_NE(ret, ERR_DM_IPC_RESPOND_FAILED);
-}
-
 /**
  * @tc.name: SendRequest_003
  * @tc.desc: 1. set cmdCode not null

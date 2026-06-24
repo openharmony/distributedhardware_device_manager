@@ -748,7 +748,6 @@ HWTEST_F(IpcModelCodecTest, EncodeDmPublishServiceParam_003, testing::ext::TestS
     EXPECT_EQ(decodedParam.freq, DmExchangeFreq::DM_SUPER_HIGH);
 }
 
-
 /**
  * @tc.name: EncodeDmServiceInfo_003
  * @tc.desc: EncodeDmServiceInfo with INVALID_TYPE authform

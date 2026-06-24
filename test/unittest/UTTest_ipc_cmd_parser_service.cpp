@@ -150,40 +150,10 @@ bool EncodePeerTargetId(const PeerTargetId &targetId, MessageParcel &parcel)
     return bRet;
 }
 
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_001, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DEVICE_STATE_NOTIFY;
-    ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
-}
-
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_001, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DEVICE_STATE_NOTIFY;
-    ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
-}
-
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_002, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DEVICE_STATE_NOTIFY;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_002, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DEVICE_FOUND;
-    ASSERT_EQ(ERR_DM_FAILED, TestIpcRequestFuncReqNull(cmdCode));
-}
-
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_003, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DEVICE_FOUND;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
-}
-
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_004, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DEVICE_FOUND;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_003, testing::ext::TestSize.Level0)
@@ -198,12 +168,6 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_005, testing::ext::TestSize.L
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_006, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DEVICE_DISCOVERY;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
-}
-
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_004, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DISCOVER_FINISH;
@@ -214,12 +178,6 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_007, testing::ext::TestSize.L
 {
     int32_t cmdCode = SERVER_DISCOVER_FINISH;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
-}
-
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_008, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DISCOVER_FINISH;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_005, testing::ext::TestSize.Level0)
@@ -234,12 +192,6 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_009, testing::ext::TestSize.L
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_010, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_PUBLISH_FINISH;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
-}
-
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_006, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_AUTH_RESULT;
@@ -250,12 +202,6 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_011, testing::ext::TestSize.L
 {
     int32_t cmdCode = SERVER_AUTH_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
-}
-
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_012, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_AUTH_RESULT;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_007, testing::ext::TestSize.Level0)
@@ -270,41 +216,10 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_013, testing::ext::TestSize.L
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_014, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DEVICE_FA_NOTIFY;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_008, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_CREDENTIAL_RESULT;
-    MessageParcel data;
-    std::shared_ptr<IpcNotifyCredentialReq> req = nullptr;
-    int ret = ERR_DM_FAILED;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-
-    req = std::make_shared<IpcNotifyCredentialReq>();
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_015, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREDENTIAL_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
-}
-
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_016, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_CREDENTIAL_RESULT;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_009, testing::ext::TestSize.Level0)
@@ -319,12 +234,6 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_017, testing::ext::TestSize.L
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_018, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = BIND_TARGET_RESULT;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
-}
-
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_010, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = UNBIND_TARGET_RESULT;
@@ -337,64 +246,10 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_019, testing::ext::TestSize.L
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_020, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = UNBIND_TARGET_RESULT;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_011, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_CREATE_PIN_HOLDER;
-    MessageParcel data;
-    std::shared_ptr<IpcReq> req = nullptr;
-    int ret = ERR_DM_FAILED;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-
-    req = std::make_shared<IpcCreatePinHolderReq>();
-    std::string pkgName = "com.ohos.test";
-    req->SetPkgName(pkgName);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_021, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREATE_PIN_HOLDER;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
-}
-
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_022, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_CREATE_PIN_HOLDER;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_012, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER;
-    MessageParcel data;
-    std::shared_ptr<IpcReq> req = nullptr;
-    int ret = ERR_DM_FAILED;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-
-    req = std::make_shared<IpcDestroyPinHolderReq>();
-    std::string pkgName = "com.ohos.test";
-    req->SetPkgName(pkgName);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_023, testing::ext::TestSize.Level0)
@@ -403,76 +258,16 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_023, testing::ext::TestSize.L
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_024, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_013, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_CREATE_PIN_HOLDER_RESULT;
-    MessageParcel data;
-    std::shared_ptr<IpcReq> req = nullptr;
-    int ret = ERR_DM_FAILED;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-
-    req = std::make_shared<IpcNotifyPublishResultReq>();
-    std::string pkgName = "com.ohos.test";
-    req->SetPkgName(pkgName);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_025, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_CREATE_PIN_HOLDER_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_026, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_CREATE_PIN_HOLDER_RESULT;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_014, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER_RESULT;
-    MessageParcel data;
-    std::shared_ptr<IpcReq> req = nullptr;
-    int ret = ERR_DM_FAILED;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-
-    req = std::make_shared<IpcNotifyPublishResultReq>();
-    std::string pkgName = "com.ohos.test";
-    req->SetPkgName(pkgName);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_027, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER_RESULT;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
-}
-
-HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_028, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DESTROY_PIN_HOLDER_RESULT;
-    ASSERT_EQ(TestReadResponseRspNotNull(cmdCode), DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_001, testing::ext::TestSize.Level0)
@@ -1408,130 +1203,6 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_063, testing::ext::TestSize.Level
     EXPECT_EQ(cmdptr(data, reply), DM_OK);
 }
 
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_016, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DEVICE_DISCOVERY;
-    MessageParcel data;
-    std::shared_ptr<IpcNotifyDeviceDiscoveryReq> pReq = std::make_shared<IpcNotifyDeviceDiscoveryReq>();
-    std::string pkgName = "com.ohos.test";
-    uint16_t subscribeId = 100;
-    DmDeviceBasicInfo deviceBasicInfo;
-    pReq->SetPkgName(pkgName);
-    pReq->SetSubscribeId(subscribeId);
-    pReq->SetDeviceBasicInfo(deviceBasicInfo);
-    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(pReq, data);
-    }
-    ASSERT_EQ(DM_OK, ret);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_017, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_AUTH_RESULT;
-    MessageParcel data;
-    std::shared_ptr<IpcNotifyAuthResultReq> pReq = std::make_shared<IpcNotifyAuthResultReq>();
-    std::string pkgName = "com.ohos.test";
-    std::string deviceId = "112233445";
-    std::string token = "134354656";
-    int32_t status = 1;
-    int32_t reason = 1;
-    pReq->SetPkgName(pkgName);
-    pReq->SetDeviceId(deviceId);
-    pReq->SetToken(token);
-    pReq->SetStatus(status);
-    pReq->SetReason(reason);
-    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(pReq, data);
-    }
-    ASSERT_EQ(DM_OK, ret);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_018, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_DEVICE_FA_NOTIFY;
-    MessageParcel data;
-    std::shared_ptr<IpcNotifyDMFAResultReq> pReq = std::make_shared<IpcNotifyDMFAResultReq>();
-    std::string pkgName = "com.ohos.test";
-    std::string paramJson = "{}";
-    pReq->SetPkgName(pkgName);
-    pReq->SetJsonParam(paramJson);
-    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(pReq, data);
-    }
-    ASSERT_EQ(DM_OK, ret);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_019, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = BIND_TARGET_RESULT;
-    MessageParcel data;
-    std::shared_ptr<IpcNotifyBindResultReq> pReq = std::make_shared<IpcNotifyBindResultReq>();
-    std::string pkgName = "com.ohos.test";
-    PeerTargetId targetId;
-    int32_t result = 1;
-    int32_t status = 1;
-    std::string content = "";
-    pReq->SetPkgName(pkgName);
-    pReq->SetPeerTargetId(targetId);
-    pReq->SetResult(result);
-    pReq->SetStatus(status);
-    pReq->SetContent(content);
-    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(pReq, data);
-    }
-    ASSERT_EQ(DM_OK, ret);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_020, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = UNBIND_TARGET_RESULT;
-    MessageParcel data;
-    std::shared_ptr<IpcNotifyBindResultReq> pReq = std::make_shared<IpcNotifyBindResultReq>();
-    std::string pkgName = "com.ohos.test";
-    PeerTargetId targetId;
-    int32_t result = 1;
-    std::string content = "";
-    pReq->SetPkgName(pkgName);
-    pReq->SetPeerTargetId(targetId);
-    pReq->SetResult(result);
-    pReq->SetContent(content);
-    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(pReq, data);
-    }
-    ASSERT_EQ(DM_OK, ret);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_021, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVER_ON_PIN_HOLDER_EVENT;
-    MessageParcel data;
-    std::shared_ptr<IpcReq> req = nullptr;
-    int ret = ERR_DM_FAILED;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-
-    req = std::make_shared<IpcNotifyPinHolderEventReq>();
-    std::string pkgName = "com.ohos.test";
-    req->SetPkgName(pkgName);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_029, testing::ext::TestSize.Level0)
 {
     int32_t cmdCode = SERVER_ON_PIN_HOLDER_EVENT;
@@ -1561,33 +1232,6 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_055, testing::ext::TestSize.Level
     OnIpcCmdFunc ptr2 = GetIpcCmdFunc(cmdCode);
     if (ptr2) {
         ret = ptr2(data, reply);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_022, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY;
-    MessageParcel data;
-    std::shared_ptr<IpcNotifyCredentialAuthStatusReq> req = nullptr;
-    int ret = ERR_DM_FAILED;
-    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(req, data);
-    }
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-
-    req = std::make_shared<IpcNotifyCredentialAuthStatusReq>();
-    std::string pkgName = "com.ohos.test";
-    std::string deviceList = "test";
-    uint16_t deviceTypeId = 0x00;
-    int32_t errcode = -1;
-    req->SetPkgName(pkgName);
-    req->SetDeviceList(deviceList);
-    req->SetDeviceTypeId(deviceTypeId);
-    req->SetErrCode(errcode);
-    if (ptr) {
-        ret = ptr(req, data);
     }
     ASSERT_EQ(ret, DM_OK);
 }

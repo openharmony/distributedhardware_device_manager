@@ -701,7 +701,6 @@ HWTEST_F(DmPinHolderTest, OnSessionOpened_102, testing::ext::TestSize.Level1)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-
 HWTEST_F(DmPinHolderTest, CheckTargetIdVaild_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();

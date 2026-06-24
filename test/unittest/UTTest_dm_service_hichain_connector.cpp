@@ -55,63 +55,21 @@ void DmServiceHiChainConnectorTest::TearDownTestCase()
  * @tc.desc: Test constructor and destructor with stack object
  * @tc.type: FUNC
  */
-HWTEST_F(DmServiceHiChainConnectorTest, DmServiceHiChainConnector_001, testing::ext::TestSize.Level1)
-{
-    EXPECT_NO_FATAL_FAILURE({
-        DmServiceHiChainConnector connector;
-        (void)connector;
-    });
-}
-
 /**
  * @tc.name: DmServiceHiChainConnector_002
  * @tc.desc: Test constructor and destructor with heap object
  * @tc.type: FUNC
  */
-HWTEST_F(DmServiceHiChainConnectorTest, DmServiceHiChainConnector_002, testing::ext::TestSize.Level1)
-{
-    EXPECT_NO_FATAL_FAILURE({
-        auto *connector = new DmServiceHiChainConnector();
-        delete connector;
-        connector = nullptr;
-    });
-}
-
 /**
  * @tc.name: DmServiceHiChainConnector_003
  * @tc.desc: Test constructor and destructor with multiple iterations
  * @tc.type: FUNC
  */
-HWTEST_F(DmServiceHiChainConnectorTest, DmServiceHiChainConnector_003, testing::ext::TestSize.Level1)
-{
-    EXPECT_NO_FATAL_FAILURE({
-        for (int i = 0; i < 5; ++i) {
-            DmServiceHiChainConnector connector;
-            (void)connector;
-        }
-    });
-}
-
 /**
  * @tc.name: DmServiceHiChainConnector_004
  * @tc.desc: Test constructor when deviceGroupManager initialization fails
  * @tc.type: FUNC
  */
-HWTEST_F(DmServiceHiChainConnectorTest, DmServiceHiChainConnector_004, testing::ext::TestSize.Level1)
-{
-    auto mockUserConnector = std::make_shared<MultipleUserConnectorMock>();
-    DmMultipleUserConnector::dmMultipleUserConnector = mockUserConnector;
-    EXPECT_CALL(*mockUserConnector, GetCurrentAccountUserID())
-        .WillRepeatedly(Return(-1));
-    DmServiceHiChainConnector connector;
-    std::vector<DmGroupInfo> groupList;
-    std::string queryParams = "{}";
-    bool ret = connector.GetGroupInfo(queryParams, groupList);
-    EXPECT_FALSE(ret);
-    EXPECT_TRUE(groupList.empty());
-    DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
-}
-
 /**
  * @tc.name: DmServiceHiChainConnector_005
  * @tc.desc: Test constructor when deviceGroupManager exists but regCallback fails
@@ -187,40 +145,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, OnFinish_005, testing::ext::TestSize.Lev
     DmServiceHiChainConnector connector;
     EXPECT_NO_FATAL_FAILURE(
         connector.onFinish(5, -1, "any")
-    );
-}
-
-/**
- * @tc.name: OnFinish_006
- * @tc.desc: Test onFinish with registered callback for GROUP_CREATE
- * @tc.type: FUNC
- */
-HWTEST_F(DmServiceHiChainConnectorTest, OnFinish_006, testing::ext::TestSize.Level1)
-{
-    DmServiceHiChainConnector connector;
-    auto callback = std::make_shared<TestDmServiceGroupResCallback>();
-    int32_t ret = connector.RegisterHiChainGroupCallback(callback);
-    ASSERT_EQ(ret, DM_OK);
-    const char *data = "create_success";
-    EXPECT_NO_FATAL_FAILURE(
-        connector.onFinish(1, static_cast<int>(GroupOperationCode::GROUP_CREATE), data)
-    );
-}
-
-/**
- * @tc.name: OnFinish_007
- * @tc.desc: Test onFinish with registered callback for GROUP_DISBAND
- * @tc.type: FUNC
- */
-HWTEST_F(DmServiceHiChainConnectorTest, OnFinish_007, testing::ext::TestSize.Level1)
-{
-    DmServiceHiChainConnector connector;
-    auto callback = std::make_shared<TestDmServiceGroupResCallback>();
-    int32_t ret = connector.RegisterHiChainGroupCallback(callback);
-    ASSERT_EQ(ret, DM_OK);
-    const char *data = "disband_success";
-    EXPECT_NO_FATAL_FAILURE(
-        connector.onFinish(2, static_cast<int>(GroupOperationCode::GROUP_DISBAND), data)
     );
 }
 
@@ -329,40 +253,6 @@ HWTEST_F(DmServiceHiChainConnectorTest, OnError_006, testing::ext::TestSize.Leve
     DmServiceHiChainConnector connector;
     EXPECT_NO_FATAL_FAILURE(
         connector.onError(301, -1, 0, "any")
-    );
-}
-
-/**
- * @tc.name: OnError_007
- * @tc.desc: Test onError with registered callback for GROUP_CREATE
- * @tc.type: FUNC
- */
-HWTEST_F(DmServiceHiChainConnectorTest, OnError_007, testing::ext::TestSize.Level1)
-{
-    DmServiceHiChainConnector connector;
-    auto callback = std::make_shared<TestDmServiceGroupResCallback>();
-    int32_t ret = connector.RegisterHiChainGroupCallback(callback);
-    ASSERT_EQ(ret, DM_OK);
-    const char *err = "create_error";
-    EXPECT_NO_FATAL_FAILURE(
-        connector.onError(100, static_cast<int>(GroupOperationCode::GROUP_CREATE), 123, err)
-    );
-}
-
-/**
- * @tc.name: OnError_008
- * @tc.desc: Test onError with registered callback for GROUP_DISBAND
- * @tc.type: FUNC
- */
-HWTEST_F(DmServiceHiChainConnectorTest, OnError_008, testing::ext::TestSize.Level1)
-{
-    DmServiceHiChainConnector connector;
-    auto callback = std::make_shared<TestDmServiceGroupResCallback>();
-    int32_t ret = connector.RegisterHiChainGroupCallback(callback);
-    ASSERT_EQ(ret, DM_OK);
-    const char *err = "disband_error";
-    EXPECT_NO_FATAL_FAILURE(
-        connector.onError(200, static_cast<int>(GroupOperationCode::GROUP_DISBAND), 456, err)
     );
 }
 

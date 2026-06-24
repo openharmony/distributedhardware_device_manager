@@ -19,7 +19,6 @@
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 
-
 namespace OHOS {
 namespace DistributedHardware {
 namespace {

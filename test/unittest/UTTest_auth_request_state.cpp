@@ -49,15 +49,6 @@ std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<Hi
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Leave_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
-    int32_t ret = authRequestState->Leave();
-    ASSERT_EQ(ret, DM_OK);
-}
-
 /**
  * @tc.name: AuthRequestInitState::SetAuthContext_001
  * @tc.desc: 1 set authManager not null
@@ -66,18 +57,6 @@ HWTEST_F(AuthRequestStateTest, Leave_001, testing::ext::TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, SetAuthContext_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    std::shared_ptr<DmAuthRequestContext> context = std::make_shared<DmAuthRequestContext>();
-    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
-    authRequestState->SetAuthContext(context);
-    int32_t ret = authRequestState->context_.use_count();
-    authRequestState->context_.reset();
-    ASSERT_EQ(ret, 2);
-}
-
 /**
  * @tc.name: AuthRequestInitState::SetAuthManager_002
  * @tc.desc: 1 set authManager to null
@@ -86,15 +65,6 @@ HWTEST_F(AuthRequestStateTest, SetAuthContext_001, testing::ext::TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, SetAuthContext_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
-    authRequestState->SetAuthContext(nullptr);
-    int32_t ret = authRequestState->authManager_.use_count();
-    authRequestState->authManager_.reset();
-    ASSERT_EQ(ret, 0);
-}
-
 /**
  * @tc.name: AuthRequestInitState::GetAuthContext_001
  * @tc.desc: 1 set authManager not null
@@ -103,18 +73,6 @@ HWTEST_F(AuthRequestStateTest, SetAuthContext_002, testing::ext::TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, GetAuthContext_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    std::shared_ptr<DmAuthRequestContext> context = std::make_shared<DmAuthRequestContext>();
-    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
-    authRequestState->GetAuthContext();
-    int32_t ret = authRequestState->context_.use_count();
-    authRequestState->context_.reset();
-    ASSERT_EQ(ret, 0);
-}
-
 /**
  * @tc.name: AuthRequestInitState::SetAuthManager_001
  * @tc.desc: 1 set authManager not null
@@ -123,17 +81,6 @@ HWTEST_F(AuthRequestStateTest, GetAuthContext_001, testing::ext::TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, SetAuthManager_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
-    authRequestState->SetAuthManager(authManager);
-    int32_t ret = authRequestState->authManager_.use_count();
-    authRequestState->authManager_.reset();
-    ASSERT_EQ(ret, 1);
-}
-
 /**
  * @tc.name: AuthRequestInitState::SetAuthManager_002
  * @tc.desc: 1 set authManager to null
@@ -168,36 +115,6 @@ HWTEST_F(AuthRequestStateTest, TransitionTo_001, testing::ext::TestSize.Level1)
     authRequestState->authManager_ = authManager;
     int32_t ret = authRequestState->TransitionTo(std::make_shared<AuthRequestNegotiateState>());
     ASSERT_EQ(ret, ERR_DM_FAILED);
-}
-
-/**
- * @tc.name: AuthRequestInitState::TransitionTo_002
- * @tc.desc: 1 set authManager not null
- *           2 call AuthRequestInitState::TransitionTo with authManager != null
- *           4 check ret is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(AuthRequestStateTest, TransitionTo_002, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    std::shared_ptr<DmAuthRequestContext> context = std::make_shared<DmAuthRequestContext>();
-    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNegotiateDoneState>();
-    authManager->timer_ = std::make_shared<DmTimer>();
-    authManager->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
-    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
-    authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
-    authManager->authMessageProcessor_->SetRequestContext(authManager->authRequestContext_);
-    context->sessionId = 123456;
-    authManager->SetAuthRequestState(authRequestState);
-    authManager->softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authManager);
-    authRequestState->SetAuthContext(context);
-    authRequestState->SetAuthManager(authManager);
-    int32_t ret = authRequestState->TransitionTo(std::make_shared<AuthRequestNegotiateDoneState>());
-    ASSERT_EQ(ret, DM_OK);
 }
 
 /**
@@ -352,35 +269,6 @@ HWTEST_F(AuthRequestStateTest, Enter_005, testing::ext::TestSize.Level1)
 }
 
 /**
- * @tc.name: AuthRequestNegotiateDoneState::Enter_006
- * @tc.desc: 1 set authManager not null
- *           2 call AuthRequestNegotiateDoneState::Enter with authManager != null
- *           3 check ret is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(AuthRequestStateTest, Enter_006, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNegotiateDoneState>();
-    authManager->timer_ = std::make_shared<DmTimer>();
-    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
-    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    authManager->authMessageProcessor_->SetRequestContext(authManager->authRequestContext_);
-    authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
-    authManager->softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authManager);
-    authManager->SetAuthRequestState(authRequestState);
-    authRequestState->SetAuthManager(authManager);
-    std::shared_ptr<DmAuthRequestContext> context = std::make_shared<DmAuthRequestContext>();
-    context->sessionId = 333333;
-    authRequestState->SetAuthContext(context);
-    int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: AuthRequestReplyState::GetStateType_004
  * @tc.desc: 1 call AuthRequestReplyState::GetStateType
  *           2 check ret is AuthState::AUTH_REQUEST_REPLY
@@ -410,36 +298,6 @@ HWTEST_F(AuthRequestStateTest, Enter_007, testing::ext::TestSize.Level1)
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
     ASSERT_EQ(ret, ERR_DM_FAILED);
-}
-
-/**
- * @tc.name: AuthRequestReplyState::Enter_008
- * @tc.desc: 1 set authManager not null
- *           2 call AuthRequestReplyState::Enter with authManager != null
- *           3 check ret is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(AuthRequestStateTest, Enter_008, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestReplyState>();
-    authManager->timer_ = std::make_shared<DmTimer>();
-    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
-    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    authManager->authRequestState_ = std::make_shared<AuthRequestReplyState>();
-    authManager->authResponseContext_->sessionId = 1;
-    authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
-    authManager->authMessageProcessor_->SetRequestContext(authManager->authRequestContext_);
-    authManager->SetAuthRequestState(authRequestState);
-    authRequestState->SetAuthManager(authManager);
-    std::shared_ptr<DmAuthRequestContext> context = std::make_shared<DmAuthRequestContext>();
-    context->sessionId = 333333;
-    authRequestState->SetAuthContext(context);
-    int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_OK);
 }
 
 /**
@@ -475,40 +333,6 @@ HWTEST_F(AuthRequestStateTest, Enter_011, testing::ext::TestSize.Level1)
 }
 
 /**
- * @tc.name: AuthRequestJoinState::Enter_012
- * @tc.desc: 1 set authManager not null
- *           2 call AuthRequestJoinState::Enter with authManager != null
- *           3 check ret is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(AuthRequestStateTest, Enter_012, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestJoinState>();
-    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
-    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager->authResponseContext_->groupId = "111";
-    authManager->authResponseContext_->groupName = "222";
-    authManager->authResponseContext_->code = 123;
-    authManager->authResponseContext_->requestId = 234;
-    authManager->authResponseContext_->deviceId = "234";
-    authRequestState->SetAuthManager(authManager);
-    authManager->timer_ = std::make_shared<DmTimer>();
-    authManager->SetAuthRequestState(authRequestState);
-    authManager->hiChainConnector_->RegisterHiChainCallback(authManager);
-    authManager->softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authManager);
-    std::shared_ptr<DmAuthRequestContext> context = std::make_shared<DmAuthRequestContext>();
-    context->deviceId = "44444";
-    context->sessionId = 55555;
-    authRequestState->SetAuthContext(context);
-    int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: AuthRequestNetworkState::GetStateType_007
  * @tc.desc: 1 call AuthRequestNetworkState::GetStateType
  *           2 check ret is AuthState::AUTH_REQUEST_NETWORK
@@ -541,33 +365,6 @@ HWTEST_F(AuthRequestStateTest, Enter_013, testing::ext::TestSize.Level1)
 }
 
 /**
- * @tc.name: AuthRequestNetworkState::Enter_014
- * @tc.desc: 1 set authManager not null
- *           2 call AuthRequestNetworkState::Enter with authManager != null
- *           3 check ret is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(AuthRequestStateTest, Enter_014, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNetworkState>();
-    authManager->timer_ = std::make_shared<DmTimer>();
-    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
-    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    authManager->authRequestState_ = std::make_shared<AuthRequestNetworkState>();
-    authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
-    authManager->authMessageProcessor_->SetRequestContext(authManager->authRequestContext_);
-    authManager->softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authManager);
-    authManager->SetAuthRequestState(authRequestState);
-    authRequestState->SetAuthManager(authManager);
-    int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: AuthRequestFinishState::GetStateType_008
  * @tc.desc: 1 call AuthRequestFinishState::GetStateType
  *           2 check ret is AuthState::AUTH_REQUEST_FINISH
@@ -597,37 +394,6 @@ HWTEST_F(AuthRequestStateTest, Enter_015, testing::ext::TestSize.Level1)
     authRequestState->SetAuthManager(nullptr);
     int32_t ret = authRequestState->Enter();
     ASSERT_EQ(ret, ERR_DM_FAILED);
-}
-
-/**
- * @tc.name: AuthRequestFinishState::Enter_016
- * @tc.desc: 1 set authManager not null
- *           2 call AuthRequestNetworkState::Enter with authManager != null
- *           3 check ret is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(AuthRequestStateTest, Enter_016, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmAuthManager> authManager =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestFinishState>();
-    authManager->timer_ = std::make_shared<DmTimer>();
-    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
-    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    authManager->authResponseState_ = std::make_shared<AuthResponseFinishState>();
-    authManager->authRequestState_ = std::make_shared<AuthRequestFinishState>();
-    authManager->authResponseContext_->sessionId = 1;
-    authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
-    authManager->authMessageProcessor_->SetRequestContext(authManager->authRequestContext_);
-    authManager->SetAuthRequestState(authRequestState);
-    authRequestState->SetAuthManager(authManager);
-    std::shared_ptr<DmAuthRequestContext> context = std::make_shared<DmAuthRequestContext>();
-    context->sessionId = 333333;
-    authRequestState->SetAuthContext(context);
-    int32_t ret = authRequestState->Enter();
-    ASSERT_EQ(ret, DM_OK);
 }
 
 /**

@@ -31,7 +31,6 @@
 #include "ipc_rsp.h"
 #include "ipc_set_useroperation_req.h"
 
-
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
@@ -783,6 +782,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult4, testing::ext::TestSize.Le
 HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceStatusCallback1, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test4";
+    DeviceManagerNotify::GetInstance().deviceStatusCallback_.clear();
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStatusCallback(pkgName);
     EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceStatusCallback_.empty(), true);
 }
@@ -794,6 +794,7 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceStatusCallback1, testing::ext:
 HWTEST_F(DeviceManagerNotifyTest, UnRegisterDeviceStatusCallback2, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
+    DeviceManagerNotify::GetInstance().deviceStatusCallback_.clear();
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStatusCallback(pkgName);
     EXPECT_EQ(DeviceManagerNotify::GetInstance().deviceStatusCallback_.empty(), true);
 }

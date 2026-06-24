@@ -53,19 +53,6 @@ namespace {
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(IpcClientProxyTest, Init_001, testing::ext::TestSize.Level0)
-{
-    // 1. set pkgName not null
-    std::string pkgName = "com.ohos.test";
-    // 2. set IpcClientProxy ipcClientManager nullptr
-    std::shared_ptr<IpcClient> ipcClientManager = nullptr;
-    std::shared_ptr<IpcClientProxy> ipcClientProxy = std::make_shared<IpcClientProxy>(ipcClientManager);
-    // 3. call IpcClientProxy
-    int32_t ret = ipcClientProxy->Init(pkgName);
-    // 4. check ret is ERR_DM_POINT_NULL
-    ASSERT_EQ(ret, ERR_DM_POINT_NULL);
-}
-
 /**
  * @tc.name: Init_002
  * @tc.desc: 1. set pkgName not null

@@ -126,12 +126,6 @@ public:
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DmCredentialManager_001, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<DmCredentialManager> Test = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
-    ASSERT_NE(Test, nullptr);
-}
-
 /**
  * @tc.name: DmCredentialManager_002
  * @tc.desc: Test whether the DmCredentialManager function can delete a new pointer

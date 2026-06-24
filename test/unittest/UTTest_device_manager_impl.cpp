@@ -312,7 +312,6 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDeviceName_102, testing::ext::TestSize.L
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
-
 /**
  * @tc.name: GetLocalDeviceType_101
  * @tc.desc: 1. set packName null

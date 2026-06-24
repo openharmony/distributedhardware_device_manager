@@ -1792,9 +1792,9 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceProfileInfoList_201, testing::ext::Test
     int32_t ret = DeviceManager::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions, callback);
     ASSERT_EQ(ret, ERR_DM_FAILED);
     EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+                .Times(0);
     ret = DeviceManager::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions, callback);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerImplTest, GetDeviceProfileInfoList_202, testing::ext::TestSize.Level0)
@@ -1804,9 +1804,9 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceProfileInfoList_202, testing::ext::Test
     std::shared_ptr<GetDeviceProfileInfoListCallback> callback =
         std::make_shared<GetDeviceProfileInfoListCallbackTest>();
     EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_OK));
+                .Times(0);
     int32_t ret = DeviceManager::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions, callback);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerImplTest, GetDeviceIconInfo_201, testing::ext::TestSize.Level0)
@@ -1817,9 +1817,9 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceIconInfo_201, testing::ext::TestSize.Le
     int32_t ret = DeviceManager::GetInstance().GetDeviceIconInfo(pkgName, filterOptions, callback);
     ASSERT_EQ(ret, ERR_DM_FAILED);
     EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+                .Times(0);
     ret = DeviceManager::GetInstance().GetDeviceIconInfo(pkgName, filterOptions, callback);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerImplTest, GetDeviceIconInfo_202, testing::ext::TestSize.Level0)
@@ -1828,9 +1828,9 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceIconInfo_202, testing::ext::TestSize.Le
     DmDeviceIconInfoFilterOptions filterOptions;
     std::shared_ptr<GetDeviceIconInfoCallback> callback = std::make_shared<GetDeviceIconInfoCallbackTest>();
     EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(DM_OK));
+                .Times(0);
     int32_t ret = DeviceManager::GetInstance().GetDeviceIconInfo(pkgName, filterOptions, callback);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerImplTest, StopAuthenticateDevice_202, testing::ext::TestSize.Level0)

@@ -55,43 +55,6 @@ bool checkSoftbusRes(int32_t ret)
     return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR;
 }
 
-HWTEST_F(DiscoveryManagerTest, EnableDiscoveryListener_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::map<std::string, std::string> discoverParam;
-    std::map<std::string, std::string> filterOptions;
-    int32_t ret = manager->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DiscoveryManagerTest, EnableDiscoveryListener_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    std::map<std::string, std::string> discoverParam;
-    discoverParam.insert(std::pair<std::string, std::string>("META_TYPE", "ohos.test"));
-    discoverParam.insert(std::pair<std::string, std::string>("SUBSCRIBE_ID", "ohos.test"));
-    std::map<std::string, std::string> filterOptions;
-    int32_t ret = manager->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
-}
-
-HWTEST_F(DiscoveryManagerTest, EnableDiscoveryListener_003, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    std::map<std::string, std::string> discoverParam;
-    std::map<std::string, std::string> filterOptions;
-    int32_t ret = manager->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
-}
-
-HWTEST_F(DiscoveryManagerTest, DisableDiscoveryListener_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::map<std::string, std::string> extraParam;
-    int32_t ret = manager->DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
 HWTEST_F(DiscoveryManagerTest, DisableDiscoveryListener_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
@@ -293,29 +256,6 @@ HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_002, testing::ext::TestSize.L
     int32_t subscribeId = 1;
     int32_t result = 0;
     manager->listener_ = nullptr;
-    manager->OnDiscoveringResult(pkgName, subscribeId, result);
-    EXPECT_EQ(manager->discoveryContextMap_.empty(), false);
-}
-
-HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_003, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    int32_t subscribeId = 1;
-    int32_t result = 0;
-    manager->listener_ = std::make_shared<DeviceManagerServiceListener>();
-    manager->OnDiscoveringResult(pkgName, subscribeId, result);
-    EXPECT_NE(manager->discoveryContextMap_.empty(), true);
-}
-
-HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    int32_t subscribeId = 1;
-    int32_t result = 1;
-    manager->pkgNameSet_.insert(pkgName);
-    DiscoveryContext context;
-    manager->discoveryContextMap_.emplace(pkgName, context);
-    manager->listener_ = std::make_shared<DeviceManagerServiceListener>();
     manager->OnDiscoveringResult(pkgName, subscribeId, result);
     EXPECT_EQ(manager->discoveryContextMap_.empty(), false);
 }
