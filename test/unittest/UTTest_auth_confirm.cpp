@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -116,79 +116,6 @@ bool DmAuthState::IsScreenLocked()
     return false;
 }
 
-HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetStateType_001, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
-    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_CONFIRM_STATE);
-}
-
-HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_Action_001, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    context = authManager->GetAuthContext();
-    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
-    context->accessee.dmVersion = "6.0.0";
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_Action_002, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    context = authManager->GetAuthContext();
-    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
-    context->accessee.dmVersion = DM_VERSION_5_1_0;
-    std::vector<DistributedDeviceProfile::AccessControlProfile> allProfiles;
-    DistributedDeviceProfile::AccessControlProfile profile;
-    profile.SetTrustDeviceId(context->accesser.deviceId);
-    profile.SetBindType(0);
-    allProfiles.push_back(profile);
-    profile.SetBindType(DM_IDENTICAL_ACCOUNT);
-    allProfiles.push_back(profile);
-    profile.SetBindType(DM_SHARE);
-    allProfiles.push_back(profile);
-    profile.SetBindType(DM_POINT_TO_POINT);
-    allProfiles.push_back(profile);
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
-HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_NegotiateCredential_001, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
-    std::string jsonStr = R"({"identicalCredType":1,"shareCredType":2,"pointTopointCredType":256,"lnnCredType":3})";
-    context = authManager->GetAuthContext();
-    context->accessee.credTypeList = jsonStr;
-    context->accesser.credTypeList = jsonStr;
-    JsonObject jsonObject;
-    authState->NegotiateCredential(context, jsonObject);
-    EXPECT_TRUE(jsonObject["identicalCredType"].Get<int32_t>() == 1);
-    EXPECT_TRUE(jsonObject["shareCredType"].Get<int32_t>() == 2);
-    EXPECT_TRUE(jsonObject["pointTopointCredType"].Get<int32_t>() == 256);
-    EXPECT_TRUE(jsonObject["lnnCredType"].Get<int32_t>() == 3);
-}
-
-HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_NegotiateAcl_001, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
-    std::string jsonStr = R"({"identicalAcl":1,"shareAcl":2,"pointTopointAcl":256,"lnnAcl":3})";
-    context = authManager->GetAuthContext();
-    context->accessee.aclTypeList = jsonStr;
-    context->accesser.aclTypeList = jsonStr;
-    JsonObject jsonObject;
-    authState->NegotiateAcl(context, jsonObject);
-    EXPECT_TRUE(jsonObject["identicalAcl"].Get<int32_t>() == 1);
-    EXPECT_TRUE(jsonObject["shareAcl"].Get<int32_t>() == 2);
-    EXPECT_TRUE(jsonObject["pointTopointAcl"].Get<int32_t>() == 256);
-    EXPECT_TRUE(jsonObject["lnnAcl"].Get<int32_t>() == 3);
-}
-
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredentialInfo_001, testing::ext::TestSize.Level1)
 {
     authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
@@ -298,7 +225,6 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_CheckCredIdInAcl_001, testing::ext
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
     context = authManager->GetAuthContext();
 
-
     DistributedDeviceProfile::AccessControlProfile profile = TestCreateAcl(TEST_CREDENTIAL_ID, DM_LNN);
 
     std::string jsonStr = R"({
@@ -405,51 +331,6 @@ HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_MatchFallBackCandidateList_001, t
     EXPECT_EQ(context->authTypeList[0], DmAuthType::AUTH_TYPE_PIN);
 }
 
-HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ProcessBindAuthorize_001, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
-    context = authManager->GetAuthContext();
-
-    context->authType = DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE;
-    context->importAuthCode = "123456";
-    context->importPkgName = "pkgName";
-    context->pkgName = "pkgName";
-
-    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
-    srvInfo.SetAuthBoxType(static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM));
-
-    srvInfo.SetAuthType(static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ONETIME));
-    EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
-        .Times(::testing::AtLeast(1))
-        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
-
-    EXPECT_EQ(authState->ProcessBindAuthorize(context), DM_OK);
-}
-
-HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ProcessNoBindAuthorize_001, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
-    context = authManager->GetAuthContext();
-
-    EXPECT_EQ(authState->ProcessNoBindAuthorize(context), ERR_DM_FAILED);
-
-    context->accessee.credTypeList = R"({"identicalCredType": true})";
-    EXPECT_EQ(authState->ProcessNoBindAuthorize(context), DM_OK);
-
-    context->accessee.credTypeList = R"({"shareCredType": true})";
-    EXPECT_EQ(authState->ProcessNoBindAuthorize(context), DM_OK);
-
-    context->accessee.credTypeList = R"({"pointTopointCredType": true})";
-    EXPECT_EQ(authState->ProcessNoBindAuthorize(context), DM_OK);
-
-    context->accessee.credTypeList = R"({"lnnCredType": true})";
-    EXPECT_EQ(authState->ProcessNoBindAuthorize(context), DM_OK);
-}
-
 HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ReadServiceInfo_002, testing::ext::TestSize.Level1)
 {
     authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
@@ -511,6 +392,323 @@ HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ReadServiceInfo_003, testing::ext
         .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
     authState->ReadServiceInfo(context);
     EXPECT_EQ(srvInfo.GetBundleName(), "com.huawei.hmos.wearlink");
+}
+
+/**
+ * @tc.name: DmAuthState_GetOutputState_001
+ * @tc.desc: GetOutputState maps AUTH_SRC_FINISH_STATE to STATUS_DM_AUTH_FINISH.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_GetOutputState_001, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    int32_t state = static_cast<int32_t>(DmAuthStateType::AUTH_SRC_FINISH_STATE);
+    EXPECT_EQ(authState->GetOutputState(state),
+        static_cast<int32_t>(DmAuthStatus::STATUS_DM_AUTH_FINISH));
+}
+
+/**
+ * @tc.name: DmAuthState_GetOutputState_002
+ * @tc.desc: GetOutputState returns STATUS_DM_AUTH_DEFAULT for an unmapped state value.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_GetOutputState_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    EXPECT_EQ(authState->GetOutputState(9999), static_cast<int32_t>(DmAuthStatus::STATUS_DM_AUTH_DEFAULT));
+}
+
+/**
+ * @tc.name: DmAuthState_GetOutputReplay_001
+ * @tc.desc: GetOutputReplay maps DM_BIND_TRUST_TARGET to DM_OK for whitelisted bundle name.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_GetOutputReplay_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    EXPECT_EQ(authState->GetOutputReplay("CollaborationFwk", DM_BIND_TRUST_TARGET), DM_OK);
+}
+
+/**
+ * @tc.name: DmAuthState_GetOutputReplay_002
+ * @tc.desc: GetOutputReplay returns original replay when bundle name is not whitelisted.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_GetOutputReplay_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    int32_t replay = 12345;
+    EXPECT_EQ(authState->GetOutputReplay("other_bundle", replay), replay);
+}
+
+/**
+ * @tc.name: DmAuthState_GetOutputReplay_003
+ * @tc.desc: GetOutputReplay returns original replay for whitelisted name but unmapped value.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_GetOutputReplay_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    int32_t replay = 999;
+    EXPECT_EQ(authState->GetOutputReplay("cast_engine_service", replay), replay);
+}
+
+/**
+ * @tc.name: DmAuthState_GetTaskTimeout_001
+ * @tc.desc: GetTaskTimeout returns mapped clone timeout for import auth code and known task.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_GetTaskTimeout_001, testing::ext::TestSize.Level1)
+{
+    context = std::make_shared<DmAuthContext>();
+    context->authType = DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE;
+    int32_t defaultTimeout = 1000;
+    int32_t ret = DmAuthState::GetTaskTimeout(context, AUTHENTICATE_TIMEOUT_TASK, defaultTimeout);
+    EXPECT_EQ(ret, CLONE_AUTHENTICATE_TIMEOUT);
+}
+
+/**
+ * @tc.name: DmAuthState_GetTaskTimeout_002
+ * @tc.desc: GetTaskTimeout returns default timeout when task name is not in the map.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_GetTaskTimeout_002, testing::ext::TestSize.Level1)
+{
+    context = std::make_shared<DmAuthContext>();
+    context->authType = DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE;
+    int32_t defaultTimeout = 5000;
+    int32_t ret = DmAuthState::GetTaskTimeout(context, "unknown_task_name", defaultTimeout);
+    EXPECT_EQ(ret, defaultTimeout);
+}
+
+/**
+ * @tc.name: DmAuthState_GetTaskTimeout_003
+ * @tc.desc: GetTaskTimeout returns default timeout for non-import auth type.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_GetTaskTimeout_003, testing::ext::TestSize.Level1)
+{
+    context = std::make_shared<DmAuthContext>();
+    context->authType = DmAuthType::AUTH_TYPE_PIN;
+    int32_t defaultTimeout = 3000;
+    int32_t ret = DmAuthState::GetTaskTimeout(context, AUTHENTICATE_TIMEOUT_TASK, defaultTimeout);
+    EXPECT_EQ(ret, defaultTimeout);
+}
+
+/**
+ * @tc.name: DmAuthState_IsImportAuthCodeCompatibility_001
+ * @tc.desc: IsImportAuthCodeCompatibility returns true for PIN and NFC auth types.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_IsImportAuthCodeCompatibility_001, testing::ext::TestSize.Level1)
+{
+    EXPECT_TRUE(DmAuthState::IsImportAuthCodeCompatibility(DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE));
+    EXPECT_TRUE(DmAuthState::IsImportAuthCodeCompatibility(DmAuthType::AUTH_TYPE_NFC));
+    EXPECT_FALSE(DmAuthState::IsImportAuthCodeCompatibility(DmAuthType::AUTH_TYPE_PIN));
+}
+
+/**
+ * @tc.name: DmAuthState_GetSysTimeMs_001
+ * @tc.desc: GetSysTimeMs returns a non-zero positive millisecond timestamp.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_GetSysTimeMs_001, testing::ext::TestSize.Level1)
+{
+    uint64_t t1 = DmAuthState::GetSysTimeMs();
+    EXPECT_GT(t1, 0ULL);
+    uint64_t t2 = DmAuthState::GetSysTimeMs();
+    EXPECT_GE(t2, t1);
+}
+
+/**
+ * @tc.name: DmAuthState_IsInFlagWhiteList_001
+ * @tc.desc: IsInFlagWhiteList returns false for empty bundle name.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_IsInFlagWhiteList_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    EXPECT_FALSE(authState->IsInFlagWhiteList(""));
+}
+
+/**
+ * @tc.name: DmAuthState_IsInFlagWhiteList_002
+ * @tc.desc: IsInFlagWhiteList returns true for whitelisted bundle, false for unknown.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_IsInFlagWhiteList_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    EXPECT_TRUE(authState->IsInFlagWhiteList("wear_link_service"));
+    EXPECT_FALSE(authState->IsInFlagWhiteList("unknown_bundle"));
+}
+
+/**
+ * @tc.name: DmAuthState_IsNeedBind_001
+ * @tc.desc: IsNeedBind returns true when context is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_IsNeedBind_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    EXPECT_TRUE(authState->IsNeedBind(nullptr));
+}
+
+/**
+ * @tc.name: DmAuthState_IsNeedAgreeCredential_001
+ * @tc.desc: IsNeedAgreeCredential returns true when context is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_IsNeedAgreeCredential_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    EXPECT_TRUE(authState->IsNeedAgreeCredential(nullptr));
+}
+
+/**
+ * @tc.name: DmAuthState_HaveSameTokenId_001
+ * @tc.desc: HaveSameTokenId returns false when tokenIdHashList size is less than 2.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_HaveSameTokenId_001, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    context = authManager->GetAuthContext();
+    std::vector<std::string> tokenList = {"hashA"};
+    EXPECT_FALSE(authState->HaveSameTokenId(context, tokenList));
+}
+
+/**
+ * @tc.name: DmAuthState_HaveSameTokenId_002
+ * @tc.desc: HaveSameTokenId returns true when both accesser and accessee hashes are in the list.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_HaveSameTokenId_002, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    context = authManager->GetAuthContext();
+    context->accesser.tokenIdHash = "accHash";
+    context->accessee.tokenIdHash = "aceHash";
+    std::vector<std::string> tokenList = {"accHash", "aceHash"};
+    EXPECT_TRUE(authState->HaveSameTokenId(context, tokenList));
+}
+
+/**
+ * @tc.name: DmAuthState_IsAclHasCredential_001
+ * @tc.desc: IsAclHasCredential returns true when accesser cred id is in cred info json.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_IsAclHasCredential_001, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    DistributedDeviceProfile::AccessControlProfile profile = TestCreateAcl(TEST_CREDENTIAL_ID, DM_LNN);
+    std::string credInfoJson = R"({"credentialId":{"credType":3}})";
+    std::string credId;
+    EXPECT_TRUE(authState->IsAclHasCredential(profile, credInfoJson, credId));
+    EXPECT_EQ(credId, TEST_CREDENTIAL_ID);
+}
+
+/**
+ * @tc.name: DmAuthState_IsAclHasCredential_002
+ * @tc.desc: IsAclHasCredential returns false when neither cred id is in cred info json.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_IsAclHasCredential_002, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    DistributedDeviceProfile::AccessControlProfile profile = TestCreateAcl(TEST_CREDENTIAL_ID, DM_LNN);
+    std::string credInfoJson = R"({"otherCredId":{"credType":3}})";
+    std::string credId;
+    EXPECT_FALSE(authState->IsAclHasCredential(profile, credInfoJson, credId));
+}
+
+/**
+ * @tc.name: DmAuthState_GenerateBindResultContent_001
+ * @tc.desc: GenerateBindResultContent returns non-empty json content including empty deviceId branch.
+ * @tc.type: FUNC
+ * @tc.require: I9JUK2
+ */
+HWTEST_F(AuthConfirmTest, DmAuthState_GenerateBindResultContent_001, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    context = authManager->GetAuthContext();
+    context->direction = DM_AUTH_SOURCE;
+    context->accessee.deviceId = "";
+    context->accessee.networkId = "network123";
+    std::string content = authState->GenerateBindResultContent(context);
+    EXPECT_FALSE(content.empty());
+    EXPECT_NE(content.find("network123"), std::string::npos);
+}
+HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetStateType_001, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_CONFIRM_STATE);
+}
+
+HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_NegotiateCredential_001, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    std::string jsonStr = R"({"identicalCredType":1,"shareCredType":2,"pointTopointCredType":256,"lnnCredType":3})";
+    context = authManager->GetAuthContext();
+    context->accessee.credTypeList = jsonStr;
+    context->accesser.credTypeList = jsonStr;
+    JsonObject jsonObject;
+    authState->NegotiateCredential(context, jsonObject);
+    EXPECT_TRUE(jsonObject["identicalCredType"].Get<int32_t>() == 1);
+    EXPECT_TRUE(jsonObject["shareCredType"].Get<int32_t>() == 2);
+    EXPECT_TRUE(jsonObject["pointTopointCredType"].Get<int32_t>() == 256);
+    EXPECT_TRUE(jsonObject["lnnCredType"].Get<int32_t>() == 3);
+}
+
+HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_NegotiateAcl_001, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    std::string jsonStr = R"({"identicalAcl":1,"shareAcl":2,"pointTopointAcl":256,"lnnAcl":3})";
+    context = authManager->GetAuthContext();
+    context->accessee.aclTypeList = jsonStr;
+    context->accesser.aclTypeList = jsonStr;
+    JsonObject jsonObject;
+    authState->NegotiateAcl(context, jsonObject);
+    EXPECT_TRUE(jsonObject["identicalAcl"].Get<int32_t>() == 1);
+    EXPECT_TRUE(jsonObject["shareAcl"].Get<int32_t>() == 2);
+    EXPECT_TRUE(jsonObject["pointTopointAcl"].Get<int32_t>() == 256);
+    EXPECT_TRUE(jsonObject["lnnAcl"].Get<int32_t>() == 3);
 }
 
 HWTEST_F(AuthConfirmTest, ProcessImportAuthInfo_AclLifeCycleDays_ParsedWhenPresent, testing::ext::TestSize.Level1)

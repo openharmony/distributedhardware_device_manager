@@ -394,7 +394,7 @@ HWTEST_F(DMTransportMsgTest, UnbindAppToJsonAndFromJson, testing::ext::TestSize.
 
     cJSON *jsonObject = cJSON_CreateObject();
     ToJson(jsonObject, unBindAppMsg);
-    
+
     UnBindAppMsg newUnBindAppMsg;
     FromJson(jsonObject, newUnBindAppMsg);
 
@@ -410,7 +410,7 @@ HWTEST_F(DMTransportMsgTest, UnbindAppToJsonAndFromJson, testing::ext::TestSize.
 
     UnBindAppMsg emptyMsg;
     FromJson(nullJsonObject, emptyMsg);
-    
+
     EXPECT_EQ(emptyMsg.userId_, -1);
     cJSON *emptyObject = cJSON_CreateObject();
     FromJson(emptyObject, emptyMsg);
@@ -418,6 +418,277 @@ HWTEST_F(DMTransportMsgTest, UnbindAppToJsonAndFromJson, testing::ext::TestSize.
 
     cJSON_Delete(nullJsonObject);
     cJSON_Delete(emptyObject);
+}
+
+/**
+ * @tc.name: UnbindServiceProxyToJsonAndFromJson
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportMsgTest, UnbindServiceProxyToJsonAndFromJson, testing::ext::TestSize.Level1)
+{
+    UnbindServiceProxyParam param;
+    param.userId = 1;
+    param.localTokenId = 100;
+    param.subjectTokenId = 200;
+    param.serviceId = 300;
+    param.localUdid = "local_udid";
+    param.isProxyUnbind = true;
+
+    cJSON *jsonObject = cJSON_CreateObject();
+    ToJson(jsonObject, param);
+
+    UnbindServiceProxyParam newParam;
+    FromJson(jsonObject, newParam);
+
+    EXPECT_EQ(newParam.userId, 1);
+    EXPECT_EQ(newParam.localTokenId, 100);
+    EXPECT_EQ(newParam.subjectTokenId, 200);
+    EXPECT_EQ(newParam.serviceId, 300);
+    EXPECT_EQ(newParam.localUdid, "local_udid");
+    EXPECT_TRUE(newParam.isProxyUnbind);
+
+    cJSON_Delete(jsonObject);
+
+    cJSON *nullJsonObject = nullptr;
+    ToJson(nullJsonObject, param);
+
+    UnbindServiceProxyParam emptyParam;
+    FromJson(nullJsonObject, emptyParam);
+    EXPECT_EQ(emptyParam.userId, -1);
+
+    cJSON *emptyObject = cJSON_CreateObject();
+    FromJson(emptyObject, emptyParam);
+    EXPECT_EQ(emptyParam.userId, -1);
+    EXPECT_FALSE(emptyParam.isProxyUnbind);
+
+    cJSON_Delete(nullJsonObject);
+    cJSON_Delete(emptyObject);
+}
+
+/**
+ * @tc.name: FromJson_UserIdsMsg_TooManyForeground
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportMsgTest, FromJson_UserIdsMsg_TooManyForeground, testing::ext::TestSize.Level1)
+{
+    const char *jsonStr = R"({"foregroundUserIds":[1,2,3,4,5,6],"backgroundUserIds":[7],"isNewEvent":true})";
+    cJSON *jsonObject = cJSON_Parse(jsonStr);
+    ASSERT_NE(jsonObject, nullptr);
+
+    UserIdsMsg userIdsMsg;
+    FromJson(jsonObject, userIdsMsg);
+    EXPECT_TRUE(userIdsMsg.foregroundUserIds.empty());
+
+    cJSON_Delete(jsonObject);
+}
+
+/**
+ * @tc.name: FromJson_UserIdsMsg_TooManyBackground
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportMsgTest, FromJson_UserIdsMsg_TooManyBackground, testing::ext::TestSize.Level1)
+{
+    const char *jsonStr =
+        R"({"foregroundUserIds":[1,2],"backgroundUserIds":[10,11,12,13,14,15],"isNewEvent":true})";
+    cJSON *jsonObject = cJSON_Parse(jsonStr);
+    ASSERT_NE(jsonObject, nullptr);
+
+    UserIdsMsg userIdsMsg;
+    FromJson(jsonObject, userIdsMsg);
+    EXPECT_TRUE(userIdsMsg.backgroundUserIds.empty());
+
+    cJSON_Delete(jsonObject);
+}
+
+/**
+ * @tc.name: FromJson_CommMsg_NonNumberCode
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportMsgTest, FromJson_CommMsg_NonNumberCode, testing::ext::TestSize.Level1)
+{
+    const char *jsonStr = R"({"code":"abc","msg":123})";
+    cJSON *jsonObject = cJSON_Parse(jsonStr);
+    ASSERT_NE(jsonObject, nullptr);
+
+    CommMsg commMsg;
+    FromJson(jsonObject, commMsg);
+    EXPECT_EQ(commMsg.code, -1);
+    EXPECT_EQ(commMsg.msg, "");
+
+    cJSON_Delete(jsonObject);
+}
+
+/**
+ * @tc.name: FromJson_NotifyUserIds_TooManyUserIds
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportMsgTest, FromJson_NotifyUserIds_TooManyUserIds, testing::ext::TestSize.Level1)
+{
+    const char *jsonStr = R"({"remoteUdid":"udid","foregroundUserIds":[1,2,3,4,5,6]})";
+    cJSON *jsonObject = cJSON_Parse(jsonStr);
+    ASSERT_NE(jsonObject, nullptr);
+
+    NotifyUserIds notifyUserIds;
+    FromJson(jsonObject, notifyUserIds);
+    EXPECT_TRUE(notifyUserIds.userIds.empty());
+
+    cJSON_Delete(jsonObject);
+}
+
+/**
+ * @tc.name: CommMsg_DefaultConstructor
+ * @tc.desc: Verify CommMsg default constructor initializes code to -1 and msg to empty.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportMsgTest, CommMsg_DefaultConstructor, testing::ext::TestSize.Level1)
+{
+    CommMsg commMsg;
+    EXPECT_EQ(commMsg.code, -1);
+    EXPECT_TRUE(commMsg.msg.empty());
+}
+
+/**
+ * @tc.name: UserIdsMsg_DefaultConstructor
+ * @tc.desc: Verify UserIdsMsg default constructor initializes fields correctly.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportMsgTest, UserIdsMsg_DefaultConstructor, testing::ext::TestSize.Level1)
+{
+    UserIdsMsg userIdsMsg;
+    EXPECT_TRUE(userIdsMsg.foregroundUserIds.empty());
+    EXPECT_TRUE(userIdsMsg.backgroundUserIds.empty());
+    EXPECT_FALSE(userIdsMsg.isNewEvent);
+}
+
+/**
+ * @tc.name: UserIdsMsg_ParameterConstructor
+ * @tc.desc: Verify UserIdsMsg parameter constructor sets fields correctly.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportMsgTest, UserIdsMsg_ParameterConstructor, testing::ext::TestSize.Level1)
+{
+    std::vector<uint32_t> foregroundUserIds{1, 2};
+    std::vector<uint32_t> backgroundUserIds{3, 4};
+    UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds, true);
+    EXPECT_EQ(userIdsMsg.foregroundUserIds.size(), 2);
+    EXPECT_EQ(userIdsMsg.backgroundUserIds.size(), 2);
+    EXPECT_TRUE(userIdsMsg.isNewEvent);
+}
+
+/**
+ * @tc.name: LogoutAccountMsg_DefaultConstructor
+ * @tc.desc: Verify LogoutAccountMsg default constructor initializes userId to -1.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportMsgTest, LogoutAccountMsg_DefaultConstructor, testing::ext::TestSize.Level1)
+{
+    LogoutAccountMsg logoutAccountMsg;
+    EXPECT_EQ(logoutAccountMsg.userId, -1);
+    EXPECT_TRUE(logoutAccountMsg.accountId.empty());
+}
+
+/**
+ * @tc.name: LogoutAccountMsg_ParameterConstructor
+ * @tc.desc: Verify LogoutAccountMsg parameter constructor sets fields.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportMsgTest, LogoutAccountMsg_ParameterConstructor, testing::ext::TestSize.Level1)
+{
+    LogoutAccountMsg logoutAccountMsg("acct_001", 42);
+    EXPECT_EQ(logoutAccountMsg.accountId, "acct_001");
+    EXPECT_EQ(logoutAccountMsg.userId, 42);
+}
+
+/**
+ * @tc.name: GetCommMsgString_002
+ * @tc.desc: Verify GetCommMsgString returns empty for default (empty msg) CommMsg is non-empty json.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportMsgTest, GetCommMsgString_002, testing::ext::TestSize.Level1)
+{
+    CommMsg commMsg(0, "");
+    std::string result = GetCommMsgString(commMsg);
+    EXPECT_FALSE(result.empty());
+    EXPECT_NE(result.find("\"code\":0"), std::string::npos);
+}
+
+/**
+ * @tc.name: NotifyUserIds_EmptyUserIds_ToString
+ * @tc.desc: Verify NotifyUserIds ToString with empty userIds vector produces valid json.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportMsgTest, NotifyUserIds_EmptyUserIds_ToString, testing::ext::TestSize.Level1)
+{
+    NotifyUserIds notifyUserIds("udid_only", {});
+    std::string result = notifyUserIds.ToString();
+    EXPECT_FALSE(result.empty());
+    EXPECT_NE(result.find("\"remoteUdid\":\"udid_only\""), std::string::npos);
+}
+
+/**
+ * @tc.name: UninstAppMsg_DefaultConstructor
+ * @tc.desc: Verify UninstAppMsg default constructor initializes fields to -1.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportMsgTest, UninstAppMsg_DefaultConstructor, testing::ext::TestSize.Level1)
+{
+    UninstAppMsg uninstAppMsg;
+    EXPECT_EQ(uninstAppMsg.userId_, -1);
+    EXPECT_EQ(uninstAppMsg.tokenId_, -1);
+}
+
+/**
+ * @tc.name: UnBindAppMsg_DefaultConstructor
+ * @tc.desc: Verify UnBindAppMsg default constructor initializes fields correctly.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportMsgTest, UnBindAppMsg_DefaultConstructor, testing::ext::TestSize.Level1)
+{
+    UnBindAppMsg unBindAppMsg;
+    EXPECT_EQ(unBindAppMsg.userId_, -1);
+    EXPECT_EQ(unBindAppMsg.tokenId_, -1);
+    EXPECT_TRUE(unBindAppMsg.extra_.empty());
+    EXPECT_TRUE(unBindAppMsg.udid_.empty());
+}
+
+/**
+ * @tc.name: UnbindServiceProxyParam_DefaultIsProxyUnbind
+ * @tc.desc: Verify UnbindServiceProxyParam default isProxyUnbind is false after FromJson on empty object.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportMsgTest, UnbindServiceProxyParam_DefaultIsProxyUnbind, testing::ext::TestSize.Level1)
+{
+    UnbindServiceProxyParam param;
+    param.userId = 5;
+    param.localTokenId = 50;
+    param.subjectTokenId = 500;
+    param.serviceId = 5000;
+    param.localUdid = "udid_5";
+    param.isProxyUnbind = false;
+
+    cJSON *jsonObject = cJSON_CreateObject();
+    ToJson(jsonObject, param);
+
+    UnbindServiceProxyParam newParam;
+    FromJson(jsonObject, newParam);
+    EXPECT_EQ(newParam.userId, 5);
+    EXPECT_EQ(newParam.localTokenId, 50);
+    EXPECT_EQ(newParam.subjectTokenId, 500);
+    EXPECT_EQ(newParam.serviceId, 5000);
+    EXPECT_EQ(newParam.localUdid, "udid_5");
+    EXPECT_FALSE(newParam.isProxyUnbind);
+
+    cJSON_Delete(jsonObject);
 }
 } // DistributedHardware
 } // OHOS

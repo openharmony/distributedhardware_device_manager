@@ -297,5 +297,255 @@ HWTEST_F(DMTransportTest, IsDeviceSessionOpened_001, testing::ext::TestSize.Leve
     ret = dmTransport_->IsDeviceSessionOpened(rmtNetworkId, socketId);
     EXPECT_FALSE(ret);
 }
+
+/**
+ * @tc.name: Send_InvalidNetworkId_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportTest, Send_InvalidNetworkId_002, testing::ext::TestSize.Level1)
+{
+    std::string rmtNetworkId = "";
+    std::string payload = "Hello";
+    int32_t result = dmTransport_->Send(rmtNetworkId, payload, 1);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: Send_EmptyPayload
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportTest, Send_EmptyPayload, testing::ext::TestSize.Level1)
+{
+    std::string rmtNetworkId = "rmt**********7";
+    std::string payload = "";
+    int32_t result = dmTransport_->Send(rmtNetworkId, payload, 1);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: Send_OverSizedPayload
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportTest, Send_OverSizedPayload, testing::ext::TestSize.Level1)
+{
+    std::string rmtNetworkId = "rmt**********7";
+    std::string payload(MAX_SEND_MSG_LENGTH + 1, 'a');
+    int32_t result = dmTransport_->Send(rmtNetworkId, payload, 1);
+    EXPECT_EQ(result, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: StopSocket_InvalidNetworkId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportTest, StopSocket_InvalidNetworkId, testing::ext::TestSize.Level1)
+{
+    std::string rmtNetworkId = "";
+    int32_t result = dmTransport_->StopSocket(rmtNetworkId);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/**
+ * @tc.name: ClearDeviceSocketOpened_InvalidNetworkId
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportTest, ClearDeviceSocketOpened_InvalidNetworkId, testing::ext::TestSize.Level1)
+{
+    int32_t socketId = 1;
+    dmTransport_->ClearDeviceSocketOpened("", socketId);
+    EXPECT_FALSE(dmTransport_->IsDeviceSessionOpened("device1", socketId));
+}
+
+/**
+ * @tc.name: GetRemoteNetworkIdBySocketId_WithOpenedSocket
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportTest, GetRemoteNetworkIdBySocketId_WithOpenedSocket, testing::ext::TestSize.Level1)
+{
+    int32_t socketId = 50;
+    std::string name = "socketName";
+    std::string networkId = "net*********11";
+    std::string pkgName = "ohos.objectstore";
+    PeerSocketInfo info = {
+        .name = name.data(),
+        .networkId = networkId.data(),
+        .pkgName = pkgName.data(),
+        .dataType = DATA_TYPE_BYTES
+    };
+    int32_t ret = dmTransport_->OnSocketOpened(socketId, info);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(dmTransport_->GetRemoteNetworkIdBySocketId(socketId), networkId);
+}
+
+/**
+ * @tc.name: OnBytesReceived_OverSizedData
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportTest, OnBytesReceived_OverSizedData, testing::ext::TestSize.Level1)
+{
+    int32_t socketId = 60;
+    std::string dataStr(MAX_SEND_MSG_LENGTH + 1, 'b');
+    void *data = reinterpret_cast<void *>(dataStr.data());
+    uint32_t dataLen = static_cast<uint32_t>(dataStr.length());
+    dmTransport_->OnBytesReceived(socketId, data, dataLen);
+    EXPECT_EQ(dmTransport_->GetRemoteNetworkIdBySocketId(socketId), "");
+}
+
+/**
+ * @tc.name: OnSocketOpened_002
+ * @tc.desc: Verify OnSocketOpened inserts a second socket for an existing networkId.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportTest, OnSocketOpened_002, testing::ext::TestSize.Level1)
+{
+    int32_t socketId1 = 201;
+    int32_t socketId2 = 202;
+    std::string name = "socketName";
+    std::string networkId = "net*********22";
+    std::string pkgName = "ohos.objectstore";
+    PeerSocketInfo info = {
+        .name = name.data(),
+        .networkId = networkId.data(),
+        .pkgName = pkgName.data(),
+        .dataType = DATA_TYPE_BYTES
+    };
+    int32_t ret = dmTransport_->OnSocketOpened(socketId1, info);
+    EXPECT_EQ(ret, DM_OK);
+    ret = dmTransport_->OnSocketOpened(socketId2, info);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(dmTransport_->GetRemoteNetworkIdBySocketId(socketId1), networkId);
+    EXPECT_EQ(dmTransport_->GetRemoteNetworkIdBySocketId(socketId2), networkId);
+}
+
+/**
+ * @tc.name: OnSocketClosed_002
+ * @tc.desc: Verify OnSocketClosed removes only the closed socket, keeping other sockets.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportTest, OnSocketClosed_002, testing::ext::TestSize.Level1)
+{
+    int32_t socketId1 = 301;
+    int32_t socketId2 = 302;
+    std::string name = "socketName";
+    std::string networkId = "net*********33";
+    std::string pkgName = "ohos.objectstore";
+    PeerSocketInfo info = {
+        .name = name.data(),
+        .networkId = networkId.data(),
+        .pkgName = pkgName.data(),
+        .dataType = DATA_TYPE_BYTES
+    };
+    dmTransport_->OnSocketOpened(socketId1, info);
+    dmTransport_->OnSocketOpened(socketId2, info);
+    ShutdownReason reason = ShutdownReason::SHUTDOWN_REASON_LNN_CHANGED;
+    dmTransport_->OnSocketClosed(socketId1, reason);
+    EXPECT_EQ(dmTransport_->GetRemoteNetworkIdBySocketId(socketId1), "");
+    EXPECT_EQ(dmTransport_->GetRemoteNetworkIdBySocketId(socketId2), networkId);
+}
+
+/**
+ * @tc.name: OnBytesReceived_NullData
+ * @tc.desc: Verify OnBytesReceived returns early when data is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportTest, OnBytesReceived_NullData, testing::ext::TestSize.Level1)
+{
+    int32_t socketId = 401;
+    void *data = nullptr;
+    uint32_t dataLen = 10;
+    dmTransport_->OnBytesReceived(socketId, data, dataLen);
+    EXPECT_EQ(dmTransport_->GetRemoteNetworkIdBySocketId(socketId), "");
+}
+
+/**
+ * @tc.name: OnBytesReceived_ZeroDataLen
+ * @tc.desc: Verify OnBytesReceived returns early when dataLen is zero.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportTest, OnBytesReceived_ZeroDataLen, testing::ext::TestSize.Level1)
+{
+    int32_t socketId = 402;
+    std::string dataStr = "somedata";
+    void *data = reinterpret_cast<void *>(dataStr.data());
+    uint32_t dataLen = 0;
+    dmTransport_->OnBytesReceived(socketId, data, dataLen);
+    EXPECT_EQ(dmTransport_->GetRemoteNetworkIdBySocketId(socketId), "");
+}
+
+/**
+ * @tc.name: GetRemoteNetworkIdBySocketId_UnknownSocket
+ * @tc.desc: Verify GetRemoteNetworkIdBySocketId returns empty for an unknown socket.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportTest, GetRemoteNetworkIdBySocketId_UnknownSocket, testing::ext::TestSize.Level1)
+{
+    EXPECT_EQ(dmTransport_->GetRemoteNetworkIdBySocketId(9999), "");
+}
+
+/**
+ * @tc.name: IsDeviceSessionOpened_002
+ * @tc.desc: Verify IsDeviceSessionOpened returns false for an opened-but-not-source socket.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportTest, IsDeviceSessionOpened_002, testing::ext::TestSize.Level1)
+{
+    int32_t socketId = 501;
+    std::string name = "socketName";
+    std::string networkId = "net*********55";
+    std::string pkgName = "ohos.objectstore";
+    PeerSocketInfo info = {
+        .name = name.data(),
+        .networkId = networkId.data(),
+        .pkgName = pkgName.data(),
+        .dataType = DATA_TYPE_BYTES
+    };
+    dmTransport_->OnSocketOpened(socketId, info);
+    int32_t outSocketId = -1;
+    bool opened = dmTransport_->IsDeviceSessionOpened(networkId, outSocketId);
+    EXPECT_FALSE(opened);
+}
+
+/**
+ * @tc.name: ClearDeviceSocketOpened_RemovesEntry
+ * @tc.desc: Verify ClearDeviceSocketOpened removes the networkId entry when its set becomes empty.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportTest, ClearDeviceSocketOpened_RemovesEntry, testing::ext::TestSize.Level1)
+{
+    int32_t socketId = 601;
+    std::string name = "socketName";
+    std::string networkId = "net*********66";
+    std::string pkgName = "ohos.objectstore";
+    PeerSocketInfo info = {
+        .name = name.data(),
+        .networkId = networkId.data(),
+        .pkgName = pkgName.data(),
+        .dataType = DATA_TYPE_BYTES
+    };
+    dmTransport_->OnSocketOpened(socketId, info);
+    dmTransport_->ClearDeviceSocketOpened(networkId, socketId);
+    EXPECT_EQ(dmTransport_->GetRemoteNetworkIdBySocketId(socketId), "");
+}
+
+/**
+ * @tc.name: HandleReceiveMessage_InvalidSocket
+ * @tc.desc: Verify HandleReceiveMessage does not crash for an unknown socket.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DMTransportTest, HandleReceiveMessage_InvalidSocket, testing::ext::TestSize.Level1)
+{
+    int32_t socketId = 701;
+    std::string payload = "{\"code\":1,\"msg\":\"hello\"}";
+    dmTransport_->HandleReceiveMessage(socketId, payload);
+    EXPECT_EQ(dmTransport_->GetRemoteNetworkIdBySocketId(socketId), "");
+}
 } // DistributedHardware
 } // OHOS

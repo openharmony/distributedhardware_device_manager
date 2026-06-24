@@ -1153,6 +1153,244 @@ HWTEST_F(SoftbusListenerTest, GetAttrFromCustomData_001, testing::ext::TestSize.
     int32_t ret = softbusListener->GetAttrFromCustomData(customDataJson, dmDevInfo, actionId);
     EXPECT_EQ(ret, DM_OK);
 }
+
+/**
+ * @tc.name: GetDeviceNameByUdid_001
+ * @tc.desc: GetDeviceNameByUdid delegates to SoftbusCache::GetDeviceNameFromCache (success and failure).
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusListenerTest, GetDeviceNameByUdid_001, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    std::string udid = "udid_001";
+    std::string deviceName;
+    EXPECT_CALL(*softbusCacheMock_, GetDeviceNameFromCache(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::string("deviceName")), Return(DM_OK)));
+    int32_t ret = softbusListener->GetDeviceNameByUdid(udid, deviceName);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(deviceName, "deviceName");
+
+    EXPECT_CALL(*softbusCacheMock_, GetDeviceNameFromCache(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    ret = softbusListener->GetDeviceNameByUdid(udid, deviceName);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ConvertBytesToUpperCaseHexString_002
+ * @tc.desc: ConvertBytesToUpperCaseHexString with size 0 returns an empty string.
+ * @tc.type: FUNC
+ */
+HWTEST_F(SoftbusListenerTest, ConvertBytesToUpperCaseHexString_002, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    uint8_t arr[1] = {0};
+    auto ret = softbusListener->ConvertBytesToUpperCaseHexString(arr, 0);
+    EXPECT_TRUE(ret.empty());
+}
+
+/**
+ * @tc.name: SaveDeviceIdHash_001
+ * @tc.desc: SaveDeviceIdHash returns false when networkId is empty.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusListenerTest, SaveDeviceIdHash_001, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    DmDeviceInfo deviceInfo;
+    (void)memset_s(&deviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    bool ret = softbusListener->SaveDeviceIdHash(deviceInfo);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SaveDeviceIdHash_002
+ * @tc.desc: SaveDeviceIdHash returns false when GetUdidFromCache returns empty udid.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusListenerTest, SaveDeviceIdHash_002, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    DmDeviceInfo deviceInfo;
+    (void)memset_s(&deviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    (void)strcpy_s(deviceInfo.networkId, sizeof(deviceInfo.networkId), "networkId_002");
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::string("")), Return(ERR_DM_FAILED)));
+    bool ret = softbusListener->SaveDeviceIdHash(deviceInfo);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: SaveDeviceIdHash_003
+ * @tc.desc: SaveDeviceIdHash returns false when GetUdidHash fails.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusListenerTest, SaveDeviceIdHash_003, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    DmDeviceInfo deviceInfo;
+    (void)memset_s(&deviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    (void)strcpy_s(deviceInfo.networkId, sizeof(deviceInfo.networkId), "networkId_003");
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::string("udid_003")), Return(DM_OK)));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    bool ret = softbusListener->SaveDeviceIdHash(deviceInfo);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: GetLocalDeviceInfo_002
+ * @tc.desc: GetLocalDeviceInfo returns DM_OK when SoftbusCache returns success.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusListenerTest, GetLocalDeviceInfo_002, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    DmDeviceInfo deviceInfo;
+    EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_)).WillOnce(Return(DM_OK));
+    int32_t ret = softbusListener->GetLocalDeviceInfo(deviceInfo);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetLocalDeviceInfo_003
+ * @tc.desc: GetLocalDeviceInfo returns error when SoftbusCache fails.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusListenerTest, GetLocalDeviceInfo_003, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    DmDeviceInfo deviceInfo;
+    EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_)).WillOnce(Return(ERR_DM_FAILED));
+    int32_t ret = softbusListener->GetLocalDeviceInfo(deviceInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: GetTrustedDeviceList_003
+ * @tc.desc: GetTrustedDeviceList returns DM_OK when SoftbusCache returns success.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusListenerTest, GetTrustedDeviceList_003, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    std::vector<DmDeviceInfo> deviceInfoList;
+    EXPECT_CALL(*softbusCacheMock_, GetDeviceInfoFromCache(_)).WillOnce(Return(DM_OK));
+    int32_t ret = softbusListener->GetTrustedDeviceList(deviceInfoList);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: GetUdidByNetworkId_002
+ * @tc.desc: GetUdidByNetworkId returns DM_OK and sets udid when SoftbusCache succeeds.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusListenerTest, GetUdidByNetworkId_002, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    std::string networkId = "networkId_udid";
+    std::string udid;
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::string("udid_value")), Return(DM_OK)));
+    int32_t ret = softbusListener->GetUdidByNetworkId(networkId.c_str(), udid);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(udid, "udid_value");
+}
+
+/**
+ * @tc.name: GetUuidByNetworkId_002
+ * @tc.desc: GetUuidByNetworkId returns DM_OK and sets uuid when SoftbusCache succeeds.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusListenerTest, GetUuidByNetworkId_002, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    std::string networkId = "networkId_uuid";
+    std::string uuid;
+    EXPECT_CALL(*softbusCacheMock_, GetUuidFromCache(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::string("uuid_value")), Return(DM_OK)));
+    int32_t ret = softbusListener->GetUuidByNetworkId(networkId.c_str(), uuid);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(uuid, "uuid_value");
+}
+
+/**
+ * @tc.name: GetNetworkIdByUdid_002
+ * @tc.desc: GetNetworkIdByUdid returns DM_OK and sets networkId when SoftbusCache succeeds.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusListenerTest, GetNetworkIdByUdid_002, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    std::string udid = "udid_network";
+    std::string networkId;
+    EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(std::string("networkId_value")), Return(DM_OK)));
+    int32_t ret = softbusListener->GetNetworkIdByUdid(udid, networkId);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(networkId, "networkId_value");
+}
+
+/**
+ * @tc.name: OnSoftbusPublishResult_002
+ * @tc.desc: OnSoftbusPublishResult runs without crash for different result values.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusListenerTest, OnSoftbusPublishResult_002, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    softbusListener->OnSoftbusPublishResult(200, static_cast<PublishResult>(1));
+    SUCCEED();
+}
+
+/**
+ * @tc.name: ShiftLNNGear_003
+ * @tc.desc: ShiftLNNGear returns input invalid for empty callerId even with isWakeUp true.
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(SoftbusListenerTest, ShiftLNNGear_003, testing::ext::TestSize.Level1)
+{
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    std::string callerId = "";
+    int32_t ret = softbusListener->ShiftLNNGear(true, callerId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

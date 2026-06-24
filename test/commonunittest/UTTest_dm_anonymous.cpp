@@ -474,7 +474,6 @@ HWTEST_F(DmAnonymousTest, StringToInt64_001, testing::ext::TestSize.Level1)
     EXPECT_EQ(ret, 0);
 }
 
-
 HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_001, testing::ext::TestSize.Level1)
 {
     std::string jsonStr = R"(
@@ -764,6 +763,284 @@ HWTEST_F(DmAnonymousTest, GetSubStr_002, testing::ext::TestSize.Level1)
     int32_t index = 1;
     std::string ret = GetSubStr(rawStr, separator, index);
     EXPECT_TRUE(ret.empty());
+}
+
+/**
+ * @tc.name: GetAnonyString_004
+ * @tc.desc: GetAnonyString long-string path (length > 20)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, GetAnonyString_004, testing::ext::TestSize.Level1)
+{
+    // length exactly 3 -> short path minimum boundary
+    std::string value3 = "abc";
+    std::string str3 = GetAnonyString(value3);
+    EXPECT_EQ(str3.size(), 8);
+
+    // length 21 -> first entry into long path (> int32ShortIdLength 20)
+    std::string value21 = "0123456789012345678ab";
+    std::string str21 = GetAnonyString(value21);
+    EXPECT_EQ(str21.size(), 14);
+    EXPECT_EQ(str21.substr(0, 4), "0123");
+    EXPECT_EQ(str21.substr(10, 4), "78ab");
+}
+
+/**
+ * @tc.name: GetAnonyInt32_004
+ * @tc.desc: GetAnonyInt32 negative value path
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, GetAnonyInt32_004, testing::ext::TestSize.Level1)
+{
+    // negative number: '-' sign preserved, digits masked
+    const int32_t value = -12345;
+    std::string str = GetAnonyInt32(value);
+    EXPECT_EQ(str.size(), 6);
+    EXPECT_EQ(str[0], '-');
+    EXPECT_EQ(str[str.size() - 1], '5');
+}
+
+/**
+ * @tc.name: IsNumberString_006
+ * @tc.desc: IsNumberString boundary at MAX_INT_LEN (20)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsNumberString_006, testing::ext::TestSize.Level1)
+{
+    // length exactly 20 -> within range, all digits -> true
+    const std::string inputString = "12345678901234567890";
+    bool ret = IsNumberString(inputString);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: ConvertMapToJsonString_002
+ * @tc.desc: ConvertMapToJsonString valid non-empty map produces JSON
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, ConvertMapToJsonString_002, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> paramMap;
+    paramMap["key1"] = "value1";
+    paramMap["key2"] = "value2";
+    std::string jsonStr = ConvertMapToJsonString(paramMap);
+    EXPECT_FALSE(jsonStr.empty());
+    EXPECT_NE(jsonStr.find("key1"), std::string::npos);
+    EXPECT_NE(jsonStr.find("value2"), std::string::npos);
+}
+
+/**
+ * @tc.name: ConvertMapToJsonString_003
+ * @tc.desc: ConvertMapToJsonString empty map returns empty string
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, ConvertMapToJsonString_003, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> paramMap;
+    std::string jsonStr = ConvertMapToJsonString(paramMap);
+    EXPECT_EQ(jsonStr, "");
+}
+
+/**
+ * @tc.name: GetAnonyJsonString_001
+ * @tc.desc: GetAnonyJsonString empty input returns empty string
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, GetAnonyJsonString_001, testing::ext::TestSize.Level1)
+{
+    std::string ret = GetAnonyJsonString("");
+    EXPECT_EQ(ret, "");
+}
+
+/**
+ * @tc.name: GetAnonyJsonString_002
+ * @tc.desc: GetAnonyJsonString non-JSON input returns empty string
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, GetAnonyJsonString_002, testing::ext::TestSize.Level1)
+{
+    std::string ret = GetAnonyJsonString("not_a_json_string");
+    EXPECT_EQ(ret, "");
+}
+
+/**
+ * @tc.name: GetAnonyJsonString_003
+ * @tc.desc: GetAnonyJsonString anonymizes sensitive keys
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, GetAnonyJsonString_003, testing::ext::TestSize.Level1)
+{
+    std::string jsonStr = R"({"deviceId":"1234567890abcdef","normal":"plaintext"})";
+    std::string ret = GetAnonyJsonString(jsonStr);
+    EXPECT_FALSE(ret.empty());
+    // sensitive value should be anonymized away
+    EXPECT_EQ(ret.find("1234567890abcdef"), std::string::npos);
+    // non-sensitive value preserved
+    EXPECT_NE(ret.find("plaintext"), std::string::npos);
+}
+
+/**
+ * @tc.name: CompareVersion_002
+ * @tc.desc: CompareVersion returns false when sink is newer
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, CompareVersion_002, testing::ext::TestSize.Level1)
+{
+    EXPECT_EQ(CompareVersion("1.2.3", "1.2.3.4"), false);
+    // equal versions -> false
+    EXPECT_EQ(CompareVersion("1.2.3", "1.2.3"), false);
+    // remote older in first segment
+    EXPECT_EQ(CompareVersion("1.9.0", "2.0.0"), false);
+}
+
+/**
+ * @tc.name: CompareVersion_003
+ * @tc.desc: CompareVersion returns true when remote newer in non-first segment
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, CompareVersion_003, testing::ext::TestSize.Level1)
+{
+    // first segments equal, second segment greater
+    EXPECT_EQ(CompareVersion("1.3.0", "1.2.0"), true);
+    // remote has more segments, all preceding equal
+    EXPECT_EQ(CompareVersion("1.2.3.4", "1.2.3"), true);
+}
+
+/**
+ * @tc.name: IsUint32_002
+ * @tc.desc: IsUint32 true branch (valid non-negative within range)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsUint32_002, testing::ext::TestSize.Level1)
+{
+    std::string str = R"(
+    {
+        "AUTHTYPE" : 256
+    }
+    )";
+    JsonObject jsonObj(str);
+    bool ret = IsUint32(jsonObj, TAG_AUTH_TYPE);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: IsUint32_003
+ * @tc.desc: IsUint32 false branch (negative value)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsUint32_003, testing::ext::TestSize.Level1)
+{
+    std::string str = R"(
+    {
+        "AUTHTYPE" : -5
+    }
+    )";
+    JsonObject jsonObj(str);
+    bool ret = IsUint32(jsonObj, TAG_AUTH_TYPE);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: IsInt32_003
+ * @tc.desc: IsInt32 true branch for negative int32 value
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsInt32_003, testing::ext::TestSize.Level1)
+{
+    std::string str = R"(
+    {
+        "AUTHTYPE" : -369
+    }
+    )";
+    JsonObject jsonObj(str);
+    bool ret = IsInt32(jsonObj, TAG_AUTH_TYPE);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: GetVersionNumber_001
+ * @tc.desc: GetVersionNumber success path
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, GetVersionNumber_001, testing::ext::TestSize.Level1)
+{
+    int32_t versionNum = 0;
+    bool ret = GetVersionNumber("1.2.3", versionNum);
+    EXPECT_EQ(ret, true);
+    EXPECT_EQ(versionNum, 123);
+}
+
+/**
+ * @tc.name: GetVersionNumber_002
+ * @tc.desc: GetVersionNumber failure path (non-numeric)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, GetVersionNumber_002, testing::ext::TestSize.Level1)
+{
+    int32_t versionNum = 0;
+    bool ret = GetVersionNumber("abc", versionNum);
+    EXPECT_EQ(ret, false);
+    EXPECT_EQ(versionNum, 0);
+}
+
+/**
+ * @tc.name: IsIdLengthValid_003
+ * @tc.desc: IsIdLengthValid boundary at MAX_ID_LEN (256)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsIdLengthValid_003, testing::ext::TestSize.Level1)
+{
+    std::string inputID;
+    inputID.assign(256, 'A'); // exactly MAX_ID_LEN -> valid
+    bool ret = IsIdLengthValid(inputID);
+    EXPECT_EQ(ret, true);
+
+    inputID.assign(257, 'A'); // beyond MAX_ID_LEN -> invalid
+    ret = IsIdLengthValid(inputID);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: IsValueExist_002
+ * @tc.desc: IsValueExist true branch (exact udid+userId match)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsValueExist_002, testing::ext::TestSize.Level1)
+{
+    std::multimap<std::string, int32_t> unorderedmap = {{"udidA", 1}, {"udidB", 2}};
+    bool ret = IsValueExist(unorderedmap, "udidB", 2);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: IsDmCommonNotifyEventValid_003
+ * @tc.desc: IsDmCommonNotifyEventValid true branch (valid event)
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsDmCommonNotifyEventValid_003, testing::ext::TestSize.Level1)
+{
+    // pick an event strictly between MIN and MAX
+    DmCommonNotifyEvent dmCommonNotifyEvent = static_cast<DmCommonNotifyEvent>(1);
+    bool ret = IsDmCommonNotifyEventValid(dmCommonNotifyEvent);
+    EXPECT_TRUE(ret);
 }
 } // namespace
 } // namespace DistributedHardware
