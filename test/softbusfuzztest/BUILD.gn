@@ -19,7 +19,6 @@ group("fuzztest") {
     "onsoftbusdeviceinfochanged_fuzzer:fuzztest",
     "onsoftbusdeviceoffline_fuzzer:fuzztest",
     "onsoftbusdeviceonline_fuzzer:fuzztest",
-    "onsoftbuslistenerdevicefound_fuzzer:fuzztest",
     "publishsoftbuslnn_fuzzer:fuzztest",
     "refreshsoftbuslnn_fuzzer:fuzztest",
     "softbusconnector_fuzzer:fuzztest",
