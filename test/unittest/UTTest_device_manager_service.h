@@ -40,6 +40,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+void DeletePermission();
+
 class DeviceManagerServiceTest : public testing::Test {
 public:
     static void SetUpTestCase();

@@ -766,6 +766,8 @@ ohos_unittest("UTTest_device_manager_service") {
 
   sources = [
     "UTTest_device_manager_service.cpp",
+    "UTTest_device_manager_service_part1.cpp",
+    "UTTest_device_manager_service_part2.cpp",
     "UTTest_device_manager_service_two.cpp",
     "mock/app_manager_mock.cpp",
     "mock/device_manager_service_impl_mock.cpp",
