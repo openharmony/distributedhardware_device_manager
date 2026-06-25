@@ -541,7 +541,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_010, testing::ext::T
     discoveryInfo.localDeviceId = "localDeviceId";
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillRepeatedly(Return(0));
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
-    EXPECT_EQ(ret, SHARE);
+    EXPECT_EQ(ret, DmAuthForm::INVALID_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_011, testing::ext::TestSize.Level1)
@@ -557,7 +557,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_011, testing::ext::T
     discoveryInfo.localDeviceId = "localDeviceId";
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillRepeatedly(Return(0));
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
-    EXPECT_EQ(ret, SHARE);
+    EXPECT_EQ(ret, DmAuthForm::INVALID_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_001, testing::ext::TestSize.Level1)
