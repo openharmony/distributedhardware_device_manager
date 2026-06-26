@@ -1027,10 +1027,22 @@ void DeviceManagerServiceListener::RemoveNotExistProcess()
     std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
     for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
         ProcessInfo processInfo;
-        if (!ParseNotifyKey(it->first, processInfo) ||
-            notifyProcessInfos.find(processInfo) == notifyProcessInfos.end()) {
+        if (!ParseNotifyKey(it->first, processInfo)) {
+            LOGE("ParseNotifyKey failed.");
             it = alreadyOnlinePkgName_.erase(it);
-            LOGI("erase stale online notify key.");
+            continue;
+        }
+        bool isExistFlag = false;
+        for (const auto &iter : notifyProcessInfos) {
+            if (iter == processInfo) {
+                isExistFlag = true;
+                break;
+            }
+        }
+        if (!isExistFlag) {
+            LOGI("Erase stale online, userId:%{public}d, tokenId:%{public}s, pkgname:%{public}s,", processInfo.userId,
+                GetAnonyInt32(static_cast<int32_t>(processInfo.tokenId)).c_str(), processInfo.pkgName.c_str());
+            it = alreadyOnlinePkgName_.erase(it);
         } else {
             ++it;
         }
