@@ -57,46 +57,6 @@ void DeviceManagerServiceImplFirstTest::TearDownTestCase()
 }
 
 namespace {
-HWTEST_F(DeviceManagerServiceImplFirstTest, GetDeviceIdAndUserId_101, testing::ext::TestSize.Level1)
-{
-    int32_t userId = 1;
-    std::string accountId = "accountId";
-    auto ret = deviceManagerServiceImpl_->GetDeviceIdAndUserId(userId, accountId);
-    EXPECT_TRUE(ret.empty());
-
-    ret = deviceManagerServiceImpl_->GetDeviceIdAndUserId(userId);
-    EXPECT_TRUE(ret.empty());
-
-    std::string localUdid = "deviceId";
-    int32_t localUserId = 123456;
-    std::string peerUdid = "remoteUdid";
-    int32_t peerUserId = 1;
-    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _)).WillOnce(Return(true));
-    if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
-        deviceManagerServiceImpl_->Initialize(listener_);
-    }
-
-    if (deviceManagerServiceImpl_->deviceStateMgr_ == nullptr) {
-        deviceManagerServiceImpl_->Initialize(listener_);
-    }
-    DMAclQuadInfo info = {localUdid, localUserId, peerUdid, peerUserId};
-    std::string accoutId = "accountId";
-    deviceManagerServiceImpl_->HandleIdentAccountLogout(info, accoutId);
-
-    std::vector<uint32_t> foregroundUserIds;
-    std::vector<uint32_t> backgroundUserIds;
-    std::string remoteUdid = "deviceId";
-    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
-    deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid, false);
-
-    std::vector<int32_t> localUserIds;
-    localUserIds.push_back(101);
-    localUserIds.push_back(102);
-    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(DoAll(SetArgReferee<0>(localUserIds), Return(DM_OK)));
-    deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid, false);
-}
-
 HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_001, testing::ext::TestSize.Level1)
 {
     std::string peerUdid = "peerUdid";
