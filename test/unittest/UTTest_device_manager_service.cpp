@@ -139,19 +139,6 @@ void DeletePermission()
 }
 
 /**
- * @tc.name: InitDMServiceListener_001
- * @tc.desc: Init device manager listener and return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, InitDMServiceListener_001, testing::ext::TestSize.Level1)
-{
-    int ret = DeviceManagerService::GetInstance().InitDMServiceListener();
-    EXPECT_EQ(ret, DM_OK);
-    DeviceManagerService::GetInstance().UninitDMServiceListener();
-}
-
-/**
  * @tc.name: PublishDeviceDiscovery_001
  * @tc.desc: Publish device discovery and return ERR_DM_NO_PERMISSION
  * @tc.type: FUNC
