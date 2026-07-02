@@ -171,6 +171,8 @@ public:
     MOCK_METHOD(int32_t, DeleteServiceInfo, (const DistributedDeviceProfile::ServiceInfo &));
     MOCK_METHOD(void, GetPeerTokenIdForServiceProxyUnbind, (int32_t, uint64_t, const std::string &, int64_t,
         std::vector<uint64_t> &));
+    MOCK_METHOD((std::vector<DistributedDeviceProfile::AccessControlProfile>), GetAclProfileByDeviceIdAndUserId,
+        (const std::string &, int32_t, const std::string &));
 };
 }
 }

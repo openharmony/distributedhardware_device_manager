@@ -109,8 +109,6 @@ public:
 
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash, const std::string &extra);
 
-    int32_t ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash);
-
     int32_t ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash,
         const std::string &extra);
 
@@ -329,6 +327,7 @@ public:
     void ProcessUnBindServiceProxy(const UnbindServiceProxyParam &param);
 #endif
 private:
+    int32_t ValidateUnBindTokenId(const std::string &pkgName, const std::string &udidHash);
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();
     bool IsDMServiceAdapterSoLoaded();

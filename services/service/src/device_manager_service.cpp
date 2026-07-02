@@ -998,7 +998,7 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
 
 int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
 {
-    int32_t result = ValidateUnBindDeviceParams(pkgName, udidHash);
+    int32_t result = ValidateUnBindDeviceParams(pkgName, udidHash, "");
     if (result != DM_OK) {
         return result;
     }
@@ -1198,30 +1198,11 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
     return DM_OK;
 }
 
-int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash)
-{
-    LOGI("pkgName: %{public}s, udidHash: %{public}s",
-        GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str());
-    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
-        LOGE("The caller does not have permission to call UnBindDevice.");
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (pkgName.empty() || udidHash.empty() || pkgName == std::string(DM_PKG_NAME)) {
-        LOGE("Invalid parameter, pkgName: %{public}s", pkgName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("UnBindDevice failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return DM_OK;
-}
-
 int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash,
     const std::string &extra)
 {
-    LOGI("pkgName: %{public}s, udidHash: %{public}s,"
-        "extra: %{public}s", GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str(),
+    LOGI("pkgName: %{public}s, udidHash: %{public}s, extra: %{public}s",
+        GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str(),
         GetAnonyString(extra).c_str());
     if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call UnBindDevice.");
@@ -1235,8 +1216,67 @@ int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgN
         LOGE("UnBindDevice failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        int32_t ret = ValidateUnBindTokenId(pkgName, udidHash);
+        if (ret != DM_OK) {
+            LOGE("ValidateUnBindTokenId failed, ret: %{public}d", ret);
+            return ret;
+        }
+    }
+#endif
     return DM_OK;
 }
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+int32_t DeviceManagerService::ValidateUnBindTokenId(const std::string &pkgName, const std::string &udidHash)
+{
+    uint32_t callingTokenId = IPCSkeleton::GetCallingTokenID();
+    if (callingTokenId == 0) {
+        LOGE("GetCallingTokenID error.");
+        return ERR_DM_GET_TOKENID_FAILED;
+    }
+    std::string realDeviceId = udidHash;
+    std::string udidHashTemp = "";
+    if (GetUdidHashByAnoyDeviceId(udidHash, udidHashTemp) == DM_OK) {
+        realDeviceId = udidHashTemp;
+    }
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
+    std::string peerUdid = "";
+    if (softbusListener_->GetUdidFromDp(realDeviceId, peerUdid) != DM_OK) {
+        LOGE("Get udid by udidhash failed.");
+        return ERR_DM_FAILED;
+    }
+    char localUdid[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
+    int32_t localUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAclProfileByDeviceIdAndUserId(std::string(localUdid),
+            localUserId, peerUdid);
+    if (profiles.empty()) {
+        LOGE("No ACL found for localUdid-peerUdid pair.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    for (const auto &profile : profiles) {
+        const auto &accesser = profile.GetAccesser();
+        const auto &accessee = profile.GetAccessee();
+        if (accesser.GetAccesserDeviceId() == std::string(localUdid)) {
+            if (static_cast<uint64_t>(accesser.GetAccesserTokenId()) == callingTokenId) {
+                LOGI("TokenId matched as accesser.");
+                return DM_OK;
+            }
+        }
+        if (accessee.GetAccesseeDeviceId() == std::string(localUdid)) {
+            if (static_cast<uint64_t>(accessee.GetAccesseeTokenId()) == callingTokenId) {
+                LOGI("TokenId matched as accessee.");
+                return DM_OK;
+            }
+        }
+    }
+    LOGE("TokenId validation failed: no matching ACL.");
+    return ERR_DM_NO_PERMISSION;
+}
+#endif
 
 int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action, const std::string &params)
 {
