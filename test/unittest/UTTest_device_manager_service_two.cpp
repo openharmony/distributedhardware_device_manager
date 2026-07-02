@@ -1727,7 +1727,7 @@ HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_201, testing::ext:
     std::string pkgName = "";
     std::string deviceId = "";
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId);
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId, "");
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1736,7 +1736,7 @@ HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_202, testing::ext:
     std::string pkgName = "ohos.test.pkgName";
     std::string deviceId = "deviceId";
     DeletePermission();
-    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId);
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId, "");
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 

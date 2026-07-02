@@ -656,8 +656,8 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfil
     return profiles;
 }
 
-std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceIdAndUserId(const std::string &deviceId,
-    int32_t userId)
+DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceIdAndUserId(
+    const std::string &deviceId, int32_t userId)
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(userId);
     std::vector<AccessControlProfile> aclProfileVec;
@@ -673,8 +673,8 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceI
 }
 //LCOV_EXCL_STOP
 
-std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceIdAndUserId(const std::string &deviceId,
-    int32_t userId, const std::string &remoteDeviceId)
+DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceIdAndUserId(
+    const std::string &deviceId, int32_t userId, const std::string &remoteDeviceId)
 {
     std::vector<AccessControlProfile> aclProfileVec;
     std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
@@ -839,25 +839,73 @@ bool DeviceProfileConnector::CheckAuthFormProxyTokenId(const std::string pkgName
     return false;
 }
 
+bool DeviceProfileConnector::CheckAuthFormForAccesser(DmAuthForm form, const std::string &pkgName,
+    const DistributedDeviceProfile::AccessControlProfile &profile, bool isSystemSA, uint32_t callingTokenId)
+{
+    const auto &accesser = profile.GetAccesser();
+    if (isSystemSA) {
+        if (pkgName == accesser.GetAccesserBundleName() ||
+            CheckAuthFormProxyTokenId(pkgName, accesser.GetAccesserExtraData())) {
+            return true;
+        }
+    } else {
+        if (pkgName == accesser.GetAccesserBundleName() &&
+            static_cast<uint64_t>(accesser.GetAccesserTokenId()) == callingTokenId) {
+            LOGI("Non-systemSA matched: pkgName and tokenId as accesser.");
+            return true;
+        }
+    }
+    return false;
+}
+
+bool DeviceProfileConnector::CheckAuthFormForAccessee(DmAuthForm form, const std::string &pkgName,
+    const DistributedDeviceProfile::AccessControlProfile &profile, bool isSystemSA, uint32_t callingTokenId)
+{
+    const auto &accessee = profile.GetAccessee();
+    if (isSystemSA) {
+        if (pkgName == accessee.GetAccesseeBundleName() ||
+            CheckAuthFormProxyTokenId(pkgName, accessee.GetAccesseeExtraData())) {
+            return true;
+        }
+    } else {
+        if (pkgName == accessee.GetAccesseeBundleName() &&
+            static_cast<uint64_t>(accessee.GetAccesseeTokenId()) == callingTokenId) {
+            LOGI("Non-systemSA matched: pkgName and tokenId as accessee.");
+            return true;
+        }
+    }
+    return false;
+}
+
 int32_t DeviceProfileConnector::CheckAuthForm(DmAuthForm form, AccessControlProfile profiles,
     DmDiscoveryInfo discoveryInfo)
 {
     if (IsLnnAcl(profiles)) {
         return DmAuthForm::INVALID_TYPE;
     }
-    if (profiles.GetBindLevel() == USER || ((profiles.GetBindLevel() == APP || profiles.GetBindLevel() == SERVICE) &&
-        discoveryInfo.pkgname == "")) {
+    if (profiles.GetBindLevel() == USER || ((profiles.GetBindLevel() == APP ||
+        profiles.GetBindLevel() == SERVICE) && discoveryInfo.pkgname == "")) {
         return form;
     }
-    if (profiles.GetBindLevel() == APP || profiles.GetBindLevel() == SERVICE) {
-        if ((discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() ||
-            CheckAuthFormProxyTokenId(discoveryInfo.pkgname, profiles.GetAccesser().GetAccesserExtraData())) &&
-            discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
+    if (profiles.GetBindLevel() != APP && profiles.GetBindLevel() != SERVICE) {
+        return DmAuthForm::INVALID_TYPE;
+    }
+    bool isSystemSA = AppManager::GetInstance().IsSystemSA();
+    uint32_t callingTokenId = 0;
+    if (!isSystemSA) {
+        callingTokenId = IPCSkeleton::GetCallingTokenID();
+        if (callingTokenId == 0) {
+            LOGE("GetCallingTokenID error.");
+            return DmAuthForm::INVALID_TYPE;
+        }
+    }
+    if (discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
+        if (CheckAuthFormForAccesser(form, discoveryInfo.pkgname, profiles, isSystemSA, callingTokenId)) {
             return form;
         }
-        if ((discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() ||
-            CheckAuthFormProxyTokenId(discoveryInfo.pkgname, profiles.GetAccessee().GetAccesseeExtraData())) &&
-            discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
+    }
+    if (discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
+        if (CheckAuthFormForAccessee(form, discoveryInfo.pkgname, profiles, isSystemSA, callingTokenId)) {
             return form;
         }
     }

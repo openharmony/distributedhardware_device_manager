@@ -212,7 +212,7 @@ public:
         const std::string &remoteUdid, const std::string &localUdid, int32_t tokenId);
     DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfileByUserId(
         int32_t userId);
-    std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByDeviceIdAndUserId(
+    DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByDeviceIdAndUserId(
         const std::string &deviceId, int32_t userId);
     DM_EXPORT uint32_t CheckBindType(std::string peerUdid, std::string localUdid);
     DM_EXPORT int32_t PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser,
@@ -346,7 +346,7 @@ public:
         const std::vector<std::string> &acceptEventUdids);
     DM_EXPORT std::string IsAuthNewVersion(int32_t bindLevel, std::string localUdid, std::string remoteUdid,
         int32_t tokenId, int32_t userId);
-    std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByDeviceIdAndUserId(
+    DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByDeviceIdAndUserId(
         const std::string &deviceId, int32_t userId, const std::string &remoteDeviceId);
     DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclList(const std::string localUdid,
         int32_t localUserId, const std::string remoteUdid, int32_t remoteUserId);
@@ -423,6 +423,10 @@ private:
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
         const std::string &reqDev);
     bool CheckAuthFormProxyTokenId(const std::string pkgName, const std::string &extraStr);
+    bool CheckAuthFormForAccesser(DmAuthForm form, const std::string &pkgName,
+        const DistributedDeviceProfile::AccessControlProfile &profile, bool isSystemSA, uint32_t callingTokenId);
+    bool CheckAuthFormForAccessee(DmAuthForm form, const std::string &pkgName,
+        const DistributedDeviceProfile::AccessControlProfile &profile, bool isSystemSA, uint32_t callingTokenId);
     int32_t CheckAuthForm(DmAuthForm form, DistributedDeviceProfile::AccessControlProfile profiles,
         DmDiscoveryInfo discoveryInfo);
     bool SingleUserProcess(const DistributedDeviceProfile::AccessControlProfile &profile, const DmAccessCaller &caller,
