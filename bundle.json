@@ -55,6 +55,8 @@
                 "mbedtls",
                 "memmgr",
                 "napi",
+                "libuv",
+                "node",
                 "openssl",
                 "os_account",
                 "power_manager",

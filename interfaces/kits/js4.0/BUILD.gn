@@ -77,6 +77,8 @@ ohos_shared_library("distributeddevicemanager") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
+    "libuv:uv",
+    "node:node_header_notice",
   ]
 
   subsystem_name = "distributedhardware"
