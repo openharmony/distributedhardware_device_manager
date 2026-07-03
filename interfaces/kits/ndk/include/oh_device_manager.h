@@ -56,10 +56,18 @@ extern "C" {
  *         Returns {@link DM_ERR_OBTAIN_BUNDLE_NAME}, Failed to obtain the bundleName.
  * @since 20
  */
-int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int &len);
+int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int *len);
 
 #ifdef __cplusplus
-};
+}
+#endif
+
+#ifdef __cplusplus
+
+static inline int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int &len)
+{
+    return OH_DeviceManager_GetLocalDeviceName(localDeviceName, &len);
+}
 #endif
 
 /** @} */
