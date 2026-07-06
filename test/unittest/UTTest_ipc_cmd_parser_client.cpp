@@ -1692,6 +1692,9 @@ HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_010, testing::ext::Tes
         ret = ptr(req, data);
     }
     ASSERT_EQ(DM_OK, ret);
+
+    int32_t userId = req->GetLocalUserId();
+    EXPECT_EQ(userId, localUserId);
 }
 
 HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_dm_ipc_011, testing::ext::TestSize.Level0)
