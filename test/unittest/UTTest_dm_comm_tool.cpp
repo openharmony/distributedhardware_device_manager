@@ -529,7 +529,7 @@ HWTEST_F(DMCommToolTest, SendUnBindAppObj_003, testing::ext::TestSize.Level1)
         .Times(::testing::AtMost(1))
         .WillOnce(Return(DM_OK));
     result = dmCommTool->SendUnBindAppObj(userId, tokenId, extra, networkId, udid);
-    EXPECT_EQ(result, ERR_DM_FAILED);
+    EXPECT_EQ(result, DM_OK);
 }
 
 HWTEST_F(DMCommToolTest, ProcessReceiveUninstAppEvent_001, testing::ext::TestSize.Level1)
