@@ -91,7 +91,7 @@
                 "priority":"translate"
             }
         },
-{
+        {
             "name":"dm_authenticating",
             "value":"Mengautentikasi…",
             "attr":{
