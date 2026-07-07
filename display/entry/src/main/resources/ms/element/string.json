@@ -93,7 +93,7 @@
         },
         {
             "name":"dm_authenticating",
-            "value":"Mengesahkan�",
+            "value":"Mengesahkan…",
             "attr":{
                 "priority":"translate"
             }
