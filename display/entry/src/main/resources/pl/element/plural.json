@@ -5,14 +5,14 @@
             "value":[
                 {
                     "quantity":"one",
-                    "value":"Nie zgadza się. Liczba pozostałych prób: %d.",
+                    "value":"Kod nieprawidłowy. Pozostała %d próba.",
                     "attr":{
                         "priority":"LT"
                     }
                 },
                 {
                     "quantity":"other",
-                    "value":"Nie zgadza się. Liczba pozostałych prób: %d.",
+                    "value":"Nieprawidłowy kod. Pozostało %d próby.",
                     "attr":{
                         "priority":"LT"
                     }

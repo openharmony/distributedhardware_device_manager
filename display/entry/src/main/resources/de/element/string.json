@@ -44,7 +44,7 @@
         },
         {
             "name":"dm_allow_always",
-            "value":"Immer Vertrauen",
+            "value":"Immer vertrauen",
             "attr":{
                 "priority":"LT"
             }
