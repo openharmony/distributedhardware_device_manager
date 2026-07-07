@@ -91,9 +91,9 @@
                 "priority":"translate"
             }
         },
-        {
+{
             "name":"dm_authenticating",
-            "value":"Mengautentikasi�",
+            "value":"Mengautentikasi…",
             "attr":{
                 "priority":"translate"
             }

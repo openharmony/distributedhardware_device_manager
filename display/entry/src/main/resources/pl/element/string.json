@@ -9,7 +9,7 @@
         },
         {
             "name":"dm_confirm_title_hap",
-            "value":"%1$s na %2$s chce uzyskać dostęp do tego urządzenia. Zaufać tej aplikacji?",
+            "value":"Aplikacja %1$s na urządzeniu %2$s chce uzyskać dostęp do tego urządzenia. Zaufać tej aplikacji?",
             "attr":{
                 "priority":"LT"
             }
@@ -100,7 +100,7 @@
         },
         {
             "name":"dm_connect_device",
-            "value":"Urządzenie %s chce nawiązać połączenie z Twoim urządzeniem.",
+            "value":"Urządzenie %s chce połączyć się z Twoim urządzeniem.",
             "attr":{
                 "priority":"translate"
             }
@@ -128,21 +128,21 @@
         },
         {
             "name":"serve_confirm_trust_nohost",
-            "value":"%1$s prosi o dostęp do usługi %2$s w tym urządzeniu. Zaufać temu urządzeniu?",
+            "value":"Urządzenie %1$s chce uzyskać o dostęp do usługi %2$s na tym urządzeniu. Zaufać temu urządzeniu?",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"serve_confirm_trust",
-            "value":"Aplikacja %2$s na %1$s chciałaby uzyskać dostęp do usługi %3$s na twoim urządzeniu. Czy zaufać tej aplikacji?",
+            "value":"Aplikacja %2$s na %1$s chciałaby uzyskać dostęp do usługi %3$s na twoim urządzeniu. Zaufać tej aplikacji?",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"serve_agency_confirm_proxy",
-            "value":"%s chciałby połączyć się z usługami na twoim urządzeniu. Wybierz usługi do autoryzowania:",
+            "value":"Użytkownik %s chce połączyć się z usługami na twoim urządzeniu. Wybierz usługi do autoryzowania:",
             "attr":{
                 "priority":"translate"
             }
