@@ -5900,7 +5900,7 @@ void DeviceManagerService::NotifyRemoteUnBindServiceByWifi(int32_t userId, uint6
     CHECK_NULL_VOID(DMCommTool::GetInstance());
     int32_t res = DMCommTool::GetInstance()->SendUnBindServiceProxyObj(param);
     if (res != DM_OK) {
-        LOGE("failed: %{public}s", netWorkId.c_str());
+        LOGE("failed: %{public}s", GetAnonyString(netWorkId).c_str());
         return;
     }
     std::lock_guard<std::mutex> autoLock(timerLocks_);
