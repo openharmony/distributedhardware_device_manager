@@ -178,7 +178,6 @@ int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     if (GetSessionKey(context)) {
         DerivativeSessionKey(context);
     }
-    // Synchronize the local SP information, the format is uncertain, not done for now
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     CompareServiceInfos(context);
     SetServiceInfos(context);
