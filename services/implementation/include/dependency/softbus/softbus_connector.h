@@ -169,6 +169,7 @@ public:
     void RegisterLeaveLNNCallback(std::shared_ptr<ISoftbusLeaveLNNCallback> callback);
     void UnRegisterLeaveLNNCallback();
     void DeleteCredential(const DelInfoCache &acl);
+    bool CheckAclInDeleteCache(const int32_t aclId);
 
 private:
     static std::shared_ptr<ConnectionAddr> SetAddrAndJson(const ConnectionAddr *addr,

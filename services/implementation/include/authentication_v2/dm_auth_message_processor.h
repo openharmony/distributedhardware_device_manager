@@ -381,6 +381,10 @@ private:
     void GetAccesseeServiceInfo(JsonObject &syncMsgJson,
         std::vector<DistributedDeviceProfile::ServiceInfo> serviceInfos, std::vector<int64_t> serviceId);
     void ParseServiceInfo(JsonObject &jsonObject, std::shared_ptr<DmAuthContext> &context);
+    bool CheckMatchServiceAcl(std::shared_ptr<DmAuthContext> &context,
+        const DistributedDeviceProfile::AccessControlProfile &acl);
+    DistributedDeviceProfile::AccessControlProfile GetAvailableAcl(
+        std::shared_ptr<DmAuthContext> context, bool &hasAcl, bool &isNeedLnn);
     std::shared_ptr<CryptoMgr> cryptoMgr_ = nullptr;
     std::unordered_map<DmMessageType, CreateMessageFuncPtr> createMessageFuncMap_;
     std::unordered_map<DmMessageType, ParaseMessageFuncPtr> paraseMessageFuncMap_;

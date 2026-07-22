@@ -407,9 +407,34 @@ void DmAuthMessageProcessor::SetLnnAccessControlList(std::shared_ptr<DmAuthConte
     accessee.SetAccesseeSKTimeStamp(context->accessee.lnnSkTimeStamp);
     accessee.SetAccesseeExtraData(context->accessee.extraInfo);
 }
+
+bool DmAuthMessageProcessor::CheckMatchServiceAcl(std::shared_ptr<DmAuthContext> &context,
+    const DistributedDeviceProfile::AccessControlProfile &acl)
+{
+    LOGI("start");
+    CHECK_NULL_RETURN(context, false);
+    CHECK_NULL_RETURN(context->softbusConnector, false);
+    std::string acerDeviceId = acl.GetAccesser().GetAccesserDeviceId();
+    int64_t acerTokenId = acl.GetAccesser().GetAccesserTokenId();
+    int32_t acerUserId = acl.GetAccesser().GetAccesserUserId();
+    std::string aceeDeviceId = acl.GetAccessee().GetAccesseeDeviceId();
+    int64_t aceeTokenId = acl.GetAccessee().GetAccesseeTokenId();
+    int32_t aceeUserId = acl.GetAccessee().GetAccesseeUserId();
+    std::string acerAccountId = acl.GetAccesser().GetAccesserAccountId();
+    std::string aceeAccountId = acl.GetAccessee().GetAccesseeAccountId();
+    bool accountIdMatch = (context->accesser.accountIdHash == Crypto::GetAccountIdHash16(acerAccountId)) &&
+        (context->accessee.accountIdHash == Crypto::GetAccountIdHash16(aceeAccountId));
+    if (context->accesser.deviceId == acerDeviceId && context->accesser.userId == acerUserId &&
+        context->accessee.deviceId == aceeDeviceId && context->accesser.tokenId == acerTokenId &&
+        context->accessee.userId == aceeUserId && context->accessee.tokenId == aceeTokenId &&
+        accountIdMatch && !context->softbusConnector->CheckAclInDeleteCache(acl.GetAccessControlId())) {
+        return true;
+    }
+    return false;
+}
 // LCOV_EXCL_START
-static DistributedDeviceProfile::AccessControlProfile GetAccessControlProfile(std::shared_ptr<DmAuthContext> context,
-    bool &hasAcl, bool &isNeedLnn)
+DistributedDeviceProfile::AccessControlProfile DmAuthMessageProcessor::GetAvailableAcl(
+    std::shared_ptr<DmAuthContext> context, bool &hasAcl, bool &isNeedLnn)
 {
     LOGI("start.");
     DistributedDeviceProfile::AccessControlProfile profile;
@@ -425,27 +450,16 @@ static DistributedDeviceProfile::AccessControlProfile GetAccessControlProfile(st
         return profile;
     }
     for (const auto& item : accessControlProfiles) {
-        std::string acerDeviceId = item.GetAccesser().GetAccesserDeviceId();
-        int64_t acerTokenId = item.GetAccesser().GetAccesserTokenId();
-        int32_t acerUserId = item.GetAccesser().GetAccesserUserId();
-        std::string aceeDeviceId = item.GetAccessee().GetAccesseeDeviceId();
-        int64_t aceeTokenId = item.GetAccessee().GetAccesseeTokenId();
-        int32_t aceeUserId = item.GetAccessee().GetAccesseeUserId();
         uint32_t bindLevel = item.GetAccesser().GetAccesserBindLevel();
-        int32_t status = item.GetStatus();
-        if (context->accesser.deviceId == acerDeviceId && context->accesser.userId == acerUserId &&
-            context->accessee.deviceId == aceeDeviceId && context->accesser.tokenId == acerTokenId &&
-            context->accessee.userId == aceeUserId && context->accessee.tokenId == aceeTokenId) {
-            if (bindLevel == static_cast<int32_t>(USER)) {
+        if (CheckMatchServiceAcl(context, item)) {
+            if (bindLevel == USER) {
                 isNeedLnn = false;
-                continue;
             }
             LOGI("match success.");
             hasAcl = true;
             profile = item;
             break;
         }
-        continue;
     }
     return profile;
 }
@@ -600,7 +614,7 @@ int32_t DmAuthMessageProcessor::PutServiceControlList(std::shared_ptr<DmAuthCont
     bool hasAcl = false;
     bool isNeedLnn = true;
     JsonObject extraData;
-    DistributedDeviceProfile::AccessControlProfile matchProfile = GetAccessControlProfile(context, hasAcl, isNeedLnn);
+    DistributedDeviceProfile::AccessControlProfile matchProfile = GetAvailableAcl(context, hasAcl, isNeedLnn);
     SetAccessExtraData(context, hasAcl, matchProfile);
     if (access.isPutLnnAcl && access.bindLevel != static_cast<int32_t>(USER) && isNeedLnn) {
         LOGI("lnn inner.");
@@ -618,8 +632,6 @@ int32_t DmAuthMessageProcessor::PutServiceControlList(std::shared_ptr<DmAuthCont
     accesser.SetAccesserExtraData(context->accesser.extraInfo);
     accessee.SetAccesseeExtraData(context->accessee.extraInfo);
     bool isAuthed = (context->direction == DM_AUTH_SOURCE) ? context->accesser.isAuthed : context->accessee.isAuthed;
-    LOGI("PutAccessControlProfile subject ones111 1:%{public}d, 2:%{public}d, 3:%{public}d, 4:%{public}d.",
-        context->IsProxyBind, context->subjectServiceOnes.empty(), context->IsCallingProxyAsSubject, isAuthed);
     if ((!context->IsProxyBind || context->subjectServiceOnes.empty() ||
         (context->IsCallingProxyAsSubject && !isAuthed)) && !hasAcl) {
         PutNonLnnAclProfile(context, access, profile, accesser, accessee, extraData);
