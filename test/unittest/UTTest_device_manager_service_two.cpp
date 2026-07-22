@@ -537,7 +537,6 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_201, testing::ext::TestSize.Leve
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(0));
     int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
     EXPECT_NE(ret, DM_OK);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
@@ -551,23 +550,18 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_202, testing::ext::TestSize.Leve
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(0));
     int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
     EXPECT_NE(ret, ERR_DM_POINT_NULL);
 
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
     EXPECT_NE(ret, ERR_DM_POINT_NULL);
 
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
     EXPECT_NE(ret, ERR_DM_POINT_NULL);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
@@ -964,25 +958,20 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_204, testing::ext::TestSize.Leve
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(0));
     ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, udidHash, extra);
     EXPECT_NE(ret, DM_OK);
 
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(1));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, udidHash, extra);
     EXPECT_NE(ret, DM_OK);
 
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(1));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, udidHash, extra);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
@@ -995,8 +984,6 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_205, testing::ext::TestSize.Leve
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(1));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, udidHash, extra);
     EXPECT_NE(ret, DM_OK);
 

@@ -39,6 +39,7 @@ void DeviceProfileConnectorTest::SetUpTestCase()
     cryptoMock_ = std::make_shared<CryptoMock>();
     DmCrypto::dmCrypto = cryptoMock_;
     DMIPCSkeleton::dmIpcSkeleton_ = ipcSkeletonMock_;
+    deviceProfileConnectorMock_ = std::make_shared<DeviceProfileConnectorMock>();
 }
 
 void DeviceProfileConnectorTest::TearDownTestCase()
@@ -48,6 +49,7 @@ void DeviceProfileConnectorTest::TearDownTestCase()
     DmCrypto::dmCrypto = nullptr;
     cryptoMock_ = nullptr;
     DMIPCSkeleton::dmIpcSkeleton_ = nullptr;
+    deviceProfileConnectorMock_ = nullptr;
 }
 
 class MockDpInitedCallback : public DistributedDeviceProfile::DpInitedCallbackStub {
@@ -675,9 +677,10 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_003, testing::ext::TestSiz
     DmDiscoveryInfo discoveryInfo;
     discoveryInfo.pkgname = "ohos_test";
     discoveryInfo.localDeviceId = "localDeviceId";
+    EXPECT_CALL(*deviceProfileConnectorMock_, IsLnnAcl(_)).WillRepeatedly(Return(false));
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillRepeatedly(Return(0));
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
-    EXPECT_EQ(ret, PEER_TO_PEER);
+    EXPECT_EQ(ret, INVALID_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_004, testing::ext::TestSize.Level1)
@@ -691,9 +694,10 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_004, testing::ext::TestSiz
     DmDiscoveryInfo discoveryInfo;
     discoveryInfo.pkgname = "ohos_test";
     discoveryInfo.localDeviceId = "localDeviceId";
+    EXPECT_CALL(*deviceProfileConnectorMock_, IsLnnAcl(_)).WillRepeatedly(Return(false));
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillRepeatedly(Return(0));
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
-    EXPECT_EQ(ret, PEER_TO_PEER);
+    EXPECT_EQ(ret, INVALID_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_005, testing::ext::TestSize.Level1)
@@ -717,9 +721,10 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_006, testing::ext::TestSiz
     DmDiscoveryInfo discoveryInfo;
     discoveryInfo.pkgname = "pkgName";
     discoveryInfo.localDeviceId = "localDeviceId";
+    EXPECT_CALL(*deviceProfileConnectorMock_, IsLnnAcl(_)).WillRepeatedly(Return(false));
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillRepeatedly(Return(0));
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
-    EXPECT_EQ(ret, PEER_TO_PEER);
+    EXPECT_EQ(ret, INVALID_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_007, testing::ext::TestSize.Level1)
@@ -733,9 +738,10 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_007, testing::ext::TestSiz
     DmDiscoveryInfo discoveryInfo;
     discoveryInfo.pkgname = "pkgName";
     discoveryInfo.localDeviceId = "localDeviceId";
+    EXPECT_CALL(*deviceProfileConnectorMock_, IsLnnAcl(_)).WillRepeatedly(Return(false));
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillRepeatedly(Return(0));
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
-    EXPECT_EQ(ret, PEER_TO_PEER);
+    EXPECT_EQ(ret, INVALID_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_008, testing::ext::TestSize.Level1)

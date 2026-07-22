@@ -659,6 +659,7 @@ ohos_unittest("UTTest_dm_credential_manager") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./dm_blocklist.txt"
   }
 
   module_out_path = module_out_path
