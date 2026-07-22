@@ -123,6 +123,17 @@ void SoftbusConnector::DeleteCredential(const DelInfoCache &acl)
     }
     hiChainAuthConnector_->UpdateCredential(acl.credId, acl.userId, appList);
 }
+
+bool SoftbusConnector::CheckAclInDeleteCache(const int32_t aclId)
+{
+    std::lock_guard<std::mutex> lock(dmDelInfoMutex_);
+    for (const auto &item : dmDelInfoCache_) {
+        if (item.aclId == aclId) {
+            return true;
+        }
+    }
+    return false;
+}
 #endif
 
 void SoftbusConnector::SyncAclList()
