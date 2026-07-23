@@ -433,7 +433,7 @@ bool DmAuthMessageProcessor::CheckMatchServiceAcl(std::shared_ptr<DmAuthContext>
     return false;
 }
 // LCOV_EXCL_START
-DistributedDeviceProfile::AccessControlProfile DmAuthMessageProcessor::GetAvailableAcl(
+DistributedDeviceProfile::AccessControlProfile DmAuthMessageProcessor::GetAvailableServiceAcl(
     std::shared_ptr<DmAuthContext> context, bool &hasAcl, bool &isNeedLnn)
 {
     LOGI("start.");
@@ -454,6 +454,7 @@ DistributedDeviceProfile::AccessControlProfile DmAuthMessageProcessor::GetAvaila
         if (CheckMatchServiceAcl(context, item)) {
             if (bindLevel == USER) {
                 isNeedLnn = false;
+                continue;
             }
             LOGI("match success.");
             hasAcl = true;
@@ -614,7 +615,7 @@ int32_t DmAuthMessageProcessor::PutServiceControlList(std::shared_ptr<DmAuthCont
     bool hasAcl = false;
     bool isNeedLnn = true;
     JsonObject extraData;
-    DistributedDeviceProfile::AccessControlProfile matchProfile = GetAvailableAcl(context, hasAcl, isNeedLnn);
+    DistributedDeviceProfile::AccessControlProfile matchProfile = GetAvailableServiceAcl(context, hasAcl, isNeedLnn);
     SetAccessExtraData(context, hasAcl, matchProfile);
     if (access.isPutLnnAcl && access.bindLevel != static_cast<int32_t>(USER) && isNeedLnn) {
         LOGI("lnn inner.");
