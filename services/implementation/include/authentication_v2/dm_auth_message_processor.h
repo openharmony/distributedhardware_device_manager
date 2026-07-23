@@ -383,7 +383,7 @@ private:
     void ParseServiceInfo(JsonObject &jsonObject, std::shared_ptr<DmAuthContext> &context);
     bool CheckMatchServiceAcl(std::shared_ptr<DmAuthContext> &context,
         const DistributedDeviceProfile::AccessControlProfile &acl);
-    DistributedDeviceProfile::AccessControlProfile GetAvailableAcl(
+    DistributedDeviceProfile::AccessControlProfile GetAvailableServiceAcl(
         std::shared_ptr<DmAuthContext> context, bool &hasAcl, bool &isNeedLnn);
     std::shared_ptr<CryptoMgr> cryptoMgr_ = nullptr;
     std::unordered_map<DmMessageType, CreateMessageFuncPtr> createMessageFuncMap_;
