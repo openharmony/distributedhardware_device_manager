@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,7 +41,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
 
 /**
  * @brief Get local device name.
@@ -55,8 +54,28 @@ extern "C" {
  *         Returns {@link DM_ERR_OBTAIN_SERVICE}, Failed to obtain devicemanager service.
  *         Returns {@link DM_ERR_OBTAIN_BUNDLE_NAME}, Failed to obtain the bundleName.
  * @since 20
+ * @deprecated since 20
+ * @useinstead OH_DeviceManager_GetLocalDeviceNameC
  */
 int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int &len);
+
+#endif
+
+/**
+ * @brief Get local device name.
+ *
+ * @param localDeviceName This is an output parameter. It indicates the address pointer of the localDeviceName.
+ *                        You need to manually release space resources after using.
+ * @param len This is an output parameter. Length of the localDeviceName.
+ *            You need to manually release space resources after using.
+ * @return Returns the status code of the execution. For detail, see {@link DeviceManager_ErrorCode}.
+ *         Returns {@link ERR_OK}, The operation is successful.
+ *         Returns {@link DM_ERR_FAILED}, Failed to execute the function.
+ *         Returns {@link DM_ERR_OBTAIN_SERVICE}, Failed to obtain devicemanager service.
+ *         Returns {@link DM_ERR_OBTAIN_BUNDLE_NAME}, Failed to obtain the bundleName.
+ * @since 26.0.0
+ */
+int32_t OH_DeviceManager_GetLocalDeviceNameC(char **localDeviceName, unsigned int *len);
 
 #ifdef __cplusplus
 };
