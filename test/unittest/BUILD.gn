@@ -3771,6 +3771,12 @@ ohos_unittest("UTTest_advertise_manager") {
 
 ## UnitTest UTTest_mini_tools_kit
 ohos_unittest("UTTest_mini_tools_kit") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   module_out_path = module_out_path
 
   sources = [ "${devicemanager_path}/test/unittest/UTTest_mini_tools_kit.cpp" ]
