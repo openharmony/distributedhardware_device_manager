@@ -23,6 +23,7 @@
 #include "dm_crypto_mock.h"
 #include "dm_ipc_skeleton_mock.h"
 #include "multiple_user_connector_mock.h"
+#include "deviceprofile_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -35,6 +36,7 @@ public:
     static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ = nullptr;
     static inline std::shared_ptr<CryptoMock> cryptoMock_ = nullptr;
     static inline std::shared_ptr<DMIPCSkeletonMock> ipcSkeletonMock_ = std::make_shared<DMIPCSkeletonMock>();
+    static inline std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

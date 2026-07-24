@@ -2324,8 +2324,23 @@ HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult_001, testing::ext::TestSize
  */
 HWTEST_F(DeviceManagerNotifyTest, OnRemoteDied_001, testing::ext::TestSize.Level0)
 {
+    // 1. set pkgName not null
+    std::string pkgName = "com.ohos.test";
+    // set dmInitCallback not null
+    int count = 0;
+    std::shared_ptr<DmInitCallback> dmInitCallback = std::make_shared<DmInitCallbackTest>(count);
+    // 2. set checkMap null
+    std::shared_ptr<DmInitCallback> checkMap = nullptr;
+    // 3. call DeviceManagerNotifyTest RegisterDeathRecipientCallback with parameter
+    DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
+    // 4. Get checkMap from DeviceManagerNotify
+    checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
+    // 5. check checkMap not null
+    ASSERT_NE(checkMap, nullptr);
+    // 6. call DeviceManagerNotify OnRemoteDied
     DeviceManagerNotify::GetInstance().OnRemoteDied();
-    SUCCEED();
+    // 7. check if dmInitCallback OnRemoteDied called
+    ASSERT_EQ(count, 1);
 }
 }
 } // namespace DistributedHardware

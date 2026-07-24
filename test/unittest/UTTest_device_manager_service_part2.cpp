@@ -263,7 +263,7 @@ HWTEST_F(DeviceManagerServiceTest, DpAclAdd_002, testing::ext::TestSize.Level1)
     std::string udid = "udid";
     int64_t accessControlId = 0;
     int32_t ret = DeviceManagerService::GetInstance().DpAclAdd(udid, accessControlId);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_002, testing::ext::TestSize.Level1)
 {
