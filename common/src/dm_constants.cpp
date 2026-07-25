@@ -235,5 +235,8 @@ const int32_t ACL_LIFE_CYCLE_DAYS_MIN = 1;
 const int32_t ACL_LIFE_CYCLE_DAYS_MAX = 3650;
 const int32_t SECONDS_PER_DAY = 86400;
 const char* DM_ACCOUNT_CONSTRAINT = "constraint.distributed.transmission";
+
+const char* TAG_SUB_PROFILE_ID = "subProfileId";
+const char* TAG_PREVIOUS_SUB_PROFILE_ID = "previousSubProfileId";
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -14,6 +14,7 @@
  */
 #include "dm_crypto.h"
 #include "dm_log.h"
+#include "securec.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "datetime_ex.h"
 #include "kv_adapter_manager.h"
@@ -41,6 +42,8 @@ constexpr int SHORT_DEVICE_ID_HASH_LENGTH = 16;
 constexpr int32_t SALT_LENGTH = 8;
 const std::string SALT_DEFAULT = "salt_defsalt_def";
 constexpr int SHORT_ACCOUNTID_ID_HASH_LENGTH = 6;
+constexpr int ACCOUNTID_HASH_7_LENGTH = 7;
+constexpr int ACCOUNTID_HASH_7_BYTES = 4;
 constexpr const char* DB_KEY_DELIMITER = "###";
 #define DM_MAX_DEVICE_ID_LEN (97)
 
@@ -248,6 +251,26 @@ DM_EXPORT int32_t Crypto::GetAccountIdHash(const std::string &accountId,
     if (ConvertBytesToHexString(reinterpret_cast<char *>(accountIdHash), SHORT_ACCOUNTID_ID_HASH_LENGTH + 1,
         reinterpret_cast<const uint8_t *>(hash), SHORT_ACCOUNTID_ID_HASH_LENGTH / HEX_TO_UINT8) != DM_OK) {
         LOGE("ConvertBytesToHexString failed.");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+DM_EXPORT int32_t Crypto::GetAccountIdHash7(const std::string &accountId,
+    unsigned char *accountIdHash)
+{
+    unsigned char hash[SHA256_DIGEST_LENGTH] = "";
+    DmGenerateStrHash(accountId.data(), accountId.size(), hash, SHA256_DIGEST_LENGTH, 0);
+    char tempHash[ACCOUNTID_HASH_7_BYTES * HEX_TO_UINT8 + 1] = {0};
+    if (ConvertBytesToHexString(tempHash, ACCOUNTID_HASH_7_BYTES * HEX_TO_UINT8 + 1,
+        reinterpret_cast<const uint8_t *>(hash), ACCOUNTID_HASH_7_BYTES) != DM_OK) {
+        LOGE("ConvertBytesToHexString failed.");
+        return ERR_DM_FAILED;
+    }
+    errno_t err = strncpy_s(reinterpret_cast<char *>(accountIdHash), ACCOUNTID_HASH_7_LENGTH + 1,
+        tempHash, ACCOUNTID_HASH_7_LENGTH);
+    if (err != EOK) {
+        LOGE("strncpy_s failed.");
         return ERR_DM_FAILED;
     }
     return DM_OK;

@@ -20,6 +20,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
+#include "dm_device_info.h"
 #include "dm_log.h"
 #include "multiple_user_connector.h"
 #include "distributed_device_profile_client.h"
@@ -68,7 +69,7 @@ enum DmDevBindType : int32_t {
     DEVICE_ACROSS_ACCOUNT_BIND_TYPE = 4,
     IDENTICAL_ACCOUNT_BIND_TYPE = 5
 };
-
+constexpr int32_t INVALID_PROFILE_STATUS = -1;
 }
 IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
 void PrintProfile(const AccessControlProfile &profile)
@@ -4514,6 +4515,376 @@ void DeviceProfileConnector::FillDmUserRemovedServiceInfoLocal(
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {
     return &DeviceProfileConnector::GetInstance();
+}
+
+void DeviceProfileConnector::HandleDistributedAccountLogin(const std::string &localUdid, int32_t userId,
+    const std::string &accountId)
+{
+    LOGI("HandleDistributedAccountLogin: localUdid %{public}s, userId %{public}d, accountId %{public}s",
+        GetAnonyString(localUdid).c_str(), userId, GetAnonyString(accountId).c_str());
+    UpdateAclStatusByAccountId(localUdid, userId, accountId, ACTIVE);
+}
+
+void DeviceProfileConnector::HandleDistributedAccountUnbound(const std::string &localUdid, int32_t userId,
+    const std::string &accountId)
+{
+    LOGI("HandleDistributedAccountUnbound: localUdid %{public}s, userId %{public}d, accountId %{public}s",
+        GetAnonyString(localUdid).c_str(), userId, GetAnonyString(accountId).c_str());
+    DeleteAclByAccountId(localUdid, userId, accountId);
+}
+
+void DeviceProfileConnector::HandleDistributedAccountLogout(const std::string &localUdid, int32_t userId,
+    const std::string &accountId)
+{
+    LOGI("HandleDistributedAccountLogout: localUdid %{public}s, userId %{public}d, accountId %{public}s",
+        GetAnonyString(localUdid).c_str(), userId, GetAnonyString(accountId).c_str());
+    UpdateAclStatusByAccountId(localUdid, userId, accountId, INACTIVE);
+}
+
+void DeviceProfileConnector::HandleDistributedAccountLogout(const std::string &localUdid, int32_t userId,
+    const std::string &accountId, const std::string &peerUdid)
+{
+    LOGI("HandleDistributedAccountLogout: localUdid %{public}s, userId %{public}d, accountId %{public}s,"
+        "peerUdid %{public}s", GetAnonyString(localUdid).c_str(), userId, GetAnonyString(accountId).c_str(),
+        GetAnonyString(peerUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    for (const auto &profile : profiles) {
+        if (CheckAclMatchByAccountId(profile, localUdid, userId, accountId, peerUdid)) {
+            AccessControlProfile updateProfile = profile;
+            updateProfile.SetStatus(INACTIVE);
+            int32_t ret = DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(updateProfile);
+            if (ret != DM_OK) {
+                LOGE("UpdateAccessControlProfile failed for accountId %{public}s, peerUdid %{public}s, ret %{public}d",
+                    GetAnonyString(accountId).c_str(), GetAnonyString(peerUdid).c_str(), ret);
+            }
+        }
+    }
+}
+
+bool DeviceProfileConnector::IsAccountInForeground(int32_t userId, const std::string &accountIdHash,
+    const std::vector<ForegroundAccountInfo> &foregroundAccounts)
+{
+    for (const auto &account : foregroundAccounts) {
+        if (account.userId == userId && account.accountId == accountIdHash) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool DeviceProfileConnector::IsAccountInForegroundByUserId(int32_t userId,
+    const std::vector<ForegroundAccountInfo> &foregroundAccounts)
+{
+    for (const auto &account : foregroundAccounts) {
+        if (account.userId == userId) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int32_t DeviceProfileConnector::GetDeviceTypeFromExtraData(const std::string &extraData)
+{
+    if (extraData.empty()) {
+        return DEVICE_TYPE_UNKNOWN;
+    }
+    JsonObject extJson(extraData);
+    if (!extJson.IsDiscarded() && extJson["deviceType"].IsNumber()) {
+        return extJson["deviceType"].Get<int32_t>();
+    }
+    return DEVICE_TYPE_UNKNOWN;
+}
+
+int32_t DeviceProfileConnector::CalculateProfileTargetStatus(const AccessControlProfile &profile,
+    const std::string &localUdid, const std::string &peerUdid,
+    const std::vector<ForegroundAccountInfo> &localForegroundAccounts,
+    const std::vector<ForegroundAccountInfo> &peerForegroundAccounts)
+{
+    std::string accesserUdid = profile.GetAccesser().GetAccesserDeviceId();
+    std::string accesseeUdid = profile.GetAccessee().GetAccesseeDeviceId();
+    if ((accesserUdid != localUdid || accesseeUdid != peerUdid) &&
+        (accesserUdid != peerUdid || accesseeUdid != localUdid)) {
+        return INVALID_PROFILE_STATUS;
+    }
+
+    char accesserAccountIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    char accesseeAccountIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (Crypto::GetAccountIdHash7(profile.GetAccesser().GetAccesserAccountId(),
+        reinterpret_cast<uint8_t *>(accesserAccountIdHash)) != DM_OK ||
+        Crypto::GetAccountIdHash7(profile.GetAccessee().GetAccesseeAccountId(),
+        reinterpret_cast<uint8_t *>(accesseeAccountIdHash)) != DM_OK) {
+        return INVALID_PROFILE_STATUS;
+    }
+
+    bool localNeedCheckAccountId = true;
+    bool peerNeedCheckAccountId = true;
+    bool isP2P = (profile.GetBindType() == DM_POINT_TO_POINT || profile.GetBindType() == DM_ACROSS_ACCOUNT);
+    if (isP2P) {
+        int32_t accesserDeviceType = GetDeviceTypeFromExtraData(profile.GetAccesser().GetAccesserExtraData());
+        int32_t accesseeDeviceType = GetDeviceTypeFromExtraData(profile.GetAccessee().GetAccesseeExtraData());
+        localNeedCheckAccountId = (accesserUdid == localUdid) ?
+            (accesserDeviceType == DEVICE_TYPE_CAR) : (accesseeDeviceType == DEVICE_TYPE_CAR);
+        peerNeedCheckAccountId = (accesserUdid == localUdid) ?
+            (accesseeDeviceType == DEVICE_TYPE_CAR) : (accesserDeviceType == DEVICE_TYPE_CAR);
+    }
+
+    int32_t accesserUserId = profile.GetAccesser().GetAccesserUserId();
+    int32_t accesseeUserId = profile.GetAccessee().GetAccesseeUserId();
+    auto localCheck = [&](int32_t userId, const std::string &accountIdHash) {
+        return localNeedCheckAccountId ? IsAccountInForeground(userId, accountIdHash, localForegroundAccounts) :
+            IsAccountInForegroundByUserId(userId, localForegroundAccounts);
+    };
+    auto peerCheck = [&](int32_t userId, const std::string &accountIdHash) {
+        return peerNeedCheckAccountId ? IsAccountInForeground(userId, accountIdHash, peerForegroundAccounts) :
+            IsAccountInForegroundByUserId(userId, peerForegroundAccounts);
+    };
+
+    bool localInForeground = (accesserUdid == localUdid) ?
+        localCheck(accesserUserId, accesserAccountIdHash) : localCheck(accesseeUserId, accesseeAccountIdHash);
+    bool peerInForeground = (accesserUdid == localUdid) ?
+        peerCheck(accesseeUserId, accesseeAccountIdHash) : peerCheck(accesserUserId, accesserAccountIdHash);
+
+    return (localInForeground && peerInForeground) ? ACTIVE : INACTIVE;
+}
+
+int32_t DeviceProfileConnector::UpdateAclByDualForegroundAccountHash(const std::string &localUdid,
+    const std::string &peerUdid, const std::vector<ForegroundAccountInfo> &localForegroundAccounts,
+    const std::vector<ForegroundAccountInfo> &peerForegroundAccounts)
+{
+    LOGI("localUdid %{public}s, peerUdid %{public}s, localAccounts %{public}zu, peerAccounts %{public}zu",
+        GetAnonyString(localUdid).c_str(), GetAnonyString(peerUdid).c_str(),
+        localForegroundAccounts.size(), peerForegroundAccounts.size());
+    
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    std::vector<AccessControlProfile> inactiveProfiles;
+    std::vector<AccessControlProfile> activeProfiles;
+    
+    for (const auto &profile : profiles) {
+        int32_t targetStatus = CalculateProfileTargetStatus(profile, localUdid, peerUdid,
+            localForegroundAccounts, peerForegroundAccounts);
+        if (targetStatus < 0 || profile.GetStatus() == targetStatus) {
+            continue;
+        }
+        
+        AccessControlProfile updateProfile = profile;
+        updateProfile.SetStatus(targetStatus);
+        if (targetStatus == INACTIVE) {
+            inactiveProfiles.push_back(updateProfile);
+        } else {
+            activeProfiles.push_back(updateProfile);
+        }
+    }
+    
+    for (const auto &profile : inactiveProfiles) {
+        int32_t ret = DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(profile);
+        if (ret != DM_OK) {
+            LOGE("Update inactive profile failed, ret %{public}d", ret);
+            return ret;
+        }
+    }
+    
+    for (const auto &profile : activeProfiles) {
+        int32_t ret = DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(profile);
+        if (ret != DM_OK) {
+            LOGE("Update active profile failed, ret %{public}d", ret);
+            return ret;
+        }
+    }
+    
+    return DM_OK;
+}
+
+bool DeviceProfileConnector::CheckAclMatchByAccountId(const AccessControlProfile &profile,
+    const std::string &localUdid, int32_t userId, const std::string &accountId)
+{
+    return CheckAclMatchByAccountId(profile, localUdid, userId, accountId, "");
+}
+
+bool DeviceProfileConnector::CheckAclMatchByAccountId(const AccessControlProfile &profile,
+    const std::string &localUdid, int32_t userId, const std::string &accountId, const std::string &peerUdid)
+{
+    return CheckAclMatchAccesser(profile, localUdid, userId, accountId, peerUdid) ||
+        CheckAclMatchAccessee(profile, localUdid, userId, accountId, peerUdid);
+}
+
+bool DeviceProfileConnector::CheckAclMatchAccesser(const AccessControlProfile &profile,
+    const std::string &localUdid, int32_t userId, const std::string &accountId, const std::string &peerUdid)
+{
+    std::string accesserUdid = profile.GetAccesser().GetAccesserDeviceId();
+    int32_t accesserUserId = profile.GetAccesser().GetAccesserUserId();
+    std::string accesserAccountId = profile.GetAccesser().GetAccesserAccountId();
+    std::string accesseeUdid = profile.GetAccessee().GetAccesseeDeviceId();
+    
+    if (accesserUdid != localUdid || accesserUserId != userId) {
+        return false;
+    }
+    if (accesserAccountId != accountId) {
+        return false;
+    }
+    if (!peerUdid.empty() && accesseeUdid != peerUdid) {
+        return false;
+    }
+    return true;
+}
+
+bool DeviceProfileConnector::CheckAclMatchAccessee(const AccessControlProfile &profile,
+    const std::string &localUdid, int32_t userId, const std::string &accountId, const std::string &peerUdid)
+{
+    std::string accesseeUdid = profile.GetAccessee().GetAccesseeDeviceId();
+    int32_t accesseeUserId = profile.GetAccessee().GetAccesseeUserId();
+    std::string accesseeAccountId = profile.GetAccessee().GetAccesseeAccountId();
+    std::string accesserUdid = profile.GetAccesser().GetAccesserDeviceId();
+    
+    if (accesseeUdid != localUdid || accesseeUserId != userId) {
+        return false;
+    }
+    if (accesseeAccountId != accountId) {
+        return false;
+    }
+    if (!peerUdid.empty() && accesserUdid != peerUdid) {
+        return false;
+    }
+    return true;
+}
+
+bool DeviceProfileConnector::CheckAclMatchByAccountIdHash(const AccessControlProfile &profile,
+    const std::string &peerUdid, int32_t userId, const std::string &accountIdHash)
+{
+    return CheckAclMatchAccesserByAccountIdHash(profile, peerUdid, userId, accountIdHash) ||
+        CheckAclMatchAccesseeByAccountIdHash(profile, peerUdid, userId, accountIdHash);
+}
+
+bool DeviceProfileConnector::CheckAclMatchAccesserByAccountIdHash(const AccessControlProfile &profile,
+    const std::string &peerUdid, int32_t userId, const std::string &accountIdHash)
+{
+    std::string accesserUdid = profile.GetAccesser().GetAccesserDeviceId();
+    int32_t accesserUserId = profile.GetAccesser().GetAccesserUserId();
+    std::string accesserAccountId = profile.GetAccesser().GetAccesserAccountId();
+    char accesserAccountIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (Crypto::GetAccountIdHash7(accesserAccountId, reinterpret_cast<uint8_t *>(accesserAccountIdHash)) != DM_OK) {
+        return false;
+    }
+    return (accesserUdid == peerUdid && accesserUserId == userId &&
+        std::string(accesserAccountIdHash) == accountIdHash);
+}
+
+bool DeviceProfileConnector::CheckAclMatchAccesseeByAccountIdHash(const AccessControlProfile &profile,
+    const std::string &peerUdid, int32_t userId, const std::string &accountIdHash)
+{
+    std::string accesseeUdid = profile.GetAccessee().GetAccesseeDeviceId();
+    int32_t accesseeUserId = profile.GetAccessee().GetAccesseeUserId();
+    std::string accesseeAccountId = profile.GetAccessee().GetAccesseeAccountId();
+    char accesseeAccountIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (Crypto::GetAccountIdHash7(accesseeAccountId, reinterpret_cast<uint8_t *>(accesseeAccountIdHash)) != DM_OK) {
+        return false;
+    }
+    return (accesseeUdid == peerUdid && accesseeUserId == userId &&
+        std::string(accesseeAccountIdHash) == accountIdHash);
+}
+
+std::vector<AccessControlProfile> DeviceProfileConnector::GetAclByAccountId(
+    const std::string &localUdid, int32_t userId, const std::string &accountId)
+{
+    std::vector<AccessControlProfile> result;
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    for (const auto &profile : profiles) {
+        if (CheckAclMatchByAccountId(profile, localUdid, userId, accountId)) {
+            result.push_back(profile);
+        }
+    }
+    LOGI("GetAclByAccountId: found %{public}zu ACLs for accountId %{public}s",
+        result.size(), GetAnonyString(accountId).c_str());
+    return result;
+}
+
+int32_t DeviceProfileConnector::UpdateAclStatusByAccountId(const std::string &localUdid, int32_t userId,
+    const std::string &accountId, int32_t newStatus)
+{
+    LOGI("localUdid %{public}s, userId %{public}d, accountId %{public}s, newStatus %{public}d",
+        GetAnonyString(localUdid).c_str(), userId, GetAnonyString(accountId).c_str(), newStatus);
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    int32_t updateCount = 0;
+    for (const auto &profile : profiles) {
+        if (CheckAclMatchByAccountId(profile, localUdid, userId, accountId) && profile.GetStatus() != newStatus) {
+            AccessControlProfile updateProfile = profile;
+            updateProfile.SetStatus(newStatus);
+            int32_t ret = DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(updateProfile);
+            if (ret == DM_OK) {
+                updateCount++;
+            } else {
+                LOGE("UpdateAccessControlProfile failed, ret %{public}d", ret);
+            }
+        }
+    }
+    LOGI("Updated %{public}d ACLs", updateCount);
+    return DM_OK;
+}
+
+int32_t DeviceProfileConnector::UpdateAclStatusByAccountIdHash(const std::string &localUdid, int32_t userId,
+    const std::string &accountIdHash, int32_t newStatus, const std::string &peerUdid)
+{
+    LOGI("localUdid %{public}s, userId %{public}d, accountIdHash %{public}s, newStatus %{public}d, peerUdid %{public}s",
+        GetAnonyString(localUdid).c_str(), userId, GetAnonyString(accountIdHash).c_str(), newStatus,
+        GetAnonyString(peerUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    int32_t updateCount = 0;
+    for (const auto &profile : profiles) {
+        if (CheckAclMatchByAccountIdHash(profile, peerUdid, userId, accountIdHash) &&
+            profile.GetStatus() != newStatus) {
+            AccessControlProfile updateProfile = profile;
+            updateProfile.SetStatus(newStatus);
+            int32_t ret = DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(updateProfile);
+            if (ret == DM_OK) {
+                updateCount++;
+            } else {
+                LOGE("UpdateAccessControlProfile failed (accesser), ret %{public}d", ret);
+            }
+        }
+    }
+    LOGI("Updated %{public}d ACLs by accountIdHash", updateCount);
+    return DM_OK;
+}
+
+int32_t DeviceProfileConnector::DeleteAclByAccountId(const std::string &localUdid, int32_t userId,
+    const std::string &accountId)
+{
+    return DeleteAclByAccountId(localUdid, userId, accountId, "");
+}
+
+int32_t DeviceProfileConnector::DeleteAclByAccountId(const std::string &localUdid, int32_t userId,
+    const std::string &accountId, const std::string &peerUdid)
+{
+    LOGI("localUdid %{public}s, userId %{public}d, accountId %{public}s, peerUdid %{public}s",
+        GetAnonyString(localUdid).c_str(), userId, GetAnonyString(accountId).c_str(),
+        GetAnonyString(peerUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    int32_t deleteCount = 0;
+    for (const auto &profile : profiles) {
+        if (CheckAclMatchByAccountId(profile, localUdid, userId, accountId, peerUdid)) {
+            DeleteAccessControlById(profile.GetAccessControlId());
+            deleteCount++;
+        }
+    }
+    LOGI("Deleted %{public}d ACLs", deleteCount);
+    return DM_OK;
+}
+
+int32_t DeviceProfileConnector::DeleteAclByAccountIdHash(const std::string &localUdid, int32_t userId,
+    const std::string &accountIdHash, const std::string &peerUdid)
+{
+    LOGI("localUdid %{public}s, userId %{public}d, accountIdHash %{public}s, peerUdid %{public}s",
+        GetAnonyString(localUdid).c_str(), userId, GetAnonyString(accountIdHash).c_str(),
+        GetAnonyString(peerUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    int32_t deleteCount = 0;
+    for (const auto &profile : profiles) {
+        if (CheckAclMatchByAccountIdHash(profile, peerUdid, userId, accountIdHash)) {
+            DeleteAccessControlById(profile.GetAccessControlId());
+            deleteCount++;
+        }
+    }
+    LOGI("Deleted %{public}d ACLs by accountIdHash", deleteCount);
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

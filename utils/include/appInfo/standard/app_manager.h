@@ -42,6 +42,8 @@ public:
     DM_EXPORT int32_t GetNativeTokenIdByName(std::string &processName, int64_t &tokenId);
     DM_EXPORT int32_t GetHapTokenIdByName(int32_t userId, std::string &bundleName,
         int32_t instIndex, int64_t &tokenId);
+    DM_EXPORT int32_t GetHapTokenIdByCloneBundleInfo(int32_t userId, std::string &bundleName,
+        int32_t appIndex, int64_t &tokenId);
     DM_EXPORT int32_t GetCallerProcessName(std::string &processName);
     DM_EXPORT int32_t GetBundleNameForSelf(std::string &bundleName);
     DM_EXPORT int32_t GetBundleNameByTokenId(int64_t tokenId, std::string &bundleName);

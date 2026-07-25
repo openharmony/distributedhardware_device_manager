@@ -248,6 +248,9 @@ extern const char* PEER_UDID;
 extern const char* PEER_OSTYPE;
 extern const char* TIME_STAMP;
 extern const char* DM_ACCOUNT_CONSTRAINT;
+
+DM_EXPORT extern const char* TAG_SUB_PROFILE_ID;
+DM_EXPORT extern const char* TAG_PREVIOUS_SUB_PROFILE_ID;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

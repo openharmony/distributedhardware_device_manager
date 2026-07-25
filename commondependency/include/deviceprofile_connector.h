@@ -23,6 +23,7 @@
 #include "access_control_profile.h"
 #include "dm_device_info.h"
 #include "dm_single_instance.h"
+#include "foreground_account_info.h"
 #include "i_dp_inited_callback.h"
 #include "json_object.h"
 #include "local_service_info.h"
@@ -407,6 +408,45 @@ public:
     DM_EXPORT void GetPeerTokenIdForServiceProxyUnbind(int32_t userId, uint64_t localTokenId,
         const std::string &peerUdid, int64_t serviceId, std::vector<uint64_t> &peerTokenId);
     DM_EXPORT void GetInvalidSkIdAcl(std::map<std::string, DmOfflineParam> &invalidAclMap);
+
+    DM_EXPORT void HandleDistributedAccountLogin(const std::string &localUdid, int32_t userId,
+        const std::string &accountId);
+    DM_EXPORT void HandleDistributedAccountUnbound(const std::string &localUdid, int32_t userId,
+        const std::string &accountId);
+    DM_EXPORT void HandleDistributedAccountLogout(const std::string &localUdid, int32_t userId,
+        const std::string &accountId);
+    DM_EXPORT void HandleDistributedAccountLogout(const std::string &localUdid, int32_t userId,
+        const std::string &accountId, const std::string &peerUdid);
+    DM_EXPORT bool CheckAclMatchByAccountId(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &localUdid, int32_t userId, const std::string &accountId);
+    DM_EXPORT bool CheckAclMatchByAccountId(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &localUdid, int32_t userId, const std::string &accountId, const std::string &peerUdid);
+    DM_EXPORT bool CheckAclMatchAccesser(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &localUdid, int32_t userId, const std::string &accountId, const std::string &peerUdid);
+    DM_EXPORT bool CheckAclMatchAccessee(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &localUdid, int32_t userId, const std::string &accountId, const std::string &peerUdid);
+    DM_EXPORT bool CheckAclMatchByAccountIdHash(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &peerUdid, int32_t userId, const std::string &accountIdHash);
+    DM_EXPORT bool CheckAclMatchAccesserByAccountIdHash(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &peerUdid, int32_t userId, const std::string &accountIdHash);
+    DM_EXPORT bool CheckAclMatchAccesseeByAccountIdHash(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &peerUdid, int32_t userId, const std::string &accountIdHash);
+    DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclByAccountId(
+        const std::string &localUdid, int32_t userId, const std::string &accountId);
+    DM_EXPORT int32_t UpdateAclStatusByAccountId(const std::string &localUdid, int32_t userId,
+        const std::string &accountId, int32_t newStatus);
+    DM_EXPORT int32_t UpdateAclStatusByAccountIdHash(const std::string &localUdid, int32_t userId,
+        const std::string &accountIdHash, int32_t newStatus, const std::string &peerUdid);
+    DM_EXPORT int32_t DeleteAclByAccountId(const std::string &localUdid, int32_t userId,
+        const std::string &accountId);
+    DM_EXPORT int32_t DeleteAclByAccountId(const std::string &localUdid, int32_t userId,
+        const std::string &accountId, const std::string &peerUdid);
+    DM_EXPORT int32_t DeleteAclByAccountIdHash(const std::string &localUdid, int32_t userId,
+        const std::string &accountIdHash, const std::string &peerUdid);
+    DM_EXPORT int32_t UpdateAclByDualForegroundAccountHash(const std::string &localUdid,
+        const std::string &peerUdid, const std::vector<ForegroundAccountInfo> &localForegroundAccounts,
+        const std::vector<ForegroundAccountInfo> &peerForegroundAccounts);
+
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,
@@ -422,6 +462,15 @@ private:
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &profilesFilter, const int32_t &userId);
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
         const std::string &reqDev);
+    bool IsAccountInForeground(int32_t userId, const std::string &accountIdHash,
+        const std::vector<ForegroundAccountInfo> &foregroundAccounts);
+    bool IsAccountInForegroundByUserId(int32_t userId,
+        const std::vector<ForegroundAccountInfo> &foregroundAccounts);
+    int32_t GetDeviceTypeFromExtraData(const std::string &extraData);
+    int32_t CalculateProfileTargetStatus(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &localUdid, const std::string &peerUdid,
+        const std::vector<ForegroundAccountInfo> &localForegroundAccounts,
+        const std::vector<ForegroundAccountInfo> &peerForegroundAccounts);
     bool CheckAuthFormProxyTokenId(const std::string pkgName, const std::string &extraStr);
     bool CheckAuthFormForAccesser(DmAuthForm form, const std::string &pkgName,
         const DistributedDeviceProfile::AccessControlProfile &profile, bool isSystemSA, uint32_t callingTokenId);
