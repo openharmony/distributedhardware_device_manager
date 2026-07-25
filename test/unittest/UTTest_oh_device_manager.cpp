@@ -63,7 +63,7 @@ HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_003, testing::
     EXPECT_EQ(result, ERR_INVALID_PARAMETER);
 }
 
-HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_004_Auto, testing::ext::TestSize.Level0)
+HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_004_Auto, testing::ext::TestSize.Level1)
 {
     auto fn = OH_DeviceManager_GetLocalDeviceName;
     char *localDeviceName = nullptr;
@@ -76,7 +76,7 @@ HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_004_Auto, test
     }
 }
 
-HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_005_AddrOf, testing::ext::TestSize.Level0)
+HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_005_AddrOf, testing::ext::TestSize.Level1)
 {
     using FnType = int32_t (*)(char **, unsigned int &);
     FnType fnPtr = &OH_DeviceManager_GetLocalDeviceName;
@@ -90,7 +90,7 @@ HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_005_AddrOf, te
     }
 }
 
-HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_006_Decltype, testing::ext::TestSize.Level0)
+HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_006_Decltype, testing::ext::TestSize.Level1)
 {
     using FnType = decltype(&OH_DeviceManager_GetLocalDeviceName);
     FnType fnPtr = &OH_DeviceManager_GetLocalDeviceName;
@@ -104,7 +104,7 @@ HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_006_Decltype, 
     }
 }
 
-HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_007_StdFunction, testing::ext::TestSize.Level0)
+HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_007_StdFunction, testing::ext::TestSize.Level1)
 {
     std::function<int32_t(char **, unsigned int &)> wrapper = OH_DeviceManager_GetLocalDeviceName;
     char *localDeviceName = nullptr;
@@ -119,7 +119,7 @@ HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_007_StdFunctio
 
 /* ---- New C ABI API: OH_DeviceManager_GetLocalDeviceNameC ---- */
 
-HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_001, testing::ext::TestSize.Level0)
+HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_001, testing::ext::TestSize.Level1)
 {
     char *localDeviceName = nullptr;
     unsigned int len = 256;
@@ -131,7 +131,7 @@ HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_001, testing:
     }
 }
 
-HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_002, testing::ext::TestSize.Level0)
+HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_002, testing::ext::TestSize.Level1)
 {
     unsigned int len = 0;
     int32_t result = OH_DeviceManager_GetLocalDeviceNameC(nullptr, &len);
@@ -139,7 +139,7 @@ HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_002, testing:
     EXPECT_EQ(result, ERR_INVALID_PARAMETER);
 }
 
-HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_003, testing::ext::TestSize.Level0)
+HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_003, testing::ext::TestSize.Level1)
 {
     char tmp[] = "nullptr";
     char *localDeviceName = tmp;
@@ -149,7 +149,7 @@ HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_003, testing:
     EXPECT_EQ(result, ERR_INVALID_PARAMETER);
 }
 
-HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_004_Auto, testing::ext::TestSize.Level0)
+HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_004_Auto, testing::ext::TestSize.Level1)
 {
     auto cFn = &OH_DeviceManager_GetLocalDeviceNameC;
     char *localDeviceName = nullptr;
@@ -162,7 +162,7 @@ HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_004_Auto, tes
     }
 }
 
-HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_005_StdFunction, testing::ext::TestSize.Level0)
+HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceNameC_005_StdFunction, testing::ext::TestSize.Level1)
 {
     std::function<int32_t(char **, unsigned int *)> cWrapper = OH_DeviceManager_GetLocalDeviceNameC;
     char *localDeviceName = nullptr;
