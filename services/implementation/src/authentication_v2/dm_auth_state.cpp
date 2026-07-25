@@ -182,6 +182,7 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
         }
     }
     context->processInfo.pkgName = context->accessee.pkgName;
+    context->peerTargetId.serviceId = context->accessee.serviceId;
     context->listener->OnSinkBindResult(context->processInfo, context->peerTargetId,
         GetOutputReplay(context->accessee.bundleName, context->reason),
         GetOutputState(context->state), GenerateBindResultContent(context));
