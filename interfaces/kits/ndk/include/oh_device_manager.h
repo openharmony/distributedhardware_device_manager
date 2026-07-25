@@ -61,7 +61,7 @@ extern "C" {
   *      Returns {@link ERR_INVALID_PARAMETER} is returned if the localDeviceName is nullptr or
   *                                            *localDeviceName is not nullptr.
   * @since 20
-  * @deprecated since 20
+  * @deprecated since 26.0.0
   * @useinstead OH_DeviceManager_GetLocalDeviceNameC
   */
 int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int &len);
