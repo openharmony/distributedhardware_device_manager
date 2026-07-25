@@ -40,7 +40,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-
 /**
   * @brief Obtains the display name of the local device.
   * The device display name involves user privacy.
