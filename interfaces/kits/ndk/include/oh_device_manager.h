@@ -85,8 +85,8 @@ int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int
   *      Returns {@link DM_ERR_FAILED} is returned if the function fails to be executed.
   *      Returns {@link DM_ERR_OBTAIN_SERVICE} is returned if the device management service fails to be obtained.
   *      Returns {@link DM_ERR_OBTAIN_BUNDLE_NAME} is returned if the bundle name fails to be obtained.
-  *      Returns {@link ERR_INVALID_PARAMETER} is returned if the localDeviceName is nullptr,
-  *                                            *localDeviceName is not nullptr, or len is nullptr.
+  *      Returns {@link ERR_INVALID_PARAMETER} is returned if the localDeviceName is nullptr or
+  *                                            *localDeviceName is not nullptr or len is nullptr.
   * @since 26.0.0
   */
 int32_t OH_DeviceManager_GetLocalDeviceNameC(char **localDeviceName, unsigned int *len);
