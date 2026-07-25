@@ -53,6 +53,7 @@ if (defined(ohos_lite)) {
     if (!device_manager_capability) {
       install_enable = false
     } else {
+      branch_protector_ret = "pac_ret"
       sanitize = {
         boundary_sanitize = true
         cfi = true
