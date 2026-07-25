@@ -30,7 +30,7 @@ int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int
 int32_t OH_DeviceManager_GetLocalDeviceNameC(char **localDeviceName, unsigned int *len)
 {
     if (localDeviceName == nullptr || *localDeviceName != nullptr || len == nullptr) {
-        LOGE("localDeviceName is nullptr or *localDeviceName is nullptr or len is nullptr");
+        LOGE("localDeviceName is nullptr or *localDeviceName is not nullptr or len is nullptr");
         return ERR_INVALID_PARAMETER;
     }
     std::string deviceName = "";
