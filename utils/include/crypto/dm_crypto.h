@@ -52,6 +52,10 @@ public:
     // after convert to string, it is 6 bytes.
     DM_EXPORT static int32_t GetAccountIdHash(const std::string &accountId,
         unsigned char *accountIdHash);
+    // use the first 4 bytes of full accountId hash, after convert to string, it is 8 bytes.
+    // then truncate to 7 bytes for payload compatibility.
+    DM_EXPORT static int32_t GetAccountIdHash7(const std::string &accountId,
+        unsigned char *accountIdHash);
     // use the first 16 bytes of full accountId hash
     // after convert to string, it is 32 bytes.
     DM_EXPORT static std::string GetAccountIdHash16(const std::string &accountId);

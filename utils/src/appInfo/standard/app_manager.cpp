@@ -268,6 +268,36 @@ DM_EXPORT int32_t AppManager::GetHapTokenIdByName(int32_t userId,
     return DM_OK;
 }
 
+DM_EXPORT int32_t AppManager::GetHapTokenIdByCloneBundleInfo(int32_t userId,
+    std::string &bundleName, int32_t appIndex, int64_t &tokenId)
+{
+    if (appIndex <= 1) {
+        return GetHapTokenIdByName(userId, bundleName, 0, tokenId);
+    }
+    sptr<AppExecFwk::IBundleMgr> bundleManager = nullptr;
+    if (!GetBundleManagerProxy(bundleManager)) {
+        LOGE("get bundleManager failed.");
+        return ERR_DM_GET_BMS_FAILED;
+    }
+    if (bundleManager == nullptr) {
+        LOGE("bundleManager is nullptr.");
+        return ERR_DM_GET_BMS_FAILED;
+    }
+    AppExecFwk::BundleInfo bundleInfo;
+    int32_t flags = static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_DEFAULT) |
+        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION);
+    int32_t ret = bundleManager->GetCloneBundleInfo(bundleName, flags, appIndex, bundleInfo, userId);
+    if (ret != ERR_OK) {
+        LOGE("GetCloneBundleInfo failed, ret %{public}d, bundleName %{public}s, appIndex %{public}d, userId %{public}d",
+            ret, GetAnonyString(bundleName).c_str(), appIndex, userId);
+        return ERR_DM_FAILED;
+    }
+    tokenId = static_cast<int64_t>(bundleInfo.applicationInfo.accessTokenId);
+    LOGI("GetHapTokenIdByCloneBundleInfo success, bundleName %{public}s, appIndex %{public}d, tokenId %{public}s",
+        GetAnonyString(bundleName).c_str(), appIndex, GetAnonyInt64(tokenId).c_str());
+    return DM_OK;
+}
+
 DM_EXPORT int32_t AppManager::GetCallerProcessName(std::string &processName)
 {
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
