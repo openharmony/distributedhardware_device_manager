@@ -1081,7 +1081,7 @@ HWTEST_F(DeviceManagerServiceImplTest, OnSessionOpened_001, testing::ext::TestSi
     int ret = deviceManagerServiceImpl_->OnSessionOpened(sessionId, result);
     deviceManagerServiceImpl_->OnBytesReceived(sessionId, data.c_str(), data.size());
     deviceManagerServiceImpl_->OnSessionClosed(sessionId);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
 /**

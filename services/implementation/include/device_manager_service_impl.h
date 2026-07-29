@@ -373,6 +373,7 @@ private:
     std::map<uint64_t, std::shared_ptr<AuthManagerBase>> authMgrMap_;  // New protocol sharing
     ffrt::mutex tokenIdSessionIdMapMtx_;
     std::map<uint64_t, int> tokenIdSessionIdMap_;  // New protocol sharing
+    std::atomic<bool> isServerBusy_ = false;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
