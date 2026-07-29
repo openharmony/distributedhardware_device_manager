@@ -21,11 +21,13 @@
 #include <openssl/rand.h>
 #include <thread>
 #include "app_manager.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_device_info.h"
 #include "dm_hidumper.h"
 #include "dm_softbus_cache.h"
+#include "json_object.h"
 #include "parameter.h"
 #include "permission_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -1680,6 +1682,44 @@ int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgNa
     }
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     return softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+}
+
+int32_t DeviceManagerService::GetOsTypeByNetworkId(const std::string &pkgName, const std::string &networkId,
+    int32_t &osType)
+{
+    CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
+    CHECK_EMPTY_RETURN(networkId, ERR_DM_INPUT_PARA_INVALID);
+    if (CheckConstraintEnabledByNetworkId(networkId)) {
+        LOGI("constraint enable is true");
+        osType = -1;
+        return DM_OK;
+    }
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission() ||
+        !PermissionManager::GetInstance().CheckDataSyncPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call GetOsTypeByNetworkId.", pkgName.c_str());
+        osType = -1;
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!AppManager::GetInstance().IsSystemApp()) {
+        LOGE("The caller: %{public}s is not system app.", pkgName.c_str());
+        osType = -1;
+        return ERR_DM_NOT_SYSTEM_APP;
+    }
+    DmDeviceInfo devInfo;
+    int32_t ret = SoftbusCache::GetInstance().GetDevInfoByNetworkId(networkId, devInfo);
+    if (ret != DM_OK) {
+        LOGE("GetDevInfoByNetworkId failed, ret: %{public}d", ret);
+        osType = -1;
+        return ERR_DM_GET_OSTYPE_FAILED;
+    }
+    JsonObject extraJson(devInfo.extraData);
+    if (extraJson.IsDiscarded() || !IsInt32(extraJson, PARAM_KEY_OS_TYPE)) {
+        LOGE("Parse osType from extraData failed.");
+        osType = -1;
+        return ERR_DM_GET_OSTYPE_FAILED;
+    }
+    osType = extraJson[PARAM_KEY_OS_TYPE].Get<int32_t>();
+    return DM_OK;
 }
 
 int32_t DeviceManagerService::ImportAuthCode(const std::string &pkgName, const std::string &authCode)

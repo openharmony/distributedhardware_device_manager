@@ -53,6 +53,8 @@
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_unpublish_req.h"
 #include "json_object.h"
+#include "ipc_get_os_type_by_network_req.h"
+#include "ipc_get_os_type_by_network_rsp.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -1346,6 +1348,49 @@ HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_032, testing::ext::TestSize.L
 {
     int32_t cmdCode = IMPORT_AUTH_INFO;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
+}
+
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmd_001, testing::ext::TestSize.Level1)
+{
+    int32_t cmdCode = GET_OS_TYPE_BY_NETWORK;
+    MessageParcel data;
+    MessageParcel reply;
+    std::string pkgName = "ohos.dm.test";
+    std::string networkId = "networkId123";
+    data.WriteString(pkgName);
+    data.WriteString(networkId);
+    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
+    ASSERT_TRUE(ptr != nullptr);
+    int32_t ret = ptr(data, reply);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, SetRequest_GetOsTypeByNetwork_001, testing::ext::TestSize.Level1)
+{
+    int32_t cmdCode = GET_OS_TYPE_BY_NETWORK;
+    std::shared_ptr<IpcGetOsTypeByNetworkIdReq> req = std::make_shared<IpcGetOsTypeByNetworkIdReq>();
+    req->SetPkgName("ohos.dm.test");
+    req->SetNetworkId("networkId123");
+    MessageParcel data;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    ASSERT_TRUE(ptr != nullptr);
+    int32_t ret = ptr(req, data);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, ReadResponse_GetOsTypeByNetwork_001, testing::ext::TestSize.Level1)
+{
+    int32_t cmdCode = GET_OS_TYPE_BY_NETWORK;
+    MessageParcel reply;
+    reply.WriteInt32(DM_OK);
+    reply.WriteInt32(1);
+    std::shared_ptr<IpcGetOsTypeByNetworkIdRsp> rsp = std::make_shared<IpcGetOsTypeByNetworkIdRsp>();
+    ReadResponseFunc ptr = GetResponseFunc(cmdCode);
+    ASSERT_TRUE(ptr != nullptr);
+    int32_t ret = ptr(reply, rsp);
+    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(rsp->GetErrCode(), DM_OK);
+    ASSERT_EQ(rsp->GetOsType(), 1);
 }
 } // namespace
 } // namespace DistributedHardware

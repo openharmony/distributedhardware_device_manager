@@ -1587,6 +1587,37 @@ napi_value DeviceManagerNapi::GetDeviceType(napi_env env, napi_callback_info inf
     return result;
 }
 
+napi_value DeviceManagerNapi::GetOsTypeByNetworkId(napi_env env, napi_callback_info info)
+{
+    LOGI("in");
+    napi_value result = nullptr;
+    int32_t osType = -1;
+    napi_create_int32(env, osType, &result);
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
+        return result;
+    }
+    DeviceManagerNapi *deviceManagerWrapper = nullptr;
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        return result;
+    }
+    std::string networkId;
+    if (!JsToStringAndCheck(env, argv[0], "networkId", networkId)) {
+        return result;
+    }
+
+    int32_t ret = DeviceManager::GetInstance().GetOsTypeByNetworkId(deviceManagerWrapper->bundleName_,
+        networkId, osType);
+    if (ret != 0) {
+        LOGE("ret %{public}d", ret);
+        CreateBusinessError(env, ret);
+        return result;
+    }
+    LOGI("osType:%{public}d", osType);
+    napi_create_int32(env, osType, &result);
+    return result;
+}
+
 void DeviceManagerNapi::LockDiscoveryCallbackMutex(napi_env env, std::string &bundleName,
     std::map<std::string, std::string> discParam, std::string &extra, uint32_t subscribeId)
 {
@@ -2857,6 +2888,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getLocalDeviceType", GetLocalDeviceType),
         DECLARE_NAPI_FUNCTION("getDeviceName", GetDeviceName),
         DECLARE_NAPI_FUNCTION("getDeviceType", GetDeviceType),
+        DECLARE_NAPI_FUNCTION("getOsTypeByNetworkId", GetOsTypeByNetworkId),
         DECLARE_NAPI_FUNCTION("startDiscovering", StartDeviceDiscover),
         DECLARE_NAPI_FUNCTION("stopDiscovering", StopDeviceDiscover),
         DECLARE_NAPI_FUNCTION("unbindTarget", UnBindTarget),

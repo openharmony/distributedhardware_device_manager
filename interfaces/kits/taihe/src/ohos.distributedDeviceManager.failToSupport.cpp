@@ -166,6 +166,12 @@ int32_t DmImpFaiToSupport::GetDeviceType(taihe::string_view networkId)
     return 0;
 }
 
+int32_t DmImpFaiToSupport::GetOsTypeByNetworkId(taihe::string_view networkId)
+{
+    ThrowErrorLite(DM_ERR_DEVICE_NOT_SUPPORT, "device not support");
+    return -1;
+}
+
 void DmImpFaiToSupport::ReplyUiAction(int32_t action, ::taihe::string_view actionResult)
 {
     LOGI("device not support");

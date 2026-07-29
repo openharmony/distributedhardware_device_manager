@@ -408,6 +408,16 @@ public:
         const std::string &netWorkId, int32_t &netWorkType) = 0;
 
     /**
+     * @brief Get OS Type by NetworkId.
+     * @param pkgName   package name.
+     * @param networkId network ID.
+     * @param osType    OS Type.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t GetOsTypeByNetworkId(const std::string &pkgName,
+        const std::string &networkId, int32_t &osType) = 0;
+
+    /**
      * @brief Import Auth Code.
      * @param pkgName  BindDevice caller package name.
      * @param authCode  Authentication code.

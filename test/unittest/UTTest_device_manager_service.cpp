@@ -72,6 +72,7 @@ void DeviceManagerServiceTest::TearDown()
     Mock::VerifyAndClearExpectations(dMCommToolMock_.get());
     Mock::VerifyAndClearExpectations(deviceProfileConnectorMock_.get());
     Mock::VerifyAndClearExpectations(deviceNameManagerMock_.get());
+    Mock::VerifyAndClearExpectations(dmConstrainsManagerMock_.get());
 }
 
 void DeviceManagerServiceTest::SetUpTestCase()
@@ -87,6 +88,7 @@ void DeviceManagerServiceTest::SetUpTestCase()
     DmDMCommTool::dmDMCommTool = dMCommToolMock_;
     DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock_;
     DmDeviceNameManager::dmDeviceNameManager_ = deviceNameManagerMock_;
+    DmDmConstrainsManager::dmConstrainsManager = dmConstrainsManagerMock_;
 }
 
 void DeviceManagerServiceTest::TearDownTestCase()
@@ -113,6 +115,8 @@ void DeviceManagerServiceTest::TearDownTestCase()
     deviceProfileConnectorMock_ = nullptr;
     DmDeviceNameManager::dmDeviceNameManager_ = nullptr;
     deviceNameManagerMock_ = nullptr;
+    DmDmConstrainsManager::dmConstrainsManager = nullptr;
+    dmConstrainsManagerMock_ = nullptr;
 }
 
 void DeletePermission()

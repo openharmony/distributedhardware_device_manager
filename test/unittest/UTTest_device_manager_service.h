@@ -30,6 +30,7 @@
 #include "device_name_manager_mock.h"
 #include "deviceprofile_connector_mock.h"
 #include "dm_comm_tool_mock.h"
+#include "dm_constraints_manager_mock.h"
 #include "dm_crypto_mock.h"
 #include "dm_single_instance.h"
 #include "dm_softbus_cache_mock.h"
@@ -69,6 +70,8 @@ public:
         std::make_shared<DeviceProfileConnectorMock>();
     static inline std::shared_ptr<DeviceNameManagerMock> deviceNameManagerMock_ =
         std::make_shared<DeviceNameManagerMock>();
+    static inline std::shared_ptr<DmConstrainsManagerMock> dmConstrainsManagerMock_ =
+        std::make_shared<DmConstrainsManagerMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

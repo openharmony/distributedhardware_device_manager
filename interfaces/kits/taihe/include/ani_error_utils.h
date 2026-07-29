@@ -35,6 +35,7 @@ enum DMBusinessErrorCode {
     DM_ERR_FROM_CLOUD_FAILED = 11600106,
     DM_ERR_NEED_LOGIN = 11600107,
     DM_ERR_SCAS_CHECK_FAILED = 11600108,
+    DM_ERR_INVALID_NETWORK_ID = 11600110,
 };
 
 void ThrowError(const char *message);

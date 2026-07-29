@@ -1923,6 +1923,12 @@ HWTEST_F(IpcCmdParserClientTest, TEST_READ_RESPONSE_NULL_002, testing::ext::Test
     EXPECT_EQ(TestReadResponseRspNull(GET_REGISTER_SERVICE_INFO), ERR_DM_FAILED);
     EXPECT_EQ(TestReadResponseRspNull(GET_PEER_SERVICEINFO_BY_SERVICEID), ERR_DM_FAILED);
     EXPECT_EQ(TestReadResponseRspNull(UNBIND_SERVICE_TARGET), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_OS_TYPE_BY_NETWORK), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, TEST_REQUEST_NULL_003, testing::ext::TestSize.Level2)
+{
+    EXPECT_EQ(TestIpcRequestNull(GET_OS_TYPE_BY_NETWORK), ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware

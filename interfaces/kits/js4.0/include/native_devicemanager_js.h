@@ -362,6 +362,7 @@ public:
     static napi_value GetLocalDeviceType(napi_env env, napi_callback_info info);
     static napi_value GetDeviceName(napi_env env, napi_callback_info info);
     static napi_value GetDeviceType(napi_env env, napi_callback_info info);
+    static napi_value GetOsTypeByNetworkId(napi_env env, napi_callback_info info);
     static napi_value StartDeviceDiscover(napi_env env, napi_callback_info info);
     static napi_value StopDeviceDiscover(napi_env env, napi_callback_info info);
     static napi_value PublishDeviceDiscoverySync(napi_env env, napi_callback_info info);

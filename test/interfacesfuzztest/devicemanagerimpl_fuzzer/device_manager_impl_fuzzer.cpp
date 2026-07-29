@@ -26,6 +26,12 @@
 namespace OHOS {
 namespace DistributedHardware {
 constexpr size_t MAX_STRING_LENGTH = 256;
+enum class EmptyParamCase : int32_t {
+    BOTH_EMPTY = 0,
+    PKG_ONLY = 1,
+    NETWORK_ONLY = 2,
+    BOTH_NON_EMPTY = 3,
+};
 
 namespace {}
 class DevTrustChangeCallbackTest : public DevTrustChangeCallback {
@@ -441,6 +447,64 @@ void UpdateServiceInfoFuzzTest(FuzzedDataProvider &fdp)
     DeviceManagerImpl::GetInstance().UpdateServiceInfo(serviceId, regServiceInfo);
 }
 
+void GetOsTypeByNetworkIdFuzzTest(FuzzedDataProvider &fdp)
+{
+    std::string pkgName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    std::string networkId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    int32_t osType = 0;
+    DeviceManagerImpl::GetInstance().GetOsTypeByNetworkId(pkgName, networkId, osType);
+}
+
+void GetOsTypeByNetworkIdWithEmptyParamsFuzzTest(FuzzedDataProvider &fdp)
+{
+    int32_t choice = fdp.ConsumeIntegralInRange<int32_t>(static_cast<int32_t>(EmptyParamCase::BOTH_EMPTY),
+        static_cast<int32_t>(EmptyParamCase::BOTH_NON_EMPTY));
+    std::string pkgName;
+    std::string networkId;
+    int32_t osType = 0;
+    
+    switch (choice) {
+        case static_cast<int32_t>(EmptyParamCase::BOTH_EMPTY):
+            pkgName = "";
+            networkId = "";
+            break;
+        case static_cast<int32_t>(EmptyParamCase::PKG_ONLY):
+            pkgName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+            networkId = "";
+            break;
+        case static_cast<int32_t>(EmptyParamCase::NETWORK_ONLY):
+            pkgName = "";
+            networkId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+            break;
+        case static_cast<int32_t>(EmptyParamCase::BOTH_NON_EMPTY):
+            pkgName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+            networkId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+            break;
+        default:
+            break;
+    }
+    DeviceManagerImpl::GetInstance().GetOsTypeByNetworkId(pkgName, networkId, osType);
+}
+
+void GetOsTypeByNetworkIdWithBoundaryFuzzTest(FuzzedDataProvider &fdp)
+{
+    std::string pkgName;
+    std::string networkId;
+    int32_t osType = 0;
+    
+    int32_t pkgLen = fdp.ConsumeIntegralInRange<int32_t>(0, MAX_STRING_LENGTH);
+    int32_t networkLen = fdp.ConsumeIntegralInRange<int32_t>(0, MAX_STRING_LENGTH);
+    
+    for (int32_t i = 0; i < pkgLen; ++i) {
+        pkgName += static_cast<char>(fdp.ConsumeIntegral<uint8_t>());
+    }
+    for (int32_t i = 0; i < networkLen; ++i) {
+        networkId += static_cast<char>(fdp.ConsumeIntegral<uint8_t>());
+    }
+    
+    DeviceManagerImpl::GetInstance().GetOsTypeByNetworkId(pkgName, networkId, osType);
+}
+
 void DeviceManagerImplFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(uint32_t))) {
@@ -471,6 +535,9 @@ void DeviceManagerImplFuzzTest(const uint8_t* data, size_t size)
     SyncServiceCallbacksToServiceFuzzTest(fdp);
     UnbindServiceTargetFuzzTest(fdp);
     UpdateServiceInfoFuzzTest(fdp);
+    GetOsTypeByNetworkIdFuzzTest(fdp);
+    GetOsTypeByNetworkIdWithEmptyParamsFuzzTest(fdp);
+    GetOsTypeByNetworkIdWithBoundaryFuzzTest(fdp);
 }
 }
 }

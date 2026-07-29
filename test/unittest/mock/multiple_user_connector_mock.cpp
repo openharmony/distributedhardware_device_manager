@@ -83,5 +83,10 @@ DMAccountInfo MultipleUserConnector::GetCurrentDMAccountInfo()
 {
     return DmMultipleUserConnector::dmMultipleUserConnector->GetCurrentDMAccountInfo();
 }
+
+int32_t MultipleUserConnector::GetForgroundUserId()
+{
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetForgroundUserId();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

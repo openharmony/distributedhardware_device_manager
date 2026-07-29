@@ -28,6 +28,7 @@
 
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
+const int32_t DM_INVALID_OS_TYPE = -1;
 const uint32_t DM_MAX_DEVICESLIST_SIZE = 50;
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFail";
@@ -299,6 +300,28 @@ int32_t DeviceManagerImpl::GetDeviceType(taihe::string_view networkId)
         return 0;
     }
     return deviceType;
+}
+
+int32_t DeviceManagerImpl::GetOsTypeByNetworkId(taihe::string_view networkId)
+{
+    if (!IsInit()) {
+        ani_errorutils::CreateBusinessError(ERR_DM_INIT_FAILED);
+        return DM_INVALID_OS_TYPE;
+    }
+    bool checkRet = ani_dmutils::CheckJsParamStringValid(std::string(networkId));
+    if (!checkRet) {
+        return DM_INVALID_OS_TYPE;
+    }
+
+    int32_t osType = DM_INVALID_OS_TYPE;
+    int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetOsTypeByNetworkId(
+        bundleName_, std::string(networkId), osType);
+    if (ret != 0) {
+        LOGE("ret %{public}d", ret);
+        ani_errorutils::CreateBusinessError(ret);
+        return DM_INVALID_OS_TYPE;
+    }
+    return osType;
 }
 
 void DeviceManagerImpl::ReplyUiAction(int32_t action, ::taihe::string_view actionResult)

@@ -18,6 +18,7 @@
 #include <string>
 #include <gmock/gmock.h>
 
+#include "dm_device_info.h"
 #include "dm_softbus_cache.h"
 
 namespace OHOS {
@@ -34,6 +35,7 @@ public:
     virtual bool CheckIsOnline(const std::string &deviceId) = 0;
     virtual int32_t GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList) = 0;
     virtual int32_t GetDeviceNameFromCache(const std::string &udid, std::string &deviceName) = 0;
+    virtual int32_t GetDevInfoByNetworkId(const std::string &networkId, DmDeviceInfo &nodeInfo) = 0;
 public:
     static inline std::shared_ptr<DmSoftbusCache> dmSoftbusCache = nullptr;
 };
@@ -48,6 +50,7 @@ public:
     MOCK_METHOD(bool, CheckIsOnline, (const std::string &));
     MOCK_METHOD(int32_t, GetDeviceInfoFromCache, (std::vector<DmDeviceInfo> &));
     MOCK_METHOD(int32_t, GetDeviceNameFromCache, (const std::string &, std::string &));
+    MOCK_METHOD(int32_t, GetDevInfoByNetworkId, (const std::string &, DmDeviceInfo &));
 };
 }
 }
