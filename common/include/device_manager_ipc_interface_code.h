@@ -150,6 +150,7 @@ enum DMIpcCmdInterfaceCode {
     GET_REGISTER_SERVICE_INFO,
     GET_PEER_SERVICEINFO_BY_SERVICEID,
     UPDATE_SERVICE_INFO,
+    GET_OS_TYPE_BY_NETWORK,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

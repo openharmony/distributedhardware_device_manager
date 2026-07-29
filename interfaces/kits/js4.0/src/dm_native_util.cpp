@@ -38,6 +38,7 @@ const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
 const std::string ERR_MESSAGE_FROM_CLOUD_FAILED = "Get data from cloud failed.";
 const std::string ERR_MESSAGE_NEED_LOGIN = "A login account is required.";
 const std::string ERR_MESSAGE_SCAS_CHECK_FAILED = "The device name contains non-compliant content.";
+const std::string ERR_MESSAGE_INVALID_NETWORK_ID = "Invalid network ID.";
 
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
@@ -270,6 +271,9 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
             break;
         case ERR_DM_INIT_FAILED:
             error = CreateErrorForCall(env, DM_ERR_OBTAIN_SERVICE, ERR_MESSAGE_OBTAIN_SERVICE, isAsync);
+            break;
+        case ERR_DM_GET_OSTYPE_FAILED:
+            error = CreateErrorForCall(env, DM_ERR_INVALID_NETWORK_ID, ERR_MESSAGE_INVALID_NETWORK_ID, isAsync);
             break;
         case ERR_DM_NOT_SYSTEM_APP:
             error = CreateErrorForCall(env, ERR_NOT_SYSTEM_APP, ERR_MESSAGE_NOT_SYSTEM_APP, isAsync);

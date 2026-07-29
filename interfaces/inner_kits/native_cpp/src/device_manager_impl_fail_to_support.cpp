@@ -404,6 +404,14 @@ int32_t DeviceManagerImplFailToSupport::GetNetworkTypeByNetworkId(const std::str
     return ERR_DM_DEVICE_NOT_SUPPORT;
 }
 
+int32_t DeviceManagerImplFailToSupport::GetOsTypeByNetworkId(const std::string &pkgName,
+    const std::string &networkId, int32_t &osType)
+{
+    LOGI("device not support");
+    osType = -1;
+    return ERR_DM_DEVICE_NOT_SUPPORT;
+}
+
 int32_t DeviceManagerImplFailToSupport::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
 {
     LOGI("device not support");

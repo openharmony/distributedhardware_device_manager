@@ -769,11 +769,13 @@ ohos_unittest("UTTest_device_manager_service") {
     "UTTest_device_manager_service_part1.cpp",
     "UTTest_device_manager_service_part2.cpp",
     "UTTest_device_manager_service_two.cpp",
+    "UTTest_get_os_type_by_network_id_service.cpp",
     "mock/app_manager_mock.cpp",
     "mock/device_manager_service_impl_mock.cpp",
     "mock/device_name_manager_mock.cpp",
     "mock/deviceprofile_connector_mock.cpp",
     "mock/dm_comm_tool_mock.cpp",
+    "mock/dm_constraints_manager_mock.cpp",
     "mock/dm_crypto_mock.cpp",
     "mock/dm_softbus_cache_mock.cpp",
     "mock/kv_adapter_manager_mock.cpp",
@@ -814,6 +816,8 @@ ohos_unittest("UTTest_device_manager_service") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "os_account:libaccountkits",
+    "os_account:os_account_innerkits",
     "selinux_adapter:librestorecon",
   ]
 }
@@ -1996,6 +2000,7 @@ ohos_unittest("UTTest_device_manager_impl") {
     "UTTest_device_manager_impl_four.cpp",
     "UTTest_device_manager_impl_three.cpp",
     "UTTest_device_manager_impl_two.cpp",
+    "UTTest_get_os_type_by_network_id.cpp",
     "mock/device_manager_notify_mock.cpp",
   ]
 

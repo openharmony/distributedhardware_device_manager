@@ -167,6 +167,7 @@ interface DeviceManager {
     GetLocalDeviceType(): i32;
     GetDeviceName(networkId: String): String;
     GetDeviceType(networkId: String): i32;
+    GetOsTypeByNetworkId(networkId: String): i32;
 
     @gen_async("getAvailableDeviceList")
     @gen_promise("getAvailableDeviceList")

@@ -46,6 +46,8 @@
 #include "ipc_get_device_screen_status_rsp.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
+#include "ipc_get_os_type_by_network_req.h"
+#include "ipc_get_os_type_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
 #include "ipc_get_local_device_name_rsp.h"
 #include "ipc_get_local_display_device_name_req.h"
@@ -1682,6 +1684,36 @@ int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName,
         return ret;
     }
     netWorkType = rsp->GetNetworkType();
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetOsTypeByNetworkId(const std::string &pkgName, const std::string &networkId,
+    int32_t &osType)
+{
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("Invalid para, pkgName: %{public}s, networkId: %{public}s",
+            pkgName.c_str(), GetAnonyString(networkId).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+
+    std::shared_ptr<IpcGetOsTypeByNetworkIdReq> req = std::make_shared<IpcGetOsTypeByNetworkIdReq>();
+    std::shared_ptr<IpcGetOsTypeByNetworkIdRsp> rsp = std::make_shared<IpcGetOsTypeByNetworkIdRsp>();
+    req->SetPkgName(pkgName);
+    req->SetNetworkId(networkId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_OS_TYPE_BY_NETWORK, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("GetOsTypeByNetworkId Failed with ret %{public}d", ret);
+        return ret;
+    }
+    osType = rsp->GetOsType();
     return DM_OK;
 }
 

@@ -339,7 +339,9 @@ public:
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId,
         const std::string &extra) override;
     virtual int32_t GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
-                                       int32_t &netWorkType) override;
+                                        int32_t &netWorkType) override;
+    virtual int32_t GetOsTypeByNetworkId(const std::string &pkgName, const std::string &networkId,
+                                        int32_t &osType) override;
     virtual int32_t ImportAuthCode(const std::string &pkgName, const std::string &authCode) override;
     virtual int32_t ExportAuthCode(std::string &authCode) override;
 

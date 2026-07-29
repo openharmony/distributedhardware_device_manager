@@ -53,6 +53,8 @@ enum DMBussinessErrorCode {
     DM_ERR_NEED_LOGIN = 11600107,
     // The device name contains non-compliant content.
     DM_ERR_SCAS_CHECK_FAILED = 11600108,
+    // Invalid network ID.
+    DM_ERR_INVALID_NETWORK_ID = 11600110,
 };
 
 struct FieldMapping {

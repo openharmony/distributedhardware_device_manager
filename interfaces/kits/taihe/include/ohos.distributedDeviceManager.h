@@ -42,6 +42,7 @@ public:
     int32_t GetLocalDeviceType();
     ::taihe::string GetDeviceName(taihe::string_view networkId);
     int32_t GetDeviceType(taihe::string_view networkId);
+    int32_t GetOsTypeByNetworkId(taihe::string_view networkId);
 
     ::taihe::array<::ohos::distributedDeviceManager::DeviceBasicInfo> GetAvailableDeviceListSync();
     void ReplyUiAction(int32_t action, ::taihe::string_view actionResult);
