@@ -19,7 +19,9 @@
 #include <thread>
 
 #include "common_event_support.h"
+#include "dm_account_event_queue.h"
 #include "dm_anonymous.h"
+#include "dm_constants.h"
 #include "dm_log.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
@@ -30,11 +32,13 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-using OHOS::EventFwk::MatchingSkills;
-using OHOS::EventFwk::CommonEventManager;
+using namespace OHOS::EventFwk;
 
 constexpr const char* DEAL_THREAD = "account_common_event";
 constexpr int32_t MAX_TRY_TIMES = 3;
+
+constexpr const char* TAG_USER_ID_PARAM = "userId";
+constexpr const char* TAG_ACCOUNT_ID_PARAM = "accountId";
 
 std::vector<std::string> DmAccountEventSubscriber::GetSubscriberEventNameVec() const
 {
@@ -44,6 +48,7 @@ std::vector<std::string> DmAccountEventSubscriber::GetSubscriberEventNameVec() c
 DmAccountCommonEventManager::~DmAccountCommonEventManager()
 {
     DmAccountCommonEventManager::UnsubscribeAccountCommonEvent();
+    DmAccountEventQueue::GetInstance().Stop();
 }
 
 bool DmAccountCommonEventManager::SubscribeAccountCommonEvent(const std::vector<std::string> &eventNameVec,
@@ -90,6 +95,8 @@ bool DmAccountCommonEventManager::SubscribeAccountCommonEvent(const std::vector<
     }
     eventNameVec_ = eventNameVec;
     eventValidFlag_ = true;
+    DmAccountEventQueue::GetInstance().SetCallback(callback);
+    DmAccountEventQueue::GetInstance().Start();
     LOGI("success to subscribe account commom event name size: %{public}zu", eventNameVec.size());
     return true;
 }
@@ -124,60 +131,102 @@ bool DmAccountCommonEventManager::UnsubscribeAccountCommonEvent()
         }
         statusChangeListener_ = nullptr;
     }
+    DmAccountEventQueue::GetInstance().Stop();
 
     LOGI("success to unsubscribe account commom event name size: %{public}zu", eventNameVec_.size());
     eventValidFlag_ = false;
     return true;
 }
 
-void DmAccountEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+bool DmAccountEventSubscriber::ParseUserCommonEvent(const CommonEventData &data,
+    const std::string &receiveEvent, DmAccountEventInfo &eventInfo)
 {
-    std::string receiveEvent = data.GetWant().GetAction();
-    int32_t currentUserId = -1;
-    int32_t beforeUserId = -1;
-    bool accountValidEvent = false;
-
     if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
-        currentUserId = data.GetCode();
-        beforeUserId = std::atoi(data.GetWant().GetStringParam("oldId").c_str());
-        accountValidEvent = true;
+        eventInfo.userId = data.GetCode();
+        eventInfo.beforeUserId = std::atoi(data.GetWant().GetStringParam("oldId").c_str());
+        LOGI("Received USER_SWITCHED event, userId: %{public}d, beforeUserId: %{public}d",
+            eventInfo.userId, eventInfo.beforeUserId);
+        return true;
     }
     if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED ||
         receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED ||
         receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
-        beforeUserId = data.GetCode();
-        accountValidEvent = true;
+        eventInfo.beforeUserId = data.GetCode();
+        LOGI("Received %{public}s event, beforeUserId: %{public}d", receiveEvent.c_str(), eventInfo.beforeUserId);
+        return true;
     }
     if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGOUT ||
         receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGIN) {
-        currentUserId = data.GetWant().GetIntParam("userId", 0);
-        beforeUserId = currentUserId;
-        accountValidEvent = true;
+        eventInfo.userId = data.GetWant().GetIntParam("userId", 0);
+        eventInfo.beforeUserId = eventInfo.userId;
+        eventInfo.subProfileId = data.GetWant().GetIntParam(TAG_SUB_PROFILE_ID, 0);
+        LOGI("Received %{public}s event, userId: %{public}d", receiveEvent.c_str(), eventInfo.userId);
+        return true;
     }
     if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED ||
         receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_FOREGROUND ||
         receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_BACKGROUND) {
-        currentUserId = data.GetCode();
-        beforeUserId = currentUserId;
-        accountValidEvent = true;
+        eventInfo.userId = data.GetCode();
+        eventInfo.beforeUserId = eventInfo.userId;
+        LOGI("Received %{public}s event, userId: %{public}d", receiveEvent.c_str(), eventInfo.userId);
+        return true;
     }
-    LOGI("Received account event: %{public}s, currentUserId: %{public}d, beforeUserId: %{public}d",
-        receiveEvent.c_str(), currentUserId, beforeUserId);
+    return false;
+}
+
+bool DmAccountEventSubscriber::ParseSubProfileEvent(const CommonEventData &data,
+    const std::string &receiveEvent, DmAccountEventInfo &eventInfo)
+{
+    if (receiveEvent == CommonEventSupport::COMMON_EVENT_OS_ACCOUNT_SUB_PROFILE_DELETED) {
+        eventInfo.userId = data.GetWant().GetIntParam(TAG_USER_ID_PARAM, 0);
+        eventInfo.subProfileId = data.GetWant().GetIntParam(TAG_SUB_PROFILE_ID, 0);
+        LOGI("Received SUB_PROFILE_DELETED event, userId: %{public}d, subProfileId: %{public}d",
+            eventInfo.userId, eventInfo.subProfileId);
+        return true;
+    }
+    if (receiveEvent == CommonEventSupport::COMMON_EVENT_OS_ACCOUNT_SUB_PROFILE_SWITCHED) {
+        eventInfo.userId = data.GetWant().GetIntParam(TAG_USER_ID_PARAM, 0);
+        eventInfo.subProfileId = data.GetWant().GetIntParam(TAG_SUB_PROFILE_ID, 0);
+        eventInfo.previousSubProfileId = data.GetWant().GetIntParam(TAG_PREVIOUS_SUB_PROFILE_ID, 0);
+        LOGI("Received SUB_PROFILE_SWITCHED event, userId: %{public}d, subProfileId: %{public}d, previous: %{public}d",
+            eventInfo.userId, eventInfo.subProfileId, eventInfo.previousSubProfileId);
+        return true;
+    }
+    if (receiveEvent == CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_BOUND) {
+        eventInfo.userId = data.GetWant().GetIntParam(TAG_USER_ID_PARAM, 0);
+        eventInfo.subProfileId = data.GetWant().GetIntParam(TAG_SUB_PROFILE_ID, 0);
+        eventInfo.accountId = data.GetWant().GetStringParam(TAG_ACCOUNT_ID_PARAM);
+        LOGI("Received ACCOUNT_BOUND event, userId: %{public}d, subProfileId: %{public}d, accountId: %{public}s",
+            eventInfo.userId, eventInfo.subProfileId, GetAnonyString(eventInfo.accountId).c_str());
+        return true;
+    }
+    if (receiveEvent == CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_UNBOUND) {
+        eventInfo.userId = data.GetWant().GetIntParam(TAG_USER_ID_PARAM, 0);
+        eventInfo.subProfileId = data.GetWant().GetIntParam(TAG_SUB_PROFILE_ID, 0);
+        LOGI("Received DISTRIBUTED_ACCOUNT_UNBOUND event, userId: %{public}d, subProfileId: %{public}d",
+            eventInfo.userId, eventInfo.subProfileId);
+        return true;
+    }
+    return false;
+}
+
+void DmAccountEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+{
+    std::string receiveEvent = data.GetWant().GetAction();
+    DmAccountEventInfo eventInfo;
+    eventInfo.eventName = receiveEvent;
+
+    bool accountValidEvent = ParseUserCommonEvent(data, receiveEvent, eventInfo);
     if (!accountValidEvent) {
-        LOGE("Invalied account type event.");
+        accountValidEvent = ParseSubProfileEvent(data, receiveEvent, eventInfo);
+    }
+
+    if (!accountValidEvent) {
+        LOGE("Invalid account event type: %{public}s", receiveEvent.c_str());
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { callback_(receiveEvent, currentUserId, beforeUserId); },
-        ffrt::task_attr().name(DEAL_THREAD));
-#else
-    std::thread dealThread([=]() { callback_(receiveEvent, currentUserId, beforeUserId); });
-    int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
-    if (ret != DM_OK) {
-        LOGE("dealThread setname failed.");
-    }
-    dealThread.detach();
-#endif
+
+    DmAccountEventQueue::GetInstance().PushEvent(eventInfo);
 }
 
 void DmAccountCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility(
@@ -196,16 +245,7 @@ void DmAccountCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystem
     if (!CommonEventManager::SubscribeCommonEvent(changeSubscriber_)) {
         LOGE("failed to subscribe account commom event: %{public}zu", eventNameVec.size());
     }
-    DMAccountInfo dmAccountInfo;
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-    dmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
-    dmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
-    LOGI("after subscribe account event accountId: %{public}s, userId: %{public}s, accountName: %{public}s",
-        GetAnonyString(dmAccountInfo.accountId).c_str(), GetAnonyInt32(userId).c_str(),
-        GetAnonyString(dmAccountInfo.accountName).c_str());
-    if (userId > 0) {
-        MultipleUserConnector::SetAccountInfo(userId, dmAccountInfo);
-    }
+    MultipleUserConnector::CacheAllUsersAccountInfo();
 }
 
 void DmAccountCommonEventManager::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(

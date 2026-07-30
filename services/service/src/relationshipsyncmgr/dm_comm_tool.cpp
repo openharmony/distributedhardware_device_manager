@@ -17,6 +17,7 @@
 #include "device_manager_service.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_crypto.h"
 #include "dm_error_type.h"
 #include "dm_transport.h"
 #include "dm_transport_msg.h"
@@ -41,6 +42,10 @@ constexpr int32_t DM_COMM_RSP_APP_UNINSTALL = 8;
 constexpr int32_t DM_COMM_RSP_APP_UNBIND = 9;
 constexpr int32_t DM_COMM_SEND_SERVICE_UNBIND_PROXY = 10;
 constexpr int32_t DM_COMM_RSP_SERVICE_UNBIND_PROXY = 11;
+constexpr int32_t DM_COMM_ACCOUNT_EVENT = 12;
+constexpr int32_t DM_COMM_FOREGROUND_ACCOUNT = 13;
+constexpr int32_t DM_COMM_RSP_FOREGROUND_ACCOUNT = 14;
+
 constexpr const char* EVENT_TASK = "EventTask";
 const char* const USER_STOP_MSG_KEY = "stopUserId";
 
@@ -376,43 +381,49 @@ void DMCommTool::DMCommToolEventHandler::HandleEvent(const std::shared_ptr<DMCom
 {
     CHECK_NULL_VOID(dmCommToolPtr);
     HandleLocalUserIdEvent(dmCommToolPtr, eventId, commMsg, userIdsMsg);
+    HandleCommEvent(dmCommToolPtr, eventId, commMsg);
+}
+
+void DMCommTool::DMCommToolEventHandler::HandleCommEvent(const std::shared_ptr<DMCommTool> &dmCommToolPtr,
+    uint32_t eventId, const std::shared_ptr<InnerCommMsg> &commMsg)
+{
     switch (eventId) {
-        case DM_COMM_SEND_USER_STOP: {
+        case DM_COMM_SEND_USER_STOP:
             dmCommToolPtr->ProcessReceiveUserStopEvent(commMsg);
             break;
-        }
-        case DM_COMM_RSP_USER_STOP: {
+        case DM_COMM_RSP_USER_STOP:
             dmCommToolPtr->ProcessResponseUserStopEvent(commMsg);
             break;
-        }
-        case DM_COMM_ACCOUNT_LOGOUT: {
+        case DM_COMM_ACCOUNT_LOGOUT:
             dmCommToolPtr->ProcessReceiveLogoutEvent(commMsg);
             break;
-        }
-        case DM_COMM_SEND_LOCAL_APP_UNINSTALL: {
+        case DM_COMM_SEND_LOCAL_APP_UNINSTALL:
             dmCommToolPtr->ProcessReceiveUninstAppEvent(commMsg);
             break;
-        }
-        case DM_COMM_SEND_LOCAL_APP_UNBIND: {
+        case DM_COMM_SEND_LOCAL_APP_UNBIND:
             dmCommToolPtr->ProcessReceiveUnBindAppEvent(commMsg);
             break;
-        }
-        case DM_COMM_RSP_APP_UNINSTALL: {
+        case DM_COMM_RSP_APP_UNINSTALL:
             dmCommToolPtr->ProcessReceiveRspAppUninstallEvent(commMsg);
             break;
-        }
-        case DM_COMM_RSP_APP_UNBIND: {
+        case DM_COMM_RSP_APP_UNBIND:
             dmCommToolPtr->ProcessReceiveRspAppUnbindEvent(commMsg);
             break;
-        }
-        case DM_COMM_SEND_SERVICE_UNBIND_PROXY: {
+        case DM_COMM_SEND_SERVICE_UNBIND_PROXY:
             dmCommToolPtr->ProcessReceiveServiceUnbindProxyEvent(commMsg);
             break;
-        }
-        case DM_COMM_RSP_SERVICE_UNBIND_PROXY: {
+        case DM_COMM_RSP_SERVICE_UNBIND_PROXY:
             dmCommToolPtr->ProcessReceiveRspServiceUnbindProxyEvent(commMsg);
             break;
-        }
+        case DM_COMM_ACCOUNT_EVENT:
+            dmCommToolPtr->ProcessReceiveAccountEvent(commMsg);
+            break;
+        case DM_COMM_FOREGROUND_ACCOUNT:
+            dmCommToolPtr->ProcessReceiveForegroundAccount(commMsg);
+            break;
+        case DM_COMM_RSP_FOREGROUND_ACCOUNT:
+            dmCommToolPtr->ProcessReceiveRspForegroundAccount(commMsg);
+            break;
         default:
             LOGE("event is undefined, id is %{public}d", eventId);
             break;
@@ -973,6 +984,38 @@ int32_t DMCommTool::SendLogoutAccountInfo(const std::string &rmtNetworkId,
     return DM_OK;
 }
 
+int32_t DMCommTool::SendAccountEvent(const std::string &rmtNetworkId, const std::string &accountId,
+    int32_t userId, AccountEventType accountEventType)
+{
+    if (!IsIdLengthValid(rmtNetworkId) || accountId.empty() || dmTransportPtr_ == nullptr) {
+        LOGE("param invalid, networkId: %{public}s, userId: %{public}d",
+            GetAnonyString(rmtNetworkId).c_str(), userId);
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start, send networkId: %{public}s, eventType: %{public}d",
+        GetAnonyString(rmtNetworkId).c_str(), static_cast<uint32_t>(accountEventType));
+    int32_t socketId = 0;
+    if (dmTransportPtr_->StartSocket(rmtNetworkId, socketId) != DM_OK || socketId <= 0) {
+        LOGE("Start socket error");
+        return ERR_DM_FAILED;
+    }
+
+    JsonObject jsonObj;
+    AccountEventMsg accountEventMsg(accountId, userId, accountEventType);
+    ToJson(jsonObj, accountEventMsg);
+    std::string msgStr = jsonObj.Dump();
+    CommMsg commMsg(DM_COMM_ACCOUNT_EVENT, msgStr);
+    std::string payload = GetCommMsgString(commMsg);
+
+    int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload, socketId);
+    if (ret != DM_OK) {
+        LOGE("Send account event failed, ret: %{public}d", ret);
+        return ERR_DM_FAILED;
+    }
+    LOGI("Send account event success");
+    return DM_OK;
+}
+
 void DMCommTool::ProcessReceiveLogoutEvent(const std::shared_ptr<InnerCommMsg> commMsg)
 {
     CHECK_NULL_VOID(commMsg);
@@ -1007,6 +1050,55 @@ void DMCommTool::ProcessReceiveLogoutEvent(const std::shared_ptr<InnerCommMsg> c
     LOGI("process remote logout success.");
 }
 
+void DMCommTool::ProcessReceiveAccountEvent(const std::shared_ptr<InnerCommMsg> commMsg)
+{
+    CHECK_NULL_VOID(commMsg);
+    CHECK_NULL_VOID(dmTransportPtr_);
+    this->dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
+    LOGI("Receive remote account event, networkId: %{public}s", GetAnonyString(commMsg->remoteNetworkId).c_str());
+    std::string rmtUdid = "";
+    SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
+    if (rmtUdid.empty()) {
+        LOGE("Can not find remote udid by networkid: %{public}s", GetAnonyString(commMsg->remoteNetworkId).c_str());
+        return;
+    }
+
+    CHECK_NULL_VOID(commMsg->commMsg);
+    std::string payload = commMsg->commMsg->msg;
+    JsonObject jsonObject(payload);
+    if (jsonObject.IsDiscarded()) {
+        LOGE("the msg is not json format");
+        return;
+    }
+    AccountEventMsg accountEventMsg;
+    FromJson(jsonObject, accountEventMsg);
+
+    if (accountEventMsg.accountId.empty() || accountEventMsg.userId == -1) {
+        LOGE("param invalid, accountId: %{public}s, userId: %{public}d",
+            GetAnonyString(accountEventMsg.accountId).c_str(), accountEventMsg.userId);
+        return;
+    }
+
+    switch (accountEventMsg.accountEventType) {
+        case AccountEventType::ACCOUNT_DELETED:
+            DeviceManagerService::GetInstance().ProcessSyncAccountDeleted(
+                accountEventMsg.accountId, rmtUdid, accountEventMsg.userId);
+            break;
+        case AccountEventType::ACCOUNT_UNBOUND:
+            DeviceManagerService::GetInstance().ProcessSyncAccountUnbound(
+                accountEventMsg.accountId, rmtUdid, accountEventMsg.userId);
+            break;
+        case AccountEventType::ACCOUNT_LOGOUT:
+            DeviceManagerService::GetInstance().ProcessMultAccountLogout(
+                accountEventMsg.accountId, rmtUdid, accountEventMsg.userId);
+            break;
+        default:
+            LOGE("unknown account event type: %{public}d", static_cast<uint32_t>(accountEventMsg.accountEventType));
+            break;
+    }
+    LOGI("process remote account event success.");
+}
+
 int32_t DMCommTool::StartCommonEvent(std::string commonEventType, EventCallback eventCallback)
 {
     if (commonEventType.empty() || eventCallback == nullptr) {
@@ -1019,6 +1111,153 @@ int32_t DMCommTool::StartCommonEvent(std::string commonEventType, EventCallback 
     auto taskFunc = [eventCallback] () { eventCallback(); };
     eventQueue_->submit(taskFunc);
     return DM_OK;
+}
+
+int32_t DMCommTool::SendForegroundAccount(const std::string &rmtNetworkId,
+    const std::vector<ForegroundAccountInfo> &foregroundAccounts)
+{
+    if (!IsIdLengthValid(rmtNetworkId) || foregroundAccounts.empty() || dmTransportPtr_ == nullptr) {
+        LOGE("param invalid, networkId: %{public}s, accounts size: %{public}zu",
+            GetAnonyString(rmtNetworkId).c_str(), foregroundAccounts.size());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start, send networkId: %{public}s, accounts count: %{public}zu",
+        GetAnonyString(rmtNetworkId).c_str(), foregroundAccounts.size());
+
+    int32_t socketId = 0;
+    if (dmTransportPtr_->StartSocket(rmtNetworkId, socketId) != DM_OK || socketId <= 0) {
+        LOGE("Start socket error");
+        return ERR_DM_FAILED;
+    }
+
+    JsonObject jsonObj;
+    ForegroundAccountMsg foregroundAccountMsg(foregroundAccounts);
+    ToJson(jsonObj, foregroundAccountMsg);
+    std::string msgStr = jsonObj.Dump();
+    CommMsg commMsg(DM_COMM_FOREGROUND_ACCOUNT, msgStr);
+    std::string payload = GetCommMsgString(commMsg);
+
+    int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload, socketId);
+    if (ret != DM_OK) {
+        LOGE("Send foreground account failed, ret: %{public}d", ret);
+        return ERR_DM_FAILED;
+    }
+    LOGI("Send foreground account success");
+    return DM_OK;
+}
+
+int32_t DMCommTool::SendRspForegroundAccount(const std::string &rmtNetworkId,
+    const std::vector<ForegroundAccountInfo> &foregroundAccounts, int32_t socketId)
+{
+    if (!IsIdLengthValid(rmtNetworkId) || foregroundAccounts.empty() || dmTransportPtr_ == nullptr) {
+        LOGE("param invalid, networkId: %{public}s, accounts size: %{public}zu",
+            GetAnonyString(rmtNetworkId).c_str(), foregroundAccounts.size());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("networkId: %{public}s, accounts count: %{public}zu",
+        GetAnonyString(rmtNetworkId).c_str(), foregroundAccounts.size());
+
+    JsonObject jsonObj;
+    ForegroundAccountMsg foregroundAccountMsg(foregroundAccounts);
+    ToJson(jsonObj, foregroundAccountMsg);
+    std::string msgStr = jsonObj.Dump();
+    CommMsg commMsg(DM_COMM_RSP_FOREGROUND_ACCOUNT, msgStr);
+    std::string payload = GetCommMsgString(commMsg);
+
+    int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload, socketId);
+    if (ret != DM_OK) {
+        LOGE("Send rsp foreground account failed, ret: %{public}d", ret);
+        return ERR_DM_FAILED;
+    }
+    LOGI("success");
+    return DM_OK;
+}
+
+void DMCommTool::ProcessReceiveForegroundAccount(const std::shared_ptr<InnerCommMsg> commMsg)
+{
+    CHECK_NULL_VOID(commMsg);
+    CHECK_NULL_VOID(dmTransportPtr_);
+    LOGI("Receive remote foreground account, networkId: %{public}s", GetAnonyString(commMsg->remoteNetworkId).c_str());
+    std::string rmtUdid;
+    SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
+    if (rmtUdid.empty()) {
+        LOGE("Can not find remote udid by networkid: %{public}s", GetAnonyString(commMsg->remoteNetworkId).c_str());
+        dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
+        return;
+    }
+    CHECK_NULL_VOID(commMsg->commMsg);
+    JsonObject jsonObject(commMsg->commMsg->msg);
+    if (jsonObject.IsDiscarded()) {
+        LOGE("the msg is not json format");
+        dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
+        return;
+    }
+    ForegroundAccountMsg foregroundAccountMsg;
+    FromJson(jsonObject, foregroundAccountMsg);
+
+    std::vector<int32_t> foregroundUserIds;
+    std::vector<ForegroundAccountInfo> localForegroundAccounts;
+    if (MultipleUserConnector::GetForegroundUserIds(foregroundUserIds) == DM_OK) {
+        for (const auto &userId : foregroundUserIds) {
+            DMAccountInfo info = MultipleUserConnector::GetDMAccountInfoByUserId(userId);
+            char hash[DM_MAX_DEVICE_ID_LEN] = {0};
+            if (!info.accountId.empty()
+                && Crypto::GetAccountIdHash7(info.accountId, reinterpret_cast<uint8_t *>(hash)) == DM_OK) {
+                localForegroundAccounts.push_back(ForegroundAccountInfo(userId, hash));
+            }
+        }
+    }
+    SendRspForegroundAccount(commMsg->remoteNetworkId, localForegroundAccounts, commMsg->socketId);
+
+    std::vector<ForegroundAccountInfo> peerForegroundAccounts;
+    for (const auto &account : foregroundAccountMsg.foregroundAccounts) {
+        char hash[DM_MAX_DEVICE_ID_LEN] = {0};
+        if (Crypto::GetAccountIdHash7(account.accountId, reinterpret_cast<uint8_t *>(hash)) == DM_OK) {
+            peerForegroundAccounts.push_back(ForegroundAccountInfo(account.userId, hash));
+        }
+    }
+    DeviceManagerService::GetInstance().ProcessSyncForegroundAccount(peerForegroundAccounts, rmtUdid);
+    LOGI("remote foreground account success, count: %{public}zu", foregroundAccountMsg.foregroundAccounts.size());
+    dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
+}
+
+void DMCommTool::ProcessReceiveRspForegroundAccount(const std::shared_ptr<InnerCommMsg> commMsg)
+{
+    CHECK_NULL_VOID(commMsg);
+    CHECK_NULL_VOID(dmTransportPtr_);
+    this->dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
+    LOGI("Receive rsp foreground account, networkId: %{public}s",
+        GetAnonyString(commMsg->remoteNetworkId).c_str());
+
+    std::string rmtUdid = "";
+    SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
+    if (rmtUdid.empty()) {
+        LOGE("Can not find remote udid by networkid: %{public}s",
+            GetAnonyString(commMsg->remoteNetworkId).c_str());
+        return;
+    }
+
+    CHECK_NULL_VOID(commMsg->commMsg);
+    std::string payload = commMsg->commMsg->msg;
+    JsonObject jsonObject(payload);
+    if (jsonObject.IsDiscarded()) {
+        LOGE("the msg is not json format");
+        return;
+    }
+    ForegroundAccountMsg foregroundAccountMsg;
+    FromJson(jsonObject, foregroundAccountMsg);
+
+    std::vector<ForegroundAccountInfo> peerForegroundAccounts;
+    for (const auto &account : foregroundAccountMsg.foregroundAccounts) {
+        char accountIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        if (Crypto::GetAccountIdHash7(account.accountId, reinterpret_cast<uint8_t *>(accountIdHash)) == DM_OK) {
+            peerForegroundAccounts.push_back(ForegroundAccountInfo(account.userId, std::string(accountIdHash)));
+        }
+    }
+    DeviceManagerService::GetInstance().ProcessSyncForegroundAccount(peerForegroundAccounts, rmtUdid);
+
+    LOGI("process rsp foreground account success, count: %{public}zu",
+        foregroundAccountMsg.foregroundAccounts.size());
 }
 //LCOV_EXCL_STOP
 } // DistributedHardware

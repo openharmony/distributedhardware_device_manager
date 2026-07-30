@@ -28,6 +28,7 @@
 #include "device_manager_service_listener.h"
 #include "dm_credential_manager.h"
 #include "dm_service_hichain_connector.h"
+#include "foreground_account_info.h"
 #include "idevice_manager_service_impl.h"
 #include "hichain_listener.h"
 #include "i_dm_check_api_white_list.h"
@@ -277,6 +278,11 @@ public:
     int32_t GetDeviceNetworkIdList(const std::string &pkgName, const NetworkIdQueryFilter &queryFilter,
         std::vector<std::string> &networkIds);
     void ProcessSyncAccountLogout(const std::string &accountId, const std::string &peerUdid, int32_t userId);
+    void ProcessSyncAccountDeleted(const std::string &accountId, const std::string &peerUdid, int32_t userId);
+    void ProcessSyncAccountUnbound(const std::string &accountId, const std::string &peerUdid, int32_t userId);
+    void ProcessMultAccountLogout(const std::string &accountId, const std::string &peerUdid, int32_t userId);
+    void ProcessSyncForegroundAccount(const std::vector<ForegroundAccountInfo> &foregroundAccounts,
+        const std::string &peerUdid);
     int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m);
     int32_t UnRegisterPinHolderCallback(const std::string &pkgName);
     void ProcessReceiveRspAppUninstall(const std::string &remoteUdid);
@@ -384,8 +390,15 @@ private:
     void SubscribeAccountCommonEvent();
     void SendShareTypeUnBindBroadCast(const char *credId, const int32_t localUserId,
         const std::vector<std::string> &peerUdids);
-    DM_EXPORT void AccountCommonEventCallback(const std::string commonEventType,
-        int32_t currentUserId, int32_t beforeUserId);
+    DM_EXPORT void AccountCommonEventCallback(const DmAccountEventInfo& eventInfo);
+    void HandleUserCommonEvent(const std::string& commonEventType, int32_t currentUserId, int32_t beforeUserId);
+    void HandleAccountEvent(const DmAccountEventInfo& eventInfo);
+    void NotifyPeerDevices(const std::string& localUdid, int32_t userId, const std::string& accountId,
+        AccountEventType accountEventType);
+    void NotifyPeerByConnection(const std::string& networkId, int32_t userId, const std::string& accountId,
+        AccountEventType accountEventType);
+    void NotifyPeerByBroadcast(int32_t userId, const std::string& accountId, const std::vector<std::string>& peerUdids,
+        AccountEventType accountEventType);
     void SubscribeScreenLockEvent();
     void ScreenCommonEventCallback(std::string commonEventType);
     DM_EXPORT void ConvertUdidHashToAnoyDeviceId(DmDeviceInfo &deviceInfo);
@@ -409,6 +422,7 @@ private:
     void ProcessInactiveServices(const DmUserRemovedServiceInfo &serviceInfo);
     void HandleShareUnbindBroadCast(const int32_t userId, const std::string &credId);
     void HandleServiceUnRegEvent(const std::string &peerUdid, int32_t userId, int64_t serviceId);
+    void HandleAccountEventBroadCast(const RelationShipChangeMsg &relationShipMsg);
 
     void NotifyRemoteUninstallApp(int32_t userId, int32_t tokenId);
     void NotifyRemoteUninstallAppByWifi(int32_t userId, int32_t tokenId,
@@ -443,6 +457,7 @@ private:
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
 
     void HandleAccountCommonEvent(const std::string commonEventType);
+    void TriggerForegroundAccountSync();
     bool IsUserStatusChanged(std::vector<int32_t> foregroundUserVec, std::vector<int32_t> backgroundUserVec);
     void PushPeerUdids(const std::map<std::string, int32_t> &curUserDeviceMap,
         const std::map<std::string, int32_t> &perUserDeviceMap, std::vector<std::string> &peerUdids);
@@ -469,6 +484,16 @@ private:
         bool isNeedResponse);
     void SendCommonEventBroadCast(const std::string commonEventType, std::vector<std::string> &bleUdids,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    void SendForegroundAccountBroadcast(const std::vector<std::string> &peerUdids,
+        const std::vector<ForegroundAccountInfo> &foregroundAccounts, bool isNeedResponse);
+    void HandleForegroundAccountBroadCast(const ForegroundAccountInfo &foregroundAccount,
+        const std::string &remoteUdid, bool isNeedResponse, uint8_t broadCastId, bool isLastBatch);
+    bool CacheForegroundAccount(const std::string &cacheKey, const ForegroundAccountInfo &foregroundAccount);
+    void StartForegroundAccountCacheTimer(const std::string &cacheKey);
+    std::vector<ForegroundAccountInfo> GetAndClearCachedAccounts(const std::string &cacheKey);
+    void DeleteForegroundAccountCacheTimer(const std::string &cacheKey);
+    void SendForegroundAccountResponse(const std::string &remoteUdid);
+    void GetWifiAndBleDevices(std::map<std::string, std::string> &wifiDevices, std::vector<std::string> &bleUdids);
     void HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId, int32_t beforeUserId);
     void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid);
     void HandleAccountLogoutEvent(int32_t userId, const std::string &accountId,
@@ -508,6 +533,11 @@ private:
         const std::vector<int32_t> &backgroundUsers);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void ParseAppUnBindRelationShip(const RelationShipChangeMsg &relationShipMsg);
+    void HandleSubProfileDeletedEvent(const std::string& localUdid, const DmAccountEventInfo& eventInfo);
+    void HandleSubProfileSwitchedEvent(const std::string& localUdid, const DmAccountEventInfo& eventInfo);
+    void HandleDistributedAccountBoundEvent(const DmAccountEventInfo& eventInfo);
+    void HandleDistributedAccountLoginEvent(const std::string& localUdid, const DmAccountEventInfo& eventInfo);
+    void HandleDistributedAccountLogoutEvent(const std::string& localUdid, const DmAccountEventInfo& eventInfo);
 #endif
     bool CheckConstraintEnabledByNetworkId(const std::string &networkId);
 
@@ -564,6 +594,8 @@ private:
     std::mutex isAdapterCheckApiWhiteListLoadedLock_;
     std::shared_ptr<IDMCheckApiWhiteList> dmCheckApiWhiteList_;
 #endif
+    std::mutex foregroundAccountCacheLock_;
+    std::map<std::string, std::vector<ForegroundAccountInfo>> foregroundAccountCache_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

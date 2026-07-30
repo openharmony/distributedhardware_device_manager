@@ -274,22 +274,25 @@ HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_202, testing::ext::TestSiz
 HWTEST_F(DeviceManagerServiceTest, InitAccountInfo_201, testing::ext::TestSize.Level1)
 {
     int32_t userId = 100;
-    std::string commonEventType = "usual.event.USER_SWITCHED";
+    DmAccountEventInfo eventInfo;
+    eventInfo.eventName = "usual.event.USER_SWITCHED";
+    eventInfo.userId = userId;
+    eventInfo.beforeUserId = 101;
     std::map<std::string, int32_t> curUserDeviceMap;
-    DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, 101);
-    commonEventType = "common.event.HWID_LOGIN";
-    DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, 101);
-    commonEventType = "usual.event.USER_SWITCHED";
-    int32_t currentUserId = -1;
-    int32_t beforeUserId = 0;
-    DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, currentUserId, beforeUserId);
-    commonEventType = "common.event.HWID_LOGOUT";
-    currentUserId = 1;
-    beforeUserId = 1;
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(eventInfo);
+    eventInfo.eventName = "common.event.HWID_LOGIN";
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(eventInfo);
+    eventInfo.eventName = "usual.event.USER_SWITCHED";
+    eventInfo.userId = -1;
+    eventInfo.beforeUserId = 0;
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(eventInfo);
+    eventInfo.eventName = "common.event.HWID_LOGOUT";
+    eventInfo.userId = 1;
+    eventInfo.beforeUserId = 1;
     DMAccountInfo dmAccountInfo;
     dmAccountInfo.accountId = "accountId";
     dmAccountInfo.accountName = "accountName";
-    DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, currentUserId, beforeUserId);
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(eventInfo);
     int32_t ret = DeviceManagerService::GetInstance().InitAccountInfo();
     EXPECT_EQ(ret, DM_OK);
 }

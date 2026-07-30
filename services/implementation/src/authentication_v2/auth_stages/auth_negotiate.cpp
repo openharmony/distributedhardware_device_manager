@@ -136,21 +136,31 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     context->accessee.deviceIdHash = Crypto::GetUdidHash(context->accessee.deviceId);
     // 2. Get userId
     int32_t deviceType = context->softbusConnector->GetLocalDeviceTypeId();
-    context->accessee.userId = GetSinkUserIdByDeviceType(context,
-        static_cast<DmDeviceType> (deviceType));
+    context->accessee.deviceType = deviceType;
+    if (context->accessee.userId <= 0) {
+        context->accessee.userId = GetSinkUserIdByDeviceType(context,
+            static_cast<DmDeviceType> (deviceType));
+    }
     if (context->accessee.userId < 0) {
         LOGE("get accessee userId failed.");
         return ERR_DM_GET_LOCAL_USERID_FAILED;
     }
     // 3. Get accountId
+#ifdef CAR_DEVICE_ENABLE
+    DMAccountInfo dmAccountInfo = MultipleUserConnector::GetDMAccountInfoByUserId(context->accessee.userId);
+    context->accessee.accountId = dmAccountInfo.accountId;
+    int32_t appIndex = MultipleUserConnector::GetAppIndexByUserId(context->accessee.userId);
+#else
     context->accessee.accountId = MultipleUserConnector::GetOhosAccountIdByUserId(context->accessee.userId);
+    int32_t appIndex = 0;
+#endif
     context->accessee.accountIdHash = Crypto::GetAccountIdHash16(context->accessee.accountId);
     // 4. Get tokenId
     if (AppManager::GetInstance().GetNativeTokenIdByName(context->accessee.bundleName,
         context->accessee.tokenId) == DM_OK) {
         context->accessee.bindLevel = DmRole::DM_ROLE_SA;
-    } else if (AppManager::GetInstance().GetHapTokenIdByName(context->accessee.userId, context->accessee.bundleName, 0,
-        context->accessee.tokenId) == DM_OK) {
+    } else if (AppManager::GetInstance().GetHapTokenIdByCloneBundleInfo(context->accessee.userId,
+        context->accessee.bundleName, appIndex, context->accessee.tokenId) == DM_OK) {
         context->accessee.bindLevel = DmRole::DM_ROLE_FA;
     } else {
         LOGE("sink not contain the bundlename %{public}s.", context->accessee.bundleName.c_str());
@@ -167,7 +177,7 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     context->accessee.language = DmLanguageManager::GetInstance().GetSystemLanguage();
     context->accessee.deviceName = context->listener->GetLocalDisplayDeviceName();
     context->accessee.networkId = context->softbusConnector->GetLocalDeviceNetworkId();
-    return RespQueryProxyAcceseeIds(context);
+    return RespQueryProxyAcceseeIds(context, appIndex);
 }
 
 int32_t AuthSinkNegotiateStateMachine::GetSinkUserIdByDeviceType(std::shared_ptr<DmAuthContext> context,
@@ -205,7 +215,8 @@ int32_t AuthSinkNegotiateStateMachine::GetSinkCarUserId(std::shared_ptr<DmAuthCo
     return mainScreenUserId;
 }
 
-int32_t AuthSinkNegotiateStateMachine::RespQueryProxyAcceseeIds(std::shared_ptr<DmAuthContext> context)
+int32_t AuthSinkNegotiateStateMachine::RespQueryProxyAcceseeIds(std::shared_ptr<DmAuthContext> context,
+    int32_t appIndex)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     if (!context->IsProxyBind) {
@@ -215,11 +226,16 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryProxyAcceseeIds(std::shared_ptr<
         return ERR_DM_INPUT_PARA_INVALID;
     }
     for (auto item = context->subjectProxyOnes.begin(); item != context->subjectProxyOnes.end(); ++item) {
+#ifdef CAR_DEVICE_ENABLE
+        int32_t proxyAppIndex = appIndex;
+#else
+        int32_t proxyAppIndex = 0;
+#endif
         if (AppManager::GetInstance().GetNativeTokenIdByName(item->proxyAccessee.bundleName,
             item->proxyAccessee.tokenId) == DM_OK) {
             item->proxyAccessee.bindLevel = DmRole::DM_ROLE_SA;
-        } else if (AppManager::GetInstance().GetHapTokenIdByName(context->accessee.userId,
-            item->proxyAccessee.bundleName, 0, item->proxyAccessee.tokenId) == DM_OK) {
+        } else if (AppManager::GetInstance().GetHapTokenIdByCloneBundleInfo(context->accessee.userId,
+            item->proxyAccessee.bundleName, proxyAppIndex, item->proxyAccessee.tokenId) == DM_OK) {
             item->proxyAccessee.bindLevel = DmRole::DM_ROLE_FA;
         } else {
             LOGE("sink not contain the bundlename %{public}s.", item->proxyAccessee.bundleName.c_str());
@@ -316,6 +332,13 @@ int32_t AuthSinkNegotiateStateMachine::SinkNegotiateService(std::shared_ptr<DmAu
         return ERR_DM_SERVICE_BIND_PEER_SERVICE_ID_UNPUBLISH;
     }
     context->accessee.userId = dpServiceInfo.GetUserId();
+#ifdef CAR_DEVICE_ENABLE
+    DMAccountInfo dmAccountInfo = MultipleUserConnector::GetDMAccountInfoByUserId(context->accessee.userId);
+    context->accessee.accountId = dmAccountInfo.accountId;
+#else
+    context->accessee.accountId = MultipleUserConnector::GetOhosAccountIdByUserId(context->accessee.userId);
+#endif
+    context->accessee.accountIdHash = Crypto::GetAccountIdHash16(context->accessee.accountId);
     context->accessee.displayId = dpServiceInfo.GetDisplayId();
     context->accessee.tokenIdHash = Crypto::GetTokenIdHash(std::to_string(context->accessee.tokenId));
     context->accesser.isOnline = context->softbusConnector->CheckIsOnline(context->accesser.deviceIdHash, true);
@@ -448,7 +471,6 @@ void AuthSinkNegotiateStateMachine::GetSinkCredType(std::shared_ptr<DmAuthContex
                     context->accessee.aclProfiles[DM_LNN].GetAccesser().GetAccesserCredentialIdStr() !=
                     item[FILED_CRED_ID].Get<std::string>())) {
                     deleteCredInfo.push_back(item[FILED_CRED_ID].Get<std::string>());
-                    DirectlyDeleteCredential(context, context->accessee.userId, item);
                 } else {
                     credTypeJson["lnnCredType"] = credType;
                     context->accessee.credentialInfos[credType] = item.Dump();
@@ -470,7 +492,12 @@ void AuthSinkNegotiateStateMachine::GetSinkCredTypeForP2P(std::shared_ptr<DmAuth
     int32_t credType, std::vector<std::string> &deleteCredInfo)
 {
     CHECK_NULL_VOID(context);
-    if (aclInfo.Contains("pointTopointAcl")) {
+    if (aclInfo.Contains("pointTopointAcl") &&
+        context->accessee.aclProfiles.find(DM_POINT_TO_POINT) != context->accessee.aclProfiles.end() &&
+        (context->accessee.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserCredentialIdStr() ==
+            credObj[FILED_CRED_ID].Get<std::string>() ||
+        context->accessee.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeCredentialIdStr() ==
+        credObj[FILED_CRED_ID].Get<std::string>())) {
         credTypeJson["pointTopointCredType"] = credType;
         context->accessee.credentialInfos[credType] = credObj.Dump();
     }
@@ -707,9 +734,19 @@ bool AuthSinkNegotiateStateMachine::IdenticalAccountAclCompare(std::shared_ptr<D
     const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee)
 {
     LOGI("start");
+    
+    bool isAccesseeCar = (context->accessee.deviceType == static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR));
+    
+    bool accountIdMatch = true;
+    if (isAccesseeCar) {
+        accountIdMatch = (context->accessee.accountIdHash ==
+            Crypto::GetAccountIdHash16(accesser.GetAccesserAccountId()));
+    }
+    
     return accesser.GetAccesserDeviceId() == context->accessee.deviceId &&
         accesser.GetAccesserUserId() == context->accessee.userId &&
-        Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accesser.deviceIdHash;
+        Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accesser.deviceIdHash &&
+        accountIdMatch;
 }
 
 bool AuthSinkNegotiateStateMachine::ShareAclCompare(std::shared_ptr<DmAuthContext> context,
@@ -725,7 +762,7 @@ bool AuthSinkNegotiateStateMachine::Point2PointAclCompare(std::shared_ptr<DmAuth
     const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee)
 {
     LOGI("start");
-    return (accessee.GetAccesseeDeviceId() == context->accessee.deviceId &&
+    return ((accessee.GetAccesseeDeviceId() == context->accessee.deviceId &&
         accessee.GetAccesseeUserId() == context->accessee.userId &&
         accessee.GetAccesseeTokenId() == context->accessee.tokenId &&
         Crypto::GetUdidHash(accesser.GetAccesserDeviceId()) == context->accesser.deviceIdHash &&
@@ -734,7 +771,7 @@ bool AuthSinkNegotiateStateMachine::Point2PointAclCompare(std::shared_ptr<DmAuth
         accesser.GetAccesserUserId() == context->accessee.userId &&
         accesser.GetAccesserTokenId() == context->accessee.tokenId &&
         Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accesser.deviceIdHash &&
-        Crypto::GetTokenIdHash(std::to_string(accessee.GetAccesseeTokenId())) == context->accesser.tokenIdHash);
+        Crypto::GetTokenIdHash(std::to_string(accessee.GetAccesseeTokenId())) == context->accesser.tokenIdHash));
 }
 
 bool AuthSinkNegotiateStateMachine::LnnAclCompare(std::shared_ptr<DmAuthContext> context,

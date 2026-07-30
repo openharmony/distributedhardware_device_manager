@@ -106,23 +106,26 @@ HWTEST_F(MultipleUserConnectorTest, GetAllUserIds_001, testing::ext::TestSize.Le
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MultipleUserConnectorTest, GetAccountInfoByUserId_001, testing::ext::TestSize.Level1)
+HWTEST_F(MultipleUserConnectorTest, GetAccountInfo_001, testing::ext::TestSize.Level1)
 {
     int32_t userId = 123;
+    int32_t subProfileId = 456;
     DMAccountInfo dmAccountInfo;
-    dmAccountInfo.accountId = "12456";
-    MultipleUserConnector::dmAccountInfoMap_[userId] = dmAccountInfo;
-    auto ret = MultipleUserConnector::GetAccountInfoByUserId(userId);
+    dmAccountInfo.accountId = "123456";
+    MultipleUserConnector::dmAccountInfoMap_[userId][subProfileId] = dmAccountInfo;
+    auto ret = MultipleUserConnector::GetAccountInfo(userId, subProfileId);
     ASSERT_FALSE(ret.accountId.empty());
 
-    MultipleUserConnector::DeleteAccountInfoByUserId(userId);
+    MultipleUserConnector::DeleteAccountInfo(userId, subProfileId);
 }
 
-HWTEST_F(MultipleUserConnectorTest, GetAccountInfoByUserId_002, testing::ext::TestSize.Level1)
+HWTEST_F(MultipleUserConnectorTest, GetAccountInfo_002, testing::ext::TestSize.Level1)
 {
     int32_t userId = 98765;
-    MultipleUserConnector::DeleteAccountInfoByUserId(userId);
-    auto ret = MultipleUserConnector::GetAccountInfoByUserId(userId);
+    int32_t subProfileId = 789;
+    std::string accountId = "testAccountId";
+    MultipleUserConnector::DeleteAccountInfo(userId, subProfileId);
+    auto ret = MultipleUserConnector::GetAccountInfo(userId, subProfileId);
     EXPECT_TRUE(ret.accountId.empty());
     EXPECT_TRUE(ret.accountName.empty());
 }
@@ -262,12 +265,13 @@ HWTEST_F(MultipleUserConnectorTest, GetCallerUserId_001, testing::ext::TestSize.
 HWTEST_F(MultipleUserConnectorTest, SetAccountInfo_001, testing::ext::TestSize.Level1)
 {
     int32_t userId = 456;
+    int32_t subProfileId = 567;
     DMAccountInfo dmAccountInfo;
     dmAccountInfo.accountId = "account_456";
     dmAccountInfo.accountName = "name_456";
-    MultipleUserConnector::SetAccountInfo(userId, dmAccountInfo);
+    MultipleUserConnector::SetAccountInfo(userId, subProfileId, dmAccountInfo);
 
-    auto ret = MultipleUserConnector::GetAccountInfoByUserId(userId);
+    auto ret = MultipleUserConnector::GetAccountInfo(userId, subProfileId);
     EXPECT_EQ(ret.accountId, "account_456");
     EXPECT_EQ(ret.accountName, "name_456");
 
@@ -438,14 +442,15 @@ HWTEST_F(MultipleUserConnectorTest, CheckMDMControl_001, testing::ext::TestSize.
 HWTEST_F(MultipleUserConnectorTest, DeleteAccountInfoByUserId_001, testing::ext::TestSize.Level1)
 {
     int32_t userId = 555001;
+    int32_t subProfileId = 567;
     DMAccountInfo dmAccountInfo;
     dmAccountInfo.accountId = "acct_555001";
     dmAccountInfo.accountName = "name_555001";
-    MultipleUserConnector::dmAccountInfoMap_[userId] = dmAccountInfo;
-    ASSERT_FALSE(MultipleUserConnector::GetAccountInfoByUserId(userId).accountId.empty());
+    MultipleUserConnector::dmAccountInfoMap_[userId][subProfileId] = dmAccountInfo;
+    ASSERT_FALSE(MultipleUserConnector::GetAccountInfo(userId, subProfileId).accountId.empty());
 
     MultipleUserConnector::DeleteAccountInfoByUserId(userId);
-    EXPECT_TRUE(MultipleUserConnector::GetAccountInfoByUserId(userId).accountId.empty());
+    EXPECT_TRUE(MultipleUserConnector::GetAccountInfo(userId, subProfileId).accountId.empty());
 }
 
 /**
@@ -456,8 +461,9 @@ HWTEST_F(MultipleUserConnectorTest, DeleteAccountInfoByUserId_001, testing::ext:
 HWTEST_F(MultipleUserConnectorTest, DeleteAccountInfoByUserId_002, testing::ext::TestSize.Level1)
 {
     int32_t userId = 555002;
+    int32_t subProfileId = 567;
     MultipleUserConnector::DeleteAccountInfoByUserId(userId);
-    EXPECT_TRUE(MultipleUserConnector::GetAccountInfoByUserId(userId).accountId.empty());
+    EXPECT_TRUE(MultipleUserConnector::GetAccountInfo(userId, subProfileId).accountId.empty());
 }
 
 /**
@@ -468,17 +474,18 @@ HWTEST_F(MultipleUserConnectorTest, DeleteAccountInfoByUserId_002, testing::ext:
 HWTEST_F(MultipleUserConnectorTest, SetAccountInfo_002, testing::ext::TestSize.Level1)
 {
     int32_t userId = 555003;
+    int32_t subProfileId = 567;
     DMAccountInfo first;
     first.accountId = "first_id";
     first.accountName = "first_name";
-    MultipleUserConnector::SetAccountInfo(userId, first);
+    MultipleUserConnector::SetAccountInfo(userId, subProfileId, first);
 
     DMAccountInfo second;
     second.accountId = "second_id";
     second.accountName = "second_name";
-    MultipleUserConnector::SetAccountInfo(userId, second);
+    MultipleUserConnector::SetAccountInfo(userId, subProfileId, second);
 
-    auto ret = MultipleUserConnector::GetAccountInfoByUserId(userId);
+    auto ret = MultipleUserConnector::GetAccountInfo(userId, subProfileId);
     EXPECT_EQ(ret.accountId, "second_id");
     EXPECT_EQ(ret.accountName, "second_name");
 
@@ -558,13 +565,13 @@ HWTEST_F(MultipleUserConnectorTest, IsUserUnlocked_002, testing::ext::TestSize.L
 }
 
 /**
- * @tc.name: GetAccountInfoByUserId_003
- * @tc.desc: GetAccountInfoByUserId returns a default (empty) info when the id was never inserted.
+ * @tc.name: GetAccountInfo_003
+ * @tc.desc: GetAccountInfo returns a default (empty) info when the id was never inserted.
  * @tc.type: FUNC
  */
-HWTEST_F(MultipleUserConnectorTest, GetAccountInfoByUserId_003, testing::ext::TestSize.Level1)
+HWTEST_F(MultipleUserConnectorTest, GetAccountInfo_003, testing::ext::TestSize.Level1)
 {
-    auto ret = MultipleUserConnector::GetAccountInfoByUserId(555008);
+    auto ret = MultipleUserConnector::GetAccountInfo(555008, 456);
     EXPECT_TRUE(ret.accountId.empty());
     EXPECT_TRUE(ret.accountName.empty());
 }
@@ -639,6 +646,7 @@ HWTEST_F(MultipleUserConnectorTest, SetAccountInfo_003, testing::ext::TestSize.L
 {
     int32_t userId1 = 600001;
     int32_t userId2 = 600002;
+    int32_t subProfileId = 567;
     DMAccountInfo info1;
     info1.accountId = "acct_600001";
     info1.accountName = "name_600001";
@@ -646,11 +654,11 @@ HWTEST_F(MultipleUserConnectorTest, SetAccountInfo_003, testing::ext::TestSize.L
     info2.accountId = "acct_600002";
     info2.accountName = "name_600002";
 
-    MultipleUserConnector::SetAccountInfo(userId1, info1);
-    MultipleUserConnector::SetAccountInfo(userId2, info2);
+    MultipleUserConnector::SetAccountInfo(userId1, subProfileId, info1);
+    MultipleUserConnector::SetAccountInfo(userId2, subProfileId, info2);
 
-    auto ret1 = MultipleUserConnector::GetAccountInfoByUserId(userId1);
-    auto ret2 = MultipleUserConnector::GetAccountInfoByUserId(userId2);
+    auto ret1 = MultipleUserConnector::GetAccountInfo(userId1, subProfileId);
+    auto ret2 = MultipleUserConnector::GetAccountInfo(userId2, subProfileId);
     EXPECT_EQ(ret1.accountId, "acct_600001");
     EXPECT_EQ(ret1.accountName, "name_600001");
     EXPECT_EQ(ret2.accountId, "acct_600002");
@@ -669,6 +677,7 @@ HWTEST_F(MultipleUserConnectorTest, DeleteAccountInfoByUserId_003, testing::ext:
 {
     int32_t keepUserId = 600003;
     int32_t deleteUserId = 600004;
+    int32_t subProfileId = 567;
     DMAccountInfo keepInfo;
     keepInfo.accountId = "acct_keep";
     keepInfo.accountName = "name_keep";
@@ -676,13 +685,13 @@ HWTEST_F(MultipleUserConnectorTest, DeleteAccountInfoByUserId_003, testing::ext:
     deleteInfo.accountId = "acct_delete";
     deleteInfo.accountName = "name_delete";
 
-    MultipleUserConnector::SetAccountInfo(keepUserId, keepInfo);
-    MultipleUserConnector::SetAccountInfo(deleteUserId, deleteInfo);
+    MultipleUserConnector::SetAccountInfo(keepUserId, subProfileId, keepInfo);
+    MultipleUserConnector::SetAccountInfo(deleteUserId, subProfileId, deleteInfo);
 
     MultipleUserConnector::DeleteAccountInfoByUserId(deleteUserId);
 
-    auto keepRet = MultipleUserConnector::GetAccountInfoByUserId(keepUserId);
-    auto deleteRet = MultipleUserConnector::GetAccountInfoByUserId(deleteUserId);
+    auto keepRet = MultipleUserConnector::GetAccountInfo(keepUserId, subProfileId);
+    auto deleteRet = MultipleUserConnector::GetAccountInfo(deleteUserId, subProfileId);
     EXPECT_EQ(keepRet.accountId, "acct_keep");
     EXPECT_TRUE(deleteRet.accountId.empty());
 

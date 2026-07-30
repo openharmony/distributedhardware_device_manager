@@ -29,6 +29,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 typedef struct DMAccountInfo {
+    int32_t subProfileId = 0;
     std::string accountId;
     std::string accountName;
 } DMAccountInfo;
@@ -113,9 +114,10 @@ public:
      */
     static std::string GetSwitchOldAccountName(void);
 
-    DM_EXPORT static void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo);
-    DM_EXPORT static DMAccountInfo GetAccountInfoByUserId(int32_t userId);
+    DM_EXPORT static void SetAccountInfo(int32_t userId, int32_t subProfileId, DMAccountInfo dmAccountInfo);
+    DM_EXPORT static DMAccountInfo GetAccountInfo(int32_t userId, int32_t subProfileId);
     DM_EXPORT static void DeleteAccountInfoByUserId(int32_t userId);
+    DM_EXPORT static void DeleteAccountInfo(int32_t userId, int32_t subProfileId);
     DM_EXPORT static void GetTokenId(uint32_t &tokenId);
     DM_EXPORT static void GetTokenIdAndForegroundUserId(uint32_t &tokenId,
         int32_t &userId);
@@ -136,15 +138,24 @@ public:
     DM_EXPORT static void UpdateForgroundUserId();
     DM_EXPORT static int32_t GetForgroundUserId();
     DM_EXPORT static int32_t TryGetCurrentAccountUserID(void);
+    DM_EXPORT static int32_t GetSubProfileIdByUserId(int32_t userId);
+    DM_EXPORT static void CacheAllUsersAccountInfo();
+    DM_EXPORT static std::string GetAccountIdBySubProfileId(int32_t userId, int32_t subProfileId);
+    DM_EXPORT static int32_t GetSubProfileIdByAccountId(int32_t userId, const std::string &accountId);
+    DM_EXPORT static DMAccountInfo GetDMAccountInfoByUserId(int32_t userId);
+    DM_EXPORT static int32_t GetAppIndexByUserId(int32_t userId);
+    DM_EXPORT static DMAccountInfo GetDMAccountInfoBySubProfileId(int32_t userId, int32_t subProfileId);
 private:
     static int32_t oldUserId_;
     static std::string accountId_;
     static std::string accountName_;
     static std::mutex lock_;
-    static std::map<int32_t, DMAccountInfo> dmAccountInfoMap_;
+    static std::map<int32_t, std::map<int32_t, DMAccountInfo>> dmAccountInfoMap_;
     static std::mutex dmAccountInfoMaplock_;
     static std::mutex currentForgroundUserIdLock_;
     static int32_t currentForgroundUserId_;
+
+    static bool FillDMAccountInfoFromSubProfile(int32_t userId, int32_t subProfileId, DMAccountInfo &dmAccountInfo);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

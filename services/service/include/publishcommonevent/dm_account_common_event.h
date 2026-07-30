@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,36 +19,40 @@
 #include "common_event_manager.h"
 #include "ffrt.h"
 #include "system_ability_status_change_stub.h"
+#include <string>
+#include <vector>
 
 namespace OHOS {
 namespace DistributedHardware {
 using OHOS::EventFwk::CommonEventData;
 using OHOS::EventFwk::CommonEventSubscriber;
 using OHOS::EventFwk::CommonEventSubscribeInfo;
-/**
- * @brief account event callback define, fun(event_type, current userid, before userid)
- * first param, accont event
- * second param, the current userid
- * third param, the userid before.
- *          first param         |       second param        |       third param
- * ------------------------------------------
- * COMMON_EVENT_USER_SWITCHED   |   switch target user id   |   the user id before switch
- * COMMON_EVENT_USER_REMOVED    |           -1              |   the user id removed
- * COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGOUT     |  logout in witch user id  |   logout in witch user id
- * COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGIN      |  login in witch user id   |   login in witch user id
- */
-using AccountEventCallback = std::function<void(std::string, int32_t, int32_t)>;
+
+struct DmAccountEventInfo {
+    std::string eventName;
+    int32_t userId = -1;
+    int32_t beforeUserId = -1;
+    int32_t subProfileId = 0;
+    int32_t previousSubProfileId = 0;
+    std::string accountId;
+};
+
+using AccountEventCallback = std::function<void(const DmAccountEventInfo&)>;
 
 class DmAccountEventSubscriber : public CommonEventSubscriber {
 public:
-    DmAccountEventSubscriber(const CommonEventSubscribeInfo &subscribeInfo, const AccountEventCallback &callback,
-        const std::vector<std::string> &eventNameVec) : CommonEventSubscriber(subscribeInfo),
-        eventNameVec_(eventNameVec), callback_(callback) {}
+    DmAccountEventSubscriber(const CommonEventSubscribeInfo &subscribeInfo,
+        const AccountEventCallback &callback, const std::vector<std::string> &eventNameVec)
+        : CommonEventSubscriber(subscribeInfo), eventNameVec_(eventNameVec), callback_(callback) {}
     ~DmAccountEventSubscriber() override = default;
     std::vector<std::string> GetSubscriberEventNameVec() const;
     void OnReceiveEvent(const CommonEventData &data) override;
 
 private:
+    bool ParseUserCommonEvent(const CommonEventData &data, const std::string &receiveEvent,
+        DmAccountEventInfo &eventInfo);
+    bool ParseSubProfileEvent(const CommonEventData &data, const std::string &receiveEvent,
+        DmAccountEventInfo &eventInfo);
     std::vector<std::string> eventNameVec_;
     AccountEventCallback callback_;
 };
@@ -81,6 +85,9 @@ private:
         std::shared_ptr<DmAccountEventSubscriber> changeSubscriber_;
     };
 };
+
+using DmSubProfileEventInfo = DmAccountEventInfo;
+using SubProfileEventCallback = AccountEventCallback;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_ACCOUNT_COMMON_EVENT_H

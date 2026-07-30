@@ -528,8 +528,24 @@ void AuthManager::ParseAccessJsonObject(const JsonObject &jsonObject)
     if (jsonObject[TAG_LOCAL_USERID].IsNumberInteger()) {
         context_->accesser.userId = jsonObject[TAG_LOCAL_USERID].Get<int32_t>();
     } else {
-        context_->accesser.userId = GetSrcUserIdByDisplayIdAndDeviceType(context_->accesser.displayId,
-            static_cast<DmDeviceType>(context_->accesser.deviceType));
+        bool isSystemSA = false;
+        {
+            std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
+            if (bindParam_.find(BIND_CALLER_IS_SYSTEM_SA) != bindParam_.end()) {
+                isSystemSA = static_cast<bool>(std::atoi(bindParam_[BIND_CALLER_IS_SYSTEM_SA].c_str()));
+            }
+        }
+        if (!isSystemSA && context_->processInfo.userId > 0) {
+            context_->accesser.userId = context_->processInfo.userId;
+            LOGI("Hap caller, use processInfo.userId: %{public}d", context_->accesser.userId);
+        } else {
+            context_->accesser.userId = GetSrcUserIdByDisplayIdAndDeviceType(context_->accesser.displayId,
+                static_cast<DmDeviceType>(context_->accesser.deviceType));
+            LOGI("SA caller, use displayId to get userId: %{public}d", context_->accesser.userId);
+        }
+    }
+    if (jsonObject[TAG_PEER_USER_ID].IsNumberInteger()) {
+        context_->accessee.userId = jsonObject[TAG_PEER_USER_ID].Get<int32_t>();
     }
     return ;
 }
@@ -696,8 +712,12 @@ void AuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
             return;
         }
     }
+#ifdef CAR_DEVICE_ENABLE
+    DMAccountInfo dmAccountInfo = MultipleUserConnector::GetDMAccountInfoByUserId(context_->accesser.userId);
+    context_->accesser.accountId = dmAccountInfo.accountId;
+#else
     context_->accesser.accountId = MultipleUserConnector::GetOhosAccountIdByUserId(context_->accesser.userId);
-
+#endif
     // compatible for old version
     context_->accesser.oldBindLevel = INVALIED_TYPE;
     CheckBindLevel(jsonObject, TAG_BIND_LEVEL, context_->accesser.oldBindLevel);

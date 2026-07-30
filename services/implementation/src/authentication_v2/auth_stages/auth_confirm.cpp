@@ -296,7 +296,6 @@ void AuthSrcConfirmState::GetSrcCredType(std::shared_ptr<DmAuthContext> context,
                     context->accesser.aclProfiles[DM_LNN].GetAccessee().GetAccesseeCredentialIdStr() !=
                     item[FILED_CRED_ID].Get<std::string>())) {
                     deleteCredInfo.push_back(item[FILED_CRED_ID].Get<std::string>());
-                    DirectlyDeleteCredential(context, context->accesser.userId, item);
                 } else {
                     credTypeJson["lnnCredType"] = credType;
                     context->accesser.credentialInfos[credType] = item.Dump();
@@ -321,7 +320,12 @@ void AuthSrcConfirmState::GetSrcCredTypeForP2P(std::shared_ptr<DmAuthContext> co
         LOGE("credObj is invalid or err json string.");
         return;
     }
-    if (aclInfo.Contains("pointTopointAcl")) {
+    if (aclInfo.Contains("pointTopointAcl") &&
+        context->accesser.aclProfiles.find(DM_POINT_TO_POINT) != context->accesser.aclProfiles.end() &&
+        (context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserCredentialIdStr() ==
+            credObj[FILED_CRED_ID].Get<std::string>() ||
+        context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeCredentialIdStr() ==
+        credObj[FILED_CRED_ID].Get<std::string>())) {
         credTypeJson["pointTopointCredType"] = credType;
         context->accesser.credentialInfos[credType] = credObj.Dump();
     }
@@ -560,9 +564,18 @@ bool AuthSrcConfirmState::IdenticalAccountAclCompare(std::shared_ptr<DmAuthConte
 {
     LOGI("start.");
     CHECK_NULL_RETURN(context, false);
+    bool isAccesserCar = (context->accesser.deviceType == static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR));
+    
+    bool accountIdMatch = true;
+    if (isAccesserCar) {
+        accountIdMatch = (context->accesser.accountIdHash ==
+            Crypto::GetAccountIdHash16(accesser.GetAccesserAccountId()));
+    }
+
     return accesser.GetAccesserDeviceId() == context->accesser.deviceId &&
         accesser.GetAccesserUserId() == context->accesser.userId &&
-        Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash;
+        Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash &&
+        accountIdMatch;
 }
 
 bool AuthSrcConfirmState::ShareAclCompare(std::shared_ptr<DmAuthContext> context,
@@ -570,9 +583,17 @@ bool AuthSrcConfirmState::ShareAclCompare(std::shared_ptr<DmAuthContext> context
 {
     LOGI("start.");
     CHECK_NULL_RETURN(context, false);
+    
+    bool isAccesserCar = (context->accesser.deviceType == static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR));
+    bool accountIdMatch = true;
+    if (isAccesserCar) {
+        accountIdMatch = (context->accesser.accountIdHash ==
+            Crypto::GetAccountIdHash16(accesser.GetAccesserAccountId()));
+    }
     return accesser.GetAccesserDeviceId() == context->accesser.deviceId &&
         accesser.GetAccesserUserId() == context->accesser.userId &&
-        Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash;
+        Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash &&
+        accountIdMatch;
 }
 
 bool AuthSrcConfirmState::Point2PointAclCompare(std::shared_ptr<DmAuthContext> context,
@@ -580,7 +601,7 @@ bool AuthSrcConfirmState::Point2PointAclCompare(std::shared_ptr<DmAuthContext> c
 {
     LOGI("start.");
     CHECK_NULL_RETURN(context, false);
-    return (accesser.GetAccesserDeviceId() == context->accesser.deviceId &&
+    return ((accesser.GetAccesserDeviceId() == context->accesser.deviceId &&
         accesser.GetAccesserUserId() == context->accesser.userId &&
         accesser.GetAccesserTokenId() == context->accesser.tokenId &&
         Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash &&
@@ -589,7 +610,7 @@ bool AuthSrcConfirmState::Point2PointAclCompare(std::shared_ptr<DmAuthContext> c
         accessee.GetAccesseeUserId() == context->accesser.userId &&
         accessee.GetAccesseeTokenId() == context->accesser.tokenId &&
         Crypto::GetUdidHash(accesser.GetAccesserDeviceId()) == context->accessee.deviceIdHash &&
-        Crypto::GetTokenIdHash(std::to_string(accesser.GetAccesserTokenId())) == context->accessee.tokenIdHash);
+        Crypto::GetTokenIdHash(std::to_string(accesser.GetAccesserTokenId())) == context->accessee.tokenIdHash));
 }
 
 bool AuthSrcConfirmState::LnnAclCompare(std::shared_ptr<DmAuthContext> context,

@@ -29,9 +29,9 @@ int32_t MultipleUserConnector::GetFirstForegroundUserId(void)
     return DmMultipleUserConnector::dmMultipleUserConnector->GetFirstForegroundUserId();
 }
 
-DMAccountInfo MultipleUserConnector::GetAccountInfoByUserId(int32_t userId)
+DMAccountInfo MultipleUserConnector::GetAccountInfo(int32_t userId, int32_t subProfileId)
 {
-    return DmMultipleUserConnector::dmMultipleUserConnector->GetAccountInfoByUserId(userId);
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetAccountInfo(userId, subProfileId);
 }
 
 int32_t MultipleUserConnector::GetBackgroundUserIds(std::vector<int32_t> &userIdVec)
@@ -74,9 +74,14 @@ void MultipleUserConnector::GetCallerUserId(int32_t &userId)
     DmMultipleUserConnector::dmMultipleUserConnector->GetCallerUserId(userId);
 }
 
-void MultipleUserConnector::SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo)
+void MultipleUserConnector::SetAccountInfo(int32_t userId, int32_t subProfileId, DMAccountInfo dmAccountInfo)
 {
-    DmMultipleUserConnector::dmMultipleUserConnector->SetAccountInfo(userId, dmAccountInfo);
+    DmMultipleUserConnector::dmMultipleUserConnector->SetAccountInfo(userId, subProfileId, dmAccountInfo);
+}
+
+void MultipleUserConnector::DeleteAccountInfo(int32_t userId, int32_t subProfileId)
+{
+    DmMultipleUserConnector::dmMultipleUserConnector->DeleteAccountInfo(userId, subProfileId);
 }
 
 DMAccountInfo MultipleUserConnector::GetCurrentDMAccountInfo()
@@ -87,6 +92,26 @@ DMAccountInfo MultipleUserConnector::GetCurrentDMAccountInfo()
 int32_t MultipleUserConnector::GetForgroundUserId()
 {
     return DmMultipleUserConnector::dmMultipleUserConnector->GetForgroundUserId();
+}
+
+int32_t MultipleUserConnector::GetSubProfileIdByUserId(int32_t userId)
+{
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetSubProfileIdByUserId(userId);
+}
+
+void MultipleUserConnector::CacheAllUsersAccountInfo()
+{
+    DmMultipleUserConnector::dmMultipleUserConnector->CacheAllUsersAccountInfo();
+}
+
+std::string MultipleUserConnector::GetAccountIdBySubProfileId(int32_t userId, int32_t subProfileId)
+{
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetAccountIdBySubProfileId(userId, subProfileId);
+}
+
+int32_t MultipleUserConnector::GetSubProfileIdByAccountId(int32_t userId, const std::string &accountId)
+{
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetSubProfileIdByAccountId(userId, accountId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
