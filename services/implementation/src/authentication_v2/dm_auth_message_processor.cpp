@@ -97,6 +97,7 @@ const char* TAG_STATE = "state";
 const char* TAG_REASON = "reason";
 const char* TAG_PEER_USER_ID = "peerUserId";
 const char* TAG_PEER_DISPLAY_ID = "peerDisplayId";
+const char* TAG_DEVICE_TYPE_IN_ACL = "deviceType";
 const char* TAG_LOCAL_DISPLAY_ID = "localDisplayId";
 const char* TAG_EXTRA_INFO = "extraInfo";
 const char* TAG_ACL_TYPE_LIST = "aclTypeList";
@@ -370,18 +371,31 @@ void DmAuthMessageProcessor::SetTransmitAccessControlList(std::shared_ptr<DmAuth
     accesser.SetAccesserCredentialIdStr(context->accesser.transmitCredentialId);
     accesser.SetAccesserSessionKeyId(context->accesser.transmitSessionKeyId);
     accesser.SetAccesserSKTimeStamp(context->accesser.transmitSkTimeStamp);
-    accesser.SetAccesserExtraData(context->accesser.extraInfo);
-
+    JsonObject accesserExtObj;
+    if (!context->accesser.extraInfo.empty()) {
+        accesserExtObj.Parse(context->accesser.extraInfo);
+    }
+    if (!accesserExtObj.IsDiscarded()) {
+        accesserExtObj[TAG_DEVICE_TYPE_IN_ACL] = context->accesser.deviceType;
+        accesser.SetAccesserExtraData(accesserExtObj.Dump());
+    }
     accessee.SetAccesseeDeviceId(context->accessee.deviceId);
     accessee.SetAccesseeUserId(context->accessee.userId);
     accessee.SetAccesseeAccountId(context->accessee.accountId);
     accessee.SetAccesseeTokenId(context->accessee.tokenId);
     accessee.SetAccesseeBundleName(context->accessee.pkgName);
     accessee.SetAccesseeDeviceName(context->accessee.deviceName);
-    accessee.SetAccesseeCredentialIdStr(context->accessee.transmitCredentialId); // 依赖dp
+    accessee.SetAccesseeCredentialIdStr(context->accessee.transmitCredentialId);
     accessee.SetAccesseeSessionKeyId(context->accessee.transmitSessionKeyId);
     accessee.SetAccesseeSKTimeStamp(context->accessee.transmitSkTimeStamp);
-    accessee.SetAccesseeExtraData(context->accessee.extraInfo);
+    JsonObject accesseeExtObj;
+    if (!context->accessee.extraInfo.empty()) {
+        accesseeExtObj.Parse(context->accessee.extraInfo);
+    }
+    if (!accesseeExtObj.IsDiscarded()) {
+        accesseeExtObj[TAG_DEVICE_TYPE_IN_ACL] = context->accessee.deviceType;
+        accessee.SetAccesseeExtraData(accesseeExtObj.Dump());
+    }
 }
 
 void DmAuthMessageProcessor::SetLnnAccessControlList(std::shared_ptr<DmAuthContext> context,
@@ -395,7 +409,12 @@ void DmAuthMessageProcessor::SetLnnAccessControlList(std::shared_ptr<DmAuthConte
     accesser.SetAccesserCredentialIdStr(context->accesser.lnnCredentialId);
     accesser.SetAccesserSessionKeyId(context->accesser.lnnSessionKeyId);
     accesser.SetAccesserSKTimeStamp(context->accesser.lnnSkTimeStamp);
-    accesser.SetAccesserExtraData(context->accesser.extraInfo);
+    JsonObject accesserExtObj;
+    if (!context->accesser.extraInfo.empty()) {
+        accesserExtObj.Parse(context->accesser.extraInfo);
+    }
+    accesserExtObj[TAG_DEVICE_TYPE_IN_ACL] = context->accesser.deviceType;
+    accesser.SetAccesserExtraData(accesserExtObj.Dump());
 
     accessee.SetAccesseeDeviceId(context->accessee.deviceId);
     accessee.SetAccesseeUserId(context->accessee.userId);
@@ -405,7 +424,12 @@ void DmAuthMessageProcessor::SetLnnAccessControlList(std::shared_ptr<DmAuthConte
     accessee.SetAccesseeCredentialIdStr(context->accessee.lnnCredentialId);
     accessee.SetAccesseeSessionKeyId(context->accessee.lnnSessionKeyId);
     accessee.SetAccesseeSKTimeStamp(context->accessee.lnnSkTimeStamp);
-    accessee.SetAccesseeExtraData(context->accessee.extraInfo);
+    JsonObject accesseeExtObj;
+    if (!context->accessee.extraInfo.empty()) {
+        accesseeExtObj.Parse(context->accessee.extraInfo);
+    }
+    accesseeExtObj[TAG_DEVICE_TYPE_IN_ACL] = context->accessee.deviceType;
+    accessee.SetAccesseeExtraData(accesseeExtObj.Dump());
 }
 
 bool DmAuthMessageProcessor::CheckMatchServiceAcl(std::shared_ptr<DmAuthContext> &context,
@@ -1329,6 +1353,8 @@ int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthCon
     jsonObject[TAG_HOST_PKGLABEL] = context->pkgLabel;
     jsonObject[TAG_SERVICE_ID] = context->accessee.serviceId;
     jsonObject[PARAM_KEY_IS_SERVICE_BIND] = context->isServiceBind;
+    jsonObject[TAG_DEVICE_TYPE] = context->accesser.deviceType;
+    jsonObject[TAG_PEER_USER_ID] = context->accessee.userId;
     if (!context->businessId.empty()) {
         jsonObject[DM_BUSINESS_ID] = context->businessId;
     }
@@ -1408,6 +1434,7 @@ int32_t DmAuthMessageProcessor::CreateRespNegotiateMessage(std::shared_ptr<DmAut
     jsonObject[TAG_CERT_RANDOM] = context->accessee.certRandom;
 
     jsonObject[TAG_IS_ONLINE] = context->accesser.isOnline;
+    jsonObject[TAG_DEVICE_TYPE] = context->accessee.deviceType;
     CreateProxyRespNegotiateMessage(context, jsonObject);
     return DM_OK;
 }
@@ -2035,6 +2062,12 @@ void DmAuthMessageProcessor::ParseAccesserInfo(const JsonObject &jsonObject,
     if (jsonObject[TAG_EXTRA_INFO].IsString()) {
         context->accesser.extraInfo = jsonObject[TAG_EXTRA_INFO].Get<std::string>();
     }
+    if (jsonObject[TAG_DEVICE_TYPE].IsNumberInteger()) {
+        context->accesser.deviceType = jsonObject[TAG_DEVICE_TYPE].Get<int32_t>();
+    }
+    if (jsonObject[TAG_PEER_USER_ID].IsNumberInteger()) {
+        context->accessee.userId = jsonObject[TAG_PEER_USER_ID].Get<int32_t>();
+    }
 }
 
 void DmAuthMessageProcessor::ParseCert(const JsonObject &jsonObject,
@@ -2202,6 +2235,9 @@ int32_t DmAuthMessageProcessor::ParseMessageRespAclNegotiate(const JsonObject &j
     }
     if (jsonObject[TAG_CERT_RANDOM].IsNumberInteger()) {
         context->accessee.certRandom = jsonObject[TAG_CERT_RANDOM].Get<uint64_t>();
+    }
+    if (jsonObject[TAG_DEVICE_TYPE].IsNumberInteger()) {
+        context->accessee.deviceType = jsonObject[TAG_DEVICE_TYPE].Get<int32_t>();
     }
     ParseMessageProxyRespAclNegotiate(jsonObject, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcConfirmState>());

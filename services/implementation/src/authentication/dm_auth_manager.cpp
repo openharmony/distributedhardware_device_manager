@@ -230,7 +230,15 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->deviceId = deviceId;
     authRequestContext_->addr = deviceId;
     authRequestContext_->dmVersion = DM_VERSION_5_0_5;
-    authRequestContext_->localUserId = MultipleUserConnector::GetFirstForegroundUserId();
+    {
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
+        if (bindParam_.find("userId") != bindParam_.end()) {
+            authRequestContext_->localUserId = std::atoi(bindParam_["userId"].c_str());
+            LOGI("Get userId from bindParam: %{public}d", authRequestContext_->localUserId);
+        } else {
+            authRequestContext_->localUserId = MultipleUserConnector::GetFirstForegroundUserId();
+        }
+    }
     authRequestContext_->localAccountId =
         MultipleUserConnector::GetOhosAccountIdByUserId(authRequestContext_->localUserId);
     authRequestContext_->isOnline = false;
@@ -2805,7 +2813,7 @@ void DmAuthManager::CompatiblePutAcl()
         accesser.requestBundleName = authResponseContext_->hostPkgName;
         accesser.requestDeviceId = localUdid;
         accesser.requestUserId = MultipleUserConnector::GetCurrentAccountUserID();
-        accesser.requestAccountId = MultipleUserConnector::GetAccountInfoByUserId(accesser.requestUserId).accountId;
+        accesser.requestAccountId = MultipleUserConnector::GetOhosAccountIdByUserId(accesser.requestUserId);
         accesser.requestTokenId = static_cast<uint64_t>(authRequestContext_->tokenId);
         accessee.trustBundleName = authResponseContext_->hostPkgName;
         accessee.trustDeviceId = remoteDeviceId_;
@@ -2820,7 +2828,7 @@ void DmAuthManager::CompatiblePutAcl()
         accessee.trustBundleName = authResponseContext_->hostPkgName;
         accessee.trustDeviceId = localUdid;
         accessee.trustUserId = MultipleUserConnector::GetCurrentAccountUserID();
-        accessee.trustAccountId = MultipleUserConnector::GetAccountInfoByUserId(accessee.trustUserId).accountId;
+        accessee.trustAccountId = MultipleUserConnector::GetOhosAccountIdByUserId(accessee.trustUserId);
         accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
     }
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);

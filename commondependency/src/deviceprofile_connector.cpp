@@ -4561,6 +4561,18 @@ void DeviceProfileConnector::HandleDistributedAccountLogout(const std::string &l
     }
 }
 
+void DeviceProfileConnector::HandleSubProfileSwitched(const std::string &localUdid, int32_t userId,
+    int32_t currentSubProfileId, int32_t previousSubProfileId)
+{
+    LOGI("localUdid %{public}s, userId %{public}d, currentSubProfileId %{public}d, "
+        "previousSubProfileId %{public}d", GetAnonyString(localUdid).c_str(), userId,
+        currentSubProfileId, previousSubProfileId);
+    std::string previousAccountId = MultipleUserConnector::GetAccountIdBySubProfileId(userId, previousSubProfileId);
+    std::string currentAccountId = MultipleUserConnector::GetAccountIdBySubProfileId(userId, currentSubProfileId);
+    UpdateAclStatusByAccountId(localUdid, userId, previousAccountId, INACTIVE);
+    UpdateAclStatusByAccountId(localUdid, userId, currentAccountId, ACTIVE);
+}
+
 bool DeviceProfileConnector::IsAccountInForeground(int32_t userId, const std::string &accountIdHash,
     const std::vector<ForegroundAccountInfo> &foregroundAccounts)
 {

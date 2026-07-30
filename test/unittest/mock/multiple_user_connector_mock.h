@@ -28,7 +28,7 @@ public:
 public:
     virtual int32_t GetCurrentAccountUserID(void) = 0;
     virtual int32_t GetFirstForegroundUserId(void) = 0;
-    virtual DMAccountInfo GetAccountInfoByUserId(int32_t userId) = 0;
+    virtual DMAccountInfo GetAccountInfo(int32_t userId, int32_t subProfileId) = 0;
     virtual int32_t GetBackgroundUserIds(std::vector<int32_t> &userIdVec) = 0;
     virtual int32_t GetForegroundUserIds(std::vector<int32_t> &userVec) = 0;
     virtual std::string GetOhosAccountId(void) = 0;
@@ -37,9 +37,14 @@ public:
     virtual std::string GetOhosAccountIdByUserId(int32_t userId) = 0;
     virtual std::string GetAccountNickName(int32_t userId) = 0;
     virtual void GetCallerUserId(int32_t &userId) = 0;
-    virtual void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo) = 0;
+    virtual void SetAccountInfo(int32_t userId, int32_t subProfileId, DMAccountInfo dmAccountInfo) = 0;
+    virtual void DeleteAccountInfo(int32_t userId, int32_t subProfileId) = 0;
     virtual DMAccountInfo GetCurrentDMAccountInfo() = 0;
     virtual int32_t GetForgroundUserId(void) = 0;
+    virtual int32_t GetSubProfileIdByUserId(int32_t userId) = 0;
+    virtual void CacheAllUsersAccountInfo() = 0;
+    virtual std::string GetAccountIdBySubProfileId(int32_t userId, int32_t subProfileId) = 0;
+    virtual int32_t GetSubProfileIdByAccountId(int32_t userId, const std::string &accountId) = 0;
 public:
     static inline std::shared_ptr<DmMultipleUserConnector> dmMultipleUserConnector = nullptr;
 };
@@ -48,7 +53,7 @@ class MultipleUserConnectorMock : public DmMultipleUserConnector {
 public:
     MOCK_METHOD(int32_t, GetCurrentAccountUserID, ());
     MOCK_METHOD(int32_t, GetFirstForegroundUserId, ());
-    MOCK_METHOD(DMAccountInfo, GetAccountInfoByUserId, (int32_t));
+    MOCK_METHOD(DMAccountInfo, GetAccountInfo, (int32_t, int32_t));
     MOCK_METHOD(int32_t, GetBackgroundUserIds, (std::vector<int32_t> &));
     MOCK_METHOD(int32_t, GetForegroundUserIds, (std::vector<int32_t> &));
     MOCK_METHOD(std::string, GetOhosAccountId, ());
@@ -57,9 +62,14 @@ public:
     MOCK_METHOD(std::string, GetOhosAccountIdByUserId, (int32_t));
     MOCK_METHOD(std::string, GetAccountNickName, (int32_t));
     MOCK_METHOD(void, GetCallerUserId, (int32_t &));
-    MOCK_METHOD(void, SetAccountInfo, (int32_t, DMAccountInfo));
+    MOCK_METHOD(void, SetAccountInfo, (int32_t, int32_t, DMAccountInfo));
+    MOCK_METHOD(void, DeleteAccountInfo, (int32_t, int32_t));
     MOCK_METHOD(DMAccountInfo, GetCurrentDMAccountInfo, ());
     MOCK_METHOD(int32_t, GetForgroundUserId, ());
+    MOCK_METHOD(int32_t, GetSubProfileIdByUserId, (int32_t));
+    MOCK_METHOD(void, CacheAllUsersAccountInfo, ());
+    MOCK_METHOD(std::string, GetAccountIdBySubProfileId, (int32_t, int32_t));
+    MOCK_METHOD(int32_t, GetSubProfileIdByAccountId, (int32_t, const std::string &));
 };
 }
 }

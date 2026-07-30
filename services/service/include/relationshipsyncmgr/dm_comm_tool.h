@@ -68,6 +68,8 @@ public:
         void HandleLocalUserIdEvent(const std::shared_ptr<DMCommTool> &dmCommToolPtr, uint32_t eventId,
             const std::shared_ptr<InnerCommMsg> &commMsg, const UserIdsMsg &userIdsMsg);
     private:
+        void HandleCommEvent(const std::shared_ptr<DMCommTool> &dmCommToolPtr, uint32_t eventId,
+            const std::shared_ptr<InnerCommMsg> &commMsg);
         void ParseUserIdsMsg(std::shared_ptr<InnerCommMsg> commMsg, UserIdsMsg &userIdsMsg);
         std::weak_ptr<DMCommTool> dmCommToolWPtr_;
     };
@@ -77,7 +79,16 @@ public:
     void ProcessReceiveUserIdsEvent(const std::shared_ptr<InnerCommMsg> commMsg);
     void ProcessResponseUserIdsEvent(const std::shared_ptr<InnerCommMsg> commMsg);
     int32_t SendLogoutAccountInfo(const std::string &rmtNetworkId, const std::string &accountId, int32_t userId);
+    int32_t SendAccountEvent(const std::string &rmtNetworkId, const std::string &accountId, int32_t userId,
+        AccountEventType accountEventType);
+    int32_t SendForegroundAccount(const std::string &rmtNetworkId,
+        const std::vector<ForegroundAccountInfo> &foregroundAccounts);
+    int32_t SendRspForegroundAccount(const std::string &rmtNetworkId,
+        const std::vector<ForegroundAccountInfo> &foregroundAccounts, int32_t socketId);
     void ProcessReceiveLogoutEvent(const std::shared_ptr<InnerCommMsg> commMsg);
+    void ProcessReceiveAccountEvent(const std::shared_ptr<InnerCommMsg> commMsg);
+    void ProcessReceiveForegroundAccount(const std::shared_ptr<InnerCommMsg> commMsg);
+    void ProcessReceiveRspForegroundAccount(const std::shared_ptr<InnerCommMsg> commMsg);
     int32_t StartCommonEvent(std::string commonEventType, EventCallback eventCallback);
     void ProcessReceiveCommonEvent(const std::shared_ptr<InnerCommMsg> commMsg);
     void ProcessResponseCommonEvent(const std::shared_ptr<InnerCommMsg> commMsg);

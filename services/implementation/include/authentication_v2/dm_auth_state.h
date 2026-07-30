@@ -29,6 +29,7 @@ const char* const FILED_DEVICE_ID = "deviceId";
 const char* const FILED_USER_ID = "userId";
 const char* const FILED_DEVICE_ID_HASH = "deviceIdHash";
 const char* const FILED_PEER_USER_SPACE_ID = "peerUserSpaceId";
+const char* const FILED_PEER_ACCOUNT_ID = "peerAccountId";
 const char* const FILED_CRED_ID = "credId";
 const char* const FILED_CRED_TYPE = "credType";
 const char* const FILED_AUTHORIZED_SCOPE = "authorizedScope";
@@ -559,7 +560,7 @@ public:
 
 private:
     int32_t RespQueryAcceseeIds(std::shared_ptr<DmAuthContext> context);
-    int32_t RespQueryProxyAcceseeIds(std::shared_ptr<DmAuthContext> context);
+    int32_t RespQueryProxyAcceseeIds(std::shared_ptr<DmAuthContext> context, int32_t appIndex);
     int32_t RespQueryServiceAcceseeIds(std::shared_ptr<DmAuthContext> context);
     int32_t ProcRespNegotiate5_1_0(std::shared_ptr<DmAuthContext> context);
     void GetSinkCredentialInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);

@@ -20,6 +20,7 @@
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_crypto.h"
 #include "dm_log.h"
 
 namespace OHOS {
@@ -74,6 +75,27 @@ namespace {
     const int32_t CREDID_PAYLOAD_LEN = 8;
     const int32_t GET_CURRENT_TIME_MAX_NUM = 3;
     const int32_t UNREG_SERVICE_ID_LEN = 10;
+    const int32_t ACCOUNT_EVENT_PAYLOAD_LEN = 11;
+    const int32_t ACCOUNT_EVENT_ACCOUNTID_LEN = 7;
+    const int32_t ACCOUNT_EVENT_TYPE_OFFSET = 1;
+    const int32_t ACCOUNT_EVENT_LAST_BATCH_OFFSET = 4;
+    const uint8_t BYTE_MASK = 0xFF;
+    const uint8_t SYNC_USER_ID_FLAG_TRUE = 0x1;
+    const uint8_t SYNC_USER_ID_FLAG_FALSE = 0x0;
+
+    // Account event byte index constants
+    const int32_t ACCOUNT_EVENT_FLAG_BYTE_INDEX = 0;
+    const int32_t ACCOUNT_EVENT_USERID_FIRST_BYTE_INDEX = 1;
+    const int32_t ACCOUNT_EVENT_USERID_SECOND_BYTE_INDEX = 2;
+    const int32_t ACCOUNT_EVENT_ACCOUNTID_START_BYTE_INDEX = 3;
+    const int32_t ACCOUNT_EVENT_BROADCAST_BYTE_INDEX = 10;
+
+    // Sync foreground account broadcast payload constants
+    const int32_t SYNC_FOREGROUND_ACCOUNT_PAYLOAD_LEN = 11;
+    const int32_t SYNC_FOREGROUND_ACCOUNT_ACCOUNTID_HASH_LEN = 7;
+    const int32_t SYNC_FOREGROUND_ACCOUNT_TYPE_OFFSET = 1;
+    const int32_t SYNC_FOREGROUND_ACCOUNT_LAST_BATCH_OFFSET = 4;
+    const int32_t SYNC_FOREGROUND_ACCOUNT_BROADCAST_INTERVAL_MS = 5000;
 
     const char * const MSG_TYPE = "TYPE";
     const char * const MSG_VALUE = "VALUE";
@@ -107,8 +129,10 @@ namespace {
 }
 
 RelationShipChangeMsg::RelationShipChangeMsg() : type(RelationShipChangeType::TYPE_MAX),
-    userId(UINT32_MAX), accountId(""), tokenId(UINT64_MAX), peerUdids({}), peerUdid(""), accountName(""),
-    syncUserIdFlag(false), userIdInfos({}), isNewEvent(false), broadCastId(UINT8_MAX), serviceId(INT64_MAX)
+    accountEventType(AccountEventType::TYPE_MAX),
+    userId(UINT32_MAX), accountId(""), tokenId(UINT64_MAX),
+    peerUdids({}), peerUdid(""), accountName(""), syncUserIdFlag(false), userIdInfos({}),
+    foregroundAccountInfos({}), isNewEvent(false), isLastBatch(false), broadCastId(UINT8_MAX), serviceId(INT64_MAX)
 {
 }
 
@@ -173,6 +197,10 @@ bool RelationShipChangeMsg::ToBroadcastPayLoadTwo(uint8_t *&msg, uint32_t &len) 
             break;
         case RelationShipChangeType::SERVICEINFO_UNREGISTER:
             ToServiceUnRegPayLoad(msg, len);
+            ret = true;
+            break;
+        case RelationShipChangeType::ACCOUNT_EVENT:
+            ToAccountEventPayLoad(msg, len);
             ret = true;
             break;
         default:
@@ -311,11 +339,27 @@ bool RelationShipChangeMsg::FromBroadcastPayLoad(const cJSON *payloadJson, Relat
         case RelationShipChangeType::SERVICEINFO_UNREGISTER:
             ret = FromServiceUnRegPayLoad(payloadJson);
             break;
+        case RelationShipChangeType::ACCOUNT_EVENT:
+            ret = ParseAccountEventPayload(payloadJson);
+            break;
         default:
             LOGE("RelationShipChange type invalid");
             break;
     }
     return ret;
+}
+
+bool RelationShipChangeMsg::ParseAccountEventPayload(const cJSON *payloadJson)
+{
+    char *jsonStr = cJSON_PrintUnformatted(payloadJson);
+    if (jsonStr == nullptr) {
+        LOGE("cJSON_PrintUnformatted failed for ACCOUNT_EVENT");
+        return false;
+    }
+    JsonObject jsonObject(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    jsonObject.Parse(std::string(jsonStr));
+    cJSON_free(jsonStr);
+    return FromAccountEventPayLoad(jsonObject);
 }
 
 bool RelationShipChangeMsg::FromShareUnbindPayLoad(const cJSON *payloadJson)
@@ -395,6 +439,9 @@ bool RelationShipChangeMsg::IsValid() const
         case RelationShipChangeType::TYPE_MAX:
             ret = false;
             break;
+        case RelationShipChangeType::ACCOUNT_EVENT:
+            ret = (userId != UINT32_MAX);
+            break;
         default:
             ret = false;
             break;
@@ -408,7 +455,8 @@ bool RelationShipChangeMsg::IsChangeTypeValid()
         (type == RelationShipChangeType::APP_UNBIND) || (type == RelationShipChangeType::SYNC_USERID) ||
         (type == RelationShipChangeType::DEL_USER) || (type == RelationShipChangeType::STOP_USER) ||
         (type == RelationShipChangeType::SERVICE_UNBIND) || (type == RelationShipChangeType::APP_UNINSTALL) ||
-        (type == RelationShipChangeType::SERVICEINFO_UNREGISTER);
+        (type == RelationShipChangeType::SERVICEINFO_UNREGISTER) ||
+        (type == RelationShipChangeType::ACCOUNT_EVENT);
 }
 
 bool RelationShipChangeMsg::IsChangeTypeValid(uint32_t type)
@@ -422,7 +470,8 @@ bool RelationShipChangeMsg::IsChangeTypeValid(uint32_t type)
         (type == (uint32_t)RelationShipChangeType::SHARE_UNBIND) ||
         (type == (uint32_t)RelationShipChangeType::SERVICE_UNBIND) ||
         (type == (uint32_t)RelationShipChangeType::APP_UNINSTALL) ||
-        (type == (uint32_t)RelationShipChangeType::SERVICEINFO_UNREGISTER);
+        (type == (uint32_t)RelationShipChangeType::SERVICEINFO_UNREGISTER) ||
+        (type == (uint32_t)RelationShipChangeType::ACCOUNT_EVENT);
 }
 
 void RelationShipChangeMsg::ToAccountLogoutPayLoad(uint8_t *&msg, uint32_t &len) const
@@ -512,6 +561,39 @@ void RelationShipChangeMsg::ToServiceUnRegPayLoad(uint8_t *&msg, uint32_t &len) 
     }
 
     len = APP_UNBIND_PAYLOAD_LEN;
+}
+
+void RelationShipChangeMsg::ToAccountEventPayLoad(uint8_t *&msg, uint32_t &len) const
+{
+    msg = new uint8_t[ACCOUNT_EVENT_PAYLOAD_LEN]();
+    
+    // Byte 0: 标志字节
+    // Bit 0: syncUserIdFlag (0=请求, 1=回复)
+    msg[ACCOUNT_EVENT_FLAG_BYTE_INDEX] |= (syncUserIdFlag ? SYNC_USER_ID_FLAG_TRUE : SYNC_USER_ID_FLAG_FALSE);
+    // Bit 1-3: accountEventType
+    msg[ACCOUNT_EVENT_FLAG_BYTE_INDEX] |= (static_cast<uint8_t>(accountEventType) << ACCOUNT_EVENT_TYPE_OFFSET);
+    // Bit 4: isLastBatch (是否批量广播中最后一个广播)
+    if (isLastBatch) {
+        msg[ACCOUNT_EVENT_FLAG_BYTE_INDEX] |= (SYNC_USER_ID_FLAG_TRUE << ACCOUNT_EVENT_LAST_BATCH_OFFSET);
+    }
+    // Bit 5-7: 保留
+    
+    // Byte 1-2: userId
+    msg[ACCOUNT_EVENT_USERID_FIRST_BYTE_INDEX] |= userId & BYTE_MASK;
+    msg[ACCOUNT_EVENT_USERID_SECOND_BYTE_INDEX] |= (userId >> BITS_PER_BYTE) & BYTE_MASK;
+    
+    // Byte 3-9: accountIdHash截断（取前7个字符）
+    for (int32_t j = ACCOUNT_EVENT_ACCOUNTID_START_BYTE_INDEX; j < ACCOUNT_EVENT_BROADCAST_BYTE_INDEX; j++) {
+        int32_t accountIdIndex = j - ACCOUNT_EVENT_ACCOUNTID_START_BYTE_INDEX;
+        if (static_cast<size_t>(accountIdIndex) < accountId.length()) {
+            msg[j] = accountId[accountIdIndex];
+        }
+    }
+    
+    // Byte 10: broadCastId
+    msg[ACCOUNT_EVENT_BROADCAST_BYTE_INDEX] |= broadCastId & BYTE_MASK;
+    
+    len = ACCOUNT_EVENT_PAYLOAD_LEN;
 }
 
 void RelationShipChangeMsg::ToServiceUnbindPayLoad(uint8_t *&msg, uint32_t &len) const
@@ -785,6 +867,96 @@ bool RelationShipChangeMsg::FromServiceUnRegPayLoad(const cJSON *payloadJson)
                 ((j - UNREG_SERVICE_ID_LEN) * BITS_PER_BYTE);
         }
     }
+    return true;
+}
+
+bool RelationShipChangeMsg::FromAccountEventPayLoad(const JsonItemObject &payloadJson)
+{
+    if (!payloadJson.IsArray()) {
+        LOGE("Account event payloadJson is not array.");
+        return false;
+    }
+    std::vector<JsonItemObject> items = payloadJson.Items();
+    int32_t arraySize = static_cast<int32_t>(items.size());
+    if (arraySize != ACCOUNT_EVENT_PAYLOAD_LEN) {
+        LOGE("Payload invalied, the size is %{public}d, expected %{public}d.", arraySize, ACCOUNT_EVENT_PAYLOAD_LEN);
+        return false;
+    }
+
+    uint8_t flagByte = items[0].Get<int32_t>();
+    // Bit 0: syncUserIdFlag (0=请求, 1=回复)
+    syncUserIdFlag = (flagByte & 0x1) != 0;
+    // Bit 1-3: accountEventType
+    accountEventType = static_cast<AccountEventType>((flagByte >> ACCOUNT_EVENT_TYPE_OFFSET) & 0x7);
+    // Bit 4: isLastBatch
+    isLastBatch = ((flagByte >> ACCOUNT_EVENT_LAST_BATCH_OFFSET) & 0x1) != 0;
+
+    userId = 0;
+    for (uint32_t i = 1; i < USERID_PAYLOAD_LEN + 1; i++) {
+        if (items[i].IsNumber()) {
+            userId |= (static_cast<uint8_t>(items[i].Get<int32_t>())) << ((i - 1) * BITS_PER_BYTE);
+        }
+    }
+
+    accountId = "";
+    for (uint32_t j = USERID_PAYLOAD_LEN + 1; j < USERID_PAYLOAD_LEN + 1 + ACCOUNT_EVENT_ACCOUNTID_LEN; j++) {
+        if (items[j].IsNumber()) {
+            accountId += static_cast<char>(items[j].Get<int32_t>());
+        }
+    }
+
+    if (items[ACCOUNT_EVENT_PAYLOAD_LEN - 1].IsNumber()) {
+        broadCastId = static_cast<uint8_t>(items[ACCOUNT_EVENT_PAYLOAD_LEN - 1].Get<int32_t>());
+    }
+
+    LOGI("userId %{public}d, accountIdHash %{public}s, eventType %{public}d, isLastBatch %{public}d,"
+        "broadCastId %{public}d", userId, GetAnonyString(accountId).c_str(), static_cast<uint32_t>(accountEventType),
+        isLastBatch, broadCastId);
+    return true;
+}
+
+bool RelationShipChangeMsg::FromSyncForegroundAccountPayLoad(const JsonItemObject &payloadJson)
+{
+    if (!payloadJson.IsArray()) {
+        LOGE("Sync foreground account payloadJson is not array.");
+        return false;
+    }
+    std::vector<JsonItemObject> items = payloadJson.Items();
+    int32_t arraySize = static_cast<int32_t>(items.size());
+    if (arraySize != SYNC_FOREGROUND_ACCOUNT_PAYLOAD_LEN) {
+        LOGE("Payload invalid, the size is %{public}d, expected %{public}d.",
+            arraySize, SYNC_FOREGROUND_ACCOUNT_PAYLOAD_LEN);
+        return false;
+    }
+
+    uint8_t flagByte = items[0].Get<int32_t>();
+    syncUserIdFlag = (flagByte & 0x1) != 0;
+    accountEventType = static_cast<AccountEventType>((flagByte >> SYNC_FOREGROUND_ACCOUNT_TYPE_OFFSET) & 0x7);
+    isLastBatch = ((flagByte >> SYNC_FOREGROUND_ACCOUNT_LAST_BATCH_OFFSET) & 0x1) != 0;
+
+    userId = 0;
+    for (uint32_t i = 1; i < USERID_PAYLOAD_LEN + 1; i++) {
+        if (items[i].IsNumber()) {
+            userId |= (static_cast<uint8_t>(items[i].Get<int32_t>())) << ((i - 1) * BITS_PER_BYTE);
+        }
+    }
+
+    accountId = "";
+    for (uint32_t j = USERID_PAYLOAD_LEN + 1;
+        j < USERID_PAYLOAD_LEN + 1 + SYNC_FOREGROUND_ACCOUNT_ACCOUNTID_HASH_LEN; j++) {
+        if (items[j].IsNumber()) {
+            accountId += static_cast<char>(items[j].Get<int32_t>());
+        }
+    }
+
+    if (items[SYNC_FOREGROUND_ACCOUNT_PAYLOAD_LEN - 1].IsNumber()) {
+        broadCastId = static_cast<uint8_t>(items[SYNC_FOREGROUND_ACCOUNT_PAYLOAD_LEN - 1].Get<int32_t>());
+    }
+
+    LOGI("FromSyncForegroundAccountPayLoad: userId %{public}d, accountId %{public}s, type %{public}d, "
+        "isLastBatch %{public}d, broadCastId %{public}d",
+        userId, GetAnonyString(accountId).c_str(), static_cast<uint32_t>(accountEventType),
+        isLastBatch, broadCastId);
     return true;
 }
 
@@ -1111,6 +1283,21 @@ std::string ReleationShipSyncMgr::SyncTrustRelationShip(RelationShipChangeMsg &m
     return msg.ToJson();
 }
 
+std::string ReleationShipSyncMgr::SyncTrustRelationShip(RelationShipChangeMsg &msg, uint8_t &broadCastId)
+{
+    int32_t currentTimeSec = 0;
+    if (broadCastId == 0) {
+        if (!GetCurrentTimeSec(currentTimeSec)) {
+            LOGE("get current time failed, use default value");
+            return msg.ToJson();
+        }
+        broadCastId = static_cast<uint8_t>(currentTimeSec);
+    }
+    msg.broadCastId = broadCastId;
+    LOGI("send trust change msg: %{public}s", msg.ToString().c_str());
+    return msg.ToJson();
+}
+
 RelationShipChangeMsg ReleationShipSyncMgr::ParseTrustRelationShipChange(const std::string &msgJson)
 {
     RelationShipChangeMsg msgObj;
@@ -1155,8 +1342,10 @@ const std::string RelationShipChangeMsg::ToString() const
 {
     std::ostringstream ret;
     std::string isNewEventStr = isNewEvent ? "true" : "false";
+    std::string isLastBatchStr = isLastBatch ? "true" : "false";
     ret << "{ MsgType: " << std::to_string(static_cast<uint32_t>(type));
-    ret << "{ isNewEvent: " << isNewEventStr;
+    ret << ", accountEventType: " << std::to_string(static_cast<uint32_t>(accountEventType));
+    ret << ", isNewEvent: " << isNewEventStr;
     ret << ", userId: " << std::to_string(userId);
     ret << ", accountId: " << GetAnonyString(accountId);
     ret << ", tokenId: " << std::to_string(tokenId);
@@ -1165,6 +1354,7 @@ const std::string RelationShipChangeMsg::ToString() const
     ret << ", accountName: " << GetAnonyString(accountName);
     ret << ", syncUserIdFlag: " << std::to_string(syncUserIdFlag);
     ret << ", userIds: " << GetUserIdInfoList(userIdInfos);
+    ret << ", isLastBatchStr: " << isLastBatchStr;
     ret << ", broadCastId: " << std::to_string(broadCastId) << " }";
     return ret.str();
 }

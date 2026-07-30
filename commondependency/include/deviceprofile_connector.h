@@ -417,6 +417,8 @@ public:
         const std::string &accountId);
     DM_EXPORT void HandleDistributedAccountLogout(const std::string &localUdid, int32_t userId,
         const std::string &accountId, const std::string &peerUdid);
+    DM_EXPORT void HandleSubProfileSwitched(const std::string &localUdid, int32_t userId,
+        int32_t currentSubProfileId, int32_t previousSubProfileId);
     DM_EXPORT bool CheckAclMatchByAccountId(const DistributedDeviceProfile::AccessControlProfile &profile,
         const std::string &localUdid, int32_t userId, const std::string &accountId);
     DM_EXPORT bool CheckAclMatchByAccountId(const DistributedDeviceProfile::AccessControlProfile &profile,

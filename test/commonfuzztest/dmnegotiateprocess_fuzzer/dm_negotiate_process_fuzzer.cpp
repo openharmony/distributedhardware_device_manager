@@ -36,7 +36,8 @@ void RespQueryProxyAcceseeIdsFuzzTest(FuzzedDataProvider &fdp)
     dmProxyAuthContext.proxyAccessee.tokenId = fdp.ConsumeIntegral<int64_t>();
     context->subjectProxyOnes.push_back(dmProxyAuthContext);
     std::shared_ptr<AuthSinkNegotiateStateMachine> authSinkPtr = std::make_shared<AuthSinkNegotiateStateMachine>();
-    authSinkPtr->RespQueryProxyAcceseeIds(context);
+    int32_t appIndex = fdp.ConsumeIntegral<int32_t>();
+    authSinkPtr->RespQueryProxyAcceseeIds(context, appIndex);
 }
 
 void GetSinkProxyCredTypeForP2PFuzzTest(FuzzedDataProvider &fdp)

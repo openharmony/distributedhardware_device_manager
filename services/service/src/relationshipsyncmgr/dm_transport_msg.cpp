@@ -30,6 +30,7 @@ const char* const DSOFTBUS_NOTIFY_USERIDS_UDIDKEY = "remoteUdid";
 const char* const DSOFTBUS_NOTIFY_USERIDS_USERIDKEY = "foregroundUserIds";
 const char* const DSOFTBUS_NOTIFY_ACCOUNTID_KEY = "accountId";
 const char* const DSOFTBUS_NOTIFY_USERID_KEY = "userId";
+const char* const DSOFTBUS_NOTIFY_EVENT_TYPE_KEY = "eventType";
 const char* const DSOFTBUS_NOTIFY_TOKENID_KEY = "tokenId";
 const char* const DSOFTBUS_NOTIFY_SUBJECTID_KEY = "subjectTokenId";
 const char* const DSOFTBUS_NOTIFY_EXTRA_KEY = "extra";
@@ -405,6 +406,59 @@ void FromJson(const cJSON *jsonObject, UnbindServiceProxyParam &unBindServiceMsg
     }
     if (cJSON_IsNumber(isProxyUnbindObj)) {
         unBindServiceMsg.isProxyUnbind = isProxyUnbindObj->valueint;
+    }
+}
+
+void ToJson(JsonItemObject &jsonObject, const AccountEventMsg &accountEventMsg)
+{
+    jsonObject[DSOFTBUS_NOTIFY_ACCOUNTID_KEY] = accountEventMsg.accountId;
+    jsonObject[DSOFTBUS_NOTIFY_USERID_KEY] = accountEventMsg.userId;
+    jsonObject[DSOFTBUS_NOTIFY_EVENT_TYPE_KEY] = static_cast<uint32_t>(accountEventMsg.accountEventType);
+}
+
+void FromJson(const JsonItemObject &jsonObject, AccountEventMsg &accountEventMsg)
+{
+    if (jsonObject.Contains(DSOFTBUS_NOTIFY_ACCOUNTID_KEY)) {
+        jsonObject[DSOFTBUS_NOTIFY_ACCOUNTID_KEY].GetTo(accountEventMsg.accountId);
+    }
+    
+    if (jsonObject.Contains(DSOFTBUS_NOTIFY_USERID_KEY)) {
+        jsonObject[DSOFTBUS_NOTIFY_USERID_KEY].GetTo(accountEventMsg.userId);
+    }
+    
+    if (jsonObject.Contains(DSOFTBUS_NOTIFY_EVENT_TYPE_KEY)) {
+        uint32_t eventType = 0;
+        jsonObject[DSOFTBUS_NOTIFY_EVENT_TYPE_KEY].GetTo(eventType);
+        accountEventMsg.accountEventType = static_cast<AccountEventType>(eventType);
+    }
+}
+
+void ToJson(JsonItemObject &jsonObject, const ForegroundAccountMsg &foregroundAccountMsg)
+{
+    JsonObject accountArray(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    for (const auto &account : foregroundAccountMsg.foregroundAccounts) {
+        JsonObject accountObj;
+        accountObj[DSOFTBUS_NOTIFY_USERID_KEY] = account.userId;
+        accountObj[DSOFTBUS_NOTIFY_ACCOUNTID_KEY] = account.accountId;
+        accountArray.PushBack(accountObj);
+    }
+    jsonObject.Insert("foregroundAccounts", accountArray);
+}
+
+void FromJson(const JsonItemObject &jsonObject, ForegroundAccountMsg &foregroundAccountMsg)
+{
+    foregroundAccountMsg.foregroundAccounts.clear();
+    if (jsonObject.Contains("foregroundAccounts") && jsonObject["foregroundAccounts"].IsArray()) {
+        for (const auto &item : jsonObject["foregroundAccounts"].Items()) {
+            ForegroundAccountInfo accountInfo;
+            if (item.Contains(DSOFTBUS_NOTIFY_USERID_KEY)) {
+                item[DSOFTBUS_NOTIFY_USERID_KEY].GetTo(accountInfo.userId);
+            }
+            if (item.Contains(DSOFTBUS_NOTIFY_ACCOUNTID_KEY)) {
+                item[DSOFTBUS_NOTIFY_ACCOUNTID_KEY].GetTo(accountInfo.accountId);
+            }
+            foregroundAccountMsg.foregroundAccounts.push_back(accountInfo);
+        }
     }
 }
 } // DistributedHardware

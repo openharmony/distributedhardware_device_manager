@@ -20,8 +20,10 @@
 #include <map>
 #include <mutex>
 #include "cJSON.h"
+#include "json_object.h"
 #include "dm_single_instance.h"
 #include "dm_timer.h"
+#include "dm_msg_comm.h"
 namespace OHOS {
 namespace DistributedHardware {
 enum class RelationShipChangeType : uint32_t {
@@ -35,7 +37,8 @@ enum class RelationShipChangeType : uint32_t {
     STOP_USER = 7,
     SHARE_UNBIND = 8,
     SERVICEINFO_UNREGISTER = 9,
-    TYPE_MAX = 10
+    ACCOUNT_EVENT = 10,
+    TYPE_MAX = 11
 };
 
 struct UserIdInfo {
@@ -50,6 +53,7 @@ struct UserIdInfo {
 
 struct RelationShipChangeMsg {
     RelationShipChangeType type;
+    AccountEventType accountEventType;
     uint32_t userId;
     std::string accountId;
     uint64_t tokenId;
@@ -63,8 +67,11 @@ struct RelationShipChangeMsg {
     bool syncUserIdFlag;
     // The foreground and background user id infos
     std::vector<UserIdInfo> userIdInfos;
+    // The foreground account infos
+    std::vector<ForegroundAccountInfo> foregroundAccountInfos;
     std::string credId;
     bool isNewEvent;
+    bool isLastBatch;
     uint8_t broadCastId;
     int64_t serviceId;
 
@@ -85,6 +92,7 @@ struct RelationShipChangeMsg {
     void ToStopUserPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToShareUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToServiceUnRegPayLoad(uint8_t *&msg, uint32_t &len) const;
+    void ToAccountEventPayLoad(uint8_t *&msg, uint32_t &len) const;
     cJSON *ToPayLoadJson() const;
 
     bool FromAccountLogoutPayLoad(const cJSON *payloadJson);
@@ -98,6 +106,7 @@ struct RelationShipChangeMsg {
     bool FromAppUninstallPayLoad(const cJSON *payloadJson);
     bool GetBroadCastId(const cJSON *payloadJson, uint32_t userIdNum);
     bool FromServiceUnRegPayLoad(const cJSON *payloadJson);
+    bool FromAccountEventPayLoad(const JsonItemObject &payloadJson);
 
     std::string ToJson() const;
     bool FromJson(const std::string &msgJson);
@@ -108,12 +117,15 @@ private:
     bool HandleBroadcastPayLoadByType(uint8_t *&msg, uint32_t &len) const;
     bool HandleBroadcastPayLoadBase(uint8_t *&msg, uint32_t &len) const;
     bool HandleBroadcastPayLoadExt(uint8_t *&msg, uint32_t &len) const;
+    bool FromSyncForegroundAccountPayLoad(const JsonItemObject &payloadJson);
+    bool ParseAccountEventPayload(const cJSON *payloadJson);
 };
 
 class ReleationShipSyncMgr {
 DM_DECLARE_SINGLE_INSTANCE(ReleationShipSyncMgr);
 public:
     std::string SyncTrustRelationShip(RelationShipChangeMsg &msg);
+    std::string SyncTrustRelationShip(RelationShipChangeMsg &msg, uint8_t &broadCastId);
     RelationShipChangeMsg ParseTrustRelationShipChange(const std::string &msgJson);
     bool IsNewBroadCastId(const RelationShipChangeMsg &msg);
 private:

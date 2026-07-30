@@ -18,7 +18,9 @@
 
 #include <string>
 #include <cJSON.h>
+#include "json_object.h"
 #include "dm_device_info.h"
+#include "dm_msg_comm.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -77,6 +79,28 @@ struct LogoutAccountMsg {
 
 void ToJson(cJSON *jsonObject, const LogoutAccountMsg &accountInfo);
 void FromJson(const cJSON *jsonObject, LogoutAccountMsg &accountInfo);
+
+struct AccountEventMsg {
+    std::string accountId;
+    int32_t userId;
+    AccountEventType accountEventType;
+    AccountEventMsg() : userId(-1), accountEventType(AccountEventType::TYPE_MAX) {}
+    AccountEventMsg(const std::string &accountId, int32_t userId, AccountEventType accountEventType)
+        : accountId(accountId), userId(userId), accountEventType(accountEventType) {}
+};
+
+
+void ToJson(JsonItemObject &jsonObject, const AccountEventMsg &accountEventMsg);
+void FromJson(const JsonItemObject &jsonObject, AccountEventMsg &accountEventMsg);
+
+struct ForegroundAccountMsg {
+    std::vector<ForegroundAccountInfo> foregroundAccounts;
+    ForegroundAccountMsg() : foregroundAccounts({}) {}
+    ForegroundAccountMsg(const std::vector<ForegroundAccountInfo> &accounts) : foregroundAccounts(accounts) {}
+};
+
+void ToJson(JsonItemObject &jsonObject, const ForegroundAccountMsg &foregroundAccountMsg);
+void FromJson(const JsonItemObject &jsonObject, ForegroundAccountMsg &foregroundAccountMsg);
 
 struct UninstAppMsg {
     int32_t userId_;

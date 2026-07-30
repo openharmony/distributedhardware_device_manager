@@ -678,14 +678,38 @@ void DmAuthState::FilterProfilesByContext(
     for (auto &item : profiles) {
         std::string accesserDeviceIdHash = Crypto::GetUdidHash(item.GetAccesser().GetAccesserDeviceId());
         std::string accesseeDeviceIdHash = Crypto::GetUdidHash(item.GetAccessee().GetAccesseeDeviceId());
+        std::string accesserAccountId = item.GetAccesser().GetAccesserAccountId();
+        std::string accesseeAccountId = item.GetAccessee().GetAccesseeAccountId();
+        
+        bool isAccesserCar = (context->accesser.deviceType == static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR));
+        bool isAccesseeCar = (context->accessee.deviceType == static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR));
+        
+        bool forwardDirectAccountIdMatch = true;
+        bool reverseDirectAccountIdMatch = true;
+        
+        if (isAccesserCar) {
+            forwardDirectAccountIdMatch = (context->accesser.accountIdHash ==
+                Crypto::GetAccountIdHash16(accesserAccountId));
+            reverseDirectAccountIdMatch = (context->accesser.accountIdHash ==
+                Crypto::GetAccountIdHash16(accesseeAccountId));
+        }
+        if (isAccesseeCar) {
+            forwardDirectAccountIdMatch = forwardDirectAccountIdMatch &&
+                (context->accessee.accountIdHash == Crypto::GetAccountIdHash16(accesseeAccountId));
+            reverseDirectAccountIdMatch = reverseDirectAccountIdMatch &&
+                (context->accessee.accountIdHash == Crypto::GetAccountIdHash16(accesserAccountId));
+        }
+        
         if ((context->accesser.deviceIdHash == accesserDeviceIdHash &&
             context->accessee.deviceIdHash == accesseeDeviceIdHash &&
             context->accesser.userId == item.GetAccesser().GetAccesserUserId() &&
-            context->accessee.userId == item.GetAccessee().GetAccesseeUserId()) ||
+            context->accessee.userId == item.GetAccessee().GetAccesseeUserId() &&
+            forwardDirectAccountIdMatch) ||
             (context->accessee.deviceIdHash == accesserDeviceIdHash &&
             context->accesser.deviceIdHash == accesseeDeviceIdHash &&
             context->accessee.userId == item.GetAccesser().GetAccesserUserId() &&
-            context->accesser.userId == item.GetAccessee().GetAccesseeUserId())) {
+            context->accesser.userId == item.GetAccessee().GetAccesseeUserId() &&
+            reverseDirectAccountIdMatch)) {
             if (item.GetStatus() == INACTIVE) {
                 item.SetStatus(ACTIVE);
                 DeviceProfileConnector::GetInstance().UpdateAclStatus(item);
@@ -1230,7 +1254,8 @@ void DmAuthState::DeleteInvalidCredAndAcl(std::shared_ptr<DmAuthContext> context
 {
     LOGI("start");
     CHECK_NULL_VOID(context);
-    int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    int32_t currentUserId = (context->direction == DM_AUTH_SOURCE) ?
+        context->accesser.userId : context->accessee.userId;
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localDeviceId);
