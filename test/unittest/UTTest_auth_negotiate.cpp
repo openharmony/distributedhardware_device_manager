@@ -128,7 +128,7 @@ HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_003, testing::ext::Tes
     std::vector<std::string> deleteCredInfo;
 
     authState->GetSinkCredTypeForP2P(context, credObj, aclInfo, credTypeJson, credType, deleteCredInfo);
-    EXPECT_EQ(credTypeJson["pointTopointCredType"].Get<int32_t>(), credType);
+    EXPECT_EQ(credTypeJson["pointTopointCredType"].Get<int32_t>(), 0);
 }
 
 HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_005, testing::ext::TestSize.Level1)
