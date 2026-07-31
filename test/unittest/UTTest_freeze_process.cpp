@@ -47,7 +47,7 @@ HWTEST_F(FreezeProcessTest, UpdateFreezeRecord, testing::ext::TestSize.Level0)
     FreezeProcess freezeProcess;
     freezeProcess.bindFailedEventsCache_ = bindFailedEventsCache;
     int32_t result = freezeProcess.UpdateFreezeRecord();
-    EXPECT_NE(result, ERR_DM_TIME_OUT);
+    EXPECT_EQ(result, 0);
 }
 
 HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_WhenJsonIsEmpty, testing::ext::TestSize.Level0)
