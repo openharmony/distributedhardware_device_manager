@@ -213,7 +213,11 @@ public:
     virtual int32_t UnRegisterUiStateCallback(const std::string &pkgName) = 0;
 
     virtual std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname) = 0;
-    virtual int32_t DpAclAdd(const std::string &udid) = 0;
+#ifdef CAR_DEVICE_ENABLE
+    virtual std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> GetAppTrustDeviceIdList(std::string pkgname,
+        ProcessInfo processInfo) = 0;
+#endif
+    virtual int32_t DpAclAdd(const std::string &udid, int64_t accessControlId) = 0;
     virtual void DeleteAlwaysAllowTimeOut() = 0;
     virtual void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId) = 0;
     virtual int32_t IsSameAccount(const std::string &udid) = 0;

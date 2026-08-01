@@ -100,7 +100,9 @@ ohos_shared_library("devicemanagerdependency") {
       defines += [ "OS_ACCOUNT_PART_EXISTS" ]
       external_deps += [ "os_account:os_account_innerkits" ]
     }
-
+    if (car_device_enable) {
+      defines += [ "CAR_DEVICE_ENABLE" ]
+    }
     subsystem_name = "distributedhardware"
 
     part_name = "device_manager"
@@ -179,7 +181,9 @@ ohos_shared_library("devicemanagerdependencytest") {
       defines += [ "OS_ACCOUNT_PART_EXISTS" ]
       external_deps += [ "os_account:os_account_innerkits" ]
     }
-
+    if (car_device_enable) {
+      defines += [ "CAR_DEVICE_ENABLE" ]
+    }
     subsystem_name = "distributedhardware"
 
     part_name = "device_manager"

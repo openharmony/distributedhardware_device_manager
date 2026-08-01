@@ -1264,10 +1264,11 @@ HWTEST_F(DeviceManagerServiceImplTest, BindTarget_001, testing::ext::TestSize.Le
 HWTEST_F(DeviceManagerServiceImplTest, DpAclAdd_001, testing::ext::TestSize.Level1)
 {
     std::string udid = "2342154";
+    int64_t accessControlId = 99999;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
-    int32_t ret = deviceManagerServiceImpl_->DpAclAdd(udid);
+    int32_t ret = deviceManagerServiceImpl_->DpAclAdd(udid, accessControlId);
     EXPECT_EQ(ret, DM_OK);
 }
 

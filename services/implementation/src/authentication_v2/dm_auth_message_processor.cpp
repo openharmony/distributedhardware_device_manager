@@ -797,6 +797,7 @@ int32_t DmAuthMessageProcessor::SetProxyAccess(std::shared_ptr<DmAuthContext> co
         accesserExtObj.Parse(context->accesser.extraInfo);
     }
     accesserExtObj[TAG_PROXY] = accesserProxyObj.Dump();
+    accesserExtObj[TAG_DEVICE_TYPE_IN_ACL] = context->accesser.deviceType;
     accesser.SetAccesserExtraData(accesserExtObj.Dump());
 
     accessee.SetAccesseeTokenId(proxyAuthContext.proxyAccessee.tokenId);
@@ -811,6 +812,7 @@ int32_t DmAuthMessageProcessor::SetProxyAccess(std::shared_ptr<DmAuthContext> co
         accesseeExtObj.Parse(context->accessee.extraInfo);
     }
     accesseeExtObj[TAG_PROXY] = accesseeProxyObj.Dump();
+    accesseeExtObj[TAG_DEVICE_TYPE_IN_ACL] = context->accessee.deviceType;
     accessee.SetAccesseeExtraData(accesseeExtObj.Dump());
     return DM_OK;
 }

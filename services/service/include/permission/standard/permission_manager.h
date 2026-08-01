@@ -43,7 +43,6 @@ public:
     bool CheckProcessValidOnGetTrustedDeviceList();
     bool CheckReadLocalDeviceName(void);
     bool CheckOnReadyRetrospectiveNotificationBlackList();
-    bool CheckPkgNameInWhiteList(const std::string &pkgName);
 
 private:
     bool VerifyAccessTokenByPermissionName(const std::string& permissionName);

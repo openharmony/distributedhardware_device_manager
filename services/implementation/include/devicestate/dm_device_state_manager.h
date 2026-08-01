@@ -92,11 +92,32 @@ public:
     void ChangeDeviceInfo(const DmDeviceInfo &info);
     int32_t RegisterSoftbusStateCallback();
     void OnDeviceOnline(std::string deviceId, int32_t authForm);
+#ifdef CAR_DEVICE_ENABLE
+    void OnDeviceOnline(std::string deviceId, int32_t authForm, const PeerDevInfo &peerDevInfo);
+#endif
     void OnDeviceOffline(std::string deviceId, const bool isOnline);
     std::string GetUdidByNetWorkId(std::string networkId);
     bool CheckIsOnline(const std::string &udid);
     void DeleteOffLineTimer(const std::string &peerUdid);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo, std::vector<ProcessInfo> &processInfos);
+#ifdef CAR_DEVICE_ENABLE
+    struct OfflineHandleParam {
+        int32_t userId;
+        std::string localAccountId;
+        std::string trustDeviceId;
+        std::string requestDeviceId;
+        DmDeviceState devState;
+        bool isOnline;
+    };
+    void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline);
+    void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline);
+    void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline);
+    void HandleOfflineForUser(DmDeviceInfo &devInfo, const OfflineHandleParam &param);
+    std::string GetUdidHashByNetworkId(const std::string &networkId, std::string &peerUdid);
+    void SetOnlineProcessInfo(const uint32_t &bindType, ProcessInfo &processInfo,
+        DmDeviceInfo &devInfo, const std::string &requestDeviceId, const std::string &trustDeviceId,
+        DmDeviceState devState, const bool isOnline);
+#endif
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void StartDelTimerByDP(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId);
 #endif

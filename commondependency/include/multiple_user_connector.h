@@ -145,6 +145,7 @@ public:
     DM_EXPORT static DMAccountInfo GetDMAccountInfoByUserId(int32_t userId);
     DM_EXPORT static int32_t GetAppIndexByUserId(int32_t userId);
     DM_EXPORT static DMAccountInfo GetDMAccountInfoBySubProfileId(int32_t userId, int32_t subProfileId);
+    DM_EXPORT static std::string GetAccountIdByUserId(int32_t userId);
 private:
     static int32_t oldUserId_;
     static std::string accountId_;

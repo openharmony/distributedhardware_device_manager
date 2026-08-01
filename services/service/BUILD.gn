@@ -326,7 +326,9 @@ if (defined(ohos_lite)) {
       if (device_manager_feature_product == "default") {
         defines += [ "SUPPORT_WISEDEVICE" ]
       }
-
+      if (car_device_enable) {
+        defines += [ "CAR_DEVICE_ENABLE" ]
+      }
       subsystem_name = "distributedhardware"
 
       part_name = "device_manager"
@@ -481,7 +483,9 @@ if (defined(ohos_lite)) {
       if (device_manager_common) {
         defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
       }
-
+      if (car_device_enable) {
+        defines += [ "CAR_DEVICE_ENABLE" ]
+      }
       subsystem_name = "distributedhardware"
 
       part_name = "device_manager"

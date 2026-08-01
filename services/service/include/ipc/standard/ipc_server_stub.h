@@ -159,7 +159,9 @@ public:
     void OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen);
     int32_t HandleUserRemoved(int32_t removedUserId);
     int32_t HandleAccountLogoutEvent(int32_t userId, const std::string &accountId);
-
+#ifdef CAR_DEVICE_ENABLE
+    const sptr<IpcRemoteBroker> GetListenerByProcessInfo(ProcessInfo processInfo) const;
+#endif
 private:
     IpcServerStub();
     ~IpcServerStub() override = default;

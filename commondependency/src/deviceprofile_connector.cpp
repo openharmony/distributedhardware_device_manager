@@ -4898,5 +4898,327 @@ int32_t DeviceProfileConnector::DeleteAclByAccountIdHash(const std::string &loca
     LOGI("Deleted %{public}d ACLs by accountIdHash", deleteCount);
     return DM_OK;
 }
+
+#ifdef CAR_DEVICE_ENABLE
+DM_EXPORT std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> DeviceProfileConnector::GetAppTrustDeviceList(
+    const std::string &pkgName, const std::string &localDeviceId, ProcessInfo processInfo)
+{
+    LOGI("localDeviceId: %{public}s, pkgName: %{public}s, userId: %{public}d, accountId: %{public}s",
+        GetAnonyString(localDeviceId).c_str(), pkgName.c_str(), processInfo.userId,
+        GetAnonyString(processInfo.accountId).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    std::vector<AccessControlProfile> profilesFilter = {};
+ 
+    for (auto &item : profiles) {
+        if (!IsLnnAcl(item) && ((item.GetAccesser().GetAccesserUserId() == processInfo.userId &&
+            item.GetAccesser().GetAccesserDeviceId() == localDeviceId &&
+            item.GetAccesser().GetAccesserAccountId() == processInfo.accountId) ||
+            (item.GetAccessee().GetAccesseeUserId() == processInfo.userId &&
+            item.GetAccessee().GetAccesseeDeviceId() == localDeviceId &&
+            item.GetAccessee().GetAccesseeAccountId() == processInfo.accountId))) {
+            profilesFilter.push_back(item);
+        }
+    }
+ 
+    return GetDmAuthFormMap(pkgName, localDeviceId, profilesFilter, processInfo.userId);
+}
+
+std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> DeviceProfileConnector::GetDmAuthFormMap(
+    const std::string &pkgName, const std::string &deviceId,
+    const std::vector<DistributedDeviceProfile::AccessControlProfile> &profilesFilter, const int32_t &userId)
+{
+    std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> deviceIdMap;
+    for (auto &item : profilesFilter) {
+        std::string trustDeviceId = item.GetTrustDeviceId();
+        LOGI("trustDeviceId: %{public}s, status: %{public}d, acerUserId: %{public}d, aceeUserId: %{public}d",
+            GetAnonyString(trustDeviceId).c_str(), item.GetStatus(), item.GetAccesser().GetAccesserUserId(),
+            item.GetAccessee().GetAccesseeUserId());
+        if (trustDeviceId == deviceId || item.GetStatus() != ACTIVE) {
+            continue;
+        }
+        DmDiscoveryInfo discoveryInfo = {pkgName, deviceId};
+        int32_t bindType = HandleDmAuthForm(item, discoveryInfo);
+        LOGI("The udid %{public}s in ACL authForm is %{public}d.", GetAnonyString(trustDeviceId).c_str(), bindType);
+        if (bindType == DmAuthForm::INVALID_TYPE) {
+            continue;
+        }
+        PeerDevInfo peerDevInfo;
+        peerDevInfo.deviceId = trustDeviceId;
+        if (trustDeviceId == item.GetAccesser().GetAccesserDeviceId()) {
+            peerDevInfo.userId = item.GetAccesser().GetAccesserUserId();
+        } else if (trustDeviceId == item.GetAccessee().GetAccesseeDeviceId()) {
+            peerDevInfo.userId = item.GetAccessee().GetAccesseeUserId();
+        }
+        if (deviceIdMap.find(peerDevInfo) == deviceIdMap.end()) {
+            if (CheckSinkShareType(item, userId, deviceId, trustDeviceId, bindType)) {
+                LOGI("CheckSinkShareType true.");
+                continue;
+            }
+            deviceIdMap[peerDevInfo] = static_cast<DmAuthForm>(bindType);
+            continue;
+        }
+        DmAuthForm authForm = deviceIdMap.at(peerDevInfo);
+        if (bindType == authForm) {
+            continue;
+        }
+        uint32_t highestBindType = CheckBindType(peerDevInfo, userId, deviceId);
+        LocalDeviceInfo localDevInfo = {userId, deviceId};
+        UpdateAuthFormMapByBindType(deviceIdMap, peerDevInfo, highestBindType, item, localDevInfo);
+    }
+    return deviceIdMap;
+}
+
+void DeviceProfileConnector::UpdateAuthFormMapByBindType(
+    std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> &deviceIdMap,
+    const PeerDevInfo &peerDevInfo, uint32_t highestBindType,
+    const DistributedDeviceProfile::AccessControlProfile &profile, const LocalDeviceInfo &localDevInfo)
+{
+    if (highestBindType == IDENTICAL_ACCOUNT_TYPE) {
+        deviceIdMap[peerDevInfo] = DmAuthForm::IDENTICAL_ACCOUNT;
+    } else if (highestBindType == SHARE_TYPE) {
+        if (CheckSinkShareType(profile, localDevInfo.userId, localDevInfo.deviceId, peerDevInfo.deviceId,
+            DmAuthForm::SHARE)) {
+            return;
+        }
+        deviceIdMap[peerDevInfo] = DmAuthForm::SHARE;
+    } else if (highestBindType == DEVICE_PEER_TO_PEER_TYPE || highestBindType == APP_PEER_TO_PEER_TYPE ||
+        highestBindType == SERVICE_PEER_TO_PEER_TYPE) {
+        deviceIdMap[peerDevInfo] = DmAuthForm::PEER_TO_PEER;
+    } else if (highestBindType == APP_ACROSS_ACCOUNT_TYPE ||
+        highestBindType == DEVICE_ACROSS_ACCOUNT_TYPE || highestBindType == SERVICE_ACROSS_ACCOUNT_TYPE) {
+        deviceIdMap[peerDevInfo] = DmAuthForm::ACROSS_ACCOUNT;
+    } else {
+        LOGE("highestBindType match failed.");
+    }
+}
+#endif
+
+#ifdef CAR_DEVICE_ENABLE
+DM_EXPORT uint32_t DeviceProfileConnector::CheckBindType(const std::string &peerDeviceId,
+    const std::string &localDeviceId, int32_t localUserId, const std::string &localAccountId, DmDeviceInfo &devInfo)
+{
+    LOGI("peerDeviceId: %{public}s, localDeviceId: %{public}s, localUserId: %{public}d, localAccountId: %{public}s",
+        GetAnonyString(peerDeviceId).c_str(), GetAnonyString(localDeviceId).c_str(), localUserId,
+        GetAnonyString(localAccountId).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    std::vector<AccessControlProfile> filterProfiles;
+    for (auto &item : profiles) {
+        if (IsLnnAcl(item) || item.GetStatus() != ACTIVE) {
+            continue;
+        }
+        bool matchAccesser = (item.GetAccesser().GetAccesserDeviceId() == localDeviceId &&
+            item.GetAccesser().GetAccesserUserId() == localUserId &&
+            item.GetAccesser().GetAccesserAccountId() == localAccountId &&
+            item.GetAccessee().GetAccesseeDeviceId() == peerDeviceId);
+        bool matchAccessee = (item.GetAccessee().GetAccesseeDeviceId() == localDeviceId &&
+            item.GetAccessee().GetAccesseeUserId() == localUserId &&
+            item.GetAccessee().GetAccesseeAccountId() == localAccountId &&
+            item.GetAccesser().GetAccesserDeviceId() == peerDeviceId);
+        if (matchAccesser || matchAccessee) {
+            filterProfiles.push_back(item);
+        }
+    }
+    LOGI("filterProfiles size is %{public}zu", filterProfiles.size());
+    uint32_t highestPriority = INVALIED_TYPE;
+    for (auto &item : filterProfiles) {
+        bool matchAccesser = (item.GetAccesser().GetAccesserDeviceId() == localDeviceId &&
+            item.GetAccesser().GetAccesserUserId() == localUserId &&
+            item.GetAccesser().GetAccesserAccountId() == localAccountId);
+        int32_t peerUserId = 0;
+        std::string peerAccountId = "";
+        if (matchAccesser) {
+            peerUserId = item.GetAccessee().GetAccesseeUserId();
+            peerAccountId = item.GetAccessee().GetAccesseeAccountId();
+        } else {
+            peerUserId = item.GetAccesser().GetAccesserUserId();
+            peerAccountId = item.GetAccesser().GetAccesserAccountId();
+        }
+        uint32_t priority = static_cast<uint32_t>(GetAuthForm(item, peerDeviceId, localDeviceId));
+        if (priority > highestPriority) {
+            highestPriority = priority;
+        }
+    }
+    LOGI("highestPriority: %{public}u", highestPriority);
+    return highestPriority;
+}
+
+DM_EXPORT uint32_t DeviceProfileConnector::CheckBindType(const PeerDevInfo &peerDevInfo, int32_t userId,
+    const std::string &deviceId)
+{
+    LOGI("peerDevInfo.deviceId: %{public}s, userId: %{public}d, deviceId: %{public}s",
+        GetAnonyString(peerDevInfo.deviceId).c_str(), userId, GetAnonyString(deviceId).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    uint32_t highestPriority = INVALIED_TYPE;
+    for (auto &item : profiles) {
+        if (IsLnnAcl(item) || item.GetStatus() != ACTIVE) {
+            continue;
+        }
+        std::string trustDeviceId = item.GetTrustDeviceId();
+        if (trustDeviceId != peerDevInfo.deviceId) {
+            continue;
+        }
+        bool matchAccesser = (item.GetAccesser().GetAccesserDeviceId() == deviceId &&
+            item.GetAccesser().GetAccesserUserId() == userId &&
+            item.GetAccessee().GetAccesseeDeviceId() == peerDevInfo.deviceId &&
+            item.GetAccessee().GetAccesseeUserId() == peerDevInfo.userId &&
+            item.GetAccessee().GetAccesseeAccountId() == peerDevInfo.accountId);
+        bool matchAccessee = (item.GetAccessee().GetAccesseeDeviceId() == deviceId &&
+            item.GetAccessee().GetAccesseeUserId() == userId &&
+            item.GetAccesser().GetAccesserDeviceId() == peerDevInfo.deviceId &&
+            item.GetAccesser().GetAccesserUserId() == peerDevInfo.userId &&
+            item.GetAccesser().GetAccesserAccountId() == peerDevInfo.accountId);
+        if (!matchAccesser && !matchAccessee) {
+            continue;
+        }
+        uint32_t priority = static_cast<uint32_t>(GetAuthForm(item, peerDevInfo.deviceId, deviceId));
+        if (priority > highestPriority) {
+            highestPriority = priority;
+        }
+    }
+    LOGI("highestPriority: %{public}u", highestPriority);
+    return highestPriority;
+}
+#endif
+
+#ifdef CAR_DEVICE_ENABLE
+std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByProcessInfo(
+    const std::string &localDeviceId, const std::string &targetDeviceId, ProcessInfo processInfo)
+{
+    LOGI("localDeviceId: %{public}s, targetDeviceId: %{public}s, userId: %{public}d, accountId: %{public}s",
+        GetAnonyString(localDeviceId).c_str(), GetAnonyString(targetDeviceId).c_str(), processInfo.userId,
+        GetAnonyString(processInfo.accountId).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    std::vector<AccessControlProfile> filterProfiles;
+    for (auto &item : profiles) {
+        if (IsLnnAcl(item) || item.GetStatus() != ACTIVE) {
+            continue;
+        }
+        bool matchAccesser = (item.GetAccesser().GetAccesserDeviceId() == localDeviceId &&
+            item.GetAccesser().GetAccesserUserId() == processInfo.userId &&
+            item.GetAccesser().GetAccesserAccountId() == processInfo.accountId &&
+            item.GetAccessee().GetAccesseeDeviceId() == targetDeviceId);
+        bool matchAccessee = (item.GetAccessee().GetAccesseeDeviceId() == localDeviceId &&
+            item.GetAccessee().GetAccesseeUserId() == processInfo.userId &&
+            item.GetAccessee().GetAccesseeAccountId() == processInfo.accountId &&
+            item.GetAccesser().GetAccesserDeviceId() == targetDeviceId);
+        if (matchAccesser || matchAccessee) {
+            filterProfiles.push_back(item);
+        }
+    }
+    LOGI("filterProfiles size is %{public}zu", filterProfiles.size());
+    return filterProfiles;
+}
+
+DM_EXPORT std::vector<OHOS::DistributedHardware::ProcessInfo> DeviceProfileConnector::GetProcessInfoFromAcl(
+    const std::string &localDeviceId, const std::string &targetDeviceId, ProcessInfo processInfo)
+{
+    std::vector<AccessControlProfile> filterProfiles = GetAclProfileByProcessInfo(
+        localDeviceId, targetDeviceId, processInfo);
+    std::vector<OHOS::DistributedHardware::ProcessInfo> processInfoVec;
+    for (auto &item : filterProfiles) {
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        OHOS::DistributedHardware::ProcessInfo info;
+        std::string extraStr;
+        if (accesserUdid == localDeviceId) {
+            info.pkgName = item.GetAccesser().GetAccesserBundleName();
+            info.userId = item.GetAccesser().GetAccesserUserId();
+            info.tokenId = static_cast<uint32_t>(item.GetAccesser().GetAccesserTokenId());
+            info.accountId = item.GetAccesser().GetAccesserAccountId();
+            processInfoVec.push_back(info);
+            extraStr = item.GetAccesser().GetAccesserExtraData();
+        } else if (accesseeUdid == localDeviceId) {
+            info.pkgName = item.GetAccessee().GetAccesseeBundleName();
+            info.userId = item.GetAccessee().GetAccesseeUserId();
+            info.tokenId = static_cast<uint32_t>(item.GetAccessee().GetAccesseeTokenId());
+            info.accountId = item.GetAccessee().GetAccesseeAccountId();
+            processInfoVec.push_back(info);
+            extraStr = item.GetAccessee().GetAccesseeExtraData();
+        } else {
+            continue;
+        }
+        std::vector<int64_t> proxyTokenIdVec = JsonStrHandle::GetInstance().GetProxyTokenIdByExtra(extraStr);
+        for (auto &proxyTokenId : proxyTokenIdVec) {
+            OHOS::DistributedHardware::ProcessInfo procInfo;
+            std::string proxyBundleName;
+            if (AppManager::GetInstance().GetBundleNameByTokenId(proxyTokenId, proxyBundleName) != DM_OK) {
+                continue;
+            }
+            procInfo.pkgName = proxyBundleName;
+            procInfo.userId = info.userId;
+            procInfo.tokenId = proxyTokenId;
+            procInfo.accountId = info.accountId;
+            processInfoVec.push_back(info);
+        }
+    }
+    LOGI("processInfoVec size is %{public}zu", processInfoVec.size());
+    return processInfoVec;
+}
+#endif
+
+#ifdef CAR_DEVICE_ENABLE
+std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByUserIdAndAccountId(
+    int32_t localUserId, const std::string &localAccountId, const std::string &localUdid,
+    const std::string &peerUdid)
+{
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::vector<AccessControlProfile> filterProfiles;
+    for (const auto &item : profiles) {
+        if (IsLnnAcl(item) || item.GetStatus() != ACTIVE) {
+            continue;
+        }
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t accesserUserid = item.GetAccesser().GetAccesserUserId();
+        int32_t accesseeUserid = item.GetAccessee().GetAccesseeUserId();
+        std::string accesserAccountId = item.GetAccesser().GetAccesserAccountId();
+        std::string accesseeAccountId = item.GetAccessee().GetAccesseeAccountId();
+        bool matchAccesser = (accesserUdid == localUdid && accesseeUdid == peerUdid &&
+            accesserUserid == localUserId && accesserAccountId == localAccountId);
+        bool matchAccessee = (accesseeUdid == localUdid && accesserUdid == peerUdid &&
+            accesseeUserid == localUserId && accesseeAccountId == localAccountId);
+        if (matchAccesser || matchAccessee) {
+            filterProfiles.push_back(item);
+        }
+    }
+    LOGI("filterProfiles size is %{public}zu", filterProfiles.size());
+    return filterProfiles;
+}
+
+DM_EXPORT std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLevel(int32_t localUserId,
+    const std::string &localAccountId, const std::string &localUdid, const std::string &peerUdid, DmDeviceInfo &devInfo)
+{
+    LOGI("localUserId %{public}d, localAccountId %{public}s, localUdid %{public}s, peerUdid %{public}s.",
+        localUserId, GetAnonyString(localAccountId).c_str(), GetAnonyString(localUdid).c_str(),
+        GetAnonyString(peerUdid).c_str());
+    std::vector<AccessControlProfile> filterProfiles = GetAclProfileByUserIdAndAccountId(
+        localUserId, localAccountId, localUdid, peerUdid);
+    std::map<int32_t, int32_t> userIdAndBindLevel;
+    for (const auto &item : filterProfiles) {
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t accesserUserId = item.GetAccesser().GetAccesserUserId();
+        int32_t accesseeUserId = item.GetAccessee().GetAccesseeUserId();
+        std::string accesserAccountId = item.GetAccesser().GetAccesserAccountId();
+        std::string accesseeAccountId = item.GetAccessee().GetAccesseeAccountId();
+        if (accesserUdid == localUdid && accesseeUdid == peerUdid) {
+            if (userIdAndBindLevel.find(accesserUserId) == userIdAndBindLevel.end()) {
+                userIdAndBindLevel[accesserUserId] = static_cast<int32_t>(item.GetBindLevel());
+            } else {
+                userIdAndBindLevel[accesserUserId] =
+                    std::min(static_cast<int32_t>(item.GetBindLevel()), userIdAndBindLevel[accesserUserId]);
+            }
+        } else if (accesseeUdid == localUdid && accesserUdid == peerUdid) {
+            if (userIdAndBindLevel.find(accesseeUserId) == userIdAndBindLevel.end()) {
+                userIdAndBindLevel[accesseeUserId] = static_cast<int32_t>(item.GetBindLevel());
+            } else {
+                userIdAndBindLevel[accesseeUserId] =
+                    std::min(static_cast<int32_t>(item.GetBindLevel()), userIdAndBindLevel[accesseeUserId]);
+            }
+        }
+    }
+    return userIdAndBindLevel;
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS

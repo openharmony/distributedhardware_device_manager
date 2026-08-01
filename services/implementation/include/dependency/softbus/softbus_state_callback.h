@@ -16,11 +16,16 @@
 #ifndef OHOS_DM_SOFTBUS_STATE_CALLBACK_H
 #define OHOS_DM_SOFTBUS_STATE_CALLBACK_H
 
+#include "dm_device_info.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class ISoftbusStateCallback {
 public:
     virtual void OnDeviceOnline(std::string deviceId, int32_t authForm) = 0;
+#ifdef CAR_DEVICE_ENABLE
+    virtual void OnDeviceOnline(std::string deviceId, int32_t authForm, const PeerDevInfo &peerDevInfo) = 0;
+#endif
     virtual void OnDeviceOffline(std::string deviceId, const bool isOnline) = 0;
     virtual void DeleteOffLineTimer(const std::string &peerUdid) = 0;
 };

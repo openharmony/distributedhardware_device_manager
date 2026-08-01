@@ -248,11 +248,15 @@ public:
     int32_t SetLocalDisplayNameToSoftbus(const std::string &displayName);
     void RemoveNotifyRecord(const ProcessInfo &processInfo);
     int32_t RegDevStateCallbackToService(const std::string &pkgName);
-
+#ifdef CAR_DEVICE_ENABLE
+    int32_t RegDevStateCallbackToService(const std::string &pkgName, ProcessInfo processInfo);
+#endif
     int32_t RegServiceStateCallback(const std::string &pkgName, int64_t serviceId);
     int32_t ClearServiceStateCallback(const std::string &pkgName, int32_t userId);
     int32_t UnRegServiceStateCallback(const std::string &pkgName, int64_t serviceId);
-
+#ifdef CAR_DEVICE_ENABLE
+    int32_t GetTrustedDeviceList(ProcessInfo processInfo, std::vector<DmDeviceInfo> &deviceList);
+#endif
     void HandleDeviceUnBind(const char *peerUdid, const GroupInformation &groupInfo);
     int32_t GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid);
     int32_t GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
@@ -385,7 +389,8 @@ private:
     void ProcessCheckSumByBT(std::string networkId, std::vector<int32_t> foregroundUserIds,
         std::vector<int32_t> backgroundUserIds);
     void AddHmlInfoToBindParam(int32_t actionId, std::string &bindParam);
-
+    int32_t HandleTrustedDeviceList(const std::string &pkgName, bool isOnlyShowNetworkId,
+        const std::vector<DmDeviceInfo> &onlineDeviceList, std::vector<DmDeviceInfo> &deviceList);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void SubscribeAccountCommonEvent();
     void SendShareTypeUnBindBroadCast(const char *credId, const int32_t localUserId,

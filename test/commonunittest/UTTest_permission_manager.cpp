@@ -548,23 +548,6 @@ HWTEST_F(PermissionManagerTest, CheckOnReadyRetrospectiveNotificationBlackList_0
     ASSERT_TRUE(ret);
 }
 
-HWTEST_F(PermissionManagerTest, CheckPkgNameInWhiteList_001, testing::ext::TestSize.Level1)
-{
-    std::string emptyName;
-    bool ret = PermissionManager::GetInstance().CheckPkgNameInWhiteList(emptyName);
-    ASSERT_FALSE(ret);
-
-    std::string invalidName = "invalid_pkg";
-    ret = PermissionManager::GetInstance().CheckPkgNameInWhiteList(invalidName);
-    ASSERT_FALSE(ret);
-
-    ret = PermissionManager::GetInstance().CheckPkgNameInWhiteList("valid_pkg1");
-    ASSERT_FALSE(ret);
-
-    ret = PermissionManager::GetInstance().CheckPkgNameInWhiteList("valid_pkg2");
-    ASSERT_FALSE(ret);
-}
-
 /* VerifyAccessTokenByPermissionName TOKEN_NATIVE branch for CheckAccessServicePermission
  * (the || TOKEN_NATIVE operand on line 370 was only exercised via TOKEN_HAP). */
 HWTEST_F(PermissionManagerTest, CheckAccessServicePermission_002, testing::ext::TestSize.Level1)

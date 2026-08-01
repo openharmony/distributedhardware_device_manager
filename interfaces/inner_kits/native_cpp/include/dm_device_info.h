@@ -390,6 +390,8 @@ DM_EXPORT extern const char* DEVICE_TYPE_PC_STRING;
 DM_EXPORT extern const char* DEVICE_TYPE_SMART_DISPLAY_STRING;
 DM_EXPORT extern const char* DEVICE_TYPE_2IN1_STRING;
 DM_EXPORT extern const char* DEVICE_TYPE_GLASSES_STRING;
+constexpr size_t HASH_SHIFT_USER_ID = 1;
+constexpr size_t HASH_SHIFT_ACCOUNT_ID = 2;
 
 typedef struct DmAccessCaller {
     std::string accountId;
@@ -414,7 +416,9 @@ typedef struct ProcessInfo {
     int32_t userId;
     std::string pkgName;
     uint32_t tokenId = 0;
-
+#ifdef CAR_DEVICE_ENABLE
+    std::string accountId = "";
+#endif
     bool operator==(const ProcessInfo &other) const
     {
         if ((userId != other.userId) || (pkgName != other.pkgName)) {
@@ -423,6 +427,11 @@ typedef struct ProcessInfo {
         if (tokenId != 0 && other.tokenId != 0 && tokenId != other.tokenId) {
             return false;
         }
+#ifdef CAR_DEVICE_ENABLE
+        if (accountId != "" && other.accountId != "" && accountId != other.accountId) {
+            return false;
+        }
+#endif
         return true;
     }
 
@@ -434,6 +443,11 @@ typedef struct ProcessInfo {
         if (pkgName != other.pkgName) {
             return pkgName < other.pkgName;
         }
+#ifdef CAR_DEVICE_ENABLE
+        if (accountId != other.accountId) {
+            return accountId < other.accountId;
+        }
+#endif
         return tokenId < other.tokenId;
     }
 } ProcessInfo;
@@ -736,6 +750,28 @@ typedef struct DmRegisterServiceState {
               serviceId == other.serviceId;
     }
 } DmRegisterServiceState;
+
+typedef struct PeerDevInfo {
+    std::string deviceId;
+    int32_t userId;
+    std::string accountId;
+
+    bool operator==(const PeerDevInfo& other) const
+    {
+        return deviceId == other.deviceId && userId == other.userId && accountId == other.accountId;
+    }
+} PeerDevInfo;
+
+struct PeerDevInfoHash {
+    size_t operator()(const PeerDevInfo& key) const
+    {
+        size_t h1 = std::hash<std::string>()(key.deviceId);
+        size_t h2 = std::hash<int32_t>()(key.userId);
+        size_t h3 = std::hash<std::string>()(key.accountId);
+
+        return h1 ^ (h2 << HASH_SHIFT_USER_ID) ^ (h3 << HASH_SHIFT_ACCOUNT_ID);
+    }
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

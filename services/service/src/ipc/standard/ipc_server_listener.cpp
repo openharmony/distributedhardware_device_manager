@@ -36,7 +36,12 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+#ifdef CAR_DEVICE_ENABLE
+    LOGE("CAR_DEVICE_ENABLE, processInfo.pkgName:%{public}s", processInfo.pkgName.c_str());
+    sptr<IpcRemoteBroker> listener = IpcServerStub::GetInstance().GetListenerByProcessInfo(processInfo);
+#else
     sptr<IpcRemoteBroker> listener = IpcServerStub::GetInstance().GetDmListener(processInfo);
+#endif
     if (listener == nullptr) {
         LOGE("cannot get listener for package:%{public}s.", processInfo.pkgName.c_str());
         return ERR_DM_POINT_NULL;

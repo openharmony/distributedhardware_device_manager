@@ -826,6 +826,15 @@ void SoftbusConnector::HandleDeviceOnline(std::string deviceId, int32_t authForm
     return;
 }
 
+#ifdef CAR_DEVICE_ENABLE
+void SoftbusConnector::HandleDeviceOnline(std::string deviceId, int32_t authForm, const PeerDevInfo &peerDevInfo)
+{
+    LOGI("start");
+    deviceStateManagerCallback_->OnDeviceOnline(deviceId, authForm, peerDevInfo);
+    return;
+}
+#endif
+
 void SoftbusConnector::HandleDeviceOffline(std::string deviceId, const bool isOnline)
 {
     LOGI("start");

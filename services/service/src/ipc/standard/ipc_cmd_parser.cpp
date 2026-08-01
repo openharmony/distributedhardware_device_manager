@@ -1687,7 +1687,11 @@ ON_IPC_CMD(SYNC_CALLBACK, MessageParcel &data, MessageParcel &reply)
     MultipleUserConnector::GetCallingTokenId(processInfo.tokenId);
     int32_t result = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
     if (dmCommonNotifyEvent == static_cast<int32_t>(DmCommonNotifyEvent::REG_DEVICE_STATE)) {
+#ifdef CAR_DEVICE_ENABLE
+        DeviceManagerService::GetInstance().RegDevStateCallbackToService(pkgName, processInfo);
+#else
         DeviceManagerService::GetInstance().RegDevStateCallbackToService(pkgName);
+#endif
     }
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");

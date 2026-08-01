@@ -119,6 +119,36 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const DmDeviceInfo &info)
     }
 }
 
+#ifdef CAR_DEVICE_ENABLE
+void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm, const PeerDevInfo &peerDevInfo)
+{
+    std::string uuid = "";
+    DmDeviceInfo devInfo = softbusConnector_->GetDeviceInfoByDeviceId(deviceId, uuid);
+    if (devInfo.deviceId[0] == '\0') {
+        LOGE("deviceId is empty.");
+        return;
+    }
+    LOGI("deviceId: %{public}s, uuid: %{public}s", GetAnonyString(deviceId).c_str(), GetAnonyString(uuid).c_str());
+    devInfo.authForm = static_cast<DmAuthForm>(authForm);
+    {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+        std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
+#else
+        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+#endif
+        if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
+            stateDeviceInfos_[deviceId] = devInfo;
+        }
+        if (remoteDeviceInfos_.find(uuid) == remoteDeviceInfos_.end()) {
+            remoteDeviceInfos_[uuid] = devInfo;
+        }
+    }
+    std::vector<ProcessInfo> processInfoVec = softbusConnector_->GetProcessInfo();
+    ProcessDeviceStateChange(DEVICE_STATE_ONLINE, devInfo, processInfoVec, true);
+    softbusConnector_->ClearProcessInfo();
+}
+#endif
+
 void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm)
 {
     std::string uuid = "";
@@ -167,6 +197,189 @@ void DmDeviceStateManager::OnDeviceOffline(std::string deviceId, const bool isOn
     ProcessDeviceStateChange(DEVICE_STATE_OFFLINE, devInfo, processInfoVec, isOnline);
     softbusConnector_->ClearProcessInfo();
 }
+
+#ifdef CAR_DEVICE_ENABLE
+std::string DmDeviceStateManager::GetUdidHashByNetworkId(const std::string &networkId, std::string &peerUdid)
+{
+    if (softbusConnector_ == nullptr) {
+        LOGE("softbusConnector_ is nullpter!");
+        return "";
+    }
+    int32_t ret = softbusConnector_->GetUdidByNetworkId(networkId.c_str(), peerUdid);
+    if (ret != DM_OK) {
+        LOGE("GetUdidByNetworkId failed ret: %{public}d", ret);
+        return "";
+    }
+    return softbusConnector_->GetDeviceUdidHashByUdid(peerUdid);
+}
+
+void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline)
+{
+    if (devState == DEVICE_STATE_ONLINE) {
+        HandleOnline(devState, devInfo, isOnline);
+    } else if (devState == DEVICE_STATE_OFFLINE) {
+        HandleOffline(devState, devInfo, isOnline);
+    } else {
+        std::string peerUdid = "";
+        std::string udidHash = GetUdidHashByNetworkId(devInfo.networkId, peerUdid);
+        if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udidHash.c_str(), udidHash.length()) != 0) {
+            LOGE("get deviceId: %{public}s failed", GetAnonyString(udidHash).c_str());
+            return;
+        }
+        std::vector<int32_t> foregroundUserIds;
+        MultipleUserConnector::GetForegroundUserIds(foregroundUserIds);
+        std::vector<ProcessInfo> processInfoVec;
+        for (const auto &it : foregroundUserIds) {
+            std::string localAccountId = MultipleUserConnector::GetAccountIdByUserId(it);
+            ProcessInfo processInfo;
+            processInfo.pkgName = std::string(DM_PKG_NAME);
+            processInfo.userId = it;
+            processInfo.accountId = localAccountId;
+            processInfoVec.push_back(processInfo);
+        }
+        HandleDeviceStatusChange(devState, devInfo, processInfoVec, peerUdid, isOnline);
+    }
+}
+
+void DmDeviceStateManager::HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline)
+{
+    LOGI("networkId: %{public}s.", GetAnonyString(devInfo.networkId).c_str());
+    std::string trustDeviceId = "";
+    if (softbusConnector_->GetUdidByNetworkId(devInfo.networkId, trustDeviceId) != DM_OK) {
+        LOGE("get udid failed.");
+        return;
+    }
+    std::string udisHash = softbusConnector_->GetDeviceUdidHashByUdid(trustDeviceId);
+    if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udisHash.c_str(), udisHash.length()) != 0) {
+        LOGE("get deviceId: %{public}s failed", GetAnonyString(udisHash).c_str());
+        return;
+    }
+    char localUdid[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
+    std::string requestDeviceId = std::string(localUdid);
+    std::vector<int32_t> foregroundUserIds;
+    MultipleUserConnector::GetForegroundUserIds(foregroundUserIds);
+ 
+    for (const auto &it : foregroundUserIds) {
+        std::string localAccountId = MultipleUserConnector::GetAccountIdByUserId(it);
+        uint32_t bindType = DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId,
+            it, localAccountId, devInfo);
+        LOGI("The online device bind type is %{public}" PRIu32" ", bindType);
+        ProcessInfo processInfo;
+        processInfo.pkgName = std::string(DM_PKG_NAME);
+        processInfo.userId = it;
+        processInfo.accountId = localAccountId;
+        SetOnlineProcessInfo(bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState, isOnline);
+    }
+}
+
+void DmDeviceStateManager::SetOnlineProcessInfo(const uint32_t &bindType, ProcessInfo &processInfo,
+    DmDeviceInfo &devInfo, const std::string &requestDeviceId, const std::string &trustDeviceId,
+    DmDeviceState devState, const bool isOnline)
+{
+    std::vector<ProcessInfo> processInfoVec;
+    if (bindType == IDENTICAL_ACCOUNT_TYPE) {
+        devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
+        processInfoVec.push_back(processInfo);
+    } else if (bindType == DEVICE_PEER_TO_PEER_TYPE) {
+        devInfo.authForm = DmAuthForm::PEER_TO_PEER;
+        processInfoVec.push_back(processInfo);
+    } else if (bindType == DEVICE_ACROSS_ACCOUNT_TYPE) {
+        devInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+        processInfoVec.push_back(processInfo);
+    } else if (bindType == APP_PEER_TO_PEER_TYPE || bindType == SERVICE_PEER_TO_PEER_TYPE) {
+        processInfoVec = DeviceProfileConnector::GetInstance().GetProcessInfoFromAcl(requestDeviceId,
+            trustDeviceId, processInfo);
+        std::set<ProcessInfo> processInfoSet(processInfoVec.begin(), processInfoVec.end());
+        processInfoVec.assign(processInfoSet.begin(), processInfoSet.end());
+        devInfo.authForm = DmAuthForm::PEER_TO_PEER;
+    } else if (bindType == APP_ACROSS_ACCOUNT_TYPE || bindType == SERVICE_ACROSS_ACCOUNT_TYPE) {
+        processInfoVec = DeviceProfileConnector::GetInstance().GetProcessInfoFromAcl(requestDeviceId,
+            trustDeviceId, processInfo);
+        std::set<ProcessInfo> processInfoSet(processInfoVec.begin(), processInfoVec.end());
+        processInfoVec.assign(processInfoSet.begin(), processInfoSet.end());
+        devInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+    } else if (bindType == INVALIED_TYPE) {
+        LOGE("bindType is invaild.");
+        return;
+    }
+ 
+    LOGI("HandleOnline success deviceId: %{public}s, authForm: %{public}d.", GetAnonyString(devInfo.deviceId).c_str(),
+        devInfo.authForm);
+    HandleDeviceStatusChange(devState, devInfo, processInfoVec, trustDeviceId, isOnline);
+    return;
+}
+
+void DmDeviceStateManager::HandleOfflineForUser(DmDeviceInfo &devInfo, const OfflineHandleParam &param)
+{
+    ProcessInfo processInfo;
+    processInfo.pkgName = std::string(DM_PKG_NAME);
+    processInfo.userId = param.userId;
+    processInfo.accountId = param.localAccountId;
+    uint32_t bindType = DeviceProfileConnector::GetInstance().CheckBindType(param.trustDeviceId,
+        param.requestDeviceId, param.userId, param.localAccountId, devInfo);
+    LOGI("The offline device bind type is %{public}" PRIu32"", bindType);
+ 
+    std::map<int32_t, int32_t> userIdAndBindLevel =
+        DeviceProfileConnector::GetInstance().GetUserIdAndBindLevel(param.userId, param.localAccountId,
+            param.requestDeviceId, param.trustDeviceId, devInfo);
+    if (userIdAndBindLevel.empty() || userIdAndBindLevel.find(processInfo.userId) == userIdAndBindLevel.end()) {
+        userIdAndBindLevel[processInfo.userId] = INVALIED_TYPE;
+    }
+    std::vector<ProcessInfo> processInfoVec;
+    for (const auto &item : userIdAndBindLevel) {
+        LOGI("userId: %{public}d, BindLevel: %{public}" PRIu32, item.first, item.second);
+        if (static_cast<uint32_t>(item.second) == INVALIED_TYPE) {
+            LOGI("The offline device is identical account bind type.");
+            devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
+            processInfo.userId = item.first;
+            processInfoVec.push_back(processInfo);
+        } else if (static_cast<uint32_t>(item.second) == USER && bindType == SHARE_TYPE) {
+            LOGI("The offline device is device bind level and share bind type.");
+            devInfo.authForm = DmAuthForm::SHARE;
+            processInfo.userId = item.first;
+            processInfoVec.push_back(processInfo);
+        } else if (static_cast<uint32_t>(item.second) == USER && bindType != SHARE_TYPE) {
+            LOGI("The offline device is device bind type.");
+            devInfo.authForm = DmAuthForm::PEER_TO_PEER;
+            processInfo.userId = item.first;
+            processInfoVec.push_back(processInfo);
+        } else if (static_cast<uint32_t>(item.second) == SERVICE || static_cast<uint32_t>(item.second) == APP) {
+            LOGI("The offline device is PEER_TO_PEER_TYPE bind type, %{public}" PRIu32, item.second);
+            CHECK_NULL_VOID(listener_);
+            std::set<ProcessInfo> processInfoSet = listener_->GetAlreadyOnlineProcess();
+            processInfoVec.assign(processInfoSet.begin(), processInfoSet.end());
+        }
+        HandleDeviceStatusChange(param.devState, devInfo, processInfoVec, param.trustDeviceId, param.isOnline);
+    }
+}
+
+void DmDeviceStateManager::HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo, const bool isOnline)
+{
+    std::string trustDeviceId = GetUdidByNetWorkId(std::string(devInfo.networkId));
+    LOGI("deviceStateMgr Udid: %{public}s", GetAnonyString(trustDeviceId).c_str());
+    if (trustDeviceId == "") {
+        LOGE("not get udid in deviceStateMgr.");
+        return;
+    }
+    std::string udisHash = softbusConnector_->GetDeviceUdidHashByUdid(trustDeviceId);
+    if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udisHash.c_str(), udisHash.length()) != 0) {
+        return;
+    }
+    char localUdid[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
+    std::string requestDeviceId = std::string(localUdid);
+    std::vector<int32_t> foregroundUserIds;
+    MultipleUserConnector::GetForegroundUserIds(foregroundUserIds);
+ 
+    for (const auto &it : foregroundUserIds) {
+        std::string localAccountId = MultipleUserConnector::GetAccountIdByUserId(it);
+        OfflineHandleParam param = {it, localAccountId, trustDeviceId, requestDeviceId, devState, isOnline};
+        HandleOfflineForUser(devInfo, param);
+    }
+}
+#endif
+
 void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
     std::vector<ProcessInfo> &processInfoVec, const std::string &peerUdid, const bool isOnline)
 {

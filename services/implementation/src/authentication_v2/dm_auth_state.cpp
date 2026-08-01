@@ -151,7 +151,15 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
         SetProcessInfo(context);
         int32_t authForm = context->accesser.transmitBindType == DM_POINT_TO_POINT_TYPE ?
             DmAuthForm::PEER_TO_PEER : context->accesser.transmitBindType;
+#ifdef CAR_DEVICE_ENABLE
+        PeerDevInfo peerDevInfo;
+        peerDevInfo.deviceId = context->accessee.deviceId;
+        peerDevInfo.userId = context->accessee.userId;
+        peerDevInfo.accountId = context->accessee.accountId;
+        context->softbusConnector->HandleDeviceOnline(context->accessee.deviceId, authForm, peerDevInfo);
+#else
         context->softbusConnector->HandleDeviceOnline(context->accessee.deviceId, authForm);
+#endif
     }
 
     context->authUiStateMgr->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
@@ -191,20 +199,33 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
         BindFail(context);
     } else {
         LOGI("notify online");
-        char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-        Crypto::GetUdidHash(context->accesser.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
-        if (SoftbusCache::GetInstance().CheckIsOnline(std::string(deviceIdHash))) {
-            SetProcessInfo(context);
-            int32_t authForm = context->accessee.transmitBindType == DM_POINT_TO_POINT_TYPE ?
-                DmAuthForm::PEER_TO_PEER : context->accessee.transmitBindType;
-            context->softbusConnector->HandleDeviceOnline(context->accesser.deviceId, authForm);
-        }
+        NotifyDeviceOnline(context);
     }
 
     context->authUiStateMgr->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
     context->authUiStateMgr->UpdateUiState(DmUiStateMsg::MSG_CANCEL_CONFIRM_SHOW);
     context->timer->DeleteAll();
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_RESP_FINISH, context); // 发送201给source侧
+}
+
+void DmAuthState::NotifyDeviceOnline(std::shared_ptr<DmAuthContext> context)
+{
+    char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    Crypto::GetUdidHash(context->accesser.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
+    if (SoftbusCache::GetInstance().CheckIsOnline(std::string(deviceIdHash))) {
+        SetProcessInfo(context);
+        int32_t authForm = context->accessee.transmitBindType == DM_POINT_TO_POINT_TYPE ?
+            DmAuthForm::PEER_TO_PEER : context->accessee.transmitBindType;
+#ifdef CAR_DEVICE_ENABLE
+    PeerDevInfo peerDevInfo;
+    peerDevInfo.deviceId = context->accesser.deviceId;
+    peerDevInfo.userId = context->accesser.userId;
+    peerDevInfo.accountId = context->accesser.accountId;
+    context->softbusConnector->HandleDeviceOnline(context->accesser.deviceId, authForm, peerDevInfo);
+#else
+    context->softbusConnector->HandleDeviceOnline(context->accesser.deviceId, authForm);
+#endif
+    }
 }
 
 std::string DmAuthState::GenerateBindResultContent(std::shared_ptr<DmAuthContext> context)

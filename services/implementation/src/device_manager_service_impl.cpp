@@ -918,12 +918,15 @@ bool DeviceManagerServiceImpl::CheckSharePeerSrc(const std::string &peerUdid, co
 void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
     const bool isOnline)
 {
-    LOGI("start, devState = %{public}d, networkId: %{public}s.",
-        devState, GetAnonyString(devInfo.networkId).c_str());
+    LOGI("start, devState = %{public}d, networkId: %{public}s.", devState, GetAnonyString(devInfo.networkId).c_str());
     if (deviceStateMgr_ == nullptr) {
         LOGE("deviceStateMgr_ is nullpter!");
         return;
     }
+#ifdef CAR_DEVICE_ENABLE
+    LOGI("carDeviceEnable, networkId: %{public}s.", GetAnonyString(devInfo.networkId).c_str());
+    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, isOnline);
+#else
     if (devState == DEVICE_STATE_ONLINE) {
         HandleOnline(devState, devInfo, isOnline);
     } else if (devState == DEVICE_STATE_OFFLINE) {
@@ -942,6 +945,7 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
         processInfoVec.push_back(processInfo);
         deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, peerUdid, isOnline);
     }
+#endif
 }
 
 std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &networkId, std::string &peerUdid)
@@ -1982,9 +1986,12 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
     return DM_OK;
 }
 
-int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
+int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid, int64_t accessControlId)
 {
-    LOGI("start udid %{public}s.", GetAnonyString(udid).c_str());
+    LOGI("start udid %{public}s, accessControlId:%{public}" PRId64" ", GetAnonyString(udid).c_str(), accessControlId);
+#ifdef CAR_DEVICE_ENABLE
+    return HandleIdenticalAccountOnline(udid, accessControlId);
+#else
     MultipleUserConnector::SetSwitchOldUserId(MultipleUserConnector::GetCurrentAccountUserID());
     MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
     CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
@@ -1998,7 +2005,53 @@ int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
         deviceStateMgr_->OnDeviceOnline(udid, DmAuthForm::IDENTICAL_ACCOUNT);
     }
     return DM_OK;
+#endif
 }
+
+#ifdef CAR_DEVICE_ENABLE
+int32_t DeviceManagerServiceImpl::HandleIdenticalAccountOnline(const std::string &udid, int64_t accessControlId)
+{
+    CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(deviceStateMgr_, ERR_DM_POINT_NULL);
+    if (!SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(udid)) {
+        LOGI("HandleIdenticalAccountOnline completed, device not online");
+        return DM_OK;
+    }
+    LOGI("DeviceManagerServiceImpl DpAclAdd identical account and online");
+    ProcessInfo processInfo;
+    processInfo.pkgName = std::string(DM_PKG_NAME);
+    PeerDevInfo peerDevInfo;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    // filter the data by accessControlId
+    for (const DistributedDeviceProfile::AccessControlProfile &profile : profiles) {
+        if (profile.GetAccessControlId() != accessControlId) {
+            continue;
+        }
+        std::string accesserUdid = profile.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = profile.GetAccessee().GetAccesseeDeviceId();
+        if (accesserUdid == udid) {
+            processInfo.userId = profile.GetAccessee().GetAccesseeUserId();
+            processInfo.accountId = profile.GetAccessee().GetAccesseeAccountId();
+            peerDevInfo.deviceId = accesserUdid;
+            peerDevInfo.userId =  profile.GetAccesser().GetAccesserUserId();
+            peerDevInfo.accountId = profile.GetAccesser().GetAccesserAccountId();
+        } else if (accesseeUdid == udid) {
+            processInfo.userId = profile.GetAccesser().GetAccesserUserId();
+            processInfo.accountId = profile.GetAccesser().GetAccesserAccountId();
+            peerDevInfo.deviceId = accesseeUdid;
+            peerDevInfo.userId =  profile.GetAccessee().GetAccesseeUserId();
+            peerDevInfo.accountId = profile.GetAccessee().GetAccesseeAccountId();
+        }
+        break;
+    }
+    softbusConnector_->SetProcessInfo(processInfo);
+    deviceStateMgr_->OnDeviceOnline(udid, DmAuthForm::IDENTICAL_ACCOUNT, peerDevInfo);
+
+    LOGI("HandleIdenticalAccountOnline completed");
+    return DM_OK;
+}
+#endif
 
 int32_t DeviceManagerServiceImpl::IsSameAccount(const std::string &udid)
 {
@@ -2025,14 +2078,24 @@ uint64_t DeviceManagerServiceImpl::GetTokenIdByNameAndDeviceId(std::string extra
     return DeviceProfileConnector::GetInstance().GetTokenIdByNameAndDeviceId(extra, requestDeviceId);
 }
 
-std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(
-    std::string pkgname)
+std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(std::string pkgname)
 {
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string deviceId = reinterpret_cast<char *>(localDeviceId);
     return DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgname, deviceId);
 }
+
+#ifdef CAR_DEVICE_ENABLE
+std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(
+    std::string pkgname, ProcessInfo processInfo)
+{
+    char localDeviceId[DEVICE_UUID_LENGTH];
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string deviceId = reinterpret_cast<char *>(localDeviceId);
+    return DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgname, deviceId, processInfo);
+}
+#endif
 
 void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId,
     std::vector<DmUserRemovedServiceInfo> &serviceInfos)
