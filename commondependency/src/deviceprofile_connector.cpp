@@ -662,11 +662,23 @@ DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfil
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(userId);
     std::vector<AccessControlProfile> aclProfileVec;
+#ifdef CAR_DEVICE_ENABLE
+    DMAccountInfo dmAccountInfo = MultipleUserConnector::GetDMAccountInfoByUserId(userId);
+    std::string localAccountId = dmAccountInfo.accountId;
+#endif
     for (auto &item : profiles) {
         if ((item.GetAccesser().GetAccesserDeviceId() == deviceId &&
-             item.GetAccesser().GetAccesserUserId() == userId) ||
+             item.GetAccesser().GetAccesserUserId() == userId
+#ifdef CAR_DEVICE_ENABLE
+             && item.GetAccesser().GetAccesserAccountId() == localAccountId
+#endif
+            ) ||
             (item.GetAccessee().GetAccesseeDeviceId() == deviceId &&
-             item.GetAccessee().GetAccesseeUserId() == userId)) {
+             item.GetAccessee().GetAccesseeUserId() == userId
+#ifdef CAR_DEVICE_ENABLE
+             && item.GetAccessee().GetAccesseeAccountId() == localAccountId
+#endif
+            )) {
             aclProfileVec.push_back(item);
         }
     }
@@ -679,12 +691,22 @@ DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfil
 {
     std::vector<AccessControlProfile> aclProfileVec;
     std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+#ifdef CAR_DEVICE_ENABLE
+    DMAccountInfo dmAccountInfo = MultipleUserConnector::GetDMAccountInfoByUserId(userId);
+    std::string localAccountId = dmAccountInfo.accountId;
+#endif
     for (auto &item : profiles) {
         if ((item.GetAccesser().GetAccesserDeviceId() == deviceId &&
              item.GetAccesser().GetAccesserUserId() == userId &&
+#ifdef CAR_DEVICE_ENABLE
+             item.GetAccesser().GetAccesserAccountId() == localAccountId &&
+#endif
              item.GetAccessee().GetAccesseeDeviceId() == remoteDeviceId) ||
             (item.GetAccessee().GetAccesseeDeviceId() == deviceId &&
              item.GetAccessee().GetAccesseeUserId() == userId &&
+#ifdef CAR_DEVICE_ENABLE
+             item.GetAccessee().GetAccesseeAccountId() == localAccountId &&
+#endif
              item.GetAccesser().GetAccesserDeviceId() == remoteDeviceId)) {
             aclProfileVec.push_back(item);
         }
