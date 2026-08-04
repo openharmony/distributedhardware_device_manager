@@ -1571,7 +1571,7 @@ bool AuthSinkConfirmState::IsUserAuthorizeService(JsonObject &paramObj,
         return false;
     }
     for (auto const &item : paramObj.Items()) {
-        if (accessee.serviceId == std::stoll(item[TAG_SERVICE_ID].Get<std::string>())) {
+        if (accessee.serviceId == std::atoll(item[TAG_SERVICE_ID].Get<std::string>().c_str())) {
             return true;
         }
     }
@@ -1584,7 +1584,7 @@ bool AuthSinkConfirmState::IsUserAuthorizeProxy(JsonObject &paramObj, std::share
         return false;
     }
     for (auto const &item : paramObj.Items()) {
-        if (context->accessee.serviceId == std::stoll(item[TAG_SERVICE_ID].Get<std::string>())) {
+        if (context->accessee.serviceId == std::atoll(item[TAG_SERVICE_ID].Get<std::string>().c_str())) {
             return true;
         }
     }

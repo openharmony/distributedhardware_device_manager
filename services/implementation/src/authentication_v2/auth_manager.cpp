@@ -1529,10 +1529,12 @@ void AuthManager::ParseServiceJsonObject(const JsonObject &jsonObject)
         if (std::find(context_->subjectServiceOnes.begin(), context_->subjectServiceOnes.end(), proxyAuthContext) ==
             context_->subjectServiceOnes.end()) {
             proxyAuthContext.proxyAccesser.pkgName = item[PARAM_KEY_LOCAL_PKGNAME].Get<std::string>();
-            proxyAuthContext.proxyAccesser.tokenId = std::stoll(item[PARAM_KEY_LOCAL_TOKENID].Get<std::string>());
+            proxyAuthContext.proxyAccesser.tokenId =
+                std::atoll(item[PARAM_KEY_LOCAL_TOKENID].Get<std::string>().c_str());
             proxyAuthContext.proxyAccesser.tokenIdHash =
                 Crypto::GetTokenIdHash(std::to_string(proxyAuthContext.proxyAccesser.tokenId));
-            proxyAuthContext.proxyAccessee.serviceId = std::stoll(item[PARAM_KEY_PEER_SERVICEID].Get<std::string>());
+            proxyAuthContext.proxyAccessee.serviceId =
+                std::atoll(item[PARAM_KEY_PEER_SERVICEID].Get<std::string>().c_str());
             proxyAuthContext.proxyContextId = Crypto::Sha256(proxyAuthContext.proxyAccesser.tokenIdHash +
                 std::to_string(proxyAuthContext.proxyAccesser.serviceId));
             proxyAuthContext.proxyAccesser.bindLevel = context_->accesser.bindLevel;

@@ -1654,7 +1654,7 @@ int DeviceManagerServiceImpl::OpenAuthSession(const std::string& deviceId,
         bindParam.at(PARAM_KEY_IS_SERVICE_BIND) == DM_VAL_TRUE) {
         CHECK_NULL_RETURN(listener_, ERR_DM_FAILED);
         if (IsNumberString(deviceId)) {
-            return listener_->OpenAuthSessionWithPara(std::stoll(deviceId));
+            return listener_->OpenAuthSessionWithPara(std::atoll(deviceId.c_str()));
         } else {
             LOGE("deviceId is not numeric.");
             return ERR_DM_FAILED;

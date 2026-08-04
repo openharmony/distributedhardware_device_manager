@@ -123,7 +123,7 @@ bool ParseNotifyKey(const std::string &notifyKey, ProcessInfo &processInfo)
         !std::getline(stream, tokenId, '#')) {
         return false;
     }
-    processInfo.userId = std::stoi(userId);
+    processInfo.userId = std::atoi(userId.c_str());
     processInfo.tokenId = std::stoul(tokenId);
     return true;
 }
