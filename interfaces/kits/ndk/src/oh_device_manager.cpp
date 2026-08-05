@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,10 +22,15 @@
 #include "dm_log.h"
 #include "oh_device_manager_err_code.h"
 
-int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int *len)
+int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int &len)
+{
+    return OH_DeviceManager_GetLocalDeviceNameC(localDeviceName, &len);
+}
+
+int32_t OH_DeviceManager_GetLocalDeviceNameC(char **localDeviceName, unsigned int *len)
 {
     if (localDeviceName == nullptr || *localDeviceName != nullptr || len == nullptr) {
-        LOGE("input param is nullptr");
+        LOGE("localDeviceName is nullptr or *localDeviceName is not nullptr or len is nullptr");
         return ERR_INVALID_PARAMETER;
     }
     std::string deviceName = "";
@@ -34,18 +39,17 @@ int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int
         LOGE("Get local device name failed, ret=%{public}d", ret);
         return ret;
     }
-    int32_t deviceNameLength = static_cast<unsigned int>(deviceName.size());
-    *localDeviceName = new (std::nothrow) char[deviceNameLength + 1] {0};
+    *len = static_cast<unsigned int>(deviceName.size());
+    *localDeviceName = new (std::nothrow) char[*len + 1] {0};
     if (*localDeviceName == nullptr) {
         LOGE("create localDeviceName fail");
         return DM_ERR_FAILED;
     }
-    if (strcpy_s(*localDeviceName, deviceNameLength + 1, deviceName.c_str()) != EOK) {
+    if (strcpy_s(*localDeviceName, *len + 1, deviceName.c_str()) != EOK) {
         LOGE("copy string fail");
         delete [] *localDeviceName;
         *localDeviceName = nullptr;
         return DM_ERR_FAILED;
     }
-    *len = deviceNameLength;
     return ERR_OK;
 }
