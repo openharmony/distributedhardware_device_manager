@@ -260,6 +260,9 @@ private:
     int32_t ParseRemoteCredentialExt(const std::string &credentialInfo, std::string &params, std::string &groupOwner);
     int32_t GetJsonInt(const JsonObject &jsonObj, const std::string &key);
     std::string GetJsonStr(const JsonObject &jsonObj, const std::string &key);
+    void DestroyReturnGroupsAndClear(char *returnGroups);
+    int32_t ParseRelatedGroupsToJson(std::string &relatedGroups, std::vector<GroupInfo> &groupList);
+    void ClearSensitiveString(std::string &sensitiveData);
 
 private:
     const DeviceGroupManager *deviceGroupManager_ = nullptr;

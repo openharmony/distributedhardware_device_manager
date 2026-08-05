@@ -76,6 +76,9 @@ public:
 private:
     const DeviceGroupManager *deviceGroupManager_ = nullptr;
     const CredManager *credManager_ = nullptr;
+    void DestroyReturnGroupsAndClear(char *returnGroups);
+    int32_t ParseRelatedGroupsToJson(std::string &relatedGroups, std::vector<GroupsInfo> &groupList);
+    void ClearSensitiveString(std::string &sensitiveData);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

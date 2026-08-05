@@ -1201,11 +1201,7 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(const std::string &deviceId, co
         deviceGroupManager_->getRelatedGroups(userId, pkgName, deviceId.c_str(), &returnGroups, &groupNum);
     if (ret != 0) {
         LOGE("[HICHAIN] fail to get related groups with ret:%{public}d.", ret);
-        size_t groupsLen = (returnGroups != nullptr) ? strlen(returnGroups) : 0;
-        if (groupsLen > 0) {
-            (void)memset_s(returnGroups, groupsLen, 0, groupsLen);
-        }
-        deviceGroupManager_->destroyInfo(&returnGroups);
+        DestroyReturnGroupsAndClear(returnGroups);
         return ERR_DM_FAILED;
     }
     if (returnGroups == nullptr) {
@@ -1214,52 +1210,12 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(const std::string &deviceId, co
     }
     if (groupNum == 0) {
         LOGE("[HICHAIN]return related goups number is zero.");
-        size_t groupsLen = strlen(returnGroups);
-        if (groupsLen > 0) {
-            (void)memset_s(returnGroups, groupsLen, 0, groupsLen);
-        }
-        deviceGroupManager_->destroyInfo(&returnGroups);
+        DestroyReturnGroupsAndClear(returnGroups);
         return ERR_DM_FAILED;
     }
     std::string relatedGroups = std::string(returnGroups);
-    size_t groupsLen = strlen(returnGroups);
-    if (groupsLen > 0) {
-        (void)memset_s(returnGroups, groupsLen, 0, groupsLen);
-    }
-    deviceGroupManager_->destroyInfo(&returnGroups);
-    JsonObject jsonObject(relatedGroups);
-    if (jsonObject.IsDiscarded()) {
-        LOGE("returnGroups parse error");
-        if (!relatedGroups.empty()) {
-            (void)memset_s(relatedGroups.data(), relatedGroups.size(), 0, relatedGroups.size());
-            relatedGroups.clear();
-        }
-        return ERR_DM_FAILED;
-    }
-    if (!jsonObject.IsArray()) {
-        LOGE("jsonObject is not an array.");
-        if (!relatedGroups.empty()) {
-            (void)memset_s(relatedGroups.data(), relatedGroups.size(), 0, relatedGroups.size());
-            relatedGroups.clear();
-        }
-        return ERR_DM_FAILED;
-    }
-    std::vector<GroupInfo> groupInfos;
-    jsonObject.Get(groupInfos);
-    if (groupInfos.empty()) {
-        LOGE("group failed, groupInfos is empty.");
-        if (!relatedGroups.empty()) {
-            (void)memset_s(relatedGroups.data(), relatedGroups.size(), 0, relatedGroups.size());
-            relatedGroups.clear();
-        }
-        return ERR_DM_FAILED;
-    }
-    groupList = groupInfos;
-    if (!relatedGroups.empty()) {
-        (void)memset_s(relatedGroups.data(), relatedGroups.size(), 0, relatedGroups.size());
-        relatedGroups.clear();
-    }
-    return DM_OK;
+    DestroyReturnGroupsAndClear(returnGroups);
+    return ParseRelatedGroupsToJson(relatedGroups, groupList);
 }
 
 int32_t HiChainConnector::DeleteGroup(const int32_t userId, std::string &groupId)
@@ -1295,11 +1251,7 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(int32_t userId, const std::stri
         deviceGroupManager_->getRelatedGroups(userId, pkgName, deviceId.c_str(), &returnGroups, &groupNum);
     if (ret != 0) {
         LOGE("[HICHAIN] fail to get related groups with ret:%{public}d.", ret);
-        size_t groupsLen = (returnGroups != nullptr) ? strlen(returnGroups) : 0;
-        if (groupsLen > 0) {
-            (void)memset_s(returnGroups, groupsLen, 0, groupsLen);
-        }
-        deviceGroupManager_->destroyInfo(&returnGroups);
+        DestroyReturnGroupsAndClear(returnGroups);
         return ERR_DM_FAILED;
     }
     if (returnGroups == nullptr) {
@@ -1308,52 +1260,55 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(int32_t userId, const std::stri
     }
     if (groupNum == 0) {
         LOGE("[HICHAIN]return related goups number is zero.");
-        size_t groupsLen = strlen(returnGroups);
-        if (groupsLen > 0) {
-            (void)memset_s(returnGroups, groupsLen, 0, groupsLen);
-        }
-        deviceGroupManager_->destroyInfo(&returnGroups);
+        DestroyReturnGroupsAndClear(returnGroups);
         return ERR_DM_FAILED;
     }
     std::string relatedGroups = std::string(returnGroups);
-    size_t groupsLen = strlen(returnGroups);
+    DestroyReturnGroupsAndClear(returnGroups);
+    return ParseRelatedGroupsToJson(relatedGroups, groupList);
+}
+
+void HiChainConnector::DestroyReturnGroupsAndClear(char *returnGroups)
+{
+    size_t groupsLen = (returnGroups != nullptr) ? strlen(returnGroups) : 0;
     if (groupsLen > 0) {
         (void)memset_s(returnGroups, groupsLen, 0, groupsLen);
     }
     deviceGroupManager_->destroyInfo(&returnGroups);
+}
+
+int32_t HiChainConnector::ParseRelatedGroupsToJson(std::string &relatedGroups,
+    std::vector<GroupInfo> &groupList)
+{
     JsonObject jsonObject(relatedGroups);
     if (jsonObject.IsDiscarded()) {
         LOGE("returnGroups parse error");
-        if (!relatedGroups.empty()) {
-            (void)memset_s(relatedGroups.data(), relatedGroups.size(), 0, relatedGroups.size());
-            relatedGroups.clear();
-        }
+        ClearSensitiveString(relatedGroups);
         return ERR_DM_FAILED;
     }
     if (!jsonObject.IsArray()) {
         LOGE("jsonObject is not an array.");
-        if (!relatedGroups.empty()) {
-            (void)memset_s(relatedGroups.data(), relatedGroups.size(), 0, relatedGroups.size());
-            relatedGroups.clear();
-        }
+        ClearSensitiveString(relatedGroups);
         return ERR_DM_FAILED;
     }
     std::vector<GroupInfo> groupInfos;
     jsonObject.Get(groupInfos);
     if (groupInfos.empty()) {
         LOGE("group failed, groupInfos is empty.");
-        if (!relatedGroups.empty()) {
-            (void)memset_s(relatedGroups.data(), relatedGroups.size(), 0, relatedGroups.size());
-            relatedGroups.clear();
-        }
+        ClearSensitiveString(relatedGroups);
         return ERR_DM_FAILED;
     }
     groupList = groupInfos;
-    if (!relatedGroups.empty()) {
-        (void)memset_s(relatedGroups.data(), relatedGroups.size(), 0, relatedGroups.size());
-        relatedGroups.clear();
-    }
+    ClearSensitiveString(relatedGroups);
     return DM_OK;
+}
+
+void HiChainConnector::ClearSensitiveString(std::string &sensitiveData)
+{
+    if (!sensitiveData.empty()) {
+        (void)memset_s(sensitiveData.data(), sensitiveData.size(), 0, sensitiveData.size());
+        sensitiveData.clear();
+    }
 }
 
 void HiChainConnector::DeleteAllGroupByUdid(const std::string &udid)
