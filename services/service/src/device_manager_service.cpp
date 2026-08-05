@@ -1036,8 +1036,10 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         return ERR_DM_FAILED;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    uint32_t callingTokenId = 0;
+    MultipleUserConnector::GetTokenId(callingTokenId);
     NotifyRemoteUnBindApp(MultipleUserConnector::GetCurrentAccountUserID(),
-        static_cast<int64_t>(tokenId), udid, bindLevel);
+        static_cast<int64_t>(callingTokenId), udid, bindLevel);
 #endif
     if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel) != DM_OK) {
         LOGE("dmServiceImpl_ UnBindDevice failed.");
