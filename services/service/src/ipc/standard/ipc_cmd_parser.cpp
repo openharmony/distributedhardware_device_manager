@@ -16,6 +16,7 @@
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 
+#include <securec.h>
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
 #include "device_manager_service_notify.h"
@@ -820,6 +821,10 @@ ON_IPC_SET_REQUEST(SERVER_CREDENTIAL_RESULT, std::shared_ptr<IpcReq> pBaseReq, M
         LOGE("write credentialResult failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
+    if (!credentialResult.empty()) {
+        (void)memset_s(credentialResult.data(), credentialResult.size(), 0, credentialResult.size());
+        credentialResult.clear();
+    }
 
     return DM_OK;
 }
@@ -976,6 +981,10 @@ ON_IPC_CMD(EXPORT_AUTH_CODE, MessageParcel &data, MessageParcel &reply)
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!authCode.empty()) {
+        (void)memset_s(authCode.data(), authCode.size(), 0, authCode.size());
+        authCode.clear();
     }
     return DM_OK;
 }
@@ -1287,6 +1296,10 @@ ON_IPC_CMD(DESTROY_PIN_HOLDER, MessageParcel &data, MessageParcel &reply)
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
+    if (!payload.empty()) {
+        (void)memset_s(payload.data(), payload.size(), 0, payload.size());
+        payload.clear();
+    }
     return DM_OK;
 }
 
@@ -1344,6 +1357,10 @@ ON_IPC_SET_REQUEST(SERVER_DESTROY_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, 
     if (!data.WriteString(payload)) {
         LOGE("write payload failed");
         return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!payload.empty()) {
+        (void)memset_s(payload.data(), payload.size(), 0, payload.size());
+        payload.clear();
     }
     return DM_OK;
 }

@@ -15,6 +15,8 @@
 
 #include "device_manager_service.h"
 
+#include <securec.h>
+
 #include "cJSON.h"
 #include <dlfcn.h>
 #include <functional>
@@ -1051,8 +1053,10 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
 #endif
     if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel) != DM_OK) {
         LOGE("dmServiceImpl_ UnBindDevice failed.");
+        (void)memset_s(localUdid, sizeof(localUdid), 0, sizeof(localUdid));
         return ERR_DM_FAILED;
     }
+    (void)memset_s(localUdid, sizeof(localUdid), 0, sizeof(localUdid));
     return DM_OK;
 }
 

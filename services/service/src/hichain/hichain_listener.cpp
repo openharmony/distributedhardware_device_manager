@@ -15,6 +15,8 @@
 
 #include "hichain_listener.h"
 
+#include <securec.h>
+
 #include "device_manager_service.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -253,6 +255,10 @@ int32_t HichainListener::GetRelatedGroupsCommon(int32_t userId, const std::strin
         deviceGroupManager_->getRelatedGroups(userId, pkgName, deviceId.c_str(), &returnGroups, &groupNum);
     if (ret != 0) {
         LOGE("[HICHAIN] fail to get related groups with ret:%{public}d.", ret);
+        size_t groupsLen = (returnGroups != nullptr) ? strlen(returnGroups) : 0;
+        if (groupsLen > 0) {
+            (void)memset_s(returnGroups, groupsLen, 0, groupsLen);
+        }
         deviceGroupManager_->destroyInfo(&returnGroups);
         return ERR_DM_FAILED;
     }
@@ -262,27 +268,51 @@ int32_t HichainListener::GetRelatedGroupsCommon(int32_t userId, const std::strin
     }
     if (groupNum == 0) {
         LOGE("[HICHAIN]return related goups number is zero.");
+        size_t groupsLen = strlen(returnGroups);
+        if (groupsLen > 0) {
+            (void)memset_s(returnGroups, groupsLen, 0, groupsLen);
+        }
         deviceGroupManager_->destroyInfo(&returnGroups);
         return ERR_DM_FAILED;
     }
     std::string relatedGroups = std::string(returnGroups);
+    size_t groupsLen = strlen(returnGroups);
+    if (groupsLen > 0) {
+        (void)memset_s(returnGroups, groupsLen, 0, groupsLen);
+    }
     deviceGroupManager_->destroyInfo(&returnGroups);
     JsonObject jsonObject(relatedGroups);
     if (jsonObject.IsDiscarded()) {
         LOGE("returnGroups parse error");
+        if (!relatedGroups.empty()) {
+            (void)memset_s(relatedGroups.data(), relatedGroups.size(), 0, relatedGroups.size());
+            relatedGroups.clear();
+        }
         return ERR_DM_FAILED;
     }
     if (!jsonObject.IsArray()) {
         LOGE("jsonObject is not an array.");
+        if (!relatedGroups.empty()) {
+            (void)memset_s(relatedGroups.data(), relatedGroups.size(), 0, relatedGroups.size());
+            relatedGroups.clear();
+        }
         return ERR_DM_FAILED;
     }
     std::vector<GroupsInfo> groupInfos;
     jsonObject.Get(groupInfos);
     if (groupInfos.empty()) {
         LOGE("group failed, groupInfos is empty.");
+        if (!relatedGroups.empty()) {
+            (void)memset_s(relatedGroups.data(), relatedGroups.size(), 0, relatedGroups.size());
+            relatedGroups.clear();
+        }
         return ERR_DM_FAILED;
     }
     groupList = groupInfos;
+    if (!relatedGroups.empty()) {
+        (void)memset_s(relatedGroups.data(), relatedGroups.size(), 0, relatedGroups.size());
+        relatedGroups.clear();
+    }
     return DM_OK;
 }
 

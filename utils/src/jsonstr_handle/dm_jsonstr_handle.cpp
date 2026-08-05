@@ -15,6 +15,8 @@
 
 #include "dm_jsonstr_handle.h"
 
+#include <securec.h>
+
 #include "json_object.h"
 #include "dm_anonymous.h"
 #include "dm_error_type.h"
@@ -62,6 +64,10 @@ DM_EXPORT std::vector<int64_t> JsonStrHandle::GetProxyTokenIdByExtra(const std::
         if (item.IsNumber()) {
             tokenIdVec.push_back(item.Get<int64_t>());
         }
+    }
+    if (!proxyListStr.empty()) {
+        (void)memset_s(proxyListStr.data(), proxyListStr.size(), 0, proxyListStr.size());
+        proxyListStr.clear();
     }
     return tokenIdVec;
 }

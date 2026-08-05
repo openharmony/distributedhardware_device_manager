@@ -15,6 +15,8 @@
 
 #include "dm_credential_manager.h"
 
+#include <securec.h>
+
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
@@ -139,6 +141,9 @@ int32_t DmCredentialManager::ImportRemoteCredentialExt(const std::string &creden
         LOGE("Failed to add member to group.");
         return ERR_DM_FAILED;
     }
+    if (!credentialInfo.empty()) {
+        (void)memset_s(const_cast<char*>(credentialInfo.data()), credentialInfo.size(), 0, credentialInfo.size());
+    }
     return DM_OK;
 }
 
@@ -224,6 +229,10 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
         return DeleteRemoteCredential(deleteInfo);
     } else {
         LOGE("credential type error!");
+    }
+    if (!userId.empty()) {
+        (void)memset_s(userId.data(), userId.size(), 0, userId.size());
+        userId.clear();
     }
     return ERR_DM_FAILED;
 }

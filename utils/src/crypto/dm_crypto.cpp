@@ -110,6 +110,7 @@ std::string Crypto::Sha256(const void *data, size_t size, bool isUpper)
     hash[SHA256_DIGEST_LENGTH * HEX_TO_UINT8] = 0;
     std::stringstream ss;
     ss << hash;
+    (void)memset_s(hash, sizeof(hash), 0, sizeof(hash));
     return ss.str();
 }
 
@@ -204,6 +205,7 @@ DM_EXPORT std::string Crypto::GetGroupIdHash(const std::string &groupId)
     for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
         ss << std::hex << (int)hash[i];
     }
+    (void)memset_s(hash, SHA256_DIGEST_LENGTH, 0, SHA256_DIGEST_LENGTH);
     return ss.str().substr(0, SHORT_DEVICE_ID_HASH_LENGTH);
 }
 

@@ -16,6 +16,7 @@
 #include "dm_device_state_manager.h"
 
 #include <pthread.h>
+#include <securec.h>
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -464,6 +465,13 @@ void DmDeviceStateManager::DeleteCredential(const DmAclIdParam &acl)
     if (ret != DM_OK) {
         LOGE("UpdateCredential err, ret:%{public}d", ret);
     }
+    for (auto &item : appList) {
+        if (!item.empty()) {
+            (void)memset_s(item.data(), item.size(), 0, item.size());
+            item.clear();
+        }
+    }
+    appList.clear();
 }
 #endif
 
