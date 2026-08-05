@@ -272,7 +272,9 @@ if (defined(ohos_lite)) {
         defines += [ "SUPPORT_MSDP" ]
         external_deps += [ "spatial_awareness:spatial_awareness_client" ]
       }
-
+      if (car_device_enable) {
+        defines += [ "CAR_DEVICE_ENABLE" ]
+      }
       subsystem_name = "distributedhardware"
 
       part_name = "device_manager"

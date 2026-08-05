@@ -81,7 +81,13 @@ void DeviceManagerNotify::UnRegisterDeviceStateCallback(const std::string &pkgNa
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    deviceStateCallback_.erase(pkgName);
+    for (auto it = deviceStateCallback_.begin(); it != deviceStateCallback_.end();) {
+        if (it->first.find(pkgName) != std::string::npos) {
+            it = deviceStateCallback_.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 void DeviceManagerNotify::UnRegisterDeviceStatusCallback(const std::string &pkgName)
@@ -91,7 +97,13 @@ void DeviceManagerNotify::UnRegisterDeviceStatusCallback(const std::string &pkgN
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    deviceStatusCallback_.erase(pkgName);
+    for (auto it = deviceStatusCallback_.begin(); it != deviceStatusCallback_.end();) {
+        if (it->first.find(pkgName) != std::string::npos) {
+            it = deviceStatusCallback_.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 void DeviceManagerNotify::RegisterDeviceStatusCallback(const std::string &pkgName,

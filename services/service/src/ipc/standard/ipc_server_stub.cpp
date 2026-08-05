@@ -450,6 +450,25 @@ std::vector<ProcessInfo> IpcServerStub::GetAllProcessInfo()
 }
 //LCOV_EXCL_STOP
 
+#ifdef CAR_DEVICE_ENABLE
+const sptr<IpcRemoteBroker> IpcServerStub::GetListenerByProcessInfo(ProcessInfo processInfo) const
+{
+    if (processInfo.pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return nullptr;
+    }
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
+    for (auto &iter : dmListener_) {
+        if ((iter.first.tokenId == processInfo.tokenId || processInfo.tokenId == 0) &&
+            iter.first.pkgName == processInfo.pkgName) {
+            LOGI("tokenId %{public}" PRIu32", pkgName %{public}s.", processInfo.tokenId, processInfo.pkgName.c_str());
+            return iter.second;
+        }
+    }
+    return nullptr;
+}
+#endif
+
 const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(ProcessInfo processInfo) const
 {
     if (processInfo.pkgName.empty()) {

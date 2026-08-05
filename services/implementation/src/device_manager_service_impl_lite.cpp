@@ -397,14 +397,26 @@ std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrus
     return tmp;
 }
 
+#ifdef CAR_DEVICE_ENABLE
+std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(
+    std::string pkgname, ProcessInfo processInfo)
+{
+    (void)pkgname;
+    (void)processInfo;
+    std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> tmp;
+    return tmp;
+}
+#endif
+
 void DeviceManagerServiceImpl::LoadHardwareFwkService()
 {
     return;
 }
 
-int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
+int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid, int64_t accessControlId)
 {
     (void)udid;
+    (void)accessControlId;
     return DM_OK;
 }
 

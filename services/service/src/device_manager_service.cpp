@@ -494,6 +494,26 @@ DM_EXPORT void DeviceManagerService::UnRegisterCallerAppId(const std::string &pk
     AppManager::GetInstance().UnRegisterCallerAppId(pkgName, userId);
 }
 
+#ifdef CAR_DEVICE_ENABLE
+int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+                                                   std::vector<DmDeviceInfo> &deviceList)
+{
+    CHECK_EMPTY_RETURN(pkgName, ERR_DM_INPUT_PARA_INVALID);
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission() &&
+        !PermissionManager::GetInstance().CheckDataSyncPermission()) {
+        LOGE("The caller does not have permission to call GetTrustedDeviceList.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    int32_t displayId = 0;
+    processInfo.userId = MultipleUserConnector::GetUserIdByDisplayId(displayId);
+    processInfo.accountId = MultipleUserConnector::GetAccountIdByUserId(processInfo.userId);
+    LOGI("pkgName: %{public}s, userId: %{public}d, accountId: %{public}s",
+        processInfo.pkgName.c_str(), processInfo.userId, GetAnonyString(processInfo.accountId).c_str());
+    return GetTrustedDeviceList(processInfo, deviceList);
+}
+#else
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                    std::vector<DmDeviceInfo> &deviceList)
 {
@@ -512,6 +532,12 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
     if (softbusListener_->GetTrustedDeviceList(onlineDeviceList) != DM_OK) {
         return ERR_DM_FAILED;
     }
+    return HandleTrustedDeviceList(pkgName, isOnlyShowNetworkId, onlineDeviceList, deviceList);
+}
+
+int32_t DeviceManagerService::HandleTrustedDeviceList(const std::string &pkgName, bool isOnlyShowNetworkId,
+    const std::vector<DmDeviceInfo> &onlineDeviceList, std::vector<DmDeviceInfo> &deviceList)
+{
     if (isOnlyShowNetworkId && !onlineDeviceList.empty()) {
         for (auto item : onlineDeviceList) {
             DmDeviceInfo tempInfo;
@@ -545,6 +571,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
     }
     return DM_OK;
 }
+#endif
 
 int32_t DeviceManagerService::GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                       std::vector<DmDeviceInfo> &deviceList)
@@ -2485,7 +2512,7 @@ int32_t DeviceManagerService::DpAclAdd(const std::string &udid, int64_t accessCo
         LOGE("instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    dmServiceImpl_->DpAclAdd(udid);
+    dmServiceImpl_->DpAclAdd(udid, accessControlId);
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("SetDnPolicy failed, instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
@@ -4769,6 +4796,42 @@ void DeviceManagerService::RemoveNotifyRecord(const ProcessInfo &processInfo)
     listener_->OnProcessRemove(processInfo);
 }
 
+#ifdef CAR_DEVICE_ENABLE
+int32_t DeviceManagerService::RegDevStateCallbackToService(const std::string &pkgName, ProcessInfo processInfo)
+{
+    if (AppManager::GetInstance().IsSystemSA()) {
+        int32_t displayId = 0;
+        processInfo.userId = MultipleUserConnector::GetUserIdByDisplayId(displayId);
+        processInfo.accountId = MultipleUserConnector::GetAccountIdByUserId(processInfo.userId);
+    } else {
+        processInfo.accountId = MultipleUserConnector::GetAccountIdByUserId(processInfo.userId);
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    CHECK_NULL_RETURN(listener_, ERR_DM_POINT_NULL);
+    std::vector<DmDeviceInfo> deviceList;
+    GetTrustedDeviceList(processInfo, deviceList);
+    if (deviceList.size() == 0) {
+        LOGI("deviceList not exist");
+        return DM_OK;
+    }
+    listener_->OnDevStateCallbackAdd(processInfo, deviceList);
+    if (PermissionManager::GetInstance().CheckOnReadyRetrospectiveNotificationBlackList()) {
+        return DM_OK;
+    }
+    std::vector<DmDeviceInfo> readyDeviceList;
+    CHECK_NULL_RETURN(dmServiceImpl_, ERR_DM_POINT_NULL);
+    dmServiceImpl_->GetNotifyEventInfos(readyDeviceList);
+    if (readyDeviceList.size() == 0) {
+        return DM_OK;
+    }
+    listener_->OnDevDbReadyCallbackAdd(processInfo, readyDeviceList);
+#else
+    (void)pkgName;
+#endif
+    return DM_OK;
+}
+#endif
+
 int32_t DeviceManagerService::RegDevStateCallbackToService(const std::string &pkgName)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -4800,6 +4863,52 @@ int32_t DeviceManagerService::RegDevStateCallbackToService(const std::string &pk
 #endif
     return DM_OK;
 }
+
+#ifdef CAR_DEVICE_ENABLE
+int32_t DeviceManagerService::GetTrustedDeviceList(ProcessInfo processInfo, std::vector<DmDeviceInfo> &deviceList)
+{
+    LOGI("pkgName: %{public}s, userId: %{public}d, accountId: %{public}s",
+        processInfo.pkgName.c_str(), processInfo.userId, GetAnonyString(processInfo.accountId).c_str());
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (DmConstrainsManager::GetInstance().CheckOsAccountConstraintEnabled(
+        MultipleUserConnector::GetForgroundUserId(), DM_ACCOUNT_CONSTRAINT)) {
+        LOGI("contraint enable is true");
+        return DM_OK;
+    }
+#endif
+    if (processInfo.pkgName.empty() || processInfo.pkgName == std::string(DM_PKG_NAME)) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::vector<DmDeviceInfo> onlineDeviceList;
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
+    int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
+    if (ret != DM_OK) {
+        LOGE("GetTrustedDeviceList failed");
+        return ret;
+    }
+    if (onlineDeviceList.empty() || !IsDMServiceImplReady()) {
+        return DM_OK;
+    }
+
+    dmServiceImpl_->DeleteAlwaysAllowTimeOut();
+    std::string pkgName = PermissionManager::GetInstance().CheckWhiteListSystemSA(processInfo.pkgName) ?
+        std::string(ALL_PKGNAME) : processInfo.pkgName;
+    std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> udidMap =
+        dmServiceImpl_->GetAppTrustDeviceIdList(pkgName, processInfo);
+    for (auto item : onlineDeviceList) {
+        std::string peerUdid = "";
+        SoftbusListener::GetUdidByNetworkId(item.networkId, peerUdid);
+        for (const auto &mapItem : udidMap) {
+            if (mapItem.first.deviceId == peerUdid) {
+                item.authForm = mapItem.second;
+                deviceList.push_back(item);
+            }
+        }
+    }
+    return DM_OK;
+}
+#endif
 
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList)
 {

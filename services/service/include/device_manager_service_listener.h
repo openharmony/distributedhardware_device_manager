@@ -164,6 +164,13 @@ private:
         const std::vector<int64_t> &serviceIds);
     void ClearDbReadyMap(std::string &notifyPkgName);
     void SetNeedNotifyProcessInfos(const ProcessInfo &processInfo, std::vector<ProcessInfo> &procInfoVec);
+#ifdef CAR_DEVICE_ENABLE
+    std::vector<ProcessInfo> GetWhiteListSAProcessInfo(DmCommonNotifyEvent dmCommonNotifyEvent,
+        const ProcessInfo &processInfo);
+    std::vector<ProcessInfo> GetNotifyProcessInfoByUserId(ProcessInfo processInfo,
+        DmCommonNotifyEvent dmCommonNotifyEvent);
+#endif
+    std::set<ProcessInfo> GetNotifyProcessInfos(DmCommonNotifyEvent dmCommonNotifyEvent);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;

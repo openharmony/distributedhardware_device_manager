@@ -102,4 +102,10 @@ declare_args() {
   } else {
     support_msdp = false
   }
+
+  if ("${target_platform}" == "car") {
+    car_device_enable = true
+  } else {
+    car_device_enable = false
+  }
 }

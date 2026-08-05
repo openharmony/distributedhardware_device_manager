@@ -744,5 +744,30 @@ DM_EXPORT DMAccountInfo MultipleUserConnector::GetDMAccountInfoBySubProfileId(in
 #endif
     return dmAccountInfo;
 }
+
+DM_EXPORT std::string MultipleUserConnector::GetAccountIdByUserId(int32_t userId)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    (void)userId;
+    return "";
+#elif OS_ACCOUNT_PART_EXISTS
+    int32_t subProfileId = -1;
+    ErrCode ret = OsAccountSubProfileClient::GetInstance().GetOsAccountForegroundSubProfileId(userId, subProfileId);
+    if (ret != 0) {
+        LOGE("GetOsAccountForegroundSubProfileId failed, userId %{public}d, ret %{public}d", userId, ret);
+        return "";
+    }
+    OhosAccountInfo accountInfo;
+    OsAccountSubspaceResult result;
+    ret = OhosAccountKits::GetInstance().GetOsAccountSubProfile(userId, subProfileId, result, accountInfo);
+    if (ret != 0 || accountInfo.uid_ == "") {
+        return "";
+    }
+    return accountInfo.uid_;
+#else
+    (void)userId;
+    return "";
+#endif
+}
 } // namespace DistributedHardware
 } // namespace OHOS

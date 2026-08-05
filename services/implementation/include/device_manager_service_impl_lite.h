@@ -119,8 +119,11 @@ public:
     int32_t DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
         DmPinType pinType, const std::string &payload);
     std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname);
-
-    int32_t DpAclAdd(const std::string &udid);
+#ifdef CAR_DEVICE_ENABLE
+    std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> GetAppTrustDeviceIdList(std::string pkgname,
+        ProcessInfo processInfo);
+#endif
+    int32_t DpAclAdd(const std::string &udid, int64_t accessControlId);
     void DeleteAlwaysAllowTimeOut();
     void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     int32_t IsSameAccount(const std::string &udid);

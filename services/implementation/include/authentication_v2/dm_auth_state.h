@@ -224,6 +224,7 @@ protected:
     void CompatibleAclAndCredInfo(std::shared_ptr<DmAuthContext> context, const int32_t userId,
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &targetProfiles,
         JsonObject &credInfo, const std::string &localUdid);
+    void NotifyDeviceOnline(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSrcConfirmState : public DmAuthState {

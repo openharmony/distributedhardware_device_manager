@@ -216,6 +216,13 @@ public:
     DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByDeviceIdAndUserId(
         const std::string &deviceId, int32_t userId);
     DM_EXPORT uint32_t CheckBindType(std::string peerUdid, std::string localUdid);
+#ifdef CAR_DEVICE_ENABLE
+    DM_EXPORT uint32_t CheckBindType(const PeerDevInfo &peerDevInfo, int32_t userId, const std::string &deviceId);
+    DM_EXPORT uint32_t CheckBindType(const std::string &peerDeviceId, const std::string &localDeviceId,
+        int32_t localUserId, const std::string &localAccountId, DmDeviceInfo &devInfo);
+    DM_EXPORT std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> GetAppTrustDeviceList(
+        const std::string &pkgName, const std::string &localDeviceId, ProcessInfo processInfo);
+#endif
     DM_EXPORT int32_t PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser,
         DmAccessee dmAccessee);
     int32_t UpdateAccessControlList(int32_t userId, std::string &oldAccountId, std::string &newAccountId);
@@ -247,6 +254,11 @@ public:
     DM_EXPORT std::vector<OHOS::DistributedHardware::ProcessInfo>
         GetProcessInfoFromAclByUserId(const std::string &localDeviceId, const std::string &targetDeviceId,
         int32_t userId);
+#ifdef CAR_DEVICE_ENABLE
+    DM_EXPORT std::vector<OHOS::DistributedHardware::ProcessInfo>
+        GetProcessInfoFromAcl(const std::string &localDeviceId, const std::string &targetDeviceId,
+        ProcessInfo processInfo);
+#endif
     DM_EXPORT DistributedDeviceProfile::AccessControlProfile GetAccessControlProfileByAccessControlId(
         int64_t accessControlId);
     DM_EXPORT void DeleteAccessControlList(const std::string &udid);
@@ -307,6 +319,14 @@ public:
         const std::string &remoteUdid, const std::vector<int32_t> &remoteUserIds);
     DM_EXPORT std::map<int32_t, int32_t> GetUserIdAndBindLevel(
         const std::string &localUdid, const std::string &peerUdid);
+#ifdef CAR_DEVICE_ENABLE
+    std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByUserIdAndAccountId(
+        int32_t localUserId, const std::string &localAccountId, const std::string &localUdid,
+        const std::string &peerUdid);
+    DM_EXPORT std::map<int32_t, int32_t> GetUserIdAndBindLevel(int32_t localUserId,
+        const std::string &localAccountId, const std::string &localUdid, const std::string &peerUdid,
+        DmDeviceInfo &devInfo);
+#endif
     DM_EXPORT void UpdateACL(std::string &localUdid, const std::vector<int32_t> &localUserIds,
         const std::string &remoteUdid, const std::vector<int32_t> &remoteFrontUserIds,
         const std::vector<int32_t> &remoteBackUserIds, DmOfflineParam &offlineParam);
@@ -460,6 +480,18 @@ private:
         const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSinkShareType(const DistributedDeviceProfile::AccessControlProfile &profile,
         const int32_t &userId, const std::string &deviceId, const std::string &trustDeviceId, const int32_t &bindType);
+#ifdef CAR_DEVICE_ENABLE
+    struct LocalDeviceInfo {
+        int32_t userId;
+        std::string deviceId;
+    };
+    std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> GetDmAuthFormMap(const std::string &pkgName,
+        const std::string &deviceId, const std::vector<DistributedDeviceProfile::AccessControlProfile> &profilesFilter,
+        const int32_t &userId);
+    void UpdateAuthFormMapByBindType(std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> &deviceIdMap,
+        const PeerDevInfo &peerDevInfo, uint32_t highestBindType,
+        const DistributedDeviceProfile::AccessControlProfile &item, const LocalDeviceInfo &localDevInfo);
+#endif
     std::unordered_map<std::string, DmAuthForm> GetAuthFormMap(const std::string &pkgName, const std::string &deviceId,
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &profilesFilter, const int32_t &userId);
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
@@ -497,6 +529,10 @@ private:
     void UpdateBindType(const std::string &udid, int32_t compareParam, std::map<std::string, int32_t> &deviceMap);
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByUserId(const std::string &localUdid,
         int32_t userId, const std::string &remoteUdid);
+#ifdef CAR_DEVICE_ENABLE
+    std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByProcessInfo(
+        const std::string &localDeviceId, const std::string &targetDeviceId, ProcessInfo processInfo);
+#endif
     void DeleteSigTrustACL(DistributedDeviceProfile::AccessControlProfile profile, const std::string &remoteUdid,
         const std::vector<int32_t> &remoteFrontUserIds, const std::vector<int32_t> &remoteBackUserIds,
         DmOfflineParam &offlineParam);

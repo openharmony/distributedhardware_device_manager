@@ -142,7 +142,11 @@ public:
 
     std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname);
 
-    int32_t DpAclAdd(const std::string &udid);
+#ifdef CAR_DEVICE_ENABLE
+    std::unordered_map<PeerDevInfo, DmAuthForm, PeerDevInfoHash> GetAppTrustDeviceIdList(std::string pkgname,
+        ProcessInfo processInfo);
+#endif
+    int32_t DpAclAdd(const std::string &udid, int64_t accessControlId);
     void DeleteAlwaysAllowTimeOut();
     void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     int32_t IsSameAccount(const std::string &udid);
@@ -216,7 +220,9 @@ public:
     int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pinLength);
     int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
     void NotifyDeviceOrAppOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid);
-
+#ifdef CAR_DEVICE_ENABLE
+    int32_t HandleIdenticalAccountOnline(const std::string &udid, int64_t accessControlId);
+#endif
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId, std::string &peerUdid);
