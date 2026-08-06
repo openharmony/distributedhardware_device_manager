@@ -398,7 +398,7 @@ void FromJson(const cJSON *jsonObject, UnbindServiceProxyParam &unBindServiceMsg
         unBindServiceMsg.subjectTokenId = subjectTokenIdObj->valueint;
     }
     if (cJSON_IsString(serviceIdObj)) {
-        unBindServiceMsg.serviceId = std::stoll(serviceIdObj->valuestring);
+        unBindServiceMsg.serviceId = std::atoll(serviceIdObj->valuestring);
         LOGI("serviceId:%{public}" PRId64, unBindServiceMsg.serviceId);
     }
     if (cJSON_IsString(udidObj)) {
