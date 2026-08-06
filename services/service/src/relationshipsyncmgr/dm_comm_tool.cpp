@@ -620,6 +620,16 @@ void DMCommTool::ProcessReceiveUnBindAppEvent(const std::shared_ptr<InnerCommMsg
     UnBindAppMsg unBindAppMsg;
     FromJson(root, unBindAppMsg);
     cJSON_Delete(root);
+
+    std::string rmtUdid = "";
+    SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
+    if (rmtUdid.empty() || rmtUdid != unBindAppMsg.udid_) {
+        LOGE("Can not find remote udid, networkid: %{public}s, rmtUdid: %{public}s, unBindAppMsg udid: %{public}s",
+            GetAnonyString(commMsg->remoteNetworkId).c_str(),
+            GetAnonyString(rmtUdid).c_str(),
+            GetAnonyString(unBindAppMsg.udid_).c_str());
+        return;
+    }
     RspAppUnbind(commMsg->remoteNetworkId, commMsg->socketId);
 
     if (unBindAppMsg.userId_ == -1 || unBindAppMsg.tokenId_ == -1) {
