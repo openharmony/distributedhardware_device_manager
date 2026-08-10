@@ -15,8 +15,6 @@
 
 #include "device_manager_service.h"
 
-#include <securec.h>
-
 #include "cJSON.h"
 #include <dlfcn.h>
 #include <functional>

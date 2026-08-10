@@ -16,7 +16,6 @@
 #include "device_manager_service_impl_lite.h"
 
 #include <functional>
-#include <securec.h>
 
 #include "dm_anonymous.h"
 #include "dm_error_type.h"
