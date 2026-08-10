@@ -19,6 +19,7 @@
 #include <random>
 #include <algorithm>
 #include <functional>
+#include <securec.h>
 
 #include "app_manager.h"
 #include "bundle_mgr_interface.h"
@@ -3639,16 +3640,34 @@ bool DeviceManagerServiceImpl::GetPinMatchFlag(uint64_t tokenId, const DmAuthInf
         std::lock_guard<std::mutex> lock(tokenIdPinCodeMapLock_);
         auto it = tokenIdPinCodeMap_.find(key);
         if (it == tokenIdPinCodeMap_.end()) {
+            if (!key.empty()) {
+                (void)memset_s(const_cast<char*>(key.data()), key.size(), 0, key.size());
+                key.clear();
+            }
             return false;
         }
         if (!std::string(dmAuthInfo.metaToken).empty()) {
             auto pinLen = std::string(dmAuthInfo.pinCode).length();
             if (pinLen != METATOKEN_PINCODE_LENGTH) {
+                if (!key.empty()) {
+                    (void)memset_s(const_cast<char*>(key.data()), key.size(), 0, key.size());
+                    key.clear();
+                }
                 return false;
             }
-            return std::string(it->second.pinCode) == std::string(dmAuthInfo.pinCode).substr(METATOKEN_LENGTH);
+            bool result = std::string(it->second.pinCode) == std::string(dmAuthInfo.pinCode).substr(METATOKEN_LENGTH);
+            if (!key.empty()) {
+                (void)memset_s(const_cast<char*>(key.data()), key.size(), 0, key.size());
+                key.clear();
+            }
+            return result;
         }
-        return strcmp(it->second.pinCode, dmAuthInfo.pinCode) == 0;
+        bool result = strcmp(it->second.pinCode, dmAuthInfo.pinCode) == 0;
+        if (!key.empty()) {
+            (void)memset_s(const_cast<char*>(key.data()), key.size(), 0, key.size());
+            key.clear();
+        }
+        return result;
     }
 }
 

@@ -15,6 +15,8 @@
 
 #include "hichain_listener.h"
 
+#include <securec.h>
+
 #include "device_manager_service.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -253,7 +255,7 @@ int32_t HichainListener::GetRelatedGroupsCommon(int32_t userId, const std::strin
         deviceGroupManager_->getRelatedGroups(userId, pkgName, deviceId.c_str(), &returnGroups, &groupNum);
     if (ret != 0) {
         LOGE("[HICHAIN] fail to get related groups with ret:%{public}d.", ret);
-        deviceGroupManager_->destroyInfo(&returnGroups);
+        DestroyReturnGroupsAndClear(returnGroups);
         return ERR_DM_FAILED;
     }
     if (returnGroups == nullptr) {
@@ -262,28 +264,55 @@ int32_t HichainListener::GetRelatedGroupsCommon(int32_t userId, const std::strin
     }
     if (groupNum == 0) {
         LOGE("[HICHAIN]return related goups number is zero.");
-        deviceGroupManager_->destroyInfo(&returnGroups);
+        DestroyReturnGroupsAndClear(returnGroups);
         return ERR_DM_FAILED;
     }
     std::string relatedGroups = std::string(returnGroups);
+    DestroyReturnGroupsAndClear(returnGroups);
+    return ParseRelatedGroupsToJson(relatedGroups, groupList);
+}
+
+void HichainListener::DestroyReturnGroupsAndClear(char *returnGroups)
+{
+    size_t groupsLen = (returnGroups != nullptr) ? strlen(returnGroups) : 0;
+    if (groupsLen > 0) {
+        (void)memset_s(returnGroups, groupsLen, 0, groupsLen);
+    }
     deviceGroupManager_->destroyInfo(&returnGroups);
+}
+
+int32_t HichainListener::ParseRelatedGroupsToJson(std::string &relatedGroups,
+    std::vector<GroupsInfo> &groupList)
+{
     JsonObject jsonObject(relatedGroups);
     if (jsonObject.IsDiscarded()) {
         LOGE("returnGroups parse error");
+        ClearSensitiveString(relatedGroups);
         return ERR_DM_FAILED;
     }
     if (!jsonObject.IsArray()) {
         LOGE("jsonObject is not an array.");
+        ClearSensitiveString(relatedGroups);
         return ERR_DM_FAILED;
     }
     std::vector<GroupsInfo> groupInfos;
     jsonObject.Get(groupInfos);
     if (groupInfos.empty()) {
         LOGE("group failed, groupInfos is empty.");
+        ClearSensitiveString(relatedGroups);
         return ERR_DM_FAILED;
     }
     groupList = groupInfos;
+    ClearSensitiveString(relatedGroups);
     return DM_OK;
+}
+
+void HichainListener::ClearSensitiveString(std::string &sensitiveData)
+{
+    if (!sensitiveData.empty()) {
+        (void)memset_s(const_cast<char*>(sensitiveData.data()), sensitiveData.size(), 0, sensitiveData.size());
+        sensitiveData.clear();
+    }
 }
 
 //LCOV_EXCL_START

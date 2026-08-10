@@ -454,6 +454,7 @@ int32_t MineSoftbusListener::ParseVertexDeviceJsonArray(const std::vector<Vertex
             output[(*outLen)++] = sha256Out[j];
         }
     }
+    (void)memset_s(sha256Out, SHA256_OUT_DATA_LEN, 0, SHA256_OUT_DATA_LEN);
     return DM_OK;
 }
 

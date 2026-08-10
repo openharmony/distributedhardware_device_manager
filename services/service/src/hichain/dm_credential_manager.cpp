@@ -15,6 +15,8 @@
 
 #include "dm_credential_manager.h"
 
+#include <securec.h>
+
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
@@ -224,6 +226,10 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
         return DeleteRemoteCredential(deleteInfo);
     } else {
         LOGE("credential type error!");
+    }
+    if (!userId.empty()) {
+        (void)memset_s(const_cast<char*>(userId.data()), userId.size(), 0, userId.size());
+        userId.clear();
     }
     return ERR_DM_FAILED;
 }

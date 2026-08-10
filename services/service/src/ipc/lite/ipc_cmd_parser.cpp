@@ -14,6 +14,7 @@
  */
 
 #include "device_manager_ipc_interface_code.h"
+#include <securec.h>
 #include "device_manager_service.h"
 #include "device_manager_service_notify.h"
 #include "dm_anonymous.h"
@@ -177,6 +178,14 @@ ON_IPC_SERVER_CMD(REQUEST_CREDENTIAL, IpcIo &req, IpcIo &reply)
     if (ret == DM_OK) {
         WriteString(&reply, returnJsonStr.c_str());
     }
+    if (!reqParaStr.empty()) {
+        (void)memset_s(const_cast<char*>(reqParaStr.data()), reqParaStr.size(), 0, reqParaStr.size());
+        reqParaStr.clear();
+    }
+    if (!returnJsonStr.empty()) {
+        (void)memset_s(const_cast<char*>(returnJsonStr.data()), returnJsonStr.size(), 0, returnJsonStr.size());
+        returnJsonStr.clear();
+    }
 }
 
 ON_IPC_SERVER_CMD(SERVER_GET_DMFA_INFO, IpcIo &req, IpcIo &reply)
@@ -237,6 +246,19 @@ ON_IPC_SERVER_CMD(DELETE_CREDENTIAL, IpcIo &req, IpcIo &reply)
     WriteInt32(&reply, ret);
     if (ret == DM_OK) {
         WriteString(&reply, outParamStr.c_str());
+    }
+    if (!requestParam.empty()) {
+        for (auto &item : requestParam) {
+            if (!item.second.empty()) {
+                (void)memset_s(const_cast<char*>(item.second.data()), item.second.size(), 0, item.second.size());
+                item.second.clear();
+            }
+        }
+        requestParam.clear();
+    }
+    if (!returnJsonStr.empty()) {
+        (void)memset_s(const_cast<char*>(returnJsonStr.data()), returnJsonStr.size(), 0, returnJsonStr.size());
+        returnJsonStr.clear();
     }
 }
 

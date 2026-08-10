@@ -14,6 +14,7 @@
  */
 
 #include <cstdlib>
+#include <securec.h>
 #include "hichain_auth_connector.h"
 
 #include "dm_log.h"
@@ -212,6 +213,10 @@ int32_t HiChainAuthConnector::ExportCredential(int32_t osAccountId, const std::s
     }
 
     JsonObject jsonAuthParam(returnData);
+    size_t dataLen = strlen(returnData);
+    if (dataLen > 0) {
+        (void)memset_s(returnData, dataLen, 0, dataLen);
+    }
     credManager->destroyInfo(&returnData);
     if (jsonAuthParam.IsDiscarded() || !jsonAuthParam["keyValue"].IsString()) {
         LOGE("Hichain exportCredential failed, returnData is invalid.");

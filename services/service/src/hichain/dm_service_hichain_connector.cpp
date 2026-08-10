@@ -144,6 +144,10 @@ void DmServiceHiChainConnector::onFinish(int64_t requestId, int operationCode, c
         }
         LOGI("Disband group success");
     }
+    if (!data.empty()) {
+        (void)memset_s(const_cast<char*>(data.data()), data.size(), 0, data.size());
+        data.clear();
+    }
 }
 
 void DmServiceHiChainConnector::onError(int64_t requestId, int operationCode, int errorCode, const char *errorReturn)
@@ -389,6 +393,10 @@ int32_t DmServiceHiChainConnector::DeleteGroup(std::string &groupId)
     if (ret != 0) {
         LOGE("[HICHAIN]fail to delete group with ret:%{public}d.", ret);
         return ERR_DM_FAILED;
+    }
+    if (!disbandParams.empty()) {
+        (void)memset_s(const_cast<char*>(disbandParams.data()), disbandParams.size(), 0, disbandParams.size());
+        disbandParams.clear();
     }
     return DM_OK;
 }
