@@ -430,7 +430,6 @@ private:
     int32_t SendUninstAppByWifi(int32_t userId, int32_t tokenId, const std::string &networkId);
     void GetNotifyRemoteUnBindAppWay(int32_t userId, int32_t tokenId,
         std::map<std::string, std::string> &wifiDevices, bool &isBleWay);
-    void NotifyRemoteUnBindApp(int32_t userId, int64_t tokenId, const std::string &udid, int32_t bindLevel);
     void NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
         const std::map<std::string, std::string> &wifiDevices);
     int32_t SendUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,

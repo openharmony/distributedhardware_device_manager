@@ -213,11 +213,7 @@ int32_t DeviceManagerServiceImpl::ImportCredential(const std::string &pkgName, c
         LOGE("credentialMgr_ is nullptr");
         return ERR_DM_POINT_NULL;
     }
-    int32_t ret = credentialMgr_->ImportCredential(pkgName, credentialInfo);
-    if (!credentialInfo.empty()) {
-        (void)memset_s(const_cast<char*>(credentialInfo.data()), credentialInfo.size(), 0, credentialInfo.size());
-    }
-    return ret;
+    return credentialMgr_->ImportCredential(pkgName, credentialInfo);
 }
 
 int32_t DeviceManagerServiceImpl::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)

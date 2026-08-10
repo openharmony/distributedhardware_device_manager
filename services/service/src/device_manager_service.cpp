@@ -1038,24 +1038,10 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     uint32_t callingTokenId = 0;
     MultipleUserConnector::GetTokenId(callingTokenId);
-    NotifyRemoteUnBindApp(MultipleUserConnector::GetCurrentAccountUserID(),
-        static_cast<int64_t>(callingTokenId), udid, bindLevel);
-#endif
-    if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel) != DM_OK) {
-        LOGE("dmServiceImpl_ UnBindDevice failed.");
-        (void)memset_s(localUdid, sizeof(localUdid), 0, sizeof(localUdid));
-        return ERR_DM_FAILED;
-    }
-    (void)memset_s(localUdid, sizeof(localUdid), 0, sizeof(localUdid));
-    return DM_OK;
-}
-
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-void DeviceManagerService::NotifyRemoteUnBindApp(int32_t userId, int64_t tokenId,
-    const std::string &udid, int32_t bindLevel)
-{
+    tokenId = static_cast<int64_t>(callingTokenId);
     std::vector<std::string> peerUdids;
     peerUdids.emplace_back(udid);
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     std::map<std::string, std::string> wifiDevices;
     bool isBleActive = false;
     GetNotifyRemoteUnBindAppWay(userId, tokenId, wifiDevices, isBleActive);
@@ -1064,8 +1050,13 @@ void DeviceManagerService::NotifyRemoteUnBindApp(int32_t userId, int64_t tokenId
     } else {
         NotifyRemoteUnBindAppByWifi(userId, tokenId, "", wifiDevices);
     }
-}
 #endif
+    if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel) != DM_OK) {
+        LOGE("dmServiceImpl_ UnBindDevice failed.");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 std::set<std::pair<std::string, std::string>> DeviceManagerService::GetProxyInfosByParseExtra(

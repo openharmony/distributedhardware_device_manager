@@ -1678,10 +1678,6 @@ int32_t SoftbusListener::GetAttrFromExtraData(DmDeviceInfo &dmDevInfo, int32_t &
     int32_t ret = GetAttrFromCustomData(customDataJson, dmDevInfo, actionId);
     cJSON_Delete(customDataJson);
     cJSON_Delete(extraDataJsonObj);
-    if (!dmDevInfo.extraData.empty()) {
-        (void)memset_s(const_cast<char*>(dmDevInfo.extraData.data()),
-            dmDevInfo.extraData.size(), 0, dmDevInfo.extraData.size());
-    }
     return ret;
 }
 

@@ -141,9 +141,6 @@ int32_t DmCredentialManager::ImportRemoteCredentialExt(const std::string &creden
         LOGE("Failed to add member to group.");
         return ERR_DM_FAILED;
     }
-    if (!credentialInfo.empty()) {
-        (void)memset_s(const_cast<char*>(credentialInfo.data()), credentialInfo.size(), 0, credentialInfo.size());
-    }
     return DM_OK;
 }
 
