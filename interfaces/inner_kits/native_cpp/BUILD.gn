@@ -151,7 +151,7 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("devicemanagersdk") {
     branch_protector_ret = "pac_ret"
-
+    branch_protector_frt = "bti"
     sanitize = {
       boundary_sanitize = true
       integer_overflow = true
