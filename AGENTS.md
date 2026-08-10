@@ -70,3 +70,7 @@
 - sink/source 职责必须清晰；跨角色改动必须说明双方影响。
 - `authentication_v2` 与老协议 `services/implementation/src/authentication/` 互不交叉；默认不改老协议。
 - 兼容 fallback、migration、deprecated 路径改动前需升级确认。
+
+### 4.7. 安全规则
+
+由于 `std::sto*` 在输入非法（非数字或溢出）时会抛出 `std::invalid_argument` 或 `std::out_of_range` 异常，而项目禁止异常处理（无 try-catch，`-fno-exceptions`），异常一旦触发，C++ 运行时将调用 `std::terminate()` → `abort()`，直接终止进程，远端设备可借此发起拒绝服务，因此 `std::stoi`、`std::stoll`、`std::stou` 等会抛异常的转换函数须改用 `atoi`、`atoll`、`atou` 等无异常抛出的替代方案。
