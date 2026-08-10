@@ -467,7 +467,7 @@ void DmDeviceStateManager::DeleteCredential(const DmAclIdParam &acl)
     }
     for (auto &item : appList) {
         if (!item.empty()) {
-            (void)memset_s(item.data(), item.size(), 0, item.size());
+            (void)memset_s(const_cast<char*>(item.data()), item.size(), 0, item.size());
             item.clear();
         }
     }

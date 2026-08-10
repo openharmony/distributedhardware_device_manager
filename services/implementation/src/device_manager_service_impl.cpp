@@ -3578,7 +3578,7 @@ bool DeviceManagerServiceImpl::GetPinMatchFlag(uint64_t tokenId, const DmAuthInf
         auto it = tokenIdPinCodeMap_.find(key);
         if (it == tokenIdPinCodeMap_.end()) {
             if (!key.empty()) {
-                (void)memset_s(key.data(), key.size(), 0, key.size());
+                (void)memset_s(const_cast<char*>(key.data()), key.size(), 0, key.size());
                 key.clear();
             }
             return false;
@@ -3587,21 +3587,21 @@ bool DeviceManagerServiceImpl::GetPinMatchFlag(uint64_t tokenId, const DmAuthInf
             auto pinLen = std::string(dmAuthInfo.pinCode).length();
             if (pinLen != METATOKEN_PINCODE_LENGTH) {
                 if (!key.empty()) {
-                    (void)memset_s(key.data(), key.size(), 0, key.size());
+                    (void)memset_s(const_cast<char*>(key.data()), key.size(), 0, key.size());
                     key.clear();
                 }
                 return false;
             }
             bool result = std::string(it->second.pinCode) == std::string(dmAuthInfo.pinCode).substr(METATOKEN_LENGTH);
             if (!key.empty()) {
-                (void)memset_s(key.data(), key.size(), 0, key.size());
+                (void)memset_s(const_cast<char*>(key.data()), key.size(), 0, key.size());
                 key.clear();
             }
             return result;
         }
         bool result = strcmp(it->second.pinCode, dmAuthInfo.pinCode) == 0;
         if (!key.empty()) {
-            (void)memset_s(key.data(), key.size(), 0, key.size());
+            (void)memset_s(const_cast<char*>(key.data()), key.size(), 0, key.size());
             key.clear();
         }
         return result;

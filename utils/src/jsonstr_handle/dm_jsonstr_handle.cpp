@@ -66,7 +66,7 @@ DM_EXPORT std::vector<int64_t> JsonStrHandle::GetProxyTokenIdByExtra(const std::
         }
     }
     if (!proxyListStr.empty()) {
-        (void)memset_s(proxyListStr.data(), proxyListStr.size(), 0, proxyListStr.size());
+        (void)memset_s(const_cast<char*>(proxyListStr.data()), proxyListStr.size(), 0, proxyListStr.size());
         proxyListStr.clear();
     }
     return tokenIdVec;

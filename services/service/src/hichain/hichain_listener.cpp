@@ -310,7 +310,7 @@ int32_t HichainListener::ParseRelatedGroupsToJson(std::string &relatedGroups,
 void HichainListener::ClearSensitiveString(std::string &sensitiveData)
 {
     if (!sensitiveData.empty()) {
-        (void)memset_s(sensitiveData.data(), sensitiveData.size(), 0, sensitiveData.size());
+        (void)memset_s(const_cast<char*>(sensitiveData.data()), sensitiveData.size(), 0, sensitiveData.size());
         sensitiveData.clear();
     }
 }

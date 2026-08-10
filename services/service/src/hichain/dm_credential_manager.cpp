@@ -231,7 +231,7 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
         LOGE("credential type error!");
     }
     if (!userId.empty()) {
-        (void)memset_s(userId.data(), userId.size(), 0, userId.size());
+        (void)memset_s(const_cast<char*>(userId.data()), userId.size(), 0, userId.size());
         userId.clear();
     }
     return ERR_DM_FAILED;

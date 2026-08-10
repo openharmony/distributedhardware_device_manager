@@ -822,7 +822,7 @@ ON_IPC_SET_REQUEST(SERVER_CREDENTIAL_RESULT, std::shared_ptr<IpcReq> pBaseReq, M
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!credentialResult.empty()) {
-        (void)memset_s(credentialResult.data(), credentialResult.size(), 0, credentialResult.size());
+        (void)memset_s(const_cast<char*>(credentialResult.data()), credentialResult.size(), 0, credentialResult.size());
         credentialResult.clear();
     }
 
@@ -983,7 +983,7 @@ ON_IPC_CMD(EXPORT_AUTH_CODE, MessageParcel &data, MessageParcel &reply)
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!authCode.empty()) {
-        (void)memset_s(authCode.data(), authCode.size(), 0, authCode.size());
+        (void)memset_s(const_cast<char*>(authCode.data()), authCode.size(), 0, authCode.size());
         authCode.clear();
     }
     return DM_OK;
@@ -1297,7 +1297,7 @@ ON_IPC_CMD(DESTROY_PIN_HOLDER, MessageParcel &data, MessageParcel &reply)
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!payload.empty()) {
-        (void)memset_s(payload.data(), payload.size(), 0, payload.size());
+        (void)memset_s(const_cast<char*>(payload.data()), payload.size(), 0, payload.size());
         payload.clear();
     }
     return DM_OK;
@@ -1359,7 +1359,7 @@ ON_IPC_SET_REQUEST(SERVER_DESTROY_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, 
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!payload.empty()) {
-        (void)memset_s(payload.data(), payload.size(), 0, payload.size());
+        (void)memset_s(const_cast<char*>(payload.data()), payload.size(), 0, payload.size());
         payload.clear();
     }
     return DM_OK;
