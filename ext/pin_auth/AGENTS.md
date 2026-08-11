@@ -6,10 +6,10 @@
 
 | 触发条件 | 先读 |
 |---|---|
-| 改 PIN 生成、展示、校验、生命周期或弹框交互 | `docs/02-workflows.md` |
-| 改导入 PIN 免弹窗绑定 | `docs/02-workflows.md` |
-| 排查板端 PIN 弹框或推包验证 | `docs/03-verification.md` |
-| 改 JS API 相关展示链路 | `docs/01-core-rules.md` |
+| 改 PIN 生成、展示、校验、生命周期或弹框交互 | `docs/01-workflows.md` |
+| 改导入 PIN 免弹窗绑定 | `docs/01-workflows.md` |
+| 排查板端 PIN 弹框或推包验证 | `docs/02-verification.md` |
+| 改 JS API 相关展示链路 | 根 `AGENTS.md` |
 
 ## 2. 红线
 
