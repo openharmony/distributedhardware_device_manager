@@ -6,10 +6,10 @@
 
 | 触发条件 | 先读 |
 |---|---|
-| 改 3rd SDK 接口 | 主栈对应接口 + `docs/01-core-rules.md` |
-| 改 3rd 服务实现 | 主栈对应实现 + `docs/01-core-rules.md` |
-| 改绑定、解绑、认证、生命周期语义 | `docs/02-workflows.md` |
-| 改导入 PIN / 代理绑定语义 | `docs/02-workflows.md` |
+| 改 3rd SDK 接口 | 主栈对应接口 + 根 `AGENTS.md` |
+| 改 3rd 服务实现 | 主栈对应实现 + 根 `AGENTS.md` |
+| 改绑定、解绑、认证、生命周期语义 | `docs/01-workflows.md` |
+| 改导入 PIN / 代理绑定语义 | `docs/01-workflows.md` |
 
 ## 2. 红线
 

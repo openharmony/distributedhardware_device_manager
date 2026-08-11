@@ -6,11 +6,11 @@
 
 | 触发条件 | 先读 |
 |---|---|
-| 改绑定、解绑、认证状态机 | `docs/02-workflows.md` |
-| 改导入 PIN 免弹窗绑定 | `docs/02-workflows.md` |
-| 改 ACL 写入 / 清理 / 永久可信关系生命周期 | `docs/01-core-rules.md`、`docs/03-verification.md` |
-| 改 DP / HiChain / SoftBus 交互 | `docs/03-verification.md` |
-| 改权限或调用方校验 | `docs/02-workflows.md` |
+| 改绑定、解绑、认证状态机 | `docs/01-workflows.md` |
+| 改导入 PIN 免弹窗绑定 | `docs/01-workflows.md` |
+| 改 ACL 写入 / 清理 / 永久可信关系生命周期 | 根 `AGENTS.md`、`docs/02-verification.md` |
+| 改 DP / HiChain / SoftBus 交互 | `docs/02-verification.md` |
+| 改权限或调用方校验 | `docs/01-workflows.md` |
 
 ## 2. 红线
 
