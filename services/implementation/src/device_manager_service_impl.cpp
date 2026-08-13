@@ -535,8 +535,8 @@ static uint64_t GenerateRandNum(int sessionId)
     // Generate random numbers
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> rand_dis(1, 0xFFFFFFFF);
-    uint32_t randomNumber = static_cast<uint32_t>(rand_dis(gen));
+    std::uniform_int_distribution<uint32_t> rand_dis(1, 0xFFFFFFFFu);
+    uint32_t randomNumber = rand_dis(gen);
 
     // Combination of random numbers
     uint64_t randNum = (static_cast<uint64_t>(timestamp) << 32) |
