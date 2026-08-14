@@ -521,28 +521,24 @@ int32_t DeviceManagerFfiImpl::EventOff(const std::string &type)
     }
 
     LOGI("bundleName %{public}s, eventType %{public}s", bundleName_.c_str(), type.c_str());
-    bool needReleaseStatus = false;
+
+    if (type == DM_FFI_EVENT_DEVICE_DISCOVER_SUCCESS || type == DM_FFI_EVENT_DEVICE_DISCOVER_FAIL) {
+        return ReleaseDiscoveryCallback();
+    }
+
+    bool needRelease = false;
     {
         std::lock_guard<std::mutex> autoLock(callbackLock);
         if (type == DM_FFI_EVENT_DEVICE_STATE_CHANGE) {
             deviceStateChangedCallback = nullptr;
         } else if (type == DM_FFI_EVENT_DEVICE_NAME_CHANGE) {
             deviceNameChangedCallback = nullptr;
-        } else if (type != DM_FFI_EVENT_DEVICE_DISCOVER_SUCCESS &&
-                   type != DM_FFI_EVENT_DEVICE_DISCOVER_FAIL) {
+        } else {
             return ERR_INVALID_PARAMS;
         }
-        if (type == DM_FFI_EVENT_DEVICE_STATE_CHANGE || type == DM_FFI_EVENT_DEVICE_NAME_CHANGE) {
-            needReleaseStatus = !deviceStateChangedCallback && !deviceNameChangedCallback;
-        }
+        needRelease = !deviceStateChangedCallback && !deviceNameChangedCallback;
     }
-    if (type == DM_FFI_EVENT_DEVICE_STATE_CHANGE || type == DM_FFI_EVENT_DEVICE_NAME_CHANGE) {
-        return needReleaseStatus ? ReleaseDevStatusCallback() : ERR_OK;
-    }
-    if (type == DM_FFI_EVENT_DEVICE_DISCOVER_SUCCESS || type == DM_FFI_EVENT_DEVICE_DISCOVER_FAIL) {
-        return ReleaseDiscoveryCallback();
-    }
-    return ERR_INVALID_PARAMS;
+    return needRelease ? ReleaseDevStatusCallback() : ERR_OK;
 }
 
 
