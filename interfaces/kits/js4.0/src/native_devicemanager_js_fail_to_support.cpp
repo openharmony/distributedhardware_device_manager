@@ -201,6 +201,13 @@ napi_value DeviceManagerNapiFailToSupport::GetDeviceType(napi_env env, napi_call
     return nullptr;
 }
 
+napi_value DeviceManagerNapiFailToSupport::GetOsTypeByNetworkId(napi_env env, napi_callback_info info)
+{
+    (void)info;
+    napi_throw_error(env, DM_NOT_SUPPORT, "device not support");
+    return nullptr;
+}
+
 napi_value DeviceManagerNapiFailToSupport::StartDeviceDiscover(napi_env env, napi_callback_info info)
 {
     (void)info;
@@ -419,6 +426,7 @@ napi_value DeviceManagerNapiFailToSupport::Init(napi_env env, napi_value exports
         DECLARE_NAPI_FUNCTION("getLocalDeviceType", GetLocalDeviceType),
         DECLARE_NAPI_FUNCTION("getDeviceName", GetDeviceName),
         DECLARE_NAPI_FUNCTION("getDeviceType", GetDeviceType),
+        DECLARE_NAPI_FUNCTION("getOsTypeByNetworkId", GetOsTypeByNetworkId),
         DECLARE_NAPI_FUNCTION("startDiscovering", StartDeviceDiscover),
         DECLARE_NAPI_FUNCTION("stopDiscovering", StopDeviceDiscover),
         DECLARE_NAPI_FUNCTION("unbindTarget", UnBindTarget),
