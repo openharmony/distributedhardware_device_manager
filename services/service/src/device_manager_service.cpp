@@ -3888,9 +3888,6 @@ void DeviceManagerService::SendForegroundAccountResponse(const std::string &remo
         }
     }
     SendForegroundAccountBroadcast(remoteUdids, localAccounts, false);
-#ifdef CAR_DEVICE_ENABLE
-    TriggerForegroundAccountSync();
-#endif
 #endif
 }
 
