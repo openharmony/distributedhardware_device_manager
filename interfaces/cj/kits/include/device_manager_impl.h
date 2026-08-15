@@ -28,6 +28,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerFfiImpl : public OHOS::FFI::FFIData {
+    DECL_TYPE(DeviceManagerFfiImpl, OHOS::FFI::FFIData)
 public:
     explicit DeviceManagerFfiImpl(const std::string &bundleName, int32_t *errCode);
     ~DeviceManagerFfiImpl() override = default;
