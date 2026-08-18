@@ -28,14 +28,7 @@ public:
 public:
     virtual bool CheckAccessServicePermission() = 0;
     virtual bool CheckDataSyncPermission() = 0;
-    virtual bool CheckProcessNameValidOnPinHolder(const std::string &processName) = 0;
-    virtual bool CheckProcessNameValidOnAuthCode(const std::string &processName) = 0;
     virtual int32_t GetCallerProcessName(std::string &processName) = 0;
-    virtual bool CheckProcessNameValidOnSetDnPolicy(const std::string &processName) = 0;
-    virtual bool CheckProcessNameValidOnGetDeviceInfo(const std::string &processName) = 0;
-    virtual bool CheckProcessNameValidModifyLocalDeviceName(const std::string &processName) = 0;
-    virtual bool CheckProcessNameValidModifyRemoteDeviceName(const std::string &processName) = 0;
-    virtual bool CheckProcessNameValidPutDeviceProfileInfoList(const std::string &processName) = 0;
     virtual bool CheckReadLocalDeviceName() = 0;
 public:
     static inline std::shared_ptr<DmPermissionManager> dmPermissionManager = nullptr;
@@ -45,14 +38,7 @@ class PermissionManagerMock : public DmPermissionManager {
 public:
     MOCK_METHOD(bool, CheckAccessServicePermission, ());
     MOCK_METHOD(bool, CheckDataSyncPermission, ());
-    MOCK_METHOD(bool, CheckProcessNameValidOnPinHolder, (const std::string &));
-    MOCK_METHOD(bool, CheckProcessNameValidOnAuthCode, (const std::string &));
     MOCK_METHOD(int32_t, GetCallerProcessName, (std::string &));
-    MOCK_METHOD(bool, CheckProcessNameValidOnSetDnPolicy, (const std::string &));
-    MOCK_METHOD(bool, CheckProcessNameValidOnGetDeviceInfo, (const std::string &));
-    MOCK_METHOD(bool, CheckProcessNameValidModifyLocalDeviceName, (const std::string &));
-    MOCK_METHOD(bool, CheckProcessNameValidModifyRemoteDeviceName, (const std::string &));
-    MOCK_METHOD(bool, CheckProcessNameValidPutDeviceProfileInfoList, (const std::string &));
     MOCK_METHOD(bool, CheckReadLocalDeviceName, ());
 };
 }

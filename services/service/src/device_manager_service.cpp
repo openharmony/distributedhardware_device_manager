@@ -657,18 +657,11 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
         }
         return ret;
     }
-    if (!AppManager::GetInstance().IsSystemSA()) {
+    if (!AppManager::GetInstance().IsSystemSA() && !AppManager::GetInstance().IsSystemApp()) {
         int32_t permissionRet = dmServiceImpl_->CheckDeviceInfoPermission(localUdid, peerDeviceId);
         if (permissionRet != DM_OK) {
-            std::string processName = "";
-            if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-                LOGE("Get caller process name failed.");
-                return ret;
-            }
-            if (!PermissionManager::GetInstance().CheckProcessNameValidOnGetDeviceInfo(processName)) {
-                LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-                return ret;
-            }
+            LOGE("Check device info permission failed.");
+            return ret;
         }
     }
     return softbusListener_->GetDeviceInfo(networkId, info);
@@ -1767,14 +1760,9 @@ int32_t DeviceManagerService::ImportAuthCode(const std::string &pkgName, const s
         LOGE("The caller: %{public}s does not have permission to call ImportAuthCode.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("The caller does not have permission.");
+        return ERR_DM_NO_PERMISSION;
     }
     if (authCode.empty() || pkgName.empty()) {
         LOGE("Invalid parameter, authCode: %{public}s.", GetAnonyString(authCode).c_str());
@@ -1793,14 +1781,9 @@ int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
         LOGE("The caller does not have permission to call ExportAuthCode.");
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, processName: %{public}s.", processName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("The caller does not have permission.");
+        return ERR_DM_NO_PERMISSION;
     }
     if (!IsDMServiceImplReady()) {
         LOGE("instance not init or init failed.");
@@ -1907,13 +1890,8 @@ int32_t DeviceManagerService::ImportAuthInfo(const DmAuthInfo &dmAuthInfo)
             dmAuthInfo.pinConsumerPkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, pkgname: %{public}s.", dmAuthInfo.pinConsumerPkgName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", GetAnonyString(processName).c_str());
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("The caller does not have permission.");
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsImportAuthInfoValid(dmAuthInfo)) {
@@ -1946,13 +1924,8 @@ int32_t DeviceManagerService::ExportAuthInfo(DmAuthInfo &dmAuthInfo, uint32_t pi
         LOGE("The caller does not have permission to call ExportAuthCode.");
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, processName: %{public}s.", processName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", GetAnonyString(processName).c_str());
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("The caller does not have permission.");
         return ERR_DM_NO_PERMISSION;
     }
     if (!IsExportAuthInfoValid(dmAuthInfo)) {
@@ -2436,17 +2409,12 @@ int32_t DeviceManagerService::GetLocalServiceInfoByBundleNameAndPinExchangeType(
 int32_t DeviceManagerService::RegisterPinHolderCallback(const std::string &pkgName)
 {
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller: %{public}s does not have permission to call ImportAuthCode.", pkgName.c_str());
+        LOGE("The caller: %{public}s does not have permission to call RegisterPinHolderCallback.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("The caller does not have permission.");
+        return ERR_DM_NO_PERMISSION;
     }
     LOGI("begin.");
     if (pkgName.empty()) {
@@ -2464,14 +2432,9 @@ int32_t DeviceManagerService::CreatePinHolder(const std::string &pkgName, const 
         LOGE("The caller: %{public}s does not have permission to call CreatePinHolder.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("The caller does not have permission.");
+        return ERR_DM_NO_PERMISSION;
     }
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
@@ -2488,14 +2451,9 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
         LOGE("The caller: %{public}s does not have permission to call DestroyPinHolder.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("The caller does not have permission.");
+        return ERR_DM_NO_PERMISSION;
     }
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
@@ -4103,14 +4061,9 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+    if (!AppManager::GetInstance().IsSystemSA() && !AppManager::GetInstance().IsSystemApp()) {
+        LOGE("The caller does not have permission.");
+        return ERR_DM_NO_PERMISSION;
     }
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -4820,9 +4773,6 @@ int32_t DeviceManagerService::RegDevStateCallbackToService(const std::string &pk
         return DM_OK;
     }
     listener_->OnDevStateCallbackAdd(processInfo, deviceList);
-    if (PermissionManager::GetInstance().CheckOnReadyRetrospectiveNotificationBlackList()) {
-        return DM_OK;
-    }
     std::vector<DmDeviceInfo> readyDeviceList;
     CHECK_NULL_RETURN(dmServiceImpl_, ERR_DM_POINT_NULL);
     dmServiceImpl_->GetNotifyEventInfos(readyDeviceList);
@@ -4853,9 +4803,6 @@ int32_t DeviceManagerService::RegDevStateCallbackToService(const std::string &pk
     processInfo.userId = userId;
     processInfo.tokenId = IPCSkeleton::GetCallingTokenID();
     listener_->OnDevStateCallbackAdd(processInfo, deviceList);
-    if (PermissionManager::GetInstance().CheckOnReadyRetrospectiveNotificationBlackList()) {
-        return DM_OK;
-    }
     std::vector<DmDeviceInfo> readyDeviceList;
     CHECK_NULL_RETURN(dmServiceImpl_, ERR_DM_POINT_NULL);
     dmServiceImpl_->GetNotifyEventInfos(readyDeviceList);
@@ -5425,13 +5372,8 @@ int32_t DeviceManagerService::PutDeviceProfileInfoList(const std::string &pkgNam
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidPutDeviceProfileInfoList(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+    if (!AppManager::GetInstance().IsSystemSA() && !AppManager::GetInstance().IsSystemApp()) {
+        LOGE("The caller does not have permission.");
         return ERR_DM_NO_PERMISSION;
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
@@ -5476,13 +5418,8 @@ int32_t DeviceManagerService::SetLocalDeviceName(const std::string &pkgName, con
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidModifyLocalDeviceName(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+    if (!AppManager::GetInstance().IsSystemSA() && !AppManager::GetInstance().IsSystemApp()) {
+        LOGE("The caller does not have permission.");
         return ERR_DM_NO_PERMISSION;
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
@@ -5516,17 +5453,12 @@ int32_t DeviceManagerService::SetLocalDeviceName(const std::string &pkgName, con
 int32_t DeviceManagerService::SetRemoteDeviceName(const std::string &pkgName,
     const std::string &deviceId, const std::string &deviceName)
 {
-    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidModifyRemoteDeviceName(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+    if (!AppManager::GetInstance().IsSystemSA() && !AppManager::GetInstance().IsSystemApp()) {
+        LOGE("The caller does not have permission.");
         return ERR_DM_NO_PERMISSION;
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
@@ -5586,13 +5518,8 @@ int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidModifyLocalDeviceName(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+    if (!AppManager::GetInstance().IsSystemSA() && !AppManager::GetInstance().IsSystemApp()) {
+        LOGE("The caller does not have permission.");
         return ERR_DM_NO_PERMISSION;
     }
     if (IsDMServiceAdapterResidentLoad()) {
@@ -5831,13 +5758,8 @@ int32_t DeviceManagerService::UnRegisterPinHolderCallback(const std::string &pkg
         LOGE("The caller: %{public}s does not have permission to call UnRegisterPinHolderCallback.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName)) {
-        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("The caller does not have permission.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("begin.");

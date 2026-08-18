@@ -30,44 +30,9 @@ bool PermissionManager::CheckDataSyncPermission()
     return DmPermissionManager::dmPermissionManager->CheckDataSyncPermission();
 }
 
-bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &processName)
-{
-    return DmPermissionManager::dmPermissionManager->CheckProcessNameValidOnPinHolder(processName);
-}
-
-bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &processName)
-{
-    return DmPermissionManager::dmPermissionManager->CheckProcessNameValidOnAuthCode(processName);
-}
-
 int32_t PermissionManager::GetCallerProcessName(std::string &processName)
 {
     return DmPermissionManager::dmPermissionManager->GetCallerProcessName(processName);
-}
-
-bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &processName)
-{
-    return DmPermissionManager::dmPermissionManager->CheckProcessNameValidOnSetDnPolicy(processName);
-}
-
-bool PermissionManager::CheckProcessNameValidOnGetDeviceInfo(const std::string &processName)
-{
-    return DmPermissionManager::dmPermissionManager->CheckProcessNameValidOnGetDeviceInfo(processName);
-}
-
-bool PermissionManager::CheckProcessNameValidModifyLocalDeviceName(const std::string &processName)
-{
-    return DmPermissionManager::dmPermissionManager->CheckProcessNameValidModifyLocalDeviceName(processName);
-}
-
-bool PermissionManager::CheckProcessNameValidModifyRemoteDeviceName(const std::string &processName)
-{
-    return DmPermissionManager::dmPermissionManager->CheckProcessNameValidModifyRemoteDeviceName(processName);
-}
-
-bool PermissionManager::CheckProcessNameValidPutDeviceProfileInfoList(const std::string &processName)
-{
-    return DmPermissionManager::dmPermissionManager->CheckProcessNameValidPutDeviceProfileInfoList(processName);
 }
 
 bool PermissionManager::CheckReadLocalDeviceName()

@@ -14,6 +14,7 @@
  */
 #include "dm_freeze_process.h"
 
+#include "app_manager.h"
 #include "cJSON.h"
 #include "datetime_ex.h"
 #include "dm_anonymous.h"
@@ -41,10 +42,6 @@ constexpr int64_t FIRST_FREEZE_DURATION_SEC = 60;
 constexpr int64_t SECOND_FREEZE_DURATION_SEC = 3 * 60;
 constexpr int64_t THIRD_FREEZE_DURATION_SEC = 5 * 60;
 constexpr int64_t MAX_FREEZE_DURATION_SEC = 10 * 60;
-constexpr const static char* IS_NEED_FREEZE_WHITE_LIST[] = {
-    "CollaborationFwk",
-};
-constexpr int32_t IS_NEED_FREEZE_WHITE_LIST_NUM = std::size(IS_NEED_FREEZE_WHITE_LIST);
 }
 
 DM_IMPLEMENT_SINGLE_INSTANCE(FreezeProcess);
@@ -347,8 +344,8 @@ bool FreezeProcess::IsNeedFreeze(std::shared_ptr<DmAuthContext> context)
         LOGE("context is null");
         return isNeedFreeze;
     }
-    if (!IsInWhiteList(context->accessee.bundleName)) {
-        LOGE("not in white list");
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGI("not system sa, need freeze");
         return isNeedFreeze;
     }
     OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
@@ -381,20 +378,5 @@ bool FreezeProcess::IsNeedFreeze(std::shared_ptr<DmAuthContext> context)
     return isNeedFreeze;
 }
 
-bool FreezeProcess::IsInWhiteList(const std::string &pkgName)
-{
-    if (pkgName.empty()) {
-        LOGE("pkgName is empty");
-        return false;
-    }
-    uint16_t index = 0;
-    for (; index < IS_NEED_FREEZE_WHITE_LIST_NUM; ++index) {
-        std::string tmp = IS_NEED_FREEZE_WHITE_LIST[index];
-        if (pkgName == tmp) {
-            return true;
-        }
-    }
-    return false;
-}
 } // namespace DistributedHardware
 } // namespace OHOS

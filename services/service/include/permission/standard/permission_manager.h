@@ -30,19 +30,11 @@ public:
     bool CheckAccessUdidPermission(void);
     bool CheckMonitorPermission(void);
     int32_t GetCallerProcessName(std::string &processName);
-    bool CheckProcessNameValidOnAuthCode(const std::string &processName);
-    bool CheckProcessNameValidOnPinHolder(const std::string &processName);
     bool CheckWhiteListSystemSA(const std::string &pkgName);
     std::unordered_set<std::string> GetWhiteListSystemSA();
     bool CheckSystemSA(const std::string &pkgName);
-    bool CheckProcessNameValidOnSetDnPolicy(const std::string &processName);
-    bool CheckProcessNameValidOnGetDeviceInfo(const std::string &processName);
-    bool CheckProcessNameValidModifyLocalDeviceName(const std::string &processName);
-    bool CheckProcessNameValidModifyRemoteDeviceName(const std::string &processName);
-    bool CheckProcessNameValidPutDeviceProfileInfoList(const std::string &processName);
     bool CheckProcessValidOnGetTrustedDeviceList();
     bool CheckReadLocalDeviceName(void);
-    bool CheckOnReadyRetrospectiveNotificationBlackList();
 
 private:
     bool VerifyAccessTokenByPermissionName(const std::string& permissionName);

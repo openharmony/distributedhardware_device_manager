@@ -176,10 +176,8 @@ HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_201, testing::ext::
 {
     std::string pkgName = "CollaborationFwk";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnPinHolder(_)).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().RegisterPinHolderCallback(pkgName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 /**
@@ -193,11 +191,8 @@ HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_201, testing::ext::TestSize.L
     DmPinType pinType = NUMBER_PIN_CODE;
     std::string payload;
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnPinHolder(_)).Times(::testing::AtLeast(1)).
-        WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().CreatePinHolder(pkgName, targetId, pinType, payload);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 /**
@@ -333,12 +328,9 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_201, testing::ext::TestSize.Level
     policy[PARAM_KEY_POLICY_TIME_OUT] = "1000";
     std::string processName = "collaboration_service";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
-        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     bool bRet = false;
-    if (ret == DM_OK || ret == ERR_DM_UNSUPPORTED_METHOD || ret == SOFTBUS_IPC_ERR) {
+    if (ret == DM_OK || ret == ERR_DM_NO_PERMISSION || ret == SOFTBUS_IPC_ERR) {
         bRet = true;
     }
     ASSERT_EQ(bRet, true);
@@ -357,11 +349,8 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_202, testing::ext::TestSize.Level
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     std::string processName = "collaboration_service";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
-        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 /**
@@ -376,11 +365,8 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_203, testing::ext::TestSize.Level
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     std::string processName = "collaboration_service";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
-        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 /**
@@ -395,11 +381,8 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_204, testing::ext::TestSize.Level
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
     std::string processName = "collaboration_service";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
-        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 /**
@@ -415,11 +398,8 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_205, testing::ext::TestSize.Level
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     std::string processName = "collaboration_service";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
-        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 /**
@@ -435,11 +415,8 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_206, testing::ext::TestSize.Level
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     std::string processName = "collaboration_service";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
-        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_202, testing::ext::TestSize.Level1)
@@ -845,30 +822,14 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_207, testing::ext::TestSize.Level
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     std::string processName = "collaboration_service";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
-        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10a";
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
-        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(true));
-    ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
-        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(ERR_DM_FAILED)));
     ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
-        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(false));
-    ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_206, testing::ext::TestSize.Level1)
@@ -1217,16 +1178,6 @@ HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_201, testing::ext::T
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_202, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    std::vector<DmDeviceProfileInfo> deviceProfileInfoList;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidPutDeviceProfileInfoList(_)).WillOnce(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
-    EXPECT_TRUE(ret == ERR_DM_UNSUPPORTED_METHOD || ret == ERR_DM_INPUT_PARA_INVALID);
-}
-
 HWTEST_F(DeviceManagerServiceTest, SetLocalDisplayNameToSoftbus_201, testing::ext::TestSize.Level1)
 {
     std::string displayName = "displayName";
@@ -1456,25 +1407,6 @@ HWTEST_F(DeviceManagerServiceTest, RestoreLocalDeviceName_201, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, RestoreLocalDeviceName_202, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManagerService::GetInstance().RestoreLocalDeviceName(pkgName);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(false));
-    ret = DeviceManagerService::GetInstance().RestoreLocalDeviceName(pkgName);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(true));
-    ret = DeviceManagerService::GetInstance().RestoreLocalDeviceName(pkgName);
-    EXPECT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
@@ -1482,31 +1414,6 @@ HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_201, testing::ext::TestSiz
     DeletePermission();
     int32_t ret = DeviceManagerService::GetInstance().SetLocalDeviceName(pkgName, deviceName);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
-HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_202, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    std::string deviceName = "deviceName";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManagerService::GetInstance().SetLocalDeviceName(pkgName, deviceName);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(false));
-    ret = DeviceManagerService::GetInstance().SetLocalDeviceName(pkgName, deviceName);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(true));
-#if !defined(DEVICE_MANAGER_COMMON_FLAG)
-    ret = DeviceManagerService::GetInstance().SetLocalDeviceName(pkgName, deviceName);
-#else
-    DeviceManagerService::GetInstance().InitDMServiceListener();
-    ret = DeviceManagerService::GetInstance().SetLocalDeviceName(pkgName, deviceName);
-#endif
-    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, SetRemoteDeviceName_201, testing::ext::TestSize.Level1)
@@ -1517,27 +1424,6 @@ HWTEST_F(DeviceManagerServiceTest, SetRemoteDeviceName_201, testing::ext::TestSi
     DeletePermission();
     int32_t ret = DeviceManagerService::GetInstance().SetRemoteDeviceName(pkgName, deviceId, deviceName);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
-HWTEST_F(DeviceManagerServiceTest, SetRemoteDeviceName_202, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    std::string deviceName = "deviceName";
-    std::string deviceId = "d*********9";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManagerService::GetInstance().SetRemoteDeviceName(pkgName, deviceId, deviceName);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyRemoteDeviceName(_)).WillOnce(Return(false));
-    ret = DeviceManagerService::GetInstance().SetRemoteDeviceName(pkgName, deviceId, deviceName);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyRemoteDeviceName(_)).WillOnce(Return(true));
-    ret = DeviceManagerService::GetInstance().SetRemoteDeviceName(pkgName, deviceId, deviceName);
-    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_201, testing::ext::TestSize.Level1)

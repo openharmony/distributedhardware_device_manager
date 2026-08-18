@@ -434,11 +434,9 @@ HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_002, testing::ext::TestSize.Le
 {
     std::string pkgName = "pkgName";
     std::string authCode = "authCode";
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().ImportAuthCode(pkgName, authCode);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_001, testing::ext::TestSize.Level1)
 {
@@ -450,11 +448,9 @@ HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_001, testing::ext::TestSize.Le
 HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_002, testing::ext::TestSize.Level1)
 {
     std::string authCode = "authCode";
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().ExportAuthCode(authCode);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceImplSo_001, testing::ext::TestSize.Level1)
 {
