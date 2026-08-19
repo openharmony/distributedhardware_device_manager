@@ -191,33 +191,6 @@ HWTEST_F(FreezeProcessTest, CleanFreezeState_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(result, DM_OK);
 }
 
-HWTEST_F(FreezeProcessTest, IsInWhiteList_001, testing::ext::TestSize.Level1)
-{
-    FreezeProcess freezeProcess;
-    std::string invalidPkg = "";
-    bool result = freezeProcess.IsInWhiteList(invalidPkg);
-
-    EXPECT_FALSE(result);
-}
-
-HWTEST_F(FreezeProcessTest, IsInWhiteList_002, testing::ext::TestSize.Level1)
-{
-    FreezeProcess freezeProcess;
-    std::string invalidPkg = "com.not.in.whitelist";
-    bool result = freezeProcess.IsInWhiteList(invalidPkg);
-
-    EXPECT_FALSE(result);
-}
-
-HWTEST_F(FreezeProcessTest, IsInWhiteList_003, testing::ext::TestSize.Level1)
-{
-    FreezeProcess freezeProcess;
-    std::string validPkg = "CollaborationFwk";
-    bool result = freezeProcess.IsInWhiteList(validPkg);
-
-    EXPECT_TRUE(result);
-}
-
 HWTEST_F(FreezeProcessTest, CleanBindFailedEvents_002, testing::ext::TestSize.Level0)
 {
     int64_t reservedDataTimeStamp = 1633072800;

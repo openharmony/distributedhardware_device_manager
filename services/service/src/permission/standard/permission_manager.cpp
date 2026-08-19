@@ -33,24 +33,6 @@ constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SER
 constexpr const char* DM_DISTRIBUTED_DATASYNC_PERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";
 constexpr const char* DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION = "ohos.permission.MONITOR_DEVICE_NETWORK_STATE";
 constexpr const char* ACCESS_UDID = "ohos.permission.sec.ACCESS_UDID";
-constexpr const static char* AUTH_CODE_WHITE_LIST[] = {
-    "CollaborationFwk",
-    "wear_link_service",
-    "watch_system_service",
-    "cast_engine_service",
-    "glasses_collaboration_service",
-    "xr_glass_app_service",
-    "gameservice_server",
-    "caas_service",
-    "car_distributed_engine",
-    "dmodem"
-};
-constexpr int32_t AUTH_CODE_WHITE_LIST_NUM = std::size(AUTH_CODE_WHITE_LIST);
-
-constexpr const static char* PIN_HOLDER_WHITE_LIST[] = {
-    "CollaborationFwk",
-};
-constexpr int32_t PIN_HOLDER_WHITE_LIST_NUM = std::size(PIN_HOLDER_WHITE_LIST);
 
 constexpr const static char* SYSTEM_SA_WHITE_LIST[] = {
     "Samgr_Networking",
@@ -66,51 +48,10 @@ constexpr const static char* SYSTEM_SA_WHITE_LIST[] = {
 };
 constexpr int32_t SYSTEM_SA_WHITE_LIST_NUM = std::size(SYSTEM_SA_WHITE_LIST);
 
-constexpr const static char* SETDNPOLICY_WHITE_LIST[] = {
-    "collaboration_service",
-    "watch_system_service",
-    "com.huawei.hmos.walletservice",
-    "com.ohos.distributedjstest",
-    "glasses_collaboration_service",
-};
-constexpr uint32_t SETDNPOLICY_WHITE_LIST_NUM = std::size(SETDNPOLICY_WHITE_LIST);
-
-constexpr const static char* GETDEVICEINFO_WHITE_LIST[] = {
-    "gameservice_server",
-    "com.huawei.hmos.slassistant",
-    "token_sync_service",
-};
-constexpr uint32_t GETDEVICEINFO_WHITE_LIST_NUM = std::size(GETDEVICEINFO_WHITE_LIST);
-
-constexpr const static char* MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST[] = {
-    "com.huawei.hmos.settings",
-    "com.huawei.hmos.tvcooperation",
-    "com.ohos.settings",
-};
-constexpr int32_t MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST_NUM = std::size(MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST);
-
-constexpr const static char* MODIFY_REMOTE_DEVICE_NAME_WHITE_LIST[] = {
-    "com.ohos.settings",
-};
-constexpr int32_t MODIFY_REMOTE_DEVICE_NAME_WHITE_LIST_NUM = std::size(MODIFY_REMOTE_DEVICE_NAME_WHITE_LIST);
-
-constexpr const static char* PUT_DEVICE_PROFILE_INFO_LIST_WHITE_LIST[] = {
-    "com.huawei.hmos.ailifesvc",
-    "com.huawei.hmos.tvcooperation",
-};
-constexpr int32_t PUT_DEVICE_PROFILE_INFO_LIST_WHITE_LIST_NUM = std::size(PUT_DEVICE_PROFILE_INFO_LIST_WHITE_LIST);
-
 constexpr const static char* GET_TRUSTED_DEVICE_LIST_WHITE_LIST[] = {
     "distributedsched",
 };
 constexpr uint32_t GET_TRUSTED_DEVICE_LIST_WHITE_LIST_NUM = std::size(GET_TRUSTED_DEVICE_LIST_WHITE_LIST);
-
-constexpr const static char* ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST[] = {
-    "distributeddata",
-};
-
-constexpr int32_t ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST_NUM =
-    std::size(ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST);
 
 constexpr const char* READ_LOCAL_DEVICE_NAME_PERMISSION = "ohos.permission.READ_LOCAL_DEVICE_NAME";
 }
@@ -191,39 +132,6 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
     return DM_OK;
 }
 
-bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &processName)
-{
-    if (processName.empty()) {
-        LOGE("ProcessName is empty");
-        return false;
-    }
-    uint16_t index = 0;
-    for (; index < AUTH_CODE_WHITE_LIST_NUM; ++index) {
-        std::string tmp(AUTH_CODE_WHITE_LIST[index]);
-        if (processName == tmp) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &processName)
-{
-    if (processName.empty()) {
-        LOGE("ProcessName is empty");
-        return false;
-    }
-
-    uint16_t index = 0;
-    for (; index < PIN_HOLDER_WHITE_LIST_NUM; ++index) {
-        std::string tmp(PIN_HOLDER_WHITE_LIST[index]);
-        if (processName == tmp) {
-            return true;
-        }
-    }
-    return false;
-}
-
 bool PermissionManager::CheckWhiteListSystemSA(const std::string &pkgName)
 {
     bool isInWhiteList = false;
@@ -269,86 +177,6 @@ bool PermissionManager::CheckSystemSA(const std::string &pkgName)
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
         return true;
-    }
-    return false;
-}
-
-bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &processName)
-{
-    if (processName.empty()) {
-        LOGE("ProcessName is empty");
-        return false;
-    }
-    uint16_t index = 0;
-    for (; index < SETDNPOLICY_WHITE_LIST_NUM; ++index) {
-        std::string tmp(SETDNPOLICY_WHITE_LIST[index]);
-        if (processName == tmp) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool PermissionManager::CheckProcessNameValidOnGetDeviceInfo(const std::string &processName)
-{
-    if (processName.empty()) {
-        LOGE("ProcessName is empty");
-        return false;
-    }
-    uint16_t index = 0;
-    for (; index < GETDEVICEINFO_WHITE_LIST_NUM; ++index) {
-        std::string tmp(GETDEVICEINFO_WHITE_LIST[index]);
-        if (processName == tmp) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool PermissionManager::CheckProcessNameValidModifyLocalDeviceName(const std::string &processName)
-{
-    if (processName.empty()) {
-        LOGE("ProcessName is empty");
-        return false;
-    }
-    uint16_t index = 0;
-    for (; index < MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST_NUM; ++index) {
-        std::string tmp(MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST[index]);
-        if (processName == tmp) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool PermissionManager::CheckProcessNameValidModifyRemoteDeviceName(const std::string &processName)
-{
-    if (processName.empty()) {
-        LOGE("ProcessName is empty");
-        return false;
-    }
-    uint16_t index = 0;
-    for (; index < MODIFY_REMOTE_DEVICE_NAME_WHITE_LIST_NUM; ++index) {
-        std::string tmp(MODIFY_REMOTE_DEVICE_NAME_WHITE_LIST[index]);
-        if (processName == tmp) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool PermissionManager::CheckProcessNameValidPutDeviceProfileInfoList(const std::string &processName)
-{
-    if (processName.empty()) {
-        LOGE("ProcessName is empty");
-        return false;
-    }
-    uint16_t index = 0;
-    for (; index < PUT_DEVICE_PROFILE_INFO_LIST_WHITE_LIST_NUM; ++index) {
-        std::string tmp(PUT_DEVICE_PROFILE_INFO_LIST_WHITE_LIST[index]);
-        if (processName == tmp) {
-            return true;
-        }
     }
     return false;
 }
@@ -399,24 +227,7 @@ bool PermissionManager::CheckReadLocalDeviceName(void)
             PermissionState::PERMISSION_GRANTED)) {
         return true;
     }
-    LOGE("Read local device name permission is denied, please apply for corresponding permissions.");
-    return false;
-}
-
-bool PermissionManager::CheckOnReadyRetrospectiveNotificationBlackList()
-{
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed");
-        return false;
-    }
-    uint16_t index = 0;
-    for (; index < ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST_NUM; ++index) {
-        if (processName == ONREADY_RETROSPECTIVE_NOTIFICATION_BLACK_LIST[index]) {
-            LOGI("no need for retrospective notification %{public}s.", processName.c_str());
-            return true;
-        }
-    }
+LOGE("Read local device name permission is denied, please apply for corresponding permissions.");
     return false;
 }
 } // namespace DistributedHardware

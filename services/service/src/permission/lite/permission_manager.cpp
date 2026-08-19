@@ -47,18 +47,6 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
     return DM_OK;
 }
 
-bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &processName)
-{
-    (void)processName;
-    return true;
-}
-
-bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &processName)
-{
-    (void)processName;
-    return true;
-}
-
 bool PermissionManager::CheckWhiteListSystemSA(const std::string &pkgName)
 {
     (void)pkgName;
@@ -76,47 +64,12 @@ bool PermissionManager::CheckSystemSA(const std::string &pkgName)
     return true;
 }
 
-bool PermissionManager::CheckProcessNameValidModifyLocalDeviceName(const std::string &processName)
-{
-    (void)processName;
-    return true;
-}
-
-bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &processName)
-{
-    (void)processName;
-    return true;
-}
-
-bool PermissionManager::CheckProcessNameValidModifyRemoteDeviceName(const std::string &processName)
-{
-    (void)processName;
-    return true;
-}
-
-bool PermissionManager::CheckProcessNameValidOnGetDeviceInfo(const std::string &processName)
-{
-    (void)processName;
-    return true;
-}
-
-bool PermissionManager::CheckProcessNameValidPutDeviceProfileInfoList(const std::string &processName)
-{
-    (void)processName;
-    return true;
-}
-
 bool PermissionManager::CheckProcessValidOnGetTrustedDeviceList()
 {
     return true;
 }
 
 bool PermissionManager::CheckReadLocalDeviceName(void)
-{
-    return true;
-}
-
-bool PermissionManager::CheckOnReadyRetrospectiveNotificationBlackList()
 {
     return true;
 }
