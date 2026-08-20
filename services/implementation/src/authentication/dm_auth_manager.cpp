@@ -1013,6 +1013,7 @@ void DmAuthManager::AbilityNegotiate()
     authResponseContext_->remoteUserId = authResponseContext_->localUserId;
     GetBinderInfo();
     bool ret = hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId, localDeviceId);
+    CHECK_NULL_VOID(authResponseContext_);
     if (ret) {
         LOGE("device is in group");
         if (!DeviceProfileConnector::GetInstance().CheckSinkDevIdInAclForDevBind(authResponseContext_->hostPkgName,
@@ -3106,6 +3107,7 @@ int32_t DmAuthManager::CheckTrustState()
                                                authRequestContext_->localDeviceId)) {
         isSameGroup = true;
     }
+    CHECK_NULL_RETURN(authResponseContext_, ERR_DM_POINT_NULL);
     if (isSameGroup && authResponseContext_->isOnline && authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
         authResponseContext_->isFinish = true;
         SetReasonAndFinish(DM_OK, AuthState::AUTH_REQUEST_FINISH);
