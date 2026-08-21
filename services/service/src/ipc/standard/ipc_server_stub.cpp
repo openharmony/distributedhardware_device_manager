@@ -433,8 +433,8 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &proces
         Memory::MemMgrClient::GetInstance().SetCritical(pid, false, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
     }
 #endif // SUPPORT_MEMMGR
-    RemoveSystemSA(processInfo.pkgName);
     DeviceManagerService::GetInstance().RemoveNotifyRecord(processInfo);
+    RemoveSystemSA(processInfo.pkgName);
     return DM_OK;
 }
 
@@ -534,6 +534,7 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 
 void IpcServerStub::AddSystemSA(const std::string &pkgName)
 {
+    std::lock_guard<ffrt::mutex> autoLock(systemSALock_);
     if (PermissionManager::GetInstance().CheckSystemSA(pkgName)) {
         systemSA_.insert(pkgName);
     }
@@ -541,6 +542,7 @@ void IpcServerStub::AddSystemSA(const std::string &pkgName)
 
 void IpcServerStub::RemoveSystemSA(const std::string &pkgName)
 {
+    std::lock_guard<ffrt::mutex> autoLock(systemSALock_);
     if (PermissionManager::GetInstance().CheckSystemSA(pkgName) || systemSA_.find(pkgName) != systemSA_.end()) {
         systemSA_.erase(pkgName);
     }
@@ -549,7 +551,7 @@ void IpcServerStub::RemoveSystemSA(const std::string &pkgName)
 //LCOV_EXCL_START
 std::set<std::string> IpcServerStub::GetSystemSA()
 {
-    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
+    std::lock_guard<ffrt::mutex> autoLock(systemSALock_);
     std::set<std::string> systemSA;
     for (const auto &item : systemSA_) {
         systemSA.insert(item);

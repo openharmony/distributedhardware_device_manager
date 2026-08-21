@@ -181,6 +181,7 @@ private:
     bool registerToService_;
     ServiceRunningState state_;
     mutable ffrt::mutex listenerLock_;
+    ffrt::mutex systemSALock_;
     std::map<ProcessInfo, sptr<AppDeathRecipient>> appRecipient_;
     std::map<ProcessInfo, sptr<IpcRemoteBroker>> dmListener_;
     std::set<std::string> systemSA_;
