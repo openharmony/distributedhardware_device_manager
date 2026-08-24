@@ -115,6 +115,7 @@ public:
         int32_t result, const std::string &content) override;
     void OnServiceStateOnlineResult(const ServiceStateBindParameter &bindParam) override;
     bool CheckIsOnlineAdapter(const std::string &peerUdid) override;
+    int32_t GetNetworkIdFromCache(const std::string &udid, std::string &networkId) override;
 #endif
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,

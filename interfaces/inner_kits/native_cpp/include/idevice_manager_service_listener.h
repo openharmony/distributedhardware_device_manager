@@ -203,6 +203,7 @@ public:
     virtual void OnSyncServiceInfoResult(const ServiceSyncInfo &serviceSyncInfo,
         int32_t result, const std::string &content) = 0;
     virtual bool CheckIsOnlineAdapter(const std::string &peerUdid) = 0;
+    virtual int32_t GetNetworkIdFromCache(const std::string &udid, std::string &networkId) = 0;
 #endif
 };
 } // namespace DistributedHardware
