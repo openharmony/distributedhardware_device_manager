@@ -1740,6 +1740,11 @@ bool DeviceManagerServiceListener::CheckIsOnlineAdapter(const std::string &peerU
 {
     return SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(peerUdid);
 }
+
+int32_t DeviceManagerServiceListener::GetNetworkIdFromCache(const std::string &udid, std::string &networkId)
+{
+    return SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, networkId);
+}
 #endif
 //LCOV_EXCL_STOP
 } // namespace DistributedHardware

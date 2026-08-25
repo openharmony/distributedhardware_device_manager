@@ -369,10 +369,18 @@ public:
         (void)pkgName;
         (void)consumerPkgName;
     }
+
     virtual bool CheckIsOnlineAdapter(const std::string &peerUdid) override
     {
         (void)peerUdid;
         return true;
+    }
+
+    virtual int32_t GetNetworkIdFromCache(const std::string &udid, std::string &networkId)
+    {
+        (void)udid;
+        (void)networkId;
+        return 0;
     }
 };
 } // namespace DistributedHardware
