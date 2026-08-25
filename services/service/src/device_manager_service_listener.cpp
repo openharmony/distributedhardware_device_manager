@@ -1175,7 +1175,8 @@ void DeviceManagerServiceListener::ProcessAppOffline(std::vector<ProcessInfo> &p
 void DeviceManagerServiceListener::OnProcessRemove(const ProcessInfo &processInfo)
 {
     std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
-    std::string notifyPkgName = MakeNotifyPrefix(processInfo) + "#";
+    ProcessInfo bindProcessInfo = DealBindProcessInfo(processInfo);
+    std::string notifyPkgName = MakeNotifyPrefix(bindProcessInfo) + "#";
     for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
         if (StartsWith(it->first, notifyPkgName)) {
             it = alreadyOnlinePkgName_.erase(it);
