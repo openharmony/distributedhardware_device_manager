@@ -122,8 +122,9 @@ private:
     void ErasePincodeInfo(ProcessInfo3rd processInfo3rd);
 
     std::shared_ptr<AuthManagerBase3rd> GetCredAuthMgrByMessage(int32_t msgType,
-        uint64_t logicalSessionId, const JsonObject &jsonObject);
+        uint64_t logicalSessionId, int32_t sessionId, const JsonObject &jsonObject);
     int32_t InitCredAuthMgr(uint32_t tokenId, uint64_t logicalSessionId, ProcessInfo3rd processInfo3rd);
+    void SendCredRespFinish(int32_t sessionId, uint64_t logicalSessionId, int32_t reply, int32_t reason);
 
 private:
     ffrt::mutex pinCodeLock_;

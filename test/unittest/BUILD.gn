@@ -34,6 +34,7 @@ group("unittest") {
     ":UTTest_crypto_mgr",
     ":UTTest_device_manager_impl",
     ":UTTest_device_manager_impl_3rd",
+    ":UTTest_device_manager_service_impl_3rd",
     ":UTTest_device_manager_notify",
     ":UTTest_device_manager_service",
     ":UTTest_device_manager_service_impl",
@@ -4744,6 +4745,64 @@ ohos_unittest("UTTest_auth_pincode_state") {
   ]
 }
 ## UnitTest UTTest_auth_pincode_state }}}
+
+## UnitTest UTTest_device_manager_service_impl_3rd {{{
+ohos_unittest("UTTest_device_manager_service_impl_3rd") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/3rd/interfaces/include/interface",
+    "${devicemanager_path}/3rd/interfaces/include/ipc",
+    "${devicemanager_path}/3rd/interfaces/include/notify",
+    "${devicemanager_path}/3rd/utils/include",
+    "${devicemanager_path}/3rd/utils/include/ipc",
+    "${devicemanager_path}/3rd/services/implementation/include",
+    "${devicemanager_path}/3rd/services/implementation/include/authcredential",
+    "${devicemanager_path}/3rd/services/implementation/include/authdevicewithacl",
+    "${devicemanager_path}/3rd/services/implementation/include/authpincode",
+    "${devicemanager_path}/3rd/services/implementation/include/dependency/softbus",
+  ]
+
+  sources = [
+    "UTTest_device_manager_service_impl_3rd.cpp",
+  ]
+
+  deps = [
+    ":device_manager_3rd_test_common",
+    "${devicemanager_path}/3rd/services/implementation:devicemanagerserviceimpl3rd",
+    "${interfaces_3rd_path}:devicemanager3rdsdk",
+    "${json_path}:devicemanagerjson",
+    "${serviceimpl_3rd_path}:devicemanagerserviceimpl3rd",
+    "${service_3rd_path}:devicemanager3rdservice",
+    "${utils_3rd_path}:devicemanager3rdutils",
+  ]
+
+  external_deps = [
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "cJSON:cjson",
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+  ]
+
+  cflags = [
+    "-Wall",
+    "-Werror",
+    "-g3",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+## UnitTest UTTest_device_manager_service_impl_3rd }}}
 
 ## Build device_manager_3rd_test_common.a {{{
 config("device_manager_3rd_test_common_public_config") {
