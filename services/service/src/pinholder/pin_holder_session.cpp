@@ -162,20 +162,20 @@ int32_t PinHolderSession::SendData(int32_t sessionId, const std::string &message
 
 int32_t PinHolderSession::GetAddrByTargetId(const PeerTargetId &targetId, ConnectionAddr &addr)
 {
-    if (!targetId.wifiIp.empty() && targetId.wifiIp.length() <= IP_STR_MAX_LEN) {
+    if (!targetId.wifiIp.empty() && targetId.wifiIp.length() < IP_STR_MAX_LEN) {
         addr.type = ConnectionAddrType::CONNECTION_ADDR_WLAN;
         if (memcpy_s(addr.info.ip.ip, IP_STR_MAX_LEN, targetId.wifiIp.c_str(), targetId.wifiIp.length()) != DM_OK) {
             LOGE("copy wifi data failed.");
             return ERR_DM_FAILED;
         }
         addr.info.ip.port = targetId.wifiPort;
-    } else if (!targetId.brMac.empty() && targetId.brMac.length() <= BT_MAC_LEN) {
+    } else if (!targetId.brMac.empty() && targetId.brMac.length() < BT_MAC_LEN) {
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BR;
         if (memcpy_s(addr.info.br.brMac, BT_MAC_LEN, targetId.brMac.c_str(), targetId.brMac.length()) != DM_OK) {
             LOGE("copy br data failed.");
             return ERR_DM_FAILED;
         }
-    } else if (!targetId.bleMac.empty() && targetId.bleMac.length() <= BT_MAC_LEN) {
+    } else if (!targetId.bleMac.empty() && targetId.bleMac.length() < BT_MAC_LEN) {
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BLE;
         if (memcpy_s(addr.info.ble.bleMac, BT_MAC_LEN, targetId.bleMac.c_str(), targetId.bleMac.length()) != DM_OK) {
             LOGE("copy ble data failed.");

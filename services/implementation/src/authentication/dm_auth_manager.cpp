@@ -2256,7 +2256,7 @@ int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::strin
     int32_t index = 0;
     std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
     ConnectionAddr addr;
-    if (!targetId.wifiIp.empty() && targetId.wifiIp.length() <= IP_STR_MAX_LEN) {
+    if (!targetId.wifiIp.empty() && targetId.wifiIp.length() < IP_STR_MAX_LEN) {
         LOGI("parse wifiIp: %{public}s.", GetAnonyString(targetId.wifiIp).c_str());
         if (!addrType.empty()) {
             addr.type = static_cast<ConnectionAddrType>(std::atoi(addrType.c_str()));
@@ -2268,14 +2268,14 @@ int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::strin
         deviceInfo->addr[index] = addr;
         deviceId = targetId.wifiIp;
         index++;
-    } else if (!targetId.brMac.empty() && targetId.brMac.length() <= BT_MAC_LEN) {
+    } else if (!targetId.brMac.empty() && targetId.brMac.length() < BT_MAC_LEN) {
         LOGI("parse brMac: %{public}s.", GetAnonyString(targetId.brMac).c_str());
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BR;
         memcpy_s(addr.info.br.brMac, BT_MAC_LEN, targetId.brMac.c_str(), targetId.brMac.length());
         deviceInfo->addr[index] = addr;
         deviceId = targetId.brMac;
         index++;
-    } else if (!targetId.bleMac.empty() && targetId.bleMac.length() <= BT_MAC_LEN) {
+    } else if (!targetId.bleMac.empty() && targetId.bleMac.length() < BT_MAC_LEN) {
         LOGI("parse bleMac: %{public}s.", GetAnonyString(targetId.bleMac).c_str());
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BLE;
         memcpy_s(addr.info.ble.bleMac, BT_MAC_LEN, targetId.bleMac.c_str(), targetId.bleMac.length());
