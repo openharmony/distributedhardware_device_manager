@@ -156,7 +156,7 @@ void DeviceManagerServiceImpl3rd::OnAuthCred3rdBytesReceived(int sessionId, cons
     if (IsUint64(jsonObject, DM_TAG_LOGICAL_SESSION_ID)) {
         logicalSessionId = jsonObject[DM_TAG_LOGICAL_SESSION_ID].Get<std::uint64_t>();
     }
-    authMgr = GetCredAuthMgrByMessage(msgType, logicalSessionId, jsonObject);
+    authMgr = GetCredAuthMgrByMessage(msgType, logicalSessionId, sessionId, jsonObject);
     if (authMgr == nullptr) {
         LOGE("GetCredAuthMgrByMessage, authMgr is null.");
         return;
@@ -517,8 +517,25 @@ std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rd::GetAuthMgrByMes
     return GetAuthMgrByTokenId(tokenId);
 }
 
+void DeviceManagerServiceImpl3rd::SendCredRespFinish(int32_t sessionId, uint64_t logicalSessionId,
+    int32_t reply, int32_t reason)
+{
+    JsonObject jsonObject;
+    jsonObject[DM_TAG_LOGICAL_SESSION_ID] = logicalSessionId;
+    jsonObject[TAG_MSG_TYPE] = static_cast<int32_t>(DmCredMessageType::CRED_RESP_FINISH);
+    jsonObject[TAG_REPLY] = reply;
+    jsonObject[TAG_REASON] = reason;
+    std::string message = jsonObject.Dump();
+    CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
+    int32_t ret = softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
+    if (ret != DM_OK) {
+        LOGE("SendCredRespFinish failed, sessionId: %{public}d, ret: %{public}d", sessionId, ret);
+    }
+}
+
 std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rd::GetCredAuthMgrByMessage(int32_t msgType,
-    uint64_t logicalSessionId, const JsonObject &jsonObject)
+    uint64_t logicalSessionId, int32_t sessionId, const JsonObject &jsonObject)
 {
     uint32_t tokenId = 0;
     if (msgType == DmCredMessageType::CRED_REQ_NEGOTIATE) {
@@ -533,6 +550,8 @@ std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rd::GetCredAuthMgrB
         tokenId = GetTokenId(false, processName);
         if (tokenId == 0) {
             LOGE("Get tokenId failed.");
+            SendCredRespFinish(sessionId, logicalSessionId, ERR_DM_BIND_INPUT_PARA_INVALID,
+                ERR_DM_BIND_INPUT_PARA_INVALID);
             return nullptr;
         }
         ProcessInfo3rd processInfo3rd;
@@ -540,8 +559,10 @@ std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rd::GetCredAuthMgrB
         processInfo3rd.businessName = businessName;
         processInfo3rd.tokenId = tokenId;
         processInfo3rd.userId = MultipleUserConnector3rd::GetCurrentAccountUserID();
-        if (InitCredAuthMgr(tokenId, logicalSessionId, processInfo3rd) != DM_OK) {
+        int32_t initRet = InitCredAuthMgr(tokenId, logicalSessionId, processInfo3rd);
+        if (initRet != DM_OK) {
             LOGE("InitCredAuthMgr failed.");
+            SendCredRespFinish(sessionId, logicalSessionId, initRet, initRet);
             return nullptr;
         }
         std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
