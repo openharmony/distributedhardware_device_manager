@@ -116,13 +116,13 @@ ConnectionAddr SoftbusSession3rd::GetAuth3rdAddrByTargetId(const PeerTargetId3rd
     if (!targetId.deviceId.empty()) {
         return CreateBleDirectAddr(targetId);
     }
-    if (!targetId.wifiIp.empty() && targetId.wifiIp.length() <= IP_STR_MAX_LEN) {
+    if (!targetId.wifiIp.empty() && targetId.wifiIp.length() < IP_STR_MAX_LEN) {
         return CreateWifiAddr(targetId);
     }
-    if (!targetId.bleMac.empty() && targetId.bleMac.length() <= BT_MAC_LEN) {
+    if (!targetId.bleMac.empty() && targetId.bleMac.length() < BT_MAC_LEN) {
         return CreateBleAddr(targetId);
     }
-    if (!targetId.brMac.empty() && targetId.brMac.length() <= BT_MAC_LEN) {
+    if (!targetId.brMac.empty() && targetId.brMac.length() < BT_MAC_LEN) {
         return CreateBrAddr(targetId);
     }
     return ConnectionAddr{};
@@ -142,13 +142,13 @@ int32_t SoftbusSession3rd::OpenAuth3rdSessionServer(const PeerTargetId3rd &targe
 
 ConnectionAddr SoftbusSession3rd::GetAddrByTargetId(const PeerTargetId3rd &targetId)
 {
-    if (!targetId.wifiIp.empty() && targetId.wifiIp.length() <= IP_STR_MAX_LEN) {
+    if (!targetId.wifiIp.empty() && targetId.wifiIp.length() < IP_STR_MAX_LEN) {
         return CreateWifiAddr(targetId);
     }
-    if (!targetId.bleMac.empty() && targetId.bleMac.length() <= BT_MAC_LEN) {
+    if (!targetId.bleMac.empty() && targetId.bleMac.length() < BT_MAC_LEN) {
         return CreateBleAddr(targetId);
     }
-    if (!targetId.brMac.empty() && targetId.brMac.length() <= BT_MAC_LEN) {
+    if (!targetId.brMac.empty() && targetId.brMac.length() < BT_MAC_LEN) {
         return CreateBrAddr(targetId);
     }
     return ConnectionAddr{};
