@@ -1417,6 +1417,14 @@ int32_t AuthSinkConfirmState::ProcessBindAuthorize(std::shared_ptr<DmAuthContext
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
         return DM_OK;
     }
+    if (context->authType == DmAuthType::AUTH_TYPE_PIN &&
+        context->authBoxType == DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) {
+        CHECK_NULL_RETURN(context->authStateMachine, ERR_DM_POINT_NULL);
+        context->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinNegotiateStartState>());
+        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
+        context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
+        return DM_OK;
+    }
     if ((context->authType == DmAuthType::AUTH_TYPE_PIN || context->authType == DmAuthType::AUTH_TYPE_NFC ||
         context->authType == DmAuthType::AUTH_TYPE_PIN_ULTRASONIC) &&
         context->authBoxType == DMLocalServiceInfoAuthBoxType::STATE3) {
