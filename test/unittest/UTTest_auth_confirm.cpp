@@ -806,5 +806,169 @@ HWTEST_F(AuthConfirmTest, ProcessImportAuthInfo_AclLifeCycleDays_NegativeNonSent
 
     EXPECT_EQ(context->aclLifeCycleDays, ACL_LIFE_CYCLE_DAYS_NOT_CONFIGURED);
 }
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ParseIsPinFallback_EmptyString_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    EXPECT_TRUE(authState->ParseIsPinFallback(""));
+}
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ParseIsPinFallback_InvalidJson_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    EXPECT_TRUE(authState->ParseIsPinFallback("not-json"));
+}
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ParseIsPinFallback_TrueValue_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    EXPECT_TRUE(authState->ParseIsPinFallback(R"({"isPinFallback":true})"));
+}
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ParseIsPinFallback_FalseValue_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    EXPECT_FALSE(authState->ParseIsPinFallback(R"({"isPinFallback":false})"));
+}
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ParseIsPinFallback_MissingField_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    EXPECT_TRUE(authState->ParseIsPinFallback(R"({"otherField":123})"));
+}
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ParseIsPinFallback_NonBoolType_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    EXPECT_TRUE(authState->ParseIsPinFallback(R"({"isPinFallback":"true"})"));
+}
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ParseIsPinFallback_NonBoolNumber_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    EXPECT_TRUE(authState->ParseIsPinFallback(R"({"isPinFallback":1})"));
+}
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ParseIsPinFallback_NullJsonValue_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    EXPECT_TRUE(authState->ParseIsPinFallback(R"({"isPinFallback":null})"));
+}
+
+HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ParseIsPinFallback_CoexistsWithOtherFields_001,
+    testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    EXPECT_FALSE(authState->ParseIsPinFallback(R"({"isPinFallback":false,"otherField":123})"));
+}
+
+HWTEST_F(AuthConfirmTest, ProcessImportAuthInfo_IsPinFallback_TrueFromExtraInfo, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    context = authManager->GetAuthContext();
+    context->isPinFallback = false;
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetExtraInfo(R"({"isPinFallback":true})");
+
+    auto state = std::make_shared<AuthSinkConfirmState>();
+    state->ProcessImportAuthInfo(context, srvInfo);
+
+    EXPECT_TRUE(context->isPinFallback);
+}
+
+HWTEST_F(AuthConfirmTest, ProcessImportAuthInfo_IsPinFallback_FalseFromExtraInfo, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    context = authManager->GetAuthContext();
+    context->isPinFallback = true;
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetExtraInfo(R"({"isPinFallback":false})");
+
+    auto state = std::make_shared<AuthSinkConfirmState>();
+    state->ProcessImportAuthInfo(context, srvInfo);
+
+    EXPECT_FALSE(context->isPinFallback);
+}
+
+HWTEST_F(AuthConfirmTest, ProcessImportAuthInfo_IsPinFallback_DefaultWhenMissing, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    context = authManager->GetAuthContext();
+    context->isPinFallback = true;
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetExtraInfo(R"({"otherField":123})");
+
+    auto state = std::make_shared<AuthSinkConfirmState>();
+    state->ProcessImportAuthInfo(context, srvInfo);
+
+    EXPECT_TRUE(context->isPinFallback);
+}
+
+HWTEST_F(AuthConfirmTest, ProcessImportAuthInfo_IsPinFallback_DefaultWhenEmpty, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    context = authManager->GetAuthContext();
+    context->isPinFallback = true;
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetExtraInfo("");
+
+    auto state = std::make_shared<AuthSinkConfirmState>();
+    state->ProcessImportAuthInfo(context, srvInfo);
+
+    EXPECT_TRUE(context->isPinFallback);
+}
+
+HWTEST_F(AuthConfirmTest, ProcessBindAuthorize_PinUltrasonic_WithPinFallback_001, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    context = authManager->GetAuthContext();
+    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+    authState->ProcessBindAuthorize(context);
+
+    bool hasPinFallback = false;
+    for (auto type : context->authTypeList) {
+        if (type == DmAuthType::AUTH_TYPE_PIN) {
+            hasPinFallback = true;
+        }
+    }
+    EXPECT_TRUE(hasPinFallback);
+    EXPECT_EQ(context->authTypeList.size(), 2);
+    EXPECT_EQ(context->authTypeList[0], DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
+    EXPECT_EQ(context->authTypeList[1], DmAuthType::AUTH_TYPE_PIN);
+}
+
+HWTEST_F(AuthConfirmTest, ProcessBindAuthorize_PinUltrasonic_WithoutPinFallback_001, testing::ext::TestSize.Level1)
+{
+    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
+        hiChainAuthConnector);
+    std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
+    context = authManager->GetAuthContext();
+    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
+
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    srvInfo.SetExtraInfo(R"({"isPinFallback":false})");
+    EXPECT_CALL(*deviceProfileConnectorMock, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(srvInfo), Return(DM_OK)));
+    authState->ProcessBindAuthorize(context);
+
+    bool hasPinFallback = false;
+    for (auto type : context->authTypeList) {
+        if (type == DmAuthType::AUTH_TYPE_PIN) {
+            hasPinFallback = true;
+        }
+    }
+    EXPECT_FALSE(hasPinFallback);
+    EXPECT_EQ(context->authTypeList.size(), 1);
+    EXPECT_EQ(context->authTypeList[0], DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
+}
 }  // end namespace DistributedHardware
 }  // end namespace OHOS
