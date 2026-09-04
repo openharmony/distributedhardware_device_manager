@@ -80,6 +80,8 @@ ohos_shared_library("cj_distributed_device_manager_ffi") {
       "napi:cj_bind_native",
     ]
 
+    version_script = "libcj_distributed_device_manager_ffi.map"
+
     innerapi_tags = [ "platformsdk" ]
     subsystem_name = "distributedhardware"
     part_name = "device_manager"
