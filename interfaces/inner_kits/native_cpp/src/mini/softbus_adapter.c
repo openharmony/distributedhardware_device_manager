@@ -20,10 +20,7 @@
 #include "cmsis_os2.h"
 #include "hichain_adapter.h"
 #include "inner_session.h"
-#include "los_config.h"
-#include "los_mux.h"
-#include "los_sem.h"
-#include "los_swtmr.h"
+
 #include "ohos_init.h"
 #include "parameter.h"
 #include "securec.h"
@@ -34,7 +31,7 @@
 
 #define NOT_FILTER (-1)
 #define SESSION_SIDE_CLIENT (1)
-#define SOFTBUS_DELAY_TICK_COUNT (10 * LOSCFG_BASE_CORE_TICK_PER_SECOND)  // 10s
+
 #define DM_MAX_DEVICE_SIZE (100)
 
 static const char * const DM_CAPABILITY_OSD = "osdCapability";
@@ -100,7 +97,7 @@ static bool IsDeviceIdValid(const char *deviceId);
 static char* CreateRespNegotiateMsg(const int bindType);
 static int AbilityNegotiate(const int bindType);
 
-static UINT32 g_bindSem = 0;
+static osSemaphoreId_t g_bindSem = NULL;
 static bool g_publishLNNFlag = false;
 static bool g_startDiscoveryFlag = false;
 static ConnectionAddr g_bindAddr;
@@ -838,7 +835,7 @@ static void OnDiscoveryDeviceFound(const DeviceInfo *deviceInfo)
         DMLOGE("UnlockDmGlobalLock failed.");
         return;
     }
-    DMLOGI("callback complete.");
+    DMLOGI("OnDiscoveryDeviceFound callback complete.");
 }
 
 static void OnRefreshDiscoveryResult(int32_t refreshId, RefreshResult reason)
@@ -967,7 +964,7 @@ static void OnSoftbusDeviceOnline(NodeBasicInfo *deviceInfo)
         DMLOGE("UnlockDmGlobalLock failed.");
         return;
     }
-    DMLOGI("callback complete.");
+    DMLOGI("OnSoftbusDeviceOnline callback complete.");
 }
 
 static void OnSoftbusDeviceOffline(NodeBasicInfo *deviceInfo)
@@ -993,13 +990,13 @@ static void OnSoftbusDeviceOffline(NodeBasicInfo *deviceInfo)
         DMLOGE("UnlockDmGlobalLock failed.");
         return;
     }
-    DMLOGI("callback complete.");
+    DMLOGI("OnSoftbusDeviceOffline callback complete.");
 }
 
 static void NodeBasicInfoCopyToDmDevice(DmDeviceBasicInfo *dmDeviceInfo, const NodeBasicInfo *nodeBasicInfo)
 {
     if (memset_s(dmDeviceInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != EOK) {
-        LOGE("memset_s failed.");
+        LOGE("NodeBasicInfoCopyToDmDevice memset_s failed.");
         return;
     }
 
@@ -1051,7 +1048,7 @@ static void DeviceInfoCopyToDmDevice(DmDeviceInfo *dmDeviceInfo, const DeviceInf
 static void DmDeviceInfoToDmBasicInfo(const DmDeviceInfo *dmDeviceInfo, DmDeviceBasicInfo *dmBasicInfo)
 {
     if (memset_s(dmBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != EOK) {
-        DMLOGE("memset_s failed");
+        DMLOGE("DmDeviceInfoToDmBasicInfo memset_s failed");
         return;
     }
     if (strcpy_s(dmBasicInfo->deviceId, sizeof(dmBasicInfo->deviceId), dmDeviceInfo->deviceId) != EOK) {
@@ -1364,8 +1361,8 @@ static void ProcessSourceMsg(const char *data, unsigned int dataLen)
     }
     JoinLNN(DM_PKG_NAME, &g_bindAddr, g_joinLNNResult);
     CloseSession(g_sessionId);
-    UINT32 osRet = LOS_SemPost(g_bindSem);
-    if (osRet != LOS_OK) {
+    osStatus_t osRet = osSemaphoreRelease(g_bindSem);
+    if (osRet != osOK) {
         DMLOGE("failed to post bind sem with ret: %u.", osRet);
         return;
     }

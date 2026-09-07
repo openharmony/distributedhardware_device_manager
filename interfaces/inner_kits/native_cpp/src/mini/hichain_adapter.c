@@ -19,15 +19,12 @@
 #include "device_auth.h"
 #include "device_auth_defines.h"
 #include "device_manager_impl_lite_m.h"
-#include "los_compiler.h"
-#include "los_config.h"
-#include "los_sem.h"
+#include <stdint.h>
+#include "cmsis_os2.h"
 #include "parameter.h"
 #include "securec.h"
 
-#define HICHAIN_DELAY_TICK_COUNT (10 * LOSCFG_BASE_CORE_TICK_PER_SECOND)  // delay 10s
-
-static const UINT32 HICHAIN_SEM_INIT_COUNT = 0;
+static const uint32_t HICHAIN_SEM_INIT_COUNT = 0;
 
 static const char * const HICHAIN_PKG_NAME = "com.ohos.devicemanager";
 static const char * const FILED_GROUP_TYPE = "groupType";
@@ -43,8 +40,7 @@ static const int AUTH_FORM_ACROSS_ACCOUNT_GROUP = 2;
 static const DeviceGroupManager *g_deviceGroupManager = NULL;
 static const GroupAuthManager *g_groupAuthManager = NULL;
 
-static UINT32 g_createGroupSem = LOSCFG_BASE_IPC_SEM_LIMIT;
-
+static osSemaphoreId_t g_createGroupSem = NULL;
 static void OnFinish(int64_t requestId, int operationCode, const char *returnData);
 static void OnError(int64_t requestId, int operationCode, int errorCode, const char *errorReturn);
 
@@ -79,8 +75,8 @@ int InitHichainModle(void)
         DMLOGE("failed to register callback function to hichain with ret: %d.", ret);
         retValue = ERR_DM_HICHAIN_REGISTER_CALLBACK;
     }
-    UINT32 osRet = LOS_BinarySemCreate(HICHAIN_SEM_INIT_COUNT, &g_createGroupSem);
-    if (osRet != LOS_OK) {
+    g_createGroupSem = osSemaphoreNew(1, HICHAIN_SEM_INIT_COUNT, NULL);
+    if (g_createGroupSem == NULL) {
         DMLOGE("failed to create group semaphore with ret: %d.", ret);
         retValue = ERR_DM_LITEOS_CREATE_MUTEX_OR_SEM;
     }
@@ -109,12 +105,12 @@ int UnInitHichainModle(void)
     DestroyDeviceAuthService();
     g_deviceGroupManager = NULL;
 
-    UINT32 osRet = LOS_SemDelete(g_createGroupSem);
-    if (osRet != LOS_OK && osRet != LOS_ERRNO_SEM_INVALID) {
+    osStatus_t osRet = osSemaphoreDelete(g_createGroupSem);
+    if (osRet != osOK && osRet != osErrorParameter) {
         DMLOGE("failed to delete group semaphore with ret: %d.", osRet);
         retValue = ERR_DM_LITEOS_DELETE_MUTEX_OR_SEM;
     } else {
-        g_createGroupSem = LOSCFG_BASE_IPC_SEM_LIMIT;
+        g_createGroupSem = NULL;
     }
     if (retValue != DM_OK) {
         DMLOGE("failed to uninit hichain modle with retValue: %d.", retValue);
