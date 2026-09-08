@@ -52,6 +52,8 @@ void DeviceManagerServiceListenerTest::SetUpTestCase()
     DmKVAdapterManager::dmKVAdapterManager = kVAdapterManagerMock_;
     DmAppManager::dmAppManager = appManagerMock_;
     DmDeviceManagerService::dmDeviceManagerService = deviceManagerServiceMock_;
+    ON_CALL(*ipcServerListenerMock_, GetSystemSA())
+        .WillByDefault(Return(std::set<std::string> {}));
 }
 
 void DeviceManagerServiceListenerTest::TearDownTestCase()
@@ -943,6 +945,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_001, testing::
 
 HWTEST_F(DeviceManagerServiceListenerTest, OnProcessRemove_001, testing::ext::TestSize.Level1)
 {
+    EXPECT_CALL(*ipcServerListenerMock_, GetSystemSA())
+        .WillOnce(Return(std::set<std::string> {}));
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
     processInfo.userId = 100;

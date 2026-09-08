@@ -29,9 +29,15 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DeviceManagerNotifyTest::SetUp() {}
+void DeviceManagerNotifyTest::SetUp()
+{
+    DeviceManagerNotify::GetInstance().dmInitCallback_.clear();
+}
 
-void DeviceManagerNotifyTest::TearDown() {}
+void DeviceManagerNotifyTest::TearDown()
+{
+    DeviceManagerNotify::GetInstance().dmInitCallback_.clear();
+}
 
 void DeviceManagerNotifyTest::SetUpTestCase() {}
 
@@ -2324,6 +2330,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult_001, testing::ext::TestSize
  */
 HWTEST_F(DeviceManagerNotifyTest, OnRemoteDied_001, testing::ext::TestSize.Level0)
 {
+    DeviceManagerNotify::GetInstance().dmInitCallback_.clear();
     DeviceManagerNotify::GetInstance().OnRemoteDied();
     SUCCEED();
 }

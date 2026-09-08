@@ -25,6 +25,7 @@ void FreezeProcessTest::SetUp()
 
 void FreezeProcessTest::TearDown()
 {
+    testing::Mock::VerifyAndClearExpectations(kvAdapterManagerMock_.get());
 }
 
 void FreezeProcessTest::SetUpTestCase()
