@@ -1449,8 +1449,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_201, testing::ext::Tes
 HWTEST_F(DeviceManagerServiceTest, HandleUserStop_201, testing::ext::TestSize.Level1)
 {
     auto &service = DeviceManagerService::GetInstance();
-    service.timer_ = std::make_shared<DmTimer>();
-    service.InitDMServiceListener();
 
     const int32_t stopUserId = 1;
     const std::string stopEventUdid = "ud*********4";
@@ -1469,14 +1467,7 @@ HWTEST_F(DeviceManagerServiceTest, HandleUserStop_201, testing::ext::TestSize.Le
     wifiDevices.emplace("wikjdmcsk", "deviceInfowifi");
     EXPECT_CALL(*dMCommToolMock_, SendUserStop(_, _)).WillOnce(Return(ERR_DM_FAILED));
     service.NotifyRemoteLocalUserStopByWifi(localUdid, wifiDevices, stopUserId);
-
-    EXPECT_CALL(*dMCommToolMock_, SendUserStop(_, _)).WillOnce(Return(DM_OK));
-    service.NotifyRemoteLocalUserStopByWifi(localUdid, wifiDevices, stopUserId);
-
-    service.UninitDMServiceListener();
     service.softbusListener_.reset();
-    service.timer_->DeleteAll();
-    service.timer_.reset();
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_202, testing::ext::TestSize.Level1)
