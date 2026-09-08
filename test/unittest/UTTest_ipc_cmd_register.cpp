@@ -88,7 +88,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_001, testing::ext::TestSize.Level0)
  *              set MessageParcel data null
  *              set IpcRegisterListenerReq null
  *           2. call IpcCmdRegister OnRemoteRequest with parameter
- *           3. check ret is ERR_DM_IPC_WRITE_FAILED
+ *           3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -103,8 +103,8 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_002, testing::ext::TestSize.Level0)
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    // 3. check ret is ERR_DM_IPC_WRITE_FAILED
-    ASSERT_EQ(ret, ERR_DM_IPC_WRITE_FAILED);
+    // 3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -113,7 +113,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_002, testing::ext::TestSize.Level0)
  *              set MessageParcel data null
  *              set IpcRegisterListenerReq with pkgName not null
  *           2. call IpcCmdRegister OnRemoteRequest with parameter
- *           3. check ret is ERR_DM_IPC_WRITE_FAILED
+ *           3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -130,8 +130,8 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_003, testing::ext::TestSize.Level0)
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    // 3. check ret is ERR_DM_IPC_WRITE_FAILED
-    ASSERT_EQ(ret, ERR_DM_IPC_WRITE_FAILED);
+    // 3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -140,7 +140,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_003, testing::ext::TestSize.Level0)
  *              set MessageParcel data null
  *              set IpcRegisterListenerReq with listener
  *           2. call IpcCmdRegister OnRemoteRequest with parameter
- *           3. check ret is ERR_DM_IPC_WRITE_FAILED
+ *           3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -159,8 +159,8 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_004, testing::ext::TestSize.Level0)
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    // 3. check ret is ERR_DM_IPC_WRITE_FAILED
-    ASSERT_EQ(ret, ERR_DM_IPC_WRITE_FAILED);
+    // 3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -169,7 +169,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_004, testing::ext::TestSize.Level0)
  *              set MessageParcel data null
  *              set IpcRegisterListenerReq with listener
  *           2. call IpcCmdRegister OnRemoteRequest with parameter
- *           3. check ret is ERR_DM_IPC_WRITE_FAILED
+ *           3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -188,8 +188,8 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_005, testing::ext::TestSize.Level0)
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    // 3. check ret is ERR_DM_IPC_WRITE_FAILED
-    ASSERT_EQ(ret, ERR_DM_IPC_WRITE_FAILED);
+    // 3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -205,7 +205,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_006, testing::ext::TestSize.Level0)
     std::string pkgName = "ohos.test";
     req->SetPkgName(pkgName);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -223,7 +223,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_007, testing::ext::TestSize.Level0)
     req->SetPkgName(pkgName);
     req->SetExtra(extra);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -239,7 +239,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_008, testing::ext::TestSize.Level0)
     std::string pkgName = "ohos.test";
     req->SetPkgName(pkgName);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -257,7 +257,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_09, testing::ext::TestSize.Level0)
     req->SetPkgName(pkgName);
     req->SetNetworkId(netWorkId);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -275,7 +275,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_010, testing::ext::TestSize.Level0)
     req->SetPkgName(pkgName);
     req->SetNetworkId(netWorkId);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -293,7 +293,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_013, testing::ext::TestSize.Level0)
     req->SetPkgName(pkgName);
     req->SetPublishInfo(dmPublishInfo);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -311,7 +311,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_014, testing::ext::TestSize.Level0)
     req->SetPkgName(pkgName);
     req->SetPublishId(publishId);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -333,7 +333,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_015, testing::ext::TestSize.Level0)
     req->SetExtra(extra);
     req->SetDeviceInfo(deviceInfo);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -353,7 +353,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_016, testing::ext::TestSize.Level0)
     req->SetEventId(eventId);
     req->SetEvent(event);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -373,7 +373,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_019, testing::ext::TestSize.Level0)
     req->SetOperation(action);
     req->SetParams(params);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -391,7 +391,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_022, testing::ext::TestSize.Level0)
     req->SetPkgName(pkgName);
     req->SetCredentialParam(requestJsonStr);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -409,7 +409,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_023, testing::ext::TestSize.Level0)
     req->SetPkgName(pkgName);
     req->SetCredentialParam(credentialInfo);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -427,7 +427,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_024, testing::ext::TestSize.Level0)
     req->SetPkgName(pkgName);
     req->SetCredentialParam(deleteInfo);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -443,7 +443,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_025, testing::ext::TestSize.Level0)
     std::string pkgName = "ohos.test";
     req->SetPkgName(pkgName);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -459,7 +459,7 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_026, testing::ext::TestSize.Level0)
     std::string pkgName = "ohos.test";
     req->SetPkgName(pkgName);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -492,7 +492,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_001, testing::ext::TestSize.Level0)
  *              set MessageParcel reply null
  *              set IpcRsp null
  *           2. call IpcCmdRegister ReadResponse with parameter
- *           3. check ret is DM_OK
+ *           3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -507,8 +507,8 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_002, testing::ext::TestSize.Level0)
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    // 3. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    // 3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -517,7 +517,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_002, testing::ext::TestSize.Level0)
  *              set MessageParcel reply null
  *              set IpcRsp null
  *           2. call IpcCmdRegister ReadResponse with parameter
- *           3. check ret is DM_OK
+ *           3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -532,8 +532,8 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_003, testing::ext::TestSize.Level0)
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    // 3. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    // 3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -542,7 +542,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_003, testing::ext::TestSize.Level0)
  *              set MessageParcel reply null
  *              set IpcRsp null
  *           2. call IpcCmdRegister ReadResponse with parameter
- *           3. check ret is DM_OK
+ *           3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -557,8 +557,8 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_004, testing::ext::TestSize.Level0)
     // 2. call IpcCmdRegister OnRemoteRequest with parameter
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    // 3. check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    // 3. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -572,7 +572,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_006, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcGetLocalDeviceInfoRsp> rsp = std::make_shared<IpcGetLocalDeviceInfoRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -586,7 +586,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_007, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -600,7 +600,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_008, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -614,7 +614,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_011, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -628,7 +628,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_012, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -642,7 +642,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_013, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -656,7 +656,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_014, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -670,7 +670,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_016, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -684,7 +684,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_017, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -698,7 +698,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_020, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -712,7 +712,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_021, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -726,7 +726,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_022, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -740,7 +740,7 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_023, testing::ext::TestSize.Level0)
     MessageParcel reply;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -775,7 +775,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_001, testing::ext::TestSize.Level0)
  *              data.WriteInt32(DEVICE_STATE_ONLINE)
  *              data.WriteRawData(&dmDeviceInfo, deviceSize)
  *           3. call IpcCmdRegister OnIpcCmd with parameter
- *           4. check ret is DM_OK
+ *           4. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
  *              check result is DM_OK
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -797,8 +797,8 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_002, testing::ext::TestSize.Level0)
     // 3. call IpcCmdRegister OnIpcCmd with parameter
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    // check ret is DEVICEMANAGER_IPC_NOT_REGISTER_FUNC
-    ASSERT_EQ(ret, DM_OK);
+    // check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -833,8 +833,8 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_003, testing::ext::TestSize.Level0)
     result = reply.ReadInt32();
     // 4. check result is DEVICE_STATE_ONLINE
     ASSERT_EQ(result, DEVICE_STATE_ONLINE);
-    // check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    // check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -844,7 +844,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_003, testing::ext::TestSize.Level0)
  *              data.WriteInt32(DEVICE_STATE_OFFLINE)
  *              data.WriteRawData(nullptr, deviceSize)
  *           3. call IpcCmdRegister OnIpcCmd with parameter
- *           4. check ret is DM_OK
+ *           4. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -864,8 +864,8 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_004, testing::ext::TestSize.Level0)
     // 3. call IpcCmdRegister OnIpcCmd with parameter
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    // check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    // check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -875,7 +875,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_004, testing::ext::TestSize.Level0)
  *              data.WriteInt32(DEVICE_INFO_CHANGED)
  *              data.WriteRawData(nullptr, deviceSize)
  *           3. call IpcCmdRegister OnIpcCmd with parameter
- *           4. check ret is DM_OK
+ *           4. check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -895,8 +895,8 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_005, testing::ext::TestSize.Level0)
     // 3. call IpcCmdRegister OnIpcCmd with parameter
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    // 4.check ret is DM_OK
-    ASSERT_EQ(ret, DM_OK);
+    // 4.check ret is ERR_DM_UNSUPPORTED_IPC_COMMAND
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -917,7 +917,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_006, testing::ext::TestSize.Level0)
     data.WriteRawData(&deviceInfo, deviceSize);
     int ret = 0;
     ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -962,7 +962,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_009, testing::ext::TestSize.Level0)
     data.WriteInt16(subscribeId);
     data.WriteInt32(failedReason);
     int ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -981,7 +981,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_010, testing::ext::TestSize.Level0)
     data.WriteInt32(publishId);
     data.WriteInt32(publishResult);
     int ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -1005,7 +1005,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_011, testing::ext::TestSize.Level0)
     data.WriteInt32(status);
     data.WriteInt32(reason);
     int ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -1023,7 +1023,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_013, testing::ext::TestSize.Level0)
     data.WriteString(pkgName);
     data.WriteString(paramJson);
     int ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 
 /**
@@ -1043,7 +1043,7 @@ HWTEST_F(IpcCmdRegisterTest, OnIpcCmd_014, testing::ext::TestSize.Level0)
     data.WriteInt32(action);
     data.WriteString(credentialResult);
     int ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_IPC_COMMAND);
 }
 } // namespace
 } // namespace DistributedHardware

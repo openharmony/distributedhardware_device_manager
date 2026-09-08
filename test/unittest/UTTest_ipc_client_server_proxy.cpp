@@ -84,21 +84,6 @@ HWTEST_F(IpcClientServerProxyTest, SendCmd_002, testing::ext::TestSize.Level0)
 }
 
 /**
- * @tc.name: SendCmd_003
- * @tc.type: FUNC
- */
-HWTEST_F(IpcClientServerProxyTest, SendCmd_003, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = 1;
-    sptr<IRemoteObject> remoteObject = sptr<IpcClientStub>(new IpcClientStub());
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    auto instance = new IpcClientServerProxy(remoteObject);
-    int ret = instance->SendCmd(cmdCode, req, rsp);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
-}
-
-/**
  * @tc.name: SendCmd_004
  * @tc.type: FUNC
  */

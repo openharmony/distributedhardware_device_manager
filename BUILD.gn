@@ -63,14 +63,6 @@ if (defined(ohos_lite)) {
         "3rd/utils:devicemanager3rdutils",
       ]
     }
-    if (!is_lite_system && support_jsapi) {
-      deps += [
-        "commondependency:devicemanagerdependencytest",
-        "radar:devicemanagerradartest",
-        "services/service:devicemanagerservicetest",
-        "utils:devicemanagerutilstest",
-      ]
-    }
     if (support_jsapi) {
       deps += [ "display/entry:DeviceManager_UI" ]
     }

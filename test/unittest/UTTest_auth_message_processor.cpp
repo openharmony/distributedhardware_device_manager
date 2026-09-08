@@ -1048,16 +1048,14 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_001, testing::ext::TestSize.Leve
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
-    std::string message = R"(
-    {
-        "AUTHTYPE": 1,
-        "CRYPTOSUPPORT": false,
-        "ITF_VER": "1.1",
-        "LOCALDEVICEID": "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5",
-        "MSG_TYPE": 80,
-        "REPLY": 2016
-    }
-    )";
+    JsonObject jsonObj;
+    jsonObj[TAG_AUTH_TYPE] = 1;
+    jsonObj[TAG_CRYPTO_SUPPORT] = false;
+    jsonObj[TAG_VER] = "1.1";
+    jsonObj[TAG_LOCAL_DEVICE_ID] = "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5";
+    jsonObj[TAG_MSG_TYPE] = 80;
+    jsonObj[TAG_REPLY] = 2016;
+    std::string message = jsonObj.Dump();
     int32_t ret = authMessageProcessor->ParseMessage(message);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -1076,16 +1074,14 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_002, testing::ext::TestSize.Leve
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
-    std::string message = R"(
-    {
-        "AUTHTYPE": 1,
-        "CRYPTOSUPPORT": false,
-        "ITF_VER": "1.1",
-        "LOCALDEVICEID": "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5",
-        "MSG_TYPE": 90,
-        "REPLY": 2016
-    }
-    )";
+    JsonObject jsonObj;
+    jsonObj[TAG_AUTH_TYPE] = 1;
+    jsonObj[TAG_CRYPTO_SUPPORT] = false;
+    jsonObj[TAG_VER] = "1.1";
+    jsonObj[TAG_LOCAL_DEVICE_ID] = "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5";
+    jsonObj[TAG_MSG_TYPE] = 90;
+    jsonObj[TAG_REPLY] = 2016;
+    std::string message = jsonObj.Dump();
     int32_t ret = authMessageProcessor->ParseMessage(message);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -1104,29 +1100,24 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_003, testing::ext::TestSize.Leve
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
-    std::string message = R"(
-    {
-        "APPDESC": "Distributed Calc",
-        "CUSTOMDESC": "customDescription",
-        "APPICON": "",
-        "APPNAME": "Distributed Calc",
-        "APPOPERATION": "appoperrationTest",
-        "AUTHTYPE":1,
-        "DEVICEID": "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5",
-        "LOCALDEVICEID": "test0b9186386e87487564b02etest1f904eb9517f262721c9ada090477etest",
-        "DEVICETYPE": 1,
-        "HOST": "com.example.distributedcalc",
-        "INDEX": 0,
-        "ITF_VER": "1.1",
-        "MSG_TYPE": 100,
-        "REQUESTER": "test0b9186386e87487564b02etest1f904eb9517f262721c9ada090477etest",
-        "SLICE": 1,
-        "TARGET": "com.example.distributedcalc",
-        "THUMSIZE": 0,
-        "TOKEN": "73141022",
-        "VISIBILITY": 0
-    }
-    )";
+    JsonObject jsonObj;
+    jsonObj[TAG_APP_DESCRIPTION] = "Distributed Calc";
+    jsonObj[TAG_CUSTOM_DESCRIPTION] = "customDescription";
+    jsonObj[TAG_APP_NAME] = "Distributed Calc";
+    jsonObj[TAG_APP_OPERATION] = "appoperrationTest";
+    jsonObj[TAG_AUTH_TYPE] = 1;
+    jsonObj[TAG_DEVICE_ID] = "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5";
+    jsonObj[TAG_LOCAL_DEVICE_ID] = "test0b9186386e87487564b02etest1f904eb9517f262721c9ada090477etest";
+    jsonObj[TAG_DEVICE_TYPE] = 1;
+    jsonObj[TAG_HOST] = "com.example.distributedcalc";
+    jsonObj[TAG_INDEX] = 0;
+    jsonObj[TAG_VER] = "1.1";
+    jsonObj[TAG_MSG_TYPE] = 100;
+    jsonObj[TAG_REQUESTER] = "test0b9186386e87487564b02etest1f904eb9517f262721c9ada090477etest";
+    jsonObj[TAG_SLICE_NUM] = 1;
+    jsonObj[TAG_TARGET] = "com.example.distributedcalc";
+    jsonObj[TAG_TOKEN] = "73141022";
+    std::string message = jsonObj.Dump();
     int32_t ret = authMessageProcessor->ParseMessage(message);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -1145,20 +1136,18 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_004, testing::ext::TestSize.Leve
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
-    std::string message = R"(
-    {
-        "REPLY": 0,
-        "DEVICEID": "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5",
-        "TOKEN": "7314",
-        "GROUPNAME": "com.example.test",
-        "ITF_VER": "1.1",
-        "MSG_TYPE": 200,
-        "NETID": "147258963",
-        "REQUESTID": 8448,
-        "authToken": "com.example.distributedcalc62063A65EC8540074FF01413BDC3B6D7",
-        "groupId" : "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5"
-    }
-    )";
+    JsonObject jsonObj;
+    jsonObj[TAG_REPLY] = 0;
+    jsonObj[TAG_DEVICE_ID] = "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5";
+    jsonObj[TAG_TOKEN] = "7314";
+    jsonObj[TAG_GROUP_NAME] = "com.example.test";
+    jsonObj[TAG_VER] = "1.1";
+    jsonObj[TAG_MSG_TYPE] = 200;
+    jsonObj[TAG_NET_ID] = "147258963";
+    jsonObj[TAG_REQUEST_ID] = 8448;
+    jsonObj[TAG_AUTH_TOKEN] = "com.example.distributedcalc62063A65EC8540074FF01413BDC3B6D7";
+    jsonObj[TAG_GROUP_ID] = "e68f0b9186386e87487564b02e91421f904eb9517f262721c9ada090477e35f5";
+    std::string message = jsonObj.Dump();
     int32_t ret = authMessageProcessor->ParseMessage(message);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -1177,13 +1166,11 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_005, testing::ext::TestSize.Leve
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->SetResponseContext(authResponseContext);
-    std::string message = R"(
-    {
-        "REPLY": 0,
-        "ITF_VER": "1.1",
-        "MSG_TYPE": 104
-    }
-    )";
+    JsonObject jsonObj;
+    jsonObj[TAG_REPLY] = 0;
+    jsonObj[TAG_VER] = "1.1";
+    jsonObj[TAG_MSG_TYPE] = 104;
+    std::string message = jsonObj.Dump();
     int32_t ret = authMessageProcessor->ParseMessage(message);
     ASSERT_EQ(ret, DM_OK);
 }

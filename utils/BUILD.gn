@@ -94,11 +94,19 @@ if (defined(ohos_lite)) {
       "-fdata-sections",
       "-fvisibility=hidden",
       "-Oz",
-      "-flto",
+      "-flto=full",
     ]
-    ldflags = [ "-flto" ]
+    cflags_cc = [
+      "-fno-asynchronous-unwind-tables",
+      "-fno-unwind-tables",
+    ]
+    ldflags = [
+      "-flto=full",
+      "-Wl,--gc-sections",
+    ]
   }
   ohos_shared_library("devicemanagerutils") {
+    version_script = "libdevicemanagerutils.map"
     if (!device_manager_capability) {
       install_enable = false
     } else {
@@ -108,6 +116,7 @@ if (defined(ohos_lite)) {
         boundary_sanitize = true
         cfi = true
         cfi_cross_dso = true
+        cfi_vcall_icall_only = true
         debug = false
         integer_overflow = true
         ubsan = true
@@ -173,12 +182,8 @@ if (defined(ohos_lite)) {
     }
   }
 
-  ohos_shared_library("devicemanagerutilstest") {
-    if (!device_manager_capability) {
-      install_enable = false
-    } else {
-      branch_protector_ret = "pac_ret"
-
+  ohos_source_set("devicemanagerutilstest") {
+    if (device_manager_capability) {
       sanitize = {
         boundary_sanitize = true
         cfi = true
@@ -188,22 +193,14 @@ if (defined(ohos_lite)) {
         ubsan = true
       }
 
-      cflags = [
-        "-fPIC",
-        "-fstack-protector-strong",
-        "-Werror",
-      ]
-
-      ldflags = [
-        "-Wl,-z,relro",
-        "-Wl,-z,now",
-      ]
+      branch_protector_ret = "pac_ret"
 
       sources = [
         "${common_path}/src/dm_anonymous.cpp",
         "src/appInfo/standard/app_manager.cpp",
         "src/crypto/dm_crypto.cpp",
         "src/dm_random.cpp",
+        "src/jsonstr_handle/dm_jsonstr_handle.cpp",
         "src/kvadapter/dm_kv_info.cpp",
         "src/kvadapter/kv_adapter.cpp",
         "src/kvadapter/kv_adapter_manager.cpp",
@@ -241,6 +238,61 @@ if (defined(ohos_lite)) {
 
       subsystem_name = "distributedhardware"
 
+      part_name = "device_manager"
+    }
+  }
+
+  ohos_source_set("devicemanagerutilstest_mock") {
+    if (device_manager_capability) {
+      sanitize = {
+        boundary_sanitize = true
+        cfi = true
+        cfi_cross_dso = true
+        debug = false
+        integer_overflow = true
+        ubsan = true
+      }
+
+      branch_protector_ret = "pac_ret"
+
+      sources = [
+        "${common_path}/src/dm_anonymous.cpp",
+        "src/dm_random.cpp",
+        "src/jsonstr_handle/dm_jsonstr_handle.cpp",
+        "src/kvadapter/dm_kv_info.cpp",
+        "src/timer/dm_timer.cpp",
+      ]
+
+      public_configs = [ ":devicemanagerutils_config" ]
+
+      defines = [
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"dmutils\"",
+        "LOG_DOMAIN=0xD004110",
+      ]
+
+      deps = [ "${json_path}:devicemanagerjson" ]
+
+      external_deps = [
+        "access_token:libaccesstoken_sdk",
+        "access_token:libtokenid_sdk",
+        "bundle_framework:appexecfwk_base",
+        "cJSON:cjson",
+        "c_utils:utils",
+        "ffrt:libffrt",
+        "hilog:libhilog",
+        "ipc:ipc_core",
+        "ipc:ipc_single",
+        "kv_store:distributeddata_inner",
+        "openssl:libcrypto_shared",
+        "os_account:os_account_innerkits",
+        "samgr:samgr_proxy",
+        "init:libbegetutil",
+      ]
+
+      testonly = true
+
+      subsystem_name = "distributedhardware"
       part_name = "device_manager"
     }
   }

@@ -53,6 +53,7 @@ ohos_fuzztest("GetLocalDeviceInfoFuzzTest") {
   ]
 
   external_deps = [
+    "hilog:libhilog",
     "c_utils:utils",
     "ffrt:libffrt",
     "ipc:ipc_single",

@@ -91,3 +91,76 @@ ohos_shared_library("devicemanager3rdservice") {
     part_name = "device_manager"
 }
 
+ohos_source_set("devicemanager3rdservicetest") {
+    if (device_manager_capability) {
+        branch_protector_ret = "pac_ret"
+        sanitize = {
+            boundary_sanitize = true
+            cfi = true
+            cfi_cross_dso = true
+            debug = false
+            integer_overflow = true
+            ubsan = true
+        }
+
+        cflags = [
+            "-Werror",
+            "-fstack-protector-strong",
+        ]
+
+        include_dirs = [
+            "include",
+            "include/ipc",
+            "${utils_3rd_path}/include",
+            "${utils_3rd_path}/include/kvadapter",
+            "${utils_3rd_path}/include/ipc",
+            "include/utils",
+            "${serviceimpl_3rd_path}/include",
+            "${json_path}/include",
+            "${utils_path}/include/kvadapter",
+        ]
+
+        sources = [
+            "src/ipc/ipc_server_client_proxy_3rd.cpp",
+            "src/ipc/ipc_service_stub_3rd.cpp",
+            "src/device_manager_service_3rd.cpp",
+            "src/device_manager_service_listener_3rd.cpp",
+            "${utils_3rd_path}/src/kvadapter/kv_adapter_3rd.cpp",
+            "${utils_3rd_path}/src/kvadapter/kv_adapter_manager_3rd.cpp",
+            "${utils_3rd_path}/src/dm_constants_3rd.cpp",
+            "${utils_3rd_path}/src/multiple_user_connector_3rd.cpp",
+            "${service_3rd_path}/src/utils/deviceprofile_connector_3rd.cpp",
+        ]
+
+        defines = [
+            "HI_LOG_ENABLE",
+            "DH_LOG_TAG=\"devicemanagerservice3rd\"",
+            "LOG_DOMAIN=0xD004110",
+        ]
+
+        deps = [
+            "${utils_3rd_path}:devicemanager3rdutils",
+            "${json_path}:devicemanagerjson",
+        ]
+
+        external_deps = [
+            "c_utils:utils",
+            "data_share:datashare_common",
+            "data_share:datashare_consumer",
+            "device_info_manager:distributed_device_profile_common",
+            "device_info_manager:distributed_device_profile_sdk",
+            "hilog:libhilog",
+            "init:libbegetutil",
+            "ipc:ipc_core",
+            "kv_store:distributeddata_inner",
+            "samgr:samgr_proxy",
+            "os_account:libaccountkits",
+            "os_account:os_account_innerkits",
+            "ffrt:libffrt",
+        ]
+
+        subsystem_name = "distributedhardware"
+
+        part_name = "device_manager"
+    }
+}

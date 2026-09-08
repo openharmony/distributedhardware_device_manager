@@ -61,6 +61,8 @@ HWTEST_F(DeviceManagerServiceTest, GetOsTypeByNetworkId_004, testing::ext::TestS
     (void)memset_s(&localDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     (void)strncpy_s(localDeviceInfo.networkId, sizeof(localDeviceInfo.networkId),
                     networkId.c_str(), networkId.length());
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_))
         .WillOnce(testing::DoAll(testing::SetArgReferee<0>(localDeviceInfo), Return(DM_OK)));
     EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(false));
@@ -78,6 +80,8 @@ HWTEST_F(DeviceManagerServiceTest, GetOsTypeByNetworkId_005, testing::ext::TestS
     (void)memset_s(&localDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     (void)strncpy_s(localDeviceInfo.networkId, sizeof(localDeviceInfo.networkId),
                     networkId.c_str(), networkId.length());
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_))
         .WillOnce(testing::DoAll(testing::SetArgReferee<0>(localDeviceInfo), Return(DM_OK)));
     EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(false));
@@ -95,6 +99,8 @@ HWTEST_F(DeviceManagerServiceTest, GetOsTypeByNetworkId_006, testing::ext::TestS
     (void)memset_s(&localDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     (void)strncpy_s(localDeviceInfo.networkId, sizeof(localDeviceInfo.networkId),
                     networkId.c_str(), networkId.length());
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_))
         .WillOnce(testing::DoAll(testing::SetArgReferee<0>(localDeviceInfo), Return(DM_OK)));
     EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(false));
@@ -112,6 +118,8 @@ HWTEST_F(DeviceManagerServiceTest, GetOsTypeByNetworkId_007, testing::ext::TestS
     (void)memset_s(&localDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     (void)strncpy_s(localDeviceInfo.networkId, sizeof(localDeviceInfo.networkId),
                     networkId.c_str(), networkId.length());
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_))
         .WillOnce(testing::DoAll(testing::SetArgReferee<0>(localDeviceInfo), Return(DM_OK)));
     EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
@@ -133,6 +141,8 @@ HWTEST_F(DeviceManagerServiceTest, GetOsTypeByNetworkId_008, testing::ext::TestS
     (void)memset_s(&localDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     (void)strncpy_s(localDeviceInfo.networkId, sizeof(localDeviceInfo.networkId),
                     networkId.c_str(), networkId.length());
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_))
         .WillOnce(testing::DoAll(testing::SetArgReferee<0>(localDeviceInfo), Return(DM_OK)));
     EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
@@ -155,6 +165,8 @@ HWTEST_F(DeviceManagerServiceTest, GetOsTypeByNetworkId_009, testing::ext::TestS
     (void)memset_s(&localDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     (void)strncpy_s(localDeviceInfo.networkId, sizeof(localDeviceInfo.networkId),
                     networkId.c_str(), networkId.length());
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_))
         .WillOnce(testing::DoAll(testing::SetArgReferee<0>(localDeviceInfo), Return(DM_OK)));
     EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
@@ -177,6 +189,8 @@ HWTEST_F(DeviceManagerServiceTest, GetOsTypeByNetworkId_010, testing::ext::TestS
     (void)memset_s(&localDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     (void)strncpy_s(localDeviceInfo.networkId, sizeof(localDeviceInfo.networkId),
                     networkId.c_str(), networkId.length());
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_))
         .WillOnce(testing::DoAll(testing::SetArgReferee<0>(localDeviceInfo), Return(DM_OK)));
     EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
@@ -199,6 +213,8 @@ HWTEST_F(DeviceManagerServiceTest, GetOsTypeByNetworkId_011, testing::ext::TestS
     (void)memset_s(&localDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     (void)strncpy_s(localDeviceInfo.networkId, sizeof(localDeviceInfo.networkId),
                     networkId.c_str(), networkId.length());
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_))
         .WillOnce(testing::DoAll(testing::SetArgReferee<0>(localDeviceInfo), Return(DM_OK)));
     EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
@@ -221,6 +237,8 @@ HWTEST_F(DeviceManagerServiceTest, GetOsTypeByNetworkId_012, testing::ext::TestS
     (void)memset_s(&localDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     (void)strncpy_s(localDeviceInfo.networkId, sizeof(localDeviceInfo.networkId),
                     networkId.c_str(), networkId.length());
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_))
         .WillOnce(testing::DoAll(testing::SetArgReferee<0>(localDeviceInfo), Return(DM_OK)));
     EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));
@@ -243,6 +261,8 @@ HWTEST_F(DeviceManagerServiceTest, GetOsTypeByNetworkId_013, testing::ext::TestS
     (void)memset_s(&localDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
     (void)strncpy_s(localDeviceInfo.networkId, sizeof(localDeviceInfo.networkId),
                     networkId.c_str(), networkId.length());
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_))
         .WillOnce(testing::DoAll(testing::SetArgReferee<0>(localDeviceInfo), Return(DM_OK)));
     EXPECT_CALL(*appManagerMock_, IsSystemApp()).WillOnce(Return(true));

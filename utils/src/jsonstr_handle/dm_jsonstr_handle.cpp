@@ -22,9 +22,11 @@
 #include "dm_error_type.h"
 #include "dm_log.h"
 
-const char* TAG_PROXY = "proxy";
-const char* TAG_PEER_BUNDLE_NAME = "peerBundleName";
-const char* TAG_PEER_TOKENID = "peerTokenId";
+namespace {
+    const char* TAG_PROXY = "proxy";
+    const char* TAG_PEER_BUNDLE_NAME = "peerBundleName";
+    const char* TAG_PEER_TOKENID = "peerTokenId";
+}
 
 namespace OHOS {
 namespace DistributedHardware {

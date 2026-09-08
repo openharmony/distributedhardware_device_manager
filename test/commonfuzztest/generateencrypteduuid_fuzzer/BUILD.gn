@@ -47,6 +47,7 @@ ohos_fuzztest("GenerateEncryptedUuidFuzzTest") {
   ]
 
   external_deps = [
+    "hilog:libhilog",
     "bounds_checking_function:libsec_shared",
     "ffrt:libffrt",
     "ipc:ipc_single",

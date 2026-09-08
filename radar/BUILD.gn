@@ -56,12 +56,20 @@ if (defined(ohos_lite)) {
       "-fdata-sections",
       "-fvisibility=hidden",
       "-Oz",
-      "-flto",
+      "-flto=full",
     ]
-    ldflags = [ "-flto" ]
+    cflags_cc = [
+      "-fno-asynchronous-unwind-tables",
+      "-fno-unwind-tables",
+    ]
+    ldflags = [
+      "-flto=full",
+      "-Wl,--gc-sections",
+    ]
   }
 
   ohos_shared_library("devicemanagerradar") {
+    version_script = "libdevicemanagerradar.map"
     if (!device_manager_capability) {
       install_enable = false
     } else {
@@ -76,6 +84,7 @@ if (defined(ohos_lite)) {
       sanitize = {
         cfi = true
         cfi_cross_dso = true
+        cfi_vcall_icall_only = true
         debug = false
       }
 
@@ -123,10 +132,8 @@ if (defined(ohos_lite)) {
     }
   }
 
-  ohos_shared_library("devicemanagerradartest") {
-    if (!device_manager_capability) {
-      install_enable = false
-    } else {
+  ohos_source_set("devicemanagerradartest") {
+    if (device_manager_capability) {
       include_dirs = [
         "include",
         "${common_path}/include",
@@ -135,21 +142,15 @@ if (defined(ohos_lite)) {
       ]
 
       sanitize = {
+        boundary_sanitize = true
         cfi = true
         cfi_cross_dso = true
         debug = false
+        integer_overflow = true
+        ubsan = true
       }
 
-      cflags = [
-        "-Werror",
-        "-fPIC",
-        "-fstack-protector-strong",
-      ]
-
-      ldflags = [
-        "-Wl,-z,relro",
-        "-Wl,-z,now",
-      ]
+      branch_protector_ret = "pac_ret"
 
       sources = [ "src/dm_radar_helper.cpp" ]
 
@@ -177,7 +178,6 @@ if (defined(ohos_lite)) {
       ]
 
       subsystem_name = "distributedhardware"
-
       part_name = "device_manager"
     }
   }

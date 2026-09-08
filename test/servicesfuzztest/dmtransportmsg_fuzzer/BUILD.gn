@@ -74,6 +74,7 @@ ohos_fuzztest("DmTransPortMsgFuzzTest") {
   ]
 
   external_deps = [
+    "hilog:libhilog",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "dsoftbus:softbus_client",

@@ -22,11 +22,19 @@ config("cflags_config") {
     "-fdata-sections",
     "-fvisibility=hidden",
     "-Oz",
-    "-flto",
+    "-flto=full",
   ]
-  ldflags = [ "-flto" ]
+  cflags_cc = [
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+  ]
+  ldflags = [
+    "-flto=full",
+    "-Wl,--gc-sections",
+  ]
 }
 ohos_shared_library("devicemanagerdependency") {
+  version_script = "libdevicemanagerdependency.map"
   if (!device_manager_capability) {
     install_enable = false
   } else {
@@ -36,6 +44,7 @@ ohos_shared_library("devicemanagerdependency") {
       boundary_sanitize = true
       cfi = true
       cfi_cross_dso = true
+      cfi_vcall_icall_only = true
       debug = false
       integer_overflow = true
       ubsan = true
@@ -109,11 +118,15 @@ ohos_shared_library("devicemanagerdependency") {
   }
 }
 
-ohos_shared_library("devicemanagerdependencytest") {
-  if (!device_manager_capability) {
-    install_enable = false
-  } else {
-    branch_protector_ret = "pac_ret"
+ohos_source_set("devicemanagerdependencytest") {
+  if (device_manager_capability) {
+    include_dirs = [
+      "include",
+      "${common_path}/include",
+      "${innerkits_path}/native_cpp/include",
+      "${servicesimpl_path}/include/cryptomgr",
+      "${utils_path}/include/crypto",
+    ]
 
     sanitize = {
       boundary_sanitize = true
@@ -124,24 +137,7 @@ ohos_shared_library("devicemanagerdependencytest") {
       ubsan = true
     }
 
-    cflags = [
-      "-Werror",
-      "-fPIC",
-      "-fstack-protector-strong",
-    ]
-
-    ldflags = [
-      "-Wl,-z,relro",
-      "-Wl,-z,now",
-    ]
-
-    include_dirs = [
-      "include",
-      "${common_path}/include",
-      "${innerkits_path}/native_cpp/include",
-      "${servicesimpl_path}/include/cryptomgr",
-      "${utils_path}/include/crypto",
-    ]
+    branch_protector_ret = "pac_ret"
 
     sources = [
       "src/deviceprofile_connector.cpp",
@@ -184,8 +180,143 @@ ohos_shared_library("devicemanagerdependencytest") {
     if (car_device_enable) {
       defines += [ "CAR_DEVICE_ENABLE" ]
     }
-    subsystem_name = "distributedhardware"
 
+    subsystem_name = "distributedhardware"
+    part_name = "device_manager"
+  }
+}
+
+ohos_source_set("devicemanagerdependencytest_mock") {
+  if (device_manager_capability) {
+    include_dirs = [
+      "include",
+      "${common_path}/include",
+      "${innerkits_path}/native_cpp/include",
+      "${servicesimpl_path}/include/cryptomgr",
+      "${utils_path}/include/crypto",
+    ]
+
+    sanitize = {
+      boundary_sanitize = true
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+      integer_overflow = true
+      ubsan = true
+    }
+
+    branch_protector_ret = "pac_ret"
+
+    sources = [
+      "src/deviceprofile_connector.cpp",
+      "src/dm_constraints_manager.cpp",
+    ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"dmdep\"",
+      "LOG_DOMAIN=0xD004112",
+    ]
+
+    deps = [
+      "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${json_path}:devicemanagerjson",
+      "${utils_path}:devicemanagerutils",
+    ]
+
+    external_deps = [
+      "ability_base:want",
+      "bundle_framework:appexecfwk_base",
+      "bundle_framework:appexecfwk_core",
+      "c_utils:utils",
+      "device_info_manager:distributed_device_profile_common",
+      "device_info_manager:distributed_device_profile_sdk",
+      "eventhandler:libeventhandler",
+      "ffrt:libffrt",
+      "hilog:libhilog",
+      "init:libbegetutil",
+      "ipc:ipc_core",
+      "os_account:libaccountkits",
+      "samgr:samgr_proxy",
+    ]
+
+    if (os_account_part_exists) {
+      defines += [ "OS_ACCOUNT_PART_EXISTS" ]
+      external_deps += [ "os_account:os_account_innerkits" ]
+    }
+    if (car_device_enable) {
+      defines += [ "CAR_DEVICE_ENABLE" ]
+    }
+
+    subsystem_name = "distributedhardware"
+    part_name = "device_manager"
+  }
+}
+
+ohos_source_set("devicemanagermultipleuser") {
+  if (device_manager_capability) {
+    include_dirs = [
+      "include",
+      "${common_path}/include",
+      "${innerkits_path}/native_cpp/include",
+      "${servicesimpl_path}/include/cryptomgr",
+      "${utils_path}/include/crypto",
+    ]
+
+    sanitize = {
+      boundary_sanitize = true
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+      integer_overflow = true
+      ubsan = true
+    }
+
+    branch_protector_ret = "pac_ret"
+
+    sources = [
+      "src/multiple_user_connector.cpp",
+    ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"dmdep\"",
+      "LOG_DOMAIN=0xD004112",
+    ]
+
+    deps = [
+      "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${json_path}:devicemanagerjson",
+      "${utils_path}:devicemanagerutils",
+    ]
+
+    external_deps = [
+      "ability_base:want",
+      "bundle_framework:appexecfwk_base",
+      "bundle_framework:appexecfwk_core",
+      "c_utils:utils",
+      "device_info_manager:distributed_device_profile_common",
+      "device_info_manager:distributed_device_profile_sdk",
+      "eventhandler:libeventhandler",
+      "ffrt:libffrt",
+      "hilog:libhilog",
+      "init:libbegetutil",
+      "ipc:ipc_core",
+      "os_account:libaccountkits",
+      "samgr:samgr_proxy",
+    ]
+
+    if (os_account_part_exists) {
+      defines += [ "OS_ACCOUNT_PART_EXISTS" ]
+      external_deps += [ "os_account:os_account_innerkits" ]
+    }
+    if (car_device_enable) {
+      defines += [ "CAR_DEVICE_ENABLE" ]
+    }
+
+    testonly = true
+
+    subsystem_name = "distributedhardware"
     part_name = "device_manager"
   }
 }
