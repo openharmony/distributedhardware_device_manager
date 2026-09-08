@@ -127,7 +127,6 @@ if (defined(ohos_lite)) {
       ]
 
       subsystem_name = "distributedhardware"
-
       part_name = "device_manager"
     }
   }

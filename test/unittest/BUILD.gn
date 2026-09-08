@@ -694,6 +694,7 @@ ohos_unittest("UTTest_dm_credential_manager") {
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${softbuscache_parh}:dmdevicecache",
     "${utils_path}:devicemanagerutilstest",
+
   ]
 
   external_deps = [
@@ -2284,17 +2285,18 @@ ohos_unittest("UTTest_permission_manager") {
   ]
 
   deps = [
-    ":device_manager_test_common",
-    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
+    ":device_manager_test_common_mock",
+    "${devicemanager_path}/commondependency:devicemanagerdependencytest_mock",
     "${devicemanager_path}/interfaces/kits/js:devicemanager",
     "${devicemanager_path}/radar:devicemanagerradartest",
     "${ext_path}/pin_auth:devicemanagerext_pin_auth",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${json_path}:devicemanagerjson",
-    "${services_path}:devicemanagerservicetest",
+    "${services_path}:devicemanagerservicetest_mock",
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${softbuscache_parh}:dmdevicecache",
-    "${utils_path}:devicemanagerutilstest",
+    "${utils_path}:devicemanagerutilstest_mock",
+
   ]
 
   external_deps = [
@@ -3146,6 +3148,7 @@ ohos_unittest("UTTest_discovery_filter") {
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${softbuscache_parh}:dmdevicecache",
     "${utils_path}:devicemanagerutilstest",
+
   ]
 
   external_deps = [
@@ -3187,6 +3190,7 @@ ohos_unittest("UTTest_discovery_manager") {
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${softbuscache_parh}:dmdevicecache",
     "${utils_path}:devicemanagerutilstest",
+
   ]
 
   external_deps = [
@@ -3545,6 +3549,7 @@ ohos_unittest("UTTest_relationship_sync_mgr") {
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${softbuscache_parh}:dmdevicecache",
     "${utils_path}:devicemanagerutilstest",
+
   ]
 
   external_deps = [
@@ -4379,6 +4384,7 @@ ohos_static_library("device_manager_test_common") {
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${softbuscache_parh}:dmdevicecache",
     "${utils_path}:devicemanagerutilstest",
+
   ]
 
   external_deps = [
@@ -4863,7 +4869,7 @@ ohos_unittest("UTTest_auth_pincode_manager") {
   deps = [
     ":device_manager_3rd_test_common",
     "${serviceimpl_3rd_path}:devicemanagerserviceimpl3rd",
-    "${service_3rd_path}:devicemanager3rdservice",
+    "${service_3rd_path}:devicemanager3rdservicetest",
     "${utils_3rd_path}:devicemanager3rdutils",
     "${interfaces_3rd_path}:devicemanager3rdsdk",
   ]
@@ -4892,7 +4898,7 @@ ohos_unittest("UTTest_auth_pincode_message_processor") {
   deps = [
     ":device_manager_3rd_test_common",
     "${serviceimpl_3rd_path}:devicemanagerserviceimpl3rd",
-    "${service_3rd_path}:devicemanager3rdservice",
+    "${service_3rd_path}:devicemanager3rdservicetest",
     "${utils_3rd_path}:devicemanager3rdutils",
     "${interfaces_3rd_path}:devicemanager3rdsdk",
   ]
@@ -4921,7 +4927,7 @@ ohos_unittest("UTTest_auth_pincode_state") {
   deps = [
     ":device_manager_3rd_test_common",
     "${serviceimpl_3rd_path}:devicemanagerserviceimpl3rd",
-    "${service_3rd_path}:devicemanager3rdservice",
+    "${service_3rd_path}:devicemanager3rdservicetest",
     "${utils_3rd_path}:devicemanager3rdutils",
     "${interfaces_3rd_path}:devicemanager3rdsdk",
   ]
@@ -5027,6 +5033,8 @@ config("device_manager_3rd_test_common_public_config") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  ldflags = [ "-Wl,--allow-multiple-definition" ]
 
   defines = [
     "HI_LOG_ENABLE",
