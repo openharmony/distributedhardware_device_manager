@@ -4497,7 +4497,10 @@ ohos_static_library("device_manager_test_common_mock") {
 ohos_unittest("UTTest_freeze_process") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_freeze_process.cpp" ]
+  sources = [
+    "UTTest_freeze_process.cpp",
+    "mock/kv_adapter_manager_mock.cpp",
+  ]
 
   deps = [
     ":device_manager_test_common",

@@ -21,6 +21,7 @@
 #include "dm_anonymous.h"
 #include "dm_device_info.h"
 #include "dm_freeze_process.h"
+#include "kv_adapter_manager_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -30,6 +31,9 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+
+    static inline std::shared_ptr<KVAdapterManagerMock> kvAdapterManagerMock_ =
+        std::make_shared<KVAdapterManagerMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

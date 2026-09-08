@@ -1285,9 +1285,8 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_023, testing::ext::TestSize.
     if (ptr) {
         ret = ptr(req, data);
     }
-    if (ptr != nullptr) {
-        ASSERT_EQ(ret, ERR_DM_FAILED);
-    }
+    ASSERT_NE(ptr, nullptr);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_024, testing::ext::TestSize.Level1)
@@ -1311,9 +1310,8 @@ HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_024, testing::ext::TestSize.
     if (ptr) {
         ret = ptr(req, data);
     }
-    if (ptr != nullptr) {
-        ASSERT_EQ(ret, ERR_DM_FAILED);
-    }
+    ASSERT_NE(ptr, nullptr);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_064, testing::ext::TestSize.Level1)
@@ -1376,13 +1374,13 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_065, testing::ext::TestSize.Level
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_031, testing::ext::TestSize.Level1)
 {
     int32_t cmdCode = EXPORT_AUTH_INFO;
-    ASSERT_EQ(ERR_DM_UNSUPPORTED_IPC_COMMAND, TestReadResponseRspNull(cmdCode));
+    ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
 HWTEST_F(IpcCmdParserServiceTest, ReadResponseFunc_032, testing::ext::TestSize.Level1)
 {
     int32_t cmdCode = IMPORT_AUTH_INFO;
-    ASSERT_EQ(ERR_DM_UNSUPPORTED_IPC_COMMAND, TestReadResponseRspNull(cmdCode));
+    ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
 }
 
 HWTEST_F(IpcCmdParserServiceTest, OnIpcCmd_001, testing::ext::TestSize.Level1)

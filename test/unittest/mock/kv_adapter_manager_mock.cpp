@@ -25,5 +25,20 @@ int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value)
 {
     return DmKVAdapterManager::dmKVAdapterManager->Get(key, value);
 }
+
+int32_t KVAdapterManager::GetFreezeData(const std::string &key, std::string &value)
+{
+    return DmKVAdapterManager::dmKVAdapterManager->GetFreezeData(key, value);
+}
+
+int32_t KVAdapterManager::PutFreezeData(const std::string &key, std::string &value)
+{
+    return DmKVAdapterManager::dmKVAdapterManager->PutFreezeData(key, value);
+}
+
+int32_t KVAdapterManager::DeleteFreezeData(const std::string &key)
+{
+    return DmKVAdapterManager::dmKVAdapterManager->DeleteFreezeData(key);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

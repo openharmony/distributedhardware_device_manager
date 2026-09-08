@@ -29,10 +29,18 @@ void FreezeProcessTest::TearDown()
 
 void FreezeProcessTest::SetUpTestCase()
 {
+    DmKVAdapterManager::dmKVAdapterManager = kvAdapterManagerMock_;
+    ON_CALL(*kvAdapterManagerMock_, GetFreezeData(testing::_, testing::_))
+        .WillByDefault(testing::Return(DM_OK));
+    ON_CALL(*kvAdapterManagerMock_, PutFreezeData(testing::_, testing::_))
+        .WillByDefault(testing::Return(DM_OK));
+    ON_CALL(*kvAdapterManagerMock_, DeleteFreezeData(testing::_))
+        .WillByDefault(testing::Return(DM_OK));
 }
 
 void FreezeProcessTest::TearDownTestCase()
 {
+    DmKVAdapterManager::dmKVAdapterManager = nullptr;
 }
 
 namespace {
@@ -40,10 +48,13 @@ constexpr int64_t DATA_REFRESH_INTERVAL = 20 * 60;
 }
 HWTEST_F(FreezeProcessTest, UpdateFreezeRecord, testing::ext::TestSize.Level0)
 {
-    int64_t nowTime = 1633072800 ;
+    const int64_t nowTime = GetSecondsSince1970ToNow();
     BindFailedEvents bindFailedEventsCache;
-    bindFailedEventsCache.failedTimeStamps = {1633072700, 1633072800, 1633072900};
-    bindFailedEventsCache.freezeTimeStamps = {1633072600};
+    bindFailedEventsCache.failedTimeStamps = {nowTime - 100, nowTime - 50, nowTime - 10};
+    bindFailedEventsCache.freezeTimeStamps = {nowTime - 200};
+    EXPECT_CALL(*kvAdapterManagerMock_, PutFreezeData(testing::_, testing::_))
+        .Times(2)
+        .WillRepeatedly(testing::Return(DM_OK));
     FreezeProcess freezeProcess;
     freezeProcess.bindFailedEventsCache_ = bindFailedEventsCache;
     int32_t result = freezeProcess.UpdateFreezeRecord();
