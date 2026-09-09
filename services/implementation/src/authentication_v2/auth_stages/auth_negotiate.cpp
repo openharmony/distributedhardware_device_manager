@@ -114,7 +114,7 @@ int32_t AuthSrcNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> cont
     if (context->timer != nullptr) {
         context->timer->StartTimer(std::string(NEGOTIATE_TIMEOUT_TASK),
             DmAuthState::GetTaskTimeout(context, NEGOTIATE_TIMEOUT_TASK, NEGOTIATE_TIMEOUT),
-            [this, context] (std::string name) {
+            [context] (std::string name) {
                 DmAuthState::HandleAuthenticateTimeout(context, name);
             });
     }
@@ -366,7 +366,7 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
     if (context->timer != nullptr) {
         context->timer->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK),
             AUTHENTICATE_TIMEOUT,
-            [this, context] (std::string name) {
+            [context] (std::string name) {
                 DmAuthState::HandleAuthenticateTimeout(context, name);
         });
     }
@@ -390,7 +390,7 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_ACL_NEGOTIATE, context);
     context->timer->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK),
         DmAuthState::GetTaskTimeout(context, WAIT_REQUEST_TIMEOUT_TASK, WAIT_REQUEST_TIMEOUT),
-        [this, context] (std::string name) {
+        [context] (std::string name) {
             DmAuthState::HandleAuthenticateTimeout(context, name);
         });
     return DM_OK;
