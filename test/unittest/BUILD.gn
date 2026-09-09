@@ -4196,8 +4196,10 @@ ohos_unittest("UTTest_auth_negotiate") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "init:libbegetutil",
     "kv_store:distributeddata_inner",
     "mbedtls:mbedtls_shared",
+    "os_account:os_account_innerkits",
     "zlib:shared_libz",
   ]
 }
