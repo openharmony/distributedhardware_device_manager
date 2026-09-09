@@ -4150,6 +4150,9 @@ ohos_unittest("UTTest_auth_negotiate") {
 
   include_dirs = []
 
+  # This target directly compiles production sources that contain legacy lambda captures.
+  cflags_cc = [ "-Wno-unused-lambda-capture" ]
+
   sources = [
     "${devicemanager_path}/test/unittest/UTTest_auth_negotiate.cpp",
     # Keep the complete send path in the test binary so GetSoftbusSession resolves to the mock.
