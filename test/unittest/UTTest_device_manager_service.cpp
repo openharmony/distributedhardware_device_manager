@@ -31,8 +31,24 @@ namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 
+namespace {
+void ResetServiceTimer()
+{
+    auto &service = DeviceManagerService::GetInstance();
+    std::shared_ptr<DmTimer> timer;
+    {
+        std::lock_guard<std::mutex> lock(service.timerLocks_);
+        timer.swap(service.timer_);
+    }
+    if (timer != nullptr) {
+        timer->DeleteAll();
+    }
+}
+}
+
 void DeviceManagerServiceTest::SetUp()
 {
+    ResetServiceTimer();
     const int32_t permsNum = 4;
     const int32_t indexZero = 0;
     const int32_t indexOne = 1;
@@ -61,6 +77,7 @@ void DeviceManagerServiceTest::SetUp()
 
 void DeviceManagerServiceTest::TearDown()
 {
+    ResetServiceTimer();
     Mock::VerifyAndClearExpectations(permissionManagerMock_.get());
     Mock::VerifyAndClearExpectations(softbusListenerMock_.get());
     Mock::VerifyAndClearExpectations(kVAdapterManagerMock_.get());

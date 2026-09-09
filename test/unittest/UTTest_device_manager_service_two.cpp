@@ -1449,6 +1449,10 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_201, testing::ext::Tes
 HWTEST_F(DeviceManagerServiceTest, HandleUserStop_201, testing::ext::TestSize.Level1)
 {
     auto &service = DeviceManagerService::GetInstance();
+    {
+        std::lock_guard<std::mutex> lock(service.timerLocks_);
+        service.timer_ = std::make_shared<DmTimer>();
+    }
 
     const int32_t stopUserId = 1;
     const std::string stopEventUdid = "ud*********4";

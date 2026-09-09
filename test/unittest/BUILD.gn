@@ -669,10 +669,11 @@ ohos_unittest("device_manager_impl_test") {
 
 ## UnitTest UTTest_dm_credential_manager {{{
 ohos_unittest("UTTest_dm_credential_manager") {
-    sanitize = {
+  sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./cfi_blocklist.txt"
   }
 
   module_out_path = module_out_path
@@ -682,7 +683,7 @@ ohos_unittest("UTTest_dm_credential_manager") {
     "${servicesimpl_path}/src/credential",
   ]
 
-   sources = [
+  sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_credential_manager.cpp",
     "${devicemanager_path}/test/unittest/mock/hichain_connector_mock.cpp",
   ]
@@ -2482,6 +2483,8 @@ ohos_unittest("UTTest_dm_device_state_manager_two") {
 
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_device_state_manager_two.cpp",
+    # Keep the caller in the test binary so SoftbusConnector calls resolve to the mock.
+    "${servicesimpl_path}/src/devicestate/dm_device_state_manager.cpp",
     "mock/deviceprofile_connector_mock.cpp",
     "mock/dm_crypto_mock.cpp",
     "mock/hichain_auth_connector_mock.cpp",
@@ -2506,6 +2509,7 @@ ohos_unittest("UTTest_dm_device_state_manager_two") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_core",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -3001,6 +3005,8 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
 
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_second.cpp",
+    # Keep the caller in the test binary so HiChainConnector calls resolve to the mock.
+    "${servicesimpl_path}/src/authentication/dm_auth_manager.cpp",
     "mock/deviceprofile_connector_mock.cpp",
     "mock/hichain_auth_connector_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/dm_crypto_mock.cpp",
@@ -3037,6 +3043,7 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
     "googletest:gmock_main",
     "hilog:libhilog",
     "kv_store:distributeddata_inner",
+    "openssl:libcrypto_shared",
   ]
 }
 
@@ -4144,6 +4151,9 @@ ohos_unittest("UTTest_auth_negotiate") {
 
   sources = [
     "${devicemanager_path}/test/unittest/UTTest_auth_negotiate.cpp",
+    # Keep the complete send path in the test binary so GetSoftbusSession resolves to the mock.
+    "${servicesimpl_path}/src/authentication_v2/auth_stages/auth_negotiate.cpp",
+    "${servicesimpl_path}/src/authentication_v2/dm_auth_message_processor.cpp",
     "${devicemanager_path}/test/unittest/mock/accesstoken_kit_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_connector_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_session_mock.cpp",
@@ -4172,6 +4182,7 @@ ohos_unittest("UTTest_auth_negotiate") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "device_auth:deviceauth_sdk",
@@ -4184,6 +4195,8 @@ ohos_unittest("UTTest_auth_negotiate") {
     "googletest:gmock_main",
     "hilog:libhilog",
     "kv_store:distributeddata_inner",
+    "mbedtls:mbedtls_shared",
+    "zlib:shared_libz",
   ]
 }
 
