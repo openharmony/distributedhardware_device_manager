@@ -344,6 +344,7 @@ if (defined(ohos_lite)) {
     }
   }
 
+  if (false) {
   ohos_source_set("devicemanagerservicetest_mock") {
     if (device_manager_capability) {
       sanitize = {
@@ -486,6 +487,8 @@ if (defined(ohos_lite)) {
       subsystem_name = "distributedhardware"
       part_name = "device_manager"
     }
+  }
+
   }
 
   ohos_source_set("devicemanagerservicetest") {
