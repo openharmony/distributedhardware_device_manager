@@ -4155,9 +4155,13 @@ ohos_unittest("UTTest_auth_negotiate") {
 
   sources = [
     "${devicemanager_path}/test/unittest/UTTest_auth_negotiate.cpp",
-    # Keep the complete send path in the test binary so GetSoftbusSession resolves to the mock.
+    # Keep the tested state hierarchy and send path in one link unit. Besides making
+    # GetSoftbusSession resolve to the mock, this prevents cross-DSO CFI checks from
+    # seeing an AuthSinkNegotiateStateMachine whose base implementation is in the
+    # production shared library.
     "${servicesimpl_path}/src/authentication_v2/auth_stages/auth_negotiate.cpp",
     "${servicesimpl_path}/src/authentication_v2/dm_auth_message_processor.cpp",
+    "${servicesimpl_path}/src/authentication_v2/dm_auth_state.cpp",
     "${devicemanager_path}/test/unittest/mock/accesstoken_kit_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_connector_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_session_mock.cpp",
