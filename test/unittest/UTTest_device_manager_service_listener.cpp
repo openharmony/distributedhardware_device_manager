@@ -631,7 +631,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_002, testing
     processInfoVec.push_back(pro);
     SetNotifyProcessInfos(DmCommonNotifyEvent::REG_DEVICE_STATE, processInfoVec);
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo())
-        .Times(2).WillRepeatedly(Return(processInfoVec));
+        .Times(3).WillRepeatedly(Return(processInfoVec));
 
     // Act
     listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
@@ -912,7 +912,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_010, testing
     processInfoVec.push_back(pro);
     SetNotifyProcessInfos(DmCommonNotifyEvent::REG_DEVICE_STATE, processInfoVec);
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo())
-        .Times(2).WillRepeatedly(Return(processInfoVec));
+        .Times(3).WillRepeatedly(Return(processInfoVec));
 
     // Act
     listener_->ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
