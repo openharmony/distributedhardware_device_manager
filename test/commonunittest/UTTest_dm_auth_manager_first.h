@@ -35,6 +35,7 @@
 #include "softbus_session_mock.h"
 #include "app_manager_mock.h"
 #include "dm_crypto_mock.h"
+#include "dm_dialog_manager_mock.h"
 #include "deviceprofile_connector_mock.h"
 #include "hichain_auth_connector_mock.h"
 #include "multiple_user_connector_mock.h"
@@ -59,6 +60,7 @@ public:
     static inline std::shared_ptr<SoftbusSessionMock> softbusSessionMock_ = nullptr;
     static inline std::shared_ptr<AppManagerMock> appManagerMock_ = nullptr;
     static inline std::shared_ptr<CryptoMock> cryptoMock_ = nullptr;
+    static inline std::shared_ptr<DmDialogManagerMock> dialogManagerMock_ = nullptr;
     static inline std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock_ = nullptr;
     static inline std::shared_ptr<HiChainAuthConnectorMock> hiChainAuthConnectorMock_ = nullptr;
     static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ = nullptr;

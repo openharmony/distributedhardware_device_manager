@@ -16,6 +16,8 @@
 #ifndef DM_DIALOG_MANAGER_MOCK_H
 #define DM_DIALOG_MANAGER_MOCK_H
 
+#include <gmock/gmock.h>
+
 #include "dm_dialog_manager.h"
 
 namespace OHOS {
@@ -23,8 +25,10 @@ namespace DistributedHardware {
 class DmDialogManagerMock {
 public:
     MOCK_METHOD(void, ShowConfirmDialog, (const std::string));
+    MOCK_METHOD(void, ShowPinDialog, (const std::string));
+    MOCK_METHOD(void, ShowInputDialog, (const std::string));
     static inline std::shared_ptr<DmDialogManagerMock> dmDialogManagerMock = nullptr;
 };
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif

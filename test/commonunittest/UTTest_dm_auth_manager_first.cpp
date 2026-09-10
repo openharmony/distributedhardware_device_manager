@@ -87,6 +87,7 @@ void DmAuthManagerTest::TearDown()
     Mock::VerifyAndClearExpectations(softbusSessionMock_.get());
     Mock::VerifyAndClearExpectations(appManagerMock_.get());
     Mock::VerifyAndClearExpectations(cryptoMock_.get());
+    Mock::VerifyAndClearExpectations(dialogManagerMock_.get());
     Mock::VerifyAndClearExpectations(deviceProfileConnectorMock_.get());
     Mock::VerifyAndClearExpectations(hiChainAuthConnectorMock_.get());
     Mock::VerifyAndClearExpectations(multipleUserConnectorMock_.get());
@@ -100,6 +101,8 @@ void DmAuthManagerTest::SetUpTestCase()
     DmAppManager::dmAppManager = appManagerMock_;
     cryptoMock_ = std::make_shared<CryptoMock>();
     DmCrypto::dmCrypto = cryptoMock_;
+    dialogManagerMock_ = std::make_shared<NiceMock<DmDialogManagerMock>>();
+    DmDialogManagerMock::dmDialogManagerMock = dialogManagerMock_;
     deviceProfileConnectorMock_ = std::make_shared<DeviceProfileConnectorMock>();
     DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock_;
     hiChainAuthConnectorMock_ = std::make_shared<HiChainAuthConnectorMock>();
@@ -118,6 +121,8 @@ void DmAuthManagerTest::TearDownTestCase()
     appManagerMock_ = nullptr;
     DmCrypto::dmCrypto = nullptr;
     cryptoMock_ = nullptr;
+    DmDialogManagerMock::dmDialogManagerMock = nullptr;
+    dialogManagerMock_ = nullptr;
     DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
     deviceProfileConnectorMock_ = nullptr;
     DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
