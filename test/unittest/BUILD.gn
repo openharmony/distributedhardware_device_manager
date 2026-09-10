@@ -2956,6 +2956,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
   ]
 
   external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
     "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
