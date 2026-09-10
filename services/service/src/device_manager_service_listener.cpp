@@ -17,6 +17,8 @@
 #include <cstdlib>
 #include <set>
 #include <sstream>
+#include <charconv>
+#include <system_error>
 #include "cJSON.h"
 
 #include "device_manager_service_listener.h"
@@ -121,6 +123,41 @@ ProcessInfo FindUniqueProcessInfoByPkgName(const std::vector<ProcessInfo> &proce
     return matchedProcessInfo;
 }
 
+
+namespace {
+bool ParseNotifyInt32(const std::string &s, int32_t &out)
+{
+    if (s.empty()) {
+        return false;
+    }
+    int32_t value = 0;
+    const char *first = s.data();
+    const char *last = first + s.size();
+    auto result = std::from_chars(first, last, value);
+    if (result.ec != std::errc() || result.ptr != last) {
+        return false;
+    }
+    out = value;
+    return true;
+}
+
+bool ParseNotifyUint32(const std::string &s, uint32_t &out)
+{
+    if (s.empty()) {
+        return false;
+    }
+    uint32_t value = 0;
+    const char *first = s.data();
+    const char *last = first + s.size();
+    auto result = std::from_chars(first, last, value);
+    if (result.ec != std::errc() || result.ptr != last) {
+        return false;
+    }
+    out = value;
+    return true;
+}
+} // namespace
+
 bool ParseNotifyKey(const std::string &notifyKey, ProcessInfo &processInfo)
 {
 #ifdef CAR_DEVICE_ENABLE
@@ -134,8 +171,10 @@ bool ParseNotifyKey(const std::string &notifyKey, ProcessInfo &processInfo)
         !std::getline(stream, processInfo.accountId, '#')) {
         return false;
     }
-    processInfo.userId = std::stoi(userId);
-    processInfo.tokenId = std::stoul(tokenId);
+    if (!ParseNotifyInt32(userId, processInfo.userId) ||
+        !ParseNotifyUint32(tokenId, processInfo.tokenId)) {
+        return false;
+    }
 #else
     std::istringstream stream(notifyKey);
     std::string userId;
@@ -145,8 +184,10 @@ bool ParseNotifyKey(const std::string &notifyKey, ProcessInfo &processInfo)
         !std::getline(stream, tokenId, '#')) {
         return false;
     }
-    processInfo.userId = std::atoi(userId.c_str());
-    processInfo.tokenId = std::stoul(tokenId);
+    if (!ParseNotifyInt32(userId, processInfo.userId) ||
+        !ParseNotifyUint32(tokenId, processInfo.tokenId)) {
+        return false;
+    }
 #endif
     return true;
 }
