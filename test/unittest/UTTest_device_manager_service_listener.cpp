@@ -42,6 +42,12 @@ void DeviceManagerServiceListenerTest::SetUp()
 
 void DeviceManagerServiceListenerTest::TearDown()
 {
+    Mock::VerifyAndClearExpectations(softbusCacheMock_.get());
+    Mock::VerifyAndClearExpectations(cryptoMock_.get());
+    Mock::VerifyAndClearExpectations(ipcServerListenerMock_.get());
+    Mock::VerifyAndClearExpectations(kVAdapterManagerMock_.get());
+    Mock::VerifyAndClearExpectations(appManagerMock_.get());
+    Mock::VerifyAndClearExpectations(deviceManagerServiceMock_.get());
 }
 
 void DeviceManagerServiceListenerTest::SetUpTestCase()
@@ -63,6 +69,13 @@ void DeviceManagerServiceListenerTest::TearDownTestCase()
     DmIpcServerListener::dmIpcServerListener = nullptr;
     DmKVAdapterManager::dmKVAdapterManager = nullptr;
     DmAppManager::dmAppManager = nullptr;
+    DmDeviceManagerService::dmDeviceManagerService = nullptr;
+    softbusCacheMock_ = nullptr;
+    cryptoMock_ = nullptr;
+    ipcServerListenerMock_ = nullptr;
+    kVAdapterManagerMock_ = nullptr;
+    appManagerMock_ = nullptr;
+    deviceManagerServiceMock_ = nullptr;
 }
 
 namespace {

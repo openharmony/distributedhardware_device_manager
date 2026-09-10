@@ -18,6 +18,7 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
+#include "dm_service_impl_ext_resident_mock.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 #include "softbus_common.h"
@@ -201,6 +202,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_002, testing::ext::
 {
     std::string pkgName = "pkgName";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().RegisterPinHolderCallback(pkgName);
     EXPECT_NE(ret, ERR_DM_NO_PERMISSION);
 }
@@ -260,9 +262,19 @@ HWTEST_F(DeviceManagerServiceTest, DpAclAdd_002, testing::ext::TestSize.Level1)
 {
     std::string udid = "udid";
     int64_t accessControlId = 0;
+    auto &service = DeviceManagerService::GetInstance();
+    bool wasResidentSoLoaded = service.isAdapterResidentSoLoaded_;
+    auto residentService = service.dmServiceImplExtResident_;
+    // The resident adapter is a separate production SO, so inject its test double for this success-path UT.
+    service.isAdapterResidentSoLoaded_ = true;
+    service.dmServiceImplExtResident_ = std::make_shared<DMServiceImplExtResidentMock>();
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
-    int32_t ret = DeviceManagerService::GetInstance().DpAclAdd(udid, accessControlId);
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile())
+        .WillOnce(Return(std::vector<DistributedDeviceProfile::AccessControlProfile> {}));
+    int32_t ret = service.DpAclAdd(udid, accessControlId);
     EXPECT_EQ(ret, DM_OK);
+    service.dmServiceImplExtResident_ = residentService;
+    service.isAdapterResidentSoLoaded_ = wasResidentSoLoaded;
 }
 HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_002, testing::ext::TestSize.Level1)
 {

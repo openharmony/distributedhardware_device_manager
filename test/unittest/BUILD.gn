@@ -3893,26 +3893,13 @@ ohos_unittest("UTTest_mini_tools_kit") {
 
   sources = [ "${devicemanager_path}/test/unittest/UTTest_mini_tools_kit.cpp" ]
 
-  deps = [
-    ":device_manager_test_common",
-    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
-    "${devicemanager_path}/interfaces/kits/js:devicemanager",
-    "${devicemanager_path}/radar:devicemanagerradartest",
-    "${ext_path}/pin_auth:devicemanagerext_pin_auth",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${json_path}:devicemanagerjson",
-    "${mini_tools_kits_path}/native_cpp:devicemanagerminisdk",
-    "${services_path}:devicemanagerservicetest",
-    "${servicesimpl_path}:devicemanagerserviceimpl",
-    "${softbuscache_parh}:dmdevicecache",
-    "${utils_path}:devicemanagerutilstest",
-  ]
+  # Loading both SDKs gives their exported MAP_ERROR_CODE object two process-exit destructors.
+  deps = [ "${mini_tools_kits_path}/native_cpp:devicemanagerminisdk" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
-    "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
     "ipc:ipc_core",
