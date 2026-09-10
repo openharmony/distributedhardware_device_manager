@@ -2476,7 +2476,6 @@ ohos_unittest("UTTest_dm_device_state_manager_two") {
 
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_device_state_manager_two.cpp",
-    # Keep the caller in the test binary so SoftbusConnector calls resolve to the mock.
     "${servicesimpl_path}/src/devicestate/dm_device_state_manager.cpp",
     "mock/deviceprofile_connector_mock.cpp",
     "mock/dm_crypto_mock.cpp",
@@ -3000,7 +2999,6 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
 
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_second.cpp",
-    # Keep the caller in the test binary so HiChainConnector calls resolve to the mock.
     "${servicesimpl_path}/src/authentication/dm_auth_manager.cpp",
     "mock/deviceprofile_connector_mock.cpp",
     "mock/hichain_auth_connector_mock.cpp",
@@ -3888,7 +3886,6 @@ ohos_unittest("UTTest_mini_tools_kit") {
 
   sources = [ "${devicemanager_path}/test/unittest/UTTest_mini_tools_kit.cpp" ]
 
-  # Loading both SDKs gives their exported MAP_ERROR_CODE object two process-exit destructors.
   deps = [ "${mini_tools_kits_path}/native_cpp:devicemanagerminisdk" ]
 
   external_deps = [
@@ -4132,15 +4129,10 @@ ohos_unittest("UTTest_auth_negotiate") {
 
   include_dirs = []
 
-  # This target directly compiles production sources that contain legacy lambda captures.
   cflags_cc = [ "-Wno-unused-lambda-capture" ]
 
   sources = [
     "${devicemanager_path}/test/unittest/UTTest_auth_negotiate.cpp",
-    # Keep the tested state hierarchy and send path in one link unit. Besides making
-    # GetSoftbusSession resolve to the mock, this prevents cross-DSO CFI checks from
-    # seeing an AuthSinkNegotiateStateMachine whose base implementation is in the
-    # production shared library.
     "${servicesimpl_path}/src/authentication_v2/auth_stages/auth_negotiate.cpp",
     "${servicesimpl_path}/src/authentication_v2/dm_auth_message_processor.cpp",
     "${servicesimpl_path}/src/authentication_v2/dm_auth_state.cpp",
