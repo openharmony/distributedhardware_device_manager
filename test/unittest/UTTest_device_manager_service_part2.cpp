@@ -265,7 +265,6 @@ HWTEST_F(DeviceManagerServiceTest, DpAclAdd_002, testing::ext::TestSize.Level1)
     auto &service = DeviceManagerService::GetInstance();
     bool wasResidentSoLoaded = service.isAdapterResidentSoLoaded_;
     auto residentService = service.dmServiceImplExtResident_;
-    // The resident adapter is a separate production SO, so inject its test double for this success-path UT.
     service.isAdapterResidentSoLoaded_ = true;
     service.dmServiceImplExtResident_ = std::make_shared<DMServiceImplExtResidentMock>();
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
