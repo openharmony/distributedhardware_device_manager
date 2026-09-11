@@ -18,6 +18,16 @@ import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DmCommToolFuzzTest") {
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    debug = true
+    integer_overflow = true
+    ubsan = true
+  }
+
   module_out_path = fuzz_test_output_path
   fuzz_config_file =
       "${devicemanager_path}/test/servicesfuzztest/dmcommtool_fuzzer"
