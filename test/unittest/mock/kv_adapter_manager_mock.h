@@ -27,6 +27,9 @@ public:
     virtual ~DmKVAdapterManager() = default;
 public:
     virtual int32_t Get(const std::string &key, DmKVValue &value) = 0;
+    virtual int32_t GetFreezeData(const std::string &key, std::string &value) = 0;
+    virtual int32_t PutFreezeData(const std::string &key, std::string &value) = 0;
+    virtual int32_t DeleteFreezeData(const std::string &key) = 0;
 public:
     static inline std::shared_ptr<DmKVAdapterManager> dmKVAdapterManager = nullptr;
 };
@@ -34,6 +37,9 @@ public:
 class KVAdapterManagerMock : public DmKVAdapterManager {
 public:
     MOCK_METHOD(int32_t, Get, (const std::string &, DmKVValue &));
+    MOCK_METHOD(int32_t, GetFreezeData, (const std::string &, std::string &));
+    MOCK_METHOD(int32_t, PutFreezeData, (const std::string &, std::string &));
+    MOCK_METHOD(int32_t, DeleteFreezeData, (const std::string &));
 };
 }
 }

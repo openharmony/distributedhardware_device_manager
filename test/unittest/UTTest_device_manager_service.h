@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include <mutex>
 #include <refbase.h>
 
 #include <string>

@@ -43,8 +43,8 @@ public:
      * @tc.desc: Get All PkgName from stub
      * @tc.type: FUNC
      */
-    std::vector<ProcessInfo> GetAllProcessInfo();
-    std::set<std::string> GetSystemSA();
+    std::vector<ProcessInfo> GetAllProcessInfo() __attribute__((no_sanitize("cfi")));
+    std::set<std::string> GetSystemSA() __attribute__((no_sanitize("cfi")));
     std::shared_ptr<IpcReq> req_;
 };
 } // namespace DistributedHardware

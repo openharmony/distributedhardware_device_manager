@@ -642,18 +642,22 @@ HWTEST_F(DMCommToolTest, ProcessReceiveUnBindAppEvent_002, testing::ext::TestSiz
 
 HWTEST_F(DMCommToolTest, ProcessReceiveUnBindAppEvent_003, testing::ext::TestSize.Level1)
 {
-    std::string validJson = R"({ "userId": "aaa", "tokenId": "bbb" })";
+    std::string validJson = R"({ "userId": 1, "tokenId": 2, "extra": "extra", "udid": "udid" })";
     std::shared_ptr<CommMsg> commMsg_ = std::make_shared<CommMsg>(1, validJson);
     std::shared_ptr<InnerCommMsg> commMsg = std::make_shared<InnerCommMsg>("networkId", commMsg_, 0);
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>("udid"), Return(DM_OK)));
     EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).WillOnce(Return(DM_OK));
     dmCommTool->ProcessReceiveUnBindAppEvent(commMsg);
 }
 
 HWTEST_F(DMCommToolTest, ProcessReceiveUnBindAppEvent_004, testing::ext::TestSize.Level1)
 {
-    std::string validJson = R"({ "userId": "1234", "tokenId": "1234" })";
+    std::string validJson = R"({ "userId": 1234, "tokenId": 1234, "extra": "extra", "udid": "udid" })";
     std::shared_ptr<CommMsg> commMsg_ = std::make_shared<CommMsg>(1, validJson);
     std::shared_ptr<InnerCommMsg> commMsg = std::make_shared<InnerCommMsg>("networkId", commMsg_, 0);
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>("udid"), Return(DM_OK)));
     EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).WillOnce(Return(DM_OK));
     dmCommTool->ProcessReceiveUnBindAppEvent(commMsg);
 }

@@ -73,6 +73,7 @@ ohos_fuzztest("DmCommToolTwoFuzzTest") {
   ]
 
   external_deps = [
+    "hilog:libhilog",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "dsoftbus:softbus_client",

@@ -56,11 +56,17 @@ void Crypto::DmGenerateStrHash(const void *data, size_t dataSize, unsigned char 
 
 std::string Crypto::Sha256(const std::string &text, bool isUpper)
 {
+    if (DmCrypto::dmCrypto == nullptr) {
+        return "";
+    }
     return DmCrypto::dmCrypto->Sha256(text, isUpper);
 }
 
 std::string Crypto::Sha256(const void *data, size_t size, bool isUpper)
 {
+    if (DmCrypto::dmCrypto == nullptr) {
+        return "";
+    }
     return DmCrypto::dmCrypto->Sha256(data, size, isUpper);
 }
 } // namespace DistributedHardware

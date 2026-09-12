@@ -29,9 +29,15 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DeviceManagerNotifyTest::SetUp() {}
+void DeviceManagerNotifyTest::SetUp()
+{
+    DeviceManagerNotify::GetInstance().dmInitCallback_.clear();
+}
 
-void DeviceManagerNotifyTest::TearDown() {}
+void DeviceManagerNotifyTest::TearDown()
+{
+    DeviceManagerNotify::GetInstance().dmInitCallback_.clear();
+}
 
 void DeviceManagerNotifyTest::SetUpTestCase() {}
 
@@ -165,46 +171,31 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_004, testing::e
 
 /**
  * @tc.name: RegisterDeathRecipientCallback_005
- * @tc.desc: 1. set pkgName not null
- *              set dmInitCallback not null
- *           2. set checkMap null
- *           3. call DeviceManagerNotifyTest RegisterDeathRecipientCallback with parameter
- *           4. Get checkMap from DeviceManagerNotify
- *           5. check checkMap not null
- *           6. call checkMap OnRemoteDied
- *           7. check count is 1
- * deviceTypeId
+ * @tc.desc: register a null callback and verify that no callback entry is created
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
 HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_005, testing::ext::TestSize.Level0)
 {
-    // 1. set pkgName not null
     std::string pkgName = "com.ohos.test";
-    // set dmInitCallback not null
     std::shared_ptr<DmInitCallback> dmInitCallback = nullptr;
-    // 2. set checkMap null
-    std::shared_ptr<DmInitCallback> checkMap = nullptr;
-    // 3. call DeviceManagerNotifyTest RegisterDeathRecipientCallback with parameter
     DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
-    // 4. Get checkMap from DeviceManagerNotify
-    checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
-    // 5. check checkMap not null
-    ASSERT_NE(checkMap, nullptr);
+    auto &callbacks = DeviceManagerNotify::GetInstance().dmInitCallback_;
+    ASSERT_EQ(callbacks.find(pkgName), callbacks.end());
 }
 
 /**
- * @tc.name: RegisterDeathRecipientCallback_005
+ * @tc.name: RegisterDeathRecipientCallback_006
+ * @tc.desc: register an empty package name with a null callback and verify that no callback entry is created
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceManagerNotifyTest, RegisterDeathRecipientCallback_006, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
     std::shared_ptr<DmInitCallback> dmInitCallback = nullptr;
-    std::shared_ptr<DmInitCallback> checkMap = nullptr;
     DeviceManagerNotify::GetInstance().RegisterDeathRecipientCallback(pkgName, dmInitCallback);
-    checkMap = DeviceManagerNotify::GetInstance().dmInitCallback_[pkgName];
-    ASSERT_EQ(checkMap, nullptr);
+    auto &callbacks = DeviceManagerNotify::GetInstance().dmInitCallback_;
+    ASSERT_EQ(callbacks.find(pkgName), callbacks.end());
 }
 
 /**
@@ -2324,6 +2315,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnCredentialResult_001, testing::ext::TestSize
  */
 HWTEST_F(DeviceManagerNotifyTest, OnRemoteDied_001, testing::ext::TestSize.Level0)
 {
+    DeviceManagerNotify::GetInstance().dmInitCallback_.clear();
     DeviceManagerNotify::GetInstance().OnRemoteDied();
     SUCCEED();
 }

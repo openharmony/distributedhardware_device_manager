@@ -1,0 +1,59 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+1.0 {
+  global:
+    extern "C++" {
+      *OHOS::DistributedHardware::CheckProcessNameInWhiteList*;
+      *OHOS::DistributedHardware::DeviceProfileConnector*;
+      *OHOS::DistributedHardware::DevUserInfo*;
+      *OHOS::DistributedHardware::DmAccessCallee*;
+      *OHOS::DistributedHardware::DmAccessCaller*;
+      *OHOS::DistributedHardware::DMAccountInfo*;
+      *OHOS::DistributedHardware::DMAclQuadInfo*;
+      *OHOS::DistributedHardware::DmAuthForm*;
+      *OHOS::DistributedHardware::DmConstrainsManager*;
+      *OHOS::DistributedHardware::DMLocalServiceInfoAuthType*;
+      *OHOS::DistributedHardware::DmOsAccountConstraintSubscriber*;
+      *OHOS::DistributedHardware::DmUserRemovedServiceInfo*;
+      *OHOS::DistributedHardware::ForegroundAccountInfo*;
+      *OHOS::DistributedHardware::GetACLByDeviceIdAndUserId*;
+      *OHOS::DistributedHardware::GetLocalDeviceid*;
+      *OHOS::DistributedHardware::IsProfileForBackgroundUser*;
+      *OHOS::DistributedHardware::IsProfileForForegroundUser*;
+      *OHOS::DistributedHardware::JsonItemObject*;
+      *OHOS::DistributedHardware::MultipleUserConnector*;
+      *OHOS::DistributedHardware::ParseServiceInfoForProfile*;
+      *OHOS::DistributedHardware::PrintProfile*;
+      *OHOS::DistributedHardware::ProcessInfo*;
+      APP;
+      APP_ACROSS_ACCOUNT_TYPE;
+      APP_PEER_TO_PEER_TYPE;
+      DEVICE_ACROSS_ACCOUNT_TYPE;
+      DEVICE_PEER_TO_PEER_TYPE;
+      DM_INVALIED_TYPE;
+      IDENTICAL_ACCOUNT_TYPE;
+      INVALIED_TYPE;
+      SERVICE;
+      SERVICE_ACROSS_ACCOUNT_TYPE;
+      SERVICE_PEER_TO_PEER_TYPE;
+      SHARE_TYPE;
+      USER;
+      TAG_PEER_TOKENID;
+    };
+
+    CreateDpConnectorInstance;
+
+  local:
+    *;
+};

@@ -69,10 +69,6 @@ void AuthNegotiateTest::SetUp()
 
     auto token = AccessTokenKitInterface::GetOrCreateAccessTokenKit();
     tokenMock = std::static_pointer_cast<AccessTokenKitMock>(token);
-
-    Mock::VerifyAndClearExpectations(&*softbusConnectorMock);
-    Mock::VerifyAndClearExpectations(&*softbusSessionMock);
-    Mock::VerifyAndClearExpectations(&*distributedDeviceProfileClientMock_);
 }
 
 void AuthNegotiateTest::TearDown()
@@ -85,7 +81,12 @@ void AuthNegotiateTest::TearDown()
     context = nullptr;
     softbusSession = nullptr;
 
-    Mock::VerifyAndClearExpectations(&*tokenMock);
+    Mock::VerifyAndClearExpectations(softbusConnectorMock.get());
+    Mock::VerifyAndClearExpectations(softbusSessionMock.get());
+    Mock::VerifyAndClearExpectations(distributedDeviceProfileClientMock_.get());
+    Mock::VerifyAndClearExpectations(multipleUserConnectorMock_.get());
+    Mock::VerifyAndClearExpectations(appManagerMock_.get());
+    Mock::VerifyAndClearExpectations(tokenMock.get());
     tokenMock = nullptr;
 }
 

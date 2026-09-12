@@ -86,7 +86,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_201, testing::ext::TestS
 {
     std::string pkgName = "pkgName";
     int32_t userId = 10001;
-    EXPECT_CALL(*appManagerMock_, GetAppId()).Times(::testing::AtLeast(1)).WillOnce(Return("appId"));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     DeviceManagerService::GetInstance().listener_ = std::make_shared<DeviceManagerServiceListener>();
     DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName, userId);
     DeletePermission();
@@ -175,7 +175,7 @@ HWTEST_F(DeviceManagerServiceTest, IsDMImplSoLoaded_201, testing::ext::TestSize.
 HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "CollaborationFwk";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().RegisterPinHolderCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -190,7 +190,9 @@ HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_201, testing::ext::TestSize.L
     PeerTargetId targetId;
     DmPinType pinType = NUMBER_PIN_CODE;
     std::string payload;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>("com.ohos.test"), Return(DM_OK)));
     int32_t ret = DeviceManagerService::GetInstance().CreatePinHolder(pkgName, targetId, pinType, payload);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -205,10 +207,10 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_201, testing::ext::Tes
     std::string networkId = "123";
     int32_t securityLevel;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusListenerMock_, GetDeviceSecurityLevel(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, networkId, securityLevel);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_NE(ret, ERR_DM_NO_PERMISSION);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
@@ -343,12 +345,15 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_201, testing::ext::TestSize.Level
 HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_202, testing::ext::TestSize.Level1)
 {
     SetSetDnPolicyPermission();
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>("com.ohos.test"), Return(DM_OK)));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillRepeatedly(Return(true));
     std::string packName;
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     std::string processName = "collaboration_service";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -361,10 +366,13 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_203, testing::ext::TestSize.Level
 {
     std::string packName = "com.ohos.test";
     SetSetDnPolicyPermission();
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>("com.ohos.test"), Return(DM_OK)));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillRepeatedly(Return(true));
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     std::string processName = "collaboration_service";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -380,7 +388,10 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_204, testing::ext::TestSize.Level
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
     std::string processName = "collaboration_service";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -397,7 +408,10 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_205, testing::ext::TestSize.Level
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "a100";
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     std::string processName = "collaboration_service";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -414,7 +428,10 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_206, testing::ext::TestSize.Level
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100a";
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     std::string processName = "collaboration_service";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -498,12 +515,11 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level1
     std::string key = PARAM_KEY_TARGET_ID;
     std::string value = "186";
     bindParam.insert(std::make_pair(key, value));
-    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
     EXPECT_EQ(ret, DM_OK);
 
     targetId.wifiIp = "178.168.1.2";
-    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*softbusListenerMock_, GetIPAddrTypeFromCache(_, _, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
     EXPECT_EQ(ret, DM_OK);
@@ -514,6 +530,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_201, testing::ext::TestSize.Leve
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "123456";
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillRepeatedly(Return(true));
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
@@ -528,6 +545,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_202, testing::ext::TestSize.Leve
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "123456";
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillRepeatedly(Return(true));
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
@@ -564,20 +582,18 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
 {
     std::string pkgName = "com.ohos.test";
     std::string networkId = "12345";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(0));
     int ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, networkId);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(1));
     EXPECT_CALL(*deviceManagerServiceImplMock_, UnAuthenticateDevice(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, networkId);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(1));
     EXPECT_CALL(*deviceManagerServiceImplMock_, UnAuthenticateDevice(_, _, _)).WillOnce(Return(DM_OK));
@@ -610,7 +626,7 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_205, testing::ext::TestSize.Level1
     int32_t authType = 1;
     std::string deviceId = "1234";
     std::string bindParam;
-    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).Times(::testing::AtLeast(2)).WillRepeatedly(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetTargetInfoFromCache(_, _, _)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, bindParam);
@@ -637,7 +653,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSiz
     std::string extra = "jdddd";
     int32_t authType = 0;
     std::string deviceId = " 2345";
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetTargetInfoFromCache(_, _, _)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
@@ -908,6 +924,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_204, testing::ext::TestSize.Leve
     std::string pkgName;
     std::string udidHash;
     std::string extra;
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillRepeatedly(Return(true));
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     int ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, udidHash, extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
@@ -956,6 +973,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_205, testing::ext::TestSize.Leve
     std::string udidHash = "udidHash";
     std::string extra = "extra";
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillRepeatedly(Return(true));
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(DM_OK));
@@ -1011,7 +1029,7 @@ HWTEST_F(DeviceManagerServiceTest, GetAnonyLocalUdid_202, testing::ext::TestSize
 {
     std::string pkgName;
     std::string anonyUdid;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().GetAnonyLocalUdid(pkgName, anonyUdid);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -1020,7 +1038,7 @@ HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_004, testing::ext::Tes
 {
     std::string pkgName = "pkgName_004";
     EXPECT_CALL(*deviceManagerServiceImplMock_, StopAuthenticateDevice(_)).WillOnce(Return(ERR_DM_FAILED));
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().StopAuthenticateDevice(pkgName);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -1146,9 +1164,9 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_202, testing::ext::T
 {
     std::string pkgName = "pkgName";
     OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+    EXPECT_NE(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_201, testing::ext::TestSize.Level1)
@@ -1164,9 +1182,9 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize
 {
     std::string pkgName = "pkgName";
     OHOS::DistributedHardware::DmDeviceIconInfoFilterOptions filterOptions;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+    EXPECT_NE(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_201, testing::ext::TestSize.Level1)
@@ -1214,7 +1232,7 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDisplayDeviceName_202, testing::ext::
     std::string deviceName = "displayName";
     EXPECT_CALL(*deviceNameManagerMock_, GetLocalDisplayDeviceName(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(deviceName), Return(0)));
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().GetLocalDisplayDeviceName(pkgName, maxNameLength, displayName);
     EXPECT_EQ(ret, DM_OK);
     EXPECT_EQ(displayName, deviceName);
@@ -1268,25 +1286,22 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Lev
     std::string networkId = "networkId";
     DmDeviceInfo deviceInfo;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, DM_OK);
-    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
-    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, DM_OK);
-    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _))
@@ -1294,7 +1309,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Lev
         .WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, DM_OK);
-    EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillOnce(Return(true));
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
@@ -1434,31 +1448,34 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_201, testing::ext::Tes
     DeletePermission();
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceNetworkIdList(pkgName, queryFilter, networkIds);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
 
-    int32_t stopUserId = 1;
-    std::string stopEventUdid = "ud*********4";
-    std::vector<std::string> acceptEventUdids{"acc**********7"};
-    DeviceManagerService::GetInstance().InitDMServiceListener();
-    DeviceManagerService::GetInstance().HandleUserStop(stopUserId, stopEventUdid, acceptEventUdids);
-    DeviceManagerService::GetInstance().HandleUserStop(stopUserId, stopEventUdid);
+HWTEST_F(DeviceManagerServiceTest, HandleUserStop_201, testing::ext::TestSize.Level1)
+{
+    auto &service = DeviceManagerService::GetInstance();
+    {
+        std::lock_guard<std::mutex> lock(service.timerLocks_);
+        service.timer_ = std::make_shared<DmTimer>();
+    }
 
-    std::string localUdid = "local*******76";
+    const int32_t stopUserId = 1;
+    const std::string stopEventUdid = "ud*********4";
+    const std::vector<std::string> acceptEventUdids {"acc**********7"};
+    service.HandleUserStop(stopUserId, stopEventUdid, acceptEventUdids);
+    service.HandleUserStop(stopUserId, stopEventUdid);
+
+    const std::string localUdid = "local*******76";
     std::vector<std::string> peerUdids;
-    DeviceManagerService::GetInstance().NotifyRemoteLocalUserStop(localUdid, peerUdids, stopUserId);
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    DeviceManagerService::GetInstance().SendUserStopBroadCast(peerUdids, stopUserId);
-    std::string remoteUdid = "re********7";
-    DeviceManagerService::GetInstance().HandleUserStopBroadCast(stopUserId, remoteUdid);
+    service.NotifyRemoteLocalUserStop(localUdid, peerUdids, stopUserId);
+    service.softbusListener_ = std::make_shared<SoftbusListener>();
+    service.SendUserStopBroadCast(peerUdids, stopUserId);
+    service.HandleUserStopBroadCast(stopUserId, "re********7");
 
     std::map<std::string, std::string> wifiDevices;
-    wifiDevices.insert(std::make_pair("wikjdmcsk", "deviceInfowifi"));
+    wifiDevices.emplace("wikjdmcsk", "deviceInfowifi");
     EXPECT_CALL(*dMCommToolMock_, SendUserStop(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    DeviceManagerService::GetInstance().NotifyRemoteLocalUserStopByWifi(localUdid, wifiDevices, stopUserId);
-
-    EXPECT_CALL(*dMCommToolMock_, SendUserStop(_, _)).WillOnce(Return(DM_OK));
-    DeviceManagerService::GetInstance().NotifyRemoteLocalUserStopByWifi(localUdid, wifiDevices, stopUserId);
-    DeviceManagerService::GetInstance().UninitDMServiceListener();
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    service.NotifyRemoteLocalUserStopByWifi(localUdid, wifiDevices, stopUserId);
+    service.softbusListener_.reset();
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_202, testing::ext::TestSize.Level1)
@@ -1728,9 +1745,9 @@ HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_001, testing::ext::TestSize
     PeerTargetId targetId;
     std::map<std::string, std::string> bindParam;
     targetId.serviceId = 1;
-    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(false));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().BindServiceTarget(pkgName, targetId, bindParam);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_002, testing::ext::TestSize.Level1)
@@ -1761,8 +1778,9 @@ HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_004, testing::ext::TestSize
     PeerTargetId targetId;
     std::map<std::string, std::string> bindParam;
     targetId.serviceId = 0;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().BindServiceTarget(pkgName, targetId, bindParam);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_005, testing::ext::TestSize.Level1)

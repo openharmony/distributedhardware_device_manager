@@ -19,12 +19,12 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-std::vector<ProcessInfo> IpcServerListener::GetAllProcessInfo()
+std::vector<ProcessInfo> IpcServerListener::GetAllProcessInfo() __attribute__((no_sanitize("cfi")))
 {
     return DmIpcServerListener::dmIpcServerListener->GetAllProcessInfo();
 }
 
-std::set<std::string> IpcServerListener::GetSystemSA()
+std::set<std::string> IpcServerListener::GetSystemSA() __attribute__((no_sanitize("cfi")))
 {
     return DmIpcServerListener::dmIpcServerListener->GetSystemSA();
 }

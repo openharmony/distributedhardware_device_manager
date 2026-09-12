@@ -1,0 +1,8 @@
+[cfi]
+# Exempt device_manager source_set code from CFI cross-DSO checking
+# Root cause: source_set code (in UT binary) makes virtual calls to objects
+# in shared libraries, triggering CFI cross-DSO vtable verification failures
+src:*foundation/distributedhardware/device_manager/*
+src:*third_party/googletest/*
+src:*third_party/cJSON/*
+src:*third_party/json/*

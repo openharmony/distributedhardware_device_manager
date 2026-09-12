@@ -22,5 +22,15 @@ void DmDialogManager::ShowConfirmDialog(const std::string param)
 {
     DmDialogManagerMock::dmDialogManagerMock->ShowConfirmDialog(param);
 }
+
+void DmDialogManager::ShowPinDialog(const std::string param)
+{
+    DmDialogManagerMock::dmDialogManagerMock->ShowPinDialog(param);
 }
+
+void DmDialogManager::ShowInputDialog(const std::string param)
+{
+    DmDialogManagerMock::dmDialogManagerMock->ShowInputDialog(param);
 }
+} // namespace DistributedHardware
+} // namespace OHOS

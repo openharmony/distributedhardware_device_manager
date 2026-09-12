@@ -62,6 +62,40 @@ public:
     MOCK_METHOD(int32_t, ImportAuthInfo, (const DmAuthInfo &));
     MOCK_METHOD(int32_t, ExportAuthInfo, (DmAuthInfo &));
     MOCK_METHOD(int32_t, InitSoftbusServer, ());
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    MOCK_METHOD(int32_t, RegisterServiceInfo, (const DmRegisterServiceInfo &, int64_t &));
+    MOCK_METHOD(int32_t, UnRegisterServiceInfo, (int64_t));
+    MOCK_METHOD(int32_t, RegisterServiceStateCallback, (const std::string &, int64_t));
+    MOCK_METHOD(int32_t, ClearServiceStateCallback, (const std::string &, int32_t));
+    MOCK_METHOD(int32_t, UnRegisterServiceStateCallback, (const std::string &, int64_t));
+    MOCK_METHOD(int32_t, HandleServiceStatusChange, (DmDeviceState, const std::string &));
+    MOCK_METHOD(int32_t, BindServiceOnline, (const ServiceStateBindParameter &));
+    MOCK_METHOD(int32_t, BindServiceOffline, (uint64_t, const std::string &, int32_t, const std::string &,
+        const DistributedDeviceProfile::ServiceInfo &));
+    MOCK_METHOD(int32_t, SetServiceNodeKeyInfo, (const std::string &));
+    MOCK_METHOD(int32_t, GetServiceNodeKeyInfo, (const std::string &, const std::string &));
+    MOCK_METHOD(int32_t, SyncServiceInfoOnline, (const std::string &, const std::string &));
+    MOCK_METHOD(int32_t, SyncServiceInfoByServiceId, (const std::string &, int32_t, const std::string &, int64_t));
+    MOCK_METHOD(int32_t, SyncAllServiceInfo, (const std::string &, int32_t, const std::string &));
+    MOCK_METHOD(int32_t, GetLocalServiceInfoByServiceId, (int64_t, DmRegisterServiceInfo &));
+    MOCK_METHOD(int32_t, GetTrustServiceInfo, (const std::string &,
+        (const std::map<std::string, std::string> &), (std::vector<DmServiceInfo> &)));
+    MOCK_METHOD(int32_t, GetRegisterServiceInfo,
+        ((const std::map<std::string, std::string> &), (std::vector<DmRegisterServiceInfo> &)));
+    MOCK_METHOD(int32_t, GetPeerServiceInfoByServiceId,
+        (const std::string &, int64_t, DmRegisterServiceInfo &));
+    MOCK_METHOD(int32_t, UnbindServiceTarget, (const std::string &,
+        (const std::map<std::string, std::string> &), const std::string &, int64_t));
+    MOCK_METHOD(void, HandleServiceUnRegEvent, (const std::string &, int64_t));
+    MOCK_METHOD(int32_t, HandleRemoteDied, (const ProcessInfo &));
+    MOCK_METHOD(int32_t, HandleDMRestart, ());
+    MOCK_METHOD(int32_t, HandleSoftbusRestart, ());
+    MOCK_METHOD(int32_t, UpdateServiceInfo, (int64_t, const DmRegisterServiceInfo &));
+    MOCK_METHOD(int32_t, DeleteServiceInfoForAccountEvent,
+        (int32_t, const std::string &, const std::string &));
+    MOCK_METHOD(int32_t, SubscribeAllServiceInfo, ());
+    MOCK_METHOD(void, HandleProcessUnBindServiceProxy, (UnbindServiceProxyParam &));
+#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -46,7 +46,7 @@ HWTEST_F(MultipleUserConnectorTest, GetCurrentAccountUserID_001, testing::ext::T
 {
     int32_t ret = DM_OK;
     ret = MultipleUserConnector::GetCurrentAccountUserID();
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_GE(ret, 0);
 }
 
 /**
@@ -561,7 +561,7 @@ HWTEST_F(MultipleUserConnectorTest, GetUserIdByDisplayId_003, testing::ext::Test
 HWTEST_F(MultipleUserConnectorTest, IsUserUnlocked_002, testing::ext::TestSize.Level1)
 {
     bool unlocked = MultipleUserConnector::IsUserUnlocked(555007);
-    EXPECT_TRUE(unlocked);
+    EXPECT_FALSE(unlocked);
 }
 
 /**

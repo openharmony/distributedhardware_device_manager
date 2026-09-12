@@ -20,6 +20,7 @@
 #include <string>
 
 #include "device_manager_service_listener.h"
+#include "device_manager_service_notify.h"
 #include "dm_device_info.h"
 #include "ipc_server_listener.h"
 #include "dm_softbus_cache_mock.h"

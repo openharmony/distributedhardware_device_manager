@@ -45,6 +45,8 @@ public:
     MockDeviceManagerServiceListener() = default;
     ~MockDeviceManagerServiceListener() = default;
     void OnCredentialResult(const ProcessInfo &processInfo, int32_t action, const std::string &resultInfo) override {}
+    void OnCredentialAuthStatus(const ProcessInfo &processInfo, const std::string &deviceList,
+        uint16_t deviceTypeId, int32_t errcode) override {}
 };
 
 class MockCredentialServiceListener : public DeviceManagerServiceListener {
