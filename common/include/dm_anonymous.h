@@ -113,6 +113,9 @@ bool IsJsonValIntegerString(const JsonItemObject &jsonObj, const std::string &ke
 std::string GetAnonyJsonString(const std::string &value);
 int64_t GetCurrentTimestamp();
 int32_t ConvertStrToInt(const std::string &inputStr);
+bool CheckDisplayIdAndServiceCode(const std::map<std::string, std::string> &paramMap);
+bool CheckDisplayIdAndServiceCode(const JsonItemObject &jsonObject);
+bool CheckBindParam(const std::map<std::string, std::string> &paramMap, std::string &deviceId);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H

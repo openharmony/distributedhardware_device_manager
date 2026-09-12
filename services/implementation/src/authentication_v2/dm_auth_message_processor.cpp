@@ -102,6 +102,7 @@ const char* TAG_LOCAL_DISPLAY_ID = "localDisplayId";
 const char* TAG_EXTRA_INFO = "extraInfo";
 const char* TAG_ACL_TYPE_LIST = "aclTypeList";
 const char* TAG_CERT_TYPE_LIST = "certTypeList";
+const char* TAG_SERVICE_CODE = "serviceCode";
 
 const char* TAG_IS_ONLINE = "isOnline";
 const char* TAG_IS_AUTHED = "isAuthed";
@@ -1374,6 +1375,7 @@ int32_t DmAuthMessageProcessor::CreateServiceNegotiateMessage(std::shared_ptr<Dm
 {
     LOGI("inner1");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    jsonObject[TAG_SERVICE_CODE] = context->accessee.serviceCode;
     jsonObject[PARAM_KEY_IS_PROXY_BIND] = context->IsProxyBind;
     jsonObject[PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT] = context->IsCallingProxyAsSubject;
     if (context != nullptr && context->IsProxyBind && !context->subjectServiceOnes.empty()) {
@@ -1434,6 +1436,7 @@ int32_t DmAuthMessageProcessor::CreateRespNegotiateMessage(std::shared_ptr<DmAut
     jsonObject[TAG_EXTRA_INFO] = context->accessee.extraInfo;
     jsonObject[TAG_NETWORKID_ID] = context->accessee.networkId;
     jsonObject[TAG_CERT_RANDOM] = context->accessee.certRandom;
+    jsonObject[TAG_SERVICE_ID] = context->accessee.serviceId;
 
     jsonObject[TAG_IS_ONLINE] = context->accesser.isOnline;
     jsonObject[TAG_DEVICE_TYPE] = context->accessee.deviceType;
@@ -1452,6 +1455,7 @@ int32_t DmAuthMessageProcessor::CreateProxyRespNegotiateMessage(std::shared_ptr<
         for (const auto &app : targetList) {
             JsonObject object;
             object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
+            object[TAG_SERVICE_ID] = app.proxyAccessee.serviceId;
             object[TAG_TOKEN_ID_HASH] = app.proxyAccessee.tokenIdHash;
             object[TAG_ACL_TYPE_LIST] = app.proxyAccessee.aclTypeList;
             object[TAG_CERT_TYPE_LIST] = app.proxyAccessee.credTypeList;
@@ -2030,6 +2034,9 @@ void DmAuthMessageProcessor::ParseServiceNego(const JsonObject &jsonObject,
     if (IsInt64(jsonObject, TAG_SERVICE_ID)) {
         context->accessee.serviceId = jsonObject[TAG_SERVICE_ID].Get<int64_t>();
     }
+    if (context->accessee.serviceId == 0 && jsonObject[TAG_SERVICE_CODE].IsString()) {
+        context->accessee.serviceCode = jsonObject[TAG_SERVICE_CODE].Get<std::string>();
+    }
 }
 
 void DmAuthMessageProcessor::ParseAccesserInfo(const JsonObject &jsonObject,
@@ -2249,6 +2256,10 @@ int32_t DmAuthMessageProcessor::ParseMessageProxyRespAclNegotiate(const JsonObje
     std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (jsonObject[TAG_SERVICE_ID].IsNumberInteger()) {
+        context->accessee.serviceId = jsonObject[TAG_SERVICE_ID].Get<int64_t>();
+        context->accesser.serviceId = context->accessee.serviceId;
+    }
     auto &targetList = context->isServiceBind ? context->subjectServiceOnes : context->subjectProxyOnes;
     auto targetKey = context->isServiceBind ? PARAM_KEY_SUBJECT_SERVICE_ONES : PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
     //sink not support proxy
@@ -2277,6 +2288,9 @@ int32_t DmAuthMessageProcessor::ParseMessageProxyRespAclNegotiate(const JsonObje
         proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
         auto it = std::find(targetList.begin(), targetList.end(), proxyAuthContext);
         if (it != targetList.end()) {
+            if (IsInt64(item, TAG_SERVICE_ID)) {
+                it->proxyAccessee.serviceId = item[TAG_SERVICE_ID].Get<int64_t>();
+            }
             it->proxyAccessee.tokenIdHash = item[TAG_TOKEN_ID_HASH].Get<std::string>();
             it->proxyAccessee.aclTypeList = item[TAG_ACL_TYPE_LIST].Get<std::string>();
             it->proxyAccessee.credTypeList = item[TAG_CERT_TYPE_LIST].Get<std::string>();

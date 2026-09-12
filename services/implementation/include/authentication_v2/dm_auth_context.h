@@ -230,6 +230,7 @@ struct DmAccess {
     bool isGeneratedLnnCredThisBind{false};
     bool isGeneratedTransmitThisBind{false};
     std::string serviceInfo;
+    std::string serviceCode;
 };
 
 struct DmAuthContext {

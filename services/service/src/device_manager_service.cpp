@@ -6032,8 +6032,8 @@ int32_t DeviceManagerService::BindServiceTarget(const std::string &pkgName, cons
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (targetId.serviceId == 0) {
-        LOGE("Invalid parameter, service id is empty.");
+    if (targetId.serviceId == 0 && !CheckDisplayIdAndServiceCode(bindParam)) {
+        LOGE("Invalid parameter, serviceId and displayId and serviceCode are not exist");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {

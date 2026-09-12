@@ -303,12 +303,21 @@ typedef struct PeerTargetId {
      * service id.
      */
     int64_t serviceId = 0;
+    /**
+     * peer display id.
+     */
+    int32_t peerDisplayId = -1;
+    /**
+     * service code.
+     */
+    std::string serviceCode = "";
 
     bool operator==(const PeerTargetId &other) const
     {
         return (deviceId == other.deviceId) && (brMac == other.brMac) &&
             (bleMac == other.bleMac) && (wifiIp == other.wifiIp) && (wifiPort == other.wifiPort) &&
-            (serviceId == other.serviceId);
+            (serviceId == other.serviceId) && (peerDisplayId == other.peerDisplayId) &&
+            (serviceCode == other.serviceCode);
     }
 
     bool operator<(const PeerTargetId &other) const
@@ -320,7 +329,12 @@ typedef struct PeerTargetId {
             (deviceId == other.deviceId && brMac == other.brMac && bleMac == other.bleMac && wifiIp == other.wifiIp &&
                 wifiPort < other.wifiPort) ||
             (deviceId == other.deviceId && brMac == other.brMac && bleMac == other.bleMac && wifiIp == other.wifiIp &&
-                wifiPort == other.wifiPort && serviceId < other.serviceId);
+                wifiPort == other.wifiPort && serviceId < other.serviceId) ||
+            (deviceId == other.deviceId && brMac == other.brMac && bleMac == other.bleMac && wifiIp == other.wifiIp &&
+                wifiPort == other.wifiPort && serviceId == other.serviceId && peerDisplayId < other.peerDisplayId) ||
+            (deviceId == other.deviceId && brMac == other.brMac && bleMac == other.bleMac && wifiIp == other.wifiIp &&
+                wifiPort == other.wifiPort && serviceId == other.serviceId && peerDisplayId == other.peerDisplayId &&
+            serviceCode < other.serviceCode);
     }
 } PeerTargetId;
 

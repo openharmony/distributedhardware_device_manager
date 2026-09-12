@@ -181,6 +181,8 @@ bool EncodePeerTargetId(const PeerTargetId &targetId, MessageParcel &parcel)
     bRet = (bRet && parcel.WriteString(targetId.wifiIp));
     bRet = (bRet && parcel.WriteUint16(targetId.wifiPort));
     bRet = (bRet && parcel.WriteInt64(targetId.serviceId));
+    bRet = (bRet && parcel.WriteInt32(targetId.peerDisplayId));
+    bRet = (bRet && parcel.WriteString(targetId.serviceCode));
     return bRet;
 }
 
@@ -192,6 +194,8 @@ void DecodePeerTargetId(MessageParcel &parcel, PeerTargetId &targetId)
     targetId.wifiIp = parcel.ReadString();
     targetId.wifiPort = parcel.ReadUint16();
     targetId.serviceId = parcel.ReadInt64();
+    targetId.peerDisplayId = parcel.ReadInt32();
+    targetId.serviceCode = parcel.ReadString();
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)

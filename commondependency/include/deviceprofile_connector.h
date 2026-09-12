@@ -468,7 +468,8 @@ public:
     DM_EXPORT int32_t UpdateAclByDualForegroundAccountHash(const std::string &localUdid,
         const std::string &peerUdid, const std::vector<ForegroundAccountInfo> &localForegroundAccounts,
         const std::vector<ForegroundAccountInfo> &peerForegroundAccounts);
-
+    DM_EXPORT int32_t GetServiceIdByDisplayIdAndServiceCode(int64_t displayId, const std::string &serviceCode,
+        int64_t &serviceId);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,

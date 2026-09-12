@@ -272,7 +272,60 @@ void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, st
 bool IsInvalidPeerTargetId(const PeerTargetId &targetId)
 {
     return targetId.deviceId.empty() && targetId.brMac.empty() && targetId.bleMac.empty() &&
-        targetId.wifiIp.empty() && (targetId.serviceId == 0);
+        targetId.wifiIp.empty() && (targetId.serviceId == 0) && (targetId.peerDisplayId == -1) &&
+        targetId.serviceCode.empty();
+}
+
+static std::string GetExtraJsonString(const std::map<std::string, std::string> &bindParam)
+{
+    auto iter = bindParam.find("BIND_EXTRA_DATA");
+    if (iter != bindParam.end()) {
+        return iter->second;
+    }
+    return ConvertMapToJsonString(bindParam);
+}
+ 
+bool CheckBindParam(const std::map<std::string, std::string> &paramMap, std::string &deviceId)
+{
+    JsonObject jsonObject(GetExtraJsonString(paramMap));
+    if (jsonObject.IsDiscarded()) {
+        LOGE("extra string not a json type.");
+        return false;
+    }
+    if (!IsInt32(jsonObject, "peerDisplayId") || !IsString(jsonObject, "serviceCode") ||
+        !IsString(jsonObject, "hmlActionId")) {
+        LOGE("Invalid paramMap.");
+        return false;
+    }
+    deviceId = jsonObject["hmlActionId"].Get<std::string>();
+    return true;
+}
+ 
+bool CheckDisplayIdAndServiceCode(const std::map<std::string, std::string> &paramMap)
+{
+    JsonObject jsonObject(GetExtraJsonString(paramMap));
+    if (jsonObject.IsDiscarded()) {
+        LOGE("extra string not a json type.");
+        return false;
+    }
+    if (!IsInt32(jsonObject, "peerDisplayId") || !IsString(jsonObject, "serviceCode")) {
+        LOGE("Invalid paramMap.");
+        return false;
+    }
+    return true;
+}
+ 
+bool CheckDisplayIdAndServiceCode(const JsonItemObject &jsonObject)
+{
+    if (jsonObject.IsDiscarded()) {
+        LOGE("extra string not a json type.");
+        return false;
+    }
+    if (!IsInt32(jsonObject, "peerDisplayId") || !IsString(jsonObject, "serviceCode")) {
+        LOGE("Invalid paramMap.");
+        return false;
+    }
+    return true;
 }
 
 std::string ConvertCharArray2String(const char *srcData, uint32_t srcLen)
