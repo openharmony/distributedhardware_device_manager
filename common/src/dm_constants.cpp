@@ -52,6 +52,7 @@ const char* DM_TYPE_OH = "OH";
 const char* TAG_SESSION_HEARTBEAT = "session_heartbeat";
 const char* TAG_BUNDLE_NAME = "bundleName";
 const char* TAG_TOKENID = "tokenId";
+const char* TAG_IS_PIN_FALLBACK = "isPinFallback";
 const char* TAG_REMAINING_FROZEN_TIME = "remainingFrozenTime";
 const char* TAG_SERVICE_ID_EXT = "serviceId";
 //The following constant are provided only for HiLink.

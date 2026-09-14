@@ -61,6 +61,7 @@ DM_EXPORT extern const char* DM_TYPE_OH;
 DM_EXPORT extern const char* TAG_SESSION_HEARTBEAT;
 DM_EXPORT extern const char* TAG_BUNDLE_NAME;
 DM_EXPORT extern const char* TAG_TOKENID;
+DM_EXPORT extern const char* TAG_IS_PIN_FALLBACK;
 DM_EXPORT extern const char* TAG_REMAINING_FROZEN_TIME;
 DM_EXPORT extern const char* TAG_SERVICE_ID_EXT;
 //The following constant are provided only for HiLink.

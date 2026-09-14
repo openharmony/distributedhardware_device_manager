@@ -314,6 +314,7 @@ private:
     bool ExtractPinConsumerTokenId(const std::string &srvExtraInfo, uint64_t &tokenId);
     void ProcessImportAuthInfo(std::shared_ptr<DmAuthContext> context,
         const OHOS::DistributedDeviceProfile::LocalServiceInfo &srvInfo);
+    bool ParseIsPinFallback(const std::string &srvExtraInfo);
 };
 
 class AuthSrcPinNegotiateStartState : public DmAuthState {

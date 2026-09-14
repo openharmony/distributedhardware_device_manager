@@ -1323,6 +1323,26 @@ int32_t ExtractAclLifeCycleDays(const std::string &extraInfo)
 }
 } // namespace
 
+bool AuthSinkConfirmState::ParseIsPinFallback(const std::string &srvExtraInfo)
+{
+    bool isPinFallback = true;
+    if (srvExtraInfo.empty()) {
+        return isPinFallback;
+    }
+    JsonObject extraInfoObj;
+    extraInfoObj.Parse(srvExtraInfo);
+    if (extraInfoObj.IsDiscarded()) {
+        LOGE("isPinFallback parse failed");
+        return isPinFallback;
+    }
+    if (!IsBool(extraInfoObj, TAG_IS_PIN_FALLBACK)) {
+        LOGE("isPinFallback field invalid");
+        return isPinFallback;
+    }
+    isPinFallback = extraInfoObj[TAG_IS_PIN_FALLBACK].Get<bool>();
+    return isPinFallback;
+}
+
 void AuthSinkConfirmState::ProcessImportAuthInfo(std::shared_ptr<DmAuthContext> context,
     const OHOS::DistributedDeviceProfile::LocalServiceInfo &srvInfo)
 {
@@ -1333,6 +1353,7 @@ void AuthSinkConfirmState::ProcessImportAuthInfo(std::shared_ptr<DmAuthContext> 
     // read authBoxType
     context->authBoxType = static_cast<DMLocalServiceInfoAuthBoxType>(srvInfo.GetAuthBoxType());
     std::string srvExtraInfo = srvInfo.GetExtraInfo();
+    context->isPinFallback = ParseIsPinFallback(srvExtraInfo);
     uint64_t pinConsumerTokenId = 0;
     bool hasTokenId = ExtractPinConsumerTokenId(srvExtraInfo, pinConsumerTokenId);
     if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) && hasTokenId &&
@@ -1403,7 +1424,9 @@ int32_t AuthSinkConfirmState::ProcessBindAuthorize(std::shared_ptr<DmAuthContext
     context->authTypeList.clear();
     context->authTypeList.push_back(context->authType);
     if (context->authType == AUTH_TYPE_PIN_ULTRASONIC) {
-        context->authTypeList.push_back(AUTH_TYPE_PIN);
+        if (context->isPinFallback) {
+            context->authTypeList.push_back(AUTH_TYPE_PIN);
+        }
     } else {
         MatchFallBackCandidateList(context, context->authType);
     }
