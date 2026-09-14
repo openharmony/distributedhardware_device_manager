@@ -367,17 +367,13 @@ int32_t IpcServiceStub3rd::QueryTrustRelation(MessageParcel &data, MessageParcel
             !reply.WriteInt32(deviceInfo.bindType) ||
             !reply.WriteString(skStr)) {
             LOGE("write trustedDeviceList item failed");
-            if (!skStr.empty()) {
-                (void)memset_s(skStr.data(), skStr.size(), 0, skStr.size());
-            }
+            (void)memset_s(skStr.data(), skStr.size(), 0, skStr.size());
             if (!sessionKeyVec.empty()) {
                 (void)memset_s(sessionKeyVec.data(), sessionKeyVec.size(), 0, sessionKeyVec.size());
             }
             return ERR_DM_IPC_WRITE_FAILED;
         }
-        if (!skStr.empty()) {
-            (void)memset_s(skStr.data(), skStr.size(), 0, skStr.size());
-        }
+        (void)memset_s(skStr.data(), skStr.size(), 0, skStr.size());
         if (!sessionKeyVec.empty()) {
             (void)memset_s(sessionKeyVec.data(), sessionKeyVec.size(), 0, sessionKeyVec.size());
         }
