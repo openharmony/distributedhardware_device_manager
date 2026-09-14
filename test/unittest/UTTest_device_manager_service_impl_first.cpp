@@ -922,11 +922,25 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, GetLogicalIdAndTokenIdBySessionId_00
     uint64_t tokenId = 1000023;
     uint64_t logicalSessionId = 45678910;
 
-    deviceManagerServiceImpl_->logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(deviceManagerServiceImpl_->logicalSessionId2SessionIdMapMtx_);
+        deviceManagerServiceImpl_->logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+    }
+    {
+        std::lock_guard<ffrt::mutex> tokenIdLock(deviceManagerServiceImpl_->logicalSessionId2TokenIdMapMtx_);
+        deviceManagerServiceImpl_->logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
+    }
     auto ret = deviceManagerServiceImpl_->GetLogicalIdAndTokenIdBySessionId(logicalSessionId,
-        tokenId, logicalSessionId);
+        tokenId, sessionId);
     EXPECT_EQ(ret, DM_OK);
-    deviceManagerServiceImpl_->logicalSessionId2SessionIdMap_.clear();
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(deviceManagerServiceImpl_->logicalSessionId2SessionIdMapMtx_);
+        deviceManagerServiceImpl_->logicalSessionId2SessionIdMap_.clear();
+    }
+    {
+        std::lock_guard<ffrt::mutex> tokenIdLock(deviceManagerServiceImpl_->logicalSessionId2TokenIdMapMtx_);
+        deviceManagerServiceImpl_->logicalSessionId2TokenIdMap_.clear();
+    }
 }
 
 HWTEST_F(DeviceManagerServiceImplFirstTest, TransferSinkOldAuthMgr_001, testing::ext::TestSize.Level1)

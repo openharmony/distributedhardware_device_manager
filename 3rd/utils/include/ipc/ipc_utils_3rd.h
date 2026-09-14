@@ -16,6 +16,10 @@
 #ifndef OHOS_DM_IPC_UTILS_3RD_H
 #define OHOS_DM_IPC_UTILS_3RD_H
 
+#include <cstring>
+#include <securec.h>
+#include <string>
+
 #include "dm_log_3rd.h"
 #include "ipc_types.h"
 #include "device_manager_data_struct_3rd.h"
