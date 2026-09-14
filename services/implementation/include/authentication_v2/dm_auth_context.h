@@ -246,6 +246,7 @@ struct DmAuthContext {
     std::vector<DmAuthType> authTypeList;
     uint32_t currentAuthTypeIdx{0};
     int32_t inputPinAuthFailTimes{0}; // Number of failed PIN authentication attempts, exceeding 3 results in failure
+    bool isPinFallback{true};
     std::string pinCode{""};
     bool serviceInfoFound{false};
     // Link delay release time, does not automatically disconnect after
