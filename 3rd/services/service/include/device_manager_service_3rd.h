@@ -61,7 +61,6 @@ public:
 private:
     bool IsDMServiceImpl3rdReady();
     int32_t GenRandInt(int32_t randMin, int32_t randMax);
-    std::string GeneratePinCode(uint32_t pinLength);
     bool IsInvalidPeerTargetId(const PeerTargetId3rd &targetId);
     void QuerySessionKey(int32_t userId, int32_t skId, TrustDeviceInfo3rd &deviceInfo);
     int32_t GetProxyDelInfo(const std::string &peerDeviceId,
