@@ -16,32 +16,12 @@
 #ifndef OHOS_DM_IPC_UTILS_3RD_H
 #define OHOS_DM_IPC_UTILS_3RD_H
 
-#include <string>
-#include <vector>
-#include <securec.h>
-
 #include "dm_log_3rd.h"
 #include "ipc_types.h"
 #include "device_manager_data_struct_3rd.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-
-inline void SecureMemZeroString(std::string &str) noexcept
-{
-    if (!str.empty()) {
-        (void)memset_s(&str[0], str.size(), 0, str.size());
-        str.clear();
-    }
-}
-
-inline void SecureMemZeroVector(std::vector<unsigned char> &bytes) noexcept
-{
-    if (!bytes.empty()) {
-        (void)memset_s(bytes.data(), bytes.size(), 0, bytes.size());
-        bytes.clear();
-    }
-}
 
 #define WRITE_HELPER_RET(parcel, type, value, failRet) \
     do { \

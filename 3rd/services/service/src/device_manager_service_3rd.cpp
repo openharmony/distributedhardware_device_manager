@@ -29,7 +29,6 @@
 #include "deviceprofile_connector_3rd.h"
 #include "kv_adapter_manager_3rd.h"
 #include "ipc_skeleton.h"
-#include "ipc_utils_3rd.h"
 #include "multiple_user_connector_3rd.h"
 #include "permission_manager_3rd.h"
 
@@ -126,6 +125,24 @@ int32_t DeviceManagerService3rd::GenRandInt(int32_t randMin, int32_t randMax)
     return disRand(genRand);
 }
 
+std::string DeviceManagerService3rd::GeneratePinCode(uint32_t pinLength)
+{
+    if (pinLength < DM_MIN_PINCODE_SIZE || pinLength > DM_MAX_PINCODE_SIZE) {
+        LOGE("pinLength error: Invalid para");
+        return "";
+    }
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    std::string pinCode = std::to_string(GenRandInt(DM_MIN_RANDOM, DM_MAX_RANDOM));
+    uint32_t left_digit_count = pinLength - 1;
+    while (pinCode.length() <= left_digit_count) {
+        uint64_t rest_num = gen();
+        pinCode += std::to_string(rest_num);
+    }
+    pinCode = pinCode.substr(0, pinLength);
+    return pinCode;
+}
+
 int32_t DeviceManagerService3rd::GeneratePinCode(uint32_t pinLength, std::string &pincode)
 {
     if (!PermissionManager3rd::GetInstance().CheckAccessServicePermission()) {
@@ -137,17 +154,16 @@ int32_t DeviceManagerService3rd::GeneratePinCode(uint32_t pinLength, std::string
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pinLength: %{public}u", pinLength);
-    SecureMemZeroString(pincode);
-    pincode.resize(pinLength);
-
-    std::random_device rd;
-    std::mt19937_64 gen(rd());
-    std::uniform_int_distribution<int32_t> digit(0, 9);
-    pincode[0] = static_cast<char>('0' + GenRandInt(DM_MIN_RANDOM, DM_MAX_RANDOM));
-    for (uint32_t i = 1; i < pinLength; ++i) {
-        pincode[i] = static_cast<char>('0' + digit(gen));
+    std::string generatedPinCode = GeneratePinCode(pinLength);
+    int32_t length = static_cast<int32_t>(generatedPinCode.length());
+    for (int32_t i = 0; i < length; i++) {
+        if (!isdigit(generatedPinCode[i])) {
+            LOGE("ImportAuthCode error: Invalid para, authCode format error.");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
     }
-
+   
+    pincode = generatedPinCode;
     LOGI("completed, pincode: %{public}zu", pincode.size());
     return DM_OK;
 }
@@ -336,25 +352,20 @@ void DeviceManagerService3rd::QuerySessionKey(int32_t userId, int32_t skId, Trus
     std::vector<unsigned char> sessionKey;
     int32_t ret = DeviceProfileConnector3rd::GetInstance().GetSessionKey(userId, skId, sessionKey);
     if (ret != DM_OK) {
-        SecureMemZeroVector(sessionKey);
         LOGE("GetSessionKey failed: %{public}d", ret);
         return;
     }
     uint32_t keyLen = sessionKey.size();
     if (keyLen > MAX_SESSION_KEY_LENGTH) {
-        SecureMemZeroVector(sessionKey);
         LOGE("SessionKey too long, len: %{public}d", keyLen);
         return;
     }
     deviceInfo.sessionKey.key = (uint8_t*)calloc(keyLen, sizeof(uint8_t));
     if (deviceInfo.sessionKey.key == nullptr) {
-        SecureMemZeroVector(sessionKey);
         LOGE("calloc failed.");
         return;
     }
-    int32_t copyRet = memcpy_s(deviceInfo.sessionKey.key, keyLen, sessionKey.data(), keyLen);
-    SecureMemZeroVector(sessionKey);
-    if (copyRet != DM_OK) {
+    if (memcpy_s(deviceInfo.sessionKey.key, keyLen, sessionKey.data(), keyLen) != DM_OK) {
         LOGE("memcpy_s failed.");
         (void)memset_s(deviceInfo.sessionKey.key, keyLen, 0, keyLen);
         free(deviceInfo.sessionKey.key);

@@ -24,7 +24,6 @@
 #include "permission_manager_3rd.h"
 #include "dm_error_type_3rd.h"
 #include "device_manager_data_struct_3rd.h"
-#include "dm_auth_info_3rd.h"
 #include "ipc_utils_3rd.h"
 #include "dm_anonymous_3rd.h"
 
@@ -203,7 +202,6 @@ int32_t IpcServiceStub3rd::ImportPinCode3rd(MessageParcel &data, MessageParcel &
     std::string businessName = data.ReadString();
     std::string pincode = data.ReadString();
     int32_t result = DeviceManagerService3rd::GetInstance().ImportPinCode3rd(businessName, pincode);
-    SecureMemZeroString(pincode);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -217,13 +215,10 @@ int32_t IpcServiceStub3rd::GeneratePinCode(MessageParcel &data, MessageParcel &r
     std::string pincode;
     int32_t result = DeviceManagerService3rd::GetInstance().GeneratePinCode(pinLength, pincode);
     if (!reply.WriteInt32(result)) {
-        SecureMemZeroString(pincode);
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    bool writeOk = reply.WriteString(pincode);
-    SecureMemZeroString(pincode);
-    if (!writeOk) {
+    if (!reply.WriteString(pincode)) {
         LOGE("write pincode failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
@@ -327,24 +322,19 @@ int32_t IpcServiceStub3rd::QueryTrustRelation(MessageParcel &data, MessageParcel
     std::vector<TrustDeviceInfo3rd> trustedDeviceList;
     int32_t result = DeviceManagerService3rd::GetInstance().QueryTrustRelation(businessName, trustedDeviceList);
     if (!reply.WriteInt32(result)) {
-        FreeDeviceInfos(trustedDeviceList);
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (result != DM_OK) {
-        FreeDeviceInfos(trustedDeviceList);
         return result;
     }
     if (!reply.WriteInt32(static_cast<int32_t>(trustedDeviceList.size()))) {
-        FreeDeviceInfos(trustedDeviceList);
         LOGE("write trustedDeviceList size failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     for (auto &deviceInfo : trustedDeviceList) {
-        std::vector<unsigned char> sessionKeyVec;
-        if (deviceInfo.sessionKey.key != nullptr) {
-            sessionKeyVec.assign(deviceInfo.sessionKey.key, deviceInfo.sessionKey.key + deviceInfo.sessionKey.keyLen);
-        }
+        std::vector<unsigned char> sessionKeyVec = std::vector<unsigned char>(deviceInfo.sessionKey.key,
+            deviceInfo.sessionKey.key + deviceInfo.sessionKey.keyLen);
         std::string skStr(sessionKeyVec.begin(), sessionKeyVec.end());
         if (deviceInfo.sessionKey.key != nullptr) {
             (void)memset_s(deviceInfo.sessionKey.key, deviceInfo.sessionKey.keyLen, 0, deviceInfo.sessionKey.keyLen);
@@ -352,18 +342,14 @@ int32_t IpcServiceStub3rd::QueryTrustRelation(MessageParcel &data, MessageParcel
             deviceInfo.sessionKey.key = nullptr;
             deviceInfo.sessionKey.keyLen = 0;
         }
-        bool writeFailed = !reply.WriteString(deviceInfo.trustDeviceId) ||
+        if (!reply.WriteString(deviceInfo.trustDeviceId) ||
             !reply.WriteInt32(deviceInfo.sessionKeyId) ||
             !reply.WriteInt64(deviceInfo.createTime) ||
             !reply.WriteInt32(deviceInfo.userId) ||
             !reply.WriteString(deviceInfo.extra) ||
             !reply.WriteInt32(deviceInfo.bindLevel) ||
             !reply.WriteInt32(deviceInfo.bindType) ||
-            !reply.WriteString(skStr);
-        SecureMemZeroString(skStr);
-        SecureMemZeroVector(sessionKeyVec);
-        if (writeFailed) {
-            FreeDeviceInfos(trustedDeviceList);
+            !reply.WriteString(skStr)) {
             LOGE("write trustedDeviceList item failed");
             return ERR_DM_IPC_WRITE_FAILED;
         }
