@@ -43,6 +43,7 @@ const int32_t DM_MIN_RANDOM = 1;
 const int32_t DM_MAX_RANDOM = 9;
 const int32_t DM_MIN_PINCODE_SIZE = 6;
 const int32_t DM_MAX_PINCODE_SIZE = 1024;
+constexpr uint32_t MAX_UINT64_DECIMAL_DIGITS = 20;
 constexpr uint32_t MAX_SESSION_KEY_LENGTH = 512;
 }
 
@@ -134,7 +135,7 @@ std::string DeviceManagerService3rd::GeneratePinCode(uint32_t pinLength)
     std::random_device rd;
     std::mt19937_64 gen(rd());
     std::string pinCode = std::to_string(GenRandInt(DM_MIN_RANDOM, DM_MAX_RANDOM));
-    pinCode.reserve(pinLength + 20);
+    pinCode.reserve(pinLength + MAX_UINT64_DECIMAL_DIGITS);
     uint32_t left_digit_count = pinLength - 1;
     while (pinCode.length() <= left_digit_count) {
         uint64_t rest_num = gen();
