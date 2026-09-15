@@ -27,6 +27,7 @@
 #include "screenlock_manager.h"
 #endif
 #include "dm_log.h"
+#include "dm_anonymous.h"
 #include <sys/time.h>
 
 namespace OHOS {
@@ -57,6 +58,15 @@ constexpr const static char* FLAG_WHITE_LIST[] = {
     "wear_link_service",
 };
 constexpr int32_t FLAG_WHITE_LIST_NUM = std::size(FLAG_WHITE_LIST);
+
+// Product and version configuration table for ultrasonic PIN V2 compatibility.
+// Each entry maps a sender device type to the minimum DM version required for both
+// ends to use the V2 ultrasonic pin interface (SetPinCodeV2 / RegisterPinCallbackV2).
+// To enable V2 for another device type in a future upgrade, add a new entry here.
+const std::vector<DmAuthState::UltrasonicPinV2ProductConfig>
+    DmAuthState::ULTRASONIC_PIN_V2_PRODUCT_TABLE = {
+    { static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR), DM_VERSION_5_1_7 },
+};
 const std::map<DmAuthStateType, DmAuthStatus> NEW_AND_OLD_STATE_MAPPING = {
     { DmAuthStateType::AUTH_SRC_FINISH_STATE, DmAuthStatus::STATUS_DM_AUTH_FINISH },
     { DmAuthStateType::AUTH_SINK_FINISH_STATE, DmAuthStatus::STATUS_DM_SINK_AUTH_FINISH },
@@ -962,6 +972,52 @@ void DmAuthState::GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::s
         }
     }
     LOGE("peerDeviceId is empty.");
+}
+
+bool DmAuthState::IsSupportUltrasonicPinV2(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, false);
+    // The sender is the accesser for reverse ultrasonic (source sends) and the
+    // accessee for forward ultrasonic (sink sends).  This value is the same on
+    // both sides because accesser/accessee are consistent after negotiation.
+    int32_t senderDeviceType = GetUltrasonicSenderDeviceType(context);
+    const char* minVer = nullptr;
+    for (const auto &config : ULTRASONIC_PIN_V2_PRODUCT_TABLE) {
+        if (config.senderDeviceType == senderDeviceType) {
+            minVer = config.minVersion;
+            break;
+        }
+    }
+    if (minVer == nullptr) {
+        LOGI("senderDeviceType %{public}d not in V2 product table, fallback to V1", senderDeviceType);
+        return false;
+    }
+    // Local version is the accesser on the source side and the accessee on the sink side;
+    // the peer version is the other one. After negotiate both sides are filled in.
+    const std::string &localVersion = (context->direction == DM_AUTH_SOURCE) ?
+        context->accesser.dmVersion : context->accessee.dmVersion;
+    const std::string &peerVersion = (context->direction == DM_AUTH_SOURCE) ?
+        context->accessee.dmVersion : context->accesser.dmVersion;
+    std::string minVersion(minVer);
+    // CompareVersion returns true when remoteVersion > oldVersion, so add == for >=.
+    bool localSupport = CompareVersion(localVersion, minVersion) || localVersion == minVersion;
+    bool peerSupport = CompareVersion(peerVersion, minVersion) || peerVersion == minVersion;
+    LOGI("senderDeviceType %{public}d localVersion %{public}s peerVersion %{public}s minVersion %{public}s "
+        "localSupport %{public}d peerSupport %{public}d",
+        senderDeviceType, localVersion.c_str(), peerVersion.c_str(), minVersion.c_str(),
+        localSupport, peerSupport);
+    return localSupport && peerSupport;
+}
+
+int32_t DmAuthState::GetUltrasonicSenderDeviceType(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, 0);
+    // Reverse: pincode is generated at source side and sent by ultrasonic from source to
+    // sink, so the sender is the accesser (source).
+    // Forward: pincode is generated at sink side and sent by ultrasonic from sink to
+    // source, so the sender is the accessee (sink).
+    return (context->ultrasonicInfo == DmUltrasonicInfo::DM_Ultrasonic_Reverse) ?
+        context->accesser.deviceType : context->accessee.deviceType;
 }
 
 bool DmAuthState::IsMatchCredentialAndP2pACL(JsonObject &credInfo, std::string &credId,

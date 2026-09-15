@@ -358,21 +358,12 @@ DM_EXPORT void DeviceManagerService::SubscribeDataShareCommonEvent()
     }
 }
 #endif
-
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
-void DeviceManagerService::QueryDependsSwitchState()
-{
-    std::shared_ptr<DmPublishEventSubscriber> publishSubScriber = nullptr;
-    {
-        std::lock_guard<ffrt::mutex> lock(eventManagerLock_);
-        CHECK_NULL_VOID(publishCommonEventManager_);
-        publishSubScriber = publishCommonEventManager_->GetSubscriber();
-    }
-    CHECK_NULL_VOID(publishSubScriber);
-    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    CHECK_NULL_VOID(samgr);
 #ifdef SUPPORT_BLUETOOTH
+static void QueryBluetoothState(const std::shared_ptr<DmPublishEventSubscriber> &publishSubScriber,
+    const sptr<ISystemAbilityManager> &samgr)
+{
     if (samgr->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID) == nullptr) {
         publishSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF));
     } else {
@@ -382,9 +373,13 @@ void DeviceManagerService::QueryDependsSwitchState()
             publishSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF));
         }
     }
+}
 #endif // SUPPORT_BLUETOOTH
 
 #ifdef SUPPORT_WIFI
+static void QueryWifiState(const std::shared_ptr<DmPublishEventSubscriber> &publishSubScriber,
+    const sptr<ISystemAbilityManager> &samgr)
+{
     if (samgr->CheckSystemAbility(WIFI_DEVICE_SYS_ABILITY_ID) == nullptr) {
         publishSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED));
     } else {
@@ -398,19 +393,49 @@ void DeviceManagerService::QueryDependsSwitchState()
             publishSubScriber->SetWifiState(static_cast<int32_t>(OHOS::Wifi::WifiState::DISABLED));
         }
     }
+}
 #endif // SUPPORT_WIFI
 
+static ScreenState QueryScreenState(const sptr<ISystemAbilityManager> &samgr)
+{
     ScreenState state = DM_SCREEN_ON;
 #ifdef SUPPORT_POWER_MANAGER
     if (samgr->CheckSystemAbility(POWER_MANAGER_SERVICE_ID) == nullptr) {
+#ifdef CAR_DEVICE_ENABLE
+        LOGI("PowerManager not started yet, default to SCREEN_ON, "
+            "screen state will be corrected by COMMON_EVENT_SCREEN_ON/OFF");
+#else
         state = DM_SCREEN_OFF;
+#endif
     } else {
         if (!OHOS::PowerMgr::PowerMgrClient::GetInstance().IsScreenOn()) {
             state = DM_SCREEN_OFF;
         }
     }
+#else
+    (void)samgr;
 #endif // SUPPORT_POWER_MANAGER
-    publishSubScriber->SetScreenState(state);
+    return state;
+}
+
+void DeviceManagerService::QueryDependsSwitchState()
+{
+    std::shared_ptr<DmPublishEventSubscriber> publishSubScriber = nullptr;
+    {
+        std::lock_guard<ffrt::mutex> lock(eventManagerLock_);
+        CHECK_NULL_VOID(publishCommonEventManager_);
+        publishSubScriber = publishCommonEventManager_->GetSubscriber();
+    }
+    CHECK_NULL_VOID(publishSubScriber);
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    CHECK_NULL_VOID(samgr);
+#ifdef SUPPORT_BLUETOOTH
+    QueryBluetoothState(publishSubScriber, samgr);
+#endif // SUPPORT_BLUETOOTH
+#ifdef SUPPORT_WIFI
+    QueryWifiState(publishSubScriber, samgr);
+#endif // SUPPORT_WIFI
+    publishSubScriber->SetScreenState(QueryScreenState(samgr));
     OHOS::DistributedHardware::PublishCommonEventCallback(publishSubScriber->GetBluetoothState(),
         publishSubScriber->GetWifiState(), publishSubScriber->GetScreenState());
 }
