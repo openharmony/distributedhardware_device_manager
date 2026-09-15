@@ -43,6 +43,36 @@ constexpr int32_t MIN_PIN_CODE = 100000;
 constexpr int32_t MAX_PIN_CODE = 999999;
 constexpr const char* UNVALID_CREDTID = "invalidCredId";
 
+#ifdef SUPPORT_MSDP
+void RegisterUltrasonicPinCallback(const sptr<SpatialLocationCallbackImpl> &callback,
+    bool useV2, int32_t peerDeviceType)
+{
+    if (useV2) {
+        Msdp::SpatialAwarenessMgrClient::GetInstance().RegisterPinCallbackV2(callback, peerDeviceType);
+    } else {
+        Msdp::SpatialAwarenessMgrClient::GetInstance().RegisterPinCallback(callback);
+    }
+}
+
+void UnregisterUltrasonicPinCallback(bool useV2, int32_t peerDeviceType)
+{
+    if (useV2) {
+        Msdp::SpatialAwarenessMgrClient::GetInstance().UnregisterPinCallbackV2(peerDeviceType);
+    } else {
+        Msdp::SpatialAwarenessMgrClient::GetInstance().UnregisterPinCallback();
+    }
+}
+
+void SetUltrasonicPinCode(const std::string &pinCode, bool useV2)
+{
+    if (useV2) {
+        Msdp::SpatialAwarenessMgrClient::GetInstance().SetPinCodeV2(pinCode);
+    } else {
+        Msdp::SpatialAwarenessMgrClient::GetInstance().SetPinCode(pinCode);
+    }
+}
+#endif
+
 int32_t AuthSinkStatePinAuthComm::ShowAuthInfoDialog(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("start");
@@ -662,7 +692,8 @@ int32_t AuthSrcReverseUltrasonicStartState::Action(std::shared_ptr<DmAuthContext
     context->pinCode = std::to_string(GenRandInt(MIN_PIN_CODE, MAX_PIN_CODE));
     std::string ultraPinCode = context->pinCode;
 #ifdef SUPPORT_MSDP
-    Msdp::SpatialAwarenessMgrClient::GetInstance().SetPinCode(ultraPinCode);
+    bool useV2 = DmAuthState::IsSupportUltrasonicPinV2(context);
+    SetUltrasonicPinCode(ultraPinCode, useV2);
 #endif
     context->reply = DM_OK;
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REVERSE_ULTRASONIC_START, context);
@@ -726,22 +757,24 @@ int32_t AuthSrcForwardUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext>
     if (context->authType != AUTH_TYPE_PIN_ULTRASONIC) {
         return STOP_BIND;
     }
+    bool useV2 = DmAuthState::IsSupportUltrasonicPinV2(context);
+    int32_t peerDeviceType = DmAuthState::GetUltrasonicSenderDeviceType(context);
     context->timer->StartTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK),
-        GET_ULTRASONIC_PIN_TIMEOUT, [context] (std::string name) {
+        GET_ULTRASONIC_PIN_TIMEOUT, [context, useV2, peerDeviceType] (std::string name) {
             LOGI("AuthSrcForwardUltrasonicDoneState timeout.");
 #ifdef SUPPORT_MSDP
-            Msdp::SpatialAwarenessMgrClient::GetInstance().UnregisterPinCallback();
+            UnregisterUltrasonicPinCallback(useV2, peerDeviceType);
 #endif
             context->authStateMachine->NotifyEventFinish(DmEventType::ON_ULTRASONIC_PIN_TIMEOUT);
         });
 #ifdef SUPPORT_MSDP
     sptr<SpatialLocationCallbackImpl> callback = new(std::nothrow) SpatialLocationCallbackImpl(context);
-    Msdp::SpatialAwarenessMgrClient::GetInstance().RegisterPinCallback(callback);
+    RegisterUltrasonicPinCallback(callback, useV2, peerDeviceType);
 #endif
     auto retEvent = context->authStateMachine->WaitExpectEvent(DmEventType::ON_ULTRASONIC_PIN_CHANGED);
     if (retEvent == DmEventType::ON_ULTRASONIC_PIN_CHANGED) {
 #ifdef SUPPORT_MSDP
-        Msdp::SpatialAwarenessMgrClient::GetInstance().UnregisterPinCallback();
+        UnregisterUltrasonicPinCallback(useV2, peerDeviceType);
 #endif
         auto ret = context->hiChainAuthConnector->AuthCredentialPinCode(context->accesser.userId, context->requestId,
             context->pinCode);
@@ -778,22 +811,24 @@ int32_t AuthSinkReverseUltrasonicStartState::Action(std::shared_ptr<DmAuthContex
     if (context->authType != AUTH_TYPE_PIN_ULTRASONIC) {
         return STOP_BIND;
     }
+    bool useV2 = DmAuthState::IsSupportUltrasonicPinV2(context);
+    int32_t peerDeviceType = DmAuthState::GetUltrasonicSenderDeviceType(context);
     context->timer->StartTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK),
-        GET_ULTRASONIC_PIN_TIMEOUT, [context] (std::string name) {
+        GET_ULTRASONIC_PIN_TIMEOUT, [context, useV2, peerDeviceType] (std::string name) {
             LOGI("AuthSinkReverseUltrasonicStartState timeout.");
 #ifdef SUPPORT_MSDP
-            Msdp::SpatialAwarenessMgrClient::GetInstance().UnregisterPinCallback();
+            UnregisterUltrasonicPinCallback(useV2, peerDeviceType);
 #endif
             context->authStateMachine->NotifyEventFinish(DmEventType::ON_ULTRASONIC_PIN_TIMEOUT);
         });
 #ifdef SUPPORT_MSDP
     sptr<SpatialLocationCallbackImpl> callback = new(std::nothrow) SpatialLocationCallbackImpl(context);
-    Msdp::SpatialAwarenessMgrClient::GetInstance().RegisterPinCallback(callback);
+    RegisterUltrasonicPinCallback(callback, useV2, peerDeviceType);
 #endif
     auto retEvent = context->authStateMachine->WaitExpectEvent(DmEventType::ON_ULTRASONIC_PIN_CHANGED);
     if (retEvent == DmEventType::ON_ULTRASONIC_PIN_CHANGED) {
 #ifdef SUPPORT_MSDP
-        Msdp::SpatialAwarenessMgrClient::GetInstance().UnregisterPinCallback();
+        UnregisterUltrasonicPinCallback(useV2, peerDeviceType);
 #endif
         context->reply = DM_OK;
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REVERSE_ULTRASONIC_DONE, context);
@@ -856,7 +891,8 @@ int32_t AuthSinkForwardUltrasonicStartState::Action(std::shared_ptr<DmAuthContex
     context->pinCode = std::to_string(GenRandInt(MIN_PIN_CODE, MAX_PIN_CODE));
     std::string ultraPinCode = context->pinCode;
 #ifdef SUPPORT_MSDP
-    Msdp::SpatialAwarenessMgrClient::GetInstance().SetPinCode(ultraPinCode);
+    bool useV2 = DmAuthState::IsSupportUltrasonicPinV2(context);
+    SetUltrasonicPinCode(ultraPinCode, useV2);
 #endif
     context->reply = DM_OK;
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_FORWARD_ULTRASONIC_NEGOTIATE, context);

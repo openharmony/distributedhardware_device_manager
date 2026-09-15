@@ -682,5 +682,126 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkPinDisplayState_002, testing::ext::TestSi
     EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
+HWTEST_F(AuthPinAuthStateTest, GetUltrasonicSenderDeviceType_001, testing::ext::TestSize.Level1)
+{
+    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
+    context->accesser.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR);
+    context->accessee.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_PHONE);
+    EXPECT_EQ(DmAuthState::GetUltrasonicSenderDeviceType(context),
+        static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR));
+}
+
+HWTEST_F(AuthPinAuthStateTest, GetUltrasonicSenderDeviceType_002, testing::ext::TestSize.Level1)
+{
+    context->ultrasonicInfo = DM_Ultrasonic_Forward;
+    context->accesser.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_PHONE);
+    context->accessee.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR);
+    EXPECT_EQ(DmAuthState::GetUltrasonicSenderDeviceType(context),
+        static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR));
+}
+
+HWTEST_F(AuthPinAuthStateTest, GetUltrasonicSenderDeviceType_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> nullContext = nullptr;
+    EXPECT_EQ(DmAuthState::GetUltrasonicSenderDeviceType(nullContext), 0);
+}
+
+HWTEST_F(AuthPinAuthStateTest, IsSupportUltrasonicPinV2_001, testing::ext::TestSize.Level1)
+{
+    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
+    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
+    context->accesser.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR);
+    context->accessee.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_PHONE);
+    context->accesser.dmVersion = DM_VERSION_5_1_7;
+    context->accessee.dmVersion = DM_VERSION_5_1_7;
+    EXPECT_TRUE(DmAuthState::IsSupportUltrasonicPinV2(context));
+}
+
+HWTEST_F(AuthPinAuthStateTest, IsSupportUltrasonicPinV2_002, testing::ext::TestSize.Level1)
+{
+    context->ultrasonicInfo = DM_Ultrasonic_Forward;
+    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
+    context->accesser.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_PHONE);
+    context->accessee.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR);
+    context->accesser.dmVersion = DM_VERSION_5_1_7;
+    context->accessee.dmVersion = DM_VERSION_5_1_7;
+    EXPECT_TRUE(DmAuthState::IsSupportUltrasonicPinV2(context));
+}
+
+HWTEST_F(AuthPinAuthStateTest, IsSupportUltrasonicPinV2_003, testing::ext::TestSize.Level1)
+{
+    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
+    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
+    context->accesser.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_PHONE);
+    context->accessee.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_PAD);
+    context->accesser.dmVersion = DM_VERSION_5_1_7;
+    context->accessee.dmVersion = DM_VERSION_5_1_7;
+    EXPECT_FALSE(DmAuthState::IsSupportUltrasonicPinV2(context));
+}
+
+HWTEST_F(AuthPinAuthStateTest, IsSupportUltrasonicPinV2_004, testing::ext::TestSize.Level1)
+{
+    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
+    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
+    context->accesser.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR);
+    context->accesser.dmVersion = DM_VERSION_5_1_5;
+    context->accessee.dmVersion = DM_VERSION_5_1_7;
+    EXPECT_FALSE(DmAuthState::IsSupportUltrasonicPinV2(context));
+}
+
+HWTEST_F(AuthPinAuthStateTest, IsSupportUltrasonicPinV2_005, testing::ext::TestSize.Level1)
+{
+    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
+    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
+    context->accesser.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR);
+    context->accesser.dmVersion = DM_VERSION_5_1_7;
+    context->accessee.dmVersion = DM_VERSION_5_1_5;
+    EXPECT_FALSE(DmAuthState::IsSupportUltrasonicPinV2(context));
+}
+
+HWTEST_F(AuthPinAuthStateTest, IsSupportUltrasonicPinV2_006, testing::ext::TestSize.Level1)
+{
+    context->ultrasonicInfo = DM_Ultrasonic_Forward;
+    context->direction = DmAuthDirection::DM_AUTH_SINK;
+    context->accessee.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR);
+    context->accesser.dmVersion = DM_VERSION_5_1_7;
+    context->accessee.dmVersion = DM_VERSION_5_1_7;
+    EXPECT_TRUE(DmAuthState::IsSupportUltrasonicPinV2(context));
+}
+
+HWTEST_F(AuthPinAuthStateTest, IsSupportUltrasonicPinV2_007, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> nullContext = nullptr;
+    EXPECT_FALSE(DmAuthState::IsSupportUltrasonicPinV2(nullContext));
+}
+
+HWTEST_F(AuthPinAuthStateTest, IsSupportUltrasonicPinV2_008, testing::ext::TestSize.Level1)
+{
+    context->ultrasonicInfo = DM_Ultrasonic_Reverse;
+    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
+    context->accesser.dmVersion = DM_VERSION_5_1_7;
+    context->accessee.dmVersion = DM_VERSION_5_1_7;
+    context->accesser.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR);
+    context->accessee.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_PHONE);
+    EXPECT_TRUE(DmAuthState::IsSupportUltrasonicPinV2(context));
+    context->accesser.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_PHONE);
+    context->accessee.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR);
+    EXPECT_FALSE(DmAuthState::IsSupportUltrasonicPinV2(context));
+}
+
+HWTEST_F(AuthPinAuthStateTest, IsSupportUltrasonicPinV2_009, testing::ext::TestSize.Level1)
+{
+    context->ultrasonicInfo = DM_Ultrasonic_Forward;
+    context->direction = DmAuthDirection::DM_AUTH_SOURCE;
+    context->accesser.dmVersion = DM_VERSION_5_1_7;
+    context->accessee.dmVersion = DM_VERSION_5_1_7;
+    context->accesser.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_PHONE);
+    context->accessee.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR);
+    EXPECT_TRUE(DmAuthState::IsSupportUltrasonicPinV2(context));
+    context->accesser.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_CAR);
+    context->accessee.deviceType = static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_PHONE);
+    EXPECT_FALSE(DmAuthState::IsSupportUltrasonicPinV2(context));
+}
+
 }
 }

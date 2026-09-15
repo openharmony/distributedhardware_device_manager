@@ -18,6 +18,7 @@
 #define TYPE_TV_ID 0x9C
 
 #include <memory>
+#include <vector>
 
 #include "access_control_profile.h"
 #include "dm_auth_context.h"
@@ -175,6 +176,21 @@ public:
     static void DeleteAcl(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile);
     void GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId);
+    // Product and version configuration table for ultrasonic PIN V2 compatibility.
+    // Maps sender device types to the minimum DM version that supports the V2 interface
+    // (SetPinCodeV2 on sender side, RegisterPinCallbackV2 on receiver side).
+    // To support a new device type in a future upgrade, add an entry here.
+    struct UltrasonicPinV2ProductConfig {
+        int32_t senderDeviceType;
+        const char* minVersion;
+    };
+    static const std::vector<UltrasonicPinV2ProductConfig> ULTRASONIC_PIN_V2_PRODUCT_TABLE;
+    // Returns true when both local and peer versions are >= the minimum version
+    // configured for the ultrasonic sender's device type in ULTRASONIC_PIN_V2_PRODUCT_TABLE.
+    static bool IsSupportUltrasonicPinV2(std::shared_ptr<DmAuthContext> context);
+    // Returns the ultrasonic sender's device type (the device that sends the pin via ultrasound).
+    // Reverse: accesser (source) sends; Forward: accessee (sink) sends.
+    static int32_t GetUltrasonicSenderDeviceType(std::shared_ptr<DmAuthContext> context);
     static void DeleteCredential(std::shared_ptr<DmAuthContext> context, int32_t userId,
         const JsonItemObject &credInfo, const DistributedDeviceProfile::AccessControlProfile &profile);
     static void DirectlyDeleteCredential(std::shared_ptr<DmAuthContext> context, int32_t userId,
