@@ -5070,6 +5070,11 @@ void DeviceManagerService::ProcessUnBindServiceProxy(const UnbindServiceProxyPar
     }
 }
 
+bool DeviceManagerService::CheckIsDeviceOnline()
+{
+    return SoftbusCache::GetInstance().CheckIsDeviceOnlineFormCache();
+}
+
 int32_t DeviceManagerService::SendUninstAppByWifi(int32_t userId, int32_t tokenId, const std::string &networkId)
 {
     LOGE("userId: %{public}s, tokenId: %{public}s",
