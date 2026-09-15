@@ -85,6 +85,7 @@ extern const char* TAG_PEER_USER_ID;
 extern const char* TAG_PEER_DISPLAY_ID;
 extern const char* TAG_LOCAL_DISPLAY_ID;
 extern const char* TAG_EXTRA_INFO;
+extern const char* TAG_SERVICE_CODE;
 
 extern const char* TAG_IS_ONLINE;
 extern const char* TAG_IS_AUTHED;

@@ -195,7 +195,12 @@ int32_t AuthSinkNegotiateStateMachine::GetSinkCarUserId(std::shared_ptr<DmAuthCo
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     LOGI("start.");
-    int32_t mainScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID);
+    int32_t mainScreenUserId = -1;
+    if (context->accessee.displayId < 0) {
+        mainScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID);
+    } else {
+        mainScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(context->accessee.displayId);
+    }
     if (mainScreenUserId < 0) {
         LOGE("mainScreenUserId = %{public}d is invalid.", mainScreenUserId);
         return INVALID_USERID;
@@ -207,9 +212,7 @@ int32_t AuthSinkNegotiateStateMachine::GetSinkCarUserId(std::shared_ptr<DmAuthCo
             return mainScreenUserId;
         }
         if (context->accessee.displayId != CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID) {
-            LOGE("accessee.displayId = %{public}d is not control screen.",
-                context->accessee.displayId);
-            return INVALID_USERID;
+            LOGE("accessee.displayId = %{public}d is not control screen.", context->accessee.displayId);
         }
     }
     return mainScreenUserId;
@@ -280,8 +283,13 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryServiceAcceseeIds(std::shared_pt
         LOGI("inner2.");
         int64_t serviceId = item->proxyAccessee.serviceId;
         if (serviceId == 0) {
-            LOGE("service id invalid.");
-            return ERR_DM_INPUT_PARA_INVALID;
+            if (context->IsCallingProxyAsSubject) {
+                serviceId = context->accessee.serviceId;
+                item->proxyAccessee.serviceId = serviceId;
+            } else {
+                LOGE("service id invalid.");
+                return ERR_DM_INPUT_PARA_INVALID;
+            }
         }
         DistributedDeviceProfile::ServiceInfo dpServiceInfo;
         int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
@@ -311,11 +319,20 @@ int32_t AuthSinkNegotiateStateMachine::SinkNegotiateService(std::shared_ptr<DmAu
 {
     LOGI("inner1.");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (context->accessee.serviceId == 0 && !context->accessee.serviceCode.empty()) {
+        int32_t ret = DeviceProfileConnector::GetInstance().GetServiceIdByDisplayIdAndServiceCode(
+            context->accessee.displayId, context->accessee.serviceCode, context->accessee.serviceId);
+        if (ret != DM_OK) {
+            LOGE("GetServiceIdByDisplayIdAndServiceCode failed, ret %{public}d.", ret);
+            return ret;
+        }
+    }
     int64_t serviceId = context->accessee.serviceId;
     if (serviceId == 0) {
         LOGE("service id invalid.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    LOGI("serviceId: %{public}s", GetAnonyString(std::to_string(serviceId)).c_str());
     DistributedDeviceProfile::ServiceInfo dpServiceInfo;
     int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoByUdidAndServiceId(
         context->accessee.deviceId, serviceId, dpServiceInfo);

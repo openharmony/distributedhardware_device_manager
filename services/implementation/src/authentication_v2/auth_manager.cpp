@@ -382,8 +382,8 @@ int32_t AuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t aut
         return ERR_DM_AUTH_FAILED;
     }
     if (pkgName.empty() || deviceId.empty()) {
-        LOGE("pkgName is %{public}s, deviceId is %{public}s, extra is"
-            "%{public}s.", pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
+        LOGE("pkgName is %{public}s, deviceId is %{public}s, extra is %{public}s",
+            pkgName.c_str(), GetAnonyString(deviceId).c_str(), extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
@@ -524,6 +524,9 @@ void AuthManager::ParseAccessJsonObject(const JsonObject &jsonObject)
     }
     if (jsonObject[TAG_PEER_DISPLAY_ID].IsNumberInteger()) {
         context_->accessee.displayId = jsonObject[TAG_PEER_DISPLAY_ID].Get<int32_t>();
+    }
+    if (jsonObject[TAG_SERVICE_CODE].IsString()) {
+        context_->accessee.serviceCode = jsonObject[TAG_SERVICE_CODE].Get<std::string>();
     }
     if (jsonObject[TAG_LOCAL_USERID].IsNumberInteger()) {
         context_->accesser.userId = jsonObject[TAG_LOCAL_USERID].Get<int32_t>();
@@ -704,12 +707,17 @@ void AuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     }
     ParseJsonObject(jsonObject);
     if (context_->isServiceBind) {
-        if (IsNumberString(deviceId)) {
-            context_->accessee.serviceId = std::atoll(deviceId.c_str()); // service bind device id is service id
-            context_->accesser.serviceId = context_->accessee.serviceId;
+        if (CheckDisplayIdAndServiceCode(jsonObject)) {
+            context_->accessee.serviceId = 0;
+            context_->accesser.serviceId = 0;
         } else {
-            LOGE("OpenAuthSession failed");
-            return;
+            if (IsNumberString(deviceId)) {
+                context_->accessee.serviceId = std::atoll(deviceId.c_str()); // service bind device id is service id
+                context_->accesser.serviceId = context_->accessee.serviceId;
+            } else {
+                LOGE("GetAuthParam failed");
+                return;
+            }
         }
     }
 #ifdef CAR_DEVICE_ENABLE
@@ -749,10 +757,12 @@ void AuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     LOGI("complete");
     return;
 }
+
 int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGI("start auth type %{public}d.", authType);
+    LOGI("start auth type %{public}d, deviceId: %{public}s, extra: %{public}s", authType,
+        GetAnonyString(deviceId).c_str(), extra.c_str());
     SetAuthType(authType);
     ParseServiceInfo(extra);
     int32_t ret = DM_OK;
@@ -816,16 +826,18 @@ int32_t AuthManager::CheckSrcNegotiateSrvParam(const std::string &pkgName, int64
     const std::map<std::string, std::string> &bindParam)
 {
     LOGI("source eegotiate service param start.");
-    if (pkgName.empty() || serviceId == 0) {
+    if (pkgName.empty() || (serviceId == 0 && !CheckDisplayIdAndServiceCode(bindParam))) {
         LOGE("param failed, pkgName or service id is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     auto iterService = bindParam.find(PARAM_KEY_SUBJECT_SERVICE_ONES);
     auto iter = bindParam.find(PARAM_KEY_IS_PROXY_BIND);
     if (iter == bindParam.end()) {
+        LOGE("isProxyBind is not exist");
         return DM_OK;
     }
     std::string isProxyBind = iter->second;
+    LOGE("isProxyBind: %{public}s", isProxyBind.c_str());
     if (isProxyBind == "true" && iterService == bindParam.end()) {
         LOGE("param failed, proxyed subjects is empty.");
         return ERR_DM_INPUT_PARA_INVALID;

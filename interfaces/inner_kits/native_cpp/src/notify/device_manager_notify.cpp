@@ -728,8 +728,7 @@ void DeviceManagerNotify::RegisterBindCallback(const std::string &pkgName, const
     std::shared_ptr<BindTargetCallback> callback)
 {
     if (pkgName.empty() || IsInvalidPeerTargetId(targetId) || (callback == nullptr)) {
-        LOGE("Invalid parameter, pkgName: %{public}s.",
-            pkgName.c_str());
+        LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
         return;
     }
     std::lock_guard<std::mutex> autoLock(bindLock_);
@@ -763,8 +762,7 @@ void DeviceManagerNotify::RegisterUnbindCallback(const std::string &pkgName, con
     std::shared_ptr<UnbindTargetCallback> callback)
 {
     if (pkgName.empty() || IsInvalidPeerTargetId(targetId) || (callback == nullptr)) {
-        LOGE("Invalid parameter, pkgName: %{public}s.",
-            pkgName.c_str());
+        LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
@@ -791,8 +789,7 @@ void DeviceManagerNotify::OnBindResult(const std::string &pkgName, const PeerTar
     {
         std::lock_guard<std::mutex> autoLock(bindLock_);
         if (bindCallback_.count(pkgName) == 0) {
-            LOGE("callback not register for pkgName %{public}s.",
-                pkgName.c_str());
+            LOGE("callback not register for pkgName %{public}s.", pkgName.c_str());
             return;
         }
         std::map<PeerTargetId, std::shared_ptr<BindTargetCallback>> &bindCbkMap = bindCallback_[pkgName];
@@ -829,8 +826,7 @@ void DeviceManagerNotify::OnUnbindResult(const std::string &pkgName, const PeerT
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (unbindCallback_.count(pkgName) == 0) {
-            LOGE("callback not register for pkgName %{public}s.",
-                pkgName.c_str());
+            LOGE("callback not register for pkgName %{public}s.", pkgName.c_str());
             return;
         }
         std::map<PeerTargetId, std::shared_ptr<UnbindTargetCallback>> &unbindCbkMap = unbindCallback_[pkgName];

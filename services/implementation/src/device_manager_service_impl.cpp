@@ -1652,17 +1652,61 @@ static bool IsHmlSessionType(const JsonObject &jsonObject)
     return connSessionType == CONN_SESSION_TYPE_HML;
 }
 
+static bool GetHmlInfoByBindParam(const std::map<std::string, std::string> &bindParam, int32_t &hmlActionId,
+    bool &hmlEnable160M)
+{
+    JsonObject jsonObject = GetExtraJsonObject(bindParam);
+    if (jsonObject.IsDiscarded()) {
+        LOGE("extra string not a json type.");
+        return false;
+    }
+    if (!IsHmlSessionType(jsonObject) || !IsString(jsonObject, PARAM_KEY_HML_ACTIONID)) {
+        LOGE("Invalid connSessionType or actionId");
+        return false;
+    }
+    std::string actionIdStr = jsonObject[PARAM_KEY_HML_ACTIONID].Get<std::string>();
+    if (!IsNumberString(actionIdStr)) {
+        LOGE("PARAM_KEY_HML_ACTIONID is not number");
+        return false;
+    }
+    int32_t actionId = std::atoi(actionIdStr.c_str());
+    if (actionId <= 0) {
+        LOGE("PARAM_KEY_HML_ACTIONID is <= 0");
+        return false;
+    }
+    hmlActionId = actionId;
+ 
+    if (jsonObject[PARAM_KEY_HML_ENABLE_160M].IsBoolean()) {
+        hmlEnable160M = jsonObject[PARAM_KEY_HML_ENABLE_160M].Get<bool>();
+        LOGI("hmlEnable160M %{public}d", hmlEnable160M);
+    }
+    return true;
+}
+
 int DeviceManagerServiceImpl::OpenAuthSession(const std::string& deviceId,
     const std::map<std::string, std::string> &bindParam)
 {
     if (bindParam.find(PARAM_KEY_IS_SERVICE_BIND) != bindParam.end() &&
         bindParam.at(PARAM_KEY_IS_SERVICE_BIND) == DM_VAL_TRUE) {
         CHECK_NULL_RETURN(listener_, ERR_DM_FAILED);
-        if (IsNumberString(deviceId)) {
-            return listener_->OpenAuthSessionWithPara(std::atoll(deviceId.c_str()));
+        if (CheckDisplayIdAndServiceCode(bindParam)) {
+            int32_t hmlActionId = 0;
+            bool hmlEnable160M = false;
+            int invalidSessionId = -1;
+            if (!GetHmlInfoByBindParam(bindParam, hmlActionId, hmlEnable160M)) {
+                LOGE("hmlActionId: %{public}d, hmlEnable160M: %{public}d", hmlActionId, hmlEnable160M);
+                return invalidSessionId;
+            }
+            LOGI("serviceBind, hmlActionId: %{public}d, hmlEnable160M: %{public}d", hmlActionId, hmlEnable160M);
+ 
+            return listener_->OpenAuthSessionWithPara(deviceId, hmlActionId, hmlEnable160M);
         } else {
-            LOGE("deviceId is not numeric.");
-            return ERR_DM_FAILED;
+            if (IsNumberString(deviceId)) {
+                return listener_->OpenAuthSessionWithPara(std::atoll(deviceId.c_str()));
+            } else {
+                LOGE("deviceId is not numeric.");
+                return ERR_DM_FAILED;
+            }
         }
     }
     bool hmlEnable160M = false;
@@ -1840,7 +1884,15 @@ int32_t DeviceManagerServiceImpl::ParseConnectAddr(const PeerTargetId &targetId,
     deviceInfo->addrNum = static_cast<uint32_t>(index);
     if (bindParam.find(PARAM_KEY_IS_SERVICE_BIND) != bindParam.end() &&
         bindParam.at(PARAM_KEY_IS_SERVICE_BIND) == DM_VAL_TRUE) {
-        deviceId = std::to_string(targetId.serviceId);
+        if (targetId.serviceId != 0) {
+            deviceId = std::to_string(targetId.serviceId);
+        } else if (deviceId.empty()) {
+            if (!CheckBindParam(bindParam, deviceId)) {
+                LOGE("Invalid paramMap.");
+                return ERR_DM_INPUT_PARA_INVALID;
+            }
+            LOGI("DisplayId And ServiceCode are exist, deviceId: %{public}s", GetAnonyString(deviceId).c_str());
+        }
     }
     if (softbusConnector_->AddMemberToDiscoverMap(deviceId, deviceInfo) != DM_OK) {
         LOGE("AddMemberToDiscoverMap failed.");
@@ -1972,8 +2024,8 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
     {
         std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
         if (tokenIdSessionIdMap_.find(tokenId) != tokenIdSessionIdMap_.end()) {
-            LOGE("this device is being bound. please try again later,"
-                "pkgName:%{public}s, tokenId:%{public}" PRIu64, pkgName.c_str(), tokenId);
+            LOGE("this device is being bound. please try again later, pkgName:%{public}s, tokenId:%{public}" PRIu64,
+                pkgName.c_str(), tokenId);
             return ERR_DM_AUTH_BUSINESS_BUSY;
         }
         if (tokenIdSessionIdMap_.size() >= MAX_NEW_PROC_SESSION_COUNT_TEMP) {

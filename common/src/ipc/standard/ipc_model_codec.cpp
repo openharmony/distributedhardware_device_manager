@@ -77,6 +77,8 @@ bool IpcModelCodec::EncodePeerTargetId(const PeerTargetId &targetId, MessageParc
     bRet = (bRet && parcel.WriteString(targetId.wifiIp));
     bRet = (bRet && parcel.WriteUint16(targetId.wifiPort));
     bRet = (bRet && parcel.WriteInt64(targetId.serviceId));
+    bRet = (bRet && parcel.WriteInt32(targetId.peerDisplayId));
+    bRet = (bRet && parcel.WriteString(targetId.serviceCode));
     return bRet;
 }
 
@@ -88,6 +90,8 @@ void IpcModelCodec::DecodePeerTargetId(MessageParcel &parcel, PeerTargetId &targ
     targetId.wifiIp = parcel.ReadString();
     targetId.wifiPort = parcel.ReadUint16();
     targetId.serviceId = parcel.ReadInt64();
+    targetId.peerDisplayId = parcel.ReadInt32();
+    targetId.serviceCode = parcel.ReadString();
 }
 
 bool IpcModelCodec::EncodeDmAccessCaller(const DmAccessCaller &caller, MessageParcel &parcel)

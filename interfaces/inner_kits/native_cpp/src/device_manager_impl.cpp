@@ -3400,7 +3400,7 @@ int32_t DeviceManagerImpl::RegisterServiceInfo(const DmRegisterServiceInfo &regS
         return ret;
     }
     serviceId = rsp->GetServiceId();
-    LOGI("Completed, serviceId: %{public}" PRId64, serviceId);
+    LOGI("Completed, serviceId: %{public}s", std::to_string(serviceId).c_str());
     return DM_OK;
 }
 

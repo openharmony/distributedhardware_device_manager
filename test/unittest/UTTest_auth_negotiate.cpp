@@ -427,7 +427,7 @@ HWTEST_F(AuthNegotiateTest, GetSinkCarUserId_003, testing::ext::TestSize.Level1)
     EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
     EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(DM_OK));
     int result = authState->GetSinkCarUserId(context);
-    EXPECT_EQ(result, -1);
+    EXPECT_EQ(result, 100);
 }
 
 HWTEST_F(AuthNegotiateTest, GetSinkCarUserId_004, testing::ext::TestSize.Level1)

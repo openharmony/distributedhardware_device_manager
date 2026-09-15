@@ -5242,5 +5242,29 @@ DM_EXPORT std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLev
     return userIdAndBindLevel;
 }
 #endif
+
+int32_t DeviceProfileConnector::GetServiceIdByDisplayIdAndServiceCode(int64_t displayId, const std::string &serviceCode,
+    int64_t &serviceId)
+{
+    LOGI("displayId: %{public}" PRId64 ", serviceCode: %{public}s", displayId, serviceCode.c_str());
+    std::vector<DistributedDeviceProfile::ServiceInfo> dpServiceInfos;
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetAllServiceInfoList(dpServiceInfos);
+    if (ret != DM_OK) {
+        LOGE("failed, result: %{public}d", ret);
+        if (ret == DP_NOT_FIND_DATA) {
+            ret = ERR_DM_SERVICE_INFO_NOT_EXIST;
+        }
+        return ret;
+    }
+    for (auto &dpServiceInfo : dpServiceInfos) {
+        if (dpServiceInfo.GetDisplayId() == displayId && dpServiceInfo.GetServiceCode() == serviceCode) {
+            serviceId = dpServiceInfo.GetServiceId();
+            LOGI("serviceId: %{public}s", std::to_string(serviceId).c_str());
+            return DM_OK;
+        }
+    }
+    LOGE("failed, displayId and serviceCode not match");
+    return ERR_DM_SERVICE_INFO_NOT_EXIST;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
