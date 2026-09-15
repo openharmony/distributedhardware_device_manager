@@ -51,6 +51,9 @@ constexpr int32_t MIN_PIN_CODE = 100000;
 constexpr int32_t MAX_PIN_CODE = 999999;
 constexpr size_t MAX_NEW_PROC_SESSION_COUNT_TEMP = 1;
 const int32_t OPEN_AUTH_SESSION_TIMEOUT = 15000; // 15000ms
+constexpr int32_t BINDING_SESSION_ID_IDLE = -1;
+constexpr int32_t BINDING_TIMEOUT_SECONDS = 120;
+constexpr const char* BINDING_TIMER_NAME = "binding_timeout";
 }
 
 DeviceManagerServiceImpl3rd::DeviceManagerServiceImpl3rd()
@@ -116,10 +119,67 @@ void DeviceManagerServiceImpl3rd::OnAuth3rdAclBytesReceived(int sessionId, const
     }
     authMgr->OnDataReceived(sessionId, message);
 }
+int32_t DeviceManagerServiceImpl3rd::HandleCredSessionOpenSuccess(int32_t sessionId)
+{
+    bool shouldStartTimer = false;
+    {
+        std::lock_guard<ffrt::mutex> bindLock(bindingLockMtx_);
+        if (bindingSessionId_ == BINDING_SESSION_ID_IDLE) {
+            bindingSessionId_ = sessionId;
+            shouldStartTimer = true;
+        } else if (bindingSessionId_ == sessionId) {
+            LOGI("same session, already holds binding lock");
+        } else {
+            LOGE("binding in progress with session: %{public}d, reject re-entrant on sink side",
+                bindingSessionId_);
+            return ERR_DM_AUTH_BUSINESS_BUSY;
+        }
+    }
+    if (shouldStartTimer) {
+        if (bindingTimer_ == nullptr) {
+            bindingTimer_ = std::make_unique<DmTimer3rd>();
+        }
+        bindingTimer_->StartTimer(BINDING_TIMER_NAME, BINDING_TIMEOUT_SECONDS,
+            [this](std::string name) {
+                std::lock_guard<ffrt::mutex> lock(bindingLockMtx_);
+                bindingSessionId_ = BINDING_SESSION_ID_IDLE;
+            });
+    }
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl3rd::HandleCredSessionOpenFailure(int32_t sessionId)
+{
+    bool shouldClean = false;
+    {
+        std::lock_guard<ffrt::mutex> bindLock(bindingLockMtx_);
+        if (bindingSessionId_ == sessionId) {
+            LOGI("session open failed, release binding lock, sessionId: %{public}d", sessionId);
+            bindingSessionId_ = BINDING_SESSION_ID_IDLE;
+            shouldClean = true;
+        }
+    }
+    if (shouldClean) {
+        if (bindingTimer_ != nullptr) {
+            bindingTimer_->DeleteTimer(BINDING_TIMER_NAME);
+        }
+        CHECK_NULL_VOID(softbusConnector_);
+        CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
+        softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
+    }
+}
 
 int DeviceManagerServiceImpl3rd::OnAuthCred3rdSessionOpened(int sessionId, int result)
 {
     LOGI("OnSessionOpened success, sessionId: %{public}d, res: %{public}d.", sessionId, result);
+    if (result == 0) {
+        int32_t ret = HandleCredSessionOpenSuccess(sessionId);
+        if (ret != DM_OK) {
+            return ret;
+        }
+    } else {
+        HandleCredSessionOpenFailure(sessionId);
+    }
     if (sessionEnableCvMap_.find(sessionId) != sessionEnableCvMap_.end()) {
         std::lock_guard<ffrt::mutex> lock(sessionEnableMutexMap_[sessionId]);
         if (result == 0) {
@@ -133,7 +193,36 @@ int DeviceManagerServiceImpl3rd::OnAuthCred3rdSessionOpened(int sessionId, int r
 void DeviceManagerServiceImpl3rd::OnAuthCred3rdSessionClosed(int sessionId)
 {
     LOGI("OnSessionClosed, success, sessionId: %{public}d.", sessionId);
-    return;
+    uint64_t logicalSessionId = 0;
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+        for (auto it = logicalSessionId2SessionIdMap_.begin(); it != logicalSessionId2SessionIdMap_.end(); ++it) {
+            if (it->second == sessionId) {
+                logicalSessionId = it->first;
+                break;
+            }
+        }
+    }
+    if (logicalSessionId == 0) {
+        LOGE("can not find logicalSessionId by sessionId: %{public}d", sessionId);
+        return;
+    }
+    uint32_t tokenId = 0;
+    {
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        auto it = logicalSessionId2TokenIdMap_.find(logicalSessionId);
+        if (it != logicalSessionId2TokenIdMap_.end()) {
+            tokenId = it->second;
+        }
+    }
+    if (tokenId == 0) {
+        LOGE("can not find tokenId by logicalSessionId: %{public}" PRIu64, logicalSessionId);
+        return;
+    }
+    std::shared_ptr<AuthManagerBase3rd> authMgr = GetAuthMgrByTokenId(tokenId);
+    if (authMgr != nullptr) {
+        authMgr->OnSessionClosed(sessionId);
+    }
 }
 
 void DeviceManagerServiceImpl3rd::OnAuthCred3rdBytesReceived(int sessionId, const void *data, uint32_t dataLen)
@@ -565,8 +654,14 @@ std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rd::GetCredAuthMgrB
             SendCredRespFinish(sessionId, logicalSessionId, initRet, initRet);
             return nullptr;
         }
-        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
-        logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
+        {
+            std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+            logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
+        }
+        {
+            std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+            logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+        }
     } else {
         std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
         if (logicalSessionId2TokenIdMap_.find(logicalSessionId) == logicalSessionId2TokenIdMap_.end()) {
@@ -708,6 +803,13 @@ void DeviceManagerServiceImpl3rd::CleanAuthMgrByLogicalSessionId(uint64_t logica
 void DeviceManagerServiceImpl3rd::EraseAuthMgr(uint32_t tokenId)
 {
     {
+        std::lock_guard<ffrt::mutex> bindLock(bindingLockMtx_);
+        bindingSessionId_ = BINDING_SESSION_ID_IDLE;
+    }
+    if (bindingTimer_ != nullptr) {
+        bindingTimer_->DeleteTimer(BINDING_TIMER_NAME);
+    }
+    {
         std::lock_guard<ffrt::mutex> lock(authMgrMapMtx_);
         if (authMgrMap_.find(tokenId) != authMgrMap_.end()) {
             LOGI("authMgrMap_ erase token: %{public}d.", tokenId);
@@ -774,7 +876,11 @@ void DeviceManagerServiceImpl3rd::AuthCredentialImpl(const PeerTargetId3rd &targ
     LOGE("processName:%{public}s, tokenId:%{public}s, businessName: %{public}s",
         processInfo3rd.processName.c_str(), GetAnonyUint32(processInfo3rd.tokenId).c_str(),
         processInfo3rd.businessName.c_str());
-    
+    int32_t sessionId = AcquireBindingLock(targetId, processInfo3rd);
+    if (sessionId == BINDING_SESSION_ID_IDLE) {
+        return;
+    }
+
     std::shared_ptr<AuthManagerBase3rd> authMgr = nullptr;
     std::lock_guard<ffrt::mutex> autoLock(authMgrMapLock_);
     auto it = authMgrMap_.find(processInfo3rd.tokenId);
@@ -788,12 +894,7 @@ void DeviceManagerServiceImpl3rd::AuthCredentialImpl(const PeerTargetId3rd &targ
         LOGI("Created new AuthMgr for token %{public}s",
             GetAnonyUint32(processInfo3rd.tokenId).c_str());
     }
-    int32_t sessionId = softbusConnector_->GetSoftbusSession()->OpenCredSession(targetId);
-    if (sessionId < 0) {
-        EraseAuthMgr(processInfo3rd.tokenId);
-        LOGE("OpenAuthSession failed, stop the auth");
-        return;
-    }
+
     uint64_t logicalSessionId = GenerateRandNum(sessionId);
     CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
         const ProcessInfo3rd &processInfo3rd) {
@@ -829,6 +930,41 @@ void DeviceManagerServiceImpl3rd::CredSessionOpenFailed(int32_t sessionId, const
     }
     std::vector<TrustDeviceInfo3rd> deviceInfos;
     listener_->OnAuthResult(processInfo3rd, ERR_DM_AUTH_OPEN_SESSION_FAILED, 0, deviceInfos, "");
+}
+
+int32_t DeviceManagerServiceImpl3rd::AcquireBindingLock(const PeerTargetId3rd &targetId,
+    const ProcessInfo3rd &processInfo3rd)
+{
+    int32_t errCode = DM_OK;
+    int32_t sessionId = BINDING_SESSION_ID_IDLE;
+    {
+        std::lock_guard<ffrt::mutex> bindLock(bindingLockMtx_);
+        if (bindingSessionId_ != BINDING_SESSION_ID_IDLE) {
+            LOGE("binding is already in progress, reject re-entrant binding");
+            errCode = ERR_DM_AUTH_BUSINESS_BUSY;
+        } else {
+            sessionId = softbusConnector_->GetSoftbusSession()->OpenCredSession(targetId);
+            if (sessionId < 0) {
+                LOGE("OpenAuthSession failed, stop the auth");
+                errCode = ERR_DM_AUTH_OPEN_SESSION_FAILED;
+            } else {
+                bindingSessionId_ = sessionId;
+                if (bindingTimer_ == nullptr) {
+                    bindingTimer_ = std::make_unique<DmTimer3rd>();
+                }
+                bindingTimer_->StartTimer(BINDING_TIMER_NAME, BINDING_TIMEOUT_SECONDS,
+                    [this](std::string name) {
+                        std::lock_guard<ffrt::mutex> lock(bindingLockMtx_);
+                        bindingSessionId_ = BINDING_SESSION_ID_IDLE;
+                    });
+            }
+        }
+    }
+    if (errCode != DM_OK && listener_ != nullptr) {
+        std::vector<TrustDeviceInfo3rd> deviceInfos;
+        listener_->OnAuthResult(processInfo3rd, errCode, 0, deviceInfos, "");
+    }
+    return (errCode == DM_OK) ? sessionId : BINDING_SESSION_ID_IDLE;
 }
 
 bool DeviceManagerServiceImpl3rd::SetProcessInfo3rd(const JsonObject &jsonObject, uint32_t &tokenId,

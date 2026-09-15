@@ -35,6 +35,7 @@
 #include "idevice_manager_service_impl_3rd.h"
 #include "idevice_manager_service_listener_3rd.h"
 #include "dm_anonymous_3rd.h"
+#include "dm_timer_3rd.h"
 #include "softbus_connector_3rd.h"
 
 namespace OHOS {
@@ -100,6 +101,7 @@ private:
     void AuthCredentialImpl(const PeerTargetId3rd &targetId,
         const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd);
     void CredSessionOpenFailed(int32_t sessionId, const ProcessInfo3rd &processInfo3rd);
+    int32_t AcquireBindingLock(const PeerTargetId3rd &targetId, const ProcessInfo3rd &processInfo3rd);
     void AuthPincodeImpl(const PeerTargetId3rd &targetId, const PinCodeInfo pinCodeInfo,
         const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd);
     bool SetProcessInfo3rd(const JsonObject &jsonObject, uint32_t &tokenId, ProcessInfo3rd &processInfo3rd);
@@ -125,6 +127,8 @@ private:
         uint64_t logicalSessionId, int32_t sessionId, const JsonObject &jsonObject);
     int32_t InitCredAuthMgr(uint32_t tokenId, uint64_t logicalSessionId, ProcessInfo3rd processInfo3rd);
     void SendCredRespFinish(int32_t sessionId, uint64_t logicalSessionId, int32_t reply, int32_t reason);
+    int32_t HandleCredSessionOpenSuccess(int32_t sessionId);
+    void HandleCredSessionOpenFailure(int32_t sessionId);
 
 private:
     ffrt::mutex pinCodeLock_;
@@ -152,6 +156,9 @@ private:
     std::map<int, ffrt::mutex> sessionEnableMutexMap_;
     ffrt::mutex logicalSessionId2SessionIdMapMtx_;
     std::map<uint64_t, int> logicalSessionId2SessionIdMap_; // The relationship logicalSessionId and physical sessionId
+    ffrt::mutex bindingLockMtx_;
+    int32_t bindingSessionId_{-1};
+    std::unique_ptr<DmTimer3rd> bindingTimer_ = std::make_unique<DmTimer3rd>();
 };
 
 using CreateDMServiceImpl3rdFuncPtr = IDeviceManagerServiceImpl3rd *(*)(void);
