@@ -509,31 +509,36 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
     CHECK_NULL_RETURN(authResponseContext_, ERR_DM_FAILED);
     authResponseContext_->msgType = msgType;
     LOGI("message type %{public}d", authResponseContext_->msgType);
+    return DispatchParseMessage(msgType, jsonObject);
+}
+
+int32_t AuthMessageProcessor::DispatchParseMessage(int32_t msgType, JsonObject &json)
+{
     switch (msgType) {
         case MSG_TYPE_NEGOTIATE:
-            ParseNegotiateMessage(jsonObject);
+            ParseNegotiateMessage(json);
             break;
         case MSG_TYPE_RESP_NEGOTIATE:
-            ParseRespNegotiateMessage(jsonObject);
+            ParseRespNegotiateMessage(json);
             break;
         case MSG_TYPE_REQ_AUTH:
-            return ParseAuthRequestMessage(jsonObject);
+            return ParseAuthRequestMessage(json);
         case MSG_TYPE_RESP_AUTH:
-            ParseAuthResponseMessage(jsonObject);
+            ParseAuthResponseMessage(json);
             break;
         case MSG_TYPE_RESP_AUTH_EXT:
-            ParseAuthResponseMessageExt(jsonObject);
+            ParseAuthResponseMessageExt(json);
             break;
         case MSG_TYPE_REQ_AUTH_TERMINATE:
-            ParseResponseFinishMessage(jsonObject);
+            ParseResponseFinishMessage(json);
             break;
         case MSG_TYPE_REQ_PUBLICKEY:
         case MSG_TYPE_RESP_PUBLICKEY:
-            ParsePublicKeyMessageExt(jsonObject);
+            ParsePublicKeyMessageExt(json);
             break;
         case MSG_TYPE_REQ_RECHECK_MSG:
         case MSG_TYPE_RESP_RECHECK_MSG:
-            ParseReqReCheckMessage(jsonObject);
+            ParseReqReCheckMessage(json);
             break;
         default:
             // [P5] unknown types carry no valid state transition; keep them as no-ops but observable.
@@ -631,6 +636,71 @@ void AuthMessageProcessor::GetAuthReqMessage(JsonObject &json)
     }
 }
 
+bool AuthMessageProcessor::ParseAuthRequestHeader(JsonObject &json)
+{
+    // [P5] a new message sequence resets the reassembly state.
+    recvSliceIdxSet_.clear();
+    GetAuthReqMessage(json);
+    authResponseContext_->appThumbnail = "";
+    // [P2/P10] the device id is the anchor of the trust relationship being negotiated; it must
+    // be present and well-formed.
+    if (authResponseContext_->deviceId.empty() || authResponseContext_->deviceId.size() > MAX_DEVICE_ID_LEN) {
+        LOGE("invalid deviceId in auth request.");
+        return false;
+    }
+    return true;
+}
+
+int32_t AuthMessageProcessor::ParseThumbnailSlice(JsonObject &json, int32_t idx, int32_t sliceNum)
+{
+    if (idx <= 0 || idx >= sliceNum || !IsString(json, TAG_APP_THUMBNAIL)) {
+        return DM_OK;
+    }
+    std::string appSliceThumbnail = json[TAG_APP_THUMBNAIL].Get<std::string>();
+    size_t accumulated = authResponseContext_->appThumbnail.size();
+    // [P3] a single slice must fit the slice size and the total must fit MAX_DATA_LEN; written
+    // in size_t arithmetic to avoid unsigned underflow.
+    if (appSliceThumbnail.size() > static_cast<size_t>(MSG_MAX_SIZE) ||
+        accumulated > static_cast<size_t>(MAX_DATA_LEN) ||
+        appSliceThumbnail.size() > static_cast<size_t>(MAX_DATA_LEN) - accumulated) {
+        LOGE("appSliceThumbnail size is %{public}zu invalid.", appSliceThumbnail.size());
+        return ERR_DM_FAILED;
+    }
+    authResponseContext_->appThumbnail = authResponseContext_->appThumbnail + appSliceThumbnail;
+    return ERR_DM_AUTH_MESSAGE_INCOMPLETE;
+}
+
+int32_t AuthMessageProcessor::ParseBindTypeList(const JsonObject &json)
+{
+    if (!IsInt32(json, TAG_BIND_TYPE_SIZE)) {
+        return DM_OK;
+    }
+    int32_t bindTypeSize = json[TAG_BIND_TYPE_SIZE].Get<int32_t>();
+    // [P3] negative or over-sized bind type list is rejected.
+    if (bindTypeSize < 0 || bindTypeSize > MAX_BINDTYPE_SIZE) {
+        LOGE("bindTypeSize is invalid.");
+        return ERR_DM_FAILED;
+    }
+    authResponseContext_->bindType.clear();
+    ParseBindTypeItems(json, bindTypeSize);
+    return DM_OK;
+}
+
+void AuthMessageProcessor::ParseBindTypeItems(const JsonObject &json, int32_t bindTypeSize)
+{
+    for (int32_t item = 0; item < bindTypeSize; item++) {
+        std::string itemStr = std::to_string(item);
+        if (!IsInt32(json, itemStr)) {
+            continue;
+        }
+        int32_t bindTypeValue = json[itemStr].Get<int32_t>();
+        // [P6] each peer-proposed bind type is independently validated before acceptance.
+        if (bindTypeValue >= 0) {
+            authResponseContext_->bindType.push_back(bindTypeValue);
+        }
+    }
+}
+
 int32_t AuthMessageProcessor::ParseAuthRequestMessage(JsonObject &json)
 {
     LOGI("start ParseAuthRequestMessage");
@@ -647,17 +717,8 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(JsonObject &json)
         LOGE("invalid slice idx %{public}d or sliceNum %{public}d", idx, sliceNum);
         return ERR_DM_FAILED;
     }
-    if (idx == 0) {
-        // [P5] a new message sequence resets the reassembly state.
-        recvSliceIdxSet_.clear();
-        GetAuthReqMessage(json);
-        authResponseContext_->appThumbnail = "";
-        // [P2/P10] the device id is the anchor of the trust relationship being negotiated; it must
-        // be present and well-formed.
-        if (authResponseContext_->deviceId.empty() || authResponseContext_->deviceId.size() > MAX_DEVICE_ID_LEN) {
-            LOGE("invalid deviceId in auth request.");
-            return ERR_DM_FAILED;
-        }
+    if (idx == 0 && !ParseAuthRequestHeader(json)) {
+        return ERR_DM_FAILED;
     }
     // [P5] reject duplicated slices to prevent reassembly replay/disorder.
     if (recvSliceIdxSet_.find(idx) != recvSliceIdxSet_.end()) {
@@ -665,45 +726,16 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(JsonObject &json)
         return ERR_DM_FAILED;
     }
     recvSliceIdxSet_.insert(idx);
-    if (idx > 0 && idx < sliceNum && IsString(json, TAG_APP_THUMBNAIL)) {
-        std::string appSliceThumbnail = json[TAG_APP_THUMBNAIL].Get<std::string>();
-        size_t accumulated = authResponseContext_->appThumbnail.size();
-        // [P3] a single slice must fit the slice size and the total must fit MAX_DATA_LEN; written
-        // in size_t arithmetic to avoid unsigned underflow.
-        if (appSliceThumbnail.size() > static_cast<size_t>(MSG_MAX_SIZE) ||
-            accumulated > static_cast<size_t>(MAX_DATA_LEN) ||
-            appSliceThumbnail.size() > static_cast<size_t>(MAX_DATA_LEN) - accumulated) {
-            LOGE("appSliceThumbnail size is %{public}zu invalid.", appSliceThumbnail.size());
-            return ERR_DM_FAILED;
-        }
-        authResponseContext_->appThumbnail = authResponseContext_->appThumbnail + appSliceThumbnail;
-        return ERR_DM_AUTH_MESSAGE_INCOMPLETE;
+    int32_t thumbnailRet = ParseThumbnailSlice(json, idx, sliceNum);
+    if (thumbnailRet != DM_OK) {
+        return thumbnailRet;
     }
     if (IsBool(json, TAG_IS_SHOW_DIALOG)) {
         authResponseContext_->isShowDialog = json[TAG_IS_SHOW_DIALOG].Get<bool>();
     } else {
         authResponseContext_->isShowDialog = true;
     }
-    if (IsInt32(json, TAG_BIND_TYPE_SIZE)) {
-        int32_t bindTypeSize = json[TAG_BIND_TYPE_SIZE].Get<int32_t>();
-        // [P3] negative or over-sized bind type list is rejected.
-        if (bindTypeSize < 0 || bindTypeSize > MAX_BINDTYPE_SIZE) {
-            LOGE("bindTypeSize is invalid.");
-            return ERR_DM_FAILED;
-        }
-        authResponseContext_->bindType.clear();
-        for (int32_t item = 0; item < bindTypeSize; item++) {
-            std::string itemStr = std::to_string(item);
-            if (IsInt32(json, itemStr)) {
-                int32_t bindTypeValue = json[itemStr].Get<int32_t>();
-                // [P6] each peer-proposed bind type is independently validated before acceptance.
-                if (bindTypeValue >= 0) {
-                    authResponseContext_->bindType.push_back(bindTypeValue);
-                }
-            }
-        }
-    }
-    return DM_OK;
+    return ParseBindTypeList(json);
 }
 
 void AuthMessageProcessor::ParseAuthResponseMessage(JsonObject &json)
@@ -806,23 +838,8 @@ void AuthMessageProcessor::ParsePkgNegotiateMessage(const JsonObject &json)
         authResponseContext_->dmVersion = "3.2";
     }
     ParseBoolField(json, TAG_HAVECREDENTIAL, authResponseContext_->haveCredential);
-    if (IsInt32(json, TAG_BIND_TYPE_SIZE)) {
-        int32_t bindTypeSize = json[TAG_BIND_TYPE_SIZE].Get<int32_t>();
-        if (bindTypeSize < 0 || bindTypeSize > MAX_BINDTYPE_SIZE) {
-            LOGE("bindTypeSize is invalid.");
-            return;
-        }
-        authResponseContext_->bindType.clear();
-        for (int32_t item = 0; item < bindTypeSize; item++) {
-            std::string itemStr = std::to_string(item);
-            if (IsInt32(json, itemStr)) {
-                int32_t bindTypeValue = json[itemStr].Get<int32_t>();
-                // [P6] each peer-proposed bind type is independently validated before acceptance.
-                if (bindTypeValue >= 0) {
-                    authResponseContext_->bindType.push_back(bindTypeValue);
-                }
-            }
-        }
+    if (ParseBindTypeList(json) != DM_OK) {
+        return;
     }
     ParseStringField(json, TAG_HOST_PKGLABEL, authResponseContext_->hostPkgLabel, MAX_CUSTOM_FIELD_LEN);
 }

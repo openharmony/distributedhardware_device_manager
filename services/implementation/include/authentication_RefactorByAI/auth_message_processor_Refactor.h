@@ -102,6 +102,11 @@ private:
     void CreateResponseAuthMessage(JsonObject &json);
     void ParseAuthResponseMessage(JsonObject &json);
     int32_t ParseAuthRequestMessage(JsonObject &json);
+    bool ParseAuthRequestHeader(JsonObject &json);
+    int32_t ParseThumbnailSlice(JsonObject &json, int32_t idx, int32_t sliceNum);
+    int32_t ParseBindTypeList(const JsonObject &json);
+    void ParseBindTypeItems(const JsonObject &json, int32_t bindTypeSize);
+    int32_t DispatchParseMessage(int32_t msgType, JsonObject &json);
     void ParseNegotiateMessage(const JsonObject &json);
     void ParseRespNegotiateMessage(const JsonObject &json);
     void CreateResponseFinishMessage(JsonObject &json);
