@@ -1,0 +1,1168 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "device_manager_service_impl_3rd_ai.h"
+
+#include <chrono>
+#include <random>
+#include <cstring>
+#include <thread>
+#include <securec.h>
+#include <set>
+#include <vector>
+
+#include "ipc_skeleton.h"
+
+#include "app_manager_3rd.h"
+#include "auth_manager_cred.h"
+#include "dm_anonymous_3rd.h"
+#include "dm_auth_info_3rd.h"
+#include "dm_auth_message_processor_3rd.h"
+#include "dm_auth_message_3rd.h"
+#include "dm_auth_pincode_message_processor_3rd.h"
+#include "dm_constants_3rd.h"
+#include "dm_error_type_3rd.h"
+#include "dm_log_3rd.h"
+#include "kv_adapter_manager_3rd.h"
+#include "multiple_user_connector_3rd.h"
+#include "permission_manager_3rd.h"
+#include "softbus_session_3rd.h"
+
+namespace OHOS {
+namespace DistributedHardware {
+
+namespace {
+const int32_t DM_MIN_PINCODE_SIZE = 6;
+const int32_t DM_MAX_PINCODE_SIZE = 1024;
+const int32_t MAX_DATA_LEN = 4096000;
+constexpr int32_t MIN_PIN_CODE = 100000;
+constexpr int32_t MAX_PIN_CODE = 999999;
+constexpr size_t MAX_NEW_PROC_SESSION_COUNT_TEMP = 1;
+const int32_t OPEN_AUTH_SESSION_TIMEOUT = 15000; // 15000ms
+constexpr int32_t BINDING_SESSION_ID_IDLE = -1;
+constexpr int32_t BINDING_TIMEOUT_SECONDS = 120;
+constexpr const char* BINDING_TIMER_NAME = "binding_timeout";
+}
+
+DeviceManagerServiceImpl3rdAi::DeviceManagerServiceImpl3rdAi()
+{
+    LOGI("DeviceManagerServiceImpl3rdAi constructor");
+    KVAdapterManager3rd::GetInstance().Init();
+}
+
+DeviceManagerServiceImpl3rdAi::~DeviceManagerServiceImpl3rdAi()
+{
+    LOGI("DeviceManagerServiceImpl3rdAi destructor");
+    KVAdapterManager3rd::GetInstance().UnInit();
+}
+
+int DeviceManagerServiceImpl3rdAi::OnAuth3rdAclSessionOpened(int sessionId, int result)
+{
+    LOGI("OnSessionOpened success, sessionId: %{public}d, res: %{public}d.", sessionId, result);
+    if (sessionEnableCvMap_.find(sessionId) != sessionEnableCvMap_.end()) {
+        std::lock_guard<ffrt::mutex> lock(sessionEnableMutexMap_[sessionId]);
+        if (result == 0) {
+            sessionEnableCvReadyMap_[sessionId] = true;
+        }
+        sessionEnableCvMap_[sessionId].notify_all();
+    }
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl3rdAi::OnAuth3rdAclSessionClosed(int sessionId)
+{
+    LOGI("OnSessionClosed, success, sessionId: %{public}d.", sessionId);
+    return;
+}
+
+static JsonObject GetJsonObjectFromData(const void *data, unsigned int dataLen)
+{
+    std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
+    return JsonObject(message);
+}
+
+void DeviceManagerServiceImpl3rdAi::OnAuth3rdAclBytesReceived(int sessionId, const void *data, uint32_t dataLen)
+{
+    if (sessionId < 0 || data == nullptr || dataLen <= 0 || dataLen > MAX_DATA_LEN) {
+        LOGE("[OnBytesReceived] Fail to receive data from softbus with sessionId: %{public}d, dataLen: %{public}d.",
+            sessionId, dataLen);
+        return;
+    }
+    LOGI("start, sessionId: %{public}d, dataLen: %{public}d.", sessionId, dataLen);
+    JsonObject jsonObject = GetJsonObjectFromData(data, dataLen);
+    if (jsonObject.IsDiscarded() || !IsInt32(jsonObject, TAG_MSG_TYPE)) {
+        LOGE("OnBytesReceived, MSG_TYPE parse failed.");
+        return;
+    }
+    int32_t msgType = jsonObject[TAG_MSG_TYPE].Get<int32_t>();
+    std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
+    std::shared_ptr<AuthManagerBase3rd> authMgr = nullptr;
+    uint64_t logicalSessionId = 0;
+    if (IsUint64(jsonObject, DM_TAG_LOGICAL_SESSION_ID)) {
+        logicalSessionId = jsonObject[DM_TAG_LOGICAL_SESSION_ID].Get<std::uint64_t>();
+    }
+    authMgr = GetAuthMgrByMessage(msgType, logicalSessionId, jsonObject);
+    if (authMgr == nullptr) {
+        return;
+    }
+    authMgr->OnDataReceived(sessionId, message);
+}
+int32_t DeviceManagerServiceImpl3rdAi::HandleCredSessionOpenSuccess(int32_t sessionId)
+{
+    bool shouldStartTimer = false;
+    {
+        std::lock_guard<ffrt::mutex> bindLock(bindingLockMtx_);
+        if (bindingSessionId_ == BINDING_SESSION_ID_IDLE) {
+            bindingSessionId_ = sessionId;
+            shouldStartTimer = true;
+        } else if (bindingSessionId_ == sessionId) {
+            LOGI("same session, already holds binding lock");
+        } else {
+            LOGE("binding in progress with session: %{public}d, reject re-entrant on sink side",
+                bindingSessionId_);
+            return ERR_DM_AUTH_BUSINESS_BUSY;
+        }
+    }
+    if (shouldStartTimer) {
+        if (bindingTimer_ == nullptr) {
+            bindingTimer_ = std::make_unique<DmTimer3rd>();
+        }
+        bindingTimer_->StartTimer(BINDING_TIMER_NAME, BINDING_TIMEOUT_SECONDS,
+            [this](std::string name) {
+                std::lock_guard<ffrt::mutex> lock(bindingLockMtx_);
+                bindingSessionId_ = BINDING_SESSION_ID_IDLE;
+            });
+    }
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl3rdAi::HandleCredSessionOpenFailure(int32_t sessionId)
+{
+    bool shouldClean = false;
+    {
+        std::lock_guard<ffrt::mutex> bindLock(bindingLockMtx_);
+        if (bindingSessionId_ == sessionId) {
+            LOGI("session open failed, release binding lock, sessionId: %{public}d", sessionId);
+            bindingSessionId_ = BINDING_SESSION_ID_IDLE;
+            shouldClean = true;
+        }
+    }
+    if (shouldClean) {
+        if (bindingTimer_ != nullptr) {
+            bindingTimer_->DeleteTimer(BINDING_TIMER_NAME);
+        }
+        CHECK_NULL_VOID(softbusConnector_);
+        CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
+        softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
+    }
+}
+
+int DeviceManagerServiceImpl3rdAi::OnAuthCred3rdSessionOpened(int sessionId, int result)
+{
+    LOGI("OnSessionOpened success, sessionId: %{public}d, res: %{public}d.", sessionId, result);
+    if (result == 0) {
+        int32_t ret = HandleCredSessionOpenSuccess(sessionId);
+        if (ret != DM_OK) {
+            return ret;
+        }
+    } else {
+        HandleCredSessionOpenFailure(sessionId);
+    }
+    if (sessionEnableCvMap_.find(sessionId) != sessionEnableCvMap_.end()) {
+        std::lock_guard<ffrt::mutex> lock(sessionEnableMutexMap_[sessionId]);
+        if (result == 0) {
+            sessionEnableCvReadyMap_[sessionId] = true;
+        }
+        sessionEnableCvMap_[sessionId].notify_all();
+    }
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl3rdAi::OnAuthCred3rdSessionClosed(int sessionId)
+{
+    LOGI("OnSessionClosed, success, sessionId: %{public}d.", sessionId);
+    uint64_t logicalSessionId = 0;
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+        for (auto it = logicalSessionId2SessionIdMap_.begin(); it != logicalSessionId2SessionIdMap_.end(); ++it) {
+            if (it->second == sessionId) {
+                logicalSessionId = it->first;
+                break;
+            }
+        }
+    }
+    if (logicalSessionId == 0) {
+        LOGE("can not find logicalSessionId by sessionId: %{public}d", sessionId);
+        return;
+    }
+    uint32_t tokenId = 0;
+    {
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        auto it = logicalSessionId2TokenIdMap_.find(logicalSessionId);
+        if (it != logicalSessionId2TokenIdMap_.end()) {
+            tokenId = it->second;
+        }
+    }
+    if (tokenId == 0) {
+        LOGE("can not find tokenId by logicalSessionId: %{public}" PRIu64, logicalSessionId);
+        return;
+    }
+    std::shared_ptr<AuthManagerBase3rd> authMgr = GetAuthMgrByTokenId(tokenId);
+    if (authMgr != nullptr) {
+        authMgr->OnSessionClosed(sessionId);
+    }
+}
+
+void DeviceManagerServiceImpl3rdAi::OnAuthCred3rdBytesReceived(int sessionId, const void *data, uint32_t dataLen)
+{
+    if (sessionId < 0 || data == nullptr || dataLen <= 0 || dataLen > MAX_DATA_LEN) {
+        LOGE("[OnBytesReceived] Fail to receive data from softbus with sessionId: %{public}d, dataLen: %{public}d.",
+            sessionId, dataLen);
+        return;
+    }
+    LOGI("start, sessionId: %{public}d, dataLen: %{public}d.", sessionId, dataLen);
+    JsonObject jsonObject = GetJsonObjectFromData(data, dataLen);
+    if (jsonObject.IsDiscarded() || !IsInt32(jsonObject, TAG_MSG_TYPE)) {
+        LOGE("OnBytesReceived, MSG_TYPE parse failed.");
+        return;
+    }
+    int32_t msgType = jsonObject[TAG_MSG_TYPE].Get<int32_t>();
+    std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
+    std::shared_ptr<AuthManagerBase3rd> authMgr = nullptr;
+    uint64_t logicalSessionId = 0;
+    if (IsUint64(jsonObject, DM_TAG_LOGICAL_SESSION_ID)) {
+        logicalSessionId = jsonObject[DM_TAG_LOGICAL_SESSION_ID].Get<std::uint64_t>();
+    }
+    authMgr = GetCredAuthMgrByMessage(msgType, logicalSessionId, sessionId, jsonObject);
+    if (authMgr == nullptr) {
+        LOGE("GetCredAuthMgrByMessage, authMgr is null.");
+        return;
+    }
+    authMgr->OnDataReceived(sessionId, message);
+}
+
+int32_t DeviceManagerServiceImpl3rdAi::Initialize(const std::shared_ptr<IDeviceManagerServiceListener3rd> &listener)
+{
+    listener_ = listener;
+    if (softbusConnector_ == nullptr) {
+        softbusConnector_ = std::make_shared<SoftbusConnector3rd>();
+    }
+    if (hiChainAuthConnector_ == nullptr) {
+        hiChainAuthConnector_ = std::make_shared<HiChainAuthConnector3rd>();
+    }
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl3rdAi::Release()
+{
+    listener_ = nullptr;
+    softbusConnector_ = nullptr;
+    hiChainAuthConnector_ = nullptr;
+    sessionEnableCvMap_.clear();
+    sessionEnableMutexMap_.clear();
+    return;
+}
+
+int32_t DeviceManagerServiceImpl3rdAi::ImportPinCode3rd(const std::string &businessName, const std::string &pinCode)
+{
+    if (businessName.empty() || pinCode.empty()) {
+        LOGE("Invalid parameter, businessName or pinCode is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start, businessName: %{public}s", businessName.c_str());
+    if (pinCode.length() < DM_MIN_PINCODE_SIZE || pinCode.length() > DM_MAX_PINCODE_SIZE) {
+        LOGE("Invalid pinCode length: %{public}zu", pinCode.length());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    std::string processName = "";
+    if (PermissionManager3rd::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed.");
+        return ERR_DM_FAILED;
+    }
+
+    ProcessInfo3rd processInfo3rd;
+    processInfo3rd.tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+    processInfo3rd.uid = OHOS::IPCSkeleton::GetCallingUid();
+    processInfo3rd.processName = processName;
+    processInfo3rd.businessName = businessName;
+    int32_t userId = MultipleUserConnector3rd::GetCurrentAccountUserID();
+    processInfo3rd.userId = userId;
+
+    PinCodeInfo pinCodeInfo;
+    if (strcpy_s(pinCodeInfo.pinCode, pinCode.size() + 1, pinCode.c_str()) != DM_OK) {
+        LOGE("strcpy_s pin code failed!");
+        return ERR_DM_FAILED;
+    }
+    pinCodeInfo.pincodeValidFlag = true;
+    {
+        std::lock_guard<ffrt::mutex> lock(pinCodeLock_);
+        pinCodeMap_[processInfo3rd] = pinCodeInfo;
+    }
+    LOGI("completed");
+    return DM_OK;
+}
+
+bool DeviceManagerServiceImpl3rdAi::IsInvalidPeerTargetId(const PeerTargetId3rd &targetId)
+{
+    LOGI("deviceId:%{public}s, brMac:%{public}s, bleMac:%{public}s, wifiIp:%{public}s",
+        GetAnonyString(targetId.deviceId).c_str(), GetAnonyString(targetId.brMac).c_str(),
+        GetAnonyString(targetId.bleMac).c_str(), GetAnonyString(targetId.wifiIp).c_str());
+    return targetId.deviceId.empty() && targetId.brMac.empty() && targetId.bleMac.empty() && targetId.wifiIp.empty();
+}
+
+void DeviceManagerServiceImpl3rdAi::GetBindCallerInfo(DmAuthCallerInfo3rd &authCallerInfo3rd,
+    ProcessInfo3rd &processInfo)
+{
+    int32_t uid = OHOS::IPCSkeleton::GetCallingUid();
+    int32_t userId = MultipleUserConnector3rd::GetCurrentAccountUserID();
+    uint32_t callingTokenId = 0;
+    MultipleUserConnector3rd::GetCallingTokenId(callingTokenId);
+    std::string processName = "";
+    AppManager3rd::GetInstance().GetCallerProcessName(processName);
+
+    if (AppManager3rd::GetInstance().IsSystemSA()) {
+        authCallerInfo3rd.isSystemSA = true;
+        authCallerInfo3rd.bindLevel = static_cast<int32_t>(DmRole::DM_ROLE_SA);
+    } else {
+        authCallerInfo3rd.bindLevel = static_cast<int32_t>(DmRole::DM_ROLE_FA);
+        authCallerInfo3rd.isSystemSA = false;
+    }
+    authCallerInfo3rd.uid = uid;
+    authCallerInfo3rd.userId = userId;
+    authCallerInfo3rd.tokenId = callingTokenId;
+    authCallerInfo3rd.processName = processName;
+
+    processInfo.processName = processName;
+    processInfo.tokenId = callingTokenId;
+    processInfo.uid = uid;
+    processInfo.userId = userId;
+    LOGI("uid:%{public}d, userId %{public}d, tokenId %{public}s, processName %{public}s,", uid, userId,
+        GetAnonyInt32(callingTokenId).c_str(),  GetAnonyString(processName).c_str());
+}
+
+void DeviceManagerServiceImpl3rdAi::SetBindCallerInfoToAuthParam(const std::map<std::string, std::string> &authParam,
+    std::map<std::string, std::string> &authParamTmp, const DmAuthCallerInfo3rd &authCallerInfo3rd,
+    ProcessInfo3rd &processInfo)
+{
+    if (authParam.count(TAG_BUSINESS_NAME) != 0) {
+        processInfo.businessName = authParam.at(TAG_BUSINESS_NAME);
+    }
+    authParamTmp = const_cast<std::map<std::string, std::string> &>(authParam);
+    authParamTmp["bindCallerUserId"] = std::to_string(authCallerInfo3rd.userId);
+    authParamTmp[TAG_BIND_CALLER_TOKENID] = std::to_string(authCallerInfo3rd.tokenId);
+    authParamTmp["bindCallerUid"] = std::to_string(authCallerInfo3rd.uid);
+    authParamTmp[TAG_BIND_CALLER_PROCESSNAME] = authCallerInfo3rd.processName;
+    authParamTmp[TAG_BIND_CALLER_IS_SYSTEM_SA] = std::to_string(authCallerInfo3rd.isSystemSA);
+    authParamTmp[TAG_BIND_CALLER_BIND_LEVEL] = std::to_string(authCallerInfo3rd.bindLevel);
+}
+
+static uint64_t GenerateRandNum(int sessionId)
+{
+    // Get the current timestamp
+    auto timestamp = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now().
+        time_since_epoch()).count();
+
+    // Generate random numbers
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<uint32_t> rand_dis(1, 0xFFFFFFFFu);
+    uint32_t randomNumber = rand_dis(gen);
+
+    // Combination of random numbers
+    uint64_t randNum = (static_cast<uint64_t>(timestamp) << 32) |
+                      (static_cast<uint64_t>(sessionId) << 16) |
+                      static_cast<uint64_t>(randomNumber);
+
+    return randNum;
+}
+
+void DeviceManagerServiceImpl3rdAi::AuthDeviceAclImpl(const PeerTargetId3rd &targetId, const PinCodeInfo pinCodeInfo,
+    const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd)
+{
+    LOGE("processName:%{public}s, tokenId:%{public}u, businessName: %{public}s",
+        processInfo3rd.processName.c_str(), processInfo3rd.tokenId, processInfo3rd.businessName.c_str());
+    
+    targetId3rd_ = targetId;
+    authParam_ = authParamTmp;
+
+    std::shared_ptr<AuthManagerBase3rd> authMgr = nullptr;
+    std::lock_guard<ffrt::mutex> autoLock(authMgrMapLock_);
+    auto it = authMgrMap_.find(processInfo3rd.tokenId);
+    if (it != authMgrMap_.end()) {
+        LOGI("AuthMgr already exists for token %{public}s",
+            GetAnonyString(std::to_string(processInfo3rd.tokenId)).c_str());
+        authMgr = it->second;
+    } else {
+        authMgr = std::make_shared<AuthSrcManager>(softbusConnector_, listener_, hiChainAuthConnector_);
+        authMgrMap_[processInfo3rd.tokenId] = authMgr;
+        LOGI("Created new AuthMgr for token %{public}s",
+            GetAnonyString(std::to_string(processInfo3rd.tokenId)).c_str());
+    }
+    int32_t sessionId = softbusConnector_->GetSoftbusSession()->OpenSessionServer(targetId);
+    if (sessionId < 0) {
+        LOGE("OpenAuthSession failed, stop the authentication");
+        return;
+    }
+    uint64_t logicalSessionId = GenerateRandNum(sessionId);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
+        const ProcessInfo3rd &processInfo3rd) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime, processInfo3rd);
+    };
+    authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
+    CHECK_NULL_VOID(hiChainAuthConnector_);
+    hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authMgr);
+    ImportAuthCodeAndUidFromCache(authMgr, processInfo3rd);
+    {
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        logicalSessionId2TokenIdMap_[logicalSessionId] = processInfo3rd.tokenId;
+    }
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+        logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+    }
+    sessionEnableCvReadyMap_[sessionId] = false;
+    std::unique_lock<ffrt::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
+    if (!sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::milliseconds(OPEN_AUTH_SESSION_TIMEOUT),
+        [&] { return sessionEnableCvReadyMap_[sessionId]; })) {
+        SessionOpenFailed(sessionId, processInfo3rd);
+        return;
+    }
+    authMgr->AuthDevice3rd(targetId, authParamTmp, sessionId, logicalSessionId);
+}
+
+void DeviceManagerServiceImpl3rdAi::SessionOpenFailed(int32_t sessionId, const ProcessInfo3rd &processInfo3rd)
+{
+    LOGE("wait session enable timeout or enable fail, sessionId: %{public}d.", sessionId);
+    if (listener_ == nullptr) {
+        LOGE("listener_ is nullptr");
+        return;
+    }
+    listener_->OnAuthResult(processInfo3rd, ERR_DM_AUTH_OPEN_SESSION_FAILED, 0, "");
+}
+
+int32_t DeviceManagerServiceImpl3rdAi::AuthDevice3rd(const PeerTargetId3rd &targetId,
+    const std::map<std::string, std::string> &authParam)
+{
+    if (IsInvalidPeerTargetId(targetId)) {
+        LOGE("Invalid parameter, params are empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    LOGI("Start, deviceId:%{public}s", GetAnonyString(targetId.deviceId).c_str());
+
+    ProcessInfo3rd processInfo3rd;
+    DmAuthCallerInfo3rd authCallerInfo3rd;
+    GetBindCallerInfo(authCallerInfo3rd, processInfo3rd);
+    std::map<std::string, std::string> authParamTmp;
+    SetBindCallerInfoToAuthParam(authParam, authParamTmp, authCallerInfo3rd, processInfo3rd);
+    LOGI("In, processName:%{public}s, tokenId:%{public}u", authCallerInfo3rd.processName.c_str(),
+        authCallerInfo3rd.tokenId);
+    {
+        std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
+        if (tokenIdSessionIdMap_.find(processInfo3rd.tokenId) != tokenIdSessionIdMap_.end()) {
+            LOGE("AuthDevice3rd failed, this device is being auth. please try again later,"
+                "processName:%{public}s, tokenId:%{public}u, sessionId: %{public}d",
+                authCallerInfo3rd.processName.c_str(), authCallerInfo3rd.tokenId,
+                tokenIdSessionIdMap_[processInfo3rd.tokenId]);
+            return ERR_DM_AUTH_BUSINESS_BUSY;
+        }
+    }
+    PinCodeInfo pinCodeInfo;
+    {
+        std::lock_guard<ffrt::mutex> lock(pinCodeLock_);
+        if (pinCodeMap_.find(processInfo3rd) == pinCodeMap_.end()) {
+            LOGE("pinCodeInfo is not exist");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+        pinCodeInfo = pinCodeMap_[processInfo3rd];
+    }
+    std::thread newThread(&DeviceManagerServiceImpl3rdAi::AuthDeviceAclImpl, this, targetId, pinCodeInfo,
+        authParamTmp, processInfo3rd);
+    newThread.detach();
+    LOGI("AuthDevice3rd completed");
+    return DM_OK;
+}
+
+std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rdAi::GetAuthMgrByTokenId(uint32_t tokenId)
+{
+    std::lock_guard<ffrt::mutex> autoLock(authMgrMapLock_);
+    auto it = authMgrMap_.find(tokenId);
+    if (it != authMgrMap_.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+static uint64_t StringToUint64(const std::string& str)
+{
+    // Calculate the length of the substring, taking the minimum of the string length and 8
+    size_t subStrLength = std::min(str.length(), static_cast<size_t>(8U));
+
+    // Extract substring
+    std::string substr = str.substr(str.length() - subStrLength);
+
+    // Convert substring to uint64_t
+    uint64_t result = 0;
+    for (size_t i = 0; i < subStrLength; ++i) {
+        result <<= 8; // Shift left 8 bits
+        result |= static_cast<uint64_t>(substr[i]);
+    }
+
+    return result;
+}
+
+static uint32_t GetTokenId(bool isSrcSide, std::string &processName)
+{
+    uint32_t tokenId = 0;
+    if (isSrcSide) {
+        // src end
+        tokenId = IPCSkeleton::GetCallingTokenID();
+    } else {
+        // sink end
+        uint32_t tmpTokenId;
+        // get userId
+        int32_t targetUserId =  MultipleUserConnector3rd::GetCurrentAccountUserID();
+        if (targetUserId == -1) {
+            return tokenId;
+        }
+        if (AppManager3rd::GetInstance().GetHapTokenIdByName(targetUserId, processName, 0, tmpTokenId) == DM_OK) {
+            tokenId = tmpTokenId;
+        } else if (AppManager3rd::GetInstance().GetNativeTokenIdByName(processName, tmpTokenId) == DM_OK) {
+            tokenId = tmpTokenId;
+        } else {
+            // get deviceId, take the 8 character value as tokenId
+            char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+            GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+            std::string deviceId = std::string(localDeviceId);
+            if (deviceId.length() != 0) {
+                tokenId = static_cast<uint32_t>(StringToUint64(deviceId));
+            }
+        }
+    }
+    return tokenId;
+}
+
+std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rdAi::GetAuthMgrByMessage(int32_t msgType,
+    uint64_t logicalSessionId, const JsonObject &jsonObject)
+{
+    uint32_t tokenId = 0;
+    LOGI("GetAuthMgrByMessage, msgType: %{public}d", msgType);
+    if (msgType == DmMessageType::ACL_REQ_NEGOTIATE) {
+        std::string processName;
+        std::string businessName;
+        if (IsString(jsonObject, TAG_PEER_BUSINESS_NAME)) {
+            businessName = jsonObject[TAG_PEER_BUSINESS_NAME].Get<std::string>();
+        }
+        if (IsString(jsonObject, TAG_PEER_PROCESS_NAME)) {
+            processName = jsonObject[TAG_PEER_PROCESS_NAME].Get<std::string>();
+        }
+        tokenId = GetTokenId(false, processName);
+        if (tokenId == 0) {
+            LOGE("Get tokenId failed.");
+            return nullptr;
+        }
+        ProcessInfo3rd processInfo3rd;
+        processInfo3rd.processName = processName;
+        processInfo3rd.businessName = businessName;
+        processInfo3rd.tokenId = tokenId;
+        processInfo3rd.userId = MultipleUserConnector3rd::GetCurrentAccountUserID();
+        if (InitAuthMgr(false, tokenId, logicalSessionId, processInfo3rd) != DM_OK) {
+            return nullptr;
+        }
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
+    } else if (msgType == DmPincodeMessageType::AUTH_PINCODE_REQ_NEGOTIATE) {
+        ProcessInfo3rd processInfo3rd;
+        if (!SetProcessInfo3rd(jsonObject, tokenId, processInfo3rd)) {
+            LOGE("SetProcessInfo3rd failed");
+            return nullptr;
+        }
+        if (InitAuthPincodeMgr(false, tokenId, logicalSessionId, processInfo3rd) != DM_OK) {
+            LOGE("InitAuthPincodeMgr failed");
+            return nullptr;
+        }
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
+    } else {
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        if (logicalSessionId2TokenIdMap_.find(logicalSessionId) == logicalSessionId2TokenIdMap_.end()) {
+            LOGE("Get tokenId failed from map.");
+            return nullptr;
+        }
+        tokenId = logicalSessionId2TokenIdMap_[logicalSessionId];
+    }
+    return GetAuthMgrByTokenId(tokenId);
+}
+
+void DeviceManagerServiceImpl3rdAi::SendCredRespFinish(int32_t sessionId, uint64_t logicalSessionId,
+    int32_t reply, int32_t reason)
+{
+    JsonObject jsonObject;
+    jsonObject[DM_TAG_LOGICAL_SESSION_ID] = logicalSessionId;
+    jsonObject[TAG_MSG_TYPE] = static_cast<int32_t>(DmCredMessageType::CRED_RESP_FINISH);
+    jsonObject[TAG_REPLY] = reply;
+    jsonObject[TAG_REASON] = reason;
+    std::string message = jsonObject.Dump();
+    CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
+    int32_t ret = softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
+    if (ret != DM_OK) {
+        LOGE("SendCredRespFinish failed, sessionId: %{public}d, ret: %{public}d", sessionId, ret);
+    }
+}
+
+std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rdAi::GetCredAuthMgrByMessage(int32_t msgType,
+    uint64_t logicalSessionId, int32_t sessionId, const JsonObject &jsonObject)
+{
+    uint32_t tokenId = 0;
+    if (msgType == DmCredMessageType::CRED_REQ_NEGOTIATE) {
+        std::string processName;
+        std::string businessName;
+        if (IsString(jsonObject, TAG_PEER_BUSINESS_NAME)) {
+            businessName = jsonObject[TAG_PEER_BUSINESS_NAME].Get<std::string>();
+        }
+        if (IsString(jsonObject, TAG_PEER_PROCESS_NAME)) {
+            processName = jsonObject[TAG_PEER_PROCESS_NAME].Get<std::string>();
+        }
+        tokenId = GetTokenId(false, processName);
+        if (tokenId == 0) {
+            LOGE("Get tokenId failed.");
+            SendCredRespFinish(sessionId, logicalSessionId, ERR_DM_BIND_INPUT_PARA_INVALID,
+                ERR_DM_BIND_INPUT_PARA_INVALID);
+            return nullptr;
+        }
+        ProcessInfo3rd processInfo3rd;
+        processInfo3rd.processName = processName;
+        processInfo3rd.businessName = businessName;
+        processInfo3rd.tokenId = tokenId;
+        processInfo3rd.userId = MultipleUserConnector3rd::GetCurrentAccountUserID();
+        int32_t initRet = InitCredAuthMgr(tokenId, logicalSessionId, processInfo3rd);
+        if (initRet != DM_OK) {
+            LOGE("InitCredAuthMgr failed.");
+            SendCredRespFinish(sessionId, logicalSessionId, initRet, initRet);
+            return nullptr;
+        }
+        {
+            std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+            logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
+        }
+        {
+            std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+            logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+        }
+    } else {
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        if (logicalSessionId2TokenIdMap_.find(logicalSessionId) == logicalSessionId2TokenIdMap_.end()) {
+            LOGE("Get tokenId failed from map.");
+            return nullptr;
+        }
+        tokenId = logicalSessionId2TokenIdMap_[logicalSessionId];
+    }
+    return GetAuthMgrByTokenId(tokenId);
+}
+
+int32_t DeviceManagerServiceImpl3rdAi::InitCredAuthMgr(uint32_t tokenId, uint64_t logicalSessionId,
+    ProcessInfo3rd processInfo3rd)
+{
+    std::shared_ptr<AuthManagerBase3rd> authMgr =
+        std::make_shared<AuthSinkManagerCred>(softbusConnector_, listener_, hiChainAuthConnector_);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
+        const ProcessInfo3rd &processInfo3rd) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime, processInfo3rd);
+    };
+    // Register resource destruction notification function
+    authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
+    CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
+    hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authMgr);
+    LOGI("Initialize authMgr token: %{public}d.", tokenId);
+    return AddAuthMgr(tokenId, authMgr);
+}
+
+int32_t DeviceManagerServiceImpl3rdAi::InitAuthMgr(bool isSrcSide, uint32_t tokenId, uint64_t logicalSessionId,
+    ProcessInfo3rd processInfo3rd)
+{
+    LOGI("isSrcSide:%{public}d, tokenId: %{public}s",
+        isSrcSide, GetAnonyString(std::to_string(tokenId)).c_str());
+    std::shared_ptr<AuthManagerBase3rd> authMgr = nullptr;
+    // Create a new auth_mgr, create authMgr
+    if (isSrcSide) {
+        // src end
+        authMgr = std::make_shared<AuthSrcManager>(softbusConnector_, listener_,
+            hiChainAuthConnector_);
+    } else {
+        // sink end
+        authMgr = std::make_shared<AuthSinkManager>(softbusConnector_, listener_,
+            hiChainAuthConnector_);
+    }
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
+        const ProcessInfo3rd &processInfo3rd) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime, processInfo3rd);
+    };
+    // Register resource destruction notification function
+    authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
+    CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
+    hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authMgr);
+    LOGI("Initialize authMgr token: %{public}d.", tokenId);
+    ImportAuthCodeAndUidFromCache(authMgr, processInfo3rd);
+    return AddAuthMgr(tokenId, authMgr);
+}
+
+int32_t DeviceManagerServiceImpl3rdAi::AddAuthMgr(uint32_t tokenId, std::shared_ptr<AuthManagerBase3rd> authMgr)
+{
+    if (authMgr == nullptr) {
+        LOGE("authMgr is nullptr.");
+        return ERR_DM_POINT_NULL;
+    }
+    {
+        std::lock_guard<ffrt::mutex> lock(authMgrMapMtx_);
+        if (authMgrMap_.size() >= MAX_NEW_PROC_SESSION_COUNT_TEMP) {
+            LOGE("Other bind session exist, can not start new one. authMgrMap_.size:%{public}zu", authMgrMap_.size());
+            return ERR_DM_AUTH_BUSINESS_BUSY;
+        }
+        authMgrMap_[tokenId] = authMgr;
+    }
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl3rdAi::ImportAuthCodeAndUidFromCache(std::shared_ptr<AuthManagerBase3rd> authMgr,
+    const ProcessInfo3rd processInfo3rd)
+{
+    CHECK_NULL_VOID(authMgr);
+    PinCodeInfo pinCodeInfo;
+    {
+        std::lock_guard<ffrt::mutex> lock(pinCodeLock_);
+        for (const auto &it : pinCodeMap_) {
+            if (it.first.tokenId == processInfo3rd.tokenId &&
+               it.first.processName == processInfo3rd.processName &&
+               it.first.businessName == processInfo3rd.businessName &&
+               it.first.userId == processInfo3rd.userId) {
+                authMgr->ImportAuthCodeAndUid(processInfo3rd.businessName, it.second.pinCode, it.first.uid);
+                return;
+            }
+        }
+    }
+}
+
+void DeviceManagerServiceImpl3rdAi::NotifyCleanEvent(uint64_t logicalSessionId, int32_t connDelayCloseTime,
+    ProcessInfo3rd processInfo3rd)
+{
+    LOGI("logicalSessionId: %{public}" PRIu64 ".", logicalSessionId);
+    ffrt::submit([=]() { CleanAuthMgrByLogicalSessionId(logicalSessionId, connDelayCloseTime, processInfo3rd); });
+}
+
+std::shared_ptr<AuthManagerBase3rd> DeviceManagerServiceImpl3rdAi::GetAuthMgr()
+{
+    uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+    return GetAuthMgrByTokenId(tokenId);
+}
+
+void DeviceManagerServiceImpl3rdAi::CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId,
+    int32_t connDelayCloseTime, ProcessInfo3rd processInfo3rd)
+{
+    uint32_t tokenId = 0;
+    {
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        if (logicalSessionId2TokenIdMap_.find(logicalSessionId) != logicalSessionId2TokenIdMap_.end()) {
+            tokenId = logicalSessionId2TokenIdMap_[logicalSessionId];
+        } else {
+            LOGE("logicalSessionId(%{public}" PRIu64 ") can not find the tokenId.", logicalSessionId);
+            return;
+        }
+    }
+    if (hiChainAuthConnector_ != nullptr) {
+        hiChainAuthConnector_->UnRegisterHiChainAuthCallbackById(logicalSessionId);
+    }
+    EraseAuthMgr(tokenId);
+    ErasePincodeInfo(processInfo3rd);
+    int32_t sessionId = 0;
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+        if (logicalSessionId2SessionIdMap_.find(logicalSessionId) != logicalSessionId2SessionIdMap_.end()) {
+            sessionId = logicalSessionId2SessionIdMap_[logicalSessionId];
+            logicalSessionId2SessionIdMap_.erase(logicalSessionId);
+        }
+    }
+    CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
+    softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
+    return;
+}
+
+void DeviceManagerServiceImpl3rdAi::EraseAuthMgr(uint32_t tokenId)
+{
+    {
+        std::lock_guard<ffrt::mutex> bindLock(bindingLockMtx_);
+        bindingSessionId_ = BINDING_SESSION_ID_IDLE;
+    }
+    if (bindingTimer_ != nullptr) {
+        bindingTimer_->DeleteTimer(BINDING_TIMER_NAME);
+    }
+    {
+        std::lock_guard<ffrt::mutex> lock(authMgrMapMtx_);
+        if (authMgrMap_.find(tokenId) != authMgrMap_.end()) {
+            LOGI("authMgrMap_ erase token: %{public}d.", tokenId);
+            authMgrMap_.erase(tokenId);
+        }
+    }
+    {
+        std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
+        LOGI("tokenIdSessionIdMap_ erase token: %{public}d", tokenId);
+        tokenIdSessionIdMap_.erase(tokenId);
+    }
+}
+
+void DeviceManagerServiceImpl3rdAi::ErasePincodeInfo(ProcessInfo3rd processInfo3rd)
+{
+    LOGI("processName:%{public}s, tokenId:%{public}s, businessName:%{public}s, uid:%{public}d, userId:%{public}d",
+        processInfo3rd.processName.c_str(), GetAnonyUint32(processInfo3rd.tokenId).c_str(),
+        processInfo3rd.businessName.c_str(), processInfo3rd.uid, processInfo3rd.userId);
+    std::lock_guard<ffrt::mutex> lock(pinCodeLock_);
+    if (pinCodeMap_.find(processInfo3rd) == pinCodeMap_.end()) {
+        LOGE("pinCodeInfo is not exist");
+        return;
+    }
+    pinCodeMap_.erase(processInfo3rd);
+}
+
+int32_t DeviceManagerServiceImpl3rdAi::AuthCredential(const PeerTargetId3rd &targetId,
+    std::map<std::string, std::string> &authParam)
+{
+    if (IsInvalidPeerTargetId(targetId)) {
+        LOGE("Invalid parameter, params are empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    LOGI("Start, deviceId: %{public}s", GetAnonyString(targetId.deviceId).c_str());
+    ProcessInfo3rd processInfo3rd;
+    DmAuthCallerInfo3rd authCallerInfo3rd;
+    GetBindCallerInfo(authCallerInfo3rd, processInfo3rd);
+    std::map<std::string, std::string> authParamTmp;
+    SetBindCallerInfoToAuthParam(authParam, authParamTmp, authCallerInfo3rd, processInfo3rd);
+    LOGI("In, processName:%{public}s, tokenId:%{public}u", authCallerInfo3rd.processName.c_str(),
+        authCallerInfo3rd.tokenId);
+    {
+        std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
+        if (tokenIdSessionIdMap_.find(processInfo3rd.tokenId) != tokenIdSessionIdMap_.end()) {
+            LOGE("AuthCredential failed, this device is being auth. please try again later,"
+                "processName:%{public}s, tokenId:%{public}u, sessionId: %{public}d",
+                authCallerInfo3rd.processName.c_str(), authCallerInfo3rd.tokenId,
+                tokenIdSessionIdMap_[processInfo3rd.tokenId]);
+            return ERR_DM_AUTH_BUSINESS_BUSY;
+        }
+    }
+    std::thread newThread(&DeviceManagerServiceImpl3rdAi::AuthCredentialImpl, this, targetId,
+        authParamTmp, processInfo3rd);
+    newThread.detach();
+
+    LOGI("AuthCredential completed");
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl3rdAi::AuthCredentialImpl(const PeerTargetId3rd &targetId,
+    const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd)
+{
+    LOGE("processName:%{public}s, tokenId:%{public}s, businessName: %{public}s",
+        processInfo3rd.processName.c_str(), GetAnonyUint32(processInfo3rd.tokenId).c_str(),
+        processInfo3rd.businessName.c_str());
+    int32_t sessionId = AcquireBindingLock(targetId, processInfo3rd);
+    if (sessionId == BINDING_SESSION_ID_IDLE) {
+        return;
+    }
+
+    std::shared_ptr<AuthManagerBase3rd> authMgr = nullptr;
+    std::lock_guard<ffrt::mutex> autoLock(authMgrMapLock_);
+    auto it = authMgrMap_.find(processInfo3rd.tokenId);
+    if (it != authMgrMap_.end()) {
+        LOGI("AuthMgr already exists for token %{public}s",
+            GetAnonyUint32(processInfo3rd.tokenId).c_str());
+        authMgr = it->second;
+    } else {
+        authMgr = std::make_shared<AuthSrcManagerCred>(softbusConnector_, listener_, hiChainAuthConnector_);
+        authMgrMap_[processInfo3rd.tokenId] = authMgr;
+        LOGI("Created new AuthMgr for token %{public}s",
+            GetAnonyUint32(processInfo3rd.tokenId).c_str());
+    }
+
+    uint64_t logicalSessionId = GenerateRandNum(sessionId);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
+        const ProcessInfo3rd &processInfo3rd) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime, processInfo3rd);
+    };
+    authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
+    CHECK_NULL_VOID(hiChainAuthConnector_);
+    hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authMgr);
+    ImportAuthCodeAndUidFromCache(authMgr, processInfo3rd);
+    {
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        logicalSessionId2TokenIdMap_[logicalSessionId] = processInfo3rd.tokenId;
+    }
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+        logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+    }
+    sessionEnableCvReadyMap_[sessionId] = false;
+    std::unique_lock<ffrt::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
+    if (!sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::milliseconds(OPEN_AUTH_SESSION_TIMEOUT),
+        [&] { return sessionEnableCvReadyMap_[sessionId]; })) {
+        CredSessionOpenFailed(sessionId, processInfo3rd);
+        return;
+    }
+    authMgr->AuthCredential(targetId, authParamTmp, sessionId, logicalSessionId);
+}
+
+void DeviceManagerServiceImpl3rdAi::CredSessionOpenFailed(int32_t sessionId, const ProcessInfo3rd &processInfo3rd)
+{
+    LOGE("wait session enable timeout or enable fail, sessionId: %{public}d.", sessionId);
+    if (listener_ == nullptr) {
+        return;
+    }
+    std::vector<TrustDeviceInfo3rd> deviceInfos;
+    listener_->OnAuthResult(processInfo3rd, ERR_DM_AUTH_OPEN_SESSION_FAILED, 0, deviceInfos, "");
+}
+
+int32_t DeviceManagerServiceImpl3rdAi::AcquireBindingLock(const PeerTargetId3rd &targetId,
+    const ProcessInfo3rd &processInfo3rd)
+{
+    int32_t errCode = DM_OK;
+    int32_t sessionId = BINDING_SESSION_ID_IDLE;
+    {
+        std::lock_guard<ffrt::mutex> bindLock(bindingLockMtx_);
+        if (bindingSessionId_ != BINDING_SESSION_ID_IDLE) {
+            LOGE("binding is already in progress, reject re-entrant binding");
+            errCode = ERR_DM_AUTH_BUSINESS_BUSY;
+        } else {
+            sessionId = softbusConnector_->GetSoftbusSession()->OpenCredSession(targetId);
+            if (sessionId < 0) {
+                LOGE("OpenAuthSession failed, stop the auth");
+                errCode = ERR_DM_AUTH_OPEN_SESSION_FAILED;
+            } else {
+                bindingSessionId_ = sessionId;
+                if (bindingTimer_ == nullptr) {
+                    bindingTimer_ = std::make_unique<DmTimer3rd>();
+                }
+                bindingTimer_->StartTimer(BINDING_TIMER_NAME, BINDING_TIMEOUT_SECONDS,
+                    [this](std::string name) {
+                        std::lock_guard<ffrt::mutex> lock(bindingLockMtx_);
+                        bindingSessionId_ = BINDING_SESSION_ID_IDLE;
+                    });
+            }
+        }
+    }
+    if (errCode != DM_OK && listener_ != nullptr) {
+        std::vector<TrustDeviceInfo3rd> deviceInfos;
+        listener_->OnAuthResult(processInfo3rd, errCode, 0, deviceInfos, "");
+    }
+    return (errCode == DM_OK) ? sessionId : BINDING_SESSION_ID_IDLE;
+}
+
+bool DeviceManagerServiceImpl3rdAi::SetProcessInfo3rd(const JsonObject &jsonObject, uint32_t &tokenId,
+    ProcessInfo3rd &processInfo3rd)
+{
+    LOGI("SetProcessInfo3rd tokenId: %{public}d", tokenId);
+    std::string processName;
+    std::string businessName;
+    if (IsString(jsonObject, TAG_PEER_BUSINESS_NAME)) {
+        businessName = jsonObject[TAG_PEER_BUSINESS_NAME].Get<std::string>();
+    }
+    if (IsString(jsonObject, TAG_PEER_PROCESS_NAME)) {
+        processName = jsonObject[TAG_PEER_PROCESS_NAME].Get<std::string>();
+    }
+    tokenId = GetTokenId(false, processName);
+    if (tokenId == 0) {
+        LOGE("Get tokenId failed.");
+        return false;
+    }
+    processInfo3rd.processName = processName;
+    processInfo3rd.businessName = businessName;
+    processInfo3rd.tokenId = tokenId;
+    processInfo3rd.userId = MultipleUserConnector3rd::GetCurrentAccountUserID();
+    return true;
+}
+
+int32_t DeviceManagerServiceImpl3rdAi::InitAuthPincodeMgr(bool isSrcSide, uint32_t tokenId, uint64_t logicalSessionId,
+    const ProcessInfo3rd &processInfo3rd)
+{
+    LOGI("isSrcSide:%{public}d, tokenId: %{public}s", isSrcSide, GetAnonyString(std::to_string(tokenId)).c_str());
+    std::shared_ptr<AuthManagerBase3rd> authPincodeMgr = nullptr;
+    // Create a new auth_pincode_mgr, create authPincodeMgr
+    if (isSrcSide) {
+        // src end
+        authPincodeMgr = std::make_shared<AuthPincodeSrcManager>(softbusConnector_, listener_, hiChainAuthConnector_);
+    } else {
+        // sink end
+        authPincodeMgr = std::make_shared<AuthPincodeSinkManager>(softbusConnector_, listener_, hiChainAuthConnector_);
+    }
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
+        const ProcessInfo3rd &processInfo3rd) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime, processInfo3rd);
+    };
+    // Register resource destruction notification function
+    authPincodeMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
+    CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
+    hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authPincodeMgr);
+    LOGI("Initialize authPincodeMgr token: %{public}d.", tokenId);
+    ImportAuthCodeAndUidFromCache(authPincodeMgr, processInfo3rd);
+    return AddAuthMgr(tokenId, authPincodeMgr);
+}
+
+int32_t DeviceManagerServiceImpl3rdAi::AuthPincode(const PeerTargetId3rd &targetId,
+    std::map<std::string, std::string> &authParam)
+{
+    if (IsInvalidPeerTargetId(targetId)) {
+        LOGE("Invalid parameter, params are empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    LOGI("Start, deviceId:%{public}s", GetAnonyString(targetId.deviceId).c_str());
+
+    ProcessInfo3rd processInfo3rd;
+    DmAuthCallerInfo3rd authCallerInfo3rd;
+    GetBindCallerInfo(authCallerInfo3rd, processInfo3rd);
+    std::map<std::string, std::string> authParamTmp;
+    SetBindCallerInfoToAuthParam(authParam, authParamTmp, authCallerInfo3rd, processInfo3rd);
+    LOGI("In, processName:%{public}s, tokenId:%{public}u", authCallerInfo3rd.processName.c_str(),
+        authCallerInfo3rd.tokenId);
+    {
+        std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
+        if (tokenIdSessionIdMap_.find(processInfo3rd.tokenId) != tokenIdSessionIdMap_.end()) {
+            LOGE("AuthPincode failed, this device is being auth. please try again later,"
+                "processName:%{public}s, tokenId:%{public}u, sessionId: %{public}d",
+                authCallerInfo3rd.processName.c_str(), authCallerInfo3rd.tokenId,
+                tokenIdSessionIdMap_[processInfo3rd.tokenId]);
+            return ERR_DM_AUTH_BUSINESS_BUSY;
+        }
+    }
+    PinCodeInfo pinCodeInfo;
+    {
+        std::lock_guard<ffrt::mutex> lock(pinCodeLock_);
+        if (pinCodeMap_.find(processInfo3rd) == pinCodeMap_.end()) {
+            LOGE("pinCodeInfo is not exist");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+        pinCodeInfo = pinCodeMap_[processInfo3rd];
+    }
+    std::thread newThread(&DeviceManagerServiceImpl3rdAi::AuthPincodeImpl, this, targetId, pinCodeInfo,
+        authParamTmp, processInfo3rd);
+    newThread.detach();
+    LOGI("AuthPincode completed");
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl3rdAi::AuthPincodeImpl(const PeerTargetId3rd &targetId, const PinCodeInfo pinCodeInfo,
+    const std::map<std::string, std::string> &authParamTmp, const ProcessInfo3rd processInfo3rd)
+{
+    LOGE("processName:%{public}s, tokenId:%{public}u, businessName: %{public}s",
+        processInfo3rd.processName.c_str(), processInfo3rd.tokenId, processInfo3rd.businessName.c_str());
+
+    std::shared_ptr<AuthManagerBase3rd> authMgr = nullptr;
+    std::lock_guard<ffrt::mutex> autoLock(authMgrMapLock_);
+    auto it = authMgrMap_.find(processInfo3rd.tokenId);
+    if (it != authMgrMap_.end()) {
+        LOGI("AuthMgr already exists for token %{public}s",
+            GetAnonyString(std::to_string(processInfo3rd.tokenId)).c_str());
+        authMgr = it->second;
+    } else {
+        authMgr = std::make_shared<AuthPincodeSrcManager>(softbusConnector_, listener_, hiChainAuthConnector_);
+        authMgrMap_[processInfo3rd.tokenId] = authMgr;
+        LOGI("Created new AuthMgr for token:%{public}s",
+            GetAnonyString(std::to_string(processInfo3rd.tokenId)).c_str());
+    }
+    int32_t sessionId = softbusConnector_->GetSoftbusSession()->OpenAuth3rdSessionServer(targetId);
+    if (sessionId < 0) {
+        LOGE("OpenAuthSession failed, stop the authentication");
+        return;
+    }
+    uint64_t logicalSessionId = GenerateRandNum(sessionId);
+    LOGI("AuthPincodeImpl, sessionId:%{public}d, logicalSessionId:%{public}" PRIu64 "", sessionId, logicalSessionId);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime,
+        const ProcessInfo3rd &processInfo3rd) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime, processInfo3rd);
+    };
+    authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
+    CHECK_NULL_VOID(hiChainAuthConnector_);
+    hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authMgr);
+    ImportAuthCodeAndUidFromCache(authMgr, processInfo3rd);
+    {
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        logicalSessionId2TokenIdMap_[logicalSessionId] = processInfo3rd.tokenId;
+    }
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+        logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+    }
+    sessionEnableCvReadyMap_[sessionId] = false;
+    std::unique_lock<ffrt::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
+    if (!sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::milliseconds(OPEN_AUTH_SESSION_TIMEOUT),
+        [&] { return sessionEnableCvReadyMap_[sessionId]; })) {
+        LOGE("wait session enable timeout or enable fail, sessionId: %{public}d.", sessionId);
+        CredSessionOpenFailed(sessionId, processInfo3rd);
+        return;
+    }
+    authMgr->AuthPincode(targetId, authParamTmp, sessionId, logicalSessionId);
+    return;
+}
+
+int DeviceManagerServiceImpl3rdAi::OnAuth3rdSessionOpened(int sessionId, int result)
+{
+    LOGI("OnSessionOpened success, sessionId:%{public}d, res:%{public}d.", sessionId, result);
+    if (sessionEnableCvMap_.find(sessionId) != sessionEnableCvMap_.end()) {
+        std::lock_guard<ffrt::mutex> lock(sessionEnableMutexMap_[sessionId]);
+        if (result == 0) {
+            sessionEnableCvReadyMap_[sessionId] = true;
+        }
+        sessionEnableCvMap_[sessionId].notify_all();
+    }
+    return DM_OK;
+}
+
+void DeviceManagerServiceImpl3rdAi::OnAuth3rdSessionClosed(int sessionId)
+{
+    LOGI("OnSessionClosed, success, sessionId: %{public}d.", sessionId);
+    return;
+}
+
+void DeviceManagerServiceImpl3rdAi::OnAuth3rdBytesReceived(int sessionId, const void *data, uint32_t dataLen)
+{
+    if (sessionId < 0 || data == nullptr || dataLen <= 0 || dataLen > MAX_DATA_LEN) {
+        LOGE("[SOFTBUS]fail to receive data from softbus with sessionId: %{public}d, dataLen: %{public}d.", sessionId,
+            dataLen);
+        return;
+    }
+
+    LOGI("start, sessionId: %{public}d, dataLen: %{public}d.", sessionId, dataLen);
+    JsonObject jsonObject = GetJsonObjectFromData(data, dataLen);
+    if (jsonObject.IsDiscarded() || !IsInt32(jsonObject, TAG_MSG_TYPE)) {
+        LOGE("OnBytesReceived, MSG_TYPE parse failed.");
+        return;
+    }
+    int32_t msgType = jsonObject[TAG_MSG_TYPE].Get<int32_t>();
+    std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
+    std::shared_ptr<AuthManagerBase3rd> authPincodeMgr = nullptr;
+    uint64_t logicalSessionId = 0;
+    if (IsUint64(jsonObject, DM_TAG_LOGICAL_SESSION_ID)) {
+        logicalSessionId = jsonObject[DM_TAG_LOGICAL_SESSION_ID].Get<std::uint64_t>();
+    }
+    authPincodeMgr = GetAuthMgrByMessage(msgType, logicalSessionId, jsonObject);
+    CHECK_NULL_VOID(authPincodeMgr);
+    authPincodeMgr->OnDataReceived(sessionId, message);
+}
+
+extern "C" IDeviceManagerServiceImpl3rd *CreateDMServiceImpl3rdAiObject(void)
+{
+    return new DeviceManagerServiceImpl3rdAi;
+}
+} // namespace DistributedHardware
+} // namespace OHOS
