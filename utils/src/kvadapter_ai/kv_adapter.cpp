@@ -1,0 +1,305 @@
+/*
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <cinttypes>
+#include <mutex>
+#include <unistd.h>
+
+#include "cJSON.h"
+#include "datetime_ex.h"
+#include "string_ex.h"
+
+#include "data_query.h"
+#include "dm_anonymous.h"
+#include "dm_error_type.h"
+#include "dm_log.h"
+#include "ffrt.h"
+
+namespace OHOS {
+namespace DistributedHardware {
+using namespace OHOS::DistributedKv;
+namespace {
+    const std::string APP_ID = "distributed_device_manager_service";
+    const std::string STORE_ID = "dm_kv_store";
+    const std::string DATABASE_DIR = "/data/service/el1/public/database/distributed_device_manager_service";
+    const std::string KV_REINIT_THREAD = "reinit_kv_store";
+    constexpr uint32_t MAX_BATCH_SIZE = 128;
+    constexpr int32_t MAX_STRING_LEN = 4096;
+    constexpr int32_t MAX_INIT_RETRY_TIMES = 20;
+    constexpr int32_t INIT_RETRY_SLEEP_INTERVAL = 200 * 1000; // 200ms
+    constexpr uint32_t DM_OSTYPE_PREFIX_LEN = 16;
+    const char* PEER_UDID = "peer_udid";
+    const char* PEER_OSTYPE = "peer_ostype";
+    const char* TIME_STAMP = "time_stamp";
+}
+
+int32_t KVAdapterAI::Init()
+{
+    LOGI("local DB, dataType: %{public}d", static_cast<int32_t>(dataType_));
+    this->appId_.appId = APP_ID;
+    this->storeId_.storeId = STORE_ID;
+    std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
+    if (isInited_.load()) {
+        LOGI("Local DB already inited.");
+        return DM_OK;
+    }
+    int32_t tryTimes = MAX_INIT_RETRY_TIMES;
+    while (tryTimes > 0) {
+        DistributedKv::Status status = GetLocalKvStorePtr();
+        if (status == DistributedKv::Status::SUCCESS && kvStorePtr_) {
+            LOGI("KvStorePtr Success");
+            isInited_.store(true);
+            return DM_OK;
+        }
+        LOGE("CheckKvStore, left times: %{public}d, status: %{public}d", tryTimes, status);
+        if (status == DistributedKv::Status::STORE_META_CHANGED ||
+            status == DistributedKv::Status::SECURITY_LEVEL_ERROR ||
+            status == DistributedKv::Status::DATA_CORRUPTED) {
+            LOGE("init db error, remove and rebuild it");
+            DeleteKvStore();
+        }
+        ffrt_usleep(INIT_RETRY_SLEEP_INTERVAL);
+        tryTimes--;
+    }
+    LOGE("KvStore init failed after %{public}d retries", MAX_INIT_RETRY_TIMES);
+    kvStorePtr_.reset();
+    return ERR_DM_INIT_FAILED;
+}
+
+void KVAdapterAI::UnInit()
+{
+    LOGI("KVAdapter UnInit");
+    if (isInited_.load()) {
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
+        CHECK_NULL_VOID(kvStorePtr_);
+        kvStorePtr_.reset();
+        isInited_.store(false);
+    }
+}
+
+int32_t KVAdapterAI::ReInit()
+{
+    LOGI("KVAdapter ReInit");
+    UnInit();
+    return Init();
+}
+
+int32_t KVAdapterAI::Put(const std::string &key, const std::string &value)
+{
+    if (key.empty() || key.size() > MAX_STRING_LEN || value.empty() || value.size() > MAX_STRING_LEN) {
+        LOGE("Param is invalid!");
+        return ERR_DM_FAILED;
+    }
+    DistributedKv::Status status;
+    {
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
+        CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
+
+        DistributedKv::Key kvKey(key);
+        DistributedKv::Value kvValue(value);
+        status = kvStorePtr_->Put(kvKey, kvValue);
+    }
+    if (status != DistributedKv::Status::SUCCESS) {
+        LOGE("kv to db failed, ret: %{public}d", status);
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t KVAdapterAI::Get(const std::string &key, std::string &value)
+{
+    LOGI("data by key: %{public}s", GetAnonyString(key).c_str());
+    DistributedKv::Key kvKey(key);
+    DistributedKv::Value kvValue;
+    DistributedKv::Status status;
+    {
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
+        CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
+        status = kvStorePtr_->Get(kvKey, kvValue);
+    }
+    if (status != DistributedKv::Status::SUCCESS) {
+        LOGE("data from kv failed, key: %{public}s", GetAnonyString(key).c_str());
+        return ERR_DM_FAILED;
+    }
+    value = kvValue.ToString();
+    return DM_OK;
+}
+
+DistributedKv::Status KVAdapterAI::GetLocalKvStorePtr()
+{
+    DistributedKv::Options options = {
+        .createIfMissing = true,
+        .encrypt = false,
+        .autoSync = false,
+        .securityLevel = DistributedKv::SecurityLevel::S1,
+        .area = DistributedKv::EL1,
+        .kvStoreType = DistributedKv::KvStoreType::SINGLE_VERSION,
+        .baseDir = DATABASE_DIR
+    };
+    std::lock_guard<ffrt::mutex> lock(kvDataMgrMutex_);
+    DistributedKv::Status status = kvDataMgr_.GetSingleKvStore(options, appId_, storeId_, kvStorePtr_);
+    return status;
+}
+
+int32_t KVAdapterAI::DeleteKvStore()
+{
+    LOGI("Delete KvStore!");
+    std::lock_guard<ffrt::mutex> lock(kvDataMgrMutex_);
+    kvDataMgr_.CloseKvStore(appId_, storeId_);
+    kvDataMgr_.DeleteKvStore(appId_, storeId_, DATABASE_DIR);
+    return DM_OK;
+}
+
+int32_t KVAdapterAI::DeleteByAppId(const std::string &appId, const std::string &prefix)
+{
+    if (appId.empty()) {
+        LOGE("appId is empty");
+        return ERR_DM_FAILED;
+    }
+    std::vector<DistributedKv::Entry> localEntries;
+    {
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
+        if (kvStorePtr_ == nullptr) {
+            LOGE("kvStoragePtr_ is null");
+            return ERR_DM_POINT_NULL;
+        }
+        if (kvStorePtr_->GetEntries(prefix + appId, localEntries) != DistributedKv::Status::SUCCESS) {
+            LOGE("Get entrys from DB failed.");
+            return ERR_DM_FAILED;
+        }
+    }
+    std::vector<std::string> delKeys;
+    for (const auto &entry : localEntries) {
+        delKeys.emplace_back(entry.key.ToString());
+        DmKVValue kvValue;
+        ConvertJsonToDmKVValue(entry.value.ToString(), kvValue);
+        if (!kvValue.anoyDeviceId.empty()) {
+            delKeys.emplace_back(prefix + kvValue.anoyDeviceId);
+        }
+    }
+    return DeleteBatch(delKeys);
+}
+
+int32_t KVAdapterAI::DeleteBatch(const std::vector<std::string> &keys)
+{
+    if (keys.empty()) {
+        LOGE("keys size(%{public}zu) is invalid!", keys.size());
+        return ERR_DM_FAILED;
+    }
+    uint32_t keysSize = static_cast<uint32_t>(keys.size());
+    std::vector<std::vector<DistributedKv::Key>> delKeyBatches;
+    for (uint32_t i = 0; i < keysSize; i += MAX_BATCH_SIZE) {
+        uint32_t end = (i + MAX_BATCH_SIZE) > keysSize ? keysSize : (i + MAX_BATCH_SIZE);
+        auto batch = std::vector<std::string>(keys.begin() + i, keys.begin() + end);
+        std::vector<DistributedKv::Key> delKeys;
+        for (auto item : batch) {
+            DistributedKv::Key key(item);
+            delKeys.emplace_back(key);
+        }
+        delKeyBatches.emplace_back(delKeys);
+    }
+
+    {
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
+        if (kvStorePtr_ == nullptr) {
+            LOGE("kvStorePtr is nullptr!");
+            return ERR_DM_POINT_NULL;
+        }
+        for (auto delKeys : delKeyBatches) {
+            DistributedKv::Status status = kvStorePtr_->DeleteBatch(delKeys);
+            if (status != DistributedKv::Status::SUCCESS) {
+                LOGE("failed!");
+                return ERR_DM_FAILED;
+            }
+        }
+    }
+    return DM_OK;
+}
+
+int32_t KVAdapterAI::Delete(const std::string& key)
+{
+    DistributedKv::Status status;
+    {
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
+        if (kvStorePtr_ == nullptr) {
+            LOGE("kvStorePtr is nullptr!");
+            return ERR_DM_POINT_NULL;
+        }
+        DistributedKv::Key kvKey(key);
+        status = kvStorePtr_->Delete(kvKey);
+    }
+    if (status != DistributedKv::Status::SUCCESS) {
+        LOGE("kv by key failed!");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t KVAdapterAI::GetAllOstypeData(const std::string &key, std::vector<std::string> &values)
+{
+    if (key.empty()) {
+        LOGE("key is empty");
+        return ERR_DM_FAILED;
+    }
+    std::vector<DistributedKv::Entry> localEntries;
+    {
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
+        CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
+        if (kvStorePtr_->GetEntries(key, localEntries) != DistributedKv::Status::SUCCESS) {
+            LOGE("Get entrys from DB failed.");
+            return ERR_DM_FAILED;
+        }
+    }
+    values.clear();
+    for (const auto &entry : localEntries) {
+        JsonObject osTypeJson(entry.value.ToString());
+        if (osTypeJson.IsDiscarded() || !IsInt32(osTypeJson, PEER_OSTYPE) || !IsInt64(osTypeJson, TIME_STAMP)) {
+            LOGE("entry parse error.");
+            continue;
+        }
+        if (entry.key.ToString().size() < DM_OSTYPE_PREFIX_LEN) {
+            LOGE("entry value invalid.");
+            continue;
+        }
+        JsonObject jsonObj;
+        jsonObj[PEER_UDID] = entry.key.ToString().substr(DM_OSTYPE_PREFIX_LEN);
+        jsonObj[PEER_OSTYPE] = osTypeJson[PEER_OSTYPE].Get<int32_t>();
+        jsonObj[TIME_STAMP] = osTypeJson[TIME_STAMP].Get<int64_t>();
+        values.push_back(jsonObj.Dump());
+    }
+    return DM_OK;
+}
+
+int32_t KVAdapterAI::GetOstypeCountByPrefix(const std::string &prefix, int32_t &count)
+{
+    LOGI("prefix %{public}s.", prefix.c_str());
+    if (prefix.empty()) {
+        LOGE("prefix is empty.");
+        return ERR_DM_FAILED;
+    }
+    {
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
+        CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
+        DataQuery prefixQuery;
+        prefixQuery.KeyPrefix(prefix);
+        if (kvStorePtr_->GetCount(prefixQuery, count) != DistributedKv::Status::SUCCESS) {
+            LOGE("GetCount failed.");
+            return ERR_DM_FAILED;
+        }
+    }
+    return DM_OK;
+}
+} // namespace DistributedHardware
+} // namespace OHOS
