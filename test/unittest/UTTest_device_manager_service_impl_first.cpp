@@ -922,11 +922,25 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, GetLogicalIdAndTokenIdBySessionId_00
     uint64_t tokenId = 1000023;
     uint64_t logicalSessionId = 45678910;
 
-    deviceManagerServiceImpl_->logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(deviceManagerServiceImpl_->logicalSessionId2SessionIdMapMtx_);
+        deviceManagerServiceImpl_->logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
+    }
+    {
+        std::lock_guard<ffrt::mutex> tokenIdLock(deviceManagerServiceImpl_->logicalSessionId2TokenIdMapMtx_);
+        deviceManagerServiceImpl_->logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
+    }
     auto ret = deviceManagerServiceImpl_->GetLogicalIdAndTokenIdBySessionId(logicalSessionId,
-        tokenId, logicalSessionId);
+        tokenId, sessionId);
     EXPECT_EQ(ret, DM_OK);
-    deviceManagerServiceImpl_->logicalSessionId2SessionIdMap_.clear();
+    {
+        std::lock_guard<ffrt::mutex> sessionIdLock(deviceManagerServiceImpl_->logicalSessionId2SessionIdMapMtx_);
+        deviceManagerServiceImpl_->logicalSessionId2SessionIdMap_.clear();
+    }
+    {
+        std::lock_guard<ffrt::mutex> tokenIdLock(deviceManagerServiceImpl_->logicalSessionId2TokenIdMapMtx_);
+        deviceManagerServiceImpl_->logicalSessionId2TokenIdMap_.clear();
+    }
 }
 
 HWTEST_F(DeviceManagerServiceImplFirstTest, TransferSinkOldAuthMgr_001, testing::ext::TestSize.Level1)
@@ -993,8 +1007,11 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, OpenAuthSession_001, testing::ext::T
     std::string deviceId = "123456";
     std::map<std::string, std::string> bindParam;
     bindParam[PARAM_KEY_IS_SERVICE_BIND] = DM_VAL_TRUE;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = deviceManagerServiceImpl_->listener_;
+    deviceManagerServiceImpl_->listener_ = nullptr;
     int32_t ret = deviceManagerServiceImpl_->OpenAuthSession(deviceId, bindParam);
-    EXPECT_NE(ret, 0);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+    deviceManagerServiceImpl_->listener_ = listener;
 }
 
 HWTEST_F(DeviceManagerServiceImplFirstTest, OpenAuthSession_002, testing::ext::TestSize.Level1)

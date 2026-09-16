@@ -19,6 +19,7 @@
 #include <dlfcn.h>
 #include <functional>
 #include <cstring>
+#include <limits>
 #include <securec.h>
 
 #include "device_manager_data_struct_3rd.h"
@@ -134,12 +135,13 @@ std::string DeviceManagerService3rd::GeneratePinCode(uint32_t pinLength)
     std::random_device rd;
     std::mt19937_64 gen(rd());
     std::string pinCode = std::to_string(GenRandInt(DM_MIN_RANDOM, DM_MAX_RANDOM));
+    pinCode.reserve(pinLength + std::numeric_limits<uint64_t>::digits10 + 1);
     uint32_t left_digit_count = pinLength - 1;
     while (pinCode.length() <= left_digit_count) {
         uint64_t rest_num = gen();
         pinCode += std::to_string(rest_num);
     }
-    pinCode = pinCode.substr(0, pinLength);
+    pinCode.resize(pinLength);
     return pinCode;
 }
 
@@ -159,11 +161,13 @@ int32_t DeviceManagerService3rd::GeneratePinCode(uint32_t pinLength, std::string
     for (int32_t i = 0; i < length; i++) {
         if (!isdigit(generatedPinCode[i])) {
             LOGE("ImportAuthCode error: Invalid para, authCode format error.");
+            (void)memset_s(generatedPinCode.data(), generatedPinCode.size(), 0, generatedPinCode.size());
             return ERR_DM_INPUT_PARA_INVALID;
         }
     }
-   
+
     pincode = generatedPinCode;
+    (void)memset_s(generatedPinCode.data(), generatedPinCode.size(), 0, generatedPinCode.size());
     LOGI("completed, pincode: %{public}zu", pincode.size());
     return DM_OK;
 }

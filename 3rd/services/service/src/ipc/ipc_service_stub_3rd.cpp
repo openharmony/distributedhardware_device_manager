@@ -202,6 +202,7 @@ int32_t IpcServiceStub3rd::ImportPinCode3rd(MessageParcel &data, MessageParcel &
     std::string businessName = data.ReadString();
     std::string pincode = data.ReadString();
     int32_t result = DeviceManagerService3rd::GetInstance().ImportPinCode3rd(businessName, pincode);
+    (void)memset_s(pincode.data(), pincode.size(), 0, pincode.size());
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -216,12 +217,15 @@ int32_t IpcServiceStub3rd::GeneratePinCode(MessageParcel &data, MessageParcel &r
     int32_t result = DeviceManagerService3rd::GetInstance().GeneratePinCode(pinLength, pincode);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
+        (void)memset_s(pincode.data(), pincode.size(), 0, pincode.size());
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!reply.WriteString(pincode)) {
         LOGE("write pincode failed");
+        (void)memset_s(pincode.data(), pincode.size(), 0, pincode.size());
         return ERR_DM_IPC_WRITE_FAILED;
     }
+    (void)memset_s(pincode.data(), pincode.size(), 0, pincode.size());
     return DM_OK;
 }
 
@@ -351,7 +355,15 @@ int32_t IpcServiceStub3rd::QueryTrustRelation(MessageParcel &data, MessageParcel
             !reply.WriteInt32(deviceInfo.bindType) ||
             !reply.WriteString(skStr)) {
             LOGE("write trustedDeviceList item failed");
+            (void)memset_s(skStr.data(), skStr.size(), 0, skStr.size());
+            if (!sessionKeyVec.empty()) {
+                (void)memset_s(sessionKeyVec.data(), sessionKeyVec.size(), 0, sessionKeyVec.size());
+            }
             return ERR_DM_IPC_WRITE_FAILED;
+        }
+        (void)memset_s(skStr.data(), skStr.size(), 0, skStr.size());
+        if (!sessionKeyVec.empty()) {
+            (void)memset_s(sessionKeyVec.data(), sessionKeyVec.size(), 0, sessionKeyVec.size());
         }
     }
     return DM_OK;
