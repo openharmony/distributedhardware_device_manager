@@ -1904,6 +1904,16 @@ ON_IPC_CMD(UPDATE_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
+ON_IPC_CMD(CHECK_DEVICE_ONLINE, MessageParcel &data, MessageParcel &reply)
+{
+    bool result = DeviceManagerService::GetInstance().CheckIsDeviceOnline();
+    if (!reply.WriteBool(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(UPDATE_LOCALSERVICE_INFO, MessageParcel &data, MessageParcel &reply)
 {
     DMLocalServiceInfo serviceInfo;

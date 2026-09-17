@@ -2052,6 +2052,25 @@ ON_IPC_READ_RESPONSE(UPDATE_SERVICE_INFO, MessageParcel &reply, std::shared_ptr<
     return DM_OK;
 }
 
+ON_IPC_SET_REQUEST(CHECK_DEVICE_ONLINE, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(CHECK_DEVICE_ONLINE, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(static_cast<int32_t>(reply.ReadBool()));
+    return DM_OK;
+}
+
 ON_IPC_SET_REQUEST(UPDATE_LOCALSERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {

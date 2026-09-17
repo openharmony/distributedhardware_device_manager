@@ -712,6 +712,7 @@ public:
         const std::map<std::string, std::string> &unbindParam, const std::string &netWorkId,
         int64_t serviceId) { return 0; }
     virtual int32_t UpdateServiceInfo(int64_t serviceId, const DmRegisterServiceInfo &regServiceInfo) { return 0; }
+    virtual bool IsDeviceOnline(const std::string &pkgName) { return false; }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

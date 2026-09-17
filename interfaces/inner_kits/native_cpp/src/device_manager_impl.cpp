@@ -3841,5 +3841,21 @@ int32_t DeviceManagerImpl::UpdateServiceInfo(int64_t serviceId, const DmRegister
     LOGI("End");
     return DM_OK;
 }
+
+bool DeviceManagerImpl::IsDeviceOnline(const std::string &pkgName)
+{
+    LOGI("start pkgName:%{public}s.", pkgName.c_str());
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    CHECK_NULL_RETURN(ipcClientProxy_, false);
+    int32_t ret = ipcClientProxy_->SendRequest(CHECK_DEVICE_ONLINE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("error:Send Request failed ret: %{public}d", ret);
+        return false;
+    }
+    bool result = static_cast<bool>(rsp->GetErrCode());
+    LOGI("End");
+    return result;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

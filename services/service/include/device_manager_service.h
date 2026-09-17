@@ -336,6 +336,7 @@ public:
     int32_t HandleServiceStatusChange(DmDeviceState devState, const std::string &peerUdid);
     void ProcessReceiveRspSvcUnbindProxy(const std::string &remoteUdid);
     void ProcessUnBindServiceProxy(const UnbindServiceProxyParam &param);
+    bool CheckIsDeviceOnline();
 #endif
 private:
     int32_t ValidateUnBindTokenId(const std::string &pkgName, const std::string &udidHash);
