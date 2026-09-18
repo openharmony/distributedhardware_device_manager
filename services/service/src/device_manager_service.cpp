@@ -5369,7 +5369,7 @@ int32_t DeviceManagerService::GetDeviceProfileInfoList(const std::string &pkgNam
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    LOGI("pkgName %{public}s", pkgName.c_str());
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;

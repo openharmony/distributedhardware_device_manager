@@ -377,7 +377,6 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceInfoOffline(deviceInfo, tempCbk); }, ffrt::task_attr().name(DEVICE_OFFLINE));
-    LOGI("Completed, Offline with DmDeviceInfo, pkgName:%{public}s", pkgName.c_str());
 #else
     std::thread deviceOffline([=]() { DeviceInfoOffline(deviceInfo, tempCbk); });
     if (pthread_setname_np(deviceOffline.native_handle(), DEVICE_OFFLINE) != DM_OK) {
@@ -1292,7 +1291,6 @@ void DeviceManagerNotify::GetCallBack(std::map<DmCommonNotifyEvent, std::set<std
 int32_t DeviceManagerNotify::RegisterGetDeviceProfileInfoListCallback(const std::string &pkgName,
     std::shared_ptr<GetDeviceProfileInfoListCallback> callback)
 {
-    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
     if (callback == nullptr || pkgName.empty()) {
         LOGE("callback is null or pkgName is empty");
         return ERR_DM_CALLBACK_REGISTER_FAILED;
@@ -1310,7 +1308,7 @@ void DeviceManagerNotify::OnGetDeviceProfileInfoListResult(const std::string &pk
         LOGE("Invalid para, pkgName: %{public}s.", pkgName.c_str());
         return;
     }
-    LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
+    LOGI("pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
     std::shared_ptr<GetDeviceProfileInfoListCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(bindLock_);
