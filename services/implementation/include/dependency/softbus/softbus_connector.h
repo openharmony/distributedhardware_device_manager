@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef SOFTBUS_CONNECTOR_H
+#define SOFTBUS_CONNECTOR_H
+
 #ifndef OHOS_DM_SOFTBUS_CONNECTOR_H
 #define OHOS_DM_SOFTBUS_CONNECTOR_H
 
@@ -28,7 +31,6 @@
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "deviceprofile_connector.h"
 #include "softbus_session.h"
 #endif
@@ -130,12 +132,10 @@ public:
     ~SoftbusConnector();
     int32_t RegisterSoftbusStateCallback(const std::shared_ptr<ISoftbusStateCallback> callback);
     int32_t UnRegisterSoftbusStateCallback();
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<SoftbusSession> GetSoftbusSession();
     void SortAclListDesc(const std::vector<AclHashItem> &remoteAllAclList, std::vector<std::string> &aclVerDesc,
         std::map<std::string, AclHashItem> &remoteAllAclMap);
     std::string MatchTargetVersion(const std::string &localVersion, const std::vector<std::string> &remoteVerDesc);
-#endif
     bool HaveDeviceInMap(std::string deviceId);
     std::string GetDeviceUdidHashByUdid(const std::string &udid);
     void EraseUdidFromMap(const std::string &udid);
@@ -180,21 +180,17 @@ private:
     static ConnectionAddr *GetConnectAddrByType(DeviceInfo *deviceInfo, ConnectionAddrType type);
     static void ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo);
     static std::shared_ptr<DeviceInfo> GetDeviceInfoFromMap(const std::string &deviceId);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t ParaseAclChecksumList(const std::string &jsonString, std::vector<AclHashItem> &remoteAllAclList);
     int32_t SyncLocalAclList5_1_0(const std::string localUdid, const std::string remoteUdid,
         DistributedDeviceProfile::AccessControlProfile &localAcl,
         std::vector<std::string> &acLStrList, bool isDelImmediately);
     int32_t GetLocalVersion(const std::string localUdid, const std::string remoteUdid,
         std::string &localVersion, DistributedDeviceProfile::AccessControlProfile &localAcl);
-#endif
 
 private:
     static std::string remoteUdidHash_;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<SoftbusSession> softbusSession_;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
-#endif
     static std::map<std::string, std::shared_ptr<DeviceInfo>> discoveryDeviceInfoMap_;
     std::shared_ptr<ISoftbusStateCallback> deviceStateManagerCallback_;
     static std::unordered_map<std::string, std::string> deviceUdidMap_;
@@ -213,4 +209,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_SOFTBUS_CONNECTOR_H
+#endif // SOFTBUS_CONNECTOR_H

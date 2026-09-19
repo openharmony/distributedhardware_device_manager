@@ -13,6 +13,11 @@
 import("//build/ohos.gni")
 import("./DeviceManager_UI.gni")
 
+if (defined(ohos_lite)) {
+  group("DeviceManager_UI") {
+    deps = []
+  }
+} else {
 ohos_hap("DeviceManager_UI") {
   hap_profile = "src/main/module.json"
   deps = [
@@ -48,4 +53,5 @@ ohos_resources("devicemanager_ui_resources") {
   sources = [ "src/main/resources" ]
   deps = [ ":devicemanager_ui_app_profile" ]
   hap_profile = "src/main/module.json"
+}
 }

@@ -20,6 +20,11 @@ subsystem_name = "distributedhardware"
 part_name = "device_manager"
 taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
 
+if (defined(ohos_lite)) {
+  group("devicemanager_ani") {
+    deps = []
+  }
+} else {
 copy_taihe_idl("copy_taihe") {
   sources = [ "${devicemanager_path}/interfaces/kits/taihe/idl/ohos.distributedDeviceManager.taihe" ]
 }
@@ -128,4 +133,5 @@ group("devicemanager_ani") {
       ":ohos_distributedDeviceManager_etc",
     ]
   }
+}
 }

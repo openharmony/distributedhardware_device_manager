@@ -13,12 +13,14 @@
  * limitations under the License.
  */
 
+#ifndef I_DM_SERVICE_IMPL_EXT_RESIDENT_H
+#define I_DM_SERVICE_IMPL_EXT_RESIDENT_H
+
 #ifndef OHOS_I_DM_SERVICE_IMPL_EXT_RESIDENT_H
 #define OHOS_I_DM_SERVICE_IMPL_EXT_RESIDENT_H
 
 #include "idevice_manager_service_listener.h"
 #include "isa_specification_verify.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "service_info.h"
 #endif
 namespace OHOS {
@@ -123,7 +125,6 @@ public:
     virtual int32_t ExportAuthInfo(DmAuthInfo &dmAuthInfo) = 0;
     virtual int32_t InitSoftbusServer() = 0;
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     virtual int32_t RegisterServiceInfo(const DmRegisterServiceInfo &regServiceInfo, int64_t &serviceId) = 0;
     virtual int32_t UnRegisterServiceInfo(int64_t serviceId) = 0;
     virtual int32_t StartPublishService(const std::string &pkgName, int64_t serviceId,
@@ -164,10 +165,9 @@ public:
         const std::string &localUdid) = 0;
     virtual int32_t SubscribeAllServiceInfo() = 0;
     virtual void HandleProcessUnBindServiceProxy(UnbindServiceProxyParam &param) = 0;
-#endif
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_I_DM_SERVICE_IMPL_EXT_RESIDENT_H
+#endif // I_DM_SERVICE_IMPL_EXT_RESIDENT_H

@@ -23,9 +23,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
-#endif
 #include "iservice_registry.h"
 #include "multiple_user_connector.h"
 #include "system_ability_definition.h"

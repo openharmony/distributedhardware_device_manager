@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef DM_NATIVE_EVENT_H
+#define DM_NATIVE_EVENT_H
+
 #ifndef OHOS_DM_NATIVE_EVENT_H
 #define OHOS_DM_NATIVE_EVENT_H
 
@@ -41,8 +44,7 @@ protected:
     napi_env env_;
     napi_ref thisVarRef_;
     std::map<std::string, std::shared_ptr<DmEventListener>> eventMap_;
-#if !defined(__LITEOS_M__)
     std::mutex eventMapLock_;
 #endif
 };
-#endif // OHOS_DM_NATIVE_EVENT_H
+#endif // DM_NATIVE_EVENT_H

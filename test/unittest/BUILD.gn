@@ -15,6 +15,12 @@ import("//build/test.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 module_out_path = "device_manager/device_manager"
 
+if (defined(ohos_lite)) {
+  group("unittest") {
+    testonly = true
+    deps = []
+  }
+} else {
 group("unittest") {
   testonly = true
 
@@ -5108,3 +5114,4 @@ ohos_static_library("device_manager_3rd_test_common") {
   part_name = "device_manager"
 }
 ## Build device_manager_3rd_test_common.a }}}
+}

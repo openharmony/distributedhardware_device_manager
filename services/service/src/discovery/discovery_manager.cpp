@@ -22,9 +22,7 @@
 #include "dm_constants.h"
 #include "dm_random.h"
 #include "parameter.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -34,13 +32,11 @@ constexpr const char* LNN_DISC_CAPABILITY = "capability";
 const std::string TYPE_MINE = "findDeviceMode";
 const int32_t DECIMALISM = 10;
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 static std::mutex comDependencyLoadLock;
 constexpr const char* LIB_DM_COMDENPENDENCY_NAME = "libdevicemanagerdependency.z.so";
 bool DiscoveryManager::isSoLoaded_ = false;
 IDeviceProfileConnector* DiscoveryManager::dpConnector_ = nullptr;
 void* DiscoveryManager::dpConnectorHandle_ = nullptr;
-#endif
 
 DiscoveryManager::DiscoveryManager(std::shared_ptr<SoftbusListener> softbusListener,
     std::shared_ptr<IDeviceManagerServiceListener> listener) : softbusListener_(softbusListener), listener_(listener)
@@ -50,9 +46,7 @@ DiscoveryManager::DiscoveryManager(std::shared_ptr<SoftbusListener> softbusListe
 
 DiscoveryManager::~DiscoveryManager()
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     CloseCommonDependencyObj();
-#endif
     LOGI("destructor.");
 }
 
@@ -609,7 +603,6 @@ void DiscoveryManager::UpdateInfoMedium(
 int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, int32_t userId, std::string deviceId,
     bool &isOnline, int32_t &authForm)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     char localDeviceId[DEVICE_UUID_LENGTH];
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string requestDeviceId = static_cast<std::string>(localDeviceId);
@@ -624,11 +617,9 @@ int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, int32_t 
             return ERR_DM_FAILED;
         }
     }
-#endif
     return DM_OK;
 }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 IDeviceProfileConnector* DiscoveryManager::GetCommonDependencyObj()
 {
     std::lock_guard<std::mutex> lock(comDependencyLoadLock);
@@ -679,7 +670,6 @@ bool DiscoveryManager::CloseCommonDependencyObj()
     dpConnectorHandle_ = nullptr;
     return true;
 }
-#endif
 
 void DiscoveryManager::ClearDiscoveryCache(const ProcessInfo &processInfo)
 {
@@ -762,10 +752,8 @@ std::string DiscoveryManager::AddMultiUserIdentify(const std::string &pkgName)
 {
     int32_t userId = -1;
     uint32_t tokenId = 0;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(userId);
     MultipleUserConnector::GetCallingTokenId(tokenId);
-#endif
     if (userId == -1) {
         LOGE("Get caller userId failed.");
         return pkgName;
@@ -787,10 +775,8 @@ std::string DiscoveryManager::RemoveMultiUserIdentify(const std::string &pkgName
 {
     int32_t userId = -1;
     uint32_t tokenId = 0;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(userId);
     MultipleUserConnector::GetCallingTokenId(tokenId);
-#endif
     if (userId == -1) {
         LOGE("Get caller userId failed.");
         return pkgName;

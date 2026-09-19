@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef DEVICE_MANAGER_NOTIFY_H
+#define DEVICE_MANAGER_NOTIFY_H
+
 #ifndef OHOS_DM_NOTIFY_H
 #define OHOS_DM_NOTIFY_H
 
@@ -25,7 +28,6 @@
 
 #include "device_manager_callback.h"
 #include "dm_single_instance.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
 #endif
 
@@ -182,9 +184,7 @@ public:
         std::map<DmCommonNotifyEvent, std::set<std::pair<std::string, int64_t>>> &serviceCallbackMap);
 
 private:
-#if !defined(__LITEOS_M__)
     std::mutex lock_;
-#endif
     std::map<std::string, std::shared_ptr<DeviceStateCallback>> deviceStateCallback_;
     std::map<std::string, std::shared_ptr<DeviceStatusCallback>> deviceStatusCallback_;
     std::map<std::string, std::map<uint16_t, std::shared_ptr<DiscoveryCallback>>> deviceDiscoveryCallbacks_;
@@ -216,4 +216,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_NOTIFY_H
+#endif // DEVICE_MANAGER_NOTIFY_H

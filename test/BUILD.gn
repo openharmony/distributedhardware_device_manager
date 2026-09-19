@@ -18,7 +18,7 @@ group("test") {
   testonly = true
 
   deps = []
-  if (support_jsapi) {
+  if (!defined(ohos_lite) && support_jsapi) {
     if (device_manager_capability) {
       deps += [
         "benchmarktest:benchmarktest",

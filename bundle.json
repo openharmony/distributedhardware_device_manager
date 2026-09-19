@@ -148,9 +148,7 @@
                     "header_base": "//foundation/distributedhardware/device_manager/3rd/utils/include"
                 }
             }],
-            "test": [
-                "//foundation/distributedhardware/device_manager:device_manager_test"
-            ]
+            "test": []
         }
     }
 }

@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef IDEVICE_MANAGER_SERVICE_LISTENER_H
+#define IDEVICE_MANAGER_SERVICE_LISTENER_H
+
 #ifndef OHOS_I_DM_SERVICE_LISTENER_H
 #define OHOS_I_DM_SERVICE_LISTENER_H
 
@@ -20,7 +23,6 @@
 
 #include "dm_device_info.h"
 #include "dm_device_profile_info.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "service_info.h"
 #endif
 
@@ -188,7 +190,6 @@ public:
         int32_t retCode) {}
     virtual void OnAuthCodeInvalid(const std::string &pkgName, const std::string &consumerPkgName) {}
     virtual std::set<ProcessInfo> GetAlreadyOnlineProcess() = 0;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     virtual void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
         int32_t reason) = 0;
     virtual void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) = 0;
@@ -204,8 +205,7 @@ public:
         int32_t result, const std::string &content) = 0;
     virtual bool CheckIsOnlineAdapter(const std::string &peerUdid) = 0;
     virtual int32_t GetNetworkIdFromCache(const std::string &udid, std::string &networkId) = 0;
-#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_I_DM_SERVICE_LISTENER_H
+#endif // IDEVICE_MANAGER_SERVICE_LISTENER_H

@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef SOFTBUS_LISTENER_H
+#define SOFTBUS_LISTENER_H
+
 #ifndef OHOS_DM_SOFTBUS_LISTENER_H
 #define OHOS_DM_SOFTBUS_LISTENER_H
 
@@ -33,7 +36,6 @@
 #include "dm_radar_helper.h"
 #include "i_softbus_discovering_callback.h"
 #include "dm_anonymous.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "access_control_profile.h"
 #endif
 
@@ -147,11 +149,9 @@ public:
         std::vector<DmDeviceInfo> &deviceList);
     int32_t GetUdidFromDp(const std::string &udidHash, std::string &udid);
     static void GetActionId(const std::string &deviceId, int32_t &actionId);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     static bool SaveDeviceIdHash(DmDeviceInfo &deviceInfo);
     static void SoftbusEventQueueHandle(std::string deviceId);
     static int32_t SoftbusEventQueueAdd(DmSoftbusEvent &dmSoftbusEventInfo);
-#endif
 private:
     static int32_t FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice);
     static void ParseConnAddrInfo(const ConnectionAddr *addrInfo, JsonObject &jsonObj);
@@ -162,12 +162,10 @@ private:
     void Create3rdAuthACLSessionServer();
     void Create3rdAuthSessionServer();
     void Create3rdAuthCredSessionServer();
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessControlProfile &profile, DmDeviceInfo &dmDevice);
     static void ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr);
     static bool CheckPeerUdidTrusted(const std::string &udid);
     static int32_t PutOstypeData(const std::string &peerUdid, int32_t osType);
-#endif
     static int32_t GetAttrFromCustomData(const cJSON *const customDataJson, DmDeviceInfo &dmDevInfo,
         int32_t &actionId);
     static int32_t GetAttrFromExtraData(DmDeviceInfo &dmDevInfo, int32_t &actionId);
@@ -179,4 +177,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_SOFTBUS_LISTENER_H
+#endif // SOFTBUS_LISTENER_H

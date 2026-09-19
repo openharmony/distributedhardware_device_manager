@@ -19,9 +19,6 @@
 
 #include "dm_log.h"
 
-#if defined(__LITEOS_M__)
-#include <time.h>
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -36,15 +33,9 @@ const int32_t DM_MAX_RANDOM = 9;
 
 int32_t GenRandInt(int32_t randMin, int32_t randMax)
 {
-#if defined(__LITEOS_M__)
-    srandom(time(NULL));
-    return (randMin + random() % (randMax - randMin));
-#else
-    std::random_device randDevice;
-    std::mt19937 genRand(randDevice());
-    std::uniform_int_distribution<int> disRand(randMin, randMax);
-    return disRand(genRand);
-#endif
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    return randMin + gen() % (randMax - randMin);
 }
 
 DM_EXPORT int64_t GenRandLongLong(int64_t randMin, int64_t randMax)

@@ -13,12 +13,14 @@
  * limitations under the License.
  */
 
+#ifndef DEVICE_MANAGER_IMPL_FAIL_TO_SUPPORT_H
+#define DEVICE_MANAGER_IMPL_FAIL_TO_SUPPORT_H
+
 #ifndef OHOS_DEVICE_MANAGER_IMPL_FAIL_TO_SUPPORT_H
 #define OHOS_DEVICE_MANAGER_IMPL_FAIL_TO_SUPPORT_H
 
 #include "device_manager.h"
 #include "device_manager_ipc_interface_code.h"
-#if !defined(__LITEOS_M__)
 #include "ipc_client_manager.h"
 #include "ipc_client_proxy.h"
 #endif
@@ -276,4 +278,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DEVICE_MANAGER_IMPL_FAIL_TO_SUPPORT_H
+#endif // DEVICE_MANAGER_IMPL_FAIL_TO_SUPPORT_H

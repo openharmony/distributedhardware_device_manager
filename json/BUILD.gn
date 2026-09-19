@@ -11,41 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-} else {
-  import("//build/ohos.gni")
-}
+import("//build/ohos.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 if (defined(ohos_lite)) {
-  if (ohos_kernel_type == "linux") {
-    shared_library("devicemanagerjson") {
-      include_dirs = [
-        "include",
-        "${common_path}/include",
-      ]
-
-      if (use_nlohmann_json) {
-        include_dirs += [ "//third_party/json/include" ]
-      } else {
-        include_dirs += [ "//third_party/cJSON" ]
-      }
-
-      if (use_nlohmann_json) {
-        sources = [ "src/json_object_nlohmannjson.cpp" ]
-      } else {
-        sources = [ "src/json_object_cjson.cpp" ]
-      }
-
-      defines = [
-        "HI_LOG_ENABLE",
-        "DH_LOG_TAG=\"dmjson\"",
-        "LOG_DOMAIN=0xD004110",
-      ]
-
-      deps = [ "${hilog_path}:hilog_shared" ]
-    }
+  group("devicemanagerjson") {
+    deps = []
   }
 } else {
   config("cflags_config") {

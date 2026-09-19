@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef DM_DEVICE_STATE_MANAGER_H
+#define DM_DEVICE_STATE_MANAGER_H
+
 #ifndef OHOS_DM_DEVICE_STATE_MANAGER_H
 #define OHOS_DM_DEVICE_STATE_MANAGER_H
 
@@ -29,7 +32,6 @@
 #include "idevice_manager_service_listener.h"
 #include "multiple_user_connector.h"
 #include "softbus_connector.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "deviceprofile_connector.h"
 #include "ffrt.h"
 #endif
@@ -118,9 +120,7 @@ public:
         DmDeviceInfo &devInfo, const std::string &requestDeviceId, const std::string &trustDeviceId,
         DmDeviceState devState, const bool isOnline);
 #endif
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void StartDelTimerByDP(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId);
-#endif
 private:
     void StartEventThread();
     void StopEventThread();
@@ -128,7 +128,6 @@ private:
     int32_t AddTask(const std::shared_ptr<NotifyEvent> &task);
     void RunTask(const std::shared_ptr<NotifyEvent> &task);
     DmAuthForm GetAuthForm(const std::string &networkId);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void RegisterOffLineTimer(const DmDeviceInfo &deviceInfo);
     void StartOffLineTimer(const std::string &peerUdid);
     void DeleteTimeOutGroup(const std::string &timerName);
@@ -136,16 +135,11 @@ private:
     void DeleteCredential(const DmOfflineParam &offlineParam, const std::string &peerUdid, int32_t localUserId);
     int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
     void DeleteCredential(const DmAclIdParam &acl);
-#endif
     void ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
         std::vector<ProcessInfo> &processInfoVec, const bool isOnline);
 private:
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::mutex timerMapMutex_;
     ffrt::mutex remoteDeviceInfosMutex_;
-#else
-    std::mutex remoteDeviceInfosMutex_;
-#endif
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::map<std::string, DmDeviceInfo> remoteDeviceInfos_;
@@ -161,4 +155,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_DEVICE_STATE_MANAGER_H
+#endif // DM_DEVICE_STATE_MANAGER_H

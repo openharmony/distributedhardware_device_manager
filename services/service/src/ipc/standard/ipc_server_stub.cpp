@@ -20,9 +20,7 @@
 
 #include "ipc_cmd_register.h"
 #include "ipc_skeleton.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "kv_adapter_manager.h"
-#endif
 #ifdef SUPPORT_MEMMGR
 #include "mem_mgr_client.h"
 #include "mem_mgr_proxy.h"
@@ -103,9 +101,7 @@ void IpcServerStub::OnStart()
     AddSystemAbilityListener(SCREENLOCK_SERVICE_ID);
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
     LOGI("called:AddAbilityListener end!");
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
-#endif
     AddSystemAbilityListener(DEVICE_AUTH_SERVICE_ID);
     AddSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);
     AddSystemAbilityListener(RISK_ANALYSIS_MANAGER_SA_ID);

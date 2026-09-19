@@ -12,10 +12,17 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
-ohos_prebuilt_etc("ohos.para.dac") {
-  source = "devicemanager.para.dac"
-  subsystem_name = "distributedhardware"
-  part_name = "device_manager"
-  module_install_dir = "etc/param"
+if (defined(ohos_lite) || !device_manager_capability) {
+  group("ohos.para.dac") {
+    deps = []
+  }
+} else {
+  ohos_prebuilt_etc("ohos.para.dac") {
+    source = "devicemanager.para.dac"
+    subsystem_name = "distributedhardware"
+    part_name = "device_manager"
+    module_install_dir = "etc/param"
+  }
 }
