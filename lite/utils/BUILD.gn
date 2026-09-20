@@ -1,0 +1,131 @@
+# Copyright (c) 2022-2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+config("devicemanagerutils_config") {
+  include_dirs = [
+    "include",
+    "include/crypto",
+    "include/jsonstr_handle",
+    "include/kvadapter",
+    "include/timer",
+    "${lite_interfaces_path}/include",
+    "${lite_common_path}/include",
+    "${lite_json_path}/include",
+  ]
+}
+config("cflags_config") {
+  cflags = [
+    "-Werror",
+    "-fPIC",
+    "-fstack-protector-strong",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-Oz",
+    "-flto",
+  ]
+  if (!defined(ohos_lite)) {
+    cflags += [ "-fvisibility=hidden" ]
+  }
+  ldflags = [ "-flto" ]
+}
+ohos_shared_library("devicemanagerutils") {
+    if (defined(ohos_lite)) {
+      output_extension = "so"
+    }
+  if (!device_manager_capability) {
+    install_enable = false
+  } else {
+    branch_protector_ret = "pac_ret"
+
+    if (!defined(ohos_lite)) {
+      sanitize = {
+        boundary_sanitize = true
+        cfi = true
+        cfi_cross_dso = true
+        debug = false
+        integer_overflow = true
+        ubsan = true
+      }
+    }
+
+    cflags = [
+      "-fPIC",
+      "-fstack-protector-strong",
+      "-Werror",
+      "-std=c99",
+    ]
+
+    ldflags = [
+      "-Wl,-z,relro",
+      "-Wl,-z,now",
+    ]
+
+    configs = [ ":cflags_config" ]
+
+    sources = [
+      "${lite_common_path}/src/dm_anonymous.c",
+      "${lite_common_path}/src/dm_container.c",
+      "${lite_common_path}/src/dm_thread.c",
+      "src/crypto/dm_crypto.c",
+      "src/dm_random.c",
+      "src/jsonstr_handle/dm_jsonstr_handle.c",
+      "src/kvadapter/dm_kv_info.c",
+      "src/kvadapter/kv_adapter.c",
+      "src/kvadapter/kv_adapter_manager.c",
+    ]
+
+    public_configs = [ ":devicemanagerutils_config" ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"dmutils\"",
+      "LOG_DOMAIN=0xD004110",
+    ]
+
+    deps = [ "${lite_json_path}:devicemanagerjson" ]
+
+    if (defined(ohos_lite)) {
+      deps += [ "//foundation/distributedhardware/device_manager/lite:dm_lite_external_deps" ]
+      include_dirs = [
+        "//commonlibrary/utils_lite/include",
+        "//foundation/distributeddatamgr/kv_store/interfaces/inner_api/kv_store/include",
+      ]
+    } else {
+      external_deps = [
+        "access_token:libaccesstoken_sdk",
+        "access_token:libtokenid_sdk",
+        "bundle_framework:appexecfwk_base",
+        "bundle_framework:appexecfwk_core",
+        "cJSON:cjson",
+        "c_utils:utils",
+        "eventhandler:libeventhandler",
+        "ffrt:libffrt",
+        "hilog:libhilog",
+        "ipc:ipc_core",
+        "ipc:ipc_single",
+        "kv_store:distributeddata_inner",
+        "openssl:libcrypto_shared",
+        "os_account:os_account_innerkits",
+        "samgr:samgr_proxy",
+        "init:libbegetutil",
+      ]
+    }
+
+    subsystem_name = "distributedhardware"
+
+    part_name = "device_manager"
+  }
+}
