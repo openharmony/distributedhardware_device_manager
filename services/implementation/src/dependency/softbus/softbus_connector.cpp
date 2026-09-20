@@ -69,10 +69,8 @@ std::set<DelInfoCache> SoftbusConnector::dmDelInfoCache_ = {};
 
 SoftbusConnector::SoftbusConnector()
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     softbusSession_ = std::make_shared<SoftbusSession>();
     hiChainAuthConnector_ = std::make_shared<HiChainAuthConnector>();
-#endif
     LOGD("constructor.");
 }
 
@@ -81,7 +79,6 @@ SoftbusConnector::~SoftbusConnector()
     LOGD("destructor.");
 }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void SoftbusConnector::DeleteCredential(const DelInfoCache &acl)
 {
     CHECK_NULL_VOID(hiChainAuthConnector_);
@@ -134,11 +131,9 @@ bool SoftbusConnector::CheckAclInDeleteCache(const int32_t aclId)
     }
     return false;
 }
-#endif
 
 void SoftbusConnector::SyncAclList()
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<std::mutex> lock(dmDelInfoMutex_);
     for (const auto &item : dmDelInfoCache_) {
         int32_t userId = item.userId;
@@ -157,7 +152,6 @@ void SoftbusConnector::SyncAclList()
         DeviceProfileConnector::GetInstance().DeleteAccessControlById(aclId);
     }
     dmDelInfoCache_.clear();
-#endif
 }
 
 void SoftbusConnector::SyncAclList(int32_t userId, std::string credId,
@@ -165,7 +159,6 @@ void SoftbusConnector::SyncAclList(int32_t userId, std::string credId,
 {
     LOGI("userId:%{public}d, credId:%{public}s, sessionKeyId:%{public}d, aclId:%{public}d",
         userId, credId.c_str(), sessionKeyId, aclId);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     // 根据skid删除sk，删除skid
     int32_t ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, sessionKeyId);
     if (ret != DM_OK) {
@@ -174,10 +167,8 @@ void SoftbusConnector::SyncAclList(int32_t userId, std::string credId,
     DeleteCredential({ userId, sessionKeyId, aclId, credId });
     // 删除本条acl
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(aclId);
-#endif
 }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t SoftbusConnector::SyncLocalAclList5_1_0(const std::string localUdid, const std::string remoteUdid,
     DistributedDeviceProfile::AccessControlProfile &localAcl,
     std::vector<std::string> &acLStrList, bool isDelImmediately)
@@ -245,9 +236,7 @@ int32_t SoftbusConnector::GetLocalVersion(const std::string localUdid, const std
     }
     return DM_OK;
 }
-#endif
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void SoftbusConnector::SortAclListDesc(const std::vector<AclHashItem> &remoteAllAclList,
     std::vector<std::string> &aclVerDesc, std::map<std::string, AclHashItem> &remoteAllAclMap)
 {
@@ -278,12 +267,10 @@ std::string SoftbusConnector::MatchTargetVersion(const std::string &localVersion
     // if local version equal or smaller than remote max version, use local version to process acl aging.
     return localVersion;
 }
-#endif
 
 int32_t SoftbusConnector::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
     const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::vector<AclHashItem> remoteAllAclList;
     int32_t ret = ParaseAclChecksumList(remoteAclList, remoteAllAclList);
     if (ret != DM_OK) {
@@ -321,25 +308,20 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const DevUserInfo &localDevUse
         }
     }
     return DM_OK;
-#else
     (void)localDevUserInfo;
     (void)remoteDevUserInfo;
     (void)remoteAclList;
     return DM_OK;
-#endif
 }
 
 int32_t SoftbusConnector::GetAclListHash(const DevUserInfo &localDevUserInfo,
     const DevUserInfo &remoteDevUserInfo, std::string &aclList)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DeviceProfileConnector::GetInstance().GetAclListHashStr(localDevUserInfo, remoteDevUserInfo, aclList);
-#else
     (void)localDevUserInfo;
     (void)remoteDevUserInfo;
     (void)aclList;
     return DM_OK;
-#endif
 }
 
 int32_t SoftbusConnector::RegisterConnectorCallback(std::shared_ptr<ISoftbusConnectorCallback> callback)
@@ -479,12 +461,10 @@ int32_t SoftbusConnector::GetUuidByNetworkId(const char *networkId, std::string 
     return SoftbusCache::GetInstance().GetUuidFromCache(networkId, uuid);
 }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 std::shared_ptr<SoftbusSession> SoftbusConnector::GetSoftbusSession()
 {
     return softbusSession_;
 }
-#endif
 
 bool SoftbusConnector::HaveDeviceInMap(std::string deviceId)
 {
@@ -628,7 +608,6 @@ void SoftbusConnector::OnSoftbusJoinLNNResult(ConnectionAddr *addr, const char *
 {
     (void)networkId;
     LOGI("[SOFTBUS]OnSoftbusJoinLNNResult, result: %{public}d.", result);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (addr == nullptr) {
         LOGE("addr is null.");
         return;
@@ -640,11 +619,9 @@ void SoftbusConnector::OnSoftbusJoinLNNResult(ConnectionAddr *addr, const char *
     int32_t sessionId = addr->info.session.sessionId;
     CHECK_NULL_VOID(connectorCallback_);
     connectorCallback_->OnSoftbusJoinLNNResult(sessionId, networkId, result);
-#else
     (void)addr;
     (void)networkId;
     (void)result;
-#endif
 }
 
 std::string SoftbusConnector::GetDeviceUdidByUdidHash(const std::string &udidHash)
@@ -845,7 +822,6 @@ void SoftbusConnector::HandleDeviceOffline(std::string deviceId, const bool isOn
 void SoftbusConnector::OnSessionOpened(int32_t sessionId, int32_t result)
 {
     LOGI("start");
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string peerUdid = "";
     int32_t ret = softbusSession_->GetPeerDeviceId(sessionId, peerUdid);
     if (ret != DM_OK) {
@@ -856,10 +832,8 @@ void SoftbusConnector::OnSessionOpened(int32_t sessionId, int32_t result)
     if (result == 0 && !peerUdid.empty() && deviceStateManagerCallback_ != nullptr) {
         deviceStateManagerCallback_->DeleteOffLineTimer(peerUdid);
     }
-#else
     (void) sessionId;
     (void) result;
-#endif
 }
 
 bool SoftbusConnector::CheckIsNeedJoinLnn(const std::string &udid, const std::string &deviceId)

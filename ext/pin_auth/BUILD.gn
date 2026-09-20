@@ -14,6 +14,11 @@
 import("//build/ohos.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
+if (defined(ohos_lite)) {
+  group("devicemanagerext_pin_auth") {
+    deps = []
+  }
+} else {
 ohos_shared_library("devicemanagerext_pin_auth") {
   if (!device_manager_capability) {
     install_enable = false
@@ -110,4 +115,5 @@ ohos_shared_library("devicemanagerext_pin_auth") {
     subsystem_name = "distributedhardware"
     part_name = "device_manager"
   }
+}
 }

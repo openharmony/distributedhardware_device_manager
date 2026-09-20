@@ -11,47 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-} else {
-  import("//build/ohos.gni")
-}
+import("//build/ohos.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 if (defined(ohos_lite)) {
-  if (ohos_kernel_type == "liteos_m") {
-    static_library("devicemanagerminisdk") {
-      include_dirs = []
-
-      sources = []
-
-      deps = []
-
-      cflags = [
-        "-Wall",
-        "-O2",
-        "-std=c99",
-        "-Wdate-time",
-        "-Wextra",
-        "-Wfloat-equal",
-      ]
-      cflags_cc = cflags
-    }
-  } else {
-    shared_library("devicemanagerminisdk") {
-      include_dirs = []
-
-      sources = []
-
-      defines = [
-        "LITE_DEVICE",
-        "HI_LOG_ENABLE",
-        "DH_LOG_TAG=\"dmkit\"",
-        "LOG_DOMAIN=0xD004111",
-      ]
-
-      deps = []
-    }
+  group("devicemanagerminisdk") {
+    deps = []
   }
 } else {
   config("devicemanagerminisdk_config") {

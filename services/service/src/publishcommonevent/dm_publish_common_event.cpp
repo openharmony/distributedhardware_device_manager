@@ -27,9 +27,7 @@
 #include "wifi_msg.h"
 #endif // SUPPORT_WIFI
 #include "dm_log.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -235,17 +233,8 @@ void DmPublishEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     }
 #endif // SUPPORT_WIFI
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { callback_(bluetoothState_, wifiState_, screenState_); },
         ffrt::task_attr().name(DEAL_THREAD));
-#else
-    std::thread dealThread([=]() { callback_(bluetoothState_, wifiState_, screenState_); });
-    int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
-    if (ret != DM_OK) {
-        LOGE("dealThread setname failed.");
-    }
-    dealThread.detach();
-#endif
 }
 
 void DmPublishCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility(

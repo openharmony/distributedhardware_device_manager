@@ -24,9 +24,7 @@
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
-#endif
 #include "system_ability_definition.h"
 #ifdef SUPPORT_WIFI
 #include "wifi_msg.h"
@@ -39,19 +37,11 @@ static IPublishCb softbusPublishCallback_ = {
     .OnPublishResult = SoftbusPublish::OnSoftbusPublishResult,
 };
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 ffrt::mutex g_publishMutex;
-#else
-std::mutex g_publishMutex;
-#endif
 
 void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32_t screenState)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> saLock(g_publishMutex);
-#else
-    std::lock_guard<std::mutex> saLock(g_publishMutex);
-#endif
     DmDeviceInfo info;
     SoftbusCache::GetInstance().GetLocalDeviceInfo(info);
     LOGI("start, bleState: %{public}d, wifiState: %{public}d, screenState: %{public}d"

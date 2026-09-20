@@ -1708,7 +1708,6 @@ HWTEST_F(DeviceManagerServiceTest, GetNotifyRemoteUnBindAppWay_002, testing::ext
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoyDeviceId_001, testing::ext::TestSize.Level1)
 {
     std::string udidHash;
@@ -1737,7 +1736,6 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidHashByAnoyDeviceId_001, testing::ext::
     ret = DeviceManagerService::GetInstance().GetUdidHashByAnoyDeviceId(anoyDeviceId, udidHash);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
-#endif
 
 HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_001, testing::ext::TestSize.Level1)
 {

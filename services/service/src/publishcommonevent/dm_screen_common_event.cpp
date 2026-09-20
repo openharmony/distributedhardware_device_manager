@@ -22,9 +22,7 @@
 #include "dm_anonymous.h"
 #include "dm_error_type.h"
 #include "dm_log.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
-#endif
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
@@ -138,16 +136,7 @@ void DmScreenEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         receiveEvent != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { callback_(receiveEvent); }, ffrt::task_attr().name(DEAL_THREAD));
-#else
-    std::thread dealThread(callback_, receiveEvent);
-    int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
-    if (ret != DM_OK) {
-        LOGE("dealThread setname failed.");
-    }
-    dealThread.detach();
-#endif
 }
 
 void DmScreenCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility(

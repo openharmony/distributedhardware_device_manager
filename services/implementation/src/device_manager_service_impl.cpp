@@ -619,9 +619,7 @@ void DeviceManagerServiceImpl::Release()
 {
     LOGI("start");
     std::lock_guard<ffrt::mutex> lock(dmServiceImplInitMutex_);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     commonEventManager_ = nullptr;
-#endif
     if (softbusConnector_ != nullptr) {
         softbusConnector_->UnRegisterConnectorCallback();
         softbusConnector_->UnRegisterSoftbusStateCallback();

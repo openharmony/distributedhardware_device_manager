@@ -12,36 +12,15 @@
 # limitations under the License.
 
 if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-  if (ohos_kernel_type == "liteos_m") {
-    lite_component("device_manager") {
-      features = [ "interfaces/inner_kits/native_cpp:devicemanagersdk" ]
-    }
-    lite_component("device_manager_fwk") {
-      features = []
-    }
-    group("device_manager_test") {
-      testonly = true
-      deps = []
-    }
-  } else {
-    lite_component("device_manager") {
-      features = [
-        "utils:devicemanagerutils",
-        "services/service:devicemanagerservice",
-        "services/implementation:devicemanagerserviceimpl",
-        "interfaces/inner_kits/native_cpp:devicemanagersdk",
-        "test/smallunittest:lite_devicemanager_test",
-        "services/softbuscache:dmdevicecache",
-      ]
-    }
-    lite_component("device_manager_fwk") {
-      features = [ "interfaces/inner_kits/native_cpp:devicemanagersdk" ]
-    }
-    group("device_manager_test") {
-      testonly = true
-      deps = []
-    }
+  group("device_manager") {
+    deps = []
+  }
+  group("device_manager_fwk") {
+    deps = []
+  }
+  group("device_manager_test") {
+    testonly = true
+    deps = []
   }
 } else {
   if (defined(harmony_industry_project) &&
@@ -56,7 +35,7 @@ if (defined(ohos_lite)) {
       "services/service:devicemanagerservice",
       "services/softbuscache:dmdevicecache",
     ]
-    if (!is_lite_system && support_jsapi) {
+    if (support_jsapi) {
       deps += [
         "3rd/services/service:devicemanager3rdservice",
         "3rd/services/implementation:devicemanagerserviceimpl3rd",

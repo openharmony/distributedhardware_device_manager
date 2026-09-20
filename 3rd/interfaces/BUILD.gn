@@ -86,21 +86,22 @@ ohos_shared_library("devicemanager3rdsdk") {
     part_name = "device_manager"
 }
 } else {
-    static_library("devicemanager3rdsdk") {
-      include_dirs = []
+  static_library("devicemanager3rdsdk") {
 
-      sources = []
+    include_dirs = []
 
-      deps = []
+    sources = []
 
-      cflags = [
-        "-Wall",
-        "-O2",
-        "-std=c99",
-        "-Wdate-time",
-        "-Wextra",
-        "-Wfloat-equal",
-      ]
-      cflags_cc = cflags
-    }
+    deps = []
+
+    cflags = [
+      "-Wall",
+      "-O2",
+      "-std=c99",
+      "-Wdate-time",
+      "-Wextra",
+      "-Wfloat-equal",
+    ]
+    cflags_cc = cflags
+  }
 }

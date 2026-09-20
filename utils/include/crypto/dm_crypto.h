@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 
+#ifndef DM_CRYPTO_H
+#define DM_CRYPTO_H
+
 #ifndef OHOS_DM_CRYPTO_H
 #define OHOS_DM_CRYPTO_H
 #include <string>
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_kv_info.h"
 #endif
 
@@ -61,7 +63,6 @@ public:
     DM_EXPORT static std::string GetAccountIdHash16(const std::string &accountId);
     DM_EXPORT static int32_t ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
         const unsigned char *inBuf, uint32_t inLen);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DM_EXPORT static int32_t ConvertUdidHashToAnoyAndSave(const std::string &appId,
         const std::string &udidHash, DmKVValue &kvValue);
     DM_EXPORT static int32_t ConvertUdidHashToAnoyDeviceId(const std::string &appId,
@@ -69,8 +70,7 @@ public:
     static int32_t GetAnoyDeviceInfo(const std::string &appId, const std::string &udidHash, DmKVValue &kvValue);
     static int32_t ConvertUdidHashToAnoyGenerate(const std::string &appId, const std::string &udidHash,
         DmKVValue &kvValue);
-#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_CRYPTO_H
+#endif // DM_CRYPTO_H

@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
+#ifndef DISCOVERY_MANAGER_H
+#define DISCOVERY_MANAGER_H
+
 #ifndef OHOS_DISCOVERY_MANAGER_H
 #define OHOS_DISCOVERY_MANAGER_H
 
 #include <set>
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "deviceprofile_connector.h"
 #endif
 #include "discovery_filter.h"
@@ -72,11 +74,9 @@ public:
     int32_t EnableDiscoveryListener(const std::string &pkgName, const std::map<std::string, std::string> &discoverParam,
         const std::map<std::string, std::string> &filterOptions);
     int32_t DisableDiscoveryListener(const std::string &pkgName, const std::map<std::string, std::string> &extraParam);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     static IDeviceProfileConnector* GetCommonDependencyObj();
     static bool IsCommonDependencyReady();
     static bool CloseCommonDependencyObj();
-#endif
     void ClearDiscoveryCache(const ProcessInfo &processInfo);
     std::set<uint16_t> ClearDiscoveryPkgName(const std::string &pkgName);
 
@@ -129,14 +129,12 @@ private:
     std::mutex multiUserDiscLocks_;
     std::map<std::string, MultiUserDiscovery> multiUserDiscMap_;
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     static bool isSoLoaded_;
     static IDeviceProfileConnector *dpConnector_;
     static void *dpConnectorHandle_;
-#endif
 
     std::set<uint16_t> randSubIdSet_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DISCOVERY_MANAGER_H
+#endif // DISCOVERY_MANAGER_H

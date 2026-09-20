@@ -18,11 +18,7 @@
 
 #include "ipc_req.h"
 
-#ifdef LITE_DEVICE
-#include "ipc_skeleton.h"
-#else
 #include "iremote_stub.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -30,17 +26,6 @@ class IpcRegisterListenerReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcRegisterListenerReq);
 
 public:
-#ifdef LITE_DEVICE
-    SvcIdentity GetSvcIdentity() const
-    {
-        return svcIdentity_;
-    }
-
-    void SetSvcIdentity(SvcIdentity svcIdentity)
-    {
-        svcIdentity_ = svcIdentity;
-    }
-#else
     sptr<IRemoteObject> GetListener() const
     {
         return listener_;
@@ -55,14 +40,9 @@ public:
     {
         listener_ = listener;
     }
-#endif
 
 private:
-#ifdef LITE_DEVICE
-    SvcIdentity svcIdentity_;
-#else
     sptr<IRemoteObject> listener_;
-#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS
