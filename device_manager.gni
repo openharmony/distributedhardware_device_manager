@@ -13,6 +13,7 @@
 
 #------------------------device manager------------------------------#
 devicemanager_path = "//foundation/distributedhardware/device_manager"
+lite_path = "${devicemanager_path}/lite"
 common_path = "${devicemanager_path}/common"
 utils_path = "${devicemanager_path}/utils"
 services_path = "${devicemanager_path}/services/service"
@@ -33,6 +34,15 @@ interfaces_3rd_path = "${devicemanager_path}/3rd/interfaces"
 utils_3rd_path = "${devicemanager_path}/3rd/utils"
 service_3rd_path = "${devicemanager_path}/3rd/services/service"
 serviceimpl_3rd_path = "${devicemanager_path}/3rd/services/implementation"
+
+lite_common_path = "${lite_path}/common"
+lite_utils_path = "${lite_path}/utils"
+lite_services_path = "${lite_path}/services/service"
+lite_servicesimpl_path = "${lite_path}/services/implementation"
+lite_softbuscache_path = "${lite_path}/services/softbuscache"
+lite_interfaces_path = "${lite_path}/interfaces"
+lite_json_path = "${lite_path}/json"
+lite_commondependency_path = "${lite_path}/commondependency"
 
 #----------------------compilation options--------------------------#
 dm_ldflags = [ "-lpthread" ]

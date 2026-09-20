@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -217,16 +217,58 @@ int32_t OnCommand(int32_t code, const char* value, uint32_t inlen,
     return ret;
 }
 
+ITrustedDeviceCb g_commandCb = {
+    .onCommand = OnCommand,
+};
+
+static void DmNotifyDeviceOffline(SoftbusCache* cache, const char* remoteUdidBuf, DmDeviceInfo* deviceInfo)
+{
+    if (cache != NULL) {
+        DmString udid = DmStringCreate(remoteUdidBuf);
+        DmString networkId = DmStringCreateEmpty();
+        if (DmSoftbusCacheGetNetworkIdFromCache(cache, &udid, &networkId) == DM_OK &&
+            DmStringSize(&networkId) > 0) {
+            if (strncpy_s(deviceInfo->networkId, sizeof(deviceInfo->networkId),
+                DmStringCstr(&networkId), sizeof(deviceInfo->networkId) - 1) != 0) {
+                DmStringDestroy(&networkId);
+                DmStringDestroy(&udid);
+                return;
+            }
+            if (strncpy_s(deviceInfo->deviceId, sizeof(deviceInfo->deviceId),
+                remoteUdidBuf, sizeof(deviceInfo->deviceId) - 1) != 0) {
+                DmStringDestroy(&networkId);
+                DmStringDestroy(&udid);
+                return;
+            }
+        }
+        DmStringDestroy(&networkId);
+        DmStringDestroy(&udid);
+        DmSoftbusCacheDeleteDeviceInfoByNode(cache, deviceInfo);
+    }
+    DmLiteClientNotifyDeviceState(DEVICE_STATE_OFFLINE, deviceInfo, false);
+}
+
 static void DmProcessSingleAcl(DmLocalAclProfile* p)
 {
     DmString json = DmLocalAclProfileSerialize(p);
     const char* jsonStr = DmStringCstr(&json);
+    uint32_t jsonLen = (uint32_t)DmStringSize(&json);
     LOGW("OnCredDelete deleted ACL json=%s", jsonStr);
 
+    const char* peerUdid = DmStringCstr(&p->trustDeviceId);
     char key[32];
     DmAclKeyFromProfile(key, sizeof(key), p);
     DmAclStoreDeleteByKey(key);
     DmLocalAclProfileDelete(p);
+
+    int32_t ret = SetCommand(0, jsonStr, jsonLen);
+    LOGW("OnCredDelete SetCommand(offline) ret=%d", ret);
+    if (ret == 0) {
+        DmDeviceInfo deviceInfo;
+        (void)memset_s(&deviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+        SoftbusCache* cache = SoftbusCacheGetInstance();
+        DmNotifyDeviceOffline(cache, peerUdid, &deviceInfo);
+    }
     DmStringDestroy(&json);
 }
 
@@ -277,7 +319,7 @@ int32_t DmServiceTestTriggerCredDelete(const char* credId, const char* credInfo)
     return DM_OK;
 }
 
-static void DmLogCallbackReg(FILE* df, unsigned int h, uintptr_t t, uintptr_t c)
+static void DmLogCallbackReg(FILE* df, unsigned int h, uintptr_t t, uintptr_t c, int32_t aclRet)
 {
     (void)fprintf(df, "[register_callbacks] softbus identity handle=%u token=%u cookie=%u\n",
         h, (unsigned int)t, (unsigned int)c);
@@ -289,6 +331,8 @@ static void DmLogCallbackReg(FILE* df, unsigned int h, uintptr_t t, uintptr_t c)
         return;
     }
     (void)fprintf(df, "[register_callbacks] SUCCESS\n");
+    (void)fflush(df);
+    (void)fprintf(df, "[register_callbacks] RegisterCommandCb ret=%d\n", aclRet);
     (void)fflush(df);
     (void)fclose(df);
 }
@@ -326,12 +370,18 @@ int32_t DmSoftbusListenerRegisterCallbacksInner(void)
     if (c == 0) {
         LOGE("[register_callbacks] softbus client cookie is NULL, callbacks cannot be delivered");
         if (df != NULL) {
-            DmLogCallbackReg(df, h, t, c);
+            DmLogCallbackReg(df, h, t, c, 0);
         }
         return ERR_DM_FAILED;
     }
 
     LOGW("SoftBus callbacks registered successfully");
+
+    int32_t aclRet = RegisterCommandCb(DM_PKG_NAME, &g_commandCb);
+    LOGW("[register_callbacks] RegisterCommandCb ret=%d", aclRet);
+    if (df != NULL) {
+        DmLogCallbackReg(df, h, t, c, aclRet);
+    }
 
     return DM_OK;
 }
