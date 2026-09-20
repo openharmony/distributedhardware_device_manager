@@ -337,7 +337,8 @@ void DmDeviceStateManager::HandleOnline(DmDeviceState devState, DmDeviceInfo &de
 {
     LOGI("networkId: %{public}s.", GetAnonyString(devInfo.networkId).c_str());
     std::string trustDeviceId;
-    if (softbusConnector_ == nullptr || softbusConnector_->GetUdidByNetworkId(devInfo.networkId, trustDeviceId) != DM_OK) {
+    if (softbusConnector_ == nullptr ||
+        softbusConnector_->GetUdidByNetworkId(devInfo.networkId, trustDeviceId) != DM_OK) {
         LOGE("get udid failed.");
         return;
     }
