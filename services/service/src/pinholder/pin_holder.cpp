@@ -19,9 +19,7 @@
 #include "dm_crypto.h"
 #include "dm_log.h"
 #include "dm_radar_helper.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -83,9 +81,7 @@ int32_t PinHolder::RegisterPinHolderCallback(const std::string &pkgName)
         return ERR_DM_FAILED;
     }
     int32_t userId = -1;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(userId);
-#endif
     processInfo_.userId = userId;
     processInfo_.pkgName = pkgName;
     session_->RegisterSessionCallback(shared_from_this());

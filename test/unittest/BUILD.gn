@@ -15,6 +15,12 @@ import("//build/test.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 module_out_path = "device_manager/device_manager"
 
+if (defined(ohos_lite)) {
+  group("unittest") {
+    testonly = true
+    deps = []
+  }
+} else {
 group("unittest") {
   testonly = true
 
@@ -2596,3 +2602,4 @@ ohos_unittest("UTTest_dm_service_hichain_connector") {
 }
 
 ## UnitTest UTTest_dm_service_hichain_connector }}}
+}

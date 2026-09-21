@@ -193,4 +193,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_I_DM_SERVICE_LISTENER_H
+#endif // IDEVICE_MANAGER_SERVICE_LISTENER_H

@@ -31,7 +31,6 @@ int32_t DeviceManagerService::ImportCredential(const std::string &pkgName, const
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (pkgName.empty() || credentialInfo.empty()) {
         LOGE("DeviceManagerServiceImpl::ImportCredential failed, pkgName is %{public}s, credentialInfo is %{public}s",
             pkgName.c_str(), GetAnonyString(credentialInfo).c_str());
@@ -42,13 +41,11 @@ int32_t DeviceManagerService::ImportCredential(const std::string &pkgName, const
         return ERR_DM_POINT_NULL;
     }
     return credentialMgr_->ImportCredential(pkgName, credentialInfo);
-#else
     if (!IsDMServiceImplReady()) {
         LOGE("ImportCredential failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->ImportCredential(pkgName, credentialInfo);
-#endif
 }
 
 int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
@@ -58,7 +55,6 @@ int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (pkgName.empty() || deleteInfo.empty()) {
         LOGE("DeviceManagerServiceImpl::DeleteCredential failed, pkgName is %{public}s, deleteInfo is %{public}s",
             pkgName.c_str(), GetAnonyString(deleteInfo).c_str());
@@ -69,13 +65,11 @@ int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const
         return ERR_DM_POINT_NULL;
     }
     return credentialMgr_->DeleteCredential(pkgName, deleteInfo);
-#else
     if (!IsDMServiceImplReady()) {
         LOGE("DeleteCredential failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->DeleteCredential(pkgName, deleteInfo);
-#endif
 }
 
 int32_t DeviceManagerService::RegisterCredentialCallback(const std::string &pkgName)
@@ -84,7 +78,6 @@ int32_t DeviceManagerService::RegisterCredentialCallback(const std::string &pkgN
         LOGE("The caller: %{public}s does not have permission to call RegisterCredentialCallback.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (pkgName.empty()) {
         LOGE("RegisterCredentialCallback failed, pkgName is empty");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -94,13 +87,11 @@ int32_t DeviceManagerService::RegisterCredentialCallback(const std::string &pkgN
         return ERR_DM_POINT_NULL;
     }
     return credentialMgr_->RegisterCredentialCallback(pkgName);
-#else
     if (!IsDMServiceImplReady()) {
         LOGE("RegisterCredentialCallback failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->RegisterCredentialCallback(pkgName);
-#endif
 }
 
 int32_t DeviceManagerService::UnRegisterCredentialCallback(const std::string &pkgName)
@@ -110,7 +101,6 @@ int32_t DeviceManagerService::UnRegisterCredentialCallback(const std::string &pk
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (pkgName.empty()) {
         LOGE("UnRegisterCredentialCallback failed, pkgName is empty");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -120,13 +110,11 @@ int32_t DeviceManagerService::UnRegisterCredentialCallback(const std::string &pk
         return ERR_DM_POINT_NULL;
     }
     return credentialMgr_->UnRegisterCredentialCallback(pkgName);
-#else
     if (!IsDMServiceImplReady()) {
         LOGE("UnRegisterCredentialCallback failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->UnRegisterCredentialCallback(pkgName);
-#endif
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -12,11 +12,18 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
-ohos_prebuilt_etc("dm_permission_json") {
-  install_enable = true
-  source = "dm_permission.json"
-  relative_install_dir = "device_manager"
-  part_name = "device_manager"
-  subsystem_name = "distributedhardware"
+if (defined(ohos_lite) || !device_manager_capability) {
+  group("dm_permission_json") {
+    deps = []
+  }
+} else {
+  ohos_prebuilt_etc("dm_permission_json") {
+    install_enable = true
+    source = "dm_permission.json"
+    relative_install_dir = "device_manager"
+    part_name = "device_manager"
+    subsystem_name = "distributedhardware"
+  }
 }

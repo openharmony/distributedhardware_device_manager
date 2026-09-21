@@ -18,7 +18,6 @@
 
 #include "idevice_manager_service_listener.h"
 #include "isa_specification_verify.h"
-
 namespace OHOS {
 namespace DistributedHardware {
 class IDMServiceImplExtResident {
@@ -130,4 +129,4 @@ public:
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_I_DM_SERVICE_IMPL_EXT_RESIDENT_H
+#endif // I_DM_SERVICE_IMPL_EXT_RESIDENT_H

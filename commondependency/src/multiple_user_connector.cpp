@@ -18,7 +18,6 @@
 #include "dm_error_type.h"
 #include "dm_log.h"
 #include "dm_constants.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "account_info.h"
 #include "ipc_skeleton.h"
 #include "ohos_account_kits.h"
@@ -26,7 +25,6 @@
 #include "os_account_manager.h"
 using namespace OHOS::AccountSA;
 #endif // OS_ACCOUNT_PART_EXISTS
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -43,9 +41,6 @@ const char* DM_MDM_CONSTRAINT = "constraint.distributed.transmission.outgoing";
 
 int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 {
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    return 0;
-#elif OS_ACCOUNT_PART_EXISTS
     std::vector<int> ids;
     ErrCode ret = OsAccountManager::QueryActiveOsAccountIds(ids);
     if (ret != 0 || ids.empty()) {
@@ -53,9 +48,6 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
         return -1;
     }
     return ids[0];
-#else // OS_ACCOUNT_PART_EXISTS
-    return DEFAULT_OS_ACCOUNT_ID;
-#endif
 }
 
 DM_EXPORT bool MultipleUserConnector::CheckMDMControl()
@@ -76,9 +68,6 @@ DM_EXPORT bool MultipleUserConnector::CheckMDMControl()
 
 DM_EXPORT std::string MultipleUserConnector::GetOhosAccountId(void)
 {
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    return "";
-#elif OS_ACCOUNT_PART_EXISTS
     OhosAccountInfo accountInfo;
     ErrCode ret = OhosAccountKits::GetInstance().GetOhosAccountInfo(accountInfo);
     if (ret != 0 || accountInfo.uid_ == "") {
@@ -86,17 +75,10 @@ DM_EXPORT std::string MultipleUserConnector::GetOhosAccountId(void)
         return "";
     }
     return accountInfo.uid_;
-#else
-    return "";
-#endif
 }
 
 DM_EXPORT std::string MultipleUserConnector::GetOhosAccountIdByUserId(int32_t userId)
 {
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    (void)userId;
-    return "";
-#elif OS_ACCOUNT_PART_EXISTS
     OhosAccountInfo accountInfo;
     ErrCode ret = OhosAccountKits::GetInstance().GetOsAccountDistributedInfo(userId, accountInfo);
     if (ret != 0 || accountInfo.uid_ == "") {
@@ -104,18 +86,10 @@ DM_EXPORT std::string MultipleUserConnector::GetOhosAccountIdByUserId(int32_t us
         return "";
     }
     return accountInfo.uid_;
-#else
-    (void)userId;
-    return "";
-#endif
 }
 
 DM_EXPORT std::string MultipleUserConnector::GetOhosAccountNameByUserId(int32_t userId)
 {
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    (void)userId;
-    return "";
-#elif OS_ACCOUNT_PART_EXISTS
     OhosAccountInfo accountInfo;
     ErrCode ret = OhosAccountKits::GetInstance().GetOsAccountDistributedInfo(userId, accountInfo);
     if (ret != 0 || accountInfo.name_ == "") {
@@ -123,17 +97,10 @@ DM_EXPORT std::string MultipleUserConnector::GetOhosAccountNameByUserId(int32_t 
         return "";
     }
     return accountInfo.name_;
-#else
-    (void)userId;
-    return "";
-#endif
 }
 
 DM_EXPORT std::string MultipleUserConnector::GetOhosAccountName(void)
 {
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    return "";
-#elif OS_ACCOUNT_PART_EXISTS
     auto accountInfo = OhosAccountKits::GetInstance().QueryOhosAccountInfo();
     if (!accountInfo.first) {
         LOGE("QueryOhosAccountInfo failed.");
@@ -144,46 +111,27 @@ DM_EXPORT std::string MultipleUserConnector::GetOhosAccountName(void)
         return "";
     }
     return accountInfo.second.name_;
-#else
-    return "";
-#endif
 }
 
 void MultipleUserConnector::GetTokenIdAndForegroundUserId(uint32_t &tokenId, int32_t &userId)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
-#else
-    (void)tokenId;
-#endif
     userId = GetFirstForegroundUserId();
 }
 
 DM_EXPORT void MultipleUserConnector::GetTokenId(uint32_t &tokenId)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
-#else
-    (void)tokenId;
-#endif
 }
 
 void MultipleUserConnector::GetCallerUserId(int32_t &userId)
 {
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    (void)userId;
-    return;
-#elif OS_ACCOUNT_PART_EXISTS
     int32_t uid = OHOS::IPCSkeleton::GetCallingUid();
     ErrCode ret = OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
     if (ret != 0) {
         LOGE("GetOsAccountLocalIdFromUid error ret: %{public}d", ret);
     }
     return;
-#else // OS_ACCOUNT_PART_EXISTS
-    (void)userId;
-    return;
-#endif
 }
 
 DM_EXPORT void MultipleUserConnector::SetSwitchOldUserId(int32_t userId)
@@ -256,10 +204,6 @@ DM_EXPORT void MultipleUserConnector::DeleteAccountInfoByUserId(int32_t userId)
 DM_EXPORT int32_t MultipleUserConnector::GetForegroundUserIds(
     std::vector<int32_t> &userVec)
 {
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    userVec.push_back(DEFAULT_OS_ACCOUNT_ID);
-    return DM_OK;
-#elif OS_ACCOUNT_PART_EXISTS
     userVec.clear();
     std::vector<AccountSA::ForegroundOsAccount> accounts;
     ErrCode ret = OsAccountManager::GetForegroundOsAccounts(accounts);
@@ -271,10 +215,6 @@ DM_EXPORT int32_t MultipleUserConnector::GetForegroundUserIds(
         userVec.push_back(account.localId);
     }
     return DM_OK;
-#else // OS_ACCOUNT_PART_EXISTS
-    userVec.push_back(DEFAULT_OS_ACCOUNT_ID);
-    return DM_OK;
-#endif
 }
 
 int32_t MultipleUserConnector::GetFirstForegroundUserId(void)
@@ -291,9 +231,6 @@ int32_t MultipleUserConnector::GetFirstForegroundUserId(void)
 DM_EXPORT int32_t MultipleUserConnector::GetBackgroundUserIds(
     std::vector<int32_t> &userIdVec)
 {
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    return DM_OK;
-#elif OS_ACCOUNT_PART_EXISTS
     userIdVec.clear();
     std::vector<OsAccountInfo> allOsAccounts;
     ErrCode ret = OsAccountManager::QueryAllCreatedOsAccounts(allOsAccounts);
@@ -324,16 +261,10 @@ DM_EXPORT int32_t MultipleUserConnector::GetBackgroundUserIds(
         }
     }
     return DM_OK;
-#else
-    return DM_OK;
-#endif
 }
 
 int32_t MultipleUserConnector::GetAllUserIds(std::vector<int32_t> &userIdVec)
 {
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    return DM_OK;
-#elif OS_ACCOUNT_PART_EXISTS
     userIdVec.clear();
     std::vector<OsAccountInfo> allOsAccounts;
     ErrCode ret = OsAccountManager::QueryAllCreatedOsAccounts(allOsAccounts);
@@ -346,16 +277,10 @@ int32_t MultipleUserConnector::GetAllUserIds(std::vector<int32_t> &userIdVec)
         userIdVec.push_back(u.GetLocalId());
     }
     return DM_OK;
-#else
-    return DM_OK;
-#endif
 }
 
 DM_EXPORT std::string MultipleUserConnector::GetAccountNickName(int32_t userId)
 {
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    return "";
-#elif OS_ACCOUNT_PART_EXISTS
     OhosAccountInfo accountInfo;
     ErrCode ret = OhosAccountKits::GetInstance().GetOsAccountDistributedInfo(userId, accountInfo);
     if (ret != 0 || accountInfo.uid_ == "") {
@@ -363,16 +288,10 @@ DM_EXPORT std::string MultipleUserConnector::GetAccountNickName(int32_t userId)
         return "";
     }
     return accountInfo.nickname_;
-#else
-    return "";
-#endif
 }
 
 bool MultipleUserConnector::IsUserUnlocked(int32_t userId)
 {
-#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    return true;
-#elif OS_ACCOUNT_PART_EXISTS
     bool isUserUnlocked = false;
     ErrCode ret = OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
     if (ret != 0) {
@@ -380,9 +299,6 @@ bool MultipleUserConnector::IsUserUnlocked(int32_t userId)
         return false;
     }
     return isUserUnlocked;
-#else
-    return true;
-#endif
 }
 
 DM_EXPORT void MultipleUserConnector::ClearLockedUser(
@@ -420,18 +336,13 @@ DM_EXPORT DMAccountInfo MultipleUserConnector::GetCurrentDMAccountInfo()
 
 DM_EXPORT void MultipleUserConnector::GetCallingTokenId(uint32_t &tokenId)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
-#else
-    (void)tokenId;
-#endif
 }
 
 DM_EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(int32_t displayId)
 {
     LOGI("displayId %{public}d", displayId);
     int32_t userId = -1;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (displayId == -1) {
         userId = GetFirstForegroundUserId();
         return userId;
@@ -443,7 +354,6 @@ DM_EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(int32_t displayId)
         LOGE("GetForegroundOsAccountLocalId failed ret %{public}d.", ret);
     }
 #endif // OS_ACCOUNT_PART_EXISTS
-#endif
     return userId;
 }
 } // namespace DistributedHardware

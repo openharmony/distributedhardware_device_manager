@@ -21,9 +21,7 @@
 #include "common_event_support.h"
 #include "dm_anonymous.h"
 #include "dm_log.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
-#endif
 #include "iservice_registry.h"
 #include "multiple_user_connector.h"
 #include "system_ability_definition.h"
@@ -167,16 +165,7 @@ void DmAccountEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         LOGE("Invalied account type event.");
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { callback_(receiveEvent, currentUserId, beforeUserId); });
-#else
-    std::thread dealThread([=]() { callback_(receiveEvent, currentUserId, beforeUserId); });
-    int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
-    if (ret != DM_OK) {
-        LOGE("dealThread setname failed.");
-    }
-    dealThread.detach();
-#endif
 }
 
 void DmAccountCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility(

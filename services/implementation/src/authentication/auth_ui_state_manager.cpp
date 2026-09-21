@@ -18,9 +18,7 @@
 #include "dm_dialog_manager.h"
 #include "dm_log.h"
 #include "json_object.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
-#endif
 namespace OHOS {
 namespace DistributedHardware {
 constexpr const char* UI_STATE_MSG = "uiStateMsg";

@@ -26,19 +26,11 @@ DM_IMPLEMENT_SINGLE_INSTANCE(SoftbusCache);
 std::atomic<bool> g_online{false};
 std::atomic<bool> g_getLocalDevInfo{false};
 DmDeviceInfo localDeviceInfo_;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 ffrt::mutex localDevInfoMutex_;
-#else
-std::mutex localDevInfoMutex_;
-#endif
 void SoftbusCache::SaveLocalDeviceInfo()
 {
     LOGI("SoftbusCache::SaveLocalDeviceInfo");
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(localDevInfoMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(localDevInfoMutex_);
-#endif
     if (g_online) {
         return;
     }
@@ -61,11 +53,7 @@ void SoftbusCache::DeleteLocalDeviceInfo()
 {
     LOGI("SoftbusCache::DeleteLocalDeviceInfo networkid %{public}s.",
         GetAnonyString(std::string(localDeviceInfo_.networkId)).c_str());
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(localDevInfoMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(localDevInfoMutex_);
-#endif
     g_online = false;
     g_getLocalDevInfo = false;
     if (memset_s(&localDeviceInfo_, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != DM_OK) {
@@ -76,11 +64,7 @@ void SoftbusCache::DeleteLocalDeviceInfo()
 
 int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(localDevInfoMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(localDevInfoMutex_);
-#endif
     if (g_getLocalDevInfo) {
         nodeInfo = localDeviceInfo_;
         LOGD("SoftbusCache::GetLocalDeviceInfo from dm cache, deviceType %{public}d.", nodeInfo.deviceTypeId);
@@ -110,11 +94,7 @@ void SoftbusCache::UpDataLocalDevInfo()
         LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, ret: %{public}d.", ret);
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(localDevInfoMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(localDevInfoMutex_);
-#endif
     ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, localDeviceInfo_);
     ChangeDeviceInfo(localDeviceInfo_);
 }
@@ -168,11 +148,7 @@ void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
         LOGE("SaveDeviceInfo copy deviceId failed.");
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
     CHECK_SIZE_VOID(deviceInfo_);
     deviceInfo_[udid] = std::pair<std::string, DmDeviceInfo>(uuid, deviceInfo);
     LOGI("SaveDeviceInfo success udid %{public}s, networkId %{public}s",
@@ -183,11 +159,7 @@ void SoftbusCache::DeleteDeviceInfo(const DmDeviceInfo &nodeInfo)
 {
     LOGI("SoftbusCache::DeleteDeviceInfo networkId %{public}s",
         GetAnonyString(std::string(nodeInfo.networkId)).c_str());
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
     for (const auto &item : deviceInfo_) {
         if (std::string(item.second.second.networkId) == std::string(nodeInfo.networkId)) {
             LOGI("DeleteDeviceInfo success udid %{public}s", GetAnonyString(item.first).c_str());
@@ -199,11 +171,7 @@ void SoftbusCache::DeleteDeviceInfo(const DmDeviceInfo &nodeInfo)
 
 void SoftbusCache::DeleteDeviceInfo()
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
     deviceInfo_.clear();
 }
 
@@ -212,11 +180,7 @@ void SoftbusCache::ChangeDeviceInfo(const DmDeviceInfo deviceInfo)
     LOGI("SoftbusCache::ChangeDeviceInfo");
     std::string udid = "";
     GetUdidByNetworkId(deviceInfo.networkId, udid);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
     if (deviceInfo_.find(udid) != deviceInfo_.end()) {
         if (memcpy_s(deviceInfo_[udid].second.deviceName, sizeof(deviceInfo_[udid].second.deviceName),
                      deviceInfo.deviceName, sizeof(deviceInfo.deviceName)) != DM_OK) {
@@ -239,11 +203,7 @@ void SoftbusCache::ChangeDeviceInfo(const DmDeviceInfo deviceInfo)
 
 int32_t SoftbusCache::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
     for (const auto &item : deviceInfo_) {
         if (std::string(item.second.second.networkId) == std::string(localDeviceInfo_.networkId)) {
             continue;
@@ -256,11 +216,7 @@ int32_t SoftbusCache::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceIn
 bool SoftbusCache::GetDeviceInfoByDeviceId(const std::string &deviceId, std::string &uuid, DmDeviceInfo &devInfo)
 {
     LOGI("deviceId: %{public}s", GetAnonyString(deviceId).c_str());
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
     for (const auto &item : deviceInfo_) {
         if (item.first == deviceId) {
             uuid = item.second.first;
@@ -296,11 +252,7 @@ void SoftbusCache::UpdateDeviceInfoCache()
 
 int32_t SoftbusCache::GetUdidFromCache(const char *networkId, std::string &udid)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
     for (const auto &item : deviceInfo_) {
         if (std::string(item.second.second.networkId) == std::string(networkId)) {
             udid = item.first;
@@ -320,11 +272,7 @@ int32_t SoftbusCache::GetUdidFromCache(const char *networkId, std::string &udid)
 
 int32_t SoftbusCache::GetUuidFromCache(const char *networkId, std::string &uuid)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
     for (const auto &item : deviceInfo_) {
         if (std::string(item.second.second.networkId) == std::string(networkId)) {
             uuid = item.second.first;
@@ -372,11 +320,7 @@ int32_t SoftbusCache::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeIn
 void SoftbusCache::SaveDeviceSecurityLevel(const char *networkId)
 {
     LOGI("SoftbusCache::SaveDeviceSecurityLevel networkId %{public}s.", GetAnonyString(std::string(networkId)).c_str());
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(deviceSecurityLevelMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
-#endif
     if (deviceSecurityLevel_.find(std::string(networkId)) != deviceSecurityLevel_.end()) {
         return;
     }
@@ -394,11 +338,7 @@ void SoftbusCache::DeleteDeviceSecurityLevel(const char *networkId)
 {
     LOGI("SoftbusCache::DeleteDeviceSecurityLevel networkId %{public}s.",
         GetAnonyString(std::string(networkId)).c_str());
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(deviceSecurityLevelMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
-#endif
     if (deviceSecurityLevel_.find(std::string(networkId)) != deviceSecurityLevel_.end()) {
         deviceSecurityLevel_.erase(std::string(networkId));
     }
@@ -406,11 +346,7 @@ void SoftbusCache::DeleteDeviceSecurityLevel(const char *networkId)
 
 int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &securityLevel)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(deviceSecurityLevelMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(deviceSecurityLevelMutex_);
-#endif
     for (const auto &item : deviceSecurityLevel_) {
         if (item.first == std::string(networkId)) {
             securityLevel = item.second;
@@ -446,11 +382,7 @@ int32_t SoftbusCache::GetDevLevelFromBus(const char *networkId, int32_t &securit
 int32_t SoftbusCache::GetDevInfoByNetworkId(const std::string &networkId, DmDeviceInfo &nodeInfo)
 {
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
         for (const auto &item : deviceInfo_) {
             if (std::string(item.second.second.networkId) == networkId) {
                 nodeInfo = item.second.second;
@@ -495,11 +427,7 @@ int32_t SoftbusCache::GetUdidByUdidHash(const std::string &udidHash, std::string
 {
     LOGI("udidHash %{public}s.", GetAnonyString(udidHash).c_str());
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
         for (const auto &item : deviceInfo_) {
             if (std::string(item.second.second.deviceId) == udidHash) {
                 udid = item.first;
@@ -515,11 +443,7 @@ int32_t SoftbusCache::GetUuidByUdid(const std::string &udid, std::string &uuid)
 {
     LOGI("udid %{public}s.", GetAnonyString(udid).c_str());
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
         if (deviceInfo_.find(udid) != deviceInfo_.end()) {
             uuid = deviceInfo_[udid].first;
             LOGI("success uuid %{public}s.", GetAnonyString(uuid).c_str());
@@ -533,11 +457,7 @@ int32_t SoftbusCache::GetNetworkIdFromCache(const std::string &udid, std::string
 {
     LOGI("udid %{public}s.", GetAnonyString(udid).c_str());
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
         if (deviceInfo_.find(udid) != deviceInfo_.end()) {
             networkId = deviceInfo_[udid].second.networkId;
             LOGI("GetNetworkIdFromCache success networkId %{public}s, udid %{public}s.",
@@ -552,11 +472,7 @@ int32_t SoftbusCache::GetDeviceNameFromCache(const std::string &udid, std::strin
 {
     LOGI("udid %{public}s.", GetAnonyString(udid).c_str());
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
         if (deviceInfo_.find(udid) != deviceInfo_.end()) {
             deviceName = deviceInfo_[udid].second.deviceName;
             LOGI("GetDeviceNameFromCache success deviceName: %{public}s, udid: %{public}s.",
@@ -570,11 +486,7 @@ int32_t SoftbusCache::GetDeviceNameFromCache(const std::string &udid, std::strin
 bool SoftbusCache::CheckIsOnline(const std::string &udidHash)
 {
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
         for (const auto &item : deviceInfo_) {
             LOGI("deviceId %{public}s, cache udidHash %{public}s.", GetAnonyString(udidHash).c_str(),
                 GetAnonyString(std::string(item.second.second.deviceId)).c_str());
@@ -590,11 +502,7 @@ bool SoftbusCache::CheckIsOnline(const std::string &udidHash)
 bool SoftbusCache::CheckIsOnlineByPeerUdid(const std::string &peerUdid)
 {
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-#endif
         if (deviceInfo_.find(peerUdid) != deviceInfo_.end()) {
             LOGI("peerUdid %{public}s is online.", GetAnonyString(peerUdid).c_str());
             return true;

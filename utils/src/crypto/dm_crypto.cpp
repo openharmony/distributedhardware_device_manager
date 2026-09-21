@@ -14,10 +14,8 @@
  */
 #include "dm_crypto.h"
 #include "dm_log.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "datetime_ex.h"
 #include "kv_adapter_manager.h"
-#endif
 #include <iostream>
 #include <sstream>
 
@@ -267,7 +265,6 @@ DM_EXPORT std::string Crypto::GetAccountIdHash16(const std::string &accountId)
     return accountHashStr;
 }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 DM_EXPORT int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId,
     const std::string &udidHash, DmKVValue &kvValue)
 {
@@ -324,6 +321,5 @@ int32_t Crypto::ConvertUdidHashToAnoyGenerate(const std::string &appId, const st
     kvValue.lastModifyTime = GetSecondsSince1970ToNow();
     return DM_OK;
 }
-#endif
 } // namespace DistributedHardware
 } // namespace OHOS

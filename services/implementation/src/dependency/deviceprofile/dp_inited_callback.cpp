@@ -22,9 +22,7 @@
 
 #include "json_object.h"
 #include "parameter.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
-#endif
 
 #include "deviceprofile_connector.h"
 #include "dm_anonymous.h"
@@ -48,15 +46,7 @@ DpInitedCallback::~DpInitedCallback()
 int32_t DpInitedCallback::OnDpInited()
 {
     LOGE("In.");
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { PutAllTrustedDevices(); });
-#else
-    std::thread putAllTrustedDevicesTask([=]() { PutAllTrustedDevices(); });
-    if (pthread_setname_np(putAllTrustedDevicesTask.native_handle().c_str(), PUT_ALL_TRUSTED_DEVICES_TASK) != DM_OK) {
-        LOGE("putAllTrustedDevicesTask setname failed.");
-    }
-    putAllTrustedDevicesTask.detach();
-#endif
     return DM_OK;
 }
 

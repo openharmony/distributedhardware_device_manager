@@ -20,9 +20,7 @@
 #include "dm_log.h"
 #include "dm_random.h"
 #include "parameter.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
-#endif
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t LOCAL_CREDENTIAL_DEAL_TYPE = 1;
@@ -218,9 +216,7 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
         return ERR_DM_FAILED;
     }
     int32_t callerUserId = -1;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(callerUserId);
-#endif
     processInfo_.pkgName = pkgName;
     processInfo_.userId = callerUserId;
     JsonObject jsonObject(deleteInfo);
@@ -278,9 +274,7 @@ int32_t DmCredentialManager::RegisterCredentialCallback(const std::string &pkgNa
         return ERR_DM_FAILED;
     }
     int32_t userId = -1;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(userId);
-#endif
     LOGI("DmCredentialManager::RegisterCredentialCallback pkgName = %{public}s", GetAnonyString(pkgName).c_str());
     {
         std::lock_guard<std::mutex> autoLock(locks_);

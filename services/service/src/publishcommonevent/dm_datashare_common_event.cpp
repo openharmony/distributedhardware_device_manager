@@ -21,9 +21,7 @@
 #include "common_event_support.h"
 #include "dm_anonymous.h"
 #include "dm_log.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
-#endif
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
@@ -149,16 +147,7 @@ void DmDataShareEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         LOGE("Invalied datashare type event.");
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { callback_(receiveEvent, eventState); });
-#else
-    std::thread dealThread([=]() { callback_(receiveEvent, eventState); });
-    int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
-    if (ret != DM_OK) {
-        LOGE("dealThread setname failed.");
-    }
-    dealThread.detach();
-#endif
 }
 
 void DmDataShareCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility(
