@@ -13,14 +13,14 @@
 
 if (defined(ohos_lite)) {
   group("device_manager") {
-    deps = []
+    deps = [
+      "lite/services/etc:ohos.para.dac",
+      "lite/services/service:devicemanagerservice",
+      "lite/services/softbuscache:dmdevicecache",
+    ]
   }
   group("device_manager_fwk") {
-    deps = []
-  }
-  group("device_manager_test") {
-    testonly = true
-    deps = []
+    deps = [ "lite/interfaces:devicemanagersdk" ]
   }
 } else {
   if (defined(harmony_industry_project) &&
