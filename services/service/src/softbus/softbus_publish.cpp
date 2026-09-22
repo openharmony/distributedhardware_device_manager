@@ -108,13 +108,13 @@ int32_t SoftbusPublish::PublishSoftbusLNN()
     publishInfo.capability = DM_CAPABILITY_OSD;
     publishInfo.ranging = false;
 
-    LOGI("Begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
-        "%{public}s, ranging: %{public}d, freq: %{public}d.", publishInfo.publishId, publishInfo.mode,
+    LOGI("publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
+        "%{public}s, ranging: %{public}d, freq: %{public}d", publishInfo.publishId, publishInfo.mode,
         publishInfo.medium, publishInfo.capability, publishInfo.ranging, publishInfo.freq);
 
     int32_t ret = PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]PublishLNN failed, ret: %{public}d.", ret);
+        LOGE("error, ret: %{public}d", ret);
         return ERR_DM_PUBLISH_FAILED;
     }
     return DM_OK;
@@ -122,13 +122,12 @@ int32_t SoftbusPublish::PublishSoftbusLNN()
 
 int32_t SoftbusPublish::StopPublishSoftbusLNN(int32_t publishId)
 {
-    LOGI("Begin, publishId: %{public}d.", publishId);
+    LOGI("publishId: %{public}d", publishId);
     int32_t ret = StopPublishLNN(DM_PKG_NAME, publishId);
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]StopPublishLNN failed, ret: %{public}d.", ret);
+        LOGE("error, ret: %{public}d", ret);
         return ERR_DM_STOP_PUBLISH_LNN_FAILED;
     }
-    LOGI("StopPublishLNN success, ret: %{public}d.", ret);
     return DM_OK;
 }
 } // namespace DistributedHardware

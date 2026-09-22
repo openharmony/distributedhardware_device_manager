@@ -370,7 +370,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
     std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
     auto iter = dmListener_.find(processInfo);
     if (iter != dmListener_.end()) {
-        LOGI("Listener already exists");
+        LOGI("Listener exists");
         auto recipientIter = appRecipient_.find(processInfo);
         if (recipientIter == appRecipient_.end()) {
             LOGI("AppRecipient not exists");
@@ -401,7 +401,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
 
 int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &processInfo)
 {
-    LOGI("In, pkgName: %{public}s", processInfo.pkgName.c_str());
+    LOGI("pkgName: %{public}s", processInfo.pkgName.c_str());
     if (processInfo.pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -518,7 +518,7 @@ int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
 void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     ProcessInfo processInfo = IpcServerStub::GetInstance().GetDmListenerPkgName(remote);
-    LOGI("AppDeathRecipient: OnRemoteDied for %{public}s", processInfo.pkgName.c_str());
+    LOGI("AppDeathRecipient: for %{public}s", processInfo.pkgName.c_str());
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
     DeviceManagerServiceNotify::GetInstance().ClearDiedProcessCallback(processInfo);

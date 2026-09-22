@@ -379,7 +379,7 @@ napi_value DeviceManagerNapiFailToSupport::Constructor(napi_env env, napi_callba
         return nullptr;
     }
 
-    LOGI("Create for packageName:%{public}s", bundleName.c_str());
+    LOGI("pkgName:%{public}s", bundleName.c_str());
     DeviceManagerNapiFailToSupport *obj = new DeviceManagerNapiFailToSupport(env, thisVar);
     if (obj == nullptr) {
         return nullptr;
@@ -463,7 +463,7 @@ napi_value DeviceManagerNapiFailToSupport::Init(napi_env env, napi_value exports
 
 static napi_value Export(napi_env env, napi_value exports)
 {
-    LOGI("Export() is called!");
+    LOGI("In");
     DeviceManagerNapiFailToSupport::Init(env, exports);
     return exports;
 }
@@ -478,6 +478,6 @@ static napi_module g_dmModule = {.nm_version = 1,
 
 extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
-    LOGI("RegisterModule() is called!");
+    LOGI("In");
     napi_module_register(&g_dmModule);
 }

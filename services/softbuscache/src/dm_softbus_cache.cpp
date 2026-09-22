@@ -29,7 +29,7 @@ DmDeviceInfo localDeviceInfo_;
 ffrt::mutex localDevInfoMutex_;
 void SoftbusCache::SaveLocalDeviceInfo()
 {
-    LOGI("start");
+    LOGI("In");
     std::lock_guard<ffrt::mutex> mutexLock(localDevInfoMutex_);
     if (g_online) {
         return;
@@ -104,7 +104,7 @@ int32_t SoftbusCache::GetUdidByNetworkId(const char *networkId, std::string &udi
     uint8_t mUdid[UDID_BUF_LEN] = {0};
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UDID, mUdid, sizeof(mUdid));
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %{public}d.", ret);
+        LOGE("error, ret: %{public}d", ret);
         return ret;
     }
     udid = reinterpret_cast<char *>(mUdid);
@@ -116,7 +116,7 @@ int32_t SoftbusCache::GetUuidByNetworkId(const char *networkId, std::string &uui
     uint8_t mUuid[UUID_BUF_LEN] = {0};
     int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_UUID, mUuid, sizeof(mUuid));
     if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo failed, ret: %{public}d.", ret);
+        LOGE("error, ret: %{public}d", ret);
         return ret;
     }
     uuid = reinterpret_cast<char *>(mUuid);
@@ -125,7 +125,7 @@ int32_t SoftbusCache::GetUuidByNetworkId(const char *networkId, std::string &uui
 
 void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
 {
-    LOGI("start");
+    LOGI("In");
     std::string udid = "";
     std::string uuid = "";
     if (deviceInfo.networkId[0] == '\0') {
@@ -151,18 +151,17 @@ void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
     std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
     CHECK_SIZE_VOID(deviceInfo_);
     deviceInfo_[udid] = std::pair<std::string, DmDeviceInfo>(uuid, deviceInfo);
-    LOGI("success udid %{public}s, networkId %{public}s",
-        GetAnonyString(udid).c_str(), GetAnonyString(std::string(deviceInfo.networkId)).c_str());
+    LOGI("udid %{public}s, networkId %{public}s", GetAnonyString(udid).c_str(),
+        GetAnonyString(std::string(deviceInfo.networkId)).c_str());
 }
 
 void SoftbusCache::DeleteDeviceInfo(const DmDeviceInfo &nodeInfo)
 {
-    LOGI("networkId %{public}s",
-        GetAnonyString(std::string(nodeInfo.networkId)).c_str());
+    LOGI("networkId %{public}s", GetAnonyString(std::string(nodeInfo.networkId)).c_str());
     std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
     for (const auto &item : deviceInfo_) {
         if (std::string(item.second.second.networkId) == std::string(nodeInfo.networkId)) {
-            LOGI("success udid %{public}s", GetAnonyString(item.first).c_str());
+            LOGI("udid %{public}s", GetAnonyString(item.first).c_str());
             deviceInfo_.erase(item.first);
             break;
         }
@@ -177,7 +176,7 @@ void SoftbusCache::DeleteDeviceInfo()
 
 void SoftbusCache::ChangeDeviceInfo(const DmDeviceInfo deviceInfo)
 {
-    LOGI("start");
+    LOGI("In");
     std::string udid = "";
     GetUdidByNetworkId(deviceInfo.networkId, udid);
     std::lock_guard<ffrt::mutex> mutexLock(deviceInfosMutex_);
@@ -197,8 +196,8 @@ void SoftbusCache::ChangeDeviceInfo(const DmDeviceInfo deviceInfo)
         GetUuidByNetworkId(deviceInfo.networkId, uuid);
         deviceInfo_[udid].first = uuid;
     }
-    LOGI("sucess udid %{public}s, networkId %{public}s.",
-        GetAnonyString(udid).c_str(), GetAnonyString(std::string(deviceInfo.networkId)).c_str());
+    LOGI("udid %{public}s, networkId %{public}s", GetAnonyString(udid).c_str(),
+        GetAnonyString(std::string(deviceInfo.networkId)).c_str());
 }
 
 int32_t SoftbusCache::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList)
@@ -272,15 +271,15 @@ int32_t SoftbusCache::GetUdidFromCache(const char *networkId, std::string &udid)
     for (const auto &item : deviceInfo_) {
         if (std::string(item.second.second.networkId) == std::string(networkId)) {
             udid = item.first;
-            LOGI("Get udid from cache success, networkId %{public}s, udid %{public}s.",
+            LOGI("cache, networkId %{public}s, udid %{public}s",
                 GetAnonyString(std::string(networkId)).c_str(), GetAnonyString(udid).c_str());
             return DM_OK;
         }
     }
     int32_t ret = GetUdidByNetworkId(networkId, udid);
     if (ret == DM_OK) {
-        LOGI("Get udid from bus success, networkId %{public}s, udid %{public}s.",
-            GetAnonyString(std::string(networkId)).c_str(), GetAnonyString(udid).c_str());
+        LOGI("bus, networkId %{public}s, udid %{public}s", GetAnonyString(std::string(networkId)).c_str(),
+            GetAnonyString(udid).c_str());
         return DM_OK;
     }
     return ret;
@@ -292,15 +291,15 @@ int32_t SoftbusCache::GetUuidFromCache(const char *networkId, std::string &uuid)
     for (const auto &item : deviceInfo_) {
         if (std::string(item.second.second.networkId) == std::string(networkId)) {
             uuid = item.second.first;
-            LOGI("Get uuid from cache success, networkId %{public}s, uuid %{public}s.",
+            LOGI("cache, networkId %{public}s, uuid %{public}s",
                 GetAnonyString(std::string(networkId)).c_str(), GetAnonyString(uuid).c_str());
             return DM_OK;
         }
     }
     int32_t ret = GetUuidByNetworkId(networkId, uuid);
     if (ret == DM_OK) {
-        LOGI("Get uuid from bus success, networkId %{public}s, uuid %{public}s.",
-            GetAnonyString(std::string(networkId)).c_str(), GetAnonyString(uuid).c_str());
+        LOGI("bus, networkId %{public}s, uuid %{public}s", GetAnonyString(std::string(networkId)).c_str(),
+            GetAnonyString(uuid).c_str());
         return DM_OK;
     }
     return ret;
@@ -366,8 +365,7 @@ int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &sec
     for (const auto &item : deviceSecurityLevel_) {
         if (item.first == std::string(networkId)) {
             securityLevel = item.second;
-            LOGI("Get dev level from cache success, networkId is %{public}s.",
-                GetAnonyString(std::string(networkId)).c_str());
+            LOGI("cache, networkId is %{public}s", GetAnonyString(std::string(networkId)).c_str());
             return DM_OK;
         }
     }
@@ -402,7 +400,7 @@ int32_t SoftbusCache::GetDevInfoByNetworkId(const std::string &networkId, DmDevi
         for (const auto &item : deviceInfo_) {
             if (std::string(item.second.second.networkId) == networkId) {
                 nodeInfo = item.second.second;
-                LOGI("success networkId %{public}s, udid %{public}s.",
+                LOGI("networkId %{public}s, udid %{public}s",
                     GetAnonyString(networkId).c_str(), GetAnonyString(item.first).c_str());
                 return DM_OK;
             }

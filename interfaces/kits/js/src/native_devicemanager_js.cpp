@@ -3569,7 +3569,7 @@ napi_value DeviceManagerNapi::InitSubscribeCapEnum(napi_env env, napi_value expo
  */
 static napi_value Export(napi_env env, napi_value exports)
 {
-    LOGI("Export() is called!");
+    LOGI("In");
     DeviceManagerNapi::Init(env, exports);
     DeviceManagerNapi::InitDeviceTypeEnum(env, exports);
     DeviceManagerNapi::InitDeviceStateChangeActionEnum(env, exports);
@@ -3596,6 +3596,6 @@ static napi_module g_dmModule = {.nm_version = 1,
  */
 extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
-    LOGI("RegisterModule() is called!");
+    LOGI("In");
     napi_module_register(&g_dmModule);
 }
