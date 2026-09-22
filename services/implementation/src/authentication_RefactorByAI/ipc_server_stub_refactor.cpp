@@ -1,0 +1,702 @@
+/*
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "ipc_server_stub_refactor.h"
+
+#include <cstdio>
+#include <unordered_set>
+
+#include "ipc_cmd_register.h"
+#include "ipc_skeleton.h"
+#include "kv_adapter_manager.h"
+#ifdef SUPPORT_MEMMGR
+#include "mem_mgr_client.h"
+#include "mem_mgr_proxy.h"
+#endif // SUPPORT_MEMMGR
+#include "system_ability_definition.h"
+#include "datetime_ex.h"
+#include "device_manager_service.h"
+#include "device_manager_service_notify.h"
+#include "device_name_manager.h"
+#include "dm_error_type.h"
+#include "dm_device_info.h"
+#include "ffrt.h"
+#include <unistd.h>
+#include <string>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include "dm_log.h"
+#include "multiple_user_connector.h"
+#include "permission_manager.h"
+#include "dm_crypto.h"
+
+#include "ipc_interface_code_3rd.h"
+
+namespace OHOS {
+namespace DistributedHardware {
+namespace {
+const std::unordered_set<int32_t> CLIENT_CODE { SERVER_DEVICE_STATE_NOTIFY, SERVER_DEVICE_FOUND, BIND_TARGET_RESULT,
+SERVER_DEVICE_DISCOVERY, SERVER_PUBLISH_FINISH, SERVER_AUTH_RESULT, SERVER_DEVICE_FA_NOTIFY, SERVER_CREDENTIAL_RESULT,
+SERVER_CREATE_PIN_HOLDER, SERVER_DESTROY_PIN_HOLDER, SERVER_CREATE_PIN_HOLDER_RESULT, SERVER_DESTROY_PIN_HOLDER_RESULT,
+SERVER_ON_PIN_HOLDER_EVENT, UNBIND_TARGET_RESULT, REMOTE_DEVICE_TRUST_CHANGE, SERVER_DEVICE_SCREEN_STATE_NOTIFY,
+SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, SINK_BIND_TARGET_RESULT, GET_DEVICE_PROFILE_INFO_LIST_RESULT,
+GET_DEVICE_ICON_INFO_RESULT, SET_LOCAL_DEVICE_NAME_RESULT, SET_REMOTE_DEVICE_NAME_RESULT, SERVICE_PUBLISH_RESULT,
+ON_AUTH_CODE_INVALID, SERVER_SERVICE_STATE_NOTIFY};
+
+const std::unordered_set<int32_t> CLIENT_CODE_3RD { INIT_DEVICE_MANAGER, UNINIT_DEVICE_MANAGER, IMPORT_PINCODE_3RD,
+    GENERATE_PINCODE_3RD, AUTH_PINCODE_3RD, AUTH_DEVICE_3RD, SAVE_TRUST_RELATION_3RD, QUERY_TRUST_RELATION_3RD,
+    DELETE_TRUST_RELATION_3RD, ON_AUTH_RESULT_3RD, AUTH_CREDENTIAL_3RD};
+
+constexpr const char* LIB_IPC_SERVICE_STUB_3RD_NAME = "libdevicemanager3rdservice.z.so";
+
+constexpr const char* RECLAIM_MEMMGR_FILE_MEM_FOR_DMTASK = "ReclaimMemmgrFileMemForDMTask";
+constexpr const char* START_DETECT_DEVICE_RISK_TASK = "StartDetectDeviceRiskTask";
+
+constexpr int32_t RECLAIM_WRITE_CONTENT = 1;
+}
+
+DM_IMPLEMENT_SINGLE_INSTANCE(IpcServerStub);
+
+const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(&IpcServerStub::GetInstance());
+constexpr int32_t DM_IPC_THREAD_NUM = 32;
+constexpr int32_t MAX_CALLBACK_NUM = 5000;
+constexpr int32_t RECLAIM_DELAY_TIME = 5 * 60 * 1000 * 1000;
+constexpr int32_t ECHO_COUNT = 2;
+
+IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, true)
+{
+    std::lock_guard<ffrt::mutex> autoLock(registerLock_);
+    registerToService_ = false;
+    state_ = ServiceRunningState::STATE_NOT_START;
+}
+
+IpcServerStub::~IpcServerStub()
+{
+    Unload3rdService();
+}
+
+void IpcServerStub::Unload3rdService()
+{
+    std::lock_guard<ffrt::mutex> lock(ipcServiceStub3rdLoadLock_);
+    if (ipcServiceStub3rdSoHandle_ != nullptr) {
+        dlclose(ipcServiceStub3rdSoHandle_);
+        ipcServiceStub3rdSoHandle_ = nullptr;
+    }
+    ipcServiceStub3rd_.reset();
+    ipcServiceStub3rdSoLoaded_ = false;
+}
+
+void IpcServerStub::OnStart()
+{
+    startBeginTime_ = GetTickCount();
+    LOGI("start");
+    {
+        std::lock_guard<ffrt::mutex> autoLock(registerLock_);
+        if (state_ == ServiceRunningState::STATE_RUNNING) {
+            LOGI("IpcServerStub has already started.");
+            return;
+        }
+    }
+
+    IPCSkeleton::SetMaxWorkThreadNum(DM_IPC_THREAD_NUM);
+
+    LOGI("AddAbilityListener begin");
+    AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
+#ifdef SUPPORT_MEMMGR
+    AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
+#endif // SUPPORT_MEMMGR
+    AddSystemAbilityListener(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN);
+    AddSystemAbilityListener(SCREENLOCK_SERVICE_ID);
+    AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
+    LOGI("AddAbilityListener end");
+    AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    AddSystemAbilityListener(DEVICE_AUTH_SERVICE_ID);
+    AddSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);
+    AddSystemAbilityListener(RISK_ANALYSIS_MANAGER_SA_ID);
+    DeviceManagerService::GetInstance().SubscribePackageCommonEvent();
+}
+
+void IpcServerStub::ReclaimMemmgrFileMemForDM()
+{
+    int32_t memmgrPid = getpid();
+    if (memmgrPid <= 0) {
+        LOGE("Get invalid pid : %{public}d.", memmgrPid);
+        return;
+    }
+
+    for (int32_t i = 0; i < ECHO_COUNT; ++i) {
+        std::string path = JoinPath("/proc/", std::to_string(memmgrPid), "reclaim");
+        int fd = open(path.c_str(), O_WRONLY | O_CLOEXEC);
+        if (fd < 0) {
+            LOGE("open file failed, errno: %{public}d.", errno);
+            return;
+        }
+        const char content = static_cast<char>(RECLAIM_WRITE_CONTENT + '0');
+        ssize_t writeRet = write(fd, &content, sizeof(content));
+        if (writeRet != sizeof(content)) {
+            LOGE("write failed, errno: %{public}d.", errno);
+        }
+        if (close(fd) != 0) {
+            LOGE("close failed, errno: %{public}d.", errno);
+        }
+    }
+    LOGI("success.");
+}
+
+std::string IpcServerStub::AddDelimiter(const std::string &path)
+{
+    if (path.empty()) {
+        return path;
+    }
+    if (path.rfind("/") != path.size() - 1) {
+        return path + "/";
+    }
+    return path;
+}
+
+std::string IpcServerStub::JoinPath(const std::string &prefixPath, const std::string &subPath)
+{
+    return AddDelimiter(prefixPath) + subPath;
+}
+
+std::string IpcServerStub::JoinPath(const std::string &prefixPath, const std::string &midPath,
+    const std::string &subPath)
+{
+    return JoinPath(JoinPath(prefixPath, midPath), subPath);
+}
+
+void IpcServerStub::HandleSoftBusServerAdd()
+{
+    DeviceManagerService::GetInstance().InitSoftbusListener();
+    if (!Init()) {
+        LOGE("failed to init IpcServerStub");
+        std::lock_guard<ffrt::mutex> autoLock(registerLock_);
+        state_ = ServiceRunningState::STATE_NOT_START;
+        return;
+    }
+    {
+        std::lock_guard<ffrt::mutex> autoLock(registerLock_);
+        state_ = ServiceRunningState::STATE_RUNNING;
+    }
+    DeviceNameManager::GetInstance().InitDeviceNameWhenSoftBusReady();
+    ReclaimMemmgrFileMemForDM();
+    std::function<void()> task = [this]() {
+        LOGI("After 5mins.");
+        ReclaimMemmgrFileMemForDM();
+    };
+    DeviceManagerService::GetInstance().HandleSoftbusRestart();
+    ffrt::submit(task, ffrt::task_attr().name(RECLAIM_MEMMGR_FILE_MEM_FOR_DMTASK).delay(RECLAIM_DELAY_TIME));
+}
+
+void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+{
+    LOGI("systemAbilityId:%{public}d added!", systemAbilityId);
+    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
+        HandleSoftBusServerAdd();
+        return;
+    }
+
+#ifdef SUPPORT_MEMMGR
+    if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
+        int pid = getpid();
+        Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 1, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+        return;
+    }
+#endif // SUPPORT_MEMMGR
+
+    if (systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
+        DMAccountInfo dmAccountInfo = MultipleUserConnector::GetCurrentDMAccountInfo();
+        MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(),
+            dmAccountInfo.subProfileId, dmAccountInfo);
+        DeviceManagerService::GetInstance().InitAccountInfo();
+        return;
+    }
+
+    if (systemAbilityId == SCREENLOCK_SERVICE_ID) {
+        DeviceManagerService::GetInstance().InitScreenLockEvent();
+        return;
+    }
+
+    if (systemAbilityId == DEVICE_AUTH_SERVICE_ID) {
+        DeviceManagerService::GetInstance().InitHichainListener();
+        return;
+    }
+    if (systemAbilityId == ACCESS_TOKEN_MANAGER_SERVICE_ID) {
+        DeviceManagerService::GetInstance().InitHichainListener();
+        return;
+    }
+    if (systemAbilityId == RISK_ANALYSIS_MANAGER_SA_ID) {
+        ffrt::submit([=]() { DeviceManagerService::GetInstance().StartDetectDeviceRisk(); },
+            ffrt::task_attr().name(START_DETECT_DEVICE_RISK_TASK));
+        return;
+    }
+}
+
+void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+{
+    LOGI("systemAbilityId:%{public}d removed!", systemAbilityId);
+    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
+        DeviceManagerService::GetInstance().UninitSoftbusListener();
+        DeviceManagerService::GetInstance().HandleServiceStatusChange(DmDeviceState::DEVICE_STATE_OFFLINE, deviceId);
+    }
+}
+
+bool IpcServerStub::Init()
+{
+    LOGI("ready to init.");
+    KVAdapterManager::GetInstance().Init();
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    std::lock_guard<ffrt::mutex> autoLock(registerLock_);
+    if (!registerToService_) {
+        bool ret = Publish(this);
+        LOGI("Publish, cost %{public}" PRId64 " ms", GetTickCount() -  startBeginTime_);
+        if (!ret) {
+            LOGE("Publish failed!");
+            return false;
+        }
+        registerToService_ = true;
+    }
+    return true;
+}
+
+void IpcServerStub::OnStop()
+{
+    LOGI("ready to stop service.");
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
+    {
+        std::lock_guard<ffrt::mutex> autoLock(registerLock_);
+        if (state_ == ServiceRunningState::STATE_NOT_START) {
+            LOGI("Service already stopped.");
+            return;
+        }
+        state_ = ServiceRunningState::STATE_NOT_START;
+        registerToService_ = false;
+    }
+#ifdef SUPPORT_MEMMGR
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 0, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+#endif // SUPPORT_MEMMGR
+    LOGI("end.");
+}
+
+bool IpcServerStub::IsIpcServiceStub3rdReady()
+{
+    std::lock_guard<ffrt::mutex> lock(ipcServiceStub3rdLoadLock_);
+    if (ipcServiceStub3rdSoLoaded_ && (ipcServiceStub3rd_ != nullptr)) {
+        return true;
+    }
+    LOGI("libdevicemanager3rdservice start load.");
+    ipcServiceStub3rdSoHandle_ = dlopen(LIB_IPC_SERVICE_STUB_3RD_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (ipcServiceStub3rdSoHandle_ == nullptr) {
+        ipcServiceStub3rdSoHandle_ = dlopen(LIB_IPC_SERVICE_STUB_3RD_NAME, RTLD_NOW | RTLD_NODELETE);
+    }
+    if (ipcServiceStub3rdSoHandle_ == nullptr) {
+        LOGE("load libdevicemanager3rdservice so failed, errMsg: %{public}s.", dlerror());
+        return false;
+    }
+    dlerror();
+    auto func = (CreateIpcServiceStub3rdFuncPtr)dlsym(ipcServiceStub3rdSoHandle_, "CreateIpcServiceStub3rdObject");
+    if (dlerror() != nullptr || func == nullptr) {
+        dlclose(ipcServiceStub3rdSoHandle_);
+        ipcServiceStub3rdSoHandle_ = nullptr;
+        LOGE("Create object function is not exist.");
+        return false;
+    }
+
+    ipcServiceStub3rd_ = std::shared_ptr<IIpcServiceStub3rd>(func());
+    ipcServiceStub3rdSoLoaded_ = true;
+    LOGI("Success.");
+    return true;
+}
+
+int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (CLIENT_CODE_3RD.find(code) != CLIENT_CODE_3RD.end()) {
+        LOGI("CLIENT_CODE_3RD, code: %{public}d", code);
+        if (IsIpcServiceStub3rdReady()) {
+            return ipcServiceStub3rd_->OnRemoteRequest(code, data, reply, option);
+        }
+        LOGE("isload3rdSo failed");
+        return ERR_DM_FAILED;
+    }
+
+    if (CLIENT_CODE.find(code) != CLIENT_CODE.end()) {
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    }
+    auto remoteDescriptor = data.ReadInterfaceToken();
+    if (GetDescriptor() != remoteDescriptor) {
+        LOGI("ReadInterfaceToken fail!");
+        return ERR_DM_IPC_READ_FAILED;
+    }
+    int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd(static_cast<int32_t>(code), data, reply);
+    if (ret == ERR_DM_UNSUPPORTED_IPC_COMMAND) {
+        LOGW("unsupported code: %{public}d", code);
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    }
+    return ret;
+}
+
+int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
+        LOGE("Invalid para, cmdCode: %{public}d", cmdCode);
+        return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
+    }
+
+    if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data) != DM_OK) {
+        LOGE("set request cmd failed");
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    int32_t ret = IpcCmdRegister::GetInstance().OnIpcCmd(cmdCode, data, reply);
+    if (ret == ERR_DM_UNSUPPORTED_IPC_COMMAND) {
+        LOGW("unsupported code: %{public}d", cmdCode);
+        return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
+    }
+    return IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
+}
+
+ServiceRunningState IpcServerStub::QueryServiceState() const
+{
+    return state_;
+}
+
+bool IpcServerStub::IsValidProcessInfo(const ProcessInfo &processInfo) const
+{
+    if (processInfo.pkgName.empty()) {
+        return false;
+    }
+    if (processInfo.pkgName.length() > MAX_PKGNAME_LENGTH) {
+        return false;
+    }
+    return true;
+}
+
+void IpcServerStub::CleanupDeathRecipient(const ProcessInfo &processInfo)
+{
+    auto recipientIter = appRecipient_.find(processInfo);
+    if (recipientIter == appRecipient_.end()) {
+        return;
+    }
+    auto listenerIter = dmListener_.find(processInfo);
+    if (listenerIter != dmListener_.end()) {
+        listenerIter->second->AsObject()->RemoveDeathRecipient(recipientIter->second);
+    }
+    appRecipient_.erase(processInfo);
+}
+
+int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processInfo, sptr<IpcRemoteBroker> listener)
+{
+    if (!IsValidProcessInfo(processInfo) || listener == nullptr) {
+        LOGE("input parameter invalid.");
+        return ERR_DM_POINT_NULL;
+    }
+    LOGI("Register listener.");
+#ifdef SUPPORT_MEMMGR
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+#endif // SUPPORT_MEMMGR
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
+    auto iter = dmListener_.find(processInfo);
+    if (iter != dmListener_.end()) {
+        LOGI("Listener already exists, cleaning up old entry.");
+        CleanupDeathRecipient(processInfo);
+        dmListener_.erase(processInfo);
+    }
+    sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
+    LOGI("Add death recipient.");
+    if (!listener->AsObject()->AddDeathRecipient(appRecipient)) {
+        LOGE("AddDeathRecipient Failed");
+    }
+    if (dmListener_.size() > MAX_CALLBACK_NUM || appRecipient_.size() > MAX_CALLBACK_NUM) {
+        LOGE("dmListener_ or appRecipient_ size exceed the limit!");
+        return ERR_DM_FAILED;
+    }
+    dmListener_[processInfo] = listener;
+    appRecipient_[processInfo] = appRecipient;
+    AddSystemSA(processInfo.pkgName);
+    LOGI("complete.");
+    return DM_OK;
+}
+
+int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &processInfo)
+{
+    if (!IsValidProcessInfo(processInfo)) {
+        LOGE("Invalid parameter, processInfo invalid.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Unregister listener.");
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
+    auto listenerIter = dmListener_.find(processInfo);
+    if (listenerIter == dmListener_.end()) {
+        LOGI("Listener not exists");
+        return DM_OK;
+    }
+    auto recipientIter = appRecipient_.find(processInfo);
+    if (recipientIter == appRecipient_.end()) {
+        LOGI("AppRecipient not exists");
+        dmListener_.erase(processInfo);
+        return DM_OK;
+    }
+    auto listener = listenerIter->second;
+    auto appRecipient = recipientIter->second;
+    listener->AsObject()->RemoveDeathRecipient(appRecipient);
+    appRecipient_.erase(processInfo);
+    dmListener_.erase(processInfo);
+#ifdef SUPPORT_MEMMGR
+    if (dmListener_.size() == 0) {
+        int pid = getpid();
+        Memory::MemMgrClient::GetInstance().SetCritical(pid, false, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    }
+#endif // SUPPORT_MEMMGR
+    DeviceManagerService::GetInstance().RemoveNotifyRecord(processInfo);
+    RemoveSystemSA(processInfo.pkgName);
+    return DM_OK;
+}
+
+std::vector<ProcessInfo> IpcServerStub::GetAllProcessInfo()
+{
+    std::vector<ProcessInfo> processInfoVec;
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
+    for (const auto &iter : dmListener_) {
+        processInfoVec.push_back(iter.first);
+    }
+    return processInfoVec;
+}
+
+#ifdef CAR_DEVICE_ENABLE
+const sptr<IpcRemoteBroker> IpcServerStub::GetListenerByProcessInfo(ProcessInfo processInfo) const
+{
+    if (!IsValidProcessInfo(processInfo)) {
+        LOGE("Invalid parameter, processInfo invalid.");
+        return nullptr;
+    }
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
+    for (auto &iter : dmListener_) {
+        if ((iter.first.tokenId == processInfo.tokenId || processInfo.tokenId == 0) &&
+            iter.first.pkgName == processInfo.pkgName) {
+            return iter.second;
+        }
+    }
+    return nullptr;
+}
+#endif
+
+const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(ProcessInfo processInfo) const
+{
+    if (!IsValidProcessInfo(processInfo)) {
+        LOGE("Invalid parameter, processInfo invalid.");
+        return nullptr;
+    }
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
+    for (auto &iter : dmListener_) {
+        if (iter.first == processInfo) {
+            return iter.second;
+        }
+    }
+    return nullptr;
+}
+
+const ProcessInfo IpcServerStub::GetDmListenerPkgName(const wptr<IRemoteObject> &remote) const
+{
+    ProcessInfo processInfo;
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
+    for (const auto &iter : dmListener_) {
+        if ((iter.second)->AsObject() == remote.promote()) {
+            processInfo = iter.first;
+            break;
+        }
+    }
+    return processInfo;
+}
+
+int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
+{
+    LOGI("start.");
+    if (fd < 0 || fd > MAX_DUMP_FD) {
+        LOGE("Invalid fd: %{public}d", fd);
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::vector<std::string> argsStr {};
+    for (const auto &item : args) {
+        argsStr.emplace_back(Str16ToStr8(item));
+    }
+
+    std::string result("");
+    int ret = DeviceManagerService::GetInstance().DmHiDumper(argsStr, result);
+    if (ret != DM_OK) {
+        LOGE("DmHiDumper ret = %{public}d", ret);
+    }
+
+    ret = dprintf(fd, "%s\n", result.c_str());
+    if (ret < 0) {
+        LOGE("HiDumper dprintf error, errno: %{public}d.", errno);
+        ret = ERR_DM_FAILED;
+    }
+    return ret;
+}
+
+void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    ProcessInfo processInfo = IpcServerStub::GetInstance().GetDmListenerPkgName(remote);
+    LOGI("AppDeathRecipient: OnRemoteDied");
+    IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
+    DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
+    DeviceManagerServiceNotify::GetInstance().ClearDiedProcessCallback(processInfo);
+    DeviceManagerService::GetInstance().ClearPublishIdCache(processInfo);
+    DeviceManagerService::GetInstance().UnRegisterCallerAppId(processInfo.pkgName, processInfo.userId);
+    DeviceManagerService::GetInstance().ClearServiceStateCallback(processInfo.pkgName, processInfo.userId);
+    DeviceManagerService::GetInstance().HandleRemoteDied(processInfo);
+}
+
+void IpcServerStub::AddSystemSA(const std::string &pkgName)
+{
+    std::lock_guard<ffrt::mutex> autoLock(systemSALock_);
+    if (PermissionManager::GetInstance().CheckSystemSA(pkgName)) {
+        systemSA_.insert(pkgName);
+    }
+}
+
+void IpcServerStub::RemoveSystemSA(const std::string &pkgName)
+{
+    std::lock_guard<ffrt::mutex> autoLock(systemSALock_);
+    if (PermissionManager::GetInstance().CheckSystemSA(pkgName) || systemSA_.find(pkgName) != systemSA_.end()) {
+        systemSA_.erase(pkgName);
+    }
+}
+
+std::set<std::string> IpcServerStub::GetSystemSA()
+{
+    std::lock_guard<ffrt::mutex> autoLock(systemSALock_);
+    std::set<std::string> systemSA;
+    for (const auto &item : systemSA_) {
+        systemSA.insert(item);
+    }
+    return systemSA;
+}
+
+int IpcServerStub::OnAuth3rdAclSessionOpened(int sessionId, int result)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        return ipcServiceStub3rd_->OnAuth3rdAclSessionOpened(sessionId, result);
+    }
+    LOGE("isload3rdSo failed");
+    return ERR_DM_FAILED;
+}
+
+void IpcServerStub::OnAuth3rdAclSessionClosed(int sessionId)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        ipcServiceStub3rd_->OnAuth3rdAclSessionClosed(sessionId);
+        return;
+    }
+    LOGE("isload3rdSo failed");
+}
+
+void IpcServerStub::OnAuth3rdAclBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+    if (data == nullptr || dataLen == 0) {
+        LOGE("Invalid data or dataLen.");
+        return;
+    }
+    if (IsIpcServiceStub3rdReady()) {
+        ipcServiceStub3rd_->OnAuth3rdAclBytesReceived(sessionId, data, dataLen);
+        return;
+    }
+    LOGE("isload3rdSo failed");
+}
+
+int IpcServerStub::OnAuth3rdSessionOpened(int sessionId, int result)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        return ipcServiceStub3rd_->OnAuth3rdSessionOpened(sessionId, result);
+    }
+    LOGE("isload3rdSo failed");
+    return ERR_DM_FAILED;
+}
+
+void IpcServerStub::OnAuth3rdSessionClosed(int sessionId)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        ipcServiceStub3rd_->OnAuth3rdSessionClosed(sessionId);
+        return;
+    }
+    LOGE("isload3rdSo failed");
+}
+
+void IpcServerStub::OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+    if (data == nullptr || dataLen == 0) {
+        LOGE("Invalid data or dataLen.");
+        return;
+    }
+    if (IsIpcServiceStub3rdReady()) {
+        ipcServiceStub3rd_->OnAuth3rdBytesReceived(sessionId, data, dataLen);
+        return;
+    }
+    LOGE("isload3rdSo failed");
+}
+
+int IpcServerStub::OnAuthCred3rdSessionOpened(int sessionId, int result)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        return ipcServiceStub3rd_->OnAuthCred3rdSessionOpened(sessionId, result);
+    }
+    LOGE("isload3rdSo failed");
+    return ERR_DM_FAILED;
+}
+
+void IpcServerStub::OnAuthCred3rdSessionClosed(int sessionId)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        ipcServiceStub3rd_->OnAuthCred3rdSessionClosed(sessionId);
+        return;
+    }
+    LOGE("isload3rdSo failed");
+}
+
+void IpcServerStub::OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen)
+{
+    if (data == nullptr || dataLen == 0) {
+        LOGE("Invalid data or dataLen.");
+        return;
+    }
+    if (IsIpcServiceStub3rdReady()) {
+        ipcServiceStub3rd_->OnAuthCred3rdBytesReceived(sessionId, data, dataLen);
+        return;
+    }
+    LOGE("isload3rdSo failed");
+}
+
+int32_t IpcServerStub::HandleUserRemoved(int32_t removedUserId)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        return ipcServiceStub3rd_->HandleUserRemoved(removedUserId);
+    }
+    return ERR_DM_FAILED;
+}
+
+int32_t IpcServerStub::HandleAccountLogoutEvent(int32_t userId, const std::string &accountId)
+{
+    if (IsIpcServiceStub3rdReady()) {
+        return ipcServiceStub3rd_->HandleAccountLogoutEvent(userId, accountId);
+    }
+    return ERR_DM_FAILED;
+}
+} // namespace DistributedHardware
+} // namespace OHOS
