@@ -384,7 +384,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
         }
     }
     sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
-    LOGI("Add death recipient.");
+    LOGD("Add death recipient.");
     if (!listener->AsObject()->AddDeathRecipient(appRecipient)) {
         LOGE("AddDeathRecipient Failed");
     }

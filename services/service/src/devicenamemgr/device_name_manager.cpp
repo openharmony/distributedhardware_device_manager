@@ -612,13 +612,13 @@ int32_t DeviceNameManager::GetValue(const std::string &tableName, int32_t userId
     auto resultSet = helper->Query(uri, predicates, columns);
     ReleaseDataShareHelper(helper);
     if (resultSet == nullptr) {
-        LOGE("Query failed key=%{public}s, proxyUri=%{public}s", key.c_str(), proxyUri.c_str());
+        LOGE("Query failed key=%{public}s, proxyUri=%{public}s", key.c_str(), GetAnonyString(proxyUri).c_str());
         return ERR_DM_POINT_NULL;
     }
     int32_t count = 0;
     resultSet->GetRowCount(count);
     if (count == 0) {
-        LOGW("no value, key=%{public}s, proxyUri=%{public}s", key.c_str(), proxyUri.c_str());
+        LOGW("no value, key=%{public}s, proxyUri=%{public}s", key.c_str(), GetAnonyString(proxyUri).c_str());
         resultSet->Close();
         return DM_OK;
     }
@@ -626,12 +626,12 @@ int32_t DeviceNameManager::GetValue(const std::string &tableName, int32_t userId
     resultSet->GoToRow(index);
     int32_t ret = resultSet->GetString(index, value);
     if (ret != DataShare::E_OK) {
-        LOGE("get value failed, ret=%{public}d, proxyUri=%{public}s", ret, proxyUri.c_str());
+        LOGE("get value failed, ret=%{public}d, proxyUri=%{public}s", ret, GetAnonyString(proxyUri).c_str());
         resultSet->Close();
         return ret;
     }
     resultSet->Close();
-    LOGI("proxyUri=%{public}s, value=%{public}s", proxyUri.c_str(), GetAnonyString(value).c_str());
+    LOGI("value=%{public}s", GetAnonyString(value).c_str());
     return DM_OK;
 }
 

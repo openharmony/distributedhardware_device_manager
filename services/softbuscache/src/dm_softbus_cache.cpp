@@ -279,8 +279,8 @@ int32_t SoftbusCache::GetUdidFromCache(const char *networkId, std::string &udid)
     }
     int32_t ret = GetUdidByNetworkId(networkId, udid);
     if (ret == DM_OK) {
-        LOGI("Get udid from bus success, networkId %{public}s, udid %{public}s.",
-            GetAnonyString(std::string(networkId)).c_str(), GetAnonyString(udid).c_str());
+        LOGI("networkId %{public}s, udid %{public}s.", GetAnonyString(std::string(networkId)).c_str(),
+            GetAnonyString(udid).c_str());
         return DM_OK;
     }
     return ret;

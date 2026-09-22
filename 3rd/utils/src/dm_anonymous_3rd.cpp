@@ -109,7 +109,7 @@ bool IsString(const JsonItemObject &jsonObj, const std::string &key)
     bool res = (jsonObj.Contains(key) && jsonObj[key].IsString()
         && jsonObj[key].Get<std::string>().size() <= MAX_MESSAGE_LEN);
     if (!res) {
-        LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
+        LOGE("key:%{public}s invalid", key.c_str());
     }
     return res;
 }
@@ -119,7 +119,7 @@ bool IsInt32(const JsonItemObject &jsonObj, const std::string &key)
     bool res = jsonObj.Contains(key) && jsonObj[key].IsNumberInteger() && jsonObj[key].Get<int64_t>() >= INT32_MIN &&
         jsonObj[key].Get<int64_t>() <= INT32_MAX;
     if (!res) {
-        LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
+        LOGE("key:%{public}s invalid", key.c_str());
     }
     return res;
 }
@@ -128,7 +128,7 @@ bool IsBool(const JsonItemObject &jsonObj, const std::string &key)
 {
     bool res = jsonObj.Contains(key) && jsonObj[key].IsBoolean();
     if (!res) {
-        LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
+        LOGE("key:%{public}s invalid", key.c_str());
     }
     return res;
 }
@@ -138,7 +138,7 @@ bool IsInt64(const JsonItemObject &jsonObj, const std::string &key)
     bool res = jsonObj.Contains(key) && jsonObj[key].IsNumberInteger() && jsonObj[key].Get<int64_t>() >= INT64_MIN &&
         jsonObj[key].Get<int64_t>() <= INT64_MAX;
     if (!res) {
-        LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
+        LOGE("key:%{public}s invalid", key.c_str());
     }
     return res;
 }
@@ -185,7 +185,7 @@ bool IsUint64(const JsonItemObject &jsonObj, const std::string &key)
     bool res = jsonObj.Contains(key) && jsonObj[key].IsNumberInteger() && jsonObj[key].Get<uint64_t>() >= 0 &&
         jsonObj[key].Get<uint64_t>() <= UINT64_MAX;
     if (!res) {
-        LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
+        LOGE("key:%{public}s invalid", key.c_str());
     }
     return res;
 }
@@ -195,7 +195,7 @@ bool IsUint32(const JsonItemObject &jsonObj, const std::string &key)
     bool res = jsonObj.Contains(key) && jsonObj[key].IsNumberInteger() && jsonObj[key].Get<int64_t>() >= 0 &&
         jsonObj[key].Get<int64_t>() <= UINT32_MAX;
     if (!res) {
-        LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
+        LOGE("key:%{public}s invalid", key.c_str());
     }
     return res;
 }
@@ -205,7 +205,7 @@ bool IsUint8(const JsonItemObject &jsonObj, const std::string &key)
     bool res = jsonObj.Contains(key) && jsonObj[key].IsNumberInteger() && jsonObj[key].Get<int64_t>() >= 0 &&
         jsonObj[key].Get<int64_t>() <= UINT8_MAX;
     if (!res) {
-        LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
+        LOGE("key:%{public}s invalid", key.c_str());
     }
     return res;
 }
