@@ -1,0 +1,829 @@
+/*
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "device_name_manager_refactor.h"
+
+#include "iservice_registry.h"
+#include "multiple_user_connector.h"
+#include "system_ability_definition.h"
+#include "device_manager_service.h"
+#include "dm_anonymous.h"
+#include "dm_constants.h"
+#include "parameter.h"
+
+namespace OHOS {
+namespace DistributedHardware {
+namespace {
+constexpr int32_t USERID_HELPER_NUMBER = 100;
+constexpr int32_t USERID_MIN_VALID = 0;
+const std::string SETTING_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/";
+const std::string SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
+const std::string URI_PROXY_SUFFIX = "?Proxy=true";
+const std::string SETTINGSDATA_GLOBAL = "SETTINGSDATA";
+const std::string SETTINGS_GENERAL_DEVICE_NAME = "settings.general.device_name";
+const std::string SETTINGSDATA_SYSTEM = "USER_SETTINGSDATA_";
+const std::string SETTINGSDATA_SECURE = "USER_SETTINGSDATA_SECURE_";
+const std::string DISPLAY_DEVICE_NAME = "display_device_name";
+const std::string SETTINGS_GENERAL_DISPLAY_DEVICE_NAME = "settings.general." + DISPLAY_DEVICE_NAME;
+const std::string USER_DEFINED_DEVICE_NAME = "user_defined_device_name";
+const std::string SETTINGS_GENERAL_USER_DEFINED_DEVICE_NAME = "settings.general." + USER_DEFINED_DEVICE_NAME;
+const std::string SETTINGS_GENERAL_DISPLAY_DEVICE_NAME_STATE = "settings.general.display_device_name_state";
+const std::string SETTING_COLUMN_VALUE = "VALUE";
+const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
+constexpr int32_t NUM0 = 0;
+constexpr int32_t NUM1 = 1;
+constexpr int32_t NUM2 = 2;
+constexpr int32_t NUM3 = 3;
+constexpr int32_t NUM4 = 4;
+constexpr int32_t NUM6 = 6;
+constexpr int32_t NUM18 = 18;
+constexpr int32_t NUM21 = 21;
+constexpr int32_t NUM24 = 24;
+const std::string ANOY_STRING = "***";
+constexpr int32_t DEFAULT_DEVICE_NAME_MAX_LENGTH = 12;
+constexpr int32_t NAME_LENGTH_MIN = 18;
+constexpr int32_t NAME_LENGTH_MAX = 100;
+const std::string DEFAULT_CONCATENATION_CHARACTER = "...";
+const std::string NAME_SEPARATOR_ZH = "的";
+const std::string NAME_SEPARATOR_OTHER = "-";
+constexpr const char *SOFTBUS_NAME_RAW_JSON_KEY = "raw";
+constexpr const char *SOFTBUS_NAME_18_JSON_KEY = "name18";
+constexpr const char *SOFTBUS_NAME_21_JSON_KEY = "name21";
+constexpr const char *SOFTBUS_NAME_24_JSON_KEY = "name24";
+constexpr int32_t SYSPARA_SIZE = 128;
+constexpr const char *PERSIST_GLOBAL_LANGUAGE = "persist.global.language";
+constexpr const char *DEFAULT_LANGUAGE_KEY  = "const.global.language";
+const std::string LANGUAGE_ZH_HANS = "zh-Hans";
+constexpr const char *PERSIST_GLOBAL_LOCALE = "persist.global.locale";
+constexpr const char *DEFAULT_LOCALE_KEY = "const.global.locale";
+const std::string LOCAL_ZH_HANS_CN = "zh-Hans-CN";
+constexpr int32_t DEFAULT_USER_ID = -1;
+}
+
+DM_IMPLEMENT_SINGLE_INSTANCE(DeviceNameManagerRefactor);
+
+void DeviceNameManagerRefactor::DataShareReady()
+{
+    LOGI("In");
+    isDataShareReady_ = true;
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (!ValidateUserId(userId)) {
+        LOGE("userId invalid after data share ready");
+        return;
+    }
+    if (EnsureAccountSysReady(userId) && IsDependsReady()) {
+        InitDeviceName(userId);
+        RegisterDeviceNameChangeMonitor(userId, DEFAULT_USER_ID);
+    }
+}
+
+void DeviceNameManagerRefactor::AccountSysReady(int32_t userId)
+{
+    LOGI("In userId:%{public}d", userId);
+    if (!ValidateUserId(userId)) {
+        LOGE("invalid userId");
+        return;
+    }
+    isAccountSysReady_ = true;
+    if (IsDependsReady()) {
+        InitDeviceName(userId);
+    }
+}
+
+bool DeviceNameManagerRefactor::ValidateUserId(int32_t userId) const
+{
+    return userId != DEFAULT_USER_ID;
+}
+
+bool DeviceNameManagerRefactor::IsDependsReady() const
+{
+    if (!isDataShareReady_) {
+        LOGE("data share not ready");
+        return false;
+    }
+    if (!isAccountSysReady_) {
+        LOGE("Account system not ready");
+        return false;
+    }
+    if (GetRemoteObj() == nullptr) {
+        LOGE("dm sa not publish");
+        return false;
+    }
+    return true;
+}
+
+bool DeviceNameManagerRefactor::EnsureAccountSysReady(int32_t userId)
+{
+    if (isAccountSysReady_) {
+        return true;
+    }
+    if (MultipleUserConnector::GetCurrentAccountUserID() == DEFAULT_USER_ID) {
+        LOGE("Account system not ready");
+        return false;
+    }
+    isAccountSysReady_ = true;
+    return true;
+}
+
+int32_t DeviceNameManagerRefactor::InitDeviceNameWhenSoftBusReady()
+{
+    LOGI("In");
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (!ValidateUserId(userId)) {
+        LOGE("userId invalid");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (EnsureAccountSysReady(userId) && IsDependsReady()) {
+        InitDeviceName(userId);
+        RegisterDeviceNameChangeMonitor(userId, DEFAULT_USER_ID);
+    }
+    return DM_OK;
+}
+
+int32_t DeviceNameManagerRefactor::UnInit()
+{
+    {
+        std::lock_guard<ffrt::mutex> lock(remoteObjMtx_);
+        remoteObj_ = nullptr;
+    }
+    {
+        std::lock_guard<ffrt::mutex> lock(monitorMapMtx_);
+        monitorMap_.clear();
+    }
+    {
+        std::lock_guard<ffrt::mutex> lock(localMarketNameMtx_);
+        localMarketName_.clear();
+        localMarketNameInitialized_ = false;
+    }
+    isDataShareReady_ = false;
+    isAccountSysReady_ = false;
+    return DM_OK;
+}
+
+int32_t DeviceNameManagerRefactor::InitDeviceNameWhenUserSwitch(int32_t curUserId, int32_t preUserId)
+{
+    LOGI("In curUserId:%{public}d", curUserId);
+    if (!ValidateUserId(curUserId)) {
+        LOGE("invalid curUserId");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    isAccountSysReady_ = true;
+    if (IsDependsReady()) {
+        InitDeviceName(curUserId);
+        RegisterDeviceNameChangeMonitor(curUserId, preUserId);
+    }
+    return DM_OK;
+}
+
+int32_t DeviceNameManagerRefactor::InitDeviceNameWhenLogout()
+{
+    LOGI("In");
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (!ValidateUserId(userId)) {
+        LOGE("userId invalid after logout");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (IsDependsReady()) {
+        InitDeviceName(userId);
+    }
+    return DM_OK;
+}
+
+int32_t DeviceNameManagerRefactor::InitDeviceNameWhenLogin()
+{
+    LOGI("In");
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (!ValidateUserId(userId)) {
+        LOGE("userId invalid after login");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (IsDependsReady()) {
+        InitDeviceName(userId);
+    }
+    return DM_OK;
+}
+
+int32_t DeviceNameManagerRefactor::InitDeviceNameWhenNickChange()
+{
+    LOGI("In");
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (!ValidateUserId(userId)) {
+        LOGE("userId invalid after nick change");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (IsDependsReady()) {
+        InitDeviceName(userId);
+    }
+    return DM_OK;
+}
+
+int32_t DeviceNameManagerRefactor::InitDeviceNameWhenLanguageOrRegionChanged()
+{
+    LOGI("In");
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (!ValidateUserId(userId)) {
+        LOGE("userId invalid after language/region change");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (IsDependsReady()) {
+        InitDeviceName(userId);
+    }
+    return DM_OK;
+}
+
+std::string DeviceNameManagerRefactor::GetUserDefinedDeviceName()
+{
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::string userDefinedDeviceName;
+    GetUserDefinedDeviceName(userId, userDefinedDeviceName);
+    return userDefinedDeviceName;
+}
+
+int32_t DeviceNameManagerRefactor::InitDeviceNameWhenNameChange(int32_t userId)
+{
+    LOGI("In");
+    if (!ValidateUserId(userId)) {
+        LOGE("invalid userId");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (IsDependsReady()) {
+        InitDeviceName(userId);
+    }
+    return DM_OK;
+}
+
+void DeviceNameManagerRefactor::RegisterDeviceNameChangeMonitor(int32_t curUserId, int32_t preUserId)
+{
+    LOGI("In");
+    UnRegisterDeviceNameChangeMonitor(preUserId);
+    if (!ValidateUserId(curUserId)) {
+        LOGW("userId invalid");
+        return;
+    }
+    sptr<DeviceNameChangeMonitor> monitor = nullptr;
+    {
+        std::lock_guard<ffrt::mutex> lock(monitorMapMtx_);
+        auto iter = monitorMap_.find(curUserId);
+        if (iter != monitorMap_.end()) {
+            return;
+        }
+        monitor = sptr<DeviceNameChangeMonitor>(new DeviceNameChangeMonitor(curUserId));
+        if (monitor == nullptr) {
+            LOGE("monitor is nullptr");
+            return;
+        }
+        CHECK_SIZE_VOID(monitorMap_);
+        monitorMap_[curUserId] = monitor;
+    }
+    std::string proxyUri = GetProxyUriStr(SETTINGSDATA_SECURE, curUserId);
+    auto helper = CreateDataShareHelper(proxyUri);
+    if (helper == nullptr) {
+        LOGE("helper is nullptr");
+        {
+            std::lock_guard<ffrt::mutex> lock(monitorMapMtx_);
+            auto iter = monitorMap_.find(curUserId);
+            if (iter != monitorMap_.end()) {
+                monitorMap_.erase(iter);
+            }
+        }
+        return;
+    }
+    Uri uri = MakeUri(proxyUri, SETTINGS_GENERAL_USER_DEFINED_DEVICE_NAME);
+    helper->RegisterObserver(uri, monitor);
+    ReleaseDataShareHelper(helper);
+}
+
+void DeviceNameManagerRefactor::UnRegisterDeviceNameChangeMonitor(int32_t userId)
+{
+    LOGI("In");
+    if (!ValidateUserId(userId)) {
+        LOGW("userId invalid");
+        return;
+    }
+    sptr<DeviceNameChangeMonitor> monitor = nullptr;
+    {
+        std::lock_guard<ffrt::mutex> lock(monitorMapMtx_);
+        auto iter = monitorMap_.find(userId);
+        if (iter != monitorMap_.end()) {
+            monitor = iter->second;
+            monitorMap_.erase(iter);
+        }
+    }
+    if (monitor == nullptr) {
+        LOGW("monitor is nullptr");
+        return;
+    }
+    std::string proxyUri = GetProxyUriStr(SETTINGSDATA_SECURE, userId);
+    auto helper = CreateDataShareHelper(proxyUri);
+    if (helper == nullptr) {
+        LOGE("helper is nullptr");
+        return;
+    }
+    Uri uri = MakeUri(proxyUri, SETTINGS_GENERAL_USER_DEFINED_DEVICE_NAME);
+    helper->UnregisterObserver(uri, monitor);
+    ReleaseDataShareHelper(helper);
+}
+
+void DeviceNameManagerRefactor::InitDeviceName(int32_t userId)
+{
+    LOGI("In userId:%{public}d", userId);
+    if (!ValidateUserId(userId)) {
+        LOGE("userId:%{public}d is invalid", userId);
+        return;
+    }
+    std::string userDefinedDeviceName;
+    GetUserDefinedDeviceName(userId, userDefinedDeviceName);
+    if (!userDefinedDeviceName.empty()) {
+        LOGI("userDefinedDeviceName is set");
+        InitDeviceNameToSoftBus("", userDefinedDeviceName);
+        InitDisplayDeviceNameToSettingsData("", userDefinedDeviceName, userId);
+        userDefinedDeviceName.clear();
+        return;
+    }
+    std::string deviceName = GetLocalMarketName();
+    if (deviceName.empty()) {
+        LOGE("deviceName is empty");
+        return;
+    }
+    std::string nickName = MultipleUserConnector::GetAccountNickName(userId);
+    InitDeviceNameToSoftBus(nickName, deviceName);
+    InitDisplayDeviceNameToSettingsData(nickName, deviceName, userId);
+    nickName.clear();
+}
+
+void DeviceNameManagerRefactor::InitDeviceNameToSoftBus(const std::string &prefixName, const std::string &suffixName)
+{
+    LOGI("In");
+    std::string raw = GetLocalDisplayDeviceName(prefixName, suffixName, 0);
+    std::string name18 = GetLocalDisplayDeviceName(prefixName, suffixName, NUM18);
+    std::string name21 = GetLocalDisplayDeviceName(prefixName, suffixName, NUM21);
+    std::string name24 = GetLocalDisplayDeviceName(prefixName, suffixName, NUM24);
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        LOGE("cJSON_CreateObject fail!");
+        return;
+    }
+    cJSON_AddStringToObject(root, SOFTBUS_NAME_RAW_JSON_KEY, raw.c_str());
+    cJSON_AddStringToObject(root, SOFTBUS_NAME_18_JSON_KEY, name18.c_str());
+    cJSON_AddStringToObject(root, SOFTBUS_NAME_21_JSON_KEY, name21.c_str());
+    cJSON_AddStringToObject(root, SOFTBUS_NAME_24_JSON_KEY, name24.c_str());
+    char *jsonChar = cJSON_PrintUnformatted(root);
+    cJSON_Delete(root);
+    if (jsonChar == nullptr) {
+        LOGE("cJSON_PrintUnformatted fail!");
+        return;
+    }
+    std::string displayName = jsonChar;
+    cJSON_free(jsonChar);
+    raw.clear();
+    name18.clear();
+    name21.clear();
+    name24.clear();
+    DeviceManagerService::GetInstance().SetLocalDisplayNameToSoftbus(displayName);
+    displayName.clear();
+}
+
+int32_t DeviceNameManagerRefactor::GetLocalDisplayDeviceName(int32_t maxNamelength, std::string &displayName)
+{
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (!ValidateUserId(userId)) {
+        LOGE("userId invalid");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (maxNamelength < 0 || (maxNamelength > 0 && maxNamelength < NAME_LENGTH_MIN) ||
+        maxNamelength > NAME_LENGTH_MAX) {
+        LOGE("maxNamelength:%{public}d is invalid", maxNamelength);
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string userDefinedDeviceName;
+    GetUserDefinedDeviceName(userId, userDefinedDeviceName);
+    if (!userDefinedDeviceName.empty()) {
+        LOGI("userDefinedDeviceName is set");
+        displayName = GetLocalDisplayDeviceName("", userDefinedDeviceName, maxNamelength);
+        userDefinedDeviceName.clear();
+        return DM_OK;
+    }
+    std::string nickName = MultipleUserConnector::GetAccountNickName(userId);
+    std::string localMarketName = GetLocalMarketName();
+    displayName = GetLocalDisplayDeviceName(nickName, localMarketName, maxNamelength);
+    nickName.clear();
+    return DM_OK;
+}
+
+std::string DeviceNameManagerRefactor::TruncateSuffixToLength(
+    const std::string &text, int32_t maxLen)
+{
+    if (maxLen == 0 || static_cast<int32_t>(text.size()) <= maxLen) {
+        return text;
+    }
+    if (maxLen <= NUM3) {
+        return text.substr(0, static_cast<size_t>(maxLen));
+    }
+    return SubstrByBytes(text, maxLen - NUM3) + DEFAULT_CONCATENATION_CHARACTER;
+}
+
+std::string DeviceNameManagerRefactor::GetLocalDisplayDeviceName(const std::string &prefixName,
+    const std::string &suffixName, int32_t maxNameLength)
+{
+    if (prefixName.empty()) {
+        return TruncateSuffixToLength(suffixName, maxNameLength);
+    }
+    int32_t defaultNameMaxLength = DEFAULT_DEVICE_NAME_MAX_LENGTH;
+    if (maxNameLength >= NUM21) {
+        defaultNameMaxLength = DEFAULT_DEVICE_NAME_MAX_LENGTH + NUM3;
+    }
+    std::string nameSeparator = NAME_SEPARATOR_ZH;
+    if (GetSystemLanguage() != LANGUAGE_ZH_HANS || GetSystemRegion() != LOCAL_ZH_HANS_CN) {
+        nameSeparator = NAME_SEPARATOR_OTHER;
+    }
+    std::string displayName = prefixName + nameSeparator + suffixName;
+    if (maxNameLength == 0 || static_cast<int32_t>(displayName.size()) <= maxNameLength) {
+        return displayName;
+    }
+    std::string suffix = TruncateSuffixToLength(suffixName, defaultNameMaxLength);
+    int32_t remainingLen = maxNameLength - static_cast<int32_t>(suffix.size());
+    if (remainingLen <= 0) {
+        return suffix;
+    }
+    displayName = prefixName + nameSeparator + suffix;
+    if (static_cast<int32_t>(displayName.size()) <= maxNameLength) {
+        return displayName;
+    }
+    if (remainingLen <= NUM3) {
+        return suffix;
+    }
+    remainingLen = remainingLen - NUM3;
+    std::string prefix = prefixName;
+    if (static_cast<int32_t>(prefix.size()) > remainingLen) {
+        prefix = SubstrByBytes(prefix, remainingLen) + DEFAULT_CONCATENATION_CHARACTER;
+    }
+    displayName = prefix + suffix;
+    return displayName;
+}
+
+int32_t DeviceNameManagerRefactor::ModifyUserDefinedName(const std::string &deviceName)
+{
+    LOGI("In");
+    if (deviceName.empty()) {
+        LOGE("deviceName is empty");
+        return ERR_DM_NAME_EMPTY;
+    }
+    if (deviceName.size() > NAME_LENGTH_MAX) {
+        LOGE("deviceName exceeds max length");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (!ValidateUserId(userId)) {
+        LOGE("userId invalid");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    SetUserDefinedDeviceName(deviceName, userId);
+    SetDisplayDeviceNameState(USER_DEFINED_DEVICE_NAME, userId);
+    SetDisplayDeviceName(deviceName, userId);
+    InitDeviceNameToSoftBus("", deviceName);
+    return DM_OK;
+}
+
+int32_t DeviceNameManagerRefactor::RestoreLocalDeviceName()
+{
+    LOGI("In");
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (!ValidateUserId(userId)) {
+        LOGE("userId invalid");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    SetUserDefinedDeviceName("", userId);
+    SetDisplayDeviceNameState("", userId);
+    std::string nickName = MultipleUserConnector::GetAccountNickName(userId);
+    std::string localMarketName = GetLocalMarketName();
+    InitDeviceNameToSoftBus(nickName, localMarketName);
+    InitDisplayDeviceNameToSettingsData(nickName, localMarketName, userId);
+    nickName.clear();
+    return DM_OK;
+}
+
+int32_t DeviceNameManagerRefactor::InitDisplayDeviceNameToSettingsData(const std::string &nickName,
+    const std::string &deviceName, int32_t userId)
+{
+#if defined(SUPPORT_WISEDEVICE)
+    std::string newDisplayName = GetLocalDisplayDeviceName(nickName, deviceName, 0);
+    std::string oldDisplayName;
+    GetDisplayDeviceName(userId, oldDisplayName);
+    if (oldDisplayName != newDisplayName) {
+        SetDisplayDeviceName(newDisplayName, userId);
+    }
+    oldDisplayName.clear();
+    newDisplayName.clear();
+#else
+    (void) nickName;
+    (void) deviceName;
+    (void) userId;
+#endif // SUPPORT_WISEDEVICE
+    return DM_OK;
+}
+
+int32_t DeviceNameManagerRefactor::GetUserDefinedDeviceName(int32_t userId, std::string &deviceName)
+{
+    return GetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_USER_DEFINED_DEVICE_NAME, deviceName);
+}
+
+std::string DeviceNameManagerRefactor::SubstrByBytes(const std::string &str, int32_t maxNumBytes)
+{
+    if (str.empty() || maxNumBytes <= 0) {
+        return str;
+    }
+    int32_t length = static_cast<int32_t>(str.size());
+    if (length <= maxNumBytes) {
+        return str;
+    }
+    std::vector<std::string> substrVec;
+    for (int32_t i = 0; i < length;) {
+        unsigned char c = static_cast<unsigned char>(str[i]);
+        int numBytes = NUM1;
+        if ((c & 0x80) == 0) {
+            numBytes = NUM1;
+        } else if ((c & 0xE0) == 0xC0) {
+            numBytes = NUM2;
+        } else if ((c & 0xF0) == 0xE0) {
+            numBytes = NUM3;
+        } else if ((c & 0xF8) == 0xF0) {
+            numBytes = NUM4;
+        } else {
+            LOGE("Invalid characters");
+            return "";
+        }
+        if (i + numBytes > length) {
+            break;
+        }
+        std::string substr(str.begin() + i, str.begin() + i + numBytes);
+        substrVec.emplace_back(substr);
+        i += numBytes;
+    }
+    std::string result;
+    int32_t totalNumBytes = 0;
+    for (const auto &item : substrVec) {
+        int32_t cnt = totalNumBytes + static_cast<int32_t>(item.size());
+        if (cnt > maxNumBytes) {
+            break;
+        }
+        totalNumBytes = cnt;
+        result = result + item;
+    }
+    return result;
+}
+
+std::string DeviceNameManagerRefactor::GetSystemLanguage()
+{
+    char param[SYSPARA_SIZE] = {0};
+    int status = GetParameter(PERSIST_GLOBAL_LANGUAGE, "", param, SYSPARA_SIZE);
+    if (status > 0) {
+        return std::string(param);
+    }
+    status = GetParameter(DEFAULT_LANGUAGE_KEY, "", param, SYSPARA_SIZE);
+    if (status > 0) {
+        return std::string(param);
+    }
+    LOGE("Failed to get system language");
+    return "";
+}
+
+std::string DeviceNameManagerRefactor::GetSystemRegion()
+{
+    char param[SYSPARA_SIZE] = {0};
+    int status = GetParameter(PERSIST_GLOBAL_LOCALE, "", param, SYSPARA_SIZE);
+    if (status > 0) {
+        return std::string(param);
+    }
+    status = GetParameter(DEFAULT_LOCALE_KEY, "", param, SYSPARA_SIZE);
+    if (status > 0) {
+        return std::string(param);
+    }
+    LOGE("Failed to get system region");
+    return "";
+}
+
+std::string DeviceNameManagerRefactor::GetLocalMarketName()
+{
+    std::lock_guard<ffrt::mutex> lock(localMarketNameMtx_);
+    if (!localMarketNameInitialized_) {
+        const char *marketName = GetMarketName();
+        if (marketName == nullptr) {
+            LOGE("get marketName fail!");
+            return "";
+        }
+        localMarketName_ = marketName;
+        std::vector<std::string> prefixs = DeviceManagerService::GetInstance().GetDeviceNamePrefixs();
+        for (const auto &item : prefixs) {
+            localMarketName_ = TrimStr(ReplaceStr(localMarketName_, item, ""));
+        }
+        localMarketNameInitialized_ = true;
+    }
+    LOGI("localMarketName is cached");
+    return localMarketName_;
+}
+
+int32_t DeviceNameManagerRefactor::SetUserDefinedDeviceName(const std::string &deviceName, int32_t userId)
+{
+    LOGI("SetUserDefinedDeviceName, userId:%{public}d", userId);
+    return SetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_USER_DEFINED_DEVICE_NAME, deviceName);
+}
+
+int32_t DeviceNameManagerRefactor::GetDisplayDeviceName(int32_t userId, std::string &deviceName)
+{
+    return GetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_DISPLAY_DEVICE_NAME, deviceName);
+}
+
+int32_t DeviceNameManagerRefactor::SetDisplayDeviceNameState(const std::string &state, int32_t userId)
+{
+    LOGI("SetDisplayDeviceNameState, userId:%{public}d", userId);
+    return SetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_DISPLAY_DEVICE_NAME_STATE, state);
+}
+
+int32_t DeviceNameManagerRefactor::SetDisplayDeviceName(const std::string &deviceName, int32_t userId)
+{
+    if (deviceName.empty()) {
+        LOGE("deviceName is empty, userId:%{public}d", userId);
+        return ERR_DM_NAME_EMPTY;
+    }
+    LOGI("SetDisplayDeviceName, userId:%{public}d", userId);
+    return SetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_DISPLAY_DEVICE_NAME, deviceName);
+}
+
+int32_t DeviceNameManagerRefactor::GetDeviceName(std::string &deviceName)
+{
+    return GetValue(SETTINGSDATA_GLOBAL, 0, SETTINGS_GENERAL_DEVICE_NAME, deviceName);
+}
+
+int32_t DeviceNameManagerRefactor::SetDeviceName(const std::string &deviceName)
+{
+    if (deviceName.empty()) {
+        LOGE("deviceName is empty");
+        return ERR_DM_NAME_EMPTY;
+    }
+    return SetValue(SETTINGSDATA_GLOBAL, 0, SETTINGS_GENERAL_DEVICE_NAME, deviceName);
+}
+
+sptr<IRemoteObject> DeviceNameManagerRefactor::GetRemoteObj()
+{
+    std::lock_guard<ffrt::mutex> lock(remoteObjMtx_);
+    if (remoteObj_ != nullptr) {
+        return remoteObj_;
+    }
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        LOGE("get sa manager return nullptr");
+        return nullptr;
+    }
+    auto remoteObj = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    if (remoteObj == nullptr) {
+        LOGE("get system ability failed");
+        return nullptr;
+    }
+    remoteObj_ = remoteObj;
+    return remoteObj_;
+}
+
+int32_t DeviceNameManagerRefactor::GetValue(const std::string &tableName, int32_t userId,
+    const std::string &key, std::string &value)
+{
+    std::string proxyUri = GetProxyUriStr(tableName, userId);
+    auto helper = CreateDataShareHelper(proxyUri);
+    if (helper == nullptr) {
+        LOGE("helper is nullptr");
+        return ERR_DM_POINT_NULL;
+    }
+    std::vector<std::string> columns = { SETTING_COLUMN_VALUE };
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SETTING_COLUMN_KEYWORD, key);
+    Uri uri = MakeUri(proxyUri, key);
+    auto resultSet = helper->Query(uri, predicates, columns);
+    ReleaseDataShareHelper(helper);
+    if (resultSet == nullptr) {
+        LOGE("Query failed");
+        return ERR_DM_POINT_NULL;
+    }
+    int32_t count = 0;
+    int32_t retCount = resultSet->GetRowCount(count);
+    if (retCount != DataShare::E_OK) {
+        LOGE("GetRowCount failed, ret=%{public}d", retCount);
+        resultSet->Close();
+        return retCount;
+    }
+    if (count == 0) {
+        LOGW("no value for key");
+        resultSet->Close();
+        return DM_OK;
+    }
+    int32_t retGoTo = resultSet->GoToRow(0);
+    if (retGoTo != DataShare::E_OK) {
+        LOGE("GoToRow failed, ret=%{public}d", retGoTo);
+        resultSet->Close();
+        return retGoTo;
+    }
+    int32_t ret = resultSet->GetString(0, value);
+    if (ret != DataShare::E_OK) {
+        LOGE("get value failed, ret=%{public}d", ret);
+        resultSet->Close();
+        return ret;
+    }
+    resultSet->Close();
+    LOGI("GetValue success");
+    return DM_OK;
+}
+
+int32_t DeviceNameManagerRefactor::SetValue(const std::string &tableName, int32_t userId,
+    const std::string &key, const std::string &value)
+{
+    std::string proxyUri = GetProxyUriStr(tableName, userId);
+    auto helper = CreateDataShareHelper(proxyUri);
+    if (helper == nullptr) {
+        LOGE("helper is nullptr");
+        return ERR_DM_POINT_NULL;
+    }
+    DataShare::DataShareValuesBucket val;
+    val.Put(SETTING_COLUMN_KEYWORD, key);
+    val.Put(SETTING_COLUMN_VALUE, value);
+    Uri uri = MakeUri(proxyUri, key);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SETTING_COLUMN_KEYWORD, key);
+    int32_t ret = helper->Update(uri, predicates, val);
+    if (ret <= 0) {
+        LOGW("Update failed, ret=%{public}d, trying Insert", ret);
+        ret = helper->Insert(uri, val);
+    }
+    ReleaseDataShareHelper(helper);
+    if (ret <= 0) {
+        LOGE("set value failed, ret=%{public}d", ret);
+        return ret;
+    }
+    return ret;
+}
+
+std::shared_ptr<DataShare::DataShareHelper>
+DeviceNameManagerRefactor::CreateDataShareHelper(const std::string &proxyUri)
+{
+    if (proxyUri.empty()) {
+        LOGE("proxyUri is empty");
+        return nullptr;
+    }
+    auto [ret, helper] = DataShare::DataShareHelper::Create(GetRemoteObj(), proxyUri, SETTINGS_DATA_EXT_URI);
+    if (ret != 0) {
+        LOGE("create helper failed ret %{public}d", ret);
+        return nullptr;
+    }
+    return helper;
+}
+
+std::string DeviceNameManagerRefactor::GetProxyUriStr(const std::string &tableName, int32_t userId)
+{
+    if (tableName.empty()) {
+        LOGE("tableName is empty");
+        return "";
+    }
+    int32_t effectiveUserId = userId;
+    if (effectiveUserId < USERID_HELPER_NUMBER) {
+        LOGW("userId:%{public}d clamped to minimum", effectiveUserId);
+        effectiveUserId = USERID_HELPER_NUMBER;
+    }
+    if (tableName == SETTINGSDATA_GLOBAL) {
+        return SETTING_URI_PROXY + SETTINGSDATA_GLOBAL + URI_PROXY_SUFFIX;
+    }
+    return SETTING_URI_PROXY + tableName + std::to_string(effectiveUserId) + URI_PROXY_SUFFIX;
+}
+
+Uri DeviceNameManagerRefactor::MakeUri(const std::string &proxyUri, const std::string &key)
+{
+    if (proxyUri.empty() || key.empty()) {
+        LOGE("Invalid parameter: proxyUri or key is empty");
+        return Uri("");
+    }
+    Uri uri(proxyUri + "&key=" + key);
+    return uri;
+}
+
+bool DeviceNameManagerRefactor::ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper> helper)
+{
+    if (helper == nullptr) {
+        LOGE("helper is nullptr");
+        return false;
+    }
+    if (!helper->Release()) {
+        LOGE("release helper fail");
+        return false;
+    }
+    return true;
+}
+} // namespace DistributedHardware
+} // namespace OHOS
