@@ -747,7 +747,7 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAuthFormM
         }
         DmDiscoveryInfo discoveryInfo = {pkgName, deviceId};
         int32_t bindType = HandleDmAuthForm(item, discoveryInfo);
-        LOGI("udid %{public}s, AF: %{public}d", GetAnonyString(trustDeviceId).c_str(), bindType);  // AF: authForm
+        LOGI("udid:%{public}s, AF:%{public}d", GetAnonyString(trustDeviceId).c_str(), bindType);   // AF: authForm
         if (bindType == DmAuthForm::INVALID_TYPE) {
             continue;
         }

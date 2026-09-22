@@ -45,7 +45,6 @@ bool PermissionManager3rd::CheckSystemSA(const std::string &pkgName)
         LOGE("CheckMonitorPermission GetCallingTokenID error.");
         return false;
     }
-    LOGI("Get token type flag.");
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
         return true;
