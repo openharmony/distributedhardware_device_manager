@@ -81,11 +81,9 @@
 #include "securec.h"
 #include "ipc_auth_info_req.h"
 #include "ipc_auth_info_rsp.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ipc_model_codec.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#endif
 namespace OHOS {
 namespace DistributedHardware {
 
@@ -409,7 +407,6 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback",
@@ -427,7 +424,6 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
         LOGE("System SA not have permission, ret: %{public}d.", ret);
         return ret;
     }
-#endif
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", DM_OK, anonyLocalUdid_);
@@ -706,9 +702,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
         LOGE("extra bindParam invalid.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     extraJson[TOKENID] = std::to_string(OHOS::IPCSkeleton::GetSelfTokenID());
-#endif
     std::shared_ptr<IpcAuthenticateDeviceReq> req = std::make_shared<IpcAuthenticateDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
@@ -1562,9 +1556,7 @@ int32_t DeviceManagerImpl::BindDevice(const std::string &pkgName, int32_t bindTy
         LOGE("BindDevice bindParam invalid.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     paramJson[TOKENID] = std::to_string(OHOS::IPCSkeleton::GetSelfTokenID());
-#endif
     DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, deviceId, callback);
     std::shared_ptr<IpcBindDeviceReq> req = std::make_shared<IpcBindDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
@@ -1980,9 +1972,7 @@ int32_t DeviceManagerImpl::BindTarget(const std::string &pkgName, const PeerTarg
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManagerImpl::BindTarget start, pkgName: %{public}s", pkgName.c_str());
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     bindParam[TOKENID] = std::to_string(OHOS::IPCSkeleton::GetSelfTokenID());
-#endif
     std::string bindParamStr = ConvertMapToJsonString(bindParam);
     DeviceManagerNotify::GetInstance().RegisterBindCallback(pkgName, targetId, callback);
     std::shared_ptr<IpcBindTargetReq> req = std::make_shared<IpcBindTargetReq>();
@@ -2752,7 +2742,6 @@ int32_t DeviceManagerImpl::GetDeviceProfileInfoList(const std::string &pkgName,
 int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
     const DmDeviceIconInfoFilterOptions &filterOptions, std::shared_ptr<GetDeviceIconInfoCallback> callback)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string uk = IpcModelCodec::GetDeviceIconInfoUniqueKey(filterOptions);
     LOGI("In pkgName:%{public}s, uk:%{public}s", pkgName.c_str(), uk.c_str());
     int32_t ret = DeviceManagerNotify::GetInstance().RegisterGetDeviceIconInfoCallback(pkgName, uk, callback);
@@ -2782,7 +2771,6 @@ int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
         DeviceManagerNotify::GetInstance().OnGetDeviceIconInfoResult(pkgName, deviceIconInfo, ret);
         return ret;
     }
-#endif
     (void)pkgName;
     (void)filterOptions;
     (void)callback;

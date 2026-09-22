@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_SERVICE_H
-#define OHOS_DM_SERVICE_H
+#ifndef DEVICE_MANAGER_SERVICE_H
+#define DEVICE_MANAGER_SERVICE_H
 
 #include <string>
 #include <memory>
@@ -36,7 +36,6 @@
 #include "i_dm_service_impl_ext_resident.h"
 #include "dm_timer.h"
 #include "i_dm_device_risk_detect.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_account_common_event.h"
 #include "dm_datashare_common_event.h"
 #include "dm_package_common_event.h"
@@ -46,7 +45,6 @@
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 #include "dm_publish_common_event.h"
 #endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -206,7 +204,6 @@ public:
     bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
     void HandleDeviceNotTrust(const std::string &msg);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void HandleCredentialDeleted(const char *credId, const char *credInfo);
     void HandleDeviceTrustedChange(const std::string &msg);
     bool ParseRelationShipChangeType(const RelationShipChangeMsg &relationShipMsg);
@@ -227,7 +224,6 @@ public:
         PublishServiceParam &publishServiceParam, int64_t &serviceId);
     int32_t StopPublishService(int64_t serviceId);
     int32_t OpenAuthSessionWithPara(int64_t serviceId);
-#endif
     int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy);
     void ClearDiscoveryCache(const ProcessInfo &processInfo);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
@@ -287,11 +283,9 @@ public:
     bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t GetIdentificationByDeviceIds(const std::string &pkgName,
         const std::vector<std::string> deviceIdList,
         std::map<std::string, std::string> &deviceIdentificationMap);
-#endif
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
     int32_t GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
         DMLocalServiceInfoAuthType &authType);
@@ -349,7 +343,6 @@ private:
         std::vector<int32_t> backgroundUserIds);
     void AddHmlInfoToBindParam(int32_t actionId, std::string &bindParam);
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void SubscribeAccountCommonEvent();
     void SendShareTypeUnBindBroadCast(const char *credId, const int32_t localUserId,
         const std::vector<std::string> &peerUdids);
@@ -432,11 +425,10 @@ private:
     void QueryDependsSwitchState();
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
     DM_EXPORT void SubscribeDataShareCommonEvent();
-#endif
     void HandleNetworkConnected(int32_t networkStatus);
     void NotifyRemoteLocalLogout(const std::vector<std::string> &peerUdids,
         const std::string &accountIdHash, const std::string &accountName, int32_t userId);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
+#if !defined(DEVICE_MANAGER_COMMON_FLAG)
     bool IsCallerInWhiteList();
     void UnloadDmCheckApiWhiteListSo();
     bool IsDMAdapterCheckApiWhiteListLoaded();
@@ -446,7 +438,6 @@ private:
     void GetLocalUserIdFromDataBase(std::vector<int32_t> &foregroundUsers, std::vector<int32_t> &backgroundUsers);
     void PutLocalUserIdToDataBase(const std::vector<int32_t> &foregroundUsers,
         const std::vector<int32_t> &backgroundUsers);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t UpdateServiceInfo(int64_t serviceId);
     int32_t GenerateServiceId(int64_t &serviceId);
     int32_t ConvertServiceInfoProfileByRegInfo(const ServiceRegInfo &serviceRegInfo,
@@ -454,25 +445,17 @@ private:
     int32_t CheckServiceHasRegistered(const ServiceRegInfo &serviceRegInfo, int64_t tokenId, int32_t &regServiceId);
     int32_t GenerateRegServiceId(int32_t &regServiceId);
     void ParseAppUnBindRelationShip(const RelationShipChangeMsg &relationShipMsg);
-#endif
 
 private:
     bool isImplsoLoaded_ = false;
     bool isAdapterResidentSoLoaded_ = false;
     void *residentSoHandle_ = nullptr;
     void *dmServiceImplSoHandle_ = nullptr;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::mutex isImplLoadLock_;
     ffrt::mutex isAdapterResidentLoadLock_;
     ffrt::mutex deviceRiskDetectSoLoadLock_;
     ffrt::mutex detectLock_;
     ffrt::mutex hichainListenerLock_;
-#else
-    std::mutex isImplLoadLock_;
-    std::mutex isAdapterResidentLoadLock_;
-    std::mutex deviceRiskDetectSoLoadLock_;
-    std::mutex hichainListenerLock_;
-#endif
     std::mutex userVecLock_;
     std::shared_ptr<DmServiceHiChainConnector> hiChainConnector_;
     std::shared_ptr<DmCredentialManager> credentialMgr_;
@@ -486,7 +469,6 @@ private:
     std::shared_ptr<IDMDeviceRiskDetect> dmDeviceRiskDetect_;
     std::string localDeviceId_;
     std::shared_ptr<PinHolder> pinHolder_;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<DmAccountCommonEventManager> accountCommonEventManager_;
     std::shared_ptr<DmPackageCommonEventManager> packageCommonEventManager_;
     std::shared_ptr<DmScreenCommonEventManager> screenCommonEventManager_;
@@ -498,11 +480,10 @@ private:
     std::shared_ptr<DmPublishCommonEventManager> publishCommonEventManager_;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
     DM_EXPORT std::shared_ptr<DmDataShareCommonEventManager> dataShareCommonEventManager_;
-#endif
     std::string localNetWorkId_ = "";
     std::mutex timerLocks_;
     std::shared_ptr<DmTimer> timer_;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
+#if !defined(DEVICE_MANAGER_COMMON_FLAG)
     bool isAdapterCheckApiWhiteListSoLoaded_ = false;
     void *checkApiWhiteListSoHandle_ = nullptr;
     std::mutex isAdapterCheckApiWhiteListLoadedLock_;
@@ -511,4 +492,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_SERVICE_H
+#endif // DEVICE_MANAGER_SERVICE_H

@@ -46,13 +46,11 @@
 #include "ipc_notify_set_remote_device_name_req.h"
 #include "ipc_service_publish_result_req.h"
 #include "ipc_server_stub.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "datetime_ex.h"
 #include "device_name_manager.h"
 #include "device_manager_service.h"
 #include "kv_adapter_manager.h"
 #include "multiple_user_connector.h"
-#endif
 #include "parameter.h"
 #include "permission_manager.h"
 
@@ -138,7 +136,6 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
     pReq->SetDeviceState(state);
     DmDeviceInfo dmDeviceInfo = deviceInfo;
     FillUdidAndUuidToDeviceInfo(processInfo.pkgName, dmDeviceInfo);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string appId = "";
     if (AppManager::GetInstance().GetAppIdByPkgName(processInfo.pkgName, appId, processInfo.userId) != DM_OK) {
         pReq->SetDeviceInfo(dmDeviceInfo);
@@ -159,7 +156,6 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
     pReq->SetDeviceInfo(dmDeviceInfo);
     pReq->SetDeviceBasicInfo(dmDeviceBasicInfo);
     return;
-#endif
     pReq->SetDeviceInfo(dmDeviceInfo);
     pReq->SetDeviceBasicInfo(deviceBasicInfo);
 }
@@ -263,9 +259,7 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const ProcessInfo &proces
     } else {
         ProcessAppStateChange(processInfo, state, info, deviceBasicInfo, isOnline);
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     KVAdapterManager::GetInstance().DeleteAgedEntry();
-#endif
 }
 
 void DeviceManagerServiceListener::OnDeviceFound(const ProcessInfo &processInfo, uint16_t subscribeId,
@@ -274,9 +268,7 @@ void DeviceManagerServiceListener::OnDeviceFound(const ProcessInfo &processInfo,
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq = std::make_shared<IpcNotifyDeviceFoundReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     DmDeviceInfo deviceInfo = info;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ConvertUdidHashToAnoyAndSave(processInfo.pkgName, deviceInfo, processInfo.userId);
-#endif
     DmDeviceBasicInfo devBasicInfo;
     ConvertDeviceInfoToDeviceBasicInfo(processInfo.pkgName, deviceInfo, devBasicInfo);
     pReq->SetDeviceBasicInfo(devBasicInfo);
@@ -335,12 +327,10 @@ void DeviceManagerServiceListener::OnAuthResult(const ProcessInfo &processInfo, 
         status = STATUS_DM_AUTH_DEFAULT;
     }
     pReq->SetDeviceId(deviceId);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string deviceIdTemp = "";
     if (ConvertUdidHashToAnoyDeviceId(processInfo.pkgName, deviceId, deviceIdTemp, processInfo.userId) == DM_OK) {
         pReq->SetDeviceId(deviceIdTemp);
     }
-#endif
     pReq->SetPkgName(processInfo.pkgName);
     pReq->SetToken(token);
     pReq->SetStatus(status);
@@ -384,14 +374,12 @@ void DeviceManagerServiceListener::OnBindResult(const ProcessInfo &processInfo, 
         status = STATUS_DM_AUTH_DEFAULT;
     }
     PeerTargetId returnTargetId = targetId;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string deviceIdTemp = "";
     DmKVValue kvValue;
     if (ConvertUdidHashToAnoyDeviceId(processInfo.pkgName, targetId.deviceId, deviceIdTemp,
         processInfo.userId) == DM_OK && KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
         returnTargetId.deviceId = deviceIdTemp;
     }
-#endif
     pReq->SetPkgName(processInfo.pkgName);
     pReq->SetPeerTargetId(returnTargetId);
     pReq->SetResult(result);
@@ -407,14 +395,12 @@ void DeviceManagerServiceListener::OnUnbindResult(const ProcessInfo &processInfo
     std::shared_ptr<IpcNotifyBindResultReq> pReq = std::make_shared<IpcNotifyBindResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     PeerTargetId returnTargetId = targetId;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string deviceIdTemp = "";
     DmKVValue kvValue;
     if (ConvertUdidHashToAnoyDeviceId(processInfo.pkgName, targetId.deviceId, deviceIdTemp,
         processInfo.userId) == DM_OK && KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
         returnTargetId.deviceId = deviceIdTemp;
     }
-#endif
     pReq->SetPkgName(processInfo.pkgName);
     pReq->SetPeerTargetId(returnTargetId);
     pReq->SetResult(result);
@@ -491,7 +477,6 @@ void DeviceManagerServiceListener::OnPinHolderEvent(const ProcessInfo &processIn
     pReq->SetProcessInfo(processInfo);
     ipcServerListener_.SendRequest(SERVER_ON_PIN_HOLDER_EVENT, pReq, pRsp);
 }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyAndSave(const std::string &pkgName, DmDeviceInfo &deviceInfo,
     const int32_t userId)
 {
@@ -534,7 +519,6 @@ int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyDeviceId(const std::s
     }
     return ret;
 }
-#endif
 
 void DeviceManagerServiceListener::OnDeviceTrustChange(const std::string &udid, const std::string &uuid,
     DmAuthForm authForm)
@@ -544,9 +528,7 @@ void DeviceManagerServiceListener::OnDeviceTrustChange(const std::string &udid, 
     std::shared_ptr<IpcNotifyDevTrustChangeReq> pReq = std::make_shared<IpcNotifyDevTrustChangeReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     int32_t userId = -1;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     userId = MultipleUserConnector::GetFirstForegroundUserId();
-#endif
     std::vector<ProcessInfo> processInfoVec = GetNotifyProcessInfoByUserId(userId,
         DmCommonNotifyEvent::REG_REMOTE_DEVICE_TRUST_CHANGE);
     for (const auto &item : processInfoVec) {
@@ -565,7 +547,6 @@ void DeviceManagerServiceListener::SetDeviceScreenInfo(std::shared_ptr<IpcNotify
     LOGI("In");
     pReq->SetPkgName(processInfo.pkgName);
     pReq->SetProcessInfo(processInfo);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string appId = "";
     if (AppManager::GetInstance().GetAppIdByPkgName(processInfo.pkgName, appId, processInfo.userId) != DM_OK) {
         pReq->SetDeviceInfo(deviceInfo);
@@ -575,7 +556,6 @@ void DeviceManagerServiceListener::SetDeviceScreenInfo(std::shared_ptr<IpcNotify
     ConvertUdidHashToAnoyAndSave(processInfo.pkgName, dmDeviceInfo, processInfo.userId);
     pReq->SetDeviceInfo(dmDeviceInfo);
     return;
-#endif
     pReq->SetDeviceInfo(deviceInfo);
 }
 
@@ -586,9 +566,7 @@ void DeviceManagerServiceListener::OnDeviceScreenStateChange(const ProcessInfo &
         std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
         std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
         int32_t userId = -1;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         userId = MultipleUserConnector::GetFirstForegroundUserId();
-#endif
         std::vector<ProcessInfo> processInfoVec =
             GetNotifyProcessInfoByUserId(userId, DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE);
         for (const auto &item : processInfoVec) {
@@ -628,9 +606,7 @@ void DeviceManagerServiceListener::OnCredentialAuthStatus(const ProcessInfo &pro
 {
     LOGI("In, pkgName = %{public}s", processInfo.pkgName.c_str());
     int32_t userId = -1;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     userId = MultipleUserConnector::GetFirstForegroundUserId();
-#endif
     std::vector<ProcessInfo> processInfoVec =
         GetNotifyProcessInfoByUserId(userId, DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY);
     for (const auto &item : processInfoVec) {
@@ -667,14 +643,12 @@ void DeviceManagerServiceListener::OnSinkBindResult(const ProcessInfo &processIn
         status = STATUS_DM_AUTH_DEFAULT;
     }
     PeerTargetId returnTargetId = targetId;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string deviceIdTemp = "";
     DmKVValue kvValue;
     if (ConvertUdidHashToAnoyDeviceId(processInfo.pkgName, targetId.deviceId, deviceIdTemp,
         processInfo.userId) == DM_OK && KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
         returnTargetId.deviceId = deviceIdTemp;
     }
-#endif
     pReq->SetPkgName(processInfo.pkgName);
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
     ProcessInfo processInfoTemp;
@@ -1008,7 +982,6 @@ void DeviceManagerServiceListener::OnGetDeviceProfileInfoListResult(const Proces
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     pReq->SetPkgName(processInfo.pkgName);
     pReq->SetDeviceProfileInfoList(deviceProfileInfos);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string userDefinedDeviceName = DeviceNameManager::GetInstance().GetUserDefinedDeviceName();
     if (code == DM_OK && !userDefinedDeviceName.empty()) {
         std::vector<DmDeviceProfileInfo> temVec = deviceProfileInfos;
@@ -1020,7 +993,6 @@ void DeviceManagerServiceListener::OnGetDeviceProfileInfoListResult(const Proces
         }
         pReq->SetDeviceProfileInfoList(temVec);
     }
-#endif
     pReq->SetResult(code);
     pReq->SetProcessInfo(processInfo);
     ipcServerListener_.SendRequest(GET_DEVICE_PROFILE_INFO_LIST_RESULT, pReq, pRsp);
@@ -1048,13 +1020,10 @@ void DeviceManagerServiceListener::OnSetLocalDeviceNameResult(const ProcessInfo 
     pReq->SetPkgName(processInfo.pkgName);
     pReq->SetResult(code);
     pReq->SetProcessInfo(processInfo);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (code == DM_OK) {
         DeviceNameManager::GetInstance().ModifyUserDefinedName(deviceName);
     }
-#else
     (void) deviceName;
-#endif
     ipcServerListener_.SendRequest(SET_LOCAL_DEVICE_NAME_RESULT, pReq, pRsp);
 }
 
@@ -1126,9 +1095,7 @@ void DeviceManagerServiceListener::OnDeviceStateChange(const ProcessInfo &proces
     } else {
         ProcessAppStateChange(processInfo, state, info, deviceBasicInfo, serviceIds);
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     KVAdapterManager::GetInstance().DeleteAgedEntry();
-#endif
 }
 
 void DeviceManagerServiceListener::ProcessDeviceOnline(const std::vector<ProcessInfo> &procInfoVec,
@@ -1184,32 +1151,23 @@ void DeviceManagerServiceListener::ProcessAppOnline(std::vector<ProcessInfo> &pr
 
 std::string DeviceManagerServiceListener::GetLocalDisplayDeviceName()
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string displayName = "";
     DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(0, displayName);
     return displayName;
-#else
     return "";
-#endif
 }
 
 int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(int64_t serviceId)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DeviceManagerService::GetInstance().OpenAuthSessionWithPara(serviceId);
-#else
     return ERR_DM_UNSUPPORTED_METHOD;
-#endif
 }
 
 int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(const std::string &deviceId,
     int32_t actionId, bool isEnable160m)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DeviceManagerService::GetInstance().OpenAuthSessionWithPara(deviceId, actionId, isEnable160m);
-#else
     return ERR_DM_UNSUPPORTED_METHOD;
-#endif
 }
 
 void DeviceManagerServiceListener::OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,

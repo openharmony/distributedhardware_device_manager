@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #define OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #include <algorithm>
@@ -160,7 +161,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class IDeviceProfileConnector {
 public:
-    virtual ~IDeviceProfileConnector() {}
+    virtual ~IDeviceProfileConnector() = default;
     virtual int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm) = 0;
     virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds,
         const std::string &localUdid) = 0;

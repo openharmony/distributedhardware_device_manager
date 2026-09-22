@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef DM_SOFTBUS_CACHE_H
+#define DM_SOFTBUS_CACHE_H
+
 #ifndef OHOS_DM_SOFTBUS_CACHE_H
 #define OHOS_DM_SOFTBUS_CACHE_H
 
@@ -20,7 +23,6 @@
 #include <string>
 #include <mutex>
 #include "dm_device_info.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
 #endif
 #include "dm_single_instance.h"
@@ -64,16 +66,11 @@ private:
     int32_t GetDevLevelFromBus(const char *networkId, int32_t &securityLevel);
 
 private:
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::mutex deviceInfosMutex_;
     ffrt::mutex deviceSecurityLevelMutex_;
-#else
-    std::mutex deviceInfosMutex_;
-    std::mutex deviceSecurityLevelMutex_;
-#endif
     std::unordered_map<std::string, std::pair<std::string, DmDeviceInfo>> deviceInfo_;
     std::unordered_map<std::string, int32_t> deviceSecurityLevel_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_PERMISSION_STANDARD_PERMISSION_MANAGER_H
+#endif // DM_SOFTBUS_CACHE_H

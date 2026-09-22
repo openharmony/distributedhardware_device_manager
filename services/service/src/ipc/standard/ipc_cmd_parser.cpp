@@ -49,9 +49,7 @@
 #include "ipc_server_stub.h"
 #include "ipc_service_publish_result_req.h"
 #include "multiple_user_connector.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
-#endif
 namespace OHOS {
 namespace DistributedHardware {
 const unsigned int XCOLLIE_TIMEOUT_S = 5;

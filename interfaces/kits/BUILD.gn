@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 
 group("devicemanager_native_js") {
   deps = []
-  if (support_jsapi) {
+  if (!defined(ohos_lite) && support_jsapi) {
     deps += [
       "./js:devicemanager",
       "./js4.0:distributeddevicemanager",

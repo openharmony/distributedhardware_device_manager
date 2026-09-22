@@ -20,9 +20,7 @@
 #include "dm_error_type.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ipc_model_codec.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -303,15 +301,7 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("OnDeviceOnline error, registered device state callback is nullptr.");
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceInfoOnline(deviceInfo, tempCbk); });
-#else
-    std::thread deviceOnline([=]() { DeviceInfoOnline(deviceInfo, tempCbk); });
-    if (pthread_setname_np(deviceOnline.native_handle(), DEVICE_ONLINE) != DM_OK) {
-        LOGE("DeviceInfoOnline set name failed.");
-    }
-    deviceOnline.detach();
-#endif
 }
 
 void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo)
@@ -333,15 +323,7 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("Error, registered device status callback is nullptr.");
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceBasicInfoOnline(deviceBasicInfo, tempCbk); });
-#else
-    std::thread deviceOnline([=]() { DeviceBasicInfoOnline(deviceBasicInfo, tempCbk); });
-    if (pthread_setname_np(deviceOnline.native_handle(), DEVICE_ONLINE) != DM_OK) {
-        LOGE("DeviceInfoOnline set name failed.");
-    }
-    deviceOnline.detach();
-#endif
 }
 
 void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
@@ -363,16 +345,8 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         LOGE("Error, registered device state callback is nullptr.");
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceInfoOffline(deviceInfo, tempCbk); });
     LOGI("Completed, Offline with DmDeviceInfo, pkgName:%{public}s", pkgName.c_str());
-#else
-    std::thread deviceOffline([=]() { DeviceInfoOffline(deviceInfo, tempCbk); });
-    if (pthread_setname_np(deviceOffline.native_handle(), DEVICE_OFFLINE) != DM_OK) {
-        LOGE("DeviceInfoOffline set name failed.");
-    }
-    deviceOffline.detach();
-#endif
 }
 
 void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo)
@@ -394,15 +368,7 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         LOGE("Error, registered device status callback is nullptr.");
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceBasicInfoOffline(deviceBasicInfo, tempCbk); });
-#else
-    std::thread deviceOffline([=]() { DeviceBasicInfoOffline(deviceBasicInfo, tempCbk); });
-    if (pthread_setname_np(deviceOffline.native_handle(), DEVICE_OFFLINE) != DM_OK) {
-        LOGE("DeviceInfoOffline set name failed.");
-    }
-    deviceOffline.detach();
-#endif
 }
 
 void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
@@ -425,15 +391,7 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         LOGE("OnDeviceChanged error, registered device state callback is nullptr, pkgName:%{public}s", pkgName.c_str());
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceInfoChanged(deviceInfo, tempCbk); });
-#else
-    std::thread deviceChanged([=]() { DeviceInfoChanged(deviceInfo, tempCbk); });
-    if (pthread_setname_np(deviceChanged.native_handle(), DEVICEINFO_CHANGE) != DM_OK) {
-        LOGE("deviceChanged set name failed.");
-    }
-    deviceChanged.detach();
-#endif
 }
 
 void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo)
@@ -456,15 +414,7 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         LOGE("OnDeviceChanged error, registered device state callback is nullptr, pkgName:%{public}s", pkgName.c_str());
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceBasicInfoChanged(deviceBasicInfo, tempCbk); });
-#else
-    std::thread deviceChanged([=]() { DeviceBasicInfoChanged(deviceBasicInfo, tempCbk); });
-    if (pthread_setname_np(deviceChanged.native_handle(), DEVICEINFO_CHANGE) != DM_OK) {
-        LOGE("deviceChanged set name failed.");
-    }
-    deviceChanged.detach();
-#endif
 }
 
 void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDeviceInfo &deviceInfo)
@@ -487,15 +437,7 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         LOGE("OnDeviceReady error, registered device state callback is nullptr, pkgName:%{public}s", pkgName.c_str());
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
-#else
-    std::thread deviceReady([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
-    if (pthread_setname_np(deviceReady.native_handle(), DEVICE_READY) != DM_OK) {
-        LOGE("deviceReady set name failed.");
-    }
-    deviceReady.detach();
-#endif
 }
 
 void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDeviceBasicInfo &deviceBasicInfo)
@@ -517,15 +459,7 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         LOGE("OnDeviceReady error, registered device status callback is nullptr.");
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceBasicInfoReady(deviceBasicInfo, tempCbk); });
-#else
-    std::thread deviceReady([=]() { DeviceBasicInfoReady(deviceBasicInfo, tempCbk); });
-    if (pthread_setname_np(deviceReady.native_handle(), DEVICE_READY) != DM_OK) {
-        LOGE("deviceReady set name failed.");
-    }
-    deviceReady.detach();
-#endif
 }
 
 void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,
@@ -1057,15 +991,7 @@ void DeviceManagerNotify::OnDeviceTrustChange(const std::string &pkgName, const 
         return;
     }
     DmAuthForm dmAuthForm = static_cast<DmAuthForm>(authForm);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceTrustChange(udid, uuid, dmAuthForm, tempCbk); });
-#else
-    std::thread deviceTrustChange([=]() { DeviceTrustChange(udid, uuid, dmAuthForm, tempCbk); });
-    if (pthread_setname_np(deviceTrustChange.native_handle(), DEVICE_TRUST_CHANGE) != DM_OK) {
-        LOGE("deviceTrustChange set name failed.");
-    }
-    deviceTrustChange.detach();
-#endif
 }
 
 void DeviceManagerNotify::DeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm,
@@ -1347,7 +1273,6 @@ void DeviceManagerNotify::OnGetDeviceIconInfoResult(const std::string &pkgName, 
     }
     LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
     std::map<std::string, std::set<std::shared_ptr<GetDeviceIconInfoCallback>>> tempCbks;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string uk = IpcModelCodec::GetDeviceIconInfoUniqueKey(deviceIconInfo);
     {
         std::lock_guard<std::mutex> autoLock(bindLock_);
@@ -1364,7 +1289,6 @@ void DeviceManagerNotify::OnGetDeviceIconInfoResult(const std::string &pkgName, 
             iter->second.erase(uk);
         }
     }
-#endif
     if (tempCbks.empty()) {
         LOGE("error, registered GetDeviceIconInfoResult callback is nullptr.");
         return;
@@ -1567,16 +1491,7 @@ void DeviceManagerNotify::OnServiceOnline(const std::vector<int64_t> &serviceIds
         return;
     }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { ServiceInfoOnline(callbackInfo); });
-#else
-    std::thread serviceOnline([=]() { ServiceInfoOnline(callbackInfo);});
-    int32_t ret = pthread_setname_np(serviceOnline.native_handle(), SERVICE_ONLINE);
-    if (ret != DM_OK) {
-        LOGE("DeviceManagerNotify serviceOnline setname failed.");
-    }
-    serviceOnline.detach();
-#endif
 }
 
 void DeviceManagerNotify::ServiceInfoOnline(
@@ -1750,16 +1665,7 @@ void DeviceManagerNotify::OnAuthCodeInvalid(const std::string &regPkgName, const
         LOGE("AuthCodeInvalidCallback error, registered device state callback is nullptr.");
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { AuthCodeInvalid(tempCbk); });
-#else
-    std::thread authCodeInvalid([=]() { AuthCodeInvalid(tempCbk); });
-    int32_t ret = pthread_setname_np(authCodeInvalid.native_handle(), AUTH_CODE_INVALID);
-    if (ret != DM_OK) {
-        LOGE("DeviceManagerNotify AuthCodeInvalid setname failed, regPkgName:%{public}s", regPkgName.c_str());
-    }
-    authCodeInvalid.detach();
-#endif
 }
 
 void DeviceManagerNotify::AuthCodeInvalid(std::shared_ptr<AuthCodeInvalidCallback> tempCbk)

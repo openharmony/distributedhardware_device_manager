@@ -63,11 +63,7 @@ void DmDialogManager::ShowConfirmDialog(const std::string param)
     std::string hostPkgLabel = "";
     int32_t deviceType = -1;
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> lock(mutex_);
-#else
-        std::lock_guard<std::mutex> lock(mutex_);
-#endif
         JsonObject jsonObject(param);
         if (!jsonObject.IsDiscarded()) {
             if (IsString(jsonObject, TAG_REQUESTER)) {
@@ -111,35 +107,18 @@ void DmDialogManager::ShowPinDialog(const std::string param)
 {
     LOGI("pinCode: %{public}s", GetAnonyString(param).c_str());
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> lock(mutex_);
-#else
-        std::lock_guard<std::mutex> lock(mutex_);
-#endif
         bundleName_ = DM_UI_BUNDLE_NAME;
         abilityName_ = PIN_ABILITY_NAME;
         pinCode_ = param;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([]() { DmDialogManager::GetInstance().ConnectExtension(); });
-#else
-    std::thread pinDilog([]() { DmDialogManager::GetInstance().ConnectExtension(); });
-    int32_t ret = pthread_setname_np(pinDilog.native_handle(), CONNECT_PIN_DIALOG.c_str());
-    if (ret != DM_OK) {
-        LOGE("pinDilog setname failed.");
-    }
-    pinDilog.detach();
-#endif
 }
 
 void DmDialogManager::ShowInputDialog(const std::string param)
 {
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> lock(mutex_);
-#else
-        std::lock_guard<std::mutex> lock(mutex_);
-#endif
         targetDeviceName_ = param;
         bundleName_ = DM_UI_BUNDLE_NAME;
         abilityName_ = INPUT_ABILITY_NAME;
@@ -150,11 +129,7 @@ void DmDialogManager::ShowInputDialog(const std::string param)
 void DmDialogManager::CloseDialog()
 {
     LOGI("In");
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> lock(mutex_);
-#else
-    std::lock_guard<std::mutex> lock(mutex_);
-#endif
     if (g_remoteObject == nullptr) {
         LOGW("g_remoteObject is nullptr");
         isCloseDialog_.store(true);
@@ -190,11 +165,7 @@ void DmDialogManager::ConnectExtension()
         LOGE("AbilityManagerClient is nullptr");
         return;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> lock(mutex_);
-#else
-    std::lock_guard<std::mutex> lock(mutex_);
-#endif
     if (dialogConnectionCallback_ == nullptr) {
         dialogConnectionCallback_ = new (std::nothrow) DialogAbilityConnection();
     }
@@ -221,11 +192,7 @@ void DmDialogManager::OnAbilityConnectDone(
     const AppExecFwk::ElementName& element, const sptr<IRemoteObject>& remoteObject, int resultCode)
 {
     LOGI("OnAbilityConnectDone");
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> lock(mutex_);
-#else
-    std::lock_guard<std::mutex> lock(mutex_);
-#endif
     if (remoteObject == nullptr) {
         LOGE("remoteObject is nullptr");
         return;
@@ -287,11 +254,7 @@ void DmDialogManager::SendMsgRequest(const sptr<IRemoteObject>& remoteObject)
 void DmDialogManager::OnAbilityDisconnectDone(const AppExecFwk::ElementName& element, int resultCode)
 {
     LOGI("OnAbilityDisconnectDone");
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> lock(mutex_);
-#else
-    std::lock_guard<std::mutex> lock(mutex_);
-#endif
     g_remoteObject = nullptr;
     isConnectSystemUI_.store(false);
     isCloseDialog_.store(false);
