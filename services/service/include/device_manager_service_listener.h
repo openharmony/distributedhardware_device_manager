@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef DEVICE_MANAGER_SERVICE_LISTENER_H
+#define DEVICE_MANAGER_SERVICE_LISTENER_H
+
 #ifndef OHOS_DM_SERVICE_LISTENER_H
 #define OHOS_DM_SERVICE_LISTENER_H
 
@@ -25,13 +28,10 @@
 #include "dm_device_info.h"
 #include "dm_device_profile_info.h"
 #include "idevice_manager_service_listener.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "kv_adapter_manager.h"
 #endif
-#if !defined(__LITEOS_M__)
 #include "ipc_notify_dmfa_result_req.h"
 #include "ipc_server_listener.h"
-#endif
 #include "ipc_notify_device_state_req.h"
 
 namespace OHOS {
@@ -100,7 +100,6 @@ public:
     void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode) override;
     void OnAuthCodeInvalid(const std::string &pkgName, const std::string &consumerPkgName) override;
     std::set<ProcessInfo> GetAlreadyOnlineProcess() override;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void OnServiceDiscoveryResult(const ProcessInfo &processInfo, const std::string &serviceType,
         int32_t reason) override;
     void OnServiceFound(const ProcessInfo &processInfo, const DmServiceInfo &service) override;
@@ -116,7 +115,6 @@ public:
     void OnServiceStateOnlineResult(const ServiceStateBindParameter &bindParam) override;
     bool CheckIsOnlineAdapter(const std::string &peerUdid) override;
     int32_t GetNetworkIdFromCache(const std::string &udid, std::string &networkId) override;
-#endif
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
         const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
@@ -130,12 +128,10 @@ private:
     void SetDeviceScreenInfo(std::shared_ptr<IpcNotifyDeviceStateReq> pReq, const ProcessInfo &processInfo,
         const DmDeviceInfo &deviceInfo);
     void RemoveOnlinePkgName(const DmDeviceInfo &info);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DM_EXPORT int32_t ConvertUdidHashToAnoyAndSave(const std::string &pkgName,
         DmDeviceInfo &deviceInfo, const int32_t userId);
     int32_t ConvertUdidHashToAnoyDeviceId(const std::string &pkgName, const std::string &udidHash,
         std::string &anoyDeviceId, const int32_t userId);
-#endif
     std::vector<ProcessInfo> GetWhiteListSAProcessInfo(DmCommonNotifyEvent dmCommonNotifyEvent);
     std::vector<ProcessInfo> GetNotifyProcessInfoByUserId(int32_t userId, DmCommonNotifyEvent dmCommonNotifyEvent);
     ProcessInfo DealBindProcessInfo(const ProcessInfo &processInfo);
@@ -173,7 +169,6 @@ private:
 #endif
     std::set<ProcessInfo> GetNotifyProcessInfos(DmCommonNotifyEvent dmCommonNotifyEvent);
 private:
-#if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;
     static std::mutex alreadyNotifyPkgNameLock_;
     static std::map<std::string, DmDeviceInfo> alreadyOnlinePkgName_;
@@ -182,8 +177,7 @@ private:
     static std::unordered_set<std::string> highPriorityPkgNameSet_;
     static std::mutex actUnrelatedPkgNameLock_;
     static std::set<std::string> actUnrelatedPkgName_;
-#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_SERVICE_LISTENER_H
+#endif // DEVICE_MANAGER_SERVICE_LISTENER_H

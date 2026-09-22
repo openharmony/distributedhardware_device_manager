@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef DEVICEPROFILE_CONNECTOR_H
+#define DEVICEPROFILE_CONNECTOR_H
+
 #ifndef OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #define OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #include <algorithm>
@@ -19,7 +22,6 @@
 #include <string>
 #include <set>
 #include <unordered_set>
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "access_control_profile.h"
 #include "dm_device_info.h"
 #include "dm_single_instance.h"
@@ -135,7 +137,6 @@ typedef struct DmOfflineParam {
     // save all the user acl between localdevid/localuserId -> remotedevid
     std::vector<DmAclIdParam> allUserAclInfos;
 } DmOfflineParam;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 typedef struct DmLocalUserRemovedInfo {
     std::string localUdid = "";
     int32_t preUserId = 0;
@@ -184,7 +185,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class IDeviceProfileConnector {
 public:
-    virtual ~IDeviceProfileConnector() {}
+    virtual ~IDeviceProfileConnector() = default;
     virtual int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm) = 0;
     virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds,
         const std::string &localUdid) = 0;
@@ -581,7 +582,8 @@ private:
         const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam);
     bool FindTargetAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
         const std::string &localUdid, const uint32_t localTokenId,
-        const std::string &remoteUdid, const uint32_t peerTokenId, DmOfflineParam &offlineParam);
+        const std::string &remoteUdid, const uint32_t peerTokenId,
+        DmOfflineParam &offlineParam);
     bool FindTargetAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
         const std::string &localUdid, const int32_t remoteUserId, const std::string &remoteUdid,
         const int32_t tokenId, const int32_t peerTokenId, DmOfflineParam &offlineParam);
@@ -643,5 +645,4 @@ DM_EXPORT extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();
 using CreateDpConnectorFuncPtr = IDeviceProfileConnector *(*)(void);
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // __LITEOS_M__
-#endif // OHOS_DM_DEVICEPROFILE_CONNECTOR_H
+#endif // DEVICEPROFILE_CONNECTOR_H

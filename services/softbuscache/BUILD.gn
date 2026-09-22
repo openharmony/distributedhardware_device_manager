@@ -11,42 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-} else {
-  import("//build/ohos.gni")
-}
+import("//build/ohos.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
 if (defined(ohos_lite)) {
-  if (ohos_kernel_type == "linux") {
-    shared_library("dmdevicecache") {
-      include_dirs = [
-        "include",
-        "${common_path}/include",
-        "${innerkits_path}/native_cpp/include",
-        "${utils_path}/include/crypto",
-        "${json_path}/include",
-      ]
-
-      sources = [
-        "${common_path}/src/dm_anonymous.cpp",
-        "src/dm_softbus_cache.cpp",
-      ]
-
-      defines = [
-        "LITE_DEVICE",
-        "DH_LOG_TAG=\"dmdevcache\"",
-        "LOG_DOMAIN=0xD004113",
-      ]
-
-      deps = [
-        "${dsoftbussdk_path}:softbus_client",
-        "${hilog_path}:hilog_shared",
-        "${json_path}:devicemanagerjson",
-        "${third_path}:libsec_shared",
-        "${utils_path}:devicemanagerutils",
-      ]
-    }
+  group("dmdevicecache") {
+    deps = []
   }
 } else {
   ohos_shared_library("dmdevicecache") {

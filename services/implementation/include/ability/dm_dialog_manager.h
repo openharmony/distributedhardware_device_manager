@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef DM_DIALOG_MANAGER_H
+#define DM_DIALOG_MANAGER_H
+
 #ifndef OHOS_DM_DIALOG_MANAGER_H
 #define OHOS_DM_DIALOG_MANAGER_H
 
@@ -21,7 +24,6 @@
 
 #include "ability_connect_callback_interface.h"
 #include "ability_connect_callback_stub.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
 #endif
 
@@ -70,11 +72,7 @@ private:
     std::string serviceUserData_;
     std::string title_;
     int32_t userId_ = -1;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::mutex mutex_;
-#else
-    std::mutex mutex_;
-#endif
     sptr<OHOS::AAFwk::IAbilityConnection> dialogConnectionCallback_ = nullptr;
     sptr<IRemoteObject> g_remoteObject = nullptr;
     std::atomic<bool> isConnectSystemUI_{false};
@@ -82,4 +80,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif
+#endif // DM_DIALOG_MANAGER_H

@@ -14,6 +14,11 @@
 import("//build/ohos.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
+if (defined(ohos_lite)) {
+  group("devicemanagerserviceimpl3rd") {
+    deps = []
+  }
+} else {
 ohos_shared_library("devicemanagerserviceimpl3rd") {
     branch_protector_ret = "pac_ret"
 
@@ -129,4 +134,5 @@ ohos_shared_library("devicemanagerserviceimpl3rd") {
     subsystem_name = "distributedhardware"
 
     part_name = "device_manager"
+}
 }

@@ -1,0 +1,135 @@
+# Copyright (c) 2023-2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+config("cflags_config") {
+  cflags = [
+    "-Werror",
+    "-fPIC",
+    "-fstack-protector-strong",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-Oz",
+    "-flto",
+  ]
+  if (!defined(ohos_lite)) {
+    cflags += [ "-fvisibility=hidden" ]
+  }
+  ldflags = [ "-flto" ]
+}
+ohos_shared_library("devicemanagerdependency") {
+    if (defined(ohos_lite)) {
+      output_extension = "so"
+    }
+  if (!device_manager_capability) {
+    install_enable = false
+  } else {
+    branch_protector_ret = "pac_ret"
+
+    if (!defined(ohos_lite)) {
+      sanitize = {
+        boundary_sanitize = true
+        cfi = true
+        cfi_cross_dso = true
+        debug = false
+        integer_overflow = true
+        ubsan = true
+      }
+    }
+
+    cflags = [
+      "-Werror",
+      "-fPIC",
+      "-fstack-protector-strong",
+      "-std=c99",
+    ]
+
+    ldflags = [
+      "-Wl,-z,relro",
+      "-Wl,-z,now",
+    ]
+
+    configs = [ ":cflags_config" ]
+
+    include_dirs = [
+      "include",
+      "${lite_common_path}/include",
+      "${lite_interfaces_path}/include",
+      "${lite_utils_path}/include",
+      "${lite_utils_path}/include/crypto",
+      "${lite_json_path}/include",
+      "${lite_softbuscache_path}/include",
+    ]
+
+    if (defined(ohos_lite)) {
+      sources = [
+        "src/deviceprofile_connector.c",
+        "src/deviceprofile_connector_shell.c",
+        "src/dm_local_acl_profile.c",
+        "src/multiple_user_connector.c",
+        "src/multiple_user_connector_shell.c",
+      ]
+      include_dirs += [
+        "${lite_utils_path}/include/kvadapter",
+        "${lite_utils_path}/src/kvadapter",
+      ]
+    } else {
+      sources = [
+        "src/deviceprofile_connector.c",
+        "src/multiple_user_connector.c",
+      ]
+    }
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"dmdep\"",
+      "LOG_DOMAIN=0xD004112",
+    ]
+
+    deps = [
+      "${lite_interfaces_path}:devicemanagersdk",
+      "${lite_json_path}:devicemanagerjson",
+      "${lite_utils_path}:devicemanagerutils",
+    ]
+
+    if (defined(ohos_lite)) {
+      deps += [ "//foundation/distributedhardware/device_manager/lite:dm_lite_external_deps" ]
+    } else {
+      external_deps = [
+        "ability_base:want",
+        "bundle_framework:appexecfwk_base",
+        "bundle_framework:appexecfwk_core",
+        "c_utils:utils",
+        "device_info_manager:distributed_device_profile_common",
+        "device_info_manager:distributed_device_profile_sdk",
+        "eventhandler:libeventhandler",
+        "ffrt:libffrt",
+        "hilog:libhilog",
+        "init:libbegetutil",
+        "ipc:ipc_core",
+        "os_account:libaccountkits",
+        "samgr:samgr_proxy",
+      ]
+
+      if (os_account_part_exists) {
+        defines += [ "OS_ACCOUNT_PART_EXISTS" ]
+        external_deps += [ "os_account:os_account_innerkits" ]
+      }
+    }
+
+    subsystem_name = "distributedhardware"
+
+    part_name = "device_manager"
+  }
+}

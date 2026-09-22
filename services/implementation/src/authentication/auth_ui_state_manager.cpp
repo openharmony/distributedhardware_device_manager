@@ -18,9 +18,7 @@
 #include "dm_dialog_manager.h"
 #include "dm_log.h"
 #include "json_object.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
-#endif
 namespace OHOS {
 namespace DistributedHardware {
 constexpr const char* UI_STATE_MSG = "uiStateMsg";
@@ -32,15 +30,11 @@ AuthUiStateManager::AuthUiStateManager(std::shared_ptr<IDeviceManagerServiceList
 void AuthUiStateManager::RegisterUiStateCallback(const std::string pkgName)
 {
     int32_t userId = -1;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(userId);
-#endif
     ProcessInfo processInfo;
     processInfo.userId = userId;
     processInfo.pkgName = pkgName;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallingTokenId(processInfo.tokenId);
-#endif
     std::lock_guard<ffrt::mutex> lock(pkgSetMutex_);
     pkgSet_.emplace(processInfo);
 }
@@ -48,15 +42,11 @@ void AuthUiStateManager::RegisterUiStateCallback(const std::string pkgName)
 void AuthUiStateManager::UnRegisterUiStateCallback(const std::string pkgName)
 {
     int32_t userId = -1;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(userId);
-#endif
     ProcessInfo processInfo;
     processInfo.userId = userId;
     processInfo.pkgName = pkgName;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallingTokenId(processInfo.tokenId);
-#endif
     std::lock_guard<ffrt::mutex> lock(pkgSetMutex_);
     if (pkgSet_.find(processInfo) == pkgSet_.end()) {
         LOGE("AuthUiStateManager UnRegisterUiStateCallback processInfo is not exist.");

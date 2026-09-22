@@ -23,9 +23,7 @@
 #include "dm_crypto.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "deviceprofile_connector.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -70,11 +68,7 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
         DmDeviceInfo saveInfo = info;
         SoftbusConnector::GetUuidByNetworkId(info.networkId, uuid);
         {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
             std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
-#else
-            std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
             remoteDeviceInfos_[uuid] = saveInfo;
             stateDeviceInfos_[udid] = saveInfo;
         }
@@ -88,11 +82,7 @@ void DmDeviceStateManager::DeleteOfflineDeviceInfo(const DmDeviceInfo &info)
 {
     LOGI("begin, deviceId = %{public}s", GetAnonyString(std::string(info.deviceId)).c_str());
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
         std::string deviceId = std::string(info.deviceId);
         for (auto iter: remoteDeviceInfos_) {
             if (std::string(iter.second.deviceId) == deviceId) {
@@ -132,11 +122,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
     LOGI("deviceId: %{public}s, uuid: %{public}s", GetAnonyString(deviceId).c_str(), GetAnonyString(uuid).c_str());
     devInfo.authForm = static_cast<DmAuthForm>(authForm);
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
         if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
             stateDeviceInfos_[deviceId] = devInfo;
         }
@@ -161,11 +147,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
     LOGI("deviceId: %{public}s,  uuid: %{public}s", GetAnonyString(deviceId).c_str(), GetAnonyString(uuid).c_str());
     devInfo.authForm = static_cast<DmAuthForm>(authForm);
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
         if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
             stateDeviceInfos_[deviceId] = devInfo;
         }
@@ -183,11 +165,7 @@ void DmDeviceStateManager::OnDeviceOffline(std::string deviceId, const bool isOn
     LOGI("deviceId = %{public}s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo devInfo;
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
         if (stateDeviceInfos_.find(deviceId) == stateDeviceInfos_.end()) {
             LOGE("not find deviceId");
             return;
@@ -388,18 +366,14 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
         GetAnonyString(devInfo.deviceId).c_str());
     switch (devState) {
         case DEVICE_STATE_ONLINE:
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
             RegisterOffLineTimer(devInfo);
-#endif
             SaveOnlineDeviceInfo(devInfo);
             // need implement in the future
             // DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
             ProcessDeviceStateChange(devState, devInfo, processInfoVec, isOnline);
             break;
         case DEVICE_STATE_OFFLINE:
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
             StartOffLineTimer(peerUdid);
-#endif
             DeleteOfflineDeviceInfo(devInfo);
             if (softbusConnector_ != nullptr) {
                 std::string udid;
@@ -418,7 +392,6 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     }
 }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
     std::vector<ProcessInfo> &processInfoVec, const bool isOnline)
 {
@@ -448,20 +421,6 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
         }
     }
 }
-#else
-void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
-    std::vector<ProcessInfo> &processInfoVec, const bool isOnline)
-{
-    LOGI("begin, devState = %{public}d networkId: %{public}s.", devState,
-        GetAnonyString(devInfo.networkId).c_str());
-    CHECK_NULL_VOID(listener_);
-    for (const auto &item : processInfoVec) {
-        if (!item.pkgName.empty()) {
-            listener_->OnDeviceStateChange(item, devState, devInfo, isOnline);
-        }
-    }
-}
-#endif
 
 void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &uuid)
 {
@@ -473,11 +432,7 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
     }
     DmDeviceInfo saveInfo;
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
         auto iter = remoteDeviceInfos_.find(uuid);
         if (iter == remoteDeviceInfos_.end()) {
             LOGE("complete not find uuid: %{public}s", GetAnonyString(uuid).c_str());
@@ -494,7 +449,6 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
     }
 }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
 {
     std::string peerUdid;
@@ -686,11 +640,9 @@ void DmDeviceStateManager::DeleteCredential(const DmAclIdParam &acl)
     }
     appList.clear();
 }
-#endif
 
 void DmDeviceStateManager::DeleteOffLineTimer(const std::string &peerUdid)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t localUserId = MultipleUserConnector::GetCurrentAccountUserID();
     if (timer_ == nullptr || peerUdid.empty()) {
         return;
@@ -711,9 +663,7 @@ void DmDeviceStateManager::DeleteOffLineTimer(const std::string &peerUdid)
         timer_->DeleteTimer(iter->second.timerName);
         stateTimerInfoMap_.erase(iter);
     }
-#else
     (void)peerUdid;
-#endif
 }
 
 void DmDeviceStateManager::StartEventThread()
@@ -813,11 +763,7 @@ void DmDeviceStateManager::SaveNotifyEventInfos(const int32_t eventId, const std
     LOGI("in, eventId: %{public}d", eventId);
     DmDeviceInfo saveInfo;
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
         auto iter = remoteDeviceInfos_.find(deviceId);
         if (iter == remoteDeviceInfos_.end()) {
             LOGE("complete not find deviceId: %{public}s", GetAnonyString(deviceId).c_str());
@@ -845,11 +791,7 @@ int32_t DmDeviceStateManager::ProcNotifyEvent(const int32_t eventId, const std::
 
 void DmDeviceStateManager::ChangeDeviceInfo(const DmDeviceInfo &info)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
-#else
-    std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
     for (auto iter : remoteDeviceInfos_) {
         if (std::string(iter.second.deviceId) == std::string(info.deviceId)) {
             if (memcpy_s(iter.second.deviceName, sizeof(iter.second.deviceName), info.deviceName,
@@ -890,11 +832,7 @@ std::string DmDeviceStateManager::GetUdidByNetWorkId(std::string networkId)
 {
     LOGI("networkId %{public}s", GetAnonyString(networkId).c_str());
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
         for (auto &iter : stateDeviceInfos_) {
             if (networkId == iter.second.networkId) {
                 return iter.first;
@@ -905,7 +843,6 @@ std::string DmDeviceStateManager::GetUdidByNetWorkId(std::string networkId)
     return "";
 }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t DmDeviceStateManager::DeleteGroupByDP(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId)
 {
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
@@ -948,17 +885,12 @@ int32_t DmDeviceStateManager::DeleteGroupByDP(const std::string &peerUdid, int32
     }
     return DM_OK;
 }
-#endif
 
 bool DmDeviceStateManager::CheckIsOnline(const std::string &udid)
 {
     LOGI("start, udid: %{public}s", GetAnonyString(std::string(udid)).c_str());
     {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         std::lock_guard<ffrt::mutex> mutexLock(remoteDeviceInfosMutex_);
-#else
-        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-#endif
         if (stateDeviceInfos_.find(udid) != stateDeviceInfos_.end()) {
             return true;
         }
@@ -976,7 +908,6 @@ void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo,
     }
 }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DmDeviceStateManager::StartDelTimerByDP(const std::string &peerUdid, int32_t peerUserId, int32_t localUserId)
 {
     LOGI("peerUdid:%{public}s, peerUserId:%{public}d, localUserId:%{public}d",
@@ -1013,6 +944,5 @@ void DmDeviceStateManager::StartDelTimerByDP(const std::string &peerUdid, int32_
         DmDeviceStateManager::DeleteTimeOutGroup(name);
     });
 }
-#endif
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -11,65 +11,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-} else {
-  import("//build/ohos.gni")
-}
+import("//build/ohos.gni")
 
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 if (defined(ohos_lite)) {
-  if (ohos_kernel_type == "linux") {
-    shared_library("devicemanagerutils") {
-      include_dirs = [
-        "include",
-        "include/appInfo/lite",
-        "include/crypto",
-        "include/jsonstr_handle",
-        "include/timer/lite",
-        "${common_path}/include",
-        "${common_path}/include/dfx",
-        "${common_path}/include/dfx/lite",
-        "${common_path}/include/ipc",
-        "${common_path}/include/ipc/lite",
-        "${common_path}/include/ipc/model",
-        "${innerkits_path}/native_cpp/include",
-        "${interfaces_path}/c/ipc/include",
-        "${json_path}/include",
-        "//third_party/bounds_checking_function/include",
-      ]
-
-      sources = [
-        "${common_path}/src/dfx/lite/dm_hidumper.cpp",
-        "${common_path}/src/dfx/lite/dm_hisysevent.cpp",
-        "${common_path}/src/dfx/lite/dm_hitrace.cpp",
-        "${common_path}/src/dm_anonymous.cpp",
-        "${common_path}/src/dm_error_message.cpp",
-        "${common_path}/src/ipc/lite/ipc_cmd_register.cpp",
-        "src/appInfo/lite/app_manager.cpp",
-        "src/crypto/dm_crypto.cpp",
-        "src/dm_random.cpp",
-        "src/jsonstr_handle/dm_jsonstr_handle.cpp",
-        "src/timer/lite/dm_timer.cpp",
-      ]
-
-      defines = [
-        "LITE_DEVICE",
-        "hI_LOG_ENABLE",
-        "DH_LOG_TAG=\"dmutils\"",
-        "lOG_DOMAIN=0xD004110",
-      ]
-
-      deps = [
-        "${json_path}:devicemanagerjson",
-        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      ]
-      external_deps = [
-        "bounds_checking_function:libsec_shared",
-        "openssl:libcrypto_shared",
-      ]
-    }
+  group("devicemanagerutils") {
+    deps = []
+  }
+  group("devicemanagerutilstest") {
+    deps = []
   }
 } else {
   config("devicemanagerutils_config") {

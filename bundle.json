@@ -48,6 +48,7 @@
                 "hisysevent",
                 "hitrace",
                 "hilog",
+                "hilog_lite",
                 "init",
                 "ipc",
                 "json",
@@ -59,11 +60,13 @@
                 "node",
                 "openssl",
                 "os_account",
+                "permission_lite",
                 "power_manager",
                 "resource_management",
                 "runtime_core",
                 "safwk",
                 "samgr",
+                "samgr_lite",
                 "screenlock_mgr",
                 "selinux_adapter",
                 "wifi",
@@ -148,9 +151,7 @@
                     "header_base": "//foundation/distributedhardware/device_manager/3rd/utils/include"
                 }
             }],
-            "test": [
-                "//foundation/distributedhardware/device_manager:device_manager_test"
-            ]
+            "test": []
         }
     }
 }

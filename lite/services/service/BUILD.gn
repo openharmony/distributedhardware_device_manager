@@ -1,0 +1,316 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import("//build/ohos.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+if (defined(ohos_lite)) {
+  config("devicemanagerservice_lite_config") {
+    include_dirs = [
+      "include",
+      "include/discovery",
+      "include/ipc",
+      "include/ipc",
+      "include/permission",
+      "include/softbus",
+      "${lite_common_path}/include",
+      "${lite_common_path}/include/dfx",
+      "${lite_common_path}/include/dfx",
+      "${lite_common_path}/include/ipc",
+      "${lite_common_path}/include/ipc",
+      "${lite_common_path}/include/ipc/model",
+      "${lite_common_path}/include/kvadapter",
+      "${lite_interfaces_path}/include",
+      "${lite_commondependency_path}/include",
+    ]
+  }
+
+  executable("devicemanagerservice") {
+    cflags = [
+      "-Wno-sign-compare",
+    ]
+
+    cflags_c = [
+      "-std=c99",
+    ]
+
+    configs += [ ":devicemanagerservice_lite_config" ]
+
+    sources = [
+      "${lite_common_path}/src/dm_anonymous.c",
+      "${lite_common_path}/src/dm_container.c",
+      "${lite_common_path}/src/dm_thread.c",
+      "${lite_common_path}/src/dm_device_info_c.c",
+      "${lite_common_path}/src/dm_device_profile_info_c.c",
+      "${lite_common_path}/src/ipc/ipc_cmd_register.c",
+      "${lite_common_path}/src/ipc/ipc_model_codec_shell_lite.c",
+      "${lite_common_path}/src/ipc/model/ipc_req.c",
+      "${lite_common_path}/src/ipc/model/ipc_rsp.c",
+      "${lite_common_path}/src/ipc/model/ipc_check_access_control.c",
+      "src/device_manager_service.c",
+      "src/device_manager_service_listener.c",
+      "src/discovery/discovery_manager.c",
+      "src/discovery/discovery_filter.c",
+      "src/ipc/ipc_cmd_parser.c",
+      "src/ipc/ipc_server_stub.c",
+      "src/softbus/softbus_listener.c",
+      "src/service_shell_lite.c",
+      "src/ipc/ipc_shell_lite.c",
+      "src/ipc/ipc_cmd_register_lite.c",
+      "src/notify/dm_lite_client_notify.c",
+      "src/permission/permission_manager_lite.c",
+      "src/devicemanagerservice_main.c",
+    ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"dmsrv\"",
+      "LOG_DOMAIN=0xD004110",
+    ]
+
+    include_dirs = [
+      "${lite_common_path}/include/dfx",
+      "${lite_softbuscache_path}/include",
+      "src",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+      "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
+      "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
+      "//base/security/device_auth/interfaces/inner_api/deviceauth_lite",
+      "//base/security/device_auth/interfaces/inner_api",
+      "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
+      "//foundation/communication/dsoftbus/interfaces/kits/transport",
+      "//foundation/communication/dsoftbus/interfaces/kits/common",
+      "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
+    ]
+
+    deps = [
+      "${lite_commondependency_path}:devicemanagerdependency",
+      "${lite_interfaces_path}:devicemanagersdk",
+      "${lite_json_path}:devicemanagerjson",
+      "${lite_softbuscache_path}:dmdevicecache",
+      "${lite_utils_path}:devicemanagerutils",
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
+      "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
+      "//third_party/bounds_checking_function:libsec_shared",
+      "//foundation/communication/dsoftbus/sdk:softbus_client",
+      "//third_party/mbedtls:mbedtls_shared",
+      "//base/security/device_auth/services:deviceauth_sdk",
+    ]
+  }
+} else {
+  config("devicemanagerservice_config") {
+    include_dirs = [
+      "include",
+      "include/discovery",
+      "include/ipc",
+      "include/ipc",
+      "include/permission",
+      "include/softbus",
+      "${lite_common_path}/include",
+      "${lite_common_path}/include/dfx",
+      "${lite_common_path}/include/dfx",
+      "${lite_common_path}/include/ipc",
+      "${lite_common_path}/include/ipc/model",
+      "${lite_common_path}/include/ipc",
+      "${lite_commondependency_path}/include",
+      "${lite_interfaces_path}/include",
+      "${lite_softbuscache_path}/include",
+      "${lite_utils_path}/include/crypto",
+      "${lite_utils_path}/include/kvadapter",
+      "${lite_utils_path}/include/timer",
+      "${lite_json_path}/include",
+      "//foundation/communication/dsoftbus/interfaces/kits/bus_center",
+      "//foundation/communication/dsoftbus/interfaces/inner_kits/transport",
+      "//foundation/communication/dsoftbus/interfaces/kits/common",
+      "//foundation/communication/dsoftbus/interfaces/kits/transport",
+    ]
+  }
+  config("cflags_config") {
+    cflags = [
+      "-Werror",
+      "-fPIC",
+      "-fstack-protector-strong",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-Oz",
+      "-flto",
+    ]
+    if (!defined(ohos_lite)) {
+      cflags += [ "-fvisibility=hidden" ]
+    }
+    ldflags = [ "-flto" ]
+  }
+  ohos_executable("devicemanagerservice") {
+    if (!device_manager_capability) {
+      install_enable = false
+    } else if (defined(ohos_lite)) {
+      cflags = [
+        "-Werror",
+        "-fPIC",
+        "-fstack-protector-strong",
+      ]
+
+      cflags_c = [ "-std=c99" ]
+
+      configs = [ ":cflags_config" ]
+
+      public_configs = [ ":devicemanagerservice_config" ]
+
+      include_dirs = [
+        "${lite_common_path}/include/dfx",
+        "src",
+        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/samgr",
+        "//foundation/systemabilitymgr/samgr_lite/interfaces/kits/registry",
+        "//foundation/communication/ipc/interfaces/innerkits/c/ipc/include",
+        "//base/security/device_auth/interfaces/inner_api/deviceauth_lite",
+        "//base/security/device_auth/interfaces/inner_api",
+      ]
+
+      sources = [
+        "${lite_common_path}/src/dm_anonymous.c",
+        "${lite_common_path}/src/dm_container.c",
+        "${lite_common_path}/src/dm_thread.c",
+        "${lite_common_path}/src/dm_device_info_c.c",
+        "${lite_common_path}/src/dm_device_profile_info_c.c",
+        "${lite_common_path}/src/ipc/ipc_cmd_register.c",
+        "${lite_common_path}/src/ipc/model/ipc_req.c",
+        "${lite_common_path}/src/ipc/model/ipc_rsp.c",
+        "${lite_common_path}/src/ipc/model/ipc_check_access_control.c",
+        "src/device_manager_service.c",
+        "src/device_manager_service_listener.c",
+        "src/discovery/discovery_filter.c",
+        "src/discovery/discovery_manager.c",
+        "src/ipc/ipc_cmd_parser.c",
+        "src/ipc/ipc_server_stub.c",
+        "src/softbus/softbus_listener.c",
+        "src/service_shell_lite.c",
+        "src/ipc/ipc_shell_lite.c",
+        "src/ipc/ipc_cmd_register_lite.c",
+        "src/notify/dm_lite_client_notify.c",
+        "src/permission/permission_manager_lite.c",
+        "src/devicemanagerservice_main.c",
+      ]
+
+      defines = [
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"dmsrv\"",
+        "LOG_DOMAIN=0xD004110",
+      ]
+
+      deps = [
+        "${lite_commondependency_path}:devicemanagerdependency",
+        "${lite_interfaces_path}:devicemanagersdk",
+        "${lite_json_path}:devicemanagerjson",
+        "${lite_softbuscache_path}:dmdevicecache",
+        "${lite_utils_path}:devicemanagerutils",
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+        "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
+        "//foundation/communication/ipc/interfaces/innerkits/c/ipc:ipc_single",
+        "//third_party/bounds_checking_function:libsec_shared",
+        "//foundation/communication/dsoftbus/sdk:softbus_client",
+        "//third_party/mbedtls:mbedtls_shared",
+        "//base/security/device_auth/services:deviceauth_sdk",
+      ]
+
+      subsystem_name = "distributedhardware"
+      part_name = "device_manager"
+    } else {
+      sources = []
+
+      public_configs = [ ":devicemanagerservice_config" ]
+
+      defines = [
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"dmsrv\"",
+        "LOG_DOMAIN=0xD004110",
+      ]
+
+      deps = [
+        "${lite_commondependency_path}:devicemanagerdependency",
+        "${lite_interfaces_path}:devicemanagersdk",
+        "${lite_json_path}:devicemanagerjson",
+        "${lite_softbuscache_path}:dmdevicecache",
+        "${lite_utils_path}:devicemanagerutils",
+      ]
+
+      external_deps = [
+        "ability_base:want",
+        "access_token:libaccesstoken_sdk",
+        "access_token:libtokenid_sdk",
+        "bundle_framework:appexecfwk_base",
+        "bundle_framework:appexecfwk_core",
+        "c_utils:utils",
+        "cJSON:cjson",
+        "common_event_service:cesfwk_innerkits",
+        "data_share:datashare_common",
+        "data_share:datashare_consumer",
+        "device_auth:deviceauth_sdk",
+        "device_info_manager:distributed_device_profile_common",
+        "device_info_manager:distributed_device_profile_sdk",
+        "dsoftbus:softbus_client",
+        "eventhandler:libeventhandler",
+        "ffrt:libffrt",
+        "hicollie:libhicollie",
+        "hilog:libhilog",
+        "init:libbeget_proxy",
+        "init:libbegetutil",
+        "ipc:ipc_core",
+        "ipc:ipc_single",
+        "json:nlohmann_json_static",
+        "openssl:libcrypto_shared",
+        "os_account:libaccountkits",
+        "os_account:os_account_innerkits",
+        "safwk:system_ability_fwk",
+        "samgr:samgr_proxy",
+      ]
+
+      if ((support_bluetooth || support_wifi) &&
+          device_manager_feature_product == "default") {
+        sources += []
+      }
+
+      if (support_bluetooth && device_manager_feature_product == "default") {
+        defines += [ "SUPPORT_BLUETOOTH" ]
+        external_deps += [ "bluetooth:btframework" ]
+      }
+
+      if (support_wifi && device_manager_feature_product == "default") {
+        defines += [ "SUPPORT_WIFI" ]
+        external_deps += [ "wifi:wifi_sdk" ]
+      }
+
+      if (support_power_manager) {
+        defines += [ "SUPPORT_POWER_MANAGER" ]
+        external_deps += [ "power_manager:powermgr_client" ]
+      }
+
+      if (support_memmgr) {
+        defines += [ "SUPPORT_MEMMGR" ]
+        external_deps += [ "memmgr:memmgrclient" ]
+      }
+
+      if (device_manager_common) {
+        defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
+      }
+
+      if (device_manager_feature_product == "default") {
+        defines += [ "SUPPORT_WISEDEVICE" ]
+      }
+
+      subsystem_name = "distributedhardware"
+      part_name = "device_manager"
+    }
+  }
+}

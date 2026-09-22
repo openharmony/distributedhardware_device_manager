@@ -20,10 +20,8 @@
 #include "dm_publish_info.h"
 #include "dm_random.h"
 #include "system_ability_definition.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ipc_skeleton.h"
 #include "multiple_user_connector.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -35,19 +33,14 @@ const int32_t DM_INVALID_FLAG_ID = 0;
 
 static uint32_t GetCallingTokenId()
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return IPCSkeleton::GetCallingTokenID();
-#else
     return 0;
-#endif
 }
 
 static int32_t GetCallingUserId()
 {
     int32_t userId = -1;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(userId);
-#endif
     return userId;
 }
 
