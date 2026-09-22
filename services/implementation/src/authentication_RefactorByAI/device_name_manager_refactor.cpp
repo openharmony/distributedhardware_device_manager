@@ -771,8 +771,8 @@ int32_t DeviceNameManagerRefactor::SetValue(const std::string &tableName, int32_
     return ret;
 }
 
-std::shared_ptr<DataShare::DataShareHelper>
-DeviceNameManagerRefactor::CreateDataShareHelper(const std::string &proxyUri)
+std::shared_ptr<DataShare::DataShareHelper>DeviceNameManagerRefactor::CreateDataShareHelper(
+    const std::string &proxyUri)
 {
     if (proxyUri.empty()) {
         LOGE("proxyUri is empty");
