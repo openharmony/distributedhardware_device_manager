@@ -53,6 +53,7 @@ const char* TAG_ACL = "accessControlTable";
 const char* TAG_DMVERSION = "dmVersion";
 const char* TAG_ACL_HASH_KEY_VERSION = "aclVersion";
 const char* TAG_ACL_HASH_KEY_ACLHASHLIST = "aclHashList";
+const char* TAG_ACCOUNT_ID = "accountId";
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -5244,11 +5245,14 @@ DM_EXPORT std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLev
 #endif
 
 int32_t DeviceProfileConnector::GetServiceIdByDisplayIdAndServiceCode(int64_t displayId, const std::string &serviceCode,
-    int64_t &serviceId)
+    int64_t &serviceId, const std::string &localUdid)
 {
-    LOGI("displayId: %{public}" PRId64 ", serviceCode: %{public}s", displayId, serviceCode.c_str());
+    LOGI("displayId: %{public}" PRId64 ", serviceCode: %{public}s, localUdid:%{public}s", displayId,
+        serviceCode.c_str(), GetAnonyString(localUdid).c_str());
+    DistributedDeviceProfile::UserInfo userInfo;
+    userInfo.udid = localUdid;
     std::vector<DistributedDeviceProfile::ServiceInfo> dpServiceInfos;
-    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetAllServiceInfoList(dpServiceInfos);
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetServiceInfosByUserInfo(userInfo, dpServiceInfos);
     if (ret != DM_OK) {
         LOGE("failed, result: %{public}d", ret);
         if (ret == DP_NOT_FIND_DATA) {
@@ -5256,8 +5260,15 @@ int32_t DeviceProfileConnector::GetServiceIdByDisplayIdAndServiceCode(int64_t di
         }
         return ret;
     }
-    for (auto &dpServiceInfo : dpServiceInfos) {
-        if (dpServiceInfo.GetDisplayId() == displayId && dpServiceInfo.GetServiceCode() == serviceCode) {
+    int32_t localUserId = MultipleUserConnector::GetUserIdByDisplayId(displayId);
+    const std::string localAccountId = MultipleUserConnector::GetAccountIdByUserId(localUserId);
+    for (const auto &dpServiceInfo : dpServiceInfos) {
+        if (dpServiceInfo.GetDisplayId() != displayId || dpServiceInfo.GetServiceCode() != serviceCode) {
+            continue;
+        }
+        std::string accountId = "";
+        ParseAccountIdByExtraData(dpServiceInfo.GetExtraData(), accountId);
+        if (localAccountId == accountId) {
             serviceId = dpServiceInfo.GetServiceId();
             LOGI("serviceId: %{public}s", std::to_string(serviceId).c_str());
             return DM_OK;
@@ -5265,6 +5276,21 @@ int32_t DeviceProfileConnector::GetServiceIdByDisplayIdAndServiceCode(int64_t di
     }
     LOGE("failed, displayId and serviceCode not match");
     return ERR_DM_SERVICE_INFO_NOT_EXIST;
+}
+
+void DeviceProfileConnector::ParseAccountIdByExtraData(const std::string &extraData, std::string &accountId)
+{
+    if (extraData.empty()) {
+        LOGE("extraData is empty");
+        return;
+    }
+    JsonObject extraDataJson(extraData);
+    if (extraDataJson.IsDiscarded() || !IsString(extraDataJson, TAG_ACCOUNT_ID)) {
+        LOGE("parse extraData fail or accountid is not string");
+        return;
+    }
+    accountId = extraDataJson[TAG_ACCOUNT_ID].Get<std::string>();
+    LOGI("accountId: %{public}s", GetAnonyString(accountId).c_str());
 }
 } // namespace DistributedHardware
 } // namespace OHOS
