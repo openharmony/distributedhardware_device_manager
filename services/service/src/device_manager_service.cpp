@@ -2714,6 +2714,7 @@ void DeviceManagerService::HandleDistributedAccountLogoutEvent(const std::string
         NotifyPeerDevices(localUdid, eventInfo.userId, accountId, AccountEventType::ACCOUNT_LOGOUT);
         DeviceProfileConnector::GetInstance().HandleDistributedAccountLogout(localUdid, eventInfo.userId, accountId);
     }
+    DeviceNameManager::GetInstance().InitDeviceNameWhenLogout();
 #else
     ffrt::submit([=]() {
         HandleAccountLogoutEventCallback(eventInfo.eventName, eventInfo.userId, eventInfo.beforeUserId);

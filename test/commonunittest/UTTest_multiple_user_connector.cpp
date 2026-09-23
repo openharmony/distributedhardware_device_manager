@@ -826,6 +826,46 @@ HWTEST_F(MultipleUserConnectorTest, ClearLockedUser_008, testing::ext::TestSize.
     // Both valid (unlocked) users should remain.
     EXPECT_EQ(foregroundUserVec.size(), 2U);
 }
+
+/**
+ * @tc.name: GetMainDisplayActiveUserId_001
+ * @tc.desc: GetMainDisplayActiveUserId can be called and returns a valid int32_t value.
+ * @tc.type: FUNC
+ */
+HWTEST_F(MultipleUserConnectorTest, GetMainDisplayActiveUserId_001, testing::ext::TestSize.Level1)
+{
+    int32_t userId = MultipleUserConnector::GetMainDisplayActiveUserId();
+    EXPECT_TRUE(userId >= 0 || userId == -1);
+}
+
+/**
+ * @tc.name: GetMainDisplayActiveUserId_002
+ * @tc.desc: GetMainDisplayActiveUserId returns a consistent value across consecutive calls.
+ * @tc.type: FUNC
+ */
+HWTEST_F(MultipleUserConnectorTest, GetMainDisplayActiveUserId_002, testing::ext::TestSize.Level1)
+{
+    int32_t userIdFirst = MultipleUserConnector::GetMainDisplayActiveUserId();
+    int32_t userIdSecond = MultipleUserConnector::GetMainDisplayActiveUserId();
+    EXPECT_EQ(userIdFirst, userIdSecond);
+}
+
+/**
+ * @tc.name: GetMainDisplayActiveUserId_003
+ * @tc.desc: When GetUserIdByDisplayId fails, GetMainDisplayActiveUserId falls back to GetCurrentAccountUserID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(MultipleUserConnectorTest, GetMainDisplayActiveUserId_003, testing::ext::TestSize.Level1)
+{
+    int32_t deviceNameUserId = MultipleUserConnector::GetMainDisplayActiveUserId();
+    int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    int32_t displayUserId = MultipleUserConnector::GetUserIdByDisplayId(0);
+    if (displayUserId < 0) {
+        EXPECT_EQ(deviceNameUserId, currentUserId);
+    } else {
+        EXPECT_EQ(deviceNameUserId, displayUserId);
+    }
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS

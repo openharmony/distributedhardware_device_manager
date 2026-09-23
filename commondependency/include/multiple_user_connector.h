@@ -134,6 +134,7 @@ public:
     DM_EXPORT static DMAccountInfo GetCurrentDMAccountInfo();
     DM_EXPORT static void GetCallingTokenId(uint32_t &tokenId);
     DM_EXPORT static int32_t GetUserIdByDisplayId(int32_t displayId);
+    DM_EXPORT static int32_t GetMainDisplayActiveUserId(void);
     DM_EXPORT static bool CheckMDMControl();
     DM_EXPORT static void UpdateForgroundUserId();
     DM_EXPORT static int32_t GetForgroundUserId();
