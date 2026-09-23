@@ -562,7 +562,7 @@ void SoftbusListener::OnLocalDevInfoChange()
 
 void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *msg, uint32_t msgLen)
 {
-    LOGI("start.");
+    LOGI("In");
     if (msg == nullptr || msgLen > MAX_SOFTBUS_MSG_LEN || strlen(msg) != msgLen) {
         LOGE("msg invalied.");
         return;
@@ -913,7 +913,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
 {
     int32_t ret = SoftbusCache::GetInstance().GetDeviceInfoFromCache(deviceInfoList);
     size_t deviceCount = deviceInfoList.size();
-    LOGI("size is %{public}zu.", deviceCount);
+    LOGI("cache size: %{public}zu", deviceCount);
     return ret;
 }
 
@@ -1134,7 +1134,7 @@ int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_
         return ret;
     }
     networkType = tempNetworkType;
-    LOGI("networkType %{public}d.", tempNetworkType);
+    LOGI("networkType %{public}d", tempNetworkType);
     return DM_OK;
 }
 

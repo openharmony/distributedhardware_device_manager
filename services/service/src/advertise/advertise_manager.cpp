@@ -66,7 +66,7 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("begin for pkgName = %{public}s.", pkgName.c_str());
+    LOGI("pkgName = %{public}s", pkgName.c_str());
     std::string businessPkgName = MakeBusinessPkgName(pkgName, GetCallingUserId(), GetCallingTokenId());
     DmPublishInfo dmPubInfo;
     ConfigAdvParam(advertiseParam, &dmPubInfo, businessPkgName);
@@ -153,7 +153,7 @@ int32_t AdvertiseManager::StopAdvertising(const std::string &pkgName, int32_t pu
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("begin for pkgName = %{public}s, publishId = %{public}d.", pkgName.c_str(), publishId);
+    LOGI("pkgName = %{public}s, publishId = %{public}d", pkgName.c_str(), publishId);
     std::string businessPkgName = MakeBusinessPkgName(pkgName, GetCallingUserId(), GetCallingTokenId());
     int32_t innerPublishId = GetAndRemoveInnerPublishId(businessPkgName, publishId);
     if (innerPublishId == DM_INVALID_FLAG_ID) {
@@ -225,7 +225,7 @@ void AdvertiseManager::ClearPublishIdCache(const ProcessInfo &processInfo)
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("Begin for pkgName = %{public}s.", processInfo.pkgName.c_str());
+    LOGI("pkgName = %{public}s", processInfo.pkgName.c_str());
     CHECK_NULL_VOID(softbusListener_);
     std::string businessPkgName = MakeBusinessPkgName(processInfo.pkgName, processInfo.userId, processInfo.tokenId);
     std::lock_guard<std::mutex> autoLock(pubMapLock_);

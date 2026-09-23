@@ -87,7 +87,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
             return ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED;
         }
     }
-    LOGI("capability = %{public}s,", std::string(dmSubInfo.capability).c_str());
+    LOGI("cap = %{public}s", std::string(dmSubInfo.capability).c_str());
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
         capabilityMap_[pkgNameTemp] = std::string(dmSubInfo.capability);

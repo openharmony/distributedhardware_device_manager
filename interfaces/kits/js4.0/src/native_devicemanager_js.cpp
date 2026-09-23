@@ -111,7 +111,7 @@ void DeleteDmNapiStatusJsCallbackPtr(DmNapiStatusJsCallback *&pJsCallbackPtr)
     }
     delete pJsCallbackPtr;
     pJsCallbackPtr = nullptr;
-    LOGI("delete DmNapiStatusJsCallback callbackPtr!");
+    LOGI("End");
 }
 
 void DeleteAsyncCallbackInfo(DeviceBasicInfoListAsyncCallbackInfo *&pAsynCallbackInfo)
@@ -2841,7 +2841,7 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    LOGI("Create for packageName:%{public}s", bundleName.c_str());
+    LOGI("pkgName:%{public}s", bundleName.c_str());
     DeviceManagerNapi *obj = new DeviceManagerNapi(env, thisVar);
     if (obj == nullptr) {
         return nullptr;
@@ -3019,7 +3019,7 @@ int32_t DeviceManagerNapi::BindTargetWarpper(const std::string &pkgName, const s
  */
 static napi_value Export(napi_env env, napi_value exports)
 {
-    LOGI("Export() is called!");
+    LOGI("In");
     DeviceManagerNapi::Init(env, exports);
     DeviceManagerNapi::InitDeviceStatusChangeActionEnum(env, exports);
     DeviceManagerNapi::InitStrategyForHeartbeatEnum(env, exports);
@@ -3042,7 +3042,7 @@ static napi_module g_dmModule = {.nm_version = 1,
  */
 extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
-    LOGI("RegisterModule() is called!");
+    LOGI("In");
     napi_module_register(&g_dmModule);
 }
 

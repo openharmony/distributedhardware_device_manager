@@ -890,7 +890,7 @@ void DeviceManagerServiceImpl::SetOnlineProcessInfo(const uint32_t &bindType, Pr
         devInfo.authForm = DmAuthForm::SHARE;
         processInfoVec.push_back(processInfo);
     }
-    LOGI("HandleOnline success devInfo authForm is %{public}d.", devInfo.authForm);
+    LOGI("devInfo AF: %{public}d", devInfo.authForm);   // AF: authForm
     deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec, trustDeviceId, isOnline);
     return;
 }
@@ -2278,7 +2278,7 @@ void DeviceManagerServiceImpl::HandleUserSwitched(const std::vector<std::string>
 void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEventType)
 {
     if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
-        LOGI("on screen locked.");
+        LOGI("on screen locked");
         std::lock_guard<ffrt::mutex> lock(authMgrMapMtx_);
         for (auto& pair : authMgrMap_) {
             if (pair.second != nullptr) {
@@ -2288,7 +2288,7 @@ void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEvent
         }
         return;
     }
-    LOGI("error.");
+    LOGI("error");
 }
 
 bool DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
