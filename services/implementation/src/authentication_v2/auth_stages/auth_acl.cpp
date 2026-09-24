@@ -434,7 +434,7 @@ int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
         JoinLnn(context);
     }
     LOGI("ok");
-    if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED) {
+    if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED && context->reason != DM_BIND_TRUST_TARGET) {
         context->connDelayCloseTime = 0;
     }
     if (context->cleanNotifyCallback != nullptr) {

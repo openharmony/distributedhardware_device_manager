@@ -370,6 +370,8 @@ public:
         int32_t tokenId, int32_t userId);
     DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByDeviceIdAndUserId(
         const std::string &deviceId, int32_t userId, const std::string &remoteDeviceId);
+    DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> HandleGetAclByDevIdAndUserId(
+        const std::string &deviceId, int32_t userId, const std::string &remoteDeviceId);
     DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclList(const std::string localUdid,
         int32_t localUserId, const std::string remoteUdid, int32_t remoteUserId);
     DM_EXPORT bool ChecksumAcl(DistributedDeviceProfile::AccessControlProfile &acl,
