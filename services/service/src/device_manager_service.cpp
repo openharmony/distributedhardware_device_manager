@@ -135,6 +135,7 @@ namespace {
     constexpr size_t MAX_SINGLE_CACHE_ACCOUNTS_SIZE = 100;
     constexpr int32_t FOREGROUND_ACCOUNT_CACHE_TIMEOUT_S = 60;
     constexpr const char* FOREGROUND_ACCOUNT_CACHE_TIMEOUT_TASK = "ForegroundAccountCacheTimeout";
+    constexpr int32_t INVALID_SUB_PROFILE_ID = -1;
 
     constexpr const char* SYNC_SERVICE_INFO_ONLINE_TASK = "SyncServiceInfoOnlineTask";
     constexpr const char* SEND_APP_UN_BIND_BROAD_CAST_TASK = "SendAppUnBindBroadCastTask";
@@ -2750,8 +2751,10 @@ void DeviceManagerService::HandleAccountEvent(const DmAccountEventInfo& eventInf
     char localUdid[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
     std::string localUdidStr(localUdid);
-    
-    if (eventInfo.eventName == CommonEventSupport::COMMON_EVENT_OS_ACCOUNT_SUB_PROFILE_DELETED) {
+
+    if (eventInfo.eventName == CommonEventSupport::COMMON_EVENT_OS_ACCOUNT_SUB_PROFILE_CREATED) {
+        HandleSubProfileCreatedEvent(eventInfo);
+    } else if (eventInfo.eventName == CommonEventSupport::COMMON_EVENT_OS_ACCOUNT_SUB_PROFILE_DELETED) {
         HandleSubProfileDeletedEvent(localUdidStr, eventInfo);
     } else if (eventInfo.eventName == CommonEventSupport::COMMON_EVENT_OS_ACCOUNT_SUB_PROFILE_SWITCHED) {
         HandleSubProfileSwitchedEvent(localUdidStr, eventInfo);
@@ -2762,6 +2765,17 @@ void DeviceManagerService::HandleAccountEvent(const DmAccountEventInfo& eventInf
     } else if (eventInfo.eventName == CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGOUT) {
         HandleDistributedAccountLogoutEvent(localUdidStr, eventInfo);
     }
+}
+
+void DeviceManagerService::HandleSubProfileCreatedEvent(const DmAccountEventInfo& eventInfo)
+{
+#ifdef CAR_DEVICE_ENABLE
+    std::lock_guard<std::mutex> lock(subProfileCacheLock_);
+    cachedSubProfileId_ = eventInfo.subProfileId;
+    cachedSubProfileUserId_ = eventInfo.userId;
+    LOGI("SubProfileCreated: cached subProfileId %{public}d, userId %{public}d",
+        cachedSubProfileId_, cachedSubProfileUserId_);
+#endif
 }
 
 void DeviceManagerService::HandleSubProfileDeletedEvent(const std::string& localUdid,
@@ -2784,11 +2798,185 @@ void DeviceManagerService::HandleSubProfileSwitchedEvent(const std::string& loca
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #ifdef CAR_DEVICE_ENABLE
+    LOGI("SubProfileSwitched: userId %{public}d, subProfileId %{public}d, previousSubProfileId %{public}d",
+        eventInfo.userId, eventInfo.subProfileId, eventInfo.previousSubProfileId);
+    bool hasCachedSubProfileId = false;
+    {
+        std::lock_guard<std::mutex> lock(subProfileCacheLock_);
+        if (cachedSubProfileId_ == eventInfo.subProfileId && cachedSubProfileUserId_ == eventInfo.userId) {
+            cachedSubProfileId_ = -1;
+            cachedSubProfileUserId_ = -1;
+            hasCachedSubProfileId = true;
+            LOGI("SubProfileSwitched: cleared cached subProfileId %{public}d", eventInfo.subProfileId);
+        }
+    }
+    if (hasCachedSubProfileId) {
+        LOGI("SubProfileSwitched: accountId is empty and has cached subProfileId, deferring execution");
+        {
+            std::lock_guard<std::mutex> lock(subProfileCacheLock_);
+            deferredSubProfileSwitched_ = true;
+            deferredSwitchedEventInfo_ = eventInfo;
+        }
+        return;
+    }
+    DeletePreviousSubProfileAclOnSwitch(localUdid, eventInfo);
     TriggerForegroundAccountSync();
     LOGI("SubProfileSwitched: userId %{public}d, previousSubProfileId %{public}d",
         eventInfo.userId, eventInfo.previousSubProfileId);
     DeviceProfileConnector::GetInstance().HandleSubProfileSwitched(localUdid, eventInfo.userId,
         eventInfo.subProfileId, eventInfo.previousSubProfileId);
+#endif
+#endif
+}
+
+static bool IsCredentialSharedByUserId(
+    const std::vector<DistributedDeviceProfile::AccessControlProfile>& profiles,
+    int32_t userId, const std::string& credId)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (credId.empty()) {
+        return false;
+    }
+    for (const auto& profile : profiles) {
+        if (profile.GetAccesser().GetAccesserUserId() == userId &&
+            profile.GetAccesser().GetAccesserCredentialIdStr() == credId) {
+            return true;
+        }
+        if (profile.GetAccessee().GetAccesseeUserId() == userId &&
+            profile.GetAccessee().GetAccesseeCredentialIdStr() == credId) {
+            return true;
+        }
+    }
+#endif
+    return false;
+}
+
+static bool DeleteSingleSubProfileAcl(const std::string& localUdid,
+    const DistributedDeviceProfile::AccessControlProfile& item,
+    const std::shared_ptr<HichainListener>& hichainListener,
+    std::vector<DistributedDeviceProfile::AccessControlProfile>& remainingProfiles)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#ifdef CAR_DEVICE_ENABLE
+    std::string acerDeviceId = item.GetAccesser().GetAccesserDeviceId();
+    std::string aceeDeviceId = item.GetAccessee().GetAccesseeDeviceId();
+    std::string peerExtra;
+    int32_t localUserId = 0;
+    int32_t localSkId = 0;
+    std::string localCredId;
+    std::string peerUdid;
+    if (acerDeviceId == localUdid) {
+        peerUdid = aceeDeviceId;
+        peerExtra = DeviceProfileConnector::GetInstance().GetAclVersionInfo(peerUdid, localUdid, item);
+        localUserId = item.GetAccesser().GetAccesserUserId();
+        localSkId = item.GetAccesser().GetAccesserSessionKeyId();
+        localCredId = item.GetAccesser().GetAccesserCredentialIdStr();
+    } else if (aceeDeviceId == localUdid) {
+        peerUdid = acerDeviceId;
+        peerExtra = DeviceProfileConnector::GetInstance().GetAclVersionInfo(peerUdid, localUdid, item);
+        localUserId = item.GetAccessee().GetAccesseeUserId();
+        localSkId = item.GetAccessee().GetAccesseeSessionKeyId();
+        localCredId = item.GetAccessee().GetAccesseeCredentialIdStr();
+    } else {
+        return false;
+    }
+    std::string peerVersion;
+    DeviceProfileConnector::GetInstance().GetVersionByExtra(peerExtra, peerVersion);
+    if (!peerVersion.empty() && !CompareVersion(std::string(DM_VERSION_5_1_6), peerVersion)) {
+        LOGI("Peer %{public}s acl version %{public}s >= %{public}s, skip deletion",
+            GetAnonyString(peerUdid).c_str(), peerVersion.c_str(), DM_VERSION_5_1_6);
+        return false;
+    }
+    DeviceProfileConnector::GetInstance().DeleteSessionKey(localUserId, localSkId);
+    if (!localCredId.empty() && !IsCredentialSharedByUserId(remainingProfiles, localUserId, localCredId)) {
+        hichainListener->DeleteCredential(localUserId, localCredId);
+    }
+    DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
+    return true;
+#endif
+#endif
+    return false;
+}
+
+static std::vector<DistributedDeviceProfile::AccessControlProfile> CollectSubProfileSwitchTargetAcls(
+    const std::string& localUdid, int32_t userId, const std::string& accountId,
+    const std::vector<DistributedDeviceProfile::AccessControlProfile>& allProfiles)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> targetProfiles;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#ifdef CAR_DEVICE_ENABLE
+    for (const auto& profile : allProfiles) {
+        bool isLocalAccesser = profile.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            profile.GetAccesser().GetAccesserUserId() == userId;
+        bool isLocalAccessee = profile.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            profile.GetAccessee().GetAccesseeUserId() == userId;
+        if (!isLocalAccesser && !isLocalAccessee) {
+            continue;
+        }
+        std::string localAccountId = isLocalAccesser ?
+            profile.GetAccesser().GetAccesserAccountId() :
+            profile.GetAccessee().GetAccesseeAccountId();
+        if (localAccountId.empty() || localAccountId == accountId) {
+            continue;
+        }
+        if (profile.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+            continue;
+        }
+        targetProfiles.push_back(profile);
+    }
+#endif
+#endif
+    return targetProfiles;
+}
+
+static std::vector<DistributedDeviceProfile::AccessControlProfile> BuildRemainingProfiles(
+    const std::vector<DistributedDeviceProfile::AccessControlProfile>& allProfiles,
+    const std::vector<DistributedDeviceProfile::AccessControlProfile>& targetProfiles)
+{
+    std::unordered_set<int64_t> targetAclIds;
+    for (const auto& profile : targetProfiles) {
+        targetAclIds.insert(profile.GetAccessControlId());
+    }
+    std::vector<DistributedDeviceProfile::AccessControlProfile> remainingProfiles;
+    for (const auto& profile : allProfiles) {
+        if (targetAclIds.find(profile.GetAccessControlId()) == targetAclIds.end()) {
+            remainingProfiles.push_back(profile);
+        }
+    }
+    return remainingProfiles;
+}
+
+void DeviceManagerService::DeletePreviousSubProfileAclOnSwitch(const std::string& localUdid,
+    const DmAccountEventInfo& eventInfo)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#ifdef CAR_DEVICE_ENABLE
+    if (eventInfo.subProfileId == INVALID_SUB_PROFILE_ID ||
+        eventInfo.previousSubProfileId == INVALID_SUB_PROFILE_ID) {
+        return;
+    }
+    DMAccountInfo dmAccountInfo = MultipleUserConnector::GetDMAccountInfoByUserId(eventInfo.userId);
+    LOGI("SubProfileSwitched delete old acl: userId %{public}d, previousSubProfileId %{public}d, "
+        "accountId %{public}s", eventInfo.userId, eventInfo.previousSubProfileId,
+        GetAnonyString(dmAccountInfo.accountId).c_str());
+    if (dmAccountInfo.accountId.empty()) {
+        return;
+    }
+    std::vector<DistributedDeviceProfile::AccessControlProfile> allProfiles =
+        DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
+    std::vector<DistributedDeviceProfile::AccessControlProfile> targetProfiles =
+        CollectSubProfileSwitchTargetAcls(localUdid, eventInfo.userId, dmAccountInfo.accountId, allProfiles);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> remainingProfiles =
+        BuildRemainingProfiles(allProfiles, targetProfiles);
+    {
+        std::lock_guard<ffrt::mutex> lock(hichainListenerLock_);
+        if (hichainListener_ == nullptr) {
+            hichainListener_ = std::make_shared<HichainListener>();
+        }
+        for (const auto &item : targetProfiles) {
+            DeleteSingleSubProfileAcl(localUdid, item, hichainListener_, remainingProfiles);
+        }
+    }
 #endif
 #endif
 }
@@ -2808,6 +2996,9 @@ void DeviceManagerService::HandleDistributedAccountBoundEvent(const DmAccountEve
     MultipleUserConnector::SetAccountInfo(eventInfo.userId, eventInfo.subProfileId, dmAccountInfo);
     LOGI("Cached account binding: userId %{public}d, accountId %{public}s, subProfileId %{public}d",
         eventInfo.userId, GetAnonyString(eventInfo.accountId).c_str(), eventInfo.subProfileId);
+#ifdef CAR_DEVICE_ENABLE
+    ExecuteDeferredSubProfileSwitched(eventInfo.subProfileId);
+#endif
 }
 
 void DeviceManagerService::HandleDistributedAccountLoginEvent(const std::string& localUdid,
@@ -2828,6 +3019,36 @@ void DeviceManagerService::HandleDistributedAccountLoginEvent(const std::string&
     DeviceProfileConnector::GetInstance().HandleDistributedAccountLogin(localUdid, eventInfo.userId,
         eventInfo.accountId);
 #endif
+#endif
+}
+
+void DeviceManagerService::ExecuteDeferredSubProfileSwitched(int32_t subProfileId)
+{
+#ifdef CAR_DEVICE_ENABLE
+    DmAccountEventInfo eventInfo;
+    {
+        std::lock_guard<std::mutex> lock(subProfileCacheLock_);
+        if (!deferredSubProfileSwitched_) {
+            LOGI("ExecuteDeferredSubProfileSwitched: no deferred event, skip");
+            return;
+        }
+        if (subProfileId != -1 && deferredSwitchedEventInfo_.subProfileId != subProfileId) {
+            LOGI("subProfileId mismatch, deferred %{public}d, incoming %{public}d, skip",
+                deferredSwitchedEventInfo_.subProfileId, subProfileId);
+            return;
+        }
+        deferredSubProfileSwitched_ = false;
+        eventInfo = deferredSwitchedEventInfo_;
+    }
+    LOGI("executing deferred switched for userId %{public}d, subProfileId %{public}d",
+        eventInfo.userId, eventInfo.subProfileId);
+    char localUdid[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
+    std::string localUdidStr(localUdid);
+    DeletePreviousSubProfileAclOnSwitch(localUdidStr, eventInfo);
+    TriggerForegroundAccountSync();
+    DeviceProfileConnector::GetInstance().HandleSubProfileSwitched(localUdidStr, eventInfo.userId,
+        eventInfo.subProfileId, eventInfo.previousSubProfileId);
 #endif
 }
 

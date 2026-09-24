@@ -211,6 +211,7 @@ const char* DM_VERSION_5_1_2 = "5.1.2";
 const char* DM_VERSION_5_1_3 = "5.1.3";
 const char* DM_VERSION_5_1_4 = "5.1.4";
 const char* DM_VERSION_5_1_5 = "5.1.5";
+const char* DM_VERSION_5_1_6 = "5.1.6";
 const char* DM_VERSION_5_1_7 = "5.1.7";
 const char* DM_CURRENT_VERSION = DM_VERSION_5_1_7;
 const char* DM_ACL_AGING_VERSION = DM_VERSION_5_1_0;

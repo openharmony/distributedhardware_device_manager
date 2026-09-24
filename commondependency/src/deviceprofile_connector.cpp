@@ -406,8 +406,8 @@ std::string DeviceProfileConnector::GetDeviceAuthVersionInfo(std::string localUd
     return "";
 }
 
-std::string DeviceProfileConnector::GetAclVersionInfo(const std::string localUdid, const std::string remoteUdid,
-    const DistributedDeviceProfile::AccessControlProfile &acl)
+DM_EXPORT std::string DeviceProfileConnector::GetAclVersionInfo(const std::string localUdid,
+    const std::string remoteUdid, const DistributedDeviceProfile::AccessControlProfile &acl)
 {
     std::string acerDeviceId = acl.GetAccesser().GetAccesserDeviceId();
     std::string aceeDeviceId = acl.GetAccessee().GetAccesseeDeviceId();
