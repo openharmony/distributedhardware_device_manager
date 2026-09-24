@@ -1285,8 +1285,10 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Lev
 {
     std::string networkId = "networkId";
     DmDeviceInfo deviceInfo;
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillRepeatedly(Return(true));
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));

@@ -1032,6 +1032,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_002, testing::ext::TestSize.Lev
     DmDeviceInfo info;
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillRepeatedly(Return(true));
     EXPECT_CALL(*permissionManagerMock_, CheckDataSyncPermission()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillRepeatedly(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
