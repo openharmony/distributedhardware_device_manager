@@ -330,7 +330,7 @@ DM_EXPORT int32_t AppManager::GetCallerProcessName(std::string &processName)
         return ERR_DM_FAILED;
     }
 
-    LOGI("Get process name: %{public}s success.", processName.c_str());
+    LOGI("processName %{public}s, tokenID %{public}s", processName.c_str(), GetAnonyInt32(tokenCaller).c_str());
     return DM_OK;
 }
 

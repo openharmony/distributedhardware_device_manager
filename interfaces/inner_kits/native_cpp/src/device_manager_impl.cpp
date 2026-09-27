@@ -1849,7 +1849,7 @@ int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
         LOGE("input callback is null or pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+    LOGI("pkgName: %{public}s", pkgName.c_str());
     uint16_t subscribeId = AddDiscoveryCallback(pkgName, discoverParam, callback);
     discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
     std::string discParaStr = ConvertMapToJsonString(discoverParam);
@@ -1871,7 +1871,7 @@ int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
         LOGE("Failed with ret %{public}d", ret);
         return ret;
     }
-    LOGI("Completed");
+    LOGI("end");
     return DM_OK;
 }
 
@@ -1883,13 +1883,13 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
         LOGE("input pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+    LOGI("pkgName: %{public}s", pkgName.c_str());
     std::string pkgNameTemp = ComposeStr(pkgName, DM_INVALID_FLAG_ID);
     uint16_t subscribeId = GetSubscribeIdFromMap(pkgNameTemp);
     if (subscribeId == DM_INVALID_FLAG_ID) {
         DmRadarHelper::GetInstance().ReportDmBehavior(
             pkgName, "UnRegisterDiscoveryCallback", ERR_DM_INPUT_PARA_INVALID, anonyLocalUdid_);
-        LOGE("cannot find pkgName in cache map.");
+        LOGE("not find pkgName");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::map<std::string, std::string> extraParam;
@@ -1917,7 +1917,7 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
     }
     RemoveDiscoveryCallback(pkgNameTemp);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgNameTemp, "UnRegisterDiscoveryCallback", DM_OK, anonyLocalUdid_);
-    LOGI("Completed");
+    LOGI("end");
     return DM_OK;
 }
 
@@ -2749,7 +2749,7 @@ int32_t DeviceManagerImpl::RegisterAuthenticationType(const std::string &pkgName
 int32_t DeviceManagerImpl::GetDeviceProfileInfoList(const std::string &pkgName,
     const DmDeviceProfileInfoFilterOptions &filterOptions, std::shared_ptr<GetDeviceProfileInfoListCallback> callback)
 {
-    LOGI("In pkgName:%{public}s, isCloud:%{public}d", pkgName.c_str(), filterOptions.isCloud);
+    LOGI("pkgName:%{public}s, isCloud:%{public}d", pkgName.c_str(), filterOptions.isCloud);
     int32_t ret = DeviceManagerNotify::GetInstance().RegisterGetDeviceProfileInfoListCallback(pkgName, callback);
     if (ret != DM_OK) {
         LOGE("register callback error, ret: %{public}d", ret);

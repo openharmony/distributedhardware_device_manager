@@ -148,7 +148,7 @@ std::string DeviceManagerService3rd::GeneratePinCode(uint32_t pinLength)
 int32_t DeviceManagerService3rd::GeneratePinCode(uint32_t pinLength, std::string &pincode)
 {
     if (!PermissionManager3rd::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller does not have permission.");
+        LOGE("No permission");
         return ERR_DM_NO_PERMISSION;
     }
     if (pinLength < DM_MIN_PINCODE_SIZE || pinLength > DM_MAX_PINCODE_SIZE) {
@@ -181,7 +181,7 @@ int32_t DeviceManagerService3rd::AuthPincode(const PeerTargetId3rd &targetId,
     std::map<std::string, std::string> &authParam)
 {
     if (!PermissionManager3rd::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller does not have permission.");
+        LOGE("No permission");
         return ERR_DM_NO_PERMISSION;
     }
     if (IsInvalidPeerTargetId(targetId)) {
@@ -287,7 +287,7 @@ int32_t DeviceManagerService3rd::AuthDevice3rd(const PeerTargetId3rd &targetId,
     const std::map<std::string, std::string> &authParam)
 {
     if (!PermissionManager3rd::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller does not have permission.");
+        LOGE("No permission");
         return ERR_DM_NO_PERMISSION;
     }
     if (IsInvalidPeerTargetId(targetId)) {
@@ -310,7 +310,7 @@ int32_t DeviceManagerService3rd::QueryTrustRelation(const std::string &businessN
     std::vector<TrustDeviceInfo3rd> &trustedDeviceList)
 {
     if (!PermissionManager3rd::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller does not have permission.");
+        LOGE("No permission");
         return ERR_DM_NO_PERMISSION;
     }
     if (businessName.empty()) {
@@ -405,7 +405,7 @@ int32_t DeviceManagerService3rd::DeleteTrustRelation(const std::string &business
     const std::map<std::string, std::string> &unbindParam)
 {
     if (!PermissionManager3rd::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller does not have permission.");
+        LOGE("No permission");
         return ERR_DM_NO_PERMISSION;
     }
     if (businessName.empty() || peerDeviceId.empty()) {
@@ -552,7 +552,7 @@ int32_t DeviceManagerService3rd::AuthCredential(const PeerTargetId3rd &targetId,
     std::map<std::string, std::string> &authParam)
 {
     if (!PermissionManager3rd::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller does not have permission.");
+        LOGE("No permission");
         return ERR_DM_NO_PERMISSION;
     }
     if (IsInvalidPeerTargetId(targetId)) {

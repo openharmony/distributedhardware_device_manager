@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "ipc_server_stub.h"
+#include "ipc_server_stub_refactor.h"
 
 #include <cstdio>
 #include <unordered_set>
@@ -37,6 +37,7 @@
 #include <string>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include "dm_log.h"
 #include "multiple_user_connector.h"
 #include "permission_manager.h"
@@ -63,6 +64,8 @@ constexpr const char* LIB_IPC_SERVICE_STUB_3RD_NAME = "libdevicemanager3rdservic
 
 constexpr const char* RECLAIM_MEMMGR_FILE_MEM_FOR_DMTASK = "ReclaimMemmgrFileMemForDMTask";
 constexpr const char* START_DETECT_DEVICE_RISK_TASK = "StartDetectDeviceRiskTask";
+
+constexpr int32_t RECLAIM_WRITE_CONTENT = 1;
 }
 
 DM_IMPLEMENT_SINGLE_INSTANCE(IpcServerStub);
@@ -70,10 +73,9 @@ DM_IMPLEMENT_SINGLE_INSTANCE(IpcServerStub);
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(&IpcServerStub::GetInstance());
 constexpr int32_t DM_IPC_THREAD_NUM = 32;
 constexpr int32_t MAX_CALLBACK_NUM = 5000;
-constexpr int32_t RECLAIM_DELAY_TIME = 5 * 60 * 1000 * 1000; // 5 minutes
+constexpr int32_t RECLAIM_DELAY_TIME = 5 * 60 * 1000 * 1000;
 constexpr int32_t ECHO_COUNT = 2;
 
-//LCOV_EXCL_START
 IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, true)
 {
     std::lock_guard<ffrt::mutex> autoLock(registerLock_);
@@ -81,18 +83,37 @@ IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGE
     state_ = ServiceRunningState::STATE_NOT_START;
 }
 
+IpcServerStub::~IpcServerStub()
+{
+    Unload3rdService();
+}
+
+void IpcServerStub::Unload3rdService()
+{
+    std::lock_guard<ffrt::mutex> lock(ipcServiceStub3rdLoadLock_);
+    if (ipcServiceStub3rdSoHandle_ != nullptr) {
+        dlclose(ipcServiceStub3rdSoHandle_);
+        ipcServiceStub3rdSoHandle_ = nullptr;
+    }
+    ipcServiceStub3rd_.reset();
+    ipcServiceStub3rdSoLoaded_ = false;
+}
+
 void IpcServerStub::OnStart()
 {
     startBeginTime_ = GetTickCount();
     LOGI("start");
-    if (state_ == ServiceRunningState::STATE_RUNNING) {
-        LOGI("IpcServerStub has already started.");
-        return;
+    {
+        std::lock_guard<ffrt::mutex> autoLock(registerLock_);
+        if (state_ == ServiceRunningState::STATE_RUNNING) {
+            LOGI("IpcServerStub has already started.");
+            return;
+        }
     }
 
     IPCSkeleton::SetMaxWorkThreadNum(DM_IPC_THREAD_NUM);
 
-    LOGI("called:AddAbilityListener begin!");
+    LOGI("AddAbilityListener begin");
     AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
 #ifdef SUPPORT_MEMMGR
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
@@ -100,7 +121,7 @@ void IpcServerStub::OnStart()
     AddSystemAbilityListener(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN);
     AddSystemAbilityListener(SCREENLOCK_SERVICE_ID);
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
-    LOGI("called:AddAbilityListener end!");
+    LOGI("AddAbilityListener end");
     AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
     AddSystemAbilityListener(DEVICE_AUTH_SERVICE_ID);
     AddSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);
@@ -111,32 +132,29 @@ void IpcServerStub::OnStart()
 void IpcServerStub::ReclaimMemmgrFileMemForDM()
 {
     int32_t memmgrPid = getpid();
-    int32_t echoCnt = ECHO_COUNT;
-    for (int32_t i = 0; i < echoCnt; ++i) {
-        if (memmgrPid <= 0) {
-            LOGE("Get invalid pid : %{public}d.", memmgrPid);
-            return;
-        }
+    if (memmgrPid <= 0) {
+        LOGE("Get invalid pid : %{public}d.", memmgrPid);
+        return;
+    }
+
+    for (int32_t i = 0; i < ECHO_COUNT; ++i) {
         std::string path = JoinPath("/proc/", std::to_string(memmgrPid), "reclaim");
-        std::string contentStr = "1";
-        LOGI("Start echo 1 to pid : %{public}d, path: %{public}s", memmgrPid, path.c_str());
-        FILE *file = fopen(path.c_str(), "w");
-        if (file == NULL) {
-            LOGE("open file failed.");
+        int fd = open(path.c_str(), O_WRONLY | O_CLOEXEC);
+        if (fd < 0) {
+            LOGE("open file failed, errno: %{public}d.", errno);
             return;
         }
-        size_t strLength = contentStr.length();
-        size_t ret = fwrite(contentStr.c_str(), 1, strLength, file);
-        if (ret != strLength) {
-            LOGE("fwrite failed");
+        const char content = static_cast<char>(RECLAIM_WRITE_CONTENT + '0');
+        ssize_t writeRet = write(fd, &content, sizeof(content));
+        if (writeRet != sizeof(content)) {
+            LOGE("write failed, errno: %{public}d.", errno);
         }
-        if (fclose(file) != DM_OK) {
-            LOGE("fclose failed");
+        if (close(fd) != 0) {
+            LOGE("close failed, errno: %{public}d.", errno);
         }
     }
     LOGI("success.");
 }
-//LCOV_EXCL_STOP
 
 std::string IpcServerStub::AddDelimiter(const std::string &path)
 {
@@ -160,16 +178,19 @@ std::string IpcServerStub::JoinPath(const std::string &prefixPath, const std::st
     return JoinPath(JoinPath(prefixPath, midPath), subPath);
 }
 
-//LCOV_EXCL_START
 void IpcServerStub::HandleSoftBusServerAdd()
 {
     DeviceManagerService::GetInstance().InitSoftbusListener();
     if (!Init()) {
         LOGE("failed to init IpcServerStub");
+        std::lock_guard<ffrt::mutex> autoLock(registerLock_);
         state_ = ServiceRunningState::STATE_NOT_START;
         return;
     }
-    state_ = ServiceRunningState::STATE_RUNNING;
+    {
+        std::lock_guard<ffrt::mutex> autoLock(registerLock_);
+        state_ = ServiceRunningState::STATE_RUNNING;
+    }
     DeviceNameManager::GetInstance().InitDeviceNameWhenSoftBusReady();
     ReclaimMemmgrFileMemForDM();
     std::function<void()> task = [this]() {
@@ -178,9 +199,7 @@ void IpcServerStub::HandleSoftBusServerAdd()
     };
     DeviceManagerService::GetInstance().HandleSoftbusRestart();
     ffrt::submit(task, ffrt::task_attr().name(RECLAIM_MEMMGR_FILE_MEM_FOR_DMTASK).delay(RECLAIM_DELAY_TIME));
-    return;
 }
-//LCOV_EXCL_STOP
 
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
@@ -231,12 +250,10 @@ void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::st
     LOGI("systemAbilityId:%{public}d removed!", systemAbilityId);
     if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
         DeviceManagerService::GetInstance().UninitSoftbusListener();
-        // call notify service offline
         DeviceManagerService::GetInstance().HandleServiceStatusChange(DmDeviceState::DEVICE_STATE_OFFLINE, deviceId);
     }
 }
 
-//LCOV_EXCL_START
 bool IpcServerStub::Init()
 {
     LOGI("ready to init.");
@@ -259,9 +276,13 @@ void IpcServerStub::OnStop()
 {
     LOGI("ready to stop service.");
     DeviceManagerService::GetInstance().UninitDMServiceListener();
-    state_ = ServiceRunningState::STATE_NOT_START;
     {
         std::lock_guard<ffrt::mutex> autoLock(registerLock_);
+        if (state_ == ServiceRunningState::STATE_NOT_START) {
+            LOGI("Service already stopped.");
+            return;
+        }
+        state_ = ServiceRunningState::STATE_NOT_START;
         registerToService_ = false;
     }
 #ifdef SUPPORT_MEMMGR
@@ -270,7 +291,6 @@ void IpcServerStub::OnStop()
 #endif // SUPPORT_MEMMGR
     LOGI("end.");
 }
-//LCOV_EXCL_STOP
 
 bool IpcServerStub::IsIpcServiceStub3rdReady()
 {
@@ -335,7 +355,7 @@ int32_t IpcServerStub::SendCmd(int32_t cmdCode, std::shared_ptr<IpcReq> req, std
     MessageParcel reply;
     MessageOption option;
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("Invalid para, cmdCode: %{public}d", (int32_t)cmdCode);
+        LOGE("Invalid para, cmdCode: %{public}d", cmdCode);
         return IPCObjectStub::OnRemoteRequest(cmdCode, data, reply, option);
     }
 
@@ -356,13 +376,37 @@ ServiceRunningState IpcServerStub::QueryServiceState() const
     return state_;
 }
 
+bool IpcServerStub::IsValidProcessInfo(const ProcessInfo &processInfo) const
+{
+    if (processInfo.pkgName.empty()) {
+        return false;
+    }
+    if (processInfo.pkgName.length() > MAX_PKGNAME_LENGTH) {
+        return false;
+    }
+    return true;
+}
+
+void IpcServerStub::CleanupDeathRecipient(const ProcessInfo &processInfo)
+{
+    auto recipientIter = appRecipient_.find(processInfo);
+    if (recipientIter == appRecipient_.end()) {
+        return;
+    }
+    auto listenerIter = dmListener_.find(processInfo);
+    if (listenerIter != dmListener_.end()) {
+        listenerIter->second->AsObject()->RemoveDeathRecipient(recipientIter->second);
+    }
+    appRecipient_.erase(processInfo);
+}
+
 int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processInfo, sptr<IpcRemoteBroker> listener)
 {
-    LOGI("pkgName: %{public}s", processInfo.pkgName.c_str());
-    if (processInfo.pkgName.empty() || listener == nullptr) {
+    if (!IsValidProcessInfo(processInfo) || listener == nullptr) {
         LOGE("input parameter invalid.");
         return ERR_DM_POINT_NULL;
     }
+    LOGI("Register listener.");
 #ifdef SUPPORT_MEMMGR
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().SetCritical(pid, true, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
@@ -370,21 +414,12 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
     std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
     auto iter = dmListener_.find(processInfo);
     if (iter != dmListener_.end()) {
-        LOGI("Listener exists");
-        auto recipientIter = appRecipient_.find(processInfo);
-        if (recipientIter == appRecipient_.end()) {
-            LOGI("AppRecipient not exists");
-            dmListener_.erase(processInfo);
-        } else {
-            auto listener = iter->second;
-            auto appRecipient = recipientIter->second;
-            listener->AsObject()->RemoveDeathRecipient(appRecipient);
-            appRecipient_.erase(processInfo);
-            dmListener_.erase(processInfo);
-        }
+        LOGI("Listener already exists, cleaning up old entry.");
+        CleanupDeathRecipient(processInfo);
+        dmListener_.erase(processInfo);
     }
     sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
-    LOGD("Add death recipient.");
+    LOGI("Add death recipient.");
     if (!listener->AsObject()->AddDeathRecipient(appRecipient)) {
         LOGE("AddDeathRecipient Failed");
     }
@@ -401,11 +436,11 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
 
 int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &processInfo)
 {
-    LOGI("pkgName: %{public}s", processInfo.pkgName.c_str());
-    if (processInfo.pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (!IsValidProcessInfo(processInfo)) {
+        LOGE("Invalid parameter, processInfo invalid.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    LOGI("Unregister listener.");
     std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
     auto listenerIter = dmListener_.find(processInfo);
     if (listenerIter == dmListener_.end()) {
@@ -434,7 +469,6 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &proces
     return DM_OK;
 }
 
-//LCOV_EXCL_START
 std::vector<ProcessInfo> IpcServerStub::GetAllProcessInfo()
 {
     std::vector<ProcessInfo> processInfoVec;
@@ -444,20 +478,18 @@ std::vector<ProcessInfo> IpcServerStub::GetAllProcessInfo()
     }
     return processInfoVec;
 }
-//LCOV_EXCL_STOP
 
 #ifdef CAR_DEVICE_ENABLE
 const sptr<IpcRemoteBroker> IpcServerStub::GetListenerByProcessInfo(ProcessInfo processInfo) const
 {
-    if (processInfo.pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (!IsValidProcessInfo(processInfo)) {
+        LOGE("Invalid parameter, processInfo invalid.");
         return nullptr;
     }
     std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
     for (auto &iter : dmListener_) {
         if ((iter.first.tokenId == processInfo.tokenId || processInfo.tokenId == 0) &&
             iter.first.pkgName == processInfo.pkgName) {
-            LOGI("tokenId %{public}" PRIu32", pkgName %{public}s.", processInfo.tokenId, processInfo.pkgName.c_str());
             return iter.second;
         }
     }
@@ -467,8 +499,8 @@ const sptr<IpcRemoteBroker> IpcServerStub::GetListenerByProcessInfo(ProcessInfo 
 
 const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(ProcessInfo processInfo) const
 {
-    if (processInfo.pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
+    if (!IsValidProcessInfo(processInfo)) {
+        LOGE("Invalid parameter, processInfo invalid.");
         return nullptr;
     }
     std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
@@ -496,20 +528,24 @@ const ProcessInfo IpcServerStub::GetDmListenerPkgName(const wptr<IRemoteObject> 
 int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
     LOGI("start.");
+    if (fd < 0 || fd > MAX_DUMP_FD) {
+        LOGE("Invalid fd: %{public}d", fd);
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     std::vector<std::string> argsStr {};
-    for (auto item : args) {
+    for (const auto &item : args) {
         argsStr.emplace_back(Str16ToStr8(item));
     }
 
     std::string result("");
     int ret = DeviceManagerService::GetInstance().DmHiDumper(argsStr, result);
     if (ret != DM_OK) {
-        LOGE("ret = %{public}d", ret);
+        LOGE("DmHiDumper ret = %{public}d", ret);
     }
 
     ret = dprintf(fd, "%s\n", result.c_str());
     if (ret < 0) {
-        LOGE("HiDumper dprintf error");
+        LOGE("HiDumper dprintf error, errno: %{public}d.", errno);
         ret = ERR_DM_FAILED;
     }
     return ret;
@@ -518,7 +554,7 @@ int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
 void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     ProcessInfo processInfo = IpcServerStub::GetInstance().GetDmListenerPkgName(remote);
-    LOGI("AppDeathRecipient: for %{public}s", processInfo.pkgName.c_str());
+    LOGI("AppDeathRecipient: OnRemoteDied");
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
     DeviceManagerServiceNotify::GetInstance().ClearDiedProcessCallback(processInfo);
@@ -544,7 +580,6 @@ void IpcServerStub::RemoveSystemSA(const std::string &pkgName)
     }
 }
 
-//LCOV_EXCL_START
 std::set<std::string> IpcServerStub::GetSystemSA()
 {
     std::lock_guard<ffrt::mutex> autoLock(systemSALock_);
@@ -554,7 +589,6 @@ std::set<std::string> IpcServerStub::GetSystemSA()
     }
     return systemSA;
 }
-//LCOV_EXCL_STOP
 
 int IpcServerStub::OnAuth3rdAclSessionOpened(int sessionId, int result)
 {
@@ -576,6 +610,10 @@ void IpcServerStub::OnAuth3rdAclSessionClosed(int sessionId)
 
 void IpcServerStub::OnAuth3rdAclBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
+    if (data == nullptr || dataLen == 0) {
+        LOGE("Invalid data or dataLen.");
+        return;
+    }
     if (IsIpcServiceStub3rdReady()) {
         ipcServiceStub3rd_->OnAuth3rdAclBytesReceived(sessionId, data, dataLen);
         return;
@@ -603,6 +641,10 @@ void IpcServerStub::OnAuth3rdSessionClosed(int sessionId)
 
 void IpcServerStub::OnAuth3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
+    if (data == nullptr || dataLen == 0) {
+        LOGE("Invalid data or dataLen.");
+        return;
+    }
     if (IsIpcServiceStub3rdReady()) {
         ipcServiceStub3rd_->OnAuth3rdBytesReceived(sessionId, data, dataLen);
         return;
@@ -630,6 +672,10 @@ void IpcServerStub::OnAuthCred3rdSessionClosed(int sessionId)
 
 void IpcServerStub::OnAuthCred3rdBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
+    if (data == nullptr || dataLen == 0) {
+        LOGE("Invalid data or dataLen.");
+        return;
+    }
     if (IsIpcServiceStub3rdReady()) {
         ipcServiceStub3rd_->OnAuthCred3rdBytesReceived(sessionId, data, dataLen);
         return;

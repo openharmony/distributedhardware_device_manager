@@ -111,7 +111,7 @@ void DeleteDmNapiStatusJsCallbackPtr(DmNapiStatusJsCallback *&pJsCallbackPtr)
     }
     delete pJsCallbackPtr;
     pJsCallbackPtr = nullptr;
-    LOGI("delete DmNapiStatusJsCallback callbackPtr!");
+    LOGI("End");
 }
 
 void DeleteAsyncCallbackInfo(DeviceBasicInfoListAsyncCallbackInfo *&pAsynCallbackInfo)
@@ -2841,7 +2841,7 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    LOGI("Create for packageName:%{public}s", bundleName.c_str());
+    LOGI("pkgName:%{public}s", bundleName.c_str());
     DeviceManagerNapi *obj = new DeviceManagerNapi(env, thisVar);
     if (obj == nullptr) {
         return nullptr;
@@ -2913,13 +2913,13 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("releaseDeviceManager", ReleaseDeviceManager),
     };
 
-    LOGI("is called!");
+    LOGI("start");
     NAPI_CALL(env, napi_define_class(env, DEVICE_MANAGER_NAPI_CLASS_NAME.c_str(), NAPI_AUTO_LENGTH, Constructor,
                                      nullptr, sizeof(dmProperties) / sizeof(dmProperties[0]), dmProperties, &dmClass));
     NAPI_CALL(env, napi_create_reference(env, dmClass, 1, &sConstructor_));
     NAPI_CALL(env, napi_set_named_property(env, exports, DEVICE_MANAGER_NAPI_CLASS_NAME.c_str(), dmClass));
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(static_prop) / sizeof(static_prop[0]), static_prop));
-    LOGI("All props and functions are configured..");
+    LOGI("end");
     return exports;
 }
 
@@ -3019,7 +3019,7 @@ int32_t DeviceManagerNapi::BindTargetWarpper(const std::string &pkgName, const s
  */
 static napi_value Export(napi_env env, napi_value exports)
 {
-    LOGI("Export() is called!");
+    LOGI("In");
     DeviceManagerNapi::Init(env, exports);
     DeviceManagerNapi::InitDeviceStatusChangeActionEnum(env, exports);
     DeviceManagerNapi::InitStrategyForHeartbeatEnum(env, exports);
@@ -3042,7 +3042,7 @@ static napi_module g_dmModule = {.nm_version = 1,
  */
 extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
-    LOGI("RegisterModule() is called!");
+    LOGI("In");
     napi_module_register(&g_dmModule);
 }
 

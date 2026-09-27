@@ -48,7 +48,7 @@ int32_t DeviceManagerServiceNotify::RegisterCallBack(int32_t dmCommonNotifyEvent
     LOGI("start event %{public}d pkgName: %{public}s.", dmCommonNotifyEvent, processInfo.pkgName.c_str());
     if (!PermissionManager::GetInstance().CheckDataSyncPermission() &&
         !PermissionManager::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller does not have permission.");
+        LOGE("No permission");
         return ERR_DM_NO_PERMISSION;
     }
     if (processInfo.pkgName.empty()) {

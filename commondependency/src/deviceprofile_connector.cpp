@@ -407,8 +407,8 @@ std::string DeviceProfileConnector::GetDeviceAuthVersionInfo(std::string localUd
     return "";
 }
 
-std::string DeviceProfileConnector::GetAclVersionInfo(const std::string localUdid, const std::string remoteUdid,
-    const DistributedDeviceProfile::AccessControlProfile &acl)
+DM_EXPORT std::string DeviceProfileConnector::GetAclVersionInfo(const std::string localUdid,
+    const std::string remoteUdid, const DistributedDeviceProfile::AccessControlProfile &acl)
 {
     std::string acerDeviceId = acl.GetAccesser().GetAccesserDeviceId();
     std::string aceeDeviceId = acl.GetAccessee().GetAccesseeDeviceId();
@@ -715,6 +715,24 @@ DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfil
     return aclProfileVec;
 }
 
+DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::HandleGetAclByDevIdAndUserId(
+    const std::string &deviceId, int32_t userId, const std::string &remoteDeviceId)
+{
+    std::vector<AccessControlProfile> aclProfileVec;
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    for (auto &item : profiles) {
+        if ((item.GetAccesser().GetAccesserDeviceId() == deviceId &&
+             item.GetAccesser().GetAccesserUserId() == userId &&
+             item.GetAccessee().GetAccesseeDeviceId() == remoteDeviceId) ||
+            (item.GetAccessee().GetAccesseeDeviceId() == deviceId &&
+             item.GetAccessee().GetAccesseeUserId() == userId &&
+             item.GetAccesser().GetAccesserDeviceId() == remoteDeviceId)) {
+            aclProfileVec.push_back(item);
+        }
+    }
+    return aclProfileVec;
+}
+
 DM_EXPORT std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(
     const std::string &pkgName, const std::string &deviceId)
 {
@@ -748,7 +766,7 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAuthFormM
         }
         DmDiscoveryInfo discoveryInfo = {pkgName, deviceId};
         int32_t bindType = HandleDmAuthForm(item, discoveryInfo);
-        LOGI("The udid %{public}s in ACL authForm is %{public}d.", GetAnonyString(trustDeviceId).c_str(), bindType);
+        LOGI("udid:%{public}s, AF:%{public}d", GetAnonyString(trustDeviceId).c_str(), bindType);   // AF: authForm
         if (bindType == DmAuthForm::INVALID_TYPE) {
             continue;
         }
@@ -2622,7 +2640,7 @@ DM_EXPORT DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t re
 {
     LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, localUdid %{public}s.",
         remoteUserId, GetAnonyString(remoteUdid).c_str(), GetAnonyString(localUdid).c_str());
-    std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(remoteUdid, remoteUserId, localUdid);
+    std::vector<AccessControlProfile> profiles = HandleGetAclByDevIdAndUserId(remoteUdid, remoteUserId, localUdid);
     DmOfflineParam offlineParam;
     if (profiles.empty()) {
         LOGE("Acl is empty.");
@@ -2705,7 +2723,7 @@ DM_EXPORT DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t re
 {
     LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, localUdid %{public}s.",
         remoteUserId, GetAnonyString(remoteUdid).c_str(), GetAnonyString(localUdid).c_str());
-    std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(remoteUdid, remoteUserId, localUdid);
+    std::vector<AccessControlProfile> profiles = HandleGetAclByDevIdAndUserId(remoteUdid, remoteUserId, localUdid);
     DmOfflineParam offlineParam;
     if (profiles.empty()) {
         LOGE("Acl is empty.");
@@ -2792,7 +2810,7 @@ DmOfflineParam DeviceProfileConnector::HandleServiceUnBindEvent(int32_t remoteUs
 {
     LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, localUdid %{public}s.",
         remoteUserId, GetAnonyString(remoteUdid).c_str(), GetAnonyString(localUdid).c_str());
-    std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(remoteUdid, remoteUserId, localUdid);
+    std::vector<AccessControlProfile> profiles = HandleGetAclByDevIdAndUserId(remoteUdid, remoteUserId, localUdid);
     DmOfflineParam offlineParam;
     if (profiles.empty()) {
         LOGE("Acl is empty.");

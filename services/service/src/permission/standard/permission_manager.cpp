@@ -91,7 +91,6 @@ bool PermissionManager::CheckMonitorPermission(void)
             return true;
         }
     }
-    LOGE("DM service access is denied, please apply for corresponding permissions.");
     return false;
 }
 

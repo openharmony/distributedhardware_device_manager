@@ -3353,14 +3353,14 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("createDeviceManager", CreateDeviceManager),
     };
 
-    LOGI("called!");
+    LOGI("start");
     DM_NAPI_CALL_NO_RETURN(napi_define_class(env, DEVICE_MANAGER_NAPI_CLASS_NAME.c_str(), NAPI_AUTO_LENGTH, Constructor,
                                      nullptr, sizeof(dmProperties) / sizeof(dmProperties[0]), dmProperties, &dmClass));
     DM_NAPI_CALL_NO_RETURN(napi_create_reference(env, dmClass, 1, &sConstructor_));
     DM_NAPI_CALL_NO_RETURN(napi_set_named_property(env, exports, DEVICE_MANAGER_NAPI_CLASS_NAME.c_str(), dmClass));
     DM_NAPI_CALL_NO_RETURN(napi_define_properties(env, exports,
          sizeof(static_prop) / sizeof(static_prop[0]), static_prop));
-    LOGI("All props and functions are configured..");
+    LOGI("end");
     return exports;
 }
 
@@ -3569,7 +3569,7 @@ napi_value DeviceManagerNapi::InitSubscribeCapEnum(napi_env env, napi_value expo
  */
 static napi_value Export(napi_env env, napi_value exports)
 {
-    LOGI("Export() is called!");
+    LOGI("In");
     DeviceManagerNapi::Init(env, exports);
     DeviceManagerNapi::InitDeviceTypeEnum(env, exports);
     DeviceManagerNapi::InitDeviceStateChangeActionEnum(env, exports);
@@ -3596,6 +3596,6 @@ static napi_module g_dmModule = {.nm_version = 1,
  */
 extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
-    LOGI("RegisterModule() is called!");
+    LOGI("In");
     napi_module_register(&g_dmModule);
 }

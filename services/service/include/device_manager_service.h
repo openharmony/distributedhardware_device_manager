@@ -528,9 +528,12 @@ private:
     void PutLocalUserIdToDataBase(const std::vector<int32_t> &foregroundUsers,
         const std::vector<int32_t> &backgroundUsers);
     void ParseAppUnBindRelationShip(const RelationShipChangeMsg &relationShipMsg);
+    void HandleSubProfileCreatedEvent(const DmAccountEventInfo& eventInfo);
     void HandleSubProfileDeletedEvent(const std::string& localUdid, const DmAccountEventInfo& eventInfo);
     void HandleSubProfileSwitchedEvent(const std::string& localUdid, const DmAccountEventInfo& eventInfo);
+    void DeletePreviousSubProfileAclOnSwitch(const std::string& localUdid, const DmAccountEventInfo& eventInfo);
     void HandleDistributedAccountBoundEvent(const DmAccountEventInfo& eventInfo);
+    void ExecuteDeferredSubProfileSwitched(int32_t subProfileId);
     void HandleDistributedAccountLoginEvent(const std::string& localUdid, const DmAccountEventInfo& eventInfo);
     void HandleDistributedAccountLogoutEvent(const std::string& localUdid, const DmAccountEventInfo& eventInfo);
     bool CheckConstraintEnabledByNetworkId(const std::string &networkId);
@@ -581,6 +584,13 @@ private:
 #endif
     std::mutex foregroundAccountCacheLock_;
     std::map<std::string, std::vector<ForegroundAccountInfo>> foregroundAccountCache_;
+#ifdef CAR_DEVICE_ENABLE
+    std::mutex subProfileCacheLock_;
+    int32_t cachedSubProfileId_ = -1;
+    int32_t cachedSubProfileUserId_ = -1;
+    bool deferredSubProfileSwitched_ = false;
+    DmAccountEventInfo deferredSwitchedEventInfo_;
+#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS

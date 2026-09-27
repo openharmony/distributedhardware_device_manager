@@ -150,7 +150,7 @@ int32_t IpcServiceStub3rd::RegisterDeviceManagerListener(const ProcessInfo3rd &p
     std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
     auto iter = dmListener_.find(processInfo3rd);
     if (iter != dmListener_.end()) {
-        LOGI("Listener already exists");
+        LOGI("Listener exists");
         auto recipientIter = appRecipient3rd_.find(processInfo3rd);
         if (recipientIter == appRecipient3rd_.end()) {
             LOGI("AppRecipient not exists");
