@@ -473,6 +473,8 @@ public:
         const std::vector<ForegroundAccountInfo> &peerForegroundAccounts);
     DM_EXPORT int32_t GetServiceIdByDisplayIdAndServiceCode(int64_t displayId, const std::string &serviceCode,
         int64_t &serviceId);
+    DM_EXPORT std::string GetAclVersionInfo(const std::string localUdid, const std::string remoteUdid,
+        const DistributedDeviceProfile::AccessControlProfile &acl);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,
@@ -594,8 +596,6 @@ private:
         const int32_t remoteTokenId, DmOfflineParam &offlineParam);
     bool IsAuthNewVersion(const DistributedDeviceProfile::AccessControlProfile &acl,
         const std::string localUdid, const std::string remoteUdid);
-    std::string GetAclVersionInfo(const std::string localUdid, const std::string remoteUdid,
-        const DistributedDeviceProfile::AccessControlProfile &acl);
     std::string GetAppServiceAuthVersionInfo(std::string localUdid, std::string remoteUdid, int32_t tokenId,
         int32_t userId, std::vector<DistributedDeviceProfile::AccessControlProfile> profiles);
     std::string GetDeviceAuthVersionInfo(std::string localUdid, std::string remoteUdid,

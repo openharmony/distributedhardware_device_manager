@@ -419,10 +419,12 @@ void DmAuthState::SetAclExtraInfo(std::shared_ptr<DmAuthContext> context)
 {
     DmAccess &access = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
     DmAccess &remoteAccess = (context->direction == DM_AUTH_SOURCE) ? context->accessee : context->accesser;
-    JsonObject jsonObj;
-    jsonObj[TAG_DMVERSION] = access.dmVersion;
-    access.extraInfo = jsonObj.Dump();
-    remoteAccess.extraInfo = jsonObj.Dump();
+    JsonObject localJsonObj;
+    localJsonObj[TAG_DMVERSION] = access.dmVersion;
+    access.extraInfo = localJsonObj.Dump();
+    JsonObject remoteJsonObj;
+    remoteJsonObj[TAG_DMVERSION] = remoteAccess.dmVersion;
+    remoteAccess.extraInfo = remoteJsonObj.Dump();
 }
 
 void DmAuthState::SetAclInfo(std::shared_ptr<DmAuthContext> context)
