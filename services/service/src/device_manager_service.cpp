@@ -6756,8 +6756,8 @@ void DeviceManagerService::HandleAccountEventBroadCast(const RelationShipChangeM
             LOGI("Handle ACCOUNT_UNBOUND broadcast completed");
             break;
         case AccountEventType::ACCOUNT_LOGOUT:
-            DeviceProfileConnector::GetInstance().UpdateAclStatusByAccountIdHash(localUdid,
-                relationShipMsg.userId, relationShipMsg.accountId, INACTIVE, relationShipMsg.peerUdid);
+            DeviceProfileConnector::GetInstance().HandleDistributedAccountLogoutByHash(localUdid,
+                relationShipMsg.userId, relationShipMsg.accountId, relationShipMsg.peerUdid);
             LOGI("Handle ACCOUNT_LOGOUT broadcast completed");
             break;
         case AccountEventType::SEND_ACCOUNT:

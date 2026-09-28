@@ -4579,7 +4579,29 @@ void DeviceProfileConnector::HandleDistributedAccountLogout(const std::string &l
 {
     LOGI("HandleDistributedAccountLogout: localUdid %{public}s, userId %{public}d, accountId %{public}s",
         GetAnonyString(localUdid).c_str(), userId, GetAnonyString(accountId).c_str());
-    UpdateAclStatusByAccountId(localUdid, userId, accountId, INACTIVE);
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    for (const auto &profile : profiles) {
+        if (!CheckAclMatchByAccountId(profile, localUdid, userId, accountId)) {
+            continue;
+        }
+        if (profile.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+            if (profile.GetAccesser().GetAccesserDeviceId() == localUdid) {
+                DeleteSessionKey(profile.GetAccesser().GetAccesserUserId(),
+                    profile.GetAccesser().GetAccesserSessionKeyId());
+            } else {
+                DeleteSessionKey(profile.GetAccessee().GetAccesseeUserId(),
+                    profile.GetAccessee().GetAccesseeSessionKeyId());
+            }
+            DeleteAccessControlById(profile.GetAccessControlId());
+        } else if (profile.GetStatus() != INACTIVE) {
+            AccessControlProfile updateProfile = profile;
+            updateProfile.SetStatus(INACTIVE);
+            int32_t ret = DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(updateProfile);
+            if (ret != DM_OK) {
+                LOGE("UpdateAccessControlProfile failed, ret %{public}d", ret);
+            }
+        }
+    }
 }
 
 void DeviceProfileConnector::HandleDistributedAccountLogout(const std::string &localUdid, int32_t userId,
@@ -4590,13 +4612,56 @@ void DeviceProfileConnector::HandleDistributedAccountLogout(const std::string &l
         GetAnonyString(peerUdid).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
     for (const auto &profile : profiles) {
-        if (CheckAclMatchByAccountId(profile, localUdid, userId, accountId, peerUdid)) {
+        if (!CheckAclMatchByAccountId(profile, peerUdid, userId, accountId, localUdid)) {
+            continue;
+        }
+        if (profile.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+            if (profile.GetAccesser().GetAccesserDeviceId() == localUdid) {
+                DeleteSessionKey(profile.GetAccesser().GetAccesserUserId(),
+                    profile.GetAccesser().GetAccesserSessionKeyId());
+            } else {
+                DeleteSessionKey(profile.GetAccessee().GetAccesseeUserId(),
+                    profile.GetAccessee().GetAccesseeSessionKeyId());
+            }
+            DeleteAccessControlById(profile.GetAccessControlId());
+        } else if (profile.GetStatus() != INACTIVE) {
             AccessControlProfile updateProfile = profile;
             updateProfile.SetStatus(INACTIVE);
             int32_t ret = DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(updateProfile);
             if (ret != DM_OK) {
                 LOGE("UpdateAccessControlProfile failed for accountId %{public}s, peerUdid %{public}s, ret %{public}d",
                     GetAnonyString(accountId).c_str(), GetAnonyString(peerUdid).c_str(), ret);
+            }
+        }
+    }
+}
+
+void DeviceProfileConnector::HandleDistributedAccountLogoutByHash(const std::string &localUdid, int32_t userId,
+    const std::string &accountIdHash, const std::string &peerUdid)
+{
+    LOGI("localUdid %{public}s, userId %{public}d, accountIdHash %{public}s, peerUdid %{public}s",
+        GetAnonyString(localUdid).c_str(), userId, GetAnonyString(accountIdHash).c_str(),
+        GetAnonyString(peerUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    for (const auto &profile : profiles) {
+        if (!CheckAclMatchByAccountIdHash(profile, peerUdid, userId, accountIdHash)) {
+            continue;
+        }
+        if (profile.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+            if (profile.GetAccesser().GetAccesserDeviceId() == localUdid) {
+                DeleteSessionKey(profile.GetAccesser().GetAccesserUserId(),
+                    profile.GetAccesser().GetAccesserSessionKeyId());
+            } else {
+                DeleteSessionKey(profile.GetAccessee().GetAccesseeUserId(),
+                    profile.GetAccessee().GetAccesseeSessionKeyId());
+            }
+            DeleteAccessControlById(profile.GetAccessControlId());
+        } else if (profile.GetStatus() != INACTIVE) {
+            AccessControlProfile updateProfile = profile;
+            updateProfile.SetStatus(INACTIVE);
+            int32_t ret = DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(updateProfile);
+            if (ret != DM_OK) {
+                LOGE("UpdateAccessControlProfile failed, ret %{public}d", ret);
             }
         }
     }
@@ -4913,7 +4978,7 @@ int32_t DeviceProfileConnector::DeleteAclByAccountId(const std::string &localUdi
     std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
     int32_t deleteCount = 0;
     for (const auto &profile : profiles) {
-        if (CheckAclMatchByAccountId(profile, localUdid, userId, accountId, peerUdid)) {
+        if (CheckAclMatchByAccountId(profile, peerUdid, userId, accountId, localUdid)) {
             DeleteAccessControlById(profile.GetAccessControlId());
             deleteCount++;
         }
