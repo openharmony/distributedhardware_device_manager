@@ -471,10 +471,10 @@ public:
     DM_EXPORT int32_t UpdateAclByDualForegroundAccountHash(const std::string &localUdid,
         const std::string &peerUdid, const std::vector<ForegroundAccountInfo> &localForegroundAccounts,
         const std::vector<ForegroundAccountInfo> &peerForegroundAccounts);
-    DM_EXPORT int32_t GetServiceIdByDisplayIdAndServiceCode(int64_t displayId, const std::string &serviceCode,
-        int64_t &serviceId);
     DM_EXPORT std::string GetAclVersionInfo(const std::string localUdid, const std::string remoteUdid,
         const DistributedDeviceProfile::AccessControlProfile &acl);
+    DM_EXPORT int32_t GetServiceIdByDisplayIdAndServiceCode(int64_t displayId, const std::string &serviceCode,
+        int64_t &serviceId, const std::string &localUdid);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,
@@ -641,6 +641,7 @@ private:
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
     void FillDmUserRemovedServiceInfoLocal(const DistributedDeviceProfile::AccessControlProfile &item,
         std::vector<DmUserRemovedServiceInfo> &serviceInfos);
+    void ParseAccountIdByExtraData(const std::string &extraData, std::string &accountId);
 };
 
 DM_EXPORT extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();

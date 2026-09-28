@@ -321,7 +321,8 @@ int32_t AuthSinkNegotiateStateMachine::SinkNegotiateService(std::shared_ptr<DmAu
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     if (context->accessee.serviceId == 0 && !context->accessee.serviceCode.empty()) {
         int32_t ret = DeviceProfileConnector::GetInstance().GetServiceIdByDisplayIdAndServiceCode(
-            context->accessee.displayId, context->accessee.serviceCode, context->accessee.serviceId);
+            context->accessee.displayId, context->accessee.serviceCode, context->accessee.serviceId,
+            context->accessee.deviceId);
         if (ret != DM_OK) {
             LOGE("GetServiceIdByDisplayIdAndServiceCode failed, ret %{public}d.", ret);
             return ret;
