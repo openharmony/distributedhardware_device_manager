@@ -78,7 +78,7 @@ void DeviceNameManager::DataShareReady()
     LOGI("In");
     isDataShareReady_ = true;
     if (DependsIsReady()) {
-        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        int32_t userId = MultipleUserConnector::GetMainDisplayActiveUserId();
         InitDeviceName(userId);
         RegisterDeviceNameChangeMonitor(userId, DEFAULT_USER_ID);
     }
@@ -117,7 +117,7 @@ int32_t DeviceNameManager::InitDeviceNameWhenSoftBusReady()
 {
     LOGI("In");
     if (DependsIsReady()) {
-        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        int32_t userId = MultipleUserConnector::GetMainDisplayActiveUserId();
         InitDeviceName(userId);
         RegisterDeviceNameChangeMonitor(userId, DEFAULT_USER_ID);
     }
@@ -142,6 +142,7 @@ int32_t DeviceNameManager::InitDeviceNameWhenUserSwitch(int32_t curUserId, int32
     isAccountSysReady_ = true;
     LOGI("In");
     if (DependsIsReady()) {
+        curUserId = MultipleUserConnector::GetMainDisplayActiveUserId();
         InitDeviceName(curUserId);
         RegisterDeviceNameChangeMonitor(curUserId, preUserId);
     }
@@ -152,7 +153,7 @@ int32_t DeviceNameManager::InitDeviceNameWhenLogout()
 {
     LOGI("In");
     if (DependsIsReady()) {
-        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        int32_t userId = MultipleUserConnector::GetMainDisplayActiveUserId();
         InitDeviceName(userId);
     }
     return DM_OK;
@@ -162,7 +163,7 @@ int32_t DeviceNameManager::InitDeviceNameWhenLogin()
 {
     LOGI("In");
     if (DependsIsReady()) {
-        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        int32_t userId = MultipleUserConnector::GetMainDisplayActiveUserId();
         InitDeviceName(userId);
     }
     return DM_OK;
@@ -172,7 +173,7 @@ int32_t DeviceNameManager::InitDeviceNameWhenNickChange()
 {
     LOGI("In");
     if (DependsIsReady()) {
-        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        int32_t userId = MultipleUserConnector::GetMainDisplayActiveUserId();
         InitDeviceName(userId);
     }
     return DM_OK;
@@ -182,7 +183,7 @@ int32_t DeviceNameManager::InitDeviceNameWhenLanguageOrRegionChanged()
 {
     LOGI("In");
     if (DependsIsReady()) {
-        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        int32_t userId = MultipleUserConnector::GetMainDisplayActiveUserId();
         InitDeviceName(userId);
     }
     return DM_OK;
@@ -190,7 +191,7 @@ int32_t DeviceNameManager::InitDeviceNameWhenLanguageOrRegionChanged()
 
 std::string DeviceNameManager::GetUserDefinedDeviceName()
 {
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    int32_t userId = MultipleUserConnector::GetMainDisplayActiveUserId();
     std::string userDefinedDeviceName = "";
     GetUserDefinedDeviceName(userId, userDefinedDeviceName);
     return userDefinedDeviceName;
@@ -332,7 +333,7 @@ void DeviceNameManager::InitDeviceNameToSoftBus(const std::string &prefixName, c
 
 int32_t DeviceNameManager::GetLocalDisplayDeviceName(int32_t maxNamelength, std::string &displayName)
 {
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    int32_t userId = MultipleUserConnector::GetMainDisplayActiveUserId();
     if (maxNamelength < 0 || (maxNamelength > 0 && maxNamelength < NAME_LENGTH_MIN) ||
         maxNamelength > NAME_LENGTH_MAX) {
         LOGE("maxNamelength:%{public}d is invalid", maxNamelength);
@@ -400,7 +401,7 @@ int32_t DeviceNameManager::ModifyUserDefinedName(const std::string &deviceName)
         LOGE("deviceName is empty");
         return ERR_DM_NAME_EMPTY;
     }
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    int32_t userId = MultipleUserConnector::GetMainDisplayActiveUserId();
     SetUserDefinedDeviceName(deviceName, userId);
     SetDisplayDeviceNameState(USER_DEFINED_DEVICE_NAME, userId);
     SetDisplayDeviceName(deviceName, userId);
@@ -411,7 +412,7 @@ int32_t DeviceNameManager::ModifyUserDefinedName(const std::string &deviceName)
 int32_t DeviceNameManager::RestoreLocalDeviceName()
 {
     LOGI("DeviceNameManager In");
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    int32_t userId = MultipleUserConnector::GetMainDisplayActiveUserId();
     SetUserDefinedDeviceName("", userId);
     SetDisplayDeviceNameState("", userId);
     std::string nickName = MultipleUserConnector::GetAccountNickName(userId);

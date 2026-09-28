@@ -38,6 +38,7 @@ std::map<int32_t, std::map<int32_t, DMAccountInfo>> MultipleUserConnector::dmAcc
 std::mutex MultipleUserConnector::dmAccountInfoMaplock_;
 std::mutex MultipleUserConnector::currentForgroundUserIdLock_;
 int32_t MultipleUserConnector::currentForgroundUserId_ = -1;
+const int32_t MAIN_DISPLAY_ID = 0;
 #ifndef OS_ACCOUNT_PART_EXISTS
 const int32_t DEFAULT_OS_ACCOUNT_ID = 0; // 0 is the default id when there is no os_account part
 #endif // OS_ACCOUNT_PART_EXISTS
@@ -355,7 +356,7 @@ DM_EXPORT std::string MultipleUserConnector::GetAccountNickName(int32_t userId)
 {
     OhosAccountInfo accountInfo;
     ErrCode ret = OhosAccountKits::GetInstance().GetOsAccountDistributedInfo(userId, accountInfo);
-    if (ret != 0 || accountInfo.uid_ == "") {
+    if (ret != 0 || accountInfo.uid_ == "" || accountInfo.status_ != ACCOUNT_STATE_LOGIN) {
         LOGE("error ret: %{public}d", ret);
         return "";
     }
@@ -441,6 +442,20 @@ DM_EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(int32_t displayId)
     }
 #endif // OS_ACCOUNT_PART_EXISTS
     return userId;
+}
+
+DM_EXPORT int32_t MultipleUserConnector::GetMainDisplayActiveUserId(void)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return 0;
+#else
+    int32_t userId = MultipleUserConnector::GetUserIdByDisplayId(MAIN_DISPLAY_ID);
+    if (userId < 0) {
+        LOGI("GetUserIdByDisplayId main screen failed, fallback to GetCurrentAccountUserID.");
+        userId = MultipleUserConnector::GetCurrentAccountUserID();
+    }
+    return userId;
+#endif
 }
 
 DM_EXPORT void MultipleUserConnector::UpdateForgroundUserId()

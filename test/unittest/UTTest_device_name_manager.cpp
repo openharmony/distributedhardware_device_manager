@@ -91,7 +91,8 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNickChange_001, testing::ext::
         .WillRepeatedly(Return(bundleMgr));
     EXPECT_CALL(*client_, GetSystemAbilityManager())
         .WillRepeatedly(Return(systemAbilityManager));
-    EXPECT_CALL(*multipleUserConnector_, GetCurrentAccountUserID()).WillRepeatedly(Return(DEFAULT_VALUABLE_USER_ID));
+    EXPECT_CALL(*multipleUserConnector_, GetMainDisplayActiveUserId())
+        .WillRepeatedly(Return(DEFAULT_VALUABLE_USER_ID));
     auto resultSet = std::make_shared<DataShareResultSetMock>(nullptr);
     EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
     EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
@@ -123,6 +124,8 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNameChange_001, testing::ext::
         .WillRepeatedly(Return(systemAbilityManager));
     EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(nullptr));
     EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*multipleUserConnector_, GetMainDisplayActiveUserId())
+        .WillRepeatedly(Return(DEFAULT_VALUABLE_USER_ID));
     EXPECT_CALL(*multipleUserConnector_, GetAccountNickName(_)).WillRepeatedly(Return(prefixName));
 
     DeviceNameManager::GetInstance().InitDeviceNameWhenNameChange(DEFAULT_VALUABLE_USER_ID);
@@ -135,6 +138,8 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNameChange_001, testing::ext::
  */
 HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_002, testing::ext::TestSize.Level2)
 {
+    EXPECT_CALL(*multipleUserConnector_, GetMainDisplayActiveUserId())
+        .WillRepeatedly(Return(DEFAULT_VALUABLE_USER_ID));
     std::string output;
     int32_t maxNamelength = -1;
     auto result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(maxNamelength, output);
@@ -305,6 +310,193 @@ HWTEST_F(DeviceNameManagerTest, DependsIsReady_003, testing::ext::TestSize.Level
     bool result = DeviceNameManager::GetInstance().DependsIsReady();
     EXPECT_TRUE(DeviceNameManager::GetInstance().isAccountSysReady_);
     EXPECT_FALSE(result);
+    DeviceNameManager::GetInstance().isDataShareReady_ = srcDataShareReady;
+    DeviceNameManager::GetInstance().isAccountSysReady_ = srcAccountSysReady;
+    DeviceNameManager::GetInstance().remoteObj_ = srcRemoteObj;
+}
+
+/**
+ * @tc.name: InitDeviceNameWhenSoftBusReady_001
+ * @tc.desc: InitDeviceNameWhenSoftBusReady returns DM_OK when depends are not ready.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenSoftBusReady_001, testing::ext::TestSize.Level1)
+{
+    bool srcDataShareReady = DeviceNameManager::GetInstance().isDataShareReady_;
+    DeviceNameManager::GetInstance().isDataShareReady_ = false;
+    int32_t ret = DeviceNameManager::GetInstance().InitDeviceNameWhenSoftBusReady();
+    EXPECT_EQ(ret, DM_OK);
+    DeviceNameManager::GetInstance().isDataShareReady_ = srcDataShareReady;
+}
+
+/**
+ * @tc.name: InitDeviceNameWhenUserSwitch_001
+ * @tc.desc: InitDeviceNameWhenUserSwitch calls GetMainDisplayActiveUserId when depends are ready.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenUserSwitch_001, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(client_ != nullptr);
+    ASSERT_TRUE(multipleUserConnector_ != nullptr);
+    ASSERT_TRUE(helper_ != nullptr);
+
+    bool srcDataShareReady = DeviceNameManager::GetInstance().isDataShareReady_;
+    bool srcAccountSysReady = DeviceNameManager::GetInstance().isAccountSysReady_;
+    sptr<IRemoteObject> srcRemoteObj = DeviceNameManager::GetInstance().remoteObj_;
+    DeviceNameManager::GetInstance().isDataShareReady_ = true;
+    DeviceNameManager::GetInstance().isAccountSysReady_ = true;
+    DeviceNameManager::GetInstance().remoteObj_ = nullptr;
+
+    auto bundleMgr = sptr<BundleMgrMock>(new (std::nothrow) BundleMgrMock());
+    auto systemAbilityManager = sptr<SystemAbilityManagerMock>(new (std::nothrow) SystemAbilityManagerMock());
+    EXPECT_CALL(*systemAbilityManager, GetSystemAbility(_)).WillRepeatedly(Return(bundleMgr));
+    EXPECT_CALL(*client_, GetSystemAbilityManager()).WillRepeatedly(Return(systemAbilityManager));
+    EXPECT_CALL(*multipleUserConnector_, GetMainDisplayActiveUserId())
+        .WillRepeatedly(Return(DEFAULT_VALUABLE_USER_ID));
+    auto resultSet = std::make_shared<DataShareResultSetMock>(nullptr);
+    EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(0), Return(DataShare::E_OK)));
+
+    int32_t ret = DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(100, 101);
+    EXPECT_EQ(ret, DM_OK);
+
+    DeviceNameManager::GetInstance().isDataShareReady_ = srcDataShareReady;
+    DeviceNameManager::GetInstance().isAccountSysReady_ = srcAccountSysReady;
+    DeviceNameManager::GetInstance().remoteObj_ = srcRemoteObj;
+}
+
+/**
+ * @tc.name: InitDeviceNameWhenLogout_001
+ * @tc.desc: InitDeviceNameWhenLogout returns DM_OK when depends are not ready.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogout_001, testing::ext::TestSize.Level1)
+{
+    bool srcDataShareReady = DeviceNameManager::GetInstance().isDataShareReady_;
+    DeviceNameManager::GetInstance().isDataShareReady_ = false;
+    int32_t ret = DeviceNameManager::GetInstance().InitDeviceNameWhenLogout();
+    EXPECT_EQ(ret, DM_OK);
+    DeviceNameManager::GetInstance().isDataShareReady_ = srcDataShareReady;
+}
+
+/**
+ * @tc.name: InitDeviceNameWhenLogin_001
+ * @tc.desc: InitDeviceNameWhenLogin returns DM_OK when depends are not ready.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogin_001, testing::ext::TestSize.Level1)
+{
+    bool srcDataShareReady = DeviceNameManager::GetInstance().isDataShareReady_;
+    DeviceNameManager::GetInstance().isDataShareReady_ = false;
+    int32_t ret = DeviceNameManager::GetInstance().InitDeviceNameWhenLogin();
+    EXPECT_EQ(ret, DM_OK);
+    DeviceNameManager::GetInstance().isDataShareReady_ = srcDataShareReady;
+}
+
+/**
+ * @tc.name: InitDeviceNameWhenLanguageOrRegionChanged_001
+ * @tc.desc: InitDeviceNameWhenLanguageOrRegionChanged returns DM_OK when depends are not ready.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLanguageOrRegionChanged_001, testing::ext::TestSize.Level1)
+{
+    bool srcDataShareReady = DeviceNameManager::GetInstance().isDataShareReady_;
+    DeviceNameManager::GetInstance().isDataShareReady_ = false;
+    int32_t ret = DeviceNameManager::GetInstance().InitDeviceNameWhenLanguageOrRegionChanged();
+    EXPECT_EQ(ret, DM_OK);
+    DeviceNameManager::GetInstance().isDataShareReady_ = srcDataShareReady;
+}
+
+/**
+ * @tc.name: GetUserDefinedDeviceName_001
+ * @tc.desc: GetUserDefinedDeviceName calls GetMainDisplayActiveUserId to resolve the user id.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceNameManagerTest, GetUserDefinedDeviceName_001, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(multipleUserConnector_ != nullptr);
+    ASSERT_TRUE(helper_ != nullptr);
+
+    EXPECT_CALL(*multipleUserConnector_, GetMainDisplayActiveUserId())
+        .WillRepeatedly(Return(DEFAULT_VALUABLE_USER_ID));
+    auto resultSet = std::make_shared<DataShareResultSetMock>(nullptr);
+    EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(0), Return(DataShare::E_OK)));
+
+    std::string name = DeviceNameManager::GetInstance().GetUserDefinedDeviceName();
+    EXPECT_TRUE(name.empty());
+}
+
+/**
+ * @tc.name: ModifyUserDefinedName_001
+ * @tc.desc: ModifyUserDefinedName returns ERR_DM_NAME_EMPTY when deviceName is empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceNameManagerTest, ModifyUserDefinedName_001, testing::ext::TestSize.Level1)
+{
+    std::string deviceName = "";
+    auto ret = DeviceNameManager::GetInstance().ModifyUserDefinedName(deviceName);
+    EXPECT_EQ(ret, ERR_DM_NAME_EMPTY);
+}
+
+/**
+ * @tc.name: RestoreLocalDeviceName_001
+ * @tc.desc: RestoreLocalDeviceName calls GetMainDisplayActiveUserId and returns DM_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceNameManagerTest, RestoreLocalDeviceName_001, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(multipleUserConnector_ != nullptr);
+    ASSERT_TRUE(helper_ != nullptr);
+
+    EXPECT_CALL(*multipleUserConnector_, GetMainDisplayActiveUserId())
+        .WillRepeatedly(Return(DEFAULT_VALUABLE_USER_ID));
+    EXPECT_CALL(*helper_, Update(_, _, _)).WillRepeatedly(Return(1));
+    EXPECT_CALL(*helper_, Insert(_, _)).WillRepeatedly(Return(1));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+
+    int32_t ret = DeviceNameManager::GetInstance().RestoreLocalDeviceName();
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: InitDeviceNameWhenNameChange_002
+ * @tc.desc: InitDeviceNameWhenNameChange calls InitDeviceName which resolves userId via GetMainDisplayActiveUserId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNameChange_002, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(client_ != nullptr);
+    ASSERT_TRUE(multipleUserConnector_ != nullptr);
+    ASSERT_TRUE(helper_ != nullptr);
+
+    bool srcDataShareReady = DeviceNameManager::GetInstance().isDataShareReady_;
+    bool srcAccountSysReady = DeviceNameManager::GetInstance().isAccountSysReady_;
+    sptr<IRemoteObject> srcRemoteObj = DeviceNameManager::GetInstance().remoteObj_;
+    DeviceNameManager::GetInstance().isDataShareReady_ = true;
+    DeviceNameManager::GetInstance().isAccountSysReady_ = true;
+    DeviceNameManager::GetInstance().remoteObj_ = nullptr;
+
+    std::string suffixName = "testDevice";
+    auto bundleMgr = sptr<BundleMgrMock>(new (std::nothrow) BundleMgrMock());
+    auto systemAbilityManager = sptr<SystemAbilityManagerMock>(new (std::nothrow) SystemAbilityManagerMock());
+    EXPECT_CALL(*systemAbilityManager, GetSystemAbility(_)).WillRepeatedly(Return(bundleMgr));
+    EXPECT_CALL(*client_, GetSystemAbilityManager()).WillRepeatedly(Return(systemAbilityManager));
+    EXPECT_CALL(*multipleUserConnector_, GetMainDisplayActiveUserId())
+        .WillRepeatedly(Return(DEFAULT_VALUABLE_USER_ID));
+    auto resultSet = std::make_shared<DataShareResultSetMock>(nullptr);
+    EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
+    EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
+        DoAll(SetArgReferee<1>(suffixName), Return(DataShare::E_OK)));
+
+    int32_t passedUserId = 200;
+    int32_t ret = DeviceNameManager::GetInstance().InitDeviceNameWhenNameChange(passedUserId);
+    EXPECT_EQ(ret, DM_OK);
+
     DeviceNameManager::GetInstance().isDataShareReady_ = srcDataShareReady;
     DeviceNameManager::GetInstance().isAccountSysReady_ = srcAccountSysReady;
     DeviceNameManager::GetInstance().remoteObj_ = srcRemoteObj;
