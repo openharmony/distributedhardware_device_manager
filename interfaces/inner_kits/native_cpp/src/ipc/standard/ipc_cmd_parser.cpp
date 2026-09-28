@@ -37,11 +37,13 @@
 #include "ipc_get_authType_by_udidhash_rsp.h"
 #include "ipc_get_device_icon_info_req.h"
 #include "ipc_get_device_info_rsp.h"
+#include "ipc_get_device_name_by_network_rsp.h"
 #include "ipc_get_device_network_id_list_req.h"
 #include "ipc_get_device_network_id_list_rsp.h"
 #include "ipc_get_device_profile_info_list_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
+#include "ipc_get_device_type_by_network_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_info_by_network_req.h"
@@ -975,6 +977,50 @@ ON_IPC_READ_RESPONSE(GET_OS_TYPE_BY_NETWORK, MessageParcel &reply, std::shared_p
     std::shared_ptr<IpcGetOsTypeByNetworkIdRsp> pRsp = std::static_pointer_cast<IpcGetOsTypeByNetworkIdRsp>(pBaseRsp);
     pRsp->SetErrCode(reply.ReadInt32());
     pRsp->SetOsType(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_DEVICE_NAME_BY_NETWORK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcGetInfoByNetWorkReq> pReq = std::static_pointer_cast<IpcGetInfoByNetWorkReq>(pBaseReq);
+    std::string networkId = pReq->GetNetWorkId();
+    if (!data.WriteString(networkId)) {
+        LOGE("write networkId failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_DEVICE_NAME_BY_NETWORK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    std::shared_ptr<IpcGetDeviceNameByNetworkRsp> pRsp =
+        std::static_pointer_cast<IpcGetDeviceNameByNetworkRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    pRsp->SetDeviceName(reply.ReadString());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_DEVICE_TYPE_BY_NETWORK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcGetInfoByNetWorkReq> pReq = std::static_pointer_cast<IpcGetInfoByNetWorkReq>(pBaseReq);
+    std::string networkId = pReq->GetNetWorkId();
+    if (!data.WriteString(networkId)) {
+        LOGE("write networkId failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_DEVICE_TYPE_BY_NETWORK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    std::shared_ptr<IpcGetDeviceTypeByNetworkRsp> pRsp =
+        std::static_pointer_cast<IpcGetDeviceTypeByNetworkRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    pRsp->SetDeviceType(reply.ReadInt32());
     return DM_OK;
 }
 
