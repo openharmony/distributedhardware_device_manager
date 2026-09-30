@@ -679,7 +679,8 @@ int32_t DeviceManagerService::GetDeviceNameByNetworkId(const std::string &networ
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
-    if (localUdid != peerDeviceId) {
+    if (localUdid != peerDeviceId && !AppManager::GetInstance().IsSystemSA() &&
+        !AppManager::GetInstance().IsSystemApp()) {
         int32_t ret = dmServiceImpl_->CheckDeviceInfoPermission(localUdid, peerDeviceId);
         if (ret != DM_OK) {
             LOGE("CheckDeviceInfoPermission failed, ret: %{public}d", ret);
@@ -718,7 +719,8 @@ int32_t DeviceManagerService::GetDeviceTypeByNetworkId(const std::string &networ
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
-    if (localUdid != peerDeviceId) {
+    if (localUdid != peerDeviceId && !AppManager::GetInstance().IsSystemSA() &&
+        !AppManager::GetInstance().IsSystemApp()) {
         int32_t ret = dmServiceImpl_->CheckDeviceInfoPermission(localUdid, peerDeviceId);
         if (ret != DM_OK) {
             LOGE("CheckDeviceInfoPermission failed, ret: %{public}d", ret);
